@@ -58,7 +58,7 @@ function walk(dir, predicate) {
 // Build map: "<page>/<section>" -> source .astro path.
 const sourceMap = new Map();
 for (const file of walk(SECTIONS_DIR, (n) => n.endsWith('.astro'))) {
-  const rel = file.slice(SECTIONS_DIR.length + 1);
+  const rel = file.slice(SECTIONS_DIR.length + 1).replace(/\\/g, '/');
   const parts = rel.split('/');
   const fileName = parts.pop().replace(/\.astro$/, '');
   const pageFolder = parts.pop();
@@ -88,7 +88,7 @@ const files = walk(SRC_DIR, (n) => n === 'index.html');
 let errorCount = 0;
 
 for (const file of files) {
-  const rel = file.slice(SRC_DIR.length + 1);
+  const rel = file.slice(SRC_DIR.length + 1).replace(/\\/g, '/');
   const parts = rel.split('/');
   parts.pop();
   if (parts.length < 2) continue;

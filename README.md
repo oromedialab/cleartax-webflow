@@ -48,6 +48,10 @@ dist/
     │   └── navbar.html        # paste into an Embed element on every page
     └── uae/
         └── hero-uae.html      # paste into the UAE page Hero Embed
+
+Final assembled pages for confirmation:
+└── confirmation/
+    └── uae.html               # Open this in a browser to confirm all embeds work together
 ```
 
 `dist/_embeds/**/*.html` is guaranteed to contain no `<html>`, `<head>`, `<body>`, or `<!doctype>` — the build fails if any slips through.
