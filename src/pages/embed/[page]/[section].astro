@@ -1,0 +1,78 @@
+---
+/**
+ * Dynamic embed route — renders ONE section per page in isolation so
+ * scripts/extract-embeds.mjs can strip HTML chrome and write the body
+ * contents to dist/_embeds/<page>/<section>.html.
+ *
+ * Registry is auto-built from src/sections/<page>/*.astro and
+ * src/sections/_shared/*.astro via import.meta.glob.
+ */
+import type { GetStaticPaths } from 'astro';
+
+const sectionMods = import.meta.glob('../../../sections/**/*.astro', { eager: true }) as Record<string, { default: any }>;
+
+function kebab(s: string) {
+  return s
+    .replace(/([a-z])([A-Z])/g, '$1-$2')
+    .replace(/[_\s]+/g, '-')
+    .toLowerCase();
+}
+
+type RegistryEntry = { page: string; section: string; Component: any };
+
+function buildRegistry(): RegistryEntry[] {
+  const entries: RegistryEntry[] = [];
+  for (const [path, mod] of Object.entries(sectionMods)) {
+    const parts = path.split('/');
+    const fileName = parts.pop()!.replace(/\.astro$/, '');
+    const pageFolder = parts.pop()!;
+    entries.push({ page: pageFolder, section: kebab(fileName), Component: mod.default });
+  }
+  return entries;
+}
+
+const registry = buildRegistry();
+
+export const getStaticPaths: GetStaticPaths = async () => {
+  const mods = import.meta.glob('../../../sections/**/*.astro', { eager: true });
+  const paths: { params: { page: string; section: string } }[] = [];
+  for (const path of Object.keys(mods)) {
+    const parts = path.split('/');
+    const fileName = parts.pop()!.replace(/\.astro$/, '');
+    const pageFolder = parts.pop()!;
+    const section = fileName
+      .replace(/([a-z])([A-Z])/g, '$1-$2')
+      .replace(/[_\s]+/g, '-')
+      .toLowerCase();
+    paths.push({ params: { page: pageFolder, section } });
+  }
+  return paths;
+};
+
+const { page, section } = Astro.params as { page: string; section: string };
+const match = registry.find((e) => e.page === page && e.section === section);
+if (!match) throw new Error(`No section registered for ${page}/${section}`);
+const { Component } = match;
+
+const pageCss = page === 'uae'
+  ? '/css/uae.css'
+  : page === 'global'
+    ? '/css/global.css'
+    : page === 'ksa'
+      ? '/css/ksa.css'
+      : '/css/shared.css';
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="robots" content="noindex, nofollow" />
+    <title>{`embed: ${page}/${section}`}</title>
+    <link rel="stylesheet" href="/css/shared.css" />
+    <link rel="stylesheet" href={pageCss} />
+  </head>
+  <body data-embed-root>
+    <Component />
+  </body>
+</html>

@@ -1,0 +1,237 @@
+---
+/**
+ * Shared floating-pill navbar.
+ * Ported from uae-landing-page/index.html:275-323.
+ * Links and CTAs are props so per-country pages can override.
+ */
+export interface NavLink {
+  label: string;
+  href: string;
+}
+
+export interface Props {
+  logoSrc?: string;
+  links?: NavLink[];
+  ctaLabel?: string;
+  ctaHref?: string;
+  countryLabel?: string;
+  countryFlagSrc?: string;
+}
+
+const {
+  logoSrc = 'https://assets1.cleartax-cdn.com/finfo/wg-utils/retool/d9f36ac3-77a9-40c6-94fc-20c2e3855457.svg',
+  links = [
+    { label: 'Why Cleartax', href: '#why-cleartax' },
+    { label: 'Testimonials', href: '#testimonials' },
+    { label: 'Security', href: '#security' },
+  ],
+  ctaLabel = 'Book a Demo',
+  ctaHref = '#contact',
+  countryLabel = 'UAE',
+  countryFlagSrc = 'https://cdn.prod.website-files.com/63ede4a3da6dbd6b05c4612f/63ede4a3da6dbd077dc466f5_Mask%20group%20(3).svg',
+} = Astro.props as Props;
+---
+
+<div class="nav-wrap">
+  <nav id="mainNav" aria-label="Primary">
+    <a href="#" class="nav-logo">
+      <img src={logoSrc} alt="ClearTax" width="120" height="27" loading="eager" decoding="async" />
+    </a>
+
+    <ul class="nav-links" id="navLinks">
+      {links.map((l) => (
+        <li><a href={l.href}>{l.label}</a></li>
+      ))}
+    </ul>
+
+    <div class="nav-cta">
+      <div class="nav-country" title={`${countryLabel} Region`}>
+        <img class="country-icon" src={countryFlagSrc} alt={`${countryLabel} Flag`} loading="lazy" />
+        <span>{countryLabel}</span>
+      </div>
+
+      <a href={ctaHref} class="btn-nav-demo">
+        {ctaLabel}
+        <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true">
+          <path d="M2 6h8M6 2l4 4-4 4" stroke="white" stroke-width="1.5" stroke-linecap="round" />
+        </svg>
+      </a>
+
+      <button class="nav-mobile-toggle" id="navMobileToggle" aria-label="Toggle menu" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </nav>
+</div>
+
+<style>
+  #mainNav {
+    position: fixed;
+    top: 16px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: calc(100% - 48px);
+    max-width: 1200px;
+    height: 74px;
+    border-radius: 63px;
+    z-index: 1000;
+    background: #fff;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 16px 10px 0;
+    font-size: 14px;
+    font-weight: 500;
+  }
+
+  .nav-logo {
+    display: flex;
+    align-items: center;
+    flex-shrink: 0;
+    padding: 12px 40px 14px;
+  }
+  .nav-logo img { height: 27px; width: auto; }
+
+  .nav-links {
+    display: flex;
+    align-items: center;
+    list-style: none;
+    flex: 1;
+    justify-content: flex-end;
+    padding: 0 10px 0 16px;
+    margin: 0;
+  }
+  .nav-links > li > a {
+    color: #1a1a1a;
+    font-size: 14px;
+    font-weight: 500;
+    padding: 16px 14px;
+    display: inline-flex;
+    white-space: nowrap;
+    transition: color 0.2s;
+  }
+  .nav-links > li > a:hover { color: #483C71; }
+
+  .nav-cta {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-shrink: 0;
+  }
+
+  .btn-nav-demo {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    color: #fff;
+    font-weight: 700;
+    padding: 12px 20px;
+    border-radius: 90px;
+    font-size: 14px;
+    white-space: nowrap;
+    cursor: pointer;
+    transition: opacity 0.2s;
+    background: var(--grad-btn);
+  }
+  .btn-nav-demo:hover { opacity: 0.9; }
+
+  .nav-country {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: #000;
+    cursor: pointer;
+    background: none;
+    font-family: var(--font-body);
+    transition: all 0.2s;
+    border: none;
+  }
+  .nav-country .country-icon { width: 22px; }
+
+  .nav-mobile-toggle {
+    display: none;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 8px;
+    position: relative;
+    width: 40px;
+    height: 40px;
+    margin-right: 6px;
+  }
+  .nav-mobile-toggle span {
+    display: block;
+    width: 22px;
+    height: 2px;
+    background: #1a1a1a;
+    border-radius: 2px;
+    position: absolute;
+    left: 9px;
+    transition: transform 0.3s ease, opacity 0.2s ease, top 0.3s ease;
+  }
+  .nav-mobile-toggle span:nth-child(1) { top: 13px; }
+  .nav-mobile-toggle span:nth-child(2) { top: 19px; }
+  .nav-mobile-toggle span:nth-child(3) { top: 25px; }
+  .nav-mobile-toggle.open span:nth-child(1) { top: 19px; transform: rotate(45deg); }
+  .nav-mobile-toggle.open span:nth-child(2) { opacity: 0; }
+  .nav-mobile-toggle.open span:nth-child(3) { top: 19px; transform: rotate(-45deg); }
+
+  @media (max-width: 1024px) {
+    #mainNav { width: calc(100% - 32px); height: 56px; padding: 6px 8px 6px 0; }
+    .nav-logo { padding: 6px 12px; }
+    .nav-logo img { height: 20px; }
+    .nav-country { display: none; }
+    .nav-mobile-toggle { display: block; }
+    .btn-nav-demo { padding: 7px 14px; font-size: 13px; }
+    .nav-cta { gap: 6px; }
+    .nav-links {
+      position: absolute;
+      top: calc(100% + 8px);
+      left: 0;
+      right: 0;
+      flex-direction: column;
+      align-items: stretch;
+      background: #fff;
+      border-radius: 20px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+      padding: 0 12px;
+      gap: 2px;
+      opacity: 0;
+      transform: translateY(-8px);
+      pointer-events: none;
+      max-height: 0;
+      overflow: hidden;
+      transition: opacity 0.25s ease, transform 0.25s ease, max-height 0.3s ease, padding 0.25s ease;
+    }
+    .nav-links.open {
+      opacity: 1;
+      transform: translateY(0);
+      pointer-events: auto;
+      max-height: 400px;
+      padding: 12px;
+    }
+    .nav-links > li { width: 100%; }
+    .nav-links > li > a { display: block; padding: 12px 16px; width: 100%; }
+  }
+
+  @media (max-width: 480px) {
+    #mainNav { height: 52px; }
+    .nav-logo img { height: 18px; }
+    .btn-nav-demo { padding: 6px 12px; font-size: 12px; }
+    .btn-nav-demo svg { display: none; }
+  }
+</style>
+
+<script is:inline>
+  (function () {
+    const toggle = document.getElementById('navMobileToggle');
+    const links = document.getElementById('navLinks');
+    if (!toggle || !links) return;
+    toggle.addEventListener('click', () => {
+      const open = links.classList.toggle('open');
+      toggle.classList.toggle('open', open);
+      toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+    });
+  })();
+</script>

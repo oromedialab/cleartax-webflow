@@ -1,0 +1,204 @@
+---
+/**
+ * UAE "Why Cleartax" — six feature cards in a 3-column grid with custom row spans.
+ * Ported from uae-landing-page/index.html:706-809.
+ *
+ * Original CSS used short var names (--purple, --muted, --offwhite); mapped to
+ * the canonical --color-* tokens here so this section paints correctly when
+ * pasted into a Webflow page that only loads tokens.css.
+ */
+
+interface Card {
+  title: string;
+  body: string;
+  /** SVG inner markup (paths/lines etc) — outer <svg> attrs are added below. */
+  iconSvg: string;
+}
+
+const cards: Card[] = [
+  {
+    title: 'End-to-end e-invoicing solution',
+    body: 'A complete solution for issuing, submitting, and receiving e-invoices. It tracks the status of submitted invoices and sends email notifications for e-invoices.',
+    iconSvg: '<path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><path d="M14 3v6h6"/><path d="M8 13h8"/><path d="M8 17h5"/>',
+  },
+  {
+    title: 'Advanced dashboards &amp; reports',
+    body: 'Leverage AI-driven insights for a complete view of your e-invoicing processes via comprehensive MIS dashboards and customized reports.',
+    iconSvg: '<path d="M3 3v18h18"/><rect x="7" y="12" width="3" height="6"/><rect x="12" y="8" width="3" height="10"/><rect x="17" y="5" width="3" height="13"/>',
+  },
+  {
+    title: 'Peppol-ready',
+    body: "ClearTax follows the Peppol specifications for data exchange, ensuring compliance with the UAE's Continuous Transaction Controls (CTC) model.",
+    iconSvg: '<path d="M12 2 4 6v6c0 5 3.5 9 8 10 4.5-1 8-5 8-10V6l-8-4z"/><path d="m9 12 2 2 4-4"/>',
+  },
+  {
+    title: 'Automated error management',
+    body: 'Identify and resolve e-invoicing errors in real time with intuitive alerts, bulk resubmission options, and guided correction tools.',
+    iconSvg: '<path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>',
+  },
+  {
+    title: 'Future ready architecture',
+    body: 'New mandates or amendments never require new integrations; simply update, not rebuild.',
+    iconSvg: '<polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10"/><path d="M20.49 15A9 9 0 0 1 5.64 18.36L1 14"/>',
+  },
+  {
+    title: 'Dedicated customer support',
+    body: 'Our dedicated local support team is available 24/7 to solve any e-invoicing or integration related queries.',
+    iconSvg: '<path d="M3 14v-3a9 9 0 0 1 18 0v3"/><path d="M21 14v3a2 2 0 0 1-2 2h-1v-6h1a2 2 0 0 1 2 2z"/><path d="M3 14v3a2 2 0 0 0 2 2h1v-6H5a2 2 0 0 0-2 2z"/>',
+  },
+];
+---
+
+<section class="wc-section" id="why-cleartax">
+  <div class="wc-inner">
+    <div class="wc-header">
+      <span class="section-eyebrow">Why ClearTax</span>
+      <h2 class="wc-title section-h2">Everything you need for <em>UAE e-invoicing</em></h2>
+      <p class="section-sub">From generation to FTA submission — one unified platform that handles every step of your e-invoicing compliance journey.</p>
+    </div>
+    <div class="wc-grid">
+      {cards.map((c) => (
+        <article class="wc-card">
+          <span class="wc-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" set:html={c.iconSvg} />
+          </span>
+          <h3 set:html={c.title} />
+          <p set:html={c.body} />
+        </article>
+      ))}
+    </div>
+  </div>
+</section>
+
+<style>
+  .wc-section {
+    background: var(--color-offwhite);
+    color: #0F1020;
+    box-sizing: border-box;
+  }
+  .wc-section *,
+  .wc-section *::before,
+  .wc-section *::after { box-sizing: border-box; }
+
+  .wc-inner { max-width: 1200px; margin: 0 auto; padding: 96px 40px; }
+  .wc-header { max-width: 920px; margin-bottom: 56px; }
+
+  .section-eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(99, 85, 216, 0.10);
+    border: 1px solid rgba(99, 85, 216, 0.25);
+    color: var(--color-purple);
+    font-size: 12px;
+    font-weight: 700;
+    padding: 5px 14px;
+    border-radius: 100px;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    margin-bottom: 16px;
+  }
+
+  .wc-title {
+    font-size: clamp(28px, 4vw, 44px);
+    font-weight: 700;
+    line-height: 1.15;
+    letter-spacing: -0.02em;
+    margin: 0;
+    color: #0F1020;
+  }
+  .wc-title em {
+    font-style: normal;
+    color: var(--color-purple);
+  }
+
+  .section-sub {
+    font-size: 17px;
+    color: var(--color-muted);
+    line-height: 1.52;
+    max-width: 600px;
+    margin-top: 12px;
+  }
+
+  .wc-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-auto-rows: 1fr;
+    gap: 20px;
+  }
+  .wc-card {
+    background: #fff;
+    border: 1px solid #E5E7EB;
+    border-radius: 22px;
+    padding: 32px 30px;
+    transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    min-height: 0;
+    overflow: hidden;
+  }
+  .wc-card:nth-child(1) { grid-column: span 1; grid-row: 1; }
+  .wc-card:nth-child(2) { grid-column: span 2; grid-row: 1; }
+  .wc-card:nth-child(3) { grid-column: span 2; grid-row: 2; }
+  .wc-card:nth-child(4) { grid-column: span 1; grid-row: 2; }
+  .wc-card:nth-child(5) { grid-column: span 1; grid-row: 3; }
+  .wc-card:nth-child(6) { grid-column: span 2; grid-row: 3; }
+
+  .wc-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 24px rgba(99, 85, 216, 0.08);
+    border-color: #D9D5F5;
+  }
+
+  .wc-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    background: #EEECFB;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--color-purple);
+    margin-bottom: 20px;
+    flex-shrink: 0;
+  }
+  .wc-icon svg { width: 22px; height: 22px; }
+
+  .wc-card h3 {
+    font-size: 18px;
+    font-weight: 600;
+    line-height: 1.35;
+    letter-spacing: -0.01em;
+    margin: 0 0 10px;
+    color: #0F1020;
+  }
+  .wc-card p {
+    font-size: 15px;
+    line-height: 1.55;
+    color: #5A6070;
+    margin: 0;
+    font-weight: 400;
+  }
+
+  @media (max-width: 1024px) {
+    .wc-inner { padding: 88px 32px; }
+    .wc-header { margin-bottom: 48px; }
+  }
+  @media (max-width: 768px) {
+    .wc-inner { padding: 80px 16px; }
+    .wc-grid {
+      grid-template-columns: 1fr;
+      grid-auto-rows: auto;
+      aspect-ratio: auto;
+      gap: 16px;
+    }
+    .wc-grid .wc-card {
+      grid-column: 1 / -1 !important;
+      grid-row: auto !important;
+      aspect-ratio: auto;
+    }
+    .wc-header { margin-bottom: 40px; }
+    .wc-card { padding: 28px 24px; }
+  }
+</style>

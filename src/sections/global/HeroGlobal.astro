@@ -1,0 +1,118 @@
+---
+/**
+ * Global hero — headline, description, demo CTA, trust-logo row + lazy YouTube video card.
+ * Ported from global-e-invoicing-mandate-page/index.html:978-1069.
+ */
+export interface Props {
+  videoId?: string;
+  posterUrl?: string;
+}
+
+const { videoId = 'UX0Yt61EdfY', posterUrl } = Astro.props as Props;
+const effectivePoster = posterUrl ?? `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`;
+
+const trustLogos = [
+  { src: 'https://cdn.prod.website-files.com/6093bce33d9b4bae841b04e3/69df541c365cc00c22c2bb5a_nic-logo.webp', name: 'nic' },
+  { src: 'https://cdn.prod.website-files.com/63ede4a3da6dbd6b05c4612f/69de348a6065af3c36a69aff_zatca.svg', name: 'zatca' },
+  { src: 'https://cdn.prod.website-files.com/63ede4a3da6dbd6b05c4612f/69e0c09f3a4c77f59ef94ec9_fta%20(1).png', name: 'fta' },
+  { src: 'https://cdn.prod.website-files.com/6093bce33d9b4bae841b04e3/69e0e0478f3585b605c04e67_peppol.png', name: 'peppol' },
+];
+---
+
+<section class="hero" data-hero-global data-video-id={videoId}>
+  <div class="wf-container">
+    <div class="gi-hero-section">
+      <div class="hero-content">
+        <h1 class="hero-title">100% e-Invoicing Compliance Today.<br />Tax Assurance for Tomorrow.</h1>
+        <p class="hero-desc">
+          ClearTax helps you do more than meet the e-invoicing deadline. We prepare you for a future of automated tax scrutiny and always-on compliance.
+        </p>
+        <a href="#contact" class="hero-cta">Request Demo <span>→</span></a>
+        <div class="hero-logos">
+          {trustLogos.map((l) => (
+            <div class="hero-logo-item">
+              <img src={l.src} alt={l.name} class="hero-logo-img" loading="lazy" />
+              <p class="hero-logo-name">{l.name}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div class="hero-visual">
+        <div class="hero-video-card" data-video-card>
+          <div data-video-placeholder>
+            <img class="hero-video-poster" src={effectivePoster} alt="" />
+            <div class="hero-video-play-btn">
+              <svg width="24" height="24" viewBox="0 0 24 24"><polygon points="8,5 20,12 8,19"></polygon></svg>
+            </div>
+          </div>
+          <div class="video-wrap" data-video-wrap></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .hero { background: var(--color-gray-50); padding: 100px 0; width: 100%; overflow: hidden; }
+  .wf-container { max-width: var(--container-max); margin: 0 auto; padding: 0 24px; }
+
+  .gi-hero-section { display: flex !important; flex-direction: row !important; flex-wrap: nowrap !important; align-items: center; justify-content: space-between; gap: 40px; }
+  .hero-content { flex: 0 1 560px; width: 50%; text-align: left; }
+  .hero-title { font-size: 52px; font-weight: 600; line-height: 1.12; color: #171E28; margin: 0 0 24px 0; letter-spacing: -1.5px; }
+  .hero-desc { font-size: 17px; line-height: 1.7; color: #6C757D; margin-bottom: 40px; max-width: 480px; }
+  .hero-cta { display: inline-flex; align-items: center; gap: 8px; padding: 16px 40px; font-size: 16px; font-weight: 700; color: var(--color-white); background: var(--color-purple); border-radius: 50px; text-decoration: none; transition: all 150ms ease; }
+  .hero-cta:hover { transform: translateY(-1px); }
+  .hero-logos { display: flex; align-items: center; gap: 32px; margin-top: 32px; }
+  .hero-logo-item { display: flex; flex-direction: column; align-items: center; gap: 6px; }
+  .hero-logo-img { width: 44px; height: 44px; object-fit: contain; }
+  .hero-logo-name { font-size: 11px; color: black; text-transform: uppercase; margin: 0; opacity: 0.6; }
+
+  .hero-visual { flex: 0 1 575px; width: 50%; display: flex; justify-content: flex-end; }
+  .hero-video-card { width: 100%; max-width: 575px; aspect-ratio: 575 / 484; background: #171E28; border-radius: 12px; position: relative; overflow: hidden; cursor: pointer; box-shadow: 0 24px 80px rgba(23, 30, 40, 0.25); }
+
+  [data-video-placeholder] { position: absolute; inset: 0; z-index: 10; }
+  .hero-video-poster { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+  .hero-video-play-btn { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 64px; height: 64px; background: var(--color-purple); border-radius: 50%; display: flex; align-items: center; justify-content: center; transition: transform 0.3s ease; }
+  .hero-video-card:hover .hero-video-play-btn { transform: translate(-50%, -50%) scale(1.1); }
+  .hero-video-play-btn svg { fill: var(--color-white); width: 24px; height: 24px; }
+
+  .video-wrap { position: absolute; inset: 0; display: none; z-index: 5; }
+  .video-wrap :global(iframe) { position: absolute; inset: 0; width: 100%; height: 100%; border: none; }
+
+  @media (max-width: 1024px) {
+    .hero { padding: 64px 0; }
+    .gi-hero-section { flex-direction: column !important; flex-wrap: wrap !important; gap: 48px; }
+    .hero-content,
+    .hero-visual { width: 100%; max-width: 100%; flex: auto; }
+    .hero-visual { justify-content: flex-start; }
+    .hero-title { font-size: 32px; }
+    .hero-desc { max-width: 100%; }
+    .hero-video-card { max-width: 100%; }
+  }
+</style>
+
+<script is:inline>
+  (function () {
+    const section = document.currentScript.previousElementSibling;
+    if (!section) return;
+    const card = section.querySelector('[data-video-card]');
+    const placeholder = section.querySelector('[data-video-placeholder]');
+    const wrap = section.querySelector('[data-video-wrap]');
+    const videoId = section.getAttribute('data-video-id');
+    if (!card || !placeholder || !wrap) return;
+
+    card.addEventListener('click', function () {
+      if (card.classList.contains('playing')) return;
+      card.classList.add('playing');
+      placeholder.style.display = 'none';
+      wrap.style.display = 'block';
+      const iframe = document.createElement('iframe');
+      iframe.src = `https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0&modestbranding=1&iv_load_policy=3&disablekb`;
+      iframe.allow = 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture';
+      iframe.allowFullscreen = true;
+      iframe.referrerPolicy = 'strict-origin-when-cross-origin';
+      wrap.appendChild(iframe);
+    });
+  })();
+</script>

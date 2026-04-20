@@ -1,0 +1,493 @@
+---
+/**
+ * UAE Hero section — ported from uae-landing-page/index.html:326-567.
+ * Left: eyebrow, H1 w/ gradient, checklist, CTAs, countdown.
+ * Right: lazy-loaded YouTube video card + floating success-rate card.
+ */
+export interface Props {
+  headline?: string;
+  eyebrow?: string;
+  primaryCtaLabel?: string;
+  primaryCtaHref?: string;
+  secondaryCtaLabel?: string;
+  secondaryCtaHref?: string;
+  countdownTarget?: string;
+  videoId?: string;
+}
+
+const {
+  headline = 'Get Ready for 2026 UAE e-Invoicing with ClearTax',
+  eyebrow = 'Best Peppol-ready e-invoicing solution in UAE',
+  primaryCtaLabel = 'Book a Demo',
+  primaryCtaHref = '#contact',
+  secondaryCtaLabel = 'Explore Platform',
+  secondaryCtaHref = '#platform',
+  countdownTarget = '2026-07-01T00:00:00',
+  videoId = 'Q7yWbkvBkdA',
+} = Astro.props as Props;
+
+const checklistItems = [
+  'FTA-approved Accredited Service Provider (ASP) in the UAE',
+  'AI-powered seamless integration with any ERP/POS systems',
+  'Single unified Global e-Invoicing API (50+ country mandates)',
+];
+---
+
+<section class="hero" data-video-id={videoId} data-countdown-target={countdownTarget}>
+  <div class="hero-inner">
+    <div class="hero-left">
+      <div class="hero-eyebrow">
+        <div class="hero-eyebrow-dot"></div>
+        <span>{eyebrow}</span>
+      </div>
+
+      <h1 set:html={headline} />
+
+      <ul class="hero-checklist">
+        {checklistItems.map((item) => (
+          <li class="hero-checklist-item">
+            <div class="hero-check-icon">
+              <svg width="12" height="12" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+                <path d="M11.6666 3.5L5.24992 9.91667L2.33325 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+            {item}
+          </li>
+        ))}
+      </ul>
+
+      <div class="hero-actions">
+        <a href={primaryCtaHref} class="btn-hero-primary">
+          {primaryCtaLabel}
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+            <path d="M2 7h10M7 2l5 5-5 5" stroke="white" stroke-width="1.7" stroke-linecap="round"/>
+          </svg>
+        </a>
+        <a href={secondaryCtaHref} class="btn-hero-ghost">{secondaryCtaLabel}</a>
+      </div>
+
+      <div class="hero-countdown">
+        <div class="ct-label-row">
+          <span class="ct-live-dot"></span>
+          <span class="ct-label-text">Mandatory e-Invoicing Deadline</span>
+        </div>
+        <div class="ct-digits-row">
+          <div class="ct-card"><span class="ct-digit" data-ct="days">--</span><span class="ct-unit">Days</span></div>
+          <span class="ct-separator">:</span>
+          <div class="ct-card"><span class="ct-digit" data-ct="hours">--</span><span class="ct-unit">Hrs</span></div>
+          <span class="ct-separator">:</span>
+          <div class="ct-card"><span class="ct-digit" data-ct="mins">--</span><span class="ct-unit">Min</span></div>
+          <span class="ct-separator">:</span>
+          <div class="ct-card"><span class="ct-digit" data-ct="secs">--</span><span class="ct-unit">Sec</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="hero-visual">
+      <div class="video-card">
+        <div class="video-card-header">
+          <div class="video-card-dot" style="background:#FF5F57"></div>
+          <div class="video-card-dot" style="background:#FEBC2E"></div>
+          <div class="video-card-dot" style="background:#28C840"></div>
+          <span class="video-card-title">ClearTax UAE — Platform Overview</span>
+        </div>
+        <div class="video-embed-wrap">
+          <div class="video-placeholder" data-video-placeholder>
+            <div class="video-play-btn">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>
+            </div>
+            <p>Watch 2-min product overview</p>
+          </div>
+        </div>
+        <div class="video-card-footer">
+          <div class="fta-badge">
+            <div class="fta-badge-dot"></div>
+            <span>FTA Approved Solution</span>
+          </div>
+          <span class="fta-badge-meta">UAE Mandate Phase 1 Active</span>
+        </div>
+      </div>
+      <div class="hero-float-card">
+        <div class="float-label">Invoice Success Rate</div>
+        <div class="float-val">99.8<span>%</span></div>
+        <div class="float-sub">↑ 0.2% from last quarter</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .hero {
+    background: var(--color-dark);
+    display: flex;
+    padding: 140px 0 60px;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 60% 60% at 80% 40%, rgba(99, 85, 216, 0.15) 0%, transparent 70%),
+      radial-gradient(ellipse 40% 50% at 20% 70%, rgba(48, 37, 160, 0.12) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .hero-inner {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 40px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 64px;
+    align-items: center;
+    position: relative;
+    z-index: 1;
+  }
+
+  .hero-eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(99, 85, 216, 0.14);
+    border: 1px solid rgba(99, 85, 216, 0.35);
+    padding: 6px 14px;
+    border-radius: 100px;
+    margin-bottom: 8px;
+  }
+  .hero-eyebrow-dot {
+    width: 6px;
+    height: 6px;
+    background: var(--color-purple);
+    border-radius: 50%;
+    animation: hero-blink 2s ease-in-out infinite;
+  }
+  @keyframes hero-blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.3; }
+  }
+  .hero-eyebrow span {
+    font-size: 12.5px;
+    font-weight: 600;
+    color: var(--color-purple-light);
+    letter-spacing: 0.3px;
+  }
+
+  .hero h1 {
+    font-size: clamp(36px, 4.5vw, 58px);
+    font-weight: 900;
+    color: var(--color-white);
+    line-height: 1.1;
+    letter-spacing: -1.5px;
+    margin-bottom: 22px;
+  }
+  .hero h1 :global(.gradient-text) {
+    background: linear-gradient(135deg, #8B7EE8, #6355D8, #4338CA);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .hero-checklist {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 40px 0;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    max-width: 480px;
+  }
+  .hero-checklist-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    font-size: 16px;
+    color: rgba(255, 255, 255, 0.7);
+    line-height: 1.5;
+  }
+  .hero-check-icon {
+    flex-shrink: 0;
+    margin-top: 2px;
+    width: 18px;
+    height: 18px;
+    background: rgba(99, 85, 216, 0.15);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--color-purple-light);
+  }
+
+  .hero-actions { display: flex; gap: 14px; flex-wrap: wrap; }
+  .btn-hero-primary {
+    padding: 15px 30px;
+    background: var(--grad-btn);
+    border-radius: 100px;
+    color: #fff;
+    font-size: 15px;
+    font-weight: 700;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.25s;
+  }
+  .btn-hero-primary:hover {
+    background: var(--grad-btn-hover);
+    transform: translateY(-2px);
+    box-shadow: 0 10px 28px rgba(99, 85, 216, 0.45);
+  }
+  .btn-hero-ghost {
+    padding: 15px 30px;
+    border: 1.5px solid rgba(255, 255, 255, 0.2);
+    border-radius: 100px;
+    color: var(--color-white);
+    font-size: 15px;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.25s;
+  }
+  .btn-hero-ghost:hover {
+    border-color: rgba(255, 255, 255, 0.5);
+    background: rgba(255, 255, 255, 0.05);
+  }
+
+  .hero-visual { position: relative; }
+  .video-card {
+    background: #242D3E;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 24px;
+    overflow: hidden;
+    box-shadow: 0 40px 80px rgba(0, 0, 0, 0.5);
+  }
+  .video-card-header {
+    padding: 14px 20px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  }
+  .video-card-dot { width: 10px; height: 10px; border-radius: 50%; }
+  .video-card-title {
+    margin-left: 6px;
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.4);
+    font-weight: 500;
+  }
+  .video-embed-wrap {
+    position: relative;
+    padding-bottom: 56.25%;
+    background: #0D1117;
+  }
+  .video-placeholder {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    background:
+      linear-gradient(rgba(13, 17, 23, 0.4), rgba(13, 17, 23, 0.6)),
+      url('https://img.youtube.com/vi/Q7yWbkvBkdA/maxresdefault.jpg');
+    background-size: cover;
+    background-position: center;
+    cursor: pointer;
+  }
+  .video-embed-wrap :global(iframe) {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    border: none;
+  }
+  .video-play-btn {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    background: var(--grad-btn);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 8px 24px rgba(99, 85, 216, 0.5);
+    transition: transform 0.2s;
+  }
+  .video-placeholder:hover .video-play-btn { transform: scale(1.08); }
+  .video-play-btn svg { width: 24px; height: 24px; fill: white; margin-left: 3px; }
+  .video-placeholder p { color: rgba(255, 255, 255, 0.5); font-size: 13px; }
+  .video-card-footer {
+    padding: 16px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-top: 1px solid rgba(255, 255, 255, 0.06);
+    gap: 24px;
+  }
+  .fta-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(34, 197, 94, 0.12);
+    border: 1px solid rgba(34, 197, 94, 0.25);
+    padding: 6px 12px;
+    border-radius: 100px;
+  }
+  .fta-badge-dot { width: 7px; height: 7px; background: var(--color-green); border-radius: 50%; }
+  .fta-badge span { font-size: 11.5px; font-weight: 600; color: #4ADE80; }
+  .fta-badge-meta { font-size: 11.5px; color: rgba(255, 255, 255, 0.35); }
+
+  .hero-float-card {
+    position: absolute;
+    bottom: -20px;
+    left: -24px;
+    background: var(--color-dark-2);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 16px;
+    padding: 16px 20px;
+    box-shadow: 0 20px 48px rgba(0, 0, 0, 0.35);
+    min-width: 200px;
+  }
+  .hero-float-card .float-label {
+    font-size: 11px;
+    color: rgba(255, 255, 255, 0.4);
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    margin-bottom: 6px;
+  }
+  .hero-float-card .float-val { font-size: 24px; font-weight: 800; color: var(--color-white); }
+  .hero-float-card .float-val span { color: var(--color-green); }
+  .hero-float-card .float-sub { font-size: 11.5px; color: rgba(255, 255, 255, 0.4); margin-top: 4px; }
+
+  /* Countdown */
+  .hero-countdown {
+    margin-top: 40px;
+    display: inline-flex;
+    flex-direction: column;
+    gap: 20px;
+    max-width: fit-content;
+  }
+  .ct-label-row { display: flex; align-items: center; gap: 8px; }
+  .ct-live-dot {
+    width: 8px;
+    height: 8px;
+    background: var(--color-green);
+    border-radius: 50%;
+    box-shadow: 0 0 12px rgba(34, 197, 94, 0.4);
+    animation: ct-pulse 2s ease-in-out infinite;
+    display: inline-block;
+  }
+  @keyframes ct-pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.4; }
+  }
+  .ct-label-text {
+    font-size: 12px;
+    font-weight: 700;
+    color: rgba(255, 255, 255, 0.6);
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+  }
+  .ct-digits-row { display: flex; gap: 12px; align-items: center; }
+  .ct-card {
+    width: 84px;
+    padding: 14px 12px;
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+  }
+  .ct-digit {
+    font-size: 36px;
+    font-weight: 800;
+    letter-spacing: -1px;
+    line-height: 1;
+    color: #fff;
+    font-variant-numeric: tabular-nums;
+  }
+  .ct-unit {
+    font-size: 11px;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.45);
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+  }
+  .ct-separator {
+    font-size: 32px;
+    font-weight: 700;
+    color: rgba(255, 255, 255, 0.18);
+    align-self: center;
+    line-height: 1;
+  }
+
+  @media (max-width: 1024px) {
+    .hero { padding: 104px 0 60px; }
+  }
+  @media (max-width: 768px) {
+    .hero { padding: 96px 0 48px; }
+    .hero-inner { grid-template-columns: 1fr; gap: 48px; padding: 0 16px; }
+    .hero-float-card { display: none; }
+    .video-card-footer { flex-direction: column; gap: 16px; }
+    .ct-card { width: 62px; padding: 10px 8px; border-radius: 8px; }
+    .ct-digit { font-size: 24px; }
+    .ct-unit { font-size: 9px; letter-spacing: 1px; }
+    .ct-separator { font-size: 20px; }
+    .ct-digits-row { gap: 6px; }
+    .ct-label-text { font-size: 11px; letter-spacing: 1.2px; }
+  }
+</style>
+
+<script is:inline>
+  (function () {
+    const section = document.currentScript.previousElementSibling?.closest('.hero') ||
+                    document.querySelector('.hero[data-video-id]');
+    if (!section) return;
+
+    // Lazy-load YouTube iframe on click
+    const placeholder = section.querySelector('[data-video-placeholder]');
+    if (placeholder) {
+      placeholder.addEventListener('click', () => {
+        const videoId = section.getAttribute('data-video-id');
+        const wrap = placeholder.parentElement;
+        placeholder.style.display = 'none';
+        const iframe = document.createElement('iframe');
+        iframe.src = `https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0`;
+        iframe.allow = 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture';
+        iframe.allowFullscreen = true;
+        wrap.appendChild(iframe);
+      });
+    }
+
+    // Countdown
+    const target = new Date(section.getAttribute('data-countdown-target')).getTime();
+    const nodes = {
+      days: section.querySelector('[data-ct="days"]'),
+      hours: section.querySelector('[data-ct="hours"]'),
+      mins: section.querySelector('[data-ct="mins"]'),
+      secs: section.querySelector('[data-ct="secs"]'),
+    };
+    const label = section.querySelector('.hero-countdown');
+
+    function tick() {
+      const dist = target - Date.now();
+      if (dist < 0) {
+        if (label) label.innerHTML = "<span class='ct-label-text'>Pilot Program is Live!</span>";
+        return;
+      }
+      const days = Math.floor(dist / 86400000);
+      const hours = Math.floor((dist % 86400000) / 3600000);
+      const mins = Math.floor((dist % 3600000) / 60000);
+      const secs = Math.floor((dist % 60000) / 1000);
+      if (nodes.days) nodes.days.textContent = String(days).padStart(2, '0');
+      if (nodes.hours) nodes.hours.textContent = String(hours).padStart(2, '0');
+      if (nodes.mins) nodes.mins.textContent = String(mins).padStart(2, '0');
+      if (nodes.secs) nodes.secs.textContent = String(secs).padStart(2, '0');
+    }
+    tick();
+    setInterval(tick, 1000);
+  })();
+</script>

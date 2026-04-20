@@ -1,0 +1,224 @@
+---
+/**
+ * Global contact section with `intl-tel-input` phone field + reCAPTCHA + lead POST.
+ * Ported from global-e-invoicing-mandate-page/index.html:4294-4668.
+ *
+ * Different layout from UAE's ContactForm (light bg, side-by-side with awards strip).
+ * Keeps its own component rather than reusing _shared/ContactForm so props don't
+ * balloon to cover both visual styles.
+ */
+export interface Props {
+  recaptchaSiteKey?: string;
+  sheetName?: string;
+  originCountry?: string;
+  formType?: string;
+  leadType?: string;
+}
+
+const {
+  recaptchaSiteKey = '6Lc5ZG0mAAAAAGwClrZwtcyttcUMYDUPxg4MM4p3',
+  sheetName = 'uaeRAD',
+  originCountry = 'UAE',
+  formType = 'GCC-contact-sales-form',
+  leadType = 'GCC',
+} = Astro.props as Props;
+
+const awards = [
+  'https://cdn.prod.website-files.com/6093bce33d9b4bae841b04e3/69df6c80ff35151ecb983723_leader-fall-2023.png',
+  'https://cdn.prod.website-files.com/6093bce33d9b4bae841b04e3/69df6c805c90b373668a3bc8_leader-summer-2023.png',
+  'https://cdn.prod.website-files.com/6093bce33d9b4bae841b04e3/69df6c8088c9d84ed0c3d6e2_MOMENTUM-LEADER-FALL-2023.png',
+  'https://cdn.prod.website-files.com/6093bce33d9b4bae841b04e3/69df6c80f5c4beae88c48b2a_leader-spring-2023.png',
+  'https://cdn.prod.website-files.com/6093bce33d9b4bae841b04e3/69df6c7fb547ac9ba2bbefc4_leader-winter-2023.webp',
+];
+---
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/intl-tel-input@25.2.1/build/css/intlTelInput.css" />
+<script is:inline src={`https://www.google.com/recaptcha/api.js?render=${recaptchaSiteKey}`}></script>
+
+<section class="contact-section" id="contact"
+  data-recaptcha-key={recaptchaSiteKey}
+  data-sheet-name={sheetName}
+  data-origin-country={originCountry}
+  data-form-type={formType}
+  data-lead-type={leadType}>
+  <div class="wf-container">
+    <div class="contact-inner">
+      <div class="contact-left">
+        <h2 class="contact-title">Simplify compliance<br />with ClearTax</h2>
+        <p class="contact-desc">Discover how ClearTax helps you manage invoicing, filings, and reporting with ease.</p>
+
+        <div class="contact-awards">
+          {awards.map((src) => (
+            <img src={src} alt="Leader Award" class="contact-award-img" loading="lazy" />
+          ))}
+        </div>
+
+        <p class="contact-assurance">Assured Compliance for Businesses Across The Globe</p>
+      </div>
+
+      <div class="contact-card">
+        <form class="contact-form" data-lead-form>
+          <div class="contact-field">
+            <label class="contact-label" for="cfg-name">Name</label>
+            <input type="text" id="cfg-name" class="contact-input" placeholder="e.g. John Doe" required data-field="name" />
+          </div>
+
+          <div class="contact-field">
+            <label class="contact-label" for="cfg-phone">Phone Number</label>
+            <input type="tel" id="cfg-phone" class="contact-input" required data-field="phone" />
+          </div>
+
+          <div class="contact-field">
+            <label class="contact-label" for="cfg-email">Company Email</label>
+            <input type="email" id="cfg-email" class="contact-input" placeholder="e.g. john@company.com" required data-field="email" />
+          </div>
+
+          <div class="contact-field">
+            <label class="contact-label" for="cfg-company">Company Name</label>
+            <input type="text" id="cfg-company" class="contact-input" placeholder="e.g. Acme Corp" required data-field="company" />
+          </div>
+
+          <label class="contact-consent">
+            <input type="checkbox" id="cfg-consent" class="contact-consent-check" required />
+            <span class="contact-consent-text">
+              I agree to ClearTax's <a href="#" class="contact-consent-link">Terms of Service</a> and <a href="#" class="contact-consent-link">Privacy Policy</a>*
+            </span>
+          </label>
+
+          <button type="submit" class="contact-submit-btn" data-submit>Get in touch</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .contact-section { background: var(--color-gray-50); padding: 100px 0; }
+  .wf-container { max-width: var(--container-max); margin: 0 auto; padding: 0 24px; }
+
+  .contact-inner { display: flex; justify-content: space-between; gap: 24px; }
+  .contact-left { display: flex; flex-direction: column; gap: 16px; flex: 1; }
+  .contact-title { font-size: 44px; font-weight: 600; line-height: 1.2; color: black; margin: 0; }
+  .contact-desc { font-size: 18px; line-height: 1.6; color: rgba(0, 0, 0, 0.6); margin: 0 0 24px; max-width: 450px; }
+  .contact-awards { display: flex; align-items: center; flex-wrap: wrap; gap: 12px; }
+  .contact-award-img { height: 88px; width: auto; object-fit: contain; }
+  .contact-assurance { font-size: 18px; font-weight: 500; color: var(--color-dark); margin: 0; line-height: 1.5; }
+
+  .contact-card { background: var(--color-white); border: 1px solid var(--color-gray-200); border-radius: 16px; padding: 48px; flex: 1; max-width: 656px; box-shadow: 0 4px 24px rgba(0, 0, 0, 0.06); }
+  .contact-form { display: flex; flex-direction: column; gap: 16px; }
+  .contact-field { display: flex; flex-direction: column; gap: 8px; }
+  .contact-label { font-size: 16px; color: black; margin: 0; }
+  .contact-input { padding: 10px 12px; font-size: 14px; width: 100%; color: var(--color-dark); background: var(--color-gray-50); border: 1px solid var(--color-gray-200); border-radius: 6px; outline: none; font-family: inherit; transition: border-color var(--transition-fast), box-shadow var(--transition-fast); }
+  .contact-input:focus { border-color: var(--color-blue); box-shadow: 0 0 0 3px rgba(21, 114, 237, 0.1); }
+
+  .contact-consent { display: flex; align-items: flex-start; gap: 16px; cursor: pointer; }
+  .contact-consent-check { width: 16px; height: 16px; margin-top: 4px; flex-shrink: 0; accent-color: var(--color-blue); }
+  .contact-consent-text { font-size: 16px; color: black; line-height: 1.5; }
+  .contact-consent-link { color: var(--color-dark); text-decoration: underline; text-underline-offset: 2px; }
+
+  .contact-submit-btn { width: 100%; max-width: 207px; padding: 16px 24px; font-size: 16px; font-weight: 600; color: var(--color-white); background: var(--color-purple); border: none; border-radius: 100px; cursor: pointer; transition: all var(--transition-base); margin-top: 4px; font-family: inherit; }
+  .contact-submit-btn:hover { transform: translateY(-1px); }
+
+  .iti { width: 100%; }
+
+  @media (max-width: 1024px) {
+    .contact-section { padding: 64px 0; }
+    .contact-inner { flex-direction: column; }
+    .contact-title { font-size: 32px; }
+    .contact-label,
+    .contact-consent-text,
+    .contact-submit-btn { font-size: 14px; }
+  }
+</style>
+
+<script is:inline src="https://cdn.jsdelivr.net/npm/intl-tel-input@25.2.1/build/js/intlTelInput.min.js"></script>
+<script is:inline>
+  (function () {
+    const section = document.currentScript.previousElementSibling;
+    if (!section) return;
+    const form = section.querySelector('[data-lead-form]');
+    const phoneInput = form?.querySelector('[data-field="phone"]');
+    if (!form || !phoneInput) return;
+
+    let iti;
+    function initIti() {
+      if (typeof window.intlTelInput === 'undefined') { setTimeout(initIti, 50); return; }
+      iti = window.intlTelInput(phoneInput, {
+        utilsScript: 'https://cdn.jsdelivr.net/npm/intl-tel-input@25.2.1/build/js/utils.js',
+        initialCountry: 'us',
+        separateDialCode: true,
+        countrySearch: true,
+        preferredCountries: ['ae', 'sa', 'in', 'us', 'uk'],
+        autoPlaceholder: 'aggressive',
+      });
+    }
+    initIti();
+
+    form.addEventListener('submit', function (e) {
+      e.preventDefault();
+      const btn = form.querySelector('[data-submit]');
+      const originalText = btn.innerText;
+      btn.disabled = true;
+      btn.innerText = 'Sending...';
+
+      const recaptchaKey = section.getAttribute('data-recaptcha-key');
+      const sheetName = section.getAttribute('data-sheet-name');
+      const originCountry = section.getAttribute('data-origin-country');
+      const formType = section.getAttribute('data-form-type');
+      const leadType = section.getAttribute('data-lead-type');
+
+      function readField(name) {
+        const el = form.querySelector(`[data-field="${name}"]`);
+        return el ? el.value : '';
+      }
+
+      function submit(token) {
+        const countryData = iti ? iti.getSelectedCountryData() : { dialCode: '' };
+        const payload = {
+          lead_platforms: { google_sheet: { sheet_name: sheetName }, pardot: true, salesforce: true },
+          extra_payload: { origin_country: originCountry },
+          lead_data: {
+            name: readField('name'),
+            phone_number: iti ? iti.getNumber() : readField('phone'),
+            email: readField('email'),
+            company_name: readField('company'),
+            ISD: `+${countryData.dialCode}`,
+            form_type: formType,
+            lead_type: leadType,
+            lead_source_url: window.location.href,
+            whatsapp_consent: false,
+          },
+        };
+
+        fetch(`https://www.cleartax.com/f/common-lead/lead/?captcha_token=${token}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+        })
+          .then((response) => {
+            if (response.status === 201 || response.ok) {
+              form.reset();
+              if (iti) iti.setCountry('us');
+            } else {
+              throw new Error('Failed to submit');
+            }
+          })
+          .catch((err) => {
+            console.error(err);
+          })
+          .finally(() => {
+            btn.disabled = false;
+            btn.innerText = originalText;
+          });
+      }
+
+      if (typeof grecaptcha === 'undefined') {
+        submit('');
+        return;
+      }
+      grecaptcha.ready(function () {
+        grecaptcha.execute(recaptchaKey, { action: 'submit' }).then(submit);
+      });
+    });
+  })();
+</script>

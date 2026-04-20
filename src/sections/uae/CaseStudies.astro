@@ -1,0 +1,336 @@
+---
+/**
+ * UAE testimonials carousel — ported from uae-landing-page/index.html:987-1085.
+ * Vanilla pixel-translateX carousel with prev/next, dots, and a 5-second autoplay.
+ * No Swiper dependency to keep the embed self-contained.
+ */
+interface Story {
+  logoSrc: string;
+  logoAlt: string;
+  quote: string;
+  initials: string;
+  name: string;
+  role: string;
+}
+
+const stories: Story[] = [
+  {
+    logoSrc: 'https://cdn.prod.website-files.com/63ede4a3da6dbd6b05c4612f/69de2f47ee7a80e36ed2feb4_Puma.png',
+    logoAlt: 'Puma',
+    quote: 'ClearTax is simplifying e-Invoicing. They enabled us to implement the e-Invoicing system in time and handled all our business complexities with ease.',
+    initials: 'R',
+    name: 'Raj Kiran',
+    role: 'Head, Taxation & Retail Finance, Puma',
+  },
+  {
+    logoSrc: 'https://cdn.prod.website-files.com/63ede4a3da6dbd6b05c4612f/69df166c75f96428d73fafc5_zamil-industrial.png',
+    logoAlt: 'Zamil Industrial',
+    quote: 'We appreciate ClearTax for successfully completing the complex ZATCA Integration. Their platform enabled seamless management of multiple units.',
+    initials: 'A',
+    name: 'Abdulbary Atassi',
+    role: 'DIRECTOR OF IT, Zamil Industrial',
+  },
+  {
+    logoSrc: 'https://cdn.prod.website-files.com/63ede4a3da6dbd6b05c4612f/69de2f46ea62c039f7e81c4d_gamuda-land.png',
+    logoAlt: 'Gamuda Land',
+    quote: 'Collaborating with ClearTax was an exceptional experience. They streamlined the entire process, even under tight deadlines, for our diverse ERP systems.',
+    initials: 'V',
+    name: 'V Bharathy',
+    role: 'Manager, Finance Applications, Gamuda Land',
+  },
+  {
+    logoSrc: 'https://cdn.prod.website-files.com/63ede4a3da6dbd6b05c4612f/69de2f471b9bc75e10f68e36_JK-Tyre.png',
+    logoAlt: 'JK Tyre',
+    quote: 'ClearTax has transformed the way we handle GST compliance. Realtime creation of e-Invoices plays a significant role in providing critical insight.',
+    initials: 'P',
+    name: 'Pratush Kumar',
+    role: 'DGM-IT, JK Tyre',
+  },
+  {
+    logoSrc: 'https://cdn.prod.website-files.com/63ede4a3da6dbd6b05c4612f/69df166cc8fd06a5b99629c5_salam-removebg-preview.png',
+    logoAlt: 'Salam Telco',
+    quote: "Salam's search for a reliable partner ended with ClearTax. Their tailored solutions ensured a smooth transition for all 8 of our systems in just 3 months.",
+    initials: 'A',
+    name: 'Arslan Choudhary',
+    role: 'Director of Enterprise Enablement, Salam Telco',
+  },
+];
+---
+
+<section class="case-studies-section" id="testimonials" data-cs-total={stories.length}>
+  <div class="section-inner">
+    <div>
+      <div class="section-eyebrow">Customer Stories</div>
+      <h2 class="section-h2">Real results from <em>UAE enterprises</em></h2>
+      <p class="section-sub">See how leading UAE businesses achieved full FTA compliance with ClearTax.</p>
+    </div>
+
+    <div class="cs-carousel">
+      <div class="cs-track" data-cs-track>
+        {stories.map((s) => (
+          <div class="cs-card">
+            <img src={s.logoSrc} alt={s.logoAlt} class="cs-logo-img" loading="lazy" />
+            <p class="cs-quote">{s.quote}</p>
+            <div class="cs-author">
+              <div class="cs-avatar">{s.initials}</div>
+              <div>
+                <div class="cs-author-name">{s.name}</div>
+                <div class="cs-author-role">{s.role}</div>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+
+    <div class="cs-controls">
+      <button class="cs-btn" data-cs-prev aria-label="Previous testimonial">
+        <svg viewBox="0 0 18 18"><path d="M11 4l-5 5 5 5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+      <button class="cs-btn" data-cs-next aria-label="Next testimonial">
+        <svg viewBox="0 0 18 18"><path d="M7 4l5 5-5 5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+      <div class="cs-dots" data-cs-dots>
+        {stories.map((_, i) => (
+          <button class:list={['cs-dot', i === 0 && 'active']} data-cs-go={i} aria-label={`Go to slide ${i + 1}`}></button>
+        ))}
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .case-studies-section {
+    background: var(--color-white);
+    padding: 100px 0;
+    overflow: hidden;
+  }
+
+  .section-inner {
+    max-width: 1200px;
+    margin: 0 auto !important;
+    padding: 0 40px;
+  }
+
+  .section-eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(99, 85, 216, 0.10);
+    border: 1px solid rgba(99, 85, 216, 0.25);
+    color: var(--color-purple);
+    font-size: 12px;
+    font-weight: 700;
+    padding: 5px 14px;
+    border-radius: 100px;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    margin-bottom: 16px;
+  }
+
+  .section-h2 {
+    font-size: clamp(30px, 3.5vw, 46px);
+    font-weight: 900;
+    color: var(--color-text);
+    letter-spacing: -1.2px;
+    line-height: 1.18;
+    margin-bottom: 16px;
+  }
+  .section-h2 em {
+    font-style: normal;
+    color: var(--color-purple);
+  }
+
+  .section-sub {
+    font-size: 17px;
+    color: var(--color-muted);
+    line-height: 1.72;
+    max-width: 540px;
+    margin: 0;
+  }
+
+  .cs-carousel {
+    position: relative;
+    margin-top: 56px;
+    overflow: hidden;
+  }
+
+  .cs-track {
+    display: flex;
+    gap: 24px;
+    transition: transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  }
+
+  .cs-card {
+    flex-shrink: 0;
+    width: 360px;
+    background: var(--color-offwhite);
+    border: 1px solid var(--color-border);
+    border-radius: 22px;
+    padding: 32px 28px;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .cs-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: var(--grad-btn);
+  }
+
+  .cs-card-logo {
+    font-size: 16px;
+    font-weight: 800;
+    color: var(--color-text);
+    margin-bottom: 16px;
+    opacity: 0.65;
+  }
+
+  .cs-quote {
+    font-size: 15.5px;
+    color: var(--color-text);
+    line-height: 1.68;
+    margin-bottom: 24px;
+    font-style: italic;
+    padding-bottom: 24px;
+  }
+
+  .cs-quote::before {
+    content: '"';
+    font-size: 42px;
+    color: var(--color-purple);
+    opacity: 0.3;
+    line-height: 0;
+    vertical-align: -14px;
+    margin-right: 4px;
+  }
+
+  .cs-author {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding-top: 20px;
+    margin-top: auto;
+    border-top: 1px solid var(--color-border);
+  }
+
+  .cs-avatar {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    background: var(--grad-btn);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 14px;
+    font-weight: 700;
+  }
+
+  .cs-author-name {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--color-text);
+  }
+
+  .cs-author-role {
+    font-size: 11.5px;
+    color: var(--color-muted);
+  }
+
+  .cs-controls {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-top: 32px;
+    justify-content: start;
+  }
+
+  .cs-btn {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: var(--color-white);
+    border: 1.5px solid var(--color-border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .cs-btn:hover { background: var(--color-purple); border-color: var(--color-purple); }
+  .cs-btn:hover svg { stroke: white; }
+  .cs-btn svg {
+    width: 18px;
+    height: 18px;
+    stroke: var(--color-muted);
+    fill: none;
+    stroke-width: 2;
+  }
+
+  .cs-logo-img {
+    width: 100%;
+    height: 50px;
+    max-width: 130px;
+    object-fit: contain;
+    margin-bottom: 12px;
+    display: block;
+  }
+
+  .cs-dots { display: flex; gap: 6px; }
+  .cs-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 100px;
+    background: var(--color-border);
+    transition: all 0.3s;
+    cursor: pointer;
+    border: none;
+    padding: 0;
+  }
+  .cs-dot.active {
+    background: var(--color-purple);
+    width: 24px;
+  }
+
+  @media (max-width: 1024px) {
+    .case-studies-section { padding: 48px 0; }
+  }
+</style>
+
+<script is:inline>
+  (function () {
+    const section = document.currentScript.previousElementSibling;
+    if (!section) return;
+    const track = section.querySelector('[data-cs-track]');
+    const dots = Array.from(section.querySelectorAll('[data-cs-go]'));
+    const total = parseInt(section.getAttribute('data-cs-total'), 10) || dots.length;
+    const cardWidth = 384; // 360px card + 24px gap
+    let idx = 0;
+
+    function update() {
+      if (track) track.style.transform = `translateX(-${idx * cardWidth}px)`;
+      dots.forEach((d, i) => d.classList.toggle('active', i === idx));
+    }
+    function go(dir) {
+      idx = Math.max(0, Math.min(idx + dir, total - 1));
+      update();
+    }
+    section.querySelector('[data-cs-prev]')?.addEventListener('click', () => go(-1));
+    section.querySelector('[data-cs-next]')?.addEventListener('click', () => go(1));
+    dots.forEach((d, i) => d.addEventListener('click', () => { idx = i; update(); }));
+
+    if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      setInterval(() => {
+        idx = idx < total - 1 ? idx + 1 : 0;
+        update();
+      }, 5000);
+    }
+  })();
+</script>
