@@ -34,6 +34,7 @@ function runTailwind(target) {
     cwd: ROOT,
     stdio: ['ignore', 'inherit', 'inherit'],
     env: process.env,
+    shell: true,
   });
   return new Promise((res, reject) => {
     child.on('exit', (code) => {
