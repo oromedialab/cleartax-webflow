@@ -75,7 +75,7 @@ If a single Embed element exceeds Webflow's size limit, split the section into t
 ## Authoring rules
 
 - **One `.astro` file per section.** Section files live at `src/sections/_shared/*.astro` (cross-page) or `src/sections/<page>/*.astro` (page-specific).
-- **Every section has its own `<style>` block.** Astro scopes it automatically via `data-astro-cid-*` attributes, so sections cannot collide with each other or with Webflow's own `.w-*` classes.
+- **Every section's `<style>` block uses `<style is:global>`.** No Astro scope hashes in the output. Class-name uniqueness across sections sharing a page is the author's responsibility. Going forward all new styling is Tailwind `tw:`-prefixed utilities, which self-isolate.
 - **Shared design tokens live in `src/styles/tokens.css`** and are mirrored into `tailwind.config.js` `theme.extend`. Update both when adding a new token.
 - **Tailwind v4 utilities are prefixed `tw:`** (e.g. `tw:p-4`, `tw:text-hero`) and the Tailwind preflight reset is excluded by importing only `tailwindcss/utilities.css`, so Webflow's own base styles survive.
 - **Theme tokens live in `src/styles/tokens.css`** inside an `@theme { ... }` block — v4 turns each `--color-*` / `--text-*` into a utility automatically. Plain `:root` vars in the same file are for hand-written CSS that references them. `tailwind.config.js` is kept (loaded via `@config` directive) for backwards-compat.

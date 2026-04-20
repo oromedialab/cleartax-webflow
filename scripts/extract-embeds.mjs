@@ -4,14 +4,16 @@
  *
  * Reads dist/embed/<page>/<section>/index.html produced by Astro's dynamic
  * embed route and writes the body's inner HTML to dist/_embeds/<page>/<section>.html
- * along with ONLY the inlined <style> CSS rules that target this section's
- * own data-astro-cid attributes — discarding sibling sections' CSS that
- * Astro would otherwise bundle into the same page.
+ * along with the section's own <style> block read directly from the source
+ * .astro file. Astro's bundled per-route CSS is discarded entirely — it
+ * contains every sibling section's styles and would blow past Webflow's
+ * 50KB-per-Embed limit.
  *
- * Without this filtering each embed inlines every sibling section's styles
- * and quickly blows past Webflow's 50KB-per-Embed limit.
+ * Assumes every section's <style> is declared `<style is:global>`, i.e. no
+ * scope hashing. Coder owns class-name uniqueness within a page.
  *
- * Fails if the output still contains page chrome (<html>, <head>, <!doctype>).
+ * Fails if output contains page chrome (<html>, <head>, <!doctype>) or any
+ * residual Astro scope markers.
  */
 import { readFileSync, writeFileSync, mkdirSync, readdirSync, statSync, existsSync, rmSync } from 'node:fs';
 import { resolve, join, dirname } from 'node:path';
@@ -24,6 +26,7 @@ const ROOT = resolve(__dirname, '..');
 const DIST = resolve(ROOT, 'dist');
 const SRC_DIR = resolve(DIST, 'embed');
 const OUT_DIR = resolve(DIST, '_embeds');
+const SECTIONS_DIR = resolve(ROOT, 'src/sections');
 
 if (!existsSync(SRC_DIR)) {
   console.error(`[extract-embeds] ${SRC_DIR} not found — run astro build first.`);
@@ -34,79 +37,54 @@ rmSync(OUT_DIR, { recursive: true, force: true });
 mkdirSync(OUT_DIR, { recursive: true });
 
 const FORBIDDEN = /<html[\s>]|<\/html>|<head[\s>]|<\/head>|<!doctype|<body[\s>]|<\/body>/i;
-const CID_ATTR = /data-astro-cid-([a-z0-9]+)/g;
+const ASTRO_SCOPE_LEAK = /\bdata-astro-cid-|\bastro-[a-z0-9]{6,}\b/;
+const STYLE_BLOCK = /<style\b[^>]*>([\s\S]*?)<\/style>/gi;
 
-function walk(dir) {
+function kebab(s) {
+  return s.replace(/([a-z])([A-Z])/g, '$1-$2').replace(/[_\s]+/g, '-').toLowerCase();
+}
+
+function walk(dir, predicate) {
   const out = [];
   for (const name of readdirSync(dir)) {
     const p = join(dir, name);
     const s = statSync(p);
-    if (s.isDirectory()) out.push(...walk(p));
-    else if (s.isFile() && name === 'index.html') out.push(p);
+    if (s.isDirectory()) out.push(...walk(p, predicate));
+    else if (s.isFile() && predicate(name)) out.push(p);
   }
   return out;
 }
 
-/**
- * Filter bundled Astro CSS down to rules that reference at least one of the
- * section's own component cids. Always keeps @keyframes (used by animations
- * referenced from filtered rules), font-faces, and CSS custom property defs.
- */
-function filterCssToCids(css, cids) {
-  if (!css.trim()) return '';
-  const cidSet = new Set(cids);
-  const ast = csstree.parse(css);
-
-  csstree.walk(ast, {
-    visit: 'Rule',
-    enter(node, item, list) {
-      if (!list) return;
-      const selectorList = node.prelude;
-      if (!selectorList || selectorList.type !== 'SelectorList') return;
-
-      // Keep only selectors that reference one of our cids.
-      const kept = [];
-      csstree.walk(selectorList, {
-        visit: 'Selector',
-        enter(sel) {
-          let hit = false;
-          csstree.walk(sel, {
-            visit: 'AttributeSelector',
-            enter(attr) {
-              if (!attr.name || !attr.name.name) return;
-              const m = /^data-astro-cid-([a-z0-9]+)$/.exec(attr.name.name);
-              if (m && cidSet.has(m[1])) hit = true;
-            },
-          });
-          if (hit) kept.push(sel);
-        },
-      });
-
-      if (kept.length === 0) {
-        list.remove(item);
-        return;
-      }
-      // Replace selectorList children with the kept selectors.
-      selectorList.children = new csstree.List().fromArray(kept);
-    },
-  });
-
-  // Drop empty @media / @supports wrappers left behind.
-  csstree.walk(ast, {
-    visit: 'Atrule',
-    enter(node, item, list) {
-      if (!list) return;
-      if (!node.block) return;
-      if (node.name === 'keyframes' || node.name === '-webkit-keyframes' || node.name === 'font-face') return;
-      const hasChildren = node.block.children && node.block.children.first;
-      if (!hasChildren) list.remove(item);
-    },
-  });
-
-  return csstree.generate(ast);
+// Build map: "<page>/<section>" -> source .astro path.
+const sourceMap = new Map();
+for (const file of walk(SECTIONS_DIR, (n) => n.endsWith('.astro'))) {
+  const rel = file.slice(SECTIONS_DIR.length + 1);
+  const parts = rel.split('/');
+  const fileName = parts.pop().replace(/\.astro$/, '');
+  const pageFolder = parts.pop();
+  sourceMap.set(`${pageFolder}/${kebab(fileName)}`, file);
 }
 
-const files = walk(SRC_DIR);
+function minify(css) {
+  try {
+    return csstree.generate(csstree.parse(css));
+  } catch (e) {
+    console.warn(`[extract-embeds] css-tree parse failed, keeping raw: ${e.message}`);
+    return css;
+  }
+}
+
+function readSectionStyles(sourcePath) {
+  const src = readFileSync(sourcePath, 'utf8');
+  const blocks = [];
+  for (const m of src.matchAll(STYLE_BLOCK)) {
+    const css = m[1].trim();
+    if (css) blocks.push(`<style>${minify(css)}</style>`);
+  }
+  return blocks.join('');
+}
+
+const files = walk(SRC_DIR, (n) => n === 'index.html');
 let errorCount = 0;
 
 for (const file of files) {
@@ -116,6 +94,14 @@ for (const file of files) {
   if (parts.length < 2) continue;
   const page = parts[0];
   const section = parts[1];
+  const key = `${page}/${section}`;
+
+  const sourcePath = sourceMap.get(key);
+  if (!sourcePath) {
+    console.error(`[extract-embeds] no source .astro for ${key}`);
+    errorCount++;
+    continue;
+  }
 
   const html = readFileSync(file, 'utf8');
   const root = parseHtml(html);
@@ -126,26 +112,17 @@ for (const file of files) {
     continue;
   }
 
-  // Discover this section's own cids by scanning the body markup.
   const bodyHtml = body.innerHTML.trim();
-  const cids = new Set();
-  for (const m of bodyHtml.matchAll(CID_ATTR)) cids.add(m[1]);
-
-  // Pull <style> blocks from <head>, filter each, drop preview <link> tags.
-  const head = root.querySelector('head');
-  const styleBlocks = [];
-  if (head) {
-    for (const el of head.querySelectorAll('style')) {
-      const raw = el.text || el.innerHTML || '';
-      const filtered = cids.size > 0 ? filterCssToCids(raw, [...cids]) : raw;
-      if (filtered.trim()) styleBlocks.push(`<style>${filtered}</style>`);
-    }
-  }
-
-  const combined = [...styleBlocks, bodyHtml].filter(Boolean).join('\n');
+  const styleBlock = readSectionStyles(sourcePath);
+  const combined = [styleBlock, bodyHtml].filter(Boolean).join('\n');
 
   if (FORBIDDEN.test(combined)) {
-    console.error(`[extract-embeds] forbidden markup found in ${page}/${section}`);
+    console.error(`[extract-embeds] forbidden markup found in ${key}`);
+    errorCount++;
+    continue;
+  }
+  if (ASTRO_SCOPE_LEAK.test(combined)) {
+    console.error(`[extract-embeds] residual Astro scope marker in ${key} — ensure <style is:global> on the section`);
     errorCount++;
     continue;
   }

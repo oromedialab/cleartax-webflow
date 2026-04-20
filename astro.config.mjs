@@ -7,9 +7,8 @@ export default defineConfig({
     locales: ['en', 'ar', 'fr'],
   },
   devToolbar: { enabled: false },
-  // Force all component-scoped styles to be inlined in <style> tags within the
-  // rendered HTML. extract-embeds.mjs relies on this so the pasted Webflow
-  // embed carries its own styles and does not depend on any /_astro/*.css file.
+  // Every section uses <style is:global> — no scope hashes in output.
+  // Coder owns class-name uniqueness across sections sharing a page.
   build: {
     inlineStylesheets: 'always',
   },
