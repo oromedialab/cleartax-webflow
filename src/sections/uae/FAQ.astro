@@ -129,37 +129,43 @@ const items: FaqItem[] = [
 ];
 ---
 
-<section class="faq-section" id="faq">
-  <div class="faq-container">
-    <div class="faq-header">
-      <div class="faq-eyebrow">FAQ</div>
-      <h2 class="faq-heading">Frequently asked <em>questions</em></h2>
-      <p class="faq-sub">Everything you need to know about UAE e-invoicing and ClearTax.</p>
+<section class="tw:bg-[#F7F6FC] tw:py-24 tw:text-[#0F1020] tw:box-border" id="faq">
+  <div class="tw:max-w-[1200px] tw:mx-auto tw:px-6">
+    <div class="tw:max-w-[720px] tw:mb-12">
+      <div class="tw:inline-flex tw:items-center tw:bg-[rgba(99,85,216,0.10)] tw:border tw:border-[rgba(99,85,216,0.25)] tw:text-[#6355D8] tw:text-[12px] tw:font-bold tw:px-3.5 tw:py-1.5 tw:rounded-full tw:tracking-wider tw:uppercase tw:mb-4">
+        FAQ
+      </div>
+      <h2 class="tw:text-[clamp(30px,3.5vw,46px)] tw:font-black tw:text-[#0F172A] tw:tracking-[-1.2px] tw:leading-[1.18] tw:mb-4">
+        Frequently asked <em class="tw:not-italic tw:text-[#6355D8]">questions</em>
+      </h2>
+      <p class="tw:text-[17px] tw:text-[#64748B] tw:leading-[1.72] tw:max-w-[540px] tw:m-0">
+        Everything you need to know about UAE e-invoicing and ClearTax.
+      </p>
     </div>
 
-    <div class="faq-list" data-faq-root>
+    <div class="tw:flex tw:flex-col tw:gap-3" data-faq-root>
       {items.map((it) => (
-        <div class="faq-item">
-          <button class="faq-trigger" type="button" aria-expanded="false">
-            <span class="faq-question">{it.q}</span>
-            <span class="faq-icon" aria-hidden="true">
-              <svg viewBox="0 0 14 14" fill="none">
+        <div class="faq-item group tw:bg-white tw:border tw:border-[rgba(15,16,32,0.08)] tw:rounded-[14px] tw:overflow-hidden tw:transition-all tw:duration-250 [&.faq-open]:tw:border-[rgba(99,85,216,0.35)] [&.faq-open]:tw:shadow-[0_6px_24px_-12px_rgba(99,85,216,0.25)]">
+          <button class="faq-trigger tw:flex tw:items-center tw:justify-between tw:gap-4 tw:w-full tw:p-[22px_24px] tw:cursor-pointer tw:text-[17px] tw:font-bold tw:text-[#0F172A] tw:leading-[1.4] tw:transition-all tw:focus-visible:outline-2 tw:focus-visible:outline-[#6355D8] tw:focus-visible:outline-offset-[-2px] tw:focus-visible:rounded-[14px]" type="button" aria-expanded="false">
+            <span class="faq-question tw:flex-1 tw:min-w-0 tw:text-left tw:break-words">{it.q}</span>
+            <span class="faq-icon tw:shrink-0 tw:w-7 tw:h-7 tw:rounded-full tw:bg-[rgba(99,85,216,0.10)] tw:text-[#6355D8] tw:flex tw:items-center tw:justify-center tw:transition-all tw:duration-300 group-[.faq-open]:tw:rotate-45 group-[.faq-open]:tw:bg-[#6355D8] group-[.faq-open]:tw:text-white" aria-hidden="true">
+              <svg viewBox="0 0 14 14" class="tw:w-3.5 tw:h-3.5" fill="none">
                 <path d="M7 1v12M1 7h12" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
               </svg>
             </span>
           </button>
-          <div class="faq-panel">
-            <div class="faq-answer">
+          <div class="faq-panel tw:h-0 tw:overflow-hidden tw:transition-[height] tw:duration-320 tw:ease-[cubic-bezier(0.4,0,0.2,1)]">
+            <div class="faq-answer tw:px-6 tw:pb-[22px] tw:text-[15.5px] tw:leading-[1.7] tw:text-[#64748B]">
               {typeof it.a === 'string' ? (
-                <p>{it.a}</p>
+                <p class="tw:m-0 tw:mb-2.5 tw:last:mb-0">{it.a}</p>
               ) : (
                 it.a.map((block) =>
                   block.kind === 'p' ? (
-                    <p set:html={block.html} />
+                    <p class="tw:m-0 tw:mb-2.5 tw:last:mb-0" set:html={block.html} />
                   ) : block.kind === 'ul' ? (
-                    <ul>{block.items.map((li) => <li set:html={li} />)}</ul>
+                    <ul class="tw:m-0 tw:pl-5">{block.items.map((li) => <li class="tw:mb-1.5 tw:last:mb-0" set:html={li} />)}</ul>
                   ) : (
-                    <ol>{block.items.map((li) => <li set:html={li} />)}</ol>
+                    <ol class="tw:m-0 tw:pl-5">{block.items.map((li) => <li class="tw:mb-1.5 tw:last:mb-0" set:html={li} />)}</ol>
                   ),
                 )
               )}
@@ -170,116 +176,6 @@ const items: FaqItem[] = [
     </div>
   </div>
 </section>
-
-<style is:global>
-  .faq-section { background: #F7F6FC; padding: 96px 0; color: #0F1020; box-sizing: border-box; }
-  .faq-section *,
-  .faq-section *::before,
-  .faq-section *::after { box-sizing: border-box; }
-
-  .faq-container { max-width: 1200px; margin: 0 auto; padding: 0 24px; }
-  .faq-header { max-width: 720px; margin: 0 0 48px; }
-
-  .faq-eyebrow {
-    display: inline-flex;
-    align-items: center;
-    background: rgba(99, 85, 216, 0.10);
-    border: 1px solid rgba(99, 85, 216, 0.25);
-    color: var(--color-purple);
-    font-size: 12px;
-    font-weight: 700;
-    padding: 5px 14px;
-    border-radius: 100px;
-    letter-spacing: 0.5px;
-    text-transform: uppercase;
-    margin-bottom: 16px;
-  }
-
-  .faq-heading {
-    font-size: clamp(30px, 3.5vw, 46px);
-    font-weight: 900;
-    color: var(--color-text);
-    letter-spacing: -1.2px;
-    line-height: 1.18;
-    margin: 0 0 16px;
-  }
-  .faq-heading em { font-style: normal; color: var(--color-purple); }
-
-  .faq-sub { font-size: 17px; color: var(--color-muted); line-height: 1.72; margin: 0; max-width: 540px; }
-
-  .faq-list { display: flex; flex-direction: column; gap: 12px; }
-
-  .faq-item {
-    background: #fff;
-    border: 1px solid rgba(15, 16, 32, 0.08);
-    border-radius: 14px;
-    overflow: hidden;
-    transition: border-color 0.25s ease, box-shadow 0.25s ease;
-  }
-  .faq-item.faq-open {
-    border-color: rgba(99, 85, 216, 0.35);
-    box-shadow: 0 6px 24px -12px rgba(99, 85, 216, 0.25);
-  }
-
-  .faq-trigger {
-    all: unset;
-    box-sizing: border-box;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 16px;
-    width: 100%;
-    padding: 22px 24px;
-    cursor: pointer;
-    font-size: 17px;
-    font-weight: 700;
-    color: var(--color-text);
-    line-height: 1.4;
-  }
-  .faq-trigger:focus-visible {
-    outline: 2px solid var(--color-purple);
-    outline-offset: -2px;
-    border-radius: 14px;
-  }
-
-  .faq-question { flex: 1 1 auto; min-width: 0; text-align: left; overflow-wrap: break-word; }
-
-  .faq-icon {
-    flex-shrink: 0;
-    width: 28px;
-    height: 28px;
-    border-radius: 50%;
-    background: rgba(99, 85, 216, 0.10);
-    color: var(--color-purple);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: transform 0.3s ease, background 0.25s ease, color 0.25s ease;
-  }
-  .faq-item.faq-open .faq-icon {
-    transform: rotate(45deg);
-    background: var(--color-purple);
-    color: #fff;
-  }
-  .faq-icon svg { width: 14px; height: 14px; }
-
-  .faq-panel { height: 0; overflow: hidden; transition: height 0.32s cubic-bezier(0.4, 0, 0.2, 1); }
-  .faq-answer { padding: 0 24px 22px; font-size: 15.5px; line-height: 1.7; color: var(--color-muted); }
-  .faq-answer p { margin: 0 0 10px; }
-  .faq-answer p:last-child { margin-bottom: 0; }
-  .faq-answer ul,
-  .faq-answer ol { margin: 0; padding-left: 20px; }
-  .faq-answer li { margin-bottom: 6px; }
-  .faq-answer strong { color: var(--color-text); }
-
-  @media (max-width: 640px) {
-    .faq-section { padding: 64px 0; }
-    .faq-container { padding: 0 16px; }
-    .faq-header { margin-bottom: 32px; }
-    .faq-trigger { padding: 18px 18px; font-size: 15.5px; }
-    .faq-answer { padding: 0 18px 18px; font-size: 14.5px; }
-  }
-</style>
 
 <script is:inline>
   (function () {
