@@ -44,6 +44,13 @@ function kebab(s) {
   return s.replace(/([a-z])([A-Z])/g, '$1-$2').replace(/[_\s]+/g, '-').toLowerCase();
 }
 
+function titleWords(s) {
+  return s
+    .replace(/([a-z])([A-Z])/g, '$1 $2')
+    .replace(/([A-Z]+)([A-Z][a-z])/g, '$1 $2')
+    .toUpperCase();
+}
+
 function walk(dir, predicate) {
   const out = [];
   for (const name of readdirSync(dir)) {
@@ -62,7 +69,7 @@ for (const file of walk(SECTIONS_DIR, (n) => n.endsWith('.astro'))) {
   const parts = rel.split('/');
   const fileName = parts.pop().replace(/\.astro$/, '');
   const pageFolder = parts.pop();
-  sourceMap.set(`${pageFolder}/${kebab(fileName)}`, file);
+  sourceMap.set(`${pageFolder}/${kebab(fileName)}`, { path: file, name: fileName });
 }
 
 function minify(css) {
@@ -96,12 +103,13 @@ for (const file of files) {
   const section = parts[1];
   const key = `${page}/${section}`;
 
-  const sourcePath = sourceMap.get(key);
-  if (!sourcePath) {
+  const entry = sourceMap.get(key);
+  if (!entry) {
     console.error(`[extract-embeds] no source .astro for ${key}`);
     errorCount++;
     continue;
   }
+  const { path: sourcePath, name: sectionName } = entry;
 
   const html = readFileSync(file, 'utf8');
   const root = parseHtml(html);
@@ -114,7 +122,9 @@ for (const file of files) {
 
   const bodyHtml = body.innerHTML.trim();
   const styleBlock = readSectionStyles(sourcePath);
-  const combined = [styleBlock, bodyHtml].filter(Boolean).join('\n');
+  const title = titleWords(sectionName);
+  const banner = `<!-----------------------------------------\n                   ${title}\n-------------------------------------------->`;
+  const combined = [banner, styleBlock, bodyHtml].filter(Boolean).join('\n');
 
   if (FORBIDDEN.test(combined)) {
     console.error(`[extract-embeds] forbidden markup found in ${key}`);
