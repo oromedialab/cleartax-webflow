@@ -93,7 +93,7 @@ If a single Embed element exceeds Webflow's size limit, split the section into t
 3. `npm run build`.
 4. Paste `dist/_embeds/<page>/<section-kebab>.html` into the Webflow Embed element.
 
-The `embed/[page]/[section].astro` route picks up new sections automatically via `import.meta.glob` — no registry updates needed.
+The `embed-build/[page]/[section].astro` route picks up new sections automatically via `import.meta.glob` — no registry updates needed. `dist/embed-build/` is a build-only staging dir and is deleted by `extract-embeds`; the paste artifact is always `dist/_embeds/`.
 
 ## Adding a new page
 
@@ -111,6 +111,18 @@ The `embed/[page]/[section].astro` route picks up new sections automatically via
    { name: '<page>', input: 'src/styles/<page>.css' }
    ```
 5. `npm run build`.
+
+## Brand fonts (Nohemi, Gilroy)
+
+Webflow Site Settings → Fonts already holds both families; Webflow injects the `@font-face` rules inside its own linked `shared.webflow.<hash>.css` (not in `<head>`), so embeds pasted into Webflow pages render correctly via cascade — no extra CSS needed in the Webflow `<head>` paste.
+
+For `npm run dev` and `dist/preview/*.html` the fonts are self-hosted:
+
+- Files live in `public/fonts/nohemi/*.woff2` and `public/fonts/gilroy/*.otf` (4 weights each: 400/500/600/700).
+- `@font-face` rules live in `src/styles/fonts.css`, built to `public/css/fonts.css` via `scripts/build-css.mjs`.
+- Pages link `/css/fonts.css` above `/css/shared.css`, wrapped in a banner comment reading "PREVIEW-ONLY — DO NOT PASTE INTO WEBFLOW".
+- `fonts.css` is **not** imported into `shared.css`, so the `@font-face` block never leaks into the CSS blob pasted into Webflow. `scripts/extract-embeds.mjs` already drops bundled CSS, so `dist/_embeds/*.html` also stays clean.
+- `scripts/assemble-confirmations.mjs` emits a visible warning banner above the inlined `fonts.css` `<style>` block in `dist/preview/*.html`.
 
 ## Things we need from Cleartax before production
 

@@ -41,6 +41,17 @@ function normalizeHead(head) {
     }
     const css = readFileSync(cssPath, 'utf8').trim();
     const indentedCss = css.split('\n').map(line => line ? `${indent}  ${line}` : line).join('\n');
+    if (filename === 'fonts.css') {
+      const banner = [
+        `${indent}<!-- ============================================================`,
+        `${indent}     PREVIEW-ONLY - DO NOT PASTE INTO WEBFLOW`,
+        `${indent}     Webflow injects Nohemi + Gilroy via its own shared.css`,
+        `${indent}     (Project Settings -> Fonts). The <style> block below is`,
+        `${indent}     for local dev + dist/preview only; /fonts/* paths 404 in prod.`,
+        `${indent}============================================================ -->`,
+      ].join('\n');
+      return `${banner}\n${indent}<style>\n${indentedCss}\n${indent}</style>`;
+    }
     return `${indent}<!-- ${filename} -->\n${indent}<style>\n${indentedCss}\n${indent}</style>`;
   });
 }

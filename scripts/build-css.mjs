@@ -15,6 +15,7 @@ const ROOT = resolve(__dirname, '..');
 
 const TARGETS = [
   { name: 'shared', input: 'src/styles/shared.css' },
+  { name: 'fonts',  input: 'src/styles/fonts.css' },
   { name: 'uae',    input: 'src/styles/uae.css' },
   { name: 'global', input: 'src/styles/global.css' },
 ];
@@ -26,7 +27,7 @@ const WATCH = process.argv.includes('--watch');
 const PAGE = process.argv.find((a) => a.startsWith('--page='))?.split('=')[1] || 'all';
 
 const ACTIVE = WATCH && PAGE !== 'all'
-  ? TARGETS.filter((t) => t.name === 'shared' || t.name === PAGE)
+  ? TARGETS.filter((t) => t.name === 'shared' || t.name === 'fonts' || t.name === PAGE)
   : TARGETS;
 
 if (WATCH && PAGE !== 'all' && ACTIVE.length === 1) {
