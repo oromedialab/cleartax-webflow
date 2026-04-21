@@ -1,0 +1,158 @@
+---
+/**
+ * UAE FAQ (v2) — Tailwind-only port of FAQ.astro for A/B comparison.
+ * Unique class names (v2-*) so the `.faq-*` global CSS in FAQ.astro can't bleed in.
+ */
+interface FaqItem {
+  q: string;
+  a:
+    | string
+    | Array<
+        | { kind: 'p'; html: string }
+        | { kind: 'ul' | 'ol'; items: string[] }
+      >;
+}
+
+const items: FaqItem[] = [
+  {
+    q: 'What is e-invoicing in the UAE?',
+    a: "E-invoicing in the UAE refers to the electronic generation, submission, and storage of invoices in a standardized digital format. This process supports the UAE's move towards a fully digitized tax system.",
+  },
+  {
+    q: 'What are the advantages of using ClearTax for e-invoicing in the UAE?',
+    a: [
+      { kind: 'p', html: "ClearTax offers a seamless, end-to-end e-invoicing solution tailored to meet UAE's regulatory requirements. Key advantages include:" },
+      {
+        kind: 'ul',
+        items: [
+          'Easy integration with ERP/POS systems.',
+          'Peppol-compliant invoicing capabilities.',
+          'Automated error handling and real-time compliance checks.',
+          'Advanced dashboards and insightful reporting tools.',
+          '24/7 dedicated support for technical and compliance queries.',
+        ],
+      },
+    ],
+  },
+  {
+    q: 'When is e-invoicing being implemented, and what are the phases for UAE?',
+    a: [
+      { kind: 'p', html: 'E-invoicing in the UAE is set to become mandatory by <strong>July 2026</strong>. The phased implementation includes:' },
+      {
+        kind: 'ul',
+        items: [
+          '<strong>Q4 2024</strong>: Accreditation of service providers begins.',
+          '<strong>Q2 2025</strong>: Legislative updates for e-invoicing are introduced.',
+          '<strong>Q2 2026</strong>: Phase 1 of e-invoicing reporting goes live.',
+        ],
+      },
+    ],
+  },
+];
+---
+
+<section
+  id="faq-v2"
+  class="v2-section bg-[#F7F6FC] py-24 text-[#0F1020] box-border font-[Manrope,_-apple-system,_BlinkMacSystemFont,_Segoe_UI,_sans-serif]"
+>
+  <div class="mx-auto max-w-300 px-6">
+    <div class="mb-12 max-w-180">
+      <div class="mb-4 inline-flex items-center rounded-full border border-[rgba(99,85,216,0.25)] bg-[rgba(99,85,216,0.10)] px-3.5 py-1.5 text-[12px] font-bold uppercase tracking-[0.5px] text-[#6355D8]">
+        FAQ (Tailwind)
+      </div>
+      <h2 class="mb-4 text-[clamp(30px,3.5vw,46px)] font-black leading-[1.18] tracking-[-1.2px] text-[#0F1020]">
+        Frequently asked <em class="not-italic text-[#6355D8]">questions — v2</em>
+      </h2>
+      <p class="m-0 max-w-180 text-[17px] leading-[1.72] text-[#5A6070]">
+        Tailwind port. Compare spacing, typography, and card treatment against the plain-CSS FAQ above.
+      </p>
+    </div>
+
+    <div class="flex flex-col gap-3" data-faqv2-root>
+      {items.map((it) => (
+        <div class="v2-item group overflow-hidden rounded-[14px] border border-[rgba(15,16,32,0.08)] bg-white transition-[border-color,box-shadow] duration-250 ease-out">
+          <button
+            type="button"
+            aria-expanded="false"
+            class="v2-trigger flex w-full cursor-pointer appearance-none items-center justify-between gap-4 border-0 bg-transparent px-6 py-6.5 text-left text-[17px] font-bold leading-[1.4] text-[#0F1020] focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-[#6355D8]"
+          >
+            <span class="min-w-0 flex-1 wrap-break-word">{it.q}</span>
+            <span class="v2-icon flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-[rgba(99,85,216,0.10)] text-[#6355D8] transition-[transform,background-color,color] duration-300">
+              <svg viewBox="0 0 14 14" fill="none" class="h-3.5 w-3.5">
+                <path d="M7 1v12M1 7h12" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+              </svg>
+            </span>
+          </button>
+          <div class="v2-panel h-0 overflow-hidden transition-[height] duration-320 ease-in-out">
+            <div class="px-6 pb-5.5 text-[15.5px] leading-[1.7] text-[#5A6070] [&_strong]:text-[#0F1020] [&_ul]:m-0 [&_ul]:pl-5 [&_ol]:m-0 [&_ol]:pl-5 [&_li]:mb-1.5 [&_p]:m-0 [&_p]:mb-2.5 [&_p:last-child]:mb-0">
+              {typeof it.a === 'string' ? (
+                <p>{it.a}</p>
+              ) : (
+                it.a.map((block) =>
+                  block.kind === 'p' ? (
+                    <p set:html={block.html} />
+                  ) : block.kind === 'ul' ? (
+                    <ul>{block.items.map((li) => <li set:html={li} />)}</ul>
+                  ) : (
+                    <ol>{block.items.map((li) => <li set:html={li} />)}</ol>
+                  ),
+                )
+              )}
+            </div>
+          </div>
+        </div>
+      ))}
+    </div>
+  </div>
+</section>
+
+<style is:global>
+  /* Open-state visuals — arbitrary variants for `.faq-open` that would require
+     parent-state lookups Tailwind can't express without a `group` on the item.
+     Item itself toggles the class, so rely on plain CSS for these three rules. */
+  .v2-item.faq-open {
+    border-color: rgba(99, 85, 216, 0.35);
+    box-shadow: 0 6px 24px -12px rgba(99, 85, 216, 0.25);
+  }
+  .v2-item.faq-open .v2-icon {
+    transform: rotate(45deg);
+    background: #6355D8;
+    color: #fff;
+  }
+</style>
+
+<script is:inline>
+  (function () {
+    const root = document.querySelector('[data-faqv2-root]');
+    if (!root) return;
+    const items = root.querySelectorAll('.v2-item');
+    items.forEach(function (item) {
+      const trigger = item.querySelector('.v2-trigger');
+      const panel = item.querySelector('.v2-panel');
+      if (!trigger || !panel) return;
+
+      trigger.addEventListener('click', function () {
+        const isOpen = item.classList.contains('faq-open');
+        if (isOpen) {
+          panel.style.height = panel.scrollHeight + 'px';
+          requestAnimationFrame(function () { panel.style.height = '0px'; });
+          item.classList.remove('faq-open');
+          trigger.setAttribute('aria-expanded', 'false');
+        } else {
+          panel.style.height = panel.scrollHeight + 'px';
+          item.classList.add('faq-open');
+          trigger.setAttribute('aria-expanded', 'true');
+          panel.addEventListener('transitionend', function handler(e) {
+            if (e.propertyName !== 'height') return;
+            panel.removeEventListener('transitionend', handler);
+            if (item.classList.contains('faq-open')) panel.style.height = 'auto';
+          });
+        }
+      });
+
+      window.addEventListener('resize', function () {
+        if (item.classList.contains('faq-open')) panel.style.height = 'auto';
+      });
+    });
+  })();
+</script>

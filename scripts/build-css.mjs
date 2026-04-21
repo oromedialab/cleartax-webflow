@@ -22,20 +22,43 @@ const TARGETS = [
 const OUT_DIR = resolve(ROOT, 'public/css');
 mkdirSync(OUT_DIR, { recursive: true });
 
+const WATCH = process.argv.includes('--watch');
+const PAGE = process.argv.find((a) => a.startsWith('--page='))?.split('=')[1] || 'all';
+
+const ACTIVE = WATCH && PAGE !== 'all'
+  ? TARGETS.filter((t) => t.name === 'shared' || t.name === PAGE)
+  : TARGETS;
+
+if (WATCH && PAGE !== 'all' && ACTIVE.length === 1) {
+  console.error(`[css] unknown page "${PAGE}". Valid: ${TARGETS.filter(t => t.name !== 'shared').map(t => t.name).join(', ')}`);
+  process.exit(1);
+}
+
 function runTailwind(target) {
   const out = resolve(OUT_DIR, `${target.name}.css`);
   const args = [
     '@tailwindcss/cli',
     '-i', resolve(ROOT, target.input),
     '-o', out,
-    '--minify',
   ];
+  if (WATCH) args.push('-w');
+  else args.push('--minify');
+
   const child = spawn('npx', args, {
     cwd: ROOT,
     stdio: ['ignore', 'inherit', 'inherit'],
     env: process.env,
     shell: true,
   });
+
+  if (WATCH) {
+    console.log(`[css:${target.name}] watching -> ${out}`);
+    child.on('exit', (code) => {
+      console.log(`[css:${target.name}] watcher exited (code ${code})`);
+    });
+    return;
+  }
+
   return new Promise((res, reject) => {
     child.on('exit', (code) => {
       if (code === 0) {
@@ -48,7 +71,10 @@ function runTailwind(target) {
   });
 }
 
-for (const target of TARGETS) {
-  await runTailwind(target);
+if (WATCH) {
+  console.log(`[css] watch mode (page=${PAGE}) — targets: ${ACTIVE.map(t => t.name).join(', ')}`);
+  for (const target of ACTIVE) runTailwind(target);
+} else {
+  for (const target of TARGETS) await runTailwind(target);
+  console.log('All CSS bundles built.');
 }
-console.log('All CSS bundles built.');

@@ -49,9 +49,9 @@ dist/
     └── uae/
         └── hero-uae.html      # paste into the UAE page Hero Embed
 
-Final assembled pages for confirmation:
-└── confirmation/
-    └── uae.html               # Open this in a browser to confirm all embeds work together
+Final assembled pages for preview:
+└── preview/
+    └── uae.html               # Open this in a browser to preview all embeds work together
 ```
 
 `dist/_embeds/**/*.html` is guaranteed to contain no `<html>`, `<head>`, `<body>`, or `<!doctype>` — the build fails if any slips through.

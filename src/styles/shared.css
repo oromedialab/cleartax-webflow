@@ -1,12 +1,52 @@
 /**
  * Site-wide CSS bundle — paste into every Webflow page's <head>.
- * Tailwind v4: utilities only (no preflight), prefixed `tw:`, content scoped
- * via @source so this bundle stays minimal.
+ * Tailwind v4: utilities only (no preflight). Reset + base lives in @layer base
+ * so utilities (in @layer utilities) cascade above. Explicit layer order
+ * declared on line 1 so any stylesheet loaded after this one inherits it.
+ * Do not hand-name Webflow classes after Tailwind utilities
+ * (flex, block, grid, container, w-*, p-*, text-*, …).
  */
+@layer theme, base, utilities;
+
 @import './tokens.css';
 @import 'tailwindcss/theme.css' layer(theme);
-@import 'tailwindcss/utilities.css' layer(utilities) prefix(tw) source(none);
+@import 'tailwindcss/utilities.css' layer(utilities) source(none);
 
 @source '../sections/_shared/**/*.astro';
 
 @config '../../tailwind.config.js';
+
+@layer base {
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+
+  html {
+    scroll-behavior: smooth;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  body {
+    font-family: var(--font-body);
+    font-size: 16px;
+    color: var(--color-text);
+    background-color: var(--color-offwhite);
+    overflow-x: hidden;
+  }
+
+  a {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  img {
+    display: block;
+    max-width: 100%;
+    height: auto;
+  }
+}
