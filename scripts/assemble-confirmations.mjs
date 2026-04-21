@@ -2,7 +2,7 @@
 /**
  * Assembles full-page previews from extracted embeds.
  * Uses frontmatter imports to find the correct folder for each component.
- * Outputs to dist/confirmation/<page>.html.
+ * Outputs to dist/preview/<page>.html.
  */
 import { readFileSync, writeFileSync, mkdirSync, readdirSync, existsSync } from 'node:fs';
 import { resolve, join, dirname } from 'node:path';
@@ -14,10 +14,11 @@ const ROOT = resolve(__dirname, '..');
 const DIST = resolve(ROOT, 'dist');
 const EMBEDS_DIR = resolve(DIST, '_embeds');
 const PAGES_DIR = resolve(ROOT, 'src/pages');
-const OUT_DIR = resolve(DIST, 'confirmation');
+const CSS_DIR = resolve(DIST, 'css');
+const OUT_DIR = resolve(DIST, 'preview');
 
 if (!existsSync(EMBEDS_DIR)) {
-  console.error('[assemble-confirmations] _embeds not found — run extract-embeds first.');
+  console.error('[assemble-preview] _embeds not found — run extract-embeds first.');
   process.exit(1);
 }
 
@@ -28,11 +29,20 @@ function kebab(s) {
 }
 
 /**
- * Normalizes head metadata for confirmation pages.
+ * Inlines CSS referenced by <link rel="stylesheet" href="/css/*.css"> into <style> blocks.
+ * Each inlined block gets a filename comment above so it can be copied into Webflow.
  */
 function normalizeHead(head) {
-  // Use relative paths for CSS so confirm pages work via file://
-  return head.replace(/href="\/css\//g, 'href="../css/');
+  return head.replace(/([ \t]*)<link\b[^>]*href="\/css\/([^"]+\.css)"[^>]*>/g, (match, indent, filename) => {
+    const cssPath = join(CSS_DIR, filename);
+    if (!existsSync(cssPath)) {
+      console.warn(`[assemble-preview] CSS not found for inlining: ${cssPath}`);
+      return match;
+    }
+    const css = readFileSync(cssPath, 'utf8').trim();
+    const indentedCss = css.split('\n').map(line => line ? `${indent}  ${line}` : line).join('\n');
+    return `${indent}<!-- ${filename} -->\n${indent}<style>\n${indentedCss}\n${indent}</style>`;
+  });
 }
 
 const pages = readdirSync(PAGES_DIR).filter(f => f.endsWith('.astro') && f !== 'embed');
@@ -88,7 +98,7 @@ for (const pageFile of pages) {
     let found = false;
     for (const p of pathsToTry) {
         if (existsSync(p)) {
-            console.log(`[assemble-confirmations] Adding ${componentName} to ${pageName} (from ${p.includes('_shared') ? '_shared' : folder || pageName})`);
+            console.log(`[assemble-preview] Adding ${componentName} to ${pageName} (from ${p.includes('_shared') ? '_shared' : folder || pageName})`);
             assembledHtml += `<!-- Section: ${componentName} -->\n`;
             assembledHtml += readFileSync(p, 'utf8') + '\n';
             found = true;
@@ -97,7 +107,7 @@ for (const pageFile of pages) {
     }
 
     if (!found) {
-      console.warn(`[assemble-confirmations] Could not find embed for <${componentName}> (kebab: ${componentKebab}) in ${pageName}`);
+      console.warn(`[assemble-preview] Could not find embed for <${componentName}> (kebab: ${componentKebab}) in ${pageName}`);
     }
   }
 
@@ -115,4 +125,4 @@ ${assembledHtml}
   writeFileSync(outPath, finalHtml, 'utf8');
 }
 
-console.log(`[assemble-confirmations] Done. wrote ${pages.length} page(s) to ${OUT_DIR}`);
+console.log(`[assemble-preview] Done. wrote ${pages.length} page(s) to ${OUT_DIR}`);
