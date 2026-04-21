@@ -5,7 +5,9 @@
   "type": "module",
   "scripts": {
     "predev": "npm run build:css",
-    "dev": "astro dev",
+    "dev": "concurrently -n css,astro -c magenta,cyan \"node scripts/build-css.mjs --watch --page=${PAGE:-all}\" \"astro dev\"",
+    "dev:uae": "PAGE=uae npm run dev",
+    "dev:global": "PAGE=global npm run dev",
     "build": "npm run build:css && astro build && node scripts/extract-embeds.mjs && node scripts/assemble-confirmations.mjs",
     "build:css": "node scripts/build-css.mjs",
     "preview": "astro preview"
@@ -15,6 +17,7 @@
   },
   "devDependencies": {
     "@tailwindcss/cli": "^4.0.0",
+    "concurrently": "^9.0.0",
     "css-tree": "^3.2.1",
     "node-html-parser": "^6.1.13"
   }
