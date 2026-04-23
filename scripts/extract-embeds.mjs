@@ -2,7 +2,7 @@
 /**
  * Post-build step.
  *
- * Reads dist/embed/<page>/<section>/index.html produced by Astro's dynamic
+ * Reads dist/embed-build/<page>/<section>/index.html produced by Astro's dynamic
  * embed route and writes the body's inner HTML to dist/_embeds/<page>/<section>.html
  * along with the section's own <style> block read directly from the source
  * .astro file. Astro's bundled per-route CSS is discarded entirely — it
@@ -24,7 +24,7 @@ import * as csstree from 'css-tree';
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = resolve(__dirname, '..');
 const DIST = resolve(ROOT, 'dist');
-const SRC_DIR = resolve(DIST, 'embed');
+const SRC_DIR = resolve(DIST, 'embed-build');
 const OUT_DIR = resolve(DIST, '_embeds');
 const SECTIONS_DIR = resolve(ROOT, 'src/sections');
 
@@ -149,3 +149,5 @@ if (errorCount > 0) {
   process.exit(1);
 }
 console.log(`[extract-embeds] wrote ${files.length} file(s) to ${OUT_DIR}`);
+rmSync(SRC_DIR, { recursive: true, force: true });
+console.log(`[extract-embeds] removed intermediate ${SRC_DIR}`);
