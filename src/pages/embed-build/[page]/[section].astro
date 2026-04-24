@@ -7,6 +7,10 @@
  * Registry is auto-built from src/sections/<page>/*.astro and
  * src/sections/_shared/*.astro via import.meta.glob.
  */
+import '../../../styles/fonts.css';
+import '../../../styles/shared.css';
+import '../../../styles/uae.css';
+import '../../../styles/global.css';
 import type { GetStaticPaths } from 'astro';
 
 const sectionMods = import.meta.glob('../../../sections/**/*.astro', { eager: true }) as Record<string, { default: any }>;
@@ -20,13 +24,24 @@ function kebab(s: string) {
 
 type RegistryEntry = { page: string; section: string; Component: any };
 
+// Derive page + section key: top-level folder under sections/ is the page,
+// any intermediate folders (e.g. v2) flatten into the section kebab prefix:
+// ../../../sections/global/v2/NavbarGlobalV2.astro -> page=global, section=v2-navbar-global-v2.
+function keyFor(path: string): { page: string; section: string } {
+  const parts = path.split('/');
+  const stem = parts.pop()!.replace(/\.astro$/, '');
+  const sIdx = parts.indexOf('sections');
+  const rel = parts.slice(sIdx + 1);
+  const page = rel.shift()!;
+  const section = rel.length ? `${rel.join('-')}-${kebab(stem)}` : kebab(stem);
+  return { page, section };
+}
+
 function buildRegistry(): RegistryEntry[] {
   const entries: RegistryEntry[] = [];
   for (const [path, mod] of Object.entries(sectionMods)) {
-    const parts = path.split('/');
-    const fileName = parts.pop()!.replace(/\.astro$/, '');
-    const pageFolder = parts.pop()!;
-    entries.push({ page: pageFolder, section: kebab(fileName), Component: mod.default });
+    const { page, section } = keyFor(path);
+    entries.push({ page, section, Component: mod.default });
   }
   return entries;
 }
@@ -35,32 +50,22 @@ const registry = buildRegistry();
 
 export const getStaticPaths: GetStaticPaths = async () => {
   const mods = import.meta.glob('../../../sections/**/*.astro', { eager: true });
-  const paths: { params: { page: string; section: string } }[] = [];
-  for (const path of Object.keys(mods)) {
+  const kb = (s: string) => s.replace(/([a-z])([A-Z])/g, '$1-$2').replace(/[_\s]+/g, '-').toLowerCase();
+  return Object.keys(mods).map((path) => {
     const parts = path.split('/');
-    const fileName = parts.pop()!.replace(/\.astro$/, '');
-    const pageFolder = parts.pop()!;
-    const section = fileName
-      .replace(/([a-z])([A-Z])/g, '$1-$2')
-      .replace(/[_\s]+/g, '-')
-      .toLowerCase();
-    paths.push({ params: { page: pageFolder, section } });
-  }
-  return paths;
+    const stem = parts.pop()!.replace(/\.astro$/, '');
+    const sIdx = parts.indexOf('sections');
+    const rel = parts.slice(sIdx + 1);
+    const page = rel.shift()!;
+    const section = rel.length ? `${rel.join('-')}-${kb(stem)}` : kb(stem);
+    return { params: { page, section } };
+  });
 };
 
 const { page, section } = Astro.params as { page: string; section: string };
 const match = registry.find((e) => e.page === page && e.section === section);
 if (!match) throw new Error(`No section registered for ${page}/${section}`);
 const { Component } = match;
-
-const pageCss = page === 'uae'
-  ? '/css/uae.css'
-  : page === 'global'
-    ? '/css/global.css'
-    : page === 'ksa'
-      ? '/css/ksa.css'
-      : '/css/shared.css';
 ---
 
 <!doctype html>
@@ -69,14 +74,6 @@ const pageCss = page === 'uae'
     <meta charset="UTF-8" />
     <meta name="robots" content="noindex, nofollow" />
     <title>{`embed: ${page}/${section}`}</title>
-    <!-- ============================================================
-         PREVIEW-ONLY - DO NOT PASTE INTO WEBFLOW
-         Webflow injects Nohemi + Gilroy via its own shared.css.
-         This <link> is for local dev + dist/preview only.
-    ============================================================ -->
-    <link rel="stylesheet" href="/css/fonts.css" />
-    <link rel="stylesheet" href="/css/shared.css" />
-    <link rel="stylesheet" href={pageCss} />
   </head>
   <body data-embed-root>
     <Component />

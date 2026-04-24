@@ -1,4 +1,5 @@
 import { defineConfig } from 'astro/config';
+import tailwindcss from '@tailwindcss/vite';
 
 export default defineConfig({
   output: 'static',
@@ -11,5 +12,8 @@ export default defineConfig({
   // Coder owns class-name uniqueness across sections sharing a page.
   build: {
     inlineStylesheets: 'always',
+  },
+  vite: {
+    plugins: [tailwindcss()],
   },
 });
