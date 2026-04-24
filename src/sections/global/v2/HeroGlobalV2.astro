@@ -1,0 +1,96 @@
+---
+/**
+ * Global hero — v2 Tailwind-utility port of HeroGlobal.astro.
+ * No <style is:global>; all styles as utility classes.
+ */
+export interface Props {
+  videoId?: string;
+  posterUrl?: string;
+}
+
+const { videoId = 'UX0Yt61EdfY', posterUrl } = Astro.props as Props;
+const effectivePoster = posterUrl ?? `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`;
+
+const trustLogos = [
+  { src: 'https://cdn.prod.website-files.com/6093bce33d9b4bae841b04e3/69df541c365cc00c22c2bb5a_nic-logo.webp', name: 'nic' },
+  { src: 'https://cdn.prod.website-files.com/63ede4a3da6dbd6b05c4612f/69de348a6065af3c36a69aff_zatca.svg', name: 'zatca' },
+  { src: 'https://cdn.prod.website-files.com/63ede4a3da6dbd6b05c4612f/69e0c09f3a4c77f59ef94ec9_fta%20(1).png', name: 'fta' },
+  { src: 'https://cdn.prod.website-files.com/6093bce33d9b4bae841b04e3/69e0e0478f3585b605c04e67_peppol.png', name: 'peppol' },
+];
+---
+
+<section
+  class="bg-[var(--color-gray-50)] py-[100px] w-full overflow-hidden max-lg:py-16"
+  data-hero-global
+  data-video-id={videoId}
+>
+  <div class="max-w-[var(--container-max)] mx-auto px-6">
+    <div class="flex flex-row flex-nowrap items-center justify-between gap-10 max-lg:flex-col max-lg:flex-wrap max-lg:gap-12">
+      <div class="basis-[560px] w-1/2 text-left max-lg:w-full max-lg:max-w-full max-lg:basis-auto">
+        <h1 class="text-[52px] font-medium leading-[1.12] text-[#171E28] m-0 mb-6 tracking-[-1.5px] max-lg:text-[32px]">
+          100% e-Invoicing Compliance Today.<br />Tax Assurance for Tomorrow.
+        </h1>
+        <p class="text-[17px] leading-[1.7] text-[#6C757D] mb-10 max-w-[480px] max-lg:max-w-full">
+          ClearTax helps you do more than meet the e-invoicing deadline. We prepare you for a future of automated tax scrutiny and always-on compliance.
+        </p>
+        <a
+          href="#contact"
+          class="inline-flex items-center gap-2 px-10 py-4 text-base font-bold text-white bg-[linear-gradient(90deg,#110072_0%,#7A5698_100%)] rounded-full no-underline transition-transform duration-300 hover:-translate-y-px [&:hover_span]:translate-x-[3px]"
+        >
+          Request Demo <span class="inline-block transition-transform duration-300">→</span>
+        </a>
+        <div class="flex items-center gap-8 mt-8">
+          {trustLogos.map((l) => (
+            <div class="flex flex-col items-center gap-1.5">
+              <img src={l.src} alt={l.name} class="w-11 h-11 object-contain" loading="lazy" />
+              <p class="text-[11px] text-black uppercase m-0 opacity-60">{l.name}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div class="basis-[575px] w-1/2 flex justify-end max-lg:w-full max-lg:max-w-full max-lg:basis-auto max-lg:justify-start">
+        <div
+          class="group/video w-full max-w-[575px] aspect-[575/484] bg-[#171E28] rounded-xl relative overflow-hidden cursor-pointer shadow-[0_24px_80px_rgba(23,30,40,0.25)]"
+          data-video-card
+        >
+          <div class="absolute inset-0 z-10" data-video-placeholder>
+            <img class="absolute inset-0 w-full h-full object-cover" src={effectivePoster} alt="" />
+            <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-16 h-16 bg-[var(--color-purple)] rounded-full flex items-center justify-center transition-transform duration-300 group-hover/video:scale-110 [&>svg]:fill-white [&>svg]:w-6 [&>svg]:h-6">
+              <svg width="24" height="24" viewBox="0 0 24 24"><polygon points="8,5 20,12 8,19"></polygon></svg>
+            </div>
+          </div>
+          <div
+            class="absolute inset-0 hidden z-[5] [&_iframe]:absolute [&_iframe]:inset-0 [&_iframe]:w-full [&_iframe]:h-full [&_iframe]:border-0"
+            data-video-wrap
+          ></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script is:inline>
+  (function () {
+    const section = document.currentScript.previousElementSibling;
+    if (!section) return;
+    const card = section.querySelector('[data-video-card]');
+    const placeholder = section.querySelector('[data-video-placeholder]');
+    const wrap = section.querySelector('[data-video-wrap]');
+    const videoId = section.getAttribute('data-video-id');
+    if (!card || !placeholder || !wrap) return;
+
+    card.addEventListener('click', function () {
+      if (card.classList.contains('playing')) return;
+      card.classList.add('playing');
+      placeholder.style.display = 'none';
+      wrap.style.display = 'block';
+      const iframe = document.createElement('iframe');
+      iframe.src = `https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0&modestbranding=1&iv_load_policy=3&disablekb`;
+      iframe.allow = 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture';
+      iframe.allowFullscreen = true;
+      iframe.referrerPolicy = 'strict-origin-when-cross-origin';
+      wrap.appendChild(iframe);
+    });
+  })();
+</script>
