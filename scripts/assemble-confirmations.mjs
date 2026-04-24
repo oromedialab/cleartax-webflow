@@ -29,31 +29,34 @@ function kebab(s) {
 }
 
 /**
- * Inlines CSS referenced by <link rel="stylesheet" href="/css/*.css"> into <style> blocks.
- * Each inlined block gets a filename comment above so it can be copied into Webflow.
+ * Inlines dist/css/<bundle>.css files as <style> blocks in preview head,
+ * one per CSS import found in the page's Astro frontmatter.
  */
-function normalizeHead(head) {
-  return head.replace(/([ \t]*)<link\b[^>]*href="\/css\/([^"]+\.css)"[^>]*>/g, (match, indent, filename) => {
+function buildCssStyleBlocks(cssImports) {
+  const blocks = [];
+  for (const filename of cssImports) {
     const cssPath = join(CSS_DIR, filename);
     if (!existsSync(cssPath)) {
       console.warn(`[assemble-preview] CSS not found for inlining: ${cssPath}`);
-      return match;
+      continue;
     }
     const css = readFileSync(cssPath, 'utf8').trim();
-    const indentedCss = css.split('\n').map(line => line ? `${indent}  ${line}` : line).join('\n');
+    const indented = css.split('\n').map(line => line ? `    ${line}` : line).join('\n');
     if (filename === 'fonts.css') {
-      const banner = [
-        `${indent}<!-- ============================================================`,
-        `${indent}     PREVIEW-ONLY - DO NOT PASTE INTO WEBFLOW`,
-        `${indent}     Webflow injects Nohemi + Gilroy via its own shared.css`,
-        `${indent}     (Project Settings -> Fonts). The <style> block below is`,
-        `${indent}     for local dev + dist/preview only; /fonts/* paths 404 in prod.`,
-        `${indent}============================================================ -->`,
-      ].join('\n');
-      return `${banner}\n${indent}<style>\n${indentedCss}\n${indent}</style>`;
+      blocks.push([
+        '  <!-- ============================================================',
+        '       PREVIEW-ONLY - DO NOT PASTE INTO WEBFLOW',
+        '       Webflow injects Nohemi + Gilroy via its own shared.css',
+        '       (Project Settings -> Fonts). The <style> block below is',
+        '       for local dev + dist/preview only; /fonts/* paths 404 in prod.',
+        '  ============================================================ -->',
+        `  <style>\n${indented}\n  </style>`,
+      ].join('\n'));
+    } else {
+      blocks.push(`  <!-- ${filename} -->\n  <style>\n${indented}\n  </style>`);
     }
-    return `${indent}<!-- ${filename} -->\n${indent}<style>\n${indentedCss}\n${indent}</style>`;
-  });
+  }
+  return blocks.join('\n');
 }
 
 const pages = readdirSync(PAGES_DIR).filter(f => f.endsWith('.astro') && f !== 'embed');
@@ -68,48 +71,63 @@ for (const pageFile of pages) {
   const frontmatter = parts.length > 2 ? parts[1] : '';
   const template = parts.length > 2 ? parts[2] : content;
   
-  // 2. Build Component Map from imports
-  // Example: import HeroGlobal from '../sections/global/HeroGlobal.astro';
+  // 2. Parse CSS imports from frontmatter (e.g. import '../styles/global.css')
+  const cssImports = [];
+  const cssImportRegex = /import\s+['"]\.\.\/styles\/([a-z0-9-]+\.css)['"]/g;
+  let cssMatch;
+  while ((cssMatch = cssImportRegex.exec(frontmatter)) !== null) {
+    cssImports.push(cssMatch[1]);
+  }
+
+  // 3. Build Component Map from imports.
+  // Top-level folder under /sections/ = page bucket. Any intermediate
+  // folders (e.g. v2) get flattened into the section kebab prefix, so
+  // sections/global/v2/NavbarGlobalV2.astro -> page=global, section=v2-navbar-global-v2.
   const componentMap = new Map();
   const importRegex = /import\s+([A-Z][a-zA-Z0-9]+)\s+from\s+['"](.+?)['"]/g;
   let importMatch;
   while ((importMatch = importRegex.exec(frontmatter)) !== null) {
     const name = importMatch[1];
     const compPath = importMatch[2];
-    
+
     if (compPath.includes('/sections/')) {
       const pathParts = compPath.split('/');
-      // Expected: ['..', 'sections', 'folder', 'Component.astro']
       const sIdx = pathParts.indexOf('sections');
       if (sIdx !== -1 && sIdx < pathParts.length - 1) {
-        componentMap.set(name, pathParts[sIdx + 1]);
+        const folder = pathParts[sIdx + 1];
+        const nested = pathParts.slice(sIdx + 2, -1); // intermediate dirs between folder and file
+        componentMap.set(name, { folder, nested });
       }
     }
   }
 
   const root = parseHtml(template);
   const head = root.querySelector('head')?.innerHTML.trim() || '';
-  
+
   let assembledHtml = '';
-  
-  // 3. Find and assemble components in order from template
+
+  // 4. Find and assemble components in order from template
   const componentRegex = /<([A-Z][a-zA-Z0-9]+)\b/g;
   let match;
   while ((match = componentRegex.exec(template)) !== null) {
     const componentName = match[1];
-    const componentKebab = kebab(componentName);
-    
-    // Determine folder from import map or fall back to pageName or _shared
-    const folder = componentMap.get(componentName);
-    let pathsToTry = [];
-    if (folder) pathsToTry.push(join(EMBEDS_DIR, folder, `${componentKebab}.html`));
-    pathsToTry.push(join(EMBEDS_DIR, pageName, `${componentKebab}.html`));
-    pathsToTry.push(join(EMBEDS_DIR, '_shared', `${componentKebab}.html`));
+    const baseKebab = kebab(componentName);
+
+    const entry = componentMap.get(componentName);
+    const pathsToTry = [];
+    if (entry) {
+      const prefixedKebab = entry.nested.length
+        ? `${entry.nested.join('-')}-${baseKebab}`
+        : baseKebab;
+      pathsToTry.push(join(EMBEDS_DIR, entry.folder, `${prefixedKebab}.html`));
+    }
+    pathsToTry.push(join(EMBEDS_DIR, pageName, `${baseKebab}.html`));
+    pathsToTry.push(join(EMBEDS_DIR, '_shared', `${baseKebab}.html`));
 
     let found = false;
     for (const p of pathsToTry) {
         if (existsSync(p)) {
-            console.log(`[assemble-preview] Adding ${componentName} to ${pageName} (from ${p.includes('_shared') ? '_shared' : folder || pageName})`);
+            console.log(`[assemble-preview] Adding ${componentName} to ${pageName} (from ${p})`);
             assembledHtml += `<!-- Section: ${componentName} -->\n`;
             assembledHtml += readFileSync(p, 'utf8') + '\n';
             found = true;
@@ -118,14 +136,24 @@ for (const pageFile of pages) {
     }
 
     if (!found) {
-      console.warn(`[assemble-preview] Could not find embed for <${componentName}> (kebab: ${componentKebab}) in ${pageName}`);
+      console.warn(`[assemble-preview] Could not find embed for <${componentName}> (kebab: ${baseKebab}) in ${pageName}`);
     }
   }
+
+  // 5. Extract non-link head content (title, meta, preconnect, google fonts).
+  const headMinusLinks = head
+    .split('\n')
+    .filter(line => !/rel="stylesheet"\s+href="\/css\//.test(line))
+    .join('\n')
+    .trim();
+
+  const styleBlocks = buildCssStyleBlocks(cssImports);
 
   const finalHtml = `<!DOCTYPE html>
 <html lang="en">
 <head>
-${normalizeHead(head)}
+${headMinusLinks}
+${styleBlocks}
 </head>
 <body>
 ${assembledHtml}

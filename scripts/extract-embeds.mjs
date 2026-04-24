@@ -63,13 +63,18 @@ function walk(dir, predicate) {
 }
 
 // Build map: "<page>/<section>" -> source .astro path.
+// Top-level folder under sections/ = page. Any intermediate folders (e.g. v2)
+// flatten into the section kebab prefix so output stays one-file-per-section:
+// sections/global/v2/NavbarGlobalV2.astro -> global/v2-navbar-global-v2.
 const sourceMap = new Map();
 for (const file of walk(SECTIONS_DIR, (n) => n.endsWith('.astro'))) {
   const rel = file.slice(SECTIONS_DIR.length + 1).replace(/\\/g, '/');
   const parts = rel.split('/');
-  const fileName = parts.pop().replace(/\.astro$/, '');
-  const pageFolder = parts.pop();
-  sourceMap.set(`${pageFolder}/${kebab(fileName)}`, { path: file, name: fileName });
+  const stem = parts.pop().replace(/\.astro$/, '');
+  const pageFolder = parts.shift();
+  const nested = parts;
+  const section = nested.length ? `${nested.join('-')}-${kebab(stem)}` : kebab(stem);
+  sourceMap.set(`${pageFolder}/${section}`, { path: file, name: stem });
 }
 
 function minify(css) {
