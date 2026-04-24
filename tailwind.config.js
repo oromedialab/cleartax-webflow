@@ -8,7 +8,7 @@
  * via `@source` directives in each CSS file (see src/styles/shared.css etc).
  */
 export default {
-  content: [],
+  content: ["./src/**/*.{astro,html,js,jsx,md,mdx,svelte,ts,tsx,vue}"],
   // theme.extend is honored when this file is loaded via @config in CSS,
   // but prefer @theme in tokens.css for new tokens.
   theme: { extend: {} },
