@@ -1,6 +1,7 @@
 ---
 /**
- * ContactGlobalV2.astro — Tailwind v4 port with restored logic.
+ * ContactGlobalV2.astro — Tailwind v4 port.
+ * Matches the single-column layout and styling of Version 1.
  */
 export interface Props {
   recaptchaSiteKey?: string;
@@ -37,44 +38,34 @@ const {
       </div>
 
       <div class="basis-[560px] max-lg:basis-auto max-lg:w-full">
-        <form class="bg-white p-10 rounded-[20px] shadow-[0_8px_40px_rgba(0,0,0,0.06)] border border-[#EDEAF6] flex flex-col gap-6 max-sm:p-6" data-lead-form>
-          <div class="grid grid-cols-2 gap-4 max-sm:grid-cols-1">
-            <div class="flex flex-col gap-2">
-              <label class="text-sm font-semibold text-black uppercase tracking-[0.05em]" for="cfg-name">Full Name*</label>
-              <input type="text" id="cfg-name" data-field="name" placeholder="John Doe" class="p-[12px_16px] border border-[#E5E7EB] rounded-lg text-base outline-none focus:border-[var(--color-blue)] transition-colors" required />
-            </div>
-            <div class="flex flex-col gap-2">
-              <label class="text-sm font-semibold text-black uppercase tracking-[0.05em]" for="cfg-email">Work Email*</label>
-              <input type="email" id="cfg-email" data-field="email" placeholder="john@company.com" class="p-[12px_16px] border border-[#E5E7EB] rounded-lg text-base outline-none focus:border-[var(--color-blue)] transition-colors" required />
-            </div>
-          </div>
-
-          <div class="grid grid-cols-2 gap-4 max-sm:grid-cols-1">
-            <div class="flex flex-col gap-2">
-              <label class="text-sm font-semibold text-black uppercase tracking-[0.05em]" for="cfg-phone">Phone Number*</label>
-              <input type="tel" id="cfg-phone" data-field="phone" class="p-[12px_16px] border border-[#E5E7EB] rounded-lg text-base outline-none focus:border-[var(--color-blue)] transition-colors" required />
-            </div>
-            <div class="flex flex-col gap-2">
-              <label class="text-sm font-semibold text-black uppercase tracking-[0.05em]" for="cfg-country">Country*</label>
-              <select id="cfg-country" data-field="country" class="p-[12px_16px] border border-[#E5E7EB] rounded-lg text-base outline-none focus:border-[var(--color-blue)] transition-colors bg-white appearance-none" required>
-                <option value="">Select Country</option>
-                <option value="Saudi Arabia">Saudi Arabia</option>
-                <option value="UAE">UAE</option>
-                <option value="Oman">Oman</option>
-                <option value="Bahrain">Bahrain</option>
-                <option value="Kuwait">Kuwait</option>
-                <option value="Qatar">Qatar</option>
-                <option value="India">India</option>
-              </select>
-            </div>
-          </div>
-
+        <form id="contact-form-v2" class="bg-white p-10 rounded-[20px] shadow-[0_8px_40px_rgba(0,0,0,0.06)] border border-[#EDEAF6] flex flex-col gap-4 max-sm:p-6" data-lead-form>
+          
+          <!-- Name Field -->
           <div class="flex flex-col gap-2">
-            <label class="text-sm font-semibold text-black uppercase tracking-[0.05em]" for="cfg-company">Company Name*</label>
-            <input type="text" id="cfg-company" data-field="company" placeholder="Acme Inc." class="p-[12px_16px] border border-[#E5E7EB] rounded-lg text-base outline-none focus:border-[var(--color-blue)] transition-colors" required />
+            <label class="text-base font-medium text-black" for="cfg-name">Name*</label>
+            <input type="text" id="cfg-name" data-field="name" placeholder="e.g. John Doe" class="p-[10px_12px] border border-[#E5E7EB] rounded-lg text-base outline-none focus:border-[var(--color-blue)] bg-[#F9FAFB] transition-colors" required />
           </div>
 
-          <label class="flex items-start gap-4 cursor-pointer">
+          <!-- Phone Field -->
+          <div class="flex flex-col gap-2">
+            <label class="text-base font-medium text-black" for="cfg-phone">Phone Number*</label>
+            <input type="tel" id="cfg-phone" data-field="phone" class="w-full p-[10px_12px] border border-[#E5E7EB] rounded-lg text-base outline-none focus:border-[var(--color-blue)] bg-[#F9FAFB] transition-colors" required />
+          </div>
+
+          <!-- Email Field -->
+          <div class="flex flex-col gap-2">
+            <label class="text-base font-medium text-black" for="cfg-email">Company Email*</label>
+            <input type="email" id="cfg-email" data-field="email" placeholder="e.g. john@company.com" class="p-[10px_12px] border border-[#E5E7EB] rounded-lg text-base outline-none focus:border-[var(--color-blue)] bg-[#F9FAFB] transition-colors" required />
+          </div>
+
+          <!-- Company Field -->
+          <div class="flex flex-col gap-2">
+            <label class="text-base font-medium text-black" for="cfg-company">Company Name*</label>
+            <input type="text" id="cfg-company" data-field="company" placeholder="e.g. Acme Corp" class="p-[10px_12px] border border-[#E5E7EB] rounded-lg text-base outline-none focus:border-[var(--color-blue)] bg-[#F9FAFB] transition-colors" required />
+          </div>
+
+          <!-- Consent -->
+          <label class="flex items-start gap-4 cursor-pointer mt-2">
             <input type="checkbox" id="cfg-consent" class="w-4 h-4 mt-1 shrink-0 accent-[var(--color-blue)]" required />
             <span class="text-base text-black leading-[1.5] max-lg:text-sm">
               I agree to ClearTax's <a href="#" class="v2-link-legal text-[var(--color-dark)] underline underline-offset-2">Terms of Service</a> and <a href="#" class="v2-link-legal text-[var(--color-dark)] underline underline-offset-2">Privacy Policy</a>*
@@ -155,7 +146,7 @@ const {
       if (typeof window.intlTelInput === 'undefined') { setTimeout(initIti, 50); return; }
       iti = window.intlTelInput(phoneInput, {
         utilsScript: 'https://cdn.jsdelivr.net/npm/intl-tel-input@25.2.1/build/js/utils.js',
-          initialCountry: 'us',
+        initialCountry: 'us',
         separateDialCode: true,
         countrySearch: true,
         preferredCountries: ['ae', 'sa', 'in', 'us', 'uk'],
@@ -215,8 +206,8 @@ const {
           })
           .catch((err) => {
             console.error(err);
-            })
-            .finally(() => {
+          })
+          .finally(() => {
             btn.disabled = false;
             btn.innerText = originalText;
           });
