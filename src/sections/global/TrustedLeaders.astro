@@ -56,6 +56,9 @@ const testimonials: Testimonial[] = [
     role: 'Director of Enterprise Enablement, Salam Telco',
   },
 ];
+
+const cardColors = ['#F6E0C5', '#D8EFF2', '#DEDAF6'];
+const shuffledColors = [...cardColors].sort(() => Math.random() - 0.5);
 ---
 
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
@@ -77,23 +80,26 @@ const testimonials: Testimonial[] = [
   <div class="tl-swiper-bleed-wrapper">
     <div class="tl-swiper">
       <div class="swiper-wrapper tl-swiper-wrapper">
-        {testimonials.map((t) => (
-          <div class="swiper-slide tl-swiper-slide">
-            <div class="tl-card">
-              <img class={t.logoClass} src={t.logoSrc} alt="" />
-              <p class="tl-card-text">{t.quote}</p>
-              <div class="tl-user">
-                <div class="tl-user-img">{t.initials}</div>
-                <div>
-                  <div class="tl-user-wrapper">
-                    <p>{t.name}</p>
+        {testimonials.map((t, i) => {
+          const cardColor = shuffledColors[i % shuffledColors.length];
+          return (
+            <div class="swiper-slide tl-swiper-slide">
+              <div class="tl-card" style={`background-color: ${cardColor}`}>
+                <img class={t.logoClass} src={t.logoSrc} alt="" />
+                <p class="tl-card-text">{t.quote}</p>
+                <div class="tl-user">
+                  <div class="tl-user-img">{t.initials}</div>
+                  <div>
+                    <div class="tl-user-wrapper">
+                      <p>{t.name}</p>
+                    </div>
+                    <p class="tl-user-location">{t.role}</p>
                   </div>
-                  <p class="tl-user-location">{t.role}</p>
                 </div>
               </div>
             </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
     </div>
   </div>
@@ -110,9 +116,6 @@ const testimonials: Testimonial[] = [
   .tl-swiper-slide { width: fit-content !important; }
 
   .tl-card { max-width: 630px; width: 100%; padding: 28px; border-radius: 20px; display: flex; flex-direction: column; height: 375px; }
-  .tl-swiper-slide:nth-child(3n+1) .tl-card { background-color: #F6E0C5; }
-  .tl-swiper-slide:nth-child(3n+2) .tl-card { background-color: #D8EFF2; }
-  .tl-swiper-slide:nth-child(3n) .tl-card { background-color: #DEDAF6; }
   .tl-logo1 { width: 198px; object-fit: contain; aspect-ratio: 198/44; margin-bottom: 28px; }
   .tl-logo2 { width: 88px; aspect-ratio: 88/44; object-fit: contain; margin-bottom: 28px; }
   .tl-logo3 { width: 260px; aspect-ratio: 260/30; object-fit: cover; margin-bottom: 28px; }
