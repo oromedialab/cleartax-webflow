@@ -1,0 +1,234 @@
+---
+/**
+ * ContactGlobalV2.astro — Tailwind v4 port with restored logic.
+ */
+export interface Props {
+  recaptchaSiteKey?: string;
+  sheetName?: string;
+  originCountry?: string;
+  formType?: string;
+  leadType?: string;
+}
+
+const {
+  recaptchaSiteKey = '6Lc5ZG0mAAAAAGwClrZwtcyttcUMYDUPxg4MM4p3',
+  sheetName = 'uaeRAD',
+  originCountry = 'UAE',
+  formType = 'GCC-contact-sales-form',
+  leadType = 'GCC',
+} = Astro.props as Props;
+---
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/intl-tel-input@25.2.1/build/css/intlTelInput.css" />
+<script is:inline src={`https://www.google.com/recaptcha/api.js?render=${recaptchaSiteKey}`}></script>
+
+<section id="contact" 
+  class="bg-[linear-gradient(180deg,#FFFFFF_0%,#EDEAF6_100%)] py-25 overflow-hidden w-full max-lg:py-20 max-sm:py-16"
+  data-recaptcha-key={recaptchaSiteKey}
+  data-sheet-name={sheetName}
+  data-origin-country={originCountry}
+  data-form-type={formType}
+  data-lead-type={leadType}>
+  <div class="max-w-[var(--container-max)] mx-auto px-6">
+    <div class="flex flex-row justify-between gap-6 max-lg:flex-col">
+      <div class="flex flex-col gap-4 flex-1">
+        <h2 class="v2-contact-title text-[44px] font-semibold leading-[1.2] text-black m-0 max-lg:text-[32px]">Simplify compliance<br />with ClearTax</h2>
+        <p class="text-18 leading-[1.6] text-black m-0 mb-6 max-w-[450px]">Discover how ClearTax helps you manage invoicing, filings, and reporting with ease.</p>
+      </div>
+
+      <div class="basis-[560px] max-lg:basis-auto max-lg:w-full">
+        <form class="bg-white p-10 rounded-[20px] shadow-[0_8px_40px_rgba(0,0,0,0.06)] border border-[#EDEAF6] flex flex-col gap-6 max-sm:p-6" data-lead-form>
+          <div class="grid grid-cols-2 gap-4 max-sm:grid-cols-1">
+            <div class="flex flex-col gap-2">
+              <label class="text-sm font-semibold text-black uppercase tracking-[0.05em]" for="cfg-name">Full Name*</label>
+              <input type="text" id="cfg-name" data-field="name" placeholder="John Doe" class="p-[12px_16px] border border-[#E5E7EB] rounded-lg text-base outline-none focus:border-[var(--color-blue)] transition-colors" required />
+            </div>
+            <div class="flex flex-col gap-2">
+              <label class="text-sm font-semibold text-black uppercase tracking-[0.05em]" for="cfg-email">Work Email*</label>
+              <input type="email" id="cfg-email" data-field="email" placeholder="john@company.com" class="p-[12px_16px] border border-[#E5E7EB] rounded-lg text-base outline-none focus:border-[var(--color-blue)] transition-colors" required />
+            </div>
+          </div>
+
+          <div class="grid grid-cols-2 gap-4 max-sm:grid-cols-1">
+            <div class="flex flex-col gap-2">
+              <label class="text-sm font-semibold text-black uppercase tracking-[0.05em]" for="cfg-phone">Phone Number*</label>
+              <input type="tel" id="cfg-phone" data-field="phone" class="p-[12px_16px] border border-[#E5E7EB] rounded-lg text-base outline-none focus:border-[var(--color-blue)] transition-colors" required />
+            </div>
+            <div class="flex flex-col gap-2">
+              <label class="text-sm font-semibold text-black uppercase tracking-[0.05em]" for="cfg-country">Country*</label>
+              <select id="cfg-country" data-field="country" class="p-[12px_16px] border border-[#E5E7EB] rounded-lg text-base outline-none focus:border-[var(--color-blue)] transition-colors bg-white appearance-none" required>
+                <option value="">Select Country</option>
+                <option value="Saudi Arabia">Saudi Arabia</option>
+                <option value="UAE">UAE</option>
+                <option value="Oman">Oman</option>
+                <option value="Bahrain">Bahrain</option>
+                <option value="Kuwait">Kuwait</option>
+                <option value="Qatar">Qatar</option>
+                <option value="India">India</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="flex flex-col gap-2">
+            <label class="text-sm font-semibold text-black uppercase tracking-[0.05em]" for="cfg-company">Company Name*</label>
+            <input type="text" id="cfg-company" data-field="company" placeholder="Acme Inc." class="p-[12px_16px] border border-[#E5E7EB] rounded-lg text-base outline-none focus:border-[var(--color-blue)] transition-colors" required />
+          </div>
+
+          <label class="flex items-start gap-4 cursor-pointer">
+            <input type="checkbox" id="cfg-consent" class="w-4 h-4 mt-1 shrink-0 accent-[var(--color-blue)]" required />
+            <span class="text-base text-black leading-[1.5] max-lg:text-sm">
+              I agree to ClearTax's <a href="#" class="v2-link-legal text-[var(--color-dark)] underline underline-offset-2">Terms of Service</a> and <a href="#" class="v2-link-legal text-[var(--color-dark)] underline underline-offset-2">Privacy Policy</a>*
+            </span>
+          </label>
+
+          <button type="submit" class="v2-contact-btn w-full max-w-[207px] p-[12px_40px] text-base font-semibold text-white bg-[linear-gradient(90deg,#110072_0%,#7A5698_100%)] border-none rounded-full cursor-pointer transition-all duration-250 ease-in-out mt-1 font-inherit hover:-translate-y-[1px] max-lg:text-sm" data-submit>Get in touch</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style is:global>
+  .v2-contact-title {
+    font-size: 44px !important;
+    font-weight: 600 !important;
+    line-height: 1.2 !important;
+    color: #000000 !important;
+    margin: 0 !important;
+  }
+  @media (max-width: 1024px) {
+    .v2-contact-title { font-size: 32px !important; }
+  }
+
+  .v2-contact-btn {
+    width: 100% !important;
+    max-width: 207px !important;
+    padding: 12px 40px !important;
+    font-size: 16px !important;
+    font-weight: 600 !important;
+    color: #ffffff !important;
+    background: linear-gradient(90deg, #110072 0%, #7A5698 100%) !important;
+    border: none !important;
+    border-radius: 100px !important;
+    cursor: pointer !important;
+    transition: all 250ms ease !important;
+    margin-top: 4px !important;
+    font-family: inherit !important;
+  }
+  .v2-contact-btn:hover { transform: translateY(-1px) !important; }
+
+  .v2-link-legal {
+    color: #171E28 !important;
+    text-decoration: underline !important;
+    text-underline-offset: 2px !important;
+  }
+
+  .iti { width: 100%; }
+
+  /* ITI Search Bar & Dropdown styling */
+  .iti__country-list {
+    border-radius: 12px !important;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.1) !important;
+    border: 1px solid #E5E7EB !important;
+    padding: 8px 0 !important;
+    max-width: 300px !important;
+  }
+  .iti__search-input {
+    margin: 8px !important;
+    padding: 10px 12px !important;
+    border-radius: 8px !important;
+    border: 1px solid #E5E7EB !important;
+    width: calc(100% - 16px) !important;
+  }
+</style>
+
+<script is:inline src="https://cdn.jsdelivr.net/npm/intl-tel-input@25.2.1/build/js/intlTelInput.min.js"></script>
+<script is:inline>
+  (function () {
+    const section = document.querySelector('#contact');
+    const form = section?.querySelector('[data-lead-form]');
+    const phoneInput = form?.querySelector('[data-field="phone"]');
+    if (!form || !phoneInput) return;
+
+    let iti;
+    function initIti() {
+      if (typeof window.intlTelInput === 'undefined') { setTimeout(initIti, 50); return; }
+      iti = window.intlTelInput(phoneInput, {
+        utilsScript: 'https://cdn.jsdelivr.net/npm/intl-tel-input@25.2.1/build/js/utils.js',
+          initialCountry: 'us',
+        separateDialCode: true,
+        countrySearch: true,
+        preferredCountries: ['ae', 'sa', 'in', 'us', 'uk'],
+        autoPlaceholder: 'aggressive',
+      });
+    }
+    initIti();
+
+    form.addEventListener('submit', function (e) {
+      e.preventDefault();
+      const btn = form.querySelector('[data-submit]');
+      const originalText = btn.innerText;
+      btn.disabled = true;
+      btn.innerText = 'Sending...';
+
+      const recaptchaKey = section.getAttribute('data-recaptcha-key');
+      const sheetName = section.getAttribute('data-sheet-name');
+      const originCountry = section.getAttribute('data-origin-country');
+      const formType = section.getAttribute('data-form-type');
+      const leadType = section.getAttribute('data-lead-type');
+
+      function readField(name) {
+        const el = form.querySelector(`[data-field="${name}"]`);
+        return el ? el.value : '';
+      }
+
+      function submit(token) {
+        const countryData = iti ? iti.getSelectedCountryData() : { dialCode: '' };
+        const payload = {
+          lead_platforms: { google_sheet: { sheet_name: sheetName }, pardot: true, salesforce: true },
+          extra_payload: { origin_country: originCountry },
+          lead_data: {
+            name: readField('name'),
+            phone_number: iti ? iti.getNumber() : readField('phone'),
+            email: readField('email'),
+            company_name: readField('company'),
+            ISD: `+${countryData.dialCode}`,
+            form_type: formType,
+            lead_type: leadType,
+            lead_source_url: window.location.href,
+            whatsapp_consent: false,
+          },
+        };
+
+        fetch(`https://www.cleartax.com/f/common-lead/lead/?captcha_token=${token}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+        })
+          .then((response) => {
+            if (response.status === 201 || response.ok) {
+                form.reset();
+                if (iti) iti.setCountry('us');
+            } else {
+              throw new Error('Failed to submit');
+            }
+          })
+          .catch((err) => {
+            console.error(err);
+            })
+            .finally(() => {
+            btn.disabled = false;
+            btn.innerText = originalText;
+          });
+      }
+
+      if (typeof grecaptcha === 'undefined') {
+        submit('');
+        return;
+      }
+      grecaptcha.ready(function () {
+        grecaptcha.execute(recaptchaKey, { action: 'submit' }).then(submit);
+      });
+    });
+  })();
+</script>
