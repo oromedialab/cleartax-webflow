@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+      <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Thank You — ClearTax France e-Invoicing Survey</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+      background: #f7f8fa;
+      color: #1a1a2e;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ── Header ── */
+    header {
+      background: #fff;
+      border-bottom: 1px solid #e8eaed;
+      padding: 0 2rem;
+      display: flex;
+      align-items: center;
+      height: 64px;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      text-decoration: none;
+    }
+
+    .logo svg {
+      height: 36px;
+      width: auto;
+      fill: #1a1a2e;
+    }
+
+    /* ── Hero ── */
+    .hero {
+      background: linear-gradient(135deg, #1a56db 0%, #1239a0 100%);
+      color: #fff;
+      text-align: center;
+      padding: 60px 2rem 80px;
+      position: relative;
+    }
+
+    .hero::after {
+      content: '';
+      position: absolute;
+      bottom: -1px;
+      left: 0;
+      right: 0;
+      height: 40px;
+      background: #f7f8fa;
+      clip-path: ellipse(55% 100% at 50% 100%);
+    }
+
+    .checkmark-circle {
+      width: 72px;
+      height: 72px;
+      background: rgba(255,255,255,0.15);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 20px;
+      border: 2px solid rgba(255,255,255,0.4);
+    }
+
+    .checkmark-circle svg {
+      width: 36px;
+      height: 36px;
+      stroke: #fff;
+      fill: none;
+      stroke-width: 2.5;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .hero h1 {
+      font-size: 32px;
+      font-weight: 700;
+      margin-bottom: 12px;
+      letter-spacing: -0.5px;
+    }
+
+    .hero p {
+      font-size: 17px;
+      opacity: 0.88;
+      max-width: 540px;
+      margin: 0 auto;
+      line-height: 1.6;
+    }
+
+    /* ── Main content ── */
+    main {
+      flex: 1;
+      max-width: 1280px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 48px 2rem 60px;
+    }
+
+    .section-intro {
+      text-align: center;
+      margin-bottom: 36px;
+    }
+
+    .section-intro h2 {
+      font-size: 22px;
+      font-weight: 700;
+      color: #1a1a2e;
+      margin-bottom: 10px;
+    }
+
+    .section-intro p {
+      font-size: 15px;
+      color: #5a6072;
+      line-height: 1.6;
+      max-width: 560px;
+      margin: 0 auto;
+    }
+
+    /* ── Charity grid ── */
+    .charity-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      gap: 14px;
+      margin-bottom: 40px;
+    }
+
+    .charity-card {
+      background: #fff;
+      border: 1.5px solid #e8eaed;
+      border-radius: 12px;
+      padding: 18px 20px;
+      cursor: pointer;
+      transition: border-color 0.18s, box-shadow 0.18s;
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+      user-select: none;
+      text-decoration: none;
+      color: inherit;
+    }
+
+    .charity-card:hover {
+      border-color: #93b4f7;
+      box-shadow: 0 0 0 3px rgba(26, 86, 219, 0.08);
+    }
+
+    .charity-card.selected {
+      border-color: #1a56db;
+      box-shadow: 0 0 0 3px rgba(26, 86, 219, 0.12);
+      background: #f0f5ff;
+    }
+
+    .charity-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 10px;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+    }
+
+    .charity-info { flex: 1; min-width: 0; }
+
+    .charity-name {
+      font-size: 14px;
+      font-weight: 600;
+      color: #1a1a2e;
+      line-height: 1.35;
+      margin-bottom: 4px;
+    }
+
+    .charity-desc {
+      font-size: 12px;
+      color: #7a8398;
+      line-height: 1.45;
+    }
+
+    .check-icon {
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      border: 1.5px solid #d1d5db;
+      flex-shrink: 0;
+      margin-top: 2px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.18s, border-color 0.18s;
+    }
+
+    .charity-card.selected .check-icon {
+      background: #1a56db;
+      border-color: #1a56db;
+    }
+
+    .check-icon svg {
+      width: 11px;
+      height: 11px;
+      stroke: #fff;
+      fill: none;
+      stroke-width: 2.5;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      display: none;
+    }
+
+    .charity-card.selected .check-icon svg { display: block; }
+
+    /* ── Submit section ── */
+    .submit-section {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .selected-note {
+      font-size: 14px;
+      color: #7a8398;
+      min-height: 20px;
+    }
+
+    .selected-note strong {
+      color: #1a56db;
+      font-weight: 600;
+    }
+
+    .btn-submit {
+      background: #1a56db;
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      padding: 14px 40px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.18s, transform 0.1s;
+      letter-spacing: -0.2px;
+    }
+
+    .btn-submit:hover { background: #1239a0; }
+    .btn-submit:active { transform: scale(0.98); }
+
+    .btn-submit:disabled {
+      background: #c0ccdd;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    /* ── Success state ── */
+    .success-message {
+      display: none;
+      text-align: center;
+      padding: 32px 20px;
+      background: #fff;
+      border-radius: 14px;
+      border: 1.5px solid #c3d9f7;
+    }
+
+    .success-message.visible { display: block; }
+
+    .success-message h3 {
+      font-size: 20px;
+      font-weight: 700;
+      color: #1239a0;
+      margin-bottom: 10px;
+    }
+
+    .success-message p {
+      font-size: 15px;
+      color: #5a6072;
+      line-height: 1.6;
+    }
+
+    /* ── Footer ── */
+    footer {
+      background: #fff;
+      border-top: 1px solid #e8eaed;
+      padding: 20px 2rem;
+      text-align: center;
+      font-size: 13px;
+      color: #9aa1b0;
+    }
+
+    footer a {
+      color: #1a56db;
+      text-decoration: none;
+    }
+
+    @media (max-width: 540px) {
+      .hero h1 { font-size: 24px; }
+      .charity-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+    <!-- Header -->
+  <header>
+    <a href="https://www.cleartax.com" class="logo">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 300" aria-label="ClearTax">
+        <path d="M154.48,268.92c-47.51,0-78.42-34.93-78.42-84.74s30.91-84.74,78.42-84.74c35.8,0,60.91,21.15,68.76,44.35,2.06,6.41-.64,9.69-4.51,11.6l-14.3,6.69c-6.05,2.87-10.56.68-13.01-3.54-5.8-9.28-15.19-22.11-36.96-22.11-26.01,0-42.1,17.33-42.1,47.89s16.1,47.89,42.1,47.89c21.76,0,31.16-12.83,36.96-22.11,2.44-4.23,6.95-6.41,13.01-3.55l14.3,6.69c3.99,1.91,6.95,5.19,4.51,11.6-8.5,22.65-32.97,44.07-68.76,44.07h0Z"/>
+        <path d="M253.89,265.37c-5.41,0-9.14-3.82-9.14-9.69V40.77c0-5.73,3.61-9.69,9.14-9.69h18.15c5.41,0,9.14,3.82,9.14,9.69v215.05c0,5.73-3.61,9.69-9.14,9.69h-18.15v-.14h0Z"/>
+        <path d="M382.92,268.64c-48.8,0-78.42-28.93-78.42-84.74,0-48.85,30.65-84.47,76.62-84.47s69.41,35.34,69.41,78.05c0,10.65-4.89,17.6-16.35,17.6h-95.67c1.8,28.52,18.15,39.85,45.46,39.85,17.51,0,29.75-4.5,38.11-8.32,6.69-2.87,11.2-3.28,14.55,3.82l4.25,9.28c3.09,6.69,2.44,11.6-2.7,15.15-7.08,4.78-27.43,13.78-55.24,13.78h0ZM338.63,170.12h77.91c-2.06-26.61-16.61-36.98-36.31-36.98-21.89,0-38.76,10.23-41.59,36.98h0Z"/>
+        <path d="M565.27,245.86c-11.2,12.56-30.9,22.79-52.15,22.79-32.06,0-50.6-19.24-50.6-49.12s22.15-50.36,63.35-50.36c14.3,0,26.4,2.87,36.31,6.41v-14.19c0-17.06-10.05-27.57-30.64-27.57-15.19,0-26.4,4.5-35.8,8.74-4.89,2.19-9.65,1.63-12.1-3.55l-5.41-11.6c-3.09-6.14-2.45-11.6,4.25-15.42,12.36-7.1,30.9-12.56,51.51-12.56,36.31,0,63.35,18.29,63.35,60.73v95.66c0,5.73-3.61,9.69-9.14,9.69h-13.9c-5.41,0-9.14-3.82-9.14-9.69v-9.96h.13ZM522.01,236.85c15.19,0,29.1-5.73,39.66-14.47v-20.88c-9.14-1.91-18.8-3.28-30.64-3.28-20.34,0-32.06,7.1-32.06,20.88,0,11.05,8.11,17.74,23.05,17.74Z"/>
+        <path d="M654.99,265.37h-18.16c-5.41,0-9.14-3.82-9.14-9.69V112.27c0-5.73,3.61-9.69,9.14-9.69h16.61c5.41,0,9.14,3.82,9.14,9.69v17.6c8.5-12.83,23.31-27.29,46.35-27.29,6.05,0,9.14,3.82,9.14,9.69v18.29c0,5.46-3.61,9.01-9.14,9.01h-4.89c-19.96,0-30.64,4.78-40.05,13.51v102.75c0,5.73-3.61,9.55-9.01,9.55Z"/>
+        <path d="M807.33,265.37h-10.3c-46.35,0-62.45-23.06-62.45-56.49V63.14c0-5.73,3.61-9.69,9.14-9.69h18.15c5.41,0,9.14,3.82,9.14,9.69v39.43h36.31c5.41,0,9.14,3.82,9.14,9.69v14.47c0,5.73-3.61,9.69-9.14,9.69h-36.31v77.1c0,12.14,7.85,18.29,21.76,18.29h14.55c5.41,0,9.14,3.82,9.14,9.69v14.47c0,5.59-3.74,9.42-9.14,9.42h0Z"/>
+        <path d="M932.75,245.86c-11.2,12.56-30.9,22.79-52.15,22.79-32.06,0-50.6-19.24-50.6-49.12s22.14-50.36,63.35-50.36c14.3,0,26.4,2.87,36.31,6.41v-14.19c0-17.06-10.05-27.57-30.65-27.57-15.19,0-26.39,4.5-35.8,8.74-4.89,2.19-9.65,1.63-12.1-3.55l-5.41-11.6c-3.09-6.14-2.45-11.6,4.25-15.42,12.36-7.1,30.9-12.56,51.51-12.56,36.31,0,63.35,18.29,63.35,60.73v95.66c0,5.73-3.61,9.69-9.14,9.69h-13.9c-5.41,0-9.14-3.82-9.14-9.69v-9.96h.13ZM889.48,236.85c15.2,0,29.1-5.73,39.66-14.47v-20.88c-9.14-1.91-18.8-3.28-30.64-3.28-20.34,0-32.06,7.1-32.06,20.88,0,11.05,8.11,17.74,23.05,17.74Z"/>
+        <path d="M1007.84,265.37h-20.6c-5.41,0-6.96-5.46-4.51-9.28l46.61-72.59-46.61-71.64c-2.7-4.23-.9-9.28,4.51-9.28h21.5c7.85,0,11.85,1.64,15.2,7.37l29.36,48.17,29.1-48.17c3.35-5.46,7.21-7.37,15.19-7.37h20.6c5.41,0,6.96,5.46,4.51,9.28l-46.61,72.73,46.61,71.64c2.7,4.23.9,9.28-4.51,9.28h-21.5c-7.85,0-11.85-1.91-15.2-7.37l-29.36-48.31-28.84,47.62c-3.61,5.73-7.47,7.92-15.45,7.92h0Z"/>
+      </svg>
+    </a>
+  </header>
+
+  <!-- Hero -->
+  <section class="hero">
+    <div class="checkmark-circle">
+      <svg viewBox="0 0 24 24">
+        <polyline points="20 6 9 17 4 12"/>
+      </svg>
+    </div>
+    <h1>Thank you for your response!</h1>
+    <p>
+      Your insights on France's e-invoicing readiness are invaluable.
+      As a token of our appreciation, ClearTax will donate
+      <strong style="color:#fff;">€50</strong> to a charity of your choice.
+    </p>
+  </section>
+
+  <!-- Main -->
+  <main>
+
+    <div class="section-intro">
+      <h2>Choose your charity</h2>
+      <p>Select one organisation below — ClearTax will donate <strong>€50</strong> on your behalf.</p>
+    </div>
+
+    <div class="charity-grid" id="charityGrid">
+
+      <div class="charity-card" data-charity="Action contre la faim" onclick="selectCharity(this)">
+        <div class="charity-icon" style="background:#fff3e0;">🍽️</div>
+        <div class="charity-info">
+          <div class="charity-name">Action contre la faim</div>
+          <div class="charity-desc">Fighting hunger and malnutrition worldwide since 1979</div>
+        </div>
+        <div class="check-icon"><svg viewBox="0 0 12 12"><polyline points="10 3 5 9 2 6"/></svg></div>
+      </div>
+
+      <div class="charity-card" data-charity="Fondation Jean-Pierre Gardille" onclick="selectCharity(this)">
+        <div class="charity-icon" style="background:#e8f5e9;">🌿</div>
+        <div class="charity-info">
+          <div class="charity-name">Fondation Jean-Pierre Gardille</div>
+          <div class="charity-desc">Supporting local community and social causes in France</div>
+        </div>
+        <div class="check-icon"><svg viewBox="0 0 12 12"><polyline points="10 3 5 9 2 6"/></svg></div>
+      </div>
+
+      <div class="charity-card" data-charity="Les Restos du Cœur" onclick="selectCharity(this)">
+        <div class="charity-icon" style="background:#fce4ec;">❤️</div>
+        <div class="charity-info">
+          <div class="charity-name">Les Restos du Cœur</div>
+          <div class="charity-desc">Providing meals and support to those in need across France</div>
+        </div>
+        <div class="check-icon"><svg viewBox="0 0 12 12"><polyline points="10 3 5 9 2 6"/></svg></div>
+      </div>
+
+      <div class="charity-card" data-charity="Médecins sans frontières-France" onclick="selectCharity(this)">
+        <div class="charity-icon" style="background:#e3f2fd;">🏥</div>
+        <div class="charity-info">
+          <div class="charity-name">Médecins sans frontières</div>
+          <div class="charity-desc">Delivering emergency medical care in crisis zones worldwide</div>
+        </div>
+        <div class="check-icon"><svg viewBox="0 0 12 12"><polyline points="10 3 5 9 2 6"/></svg></div>
+      </div>
+
+      <div class="charity-card" data-charity="Médecins du monde" onclick="selectCharity(this)">
+        <div class="charity-icon" style="background:#ede7f6;">🌍</div>
+        <div class="charity-info">
+          <div class="charity-name">Médecins du monde</div>
+          <div class="charity-desc">Healthcare access for vulnerable populations globally</div>
+        </div>
+        <div class="check-icon"><svg viewBox="0 0 12 12"><polyline points="10 3 5 9 2 6"/></svg></div>
+      </div>
+
+      <div class="charity-card" data-charity="Handicap International" onclick="selectCharity(this)">
+        <div class="charity-icon" style="background:#fff8e1;">♿</div>
+        <div class="charity-info">
+          <div class="charity-name">Handicap International</div>
+          <div class="charity-desc">Improving the lives of people with disabilities in conflict zones</div>
+        </div>
+        <div class="check-icon"><svg viewBox="0 0 12 12"><polyline points="10 3 5 9 2 6"/></svg></div>
+      </div>
+
+      <div class="charity-card" data-charity="Greenpeace" onclick="selectCharity(this)">
+        <div class="charity-icon" style="background:#e8f5e9;">🌱</div>
+        <div class="charity-info">
+          <div class="charity-name">Greenpeace</div>
+          <div class="charity-desc">Campaigning for a greener, more peaceful planet</div>
+        </div>
+        <div class="check-icon"><svg viewBox="0 0 12 12"><polyline points="10 3 5 9 2 6"/></svg></div>
+      </div>
+
+      <div class="charity-card" data-charity="WWF" onclick="selectCharity(this)">
+        <div class="charity-icon" style="background:#e0f7fa;">🐼</div>
+        <div class="charity-info">
+          <div class="charity-name">WWF — World Wide Fund</div>
+          <div class="charity-desc">Protecting nature and reducing threats to biodiversity</div>
+        </div>
+        <div class="check-icon"><svg viewBox="0 0 12 12"><polyline points="10 3 5 9 2 6"/></svg></div>
+      </div>
+
+      <a class="charity-card" data-charity="La SPA" href="https://www.la-spa.fr" target="_blank" onclick="selectCharity(this); return false;">
+        <div class="charity-icon" style="background:#fce4ec;">🐾</div>
+        <div class="charity-info">
+          <div class="charity-name">La SPA</div>
+          <div class="charity-desc">Protecting and rehoming abandoned animals across France</div>
+        </div>
+        <div class="check-icon"><svg viewBox="0 0 12 12"><polyline points="10 3 5 9 2 6"/></svg></div>
+      </a>
+
+    </div>
+
+    <!-- Submit -->
+    <div class="submit-section" id="submitSection">
+      <p class="selected-note" id="selectedNote">No charity selected yet</p>
+      <button class="btn-submit" id="submitBtn" onclick="submitCharity()" disabled>
+        Confirm my choice
+      </button>
+    </div>
+
+    <!-- Success message (hidden until submit) -->
+    <div class="success-message" id="successMessage">
+      <div style="font-size:40px;margin-bottom:12px;">🎉</div>
+      <h3>Your donation is confirmed!</h3>
+      <p id="successText">
+        Thank you for making a difference. ClearTax will donate on your behalf.<br>
+        Look out for your personalised e-invoicing report in your inbox.
+      </p>
+    </div>
+
+  </main>
+
+  <!-- Footer -->
+  <footer>
+    <p>
+      &copy; 2025 ClearTax —
+      <a href="https://www.cleartax.com/fr/en/france-e-invoicing-readiness-assessment">Back to survey</a>
+      &nbsp;·&nbsp;
+      <a href="https://www.cleartax.com/privacy-policy">Privacy policy</a>
+    </p>
+  </footer>
+
+  <script>
+    var SHEET_WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbwc6cWhJYD8KW7_ARNL8Za2ayfUrJi19jqd1zH6m36hO5Lhjq3h8Hcwb_SA6flb76Rq/exec';
+    let selectedCard = null;
+    let selectedName = '';
+
+    function selectCharity(card) {
+      if (selectedCard) selectedCard.classList.remove('selected');
+      card.classList.add('selected');
+      selectedCard = card;
+      selectedName = card.dataset.charity;
+
+      document.getElementById('selectedNote').innerHTML =
+        'You selected: <strong>' + selectedName + '</strong>';
+      document.getElementById('submitBtn').disabled = false;
+    }
+
+    async function submitCharity() {
+      if (!selectedName) return;
+
+      const btn = document.getElementById('submitBtn');
+      btn.disabled = true;
+      btn.textContent = 'Submitting...';
+
+      // Get email from URL params passed from the survey page
+      const urlParams = new URLSearchParams(window.location.search);
+      const email = urlParams.get('email') || '';
+
+      const payload = {
+        region: 'france',
+        form_type: 'France-Charity-Selection',
+        work_email: email,
+        charity_selected: selectedName,
+        submitted_at: new Date().toLocaleString(),
+        page_url: window.location.href
+      };
+
+      try {
+        await fetch(SHEET_WEB_APP_URL, {
+          method: 'POST',
+          mode: 'no-cors',
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded'
+          },
+          body: new URLSearchParams(payload).toString()
+        });
+
+        document.getElementById('submitSection').style.display = 'none';
+        document.getElementById('charityGrid').style.pointerEvents = 'none';
+        document.getElementById('charityGrid').style.opacity = '0.5';
+
+        const msg = document.getElementById('successMessage');
+        document.getElementById('successText').innerHTML =
+          'ClearTax will donate <strong>€50</strong> to <strong>' + selectedName + '</strong> on your behalf.<br>' +
+          'Your personalised France e-invoicing report will arrive in your inbox shortly.';
+        msg.classList.add('visible');
+      } catch (err) {
+        console.error(err);
+        alert('Something went wrong. Please try again.');
+        btn.disabled = false;
+        btn.textContent = 'Confirm my choice';
+      }
+    }
+  </script>
+
+</body>
+</html>
