@@ -39,15 +39,13 @@ if (WATCH && PAGE !== 'all' && ACTIVE.length === 1) {
 
 /**
  * Webflow page custom-code field caps each <style> paste at ~50k chars.
- * If a built bundle exceeds SPLIT_LIMIT, emit two parts (-1.css/-2.css) that
- * together preserve cascade. The combined <name>.css stays in place.
+ * If a built bundle exceeds SPLIT_LIMIT, emit two parts (-1.css/-2.css)
+ * by slicing at the first top-level rule boundary past the file midpoint.
  *
- * Layout we expect from Tailwind v4 minified output:
- *   [banner][@layer properties{…}][@layer theme{…}][@layer utilities{…}][trailing custom CSS + @property]
- * Split happens inside @layer utilities at the first top-level rule boundary
- * past the midpoint. An explicit `@layer properties, theme, utilities;` order
- * declaration is prepended to both parts so cascade works regardless of which
- * Webflow field they land in.
+ * The combined <name>.css stays in place. Both parts are valid standalone
+ * CSS — no layer-order reconstruction needed because utilities are emitted
+ * unlayered (so cascade is purely "later in document wins") and the user
+ * pastes both parts in order on the same Webflow page.
  */
 function splitIfOverLimit(outPath, name) {
   const partA = outPath.replace(/\.css$/, '-1.css');
@@ -60,52 +58,24 @@ function splitIfOverLimit(outPath, name) {
     return;
   }
 
-  const marker = '@layer utilities{';
-  const startIdx = css.indexOf(marker);
-  if (startIdx === -1) {
-    console.warn(`[css:${name}] over ${SPLIT_LIMIT} chars but no @layer utilities found — skipping split`);
-    return;
-  }
-  const bodyStart = startIdx + marker.length;
-
-  let depth = 1;
-  let bodyEnd = -1;
-  for (let i = bodyStart; i < css.length; i++) {
+  const target = Math.floor(css.length / 2);
+  let depth = 0;
+  let splitAt = -1;
+  for (let i = 0; i < css.length; i++) {
     const c = css[i];
     if (c === '{') depth++;
     else if (c === '}') {
       depth--;
-      if (depth === 0) { bodyEnd = i; break; }
-    }
-  }
-  if (bodyEnd === -1) {
-    console.warn(`[css:${name}] unmatched braces in @layer utilities — skipping split`);
-    return;
-  }
-
-  const preamble = css.slice(0, startIdx);
-  const utilsBody = css.slice(bodyStart, bodyEnd);
-  const trailing = css.slice(bodyEnd + 1);
-
-  const target = Math.floor(utilsBody.length / 2);
-  let d = 0;
-  let splitAt = -1;
-  for (let i = 0; i < utilsBody.length; i++) {
-    const c = utilsBody[i];
-    if (c === '{') d++;
-    else if (c === '}') {
-      d--;
-      if (d === 0 && i + 1 >= target) { splitAt = i + 1; break; }
+      if (depth === 0 && i + 1 >= target) { splitAt = i + 1; break; }
     }
   }
   if (splitAt === -1) {
-    console.warn(`[css:${name}] no clean rule boundary near midpoint — skipping split`);
+    console.warn(`[css:${name}] no clean top-level rule boundary near midpoint — skipping split`);
     return;
   }
 
-  const layerOrder = '@layer properties,theme,utilities;';
-  const part1 = layerOrder + preamble + marker + utilsBody.slice(0, splitAt) + '}';
-  const part2 = layerOrder + marker + utilsBody.slice(splitAt) + '}' + trailing;
+  const part1 = css.slice(0, splitAt);
+  const part2 = css.slice(splitAt);
 
   writeFileSync(partA, part1, 'utf8');
   writeFileSync(partB, part2, 'utf8');
