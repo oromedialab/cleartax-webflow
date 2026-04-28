@@ -31,30 +31,46 @@ function kebab(s) {
 /**
  * Inlines dist/css/<bundle>.css files as <style> blocks in preview head,
  * one per CSS import found in the page's Astro frontmatter.
+ *
+ * If a bundle has been split by build-css.mjs (over Webflow's ~50k paste
+ * limit), emit one <style> block per part so the preview mirrors the exact
+ * shape the user will paste into Webflow.
  */
+function makeStyleBlock(filename, css) {
+  const indented = css.trim().split('\n').map(line => line ? `    ${line}` : line).join('\n');
+  if (filename === 'fonts.css') {
+    return [
+      '  <!-- ============================================================',
+      '       PREVIEW-ONLY - DO NOT PASTE INTO WEBFLOW',
+      '       Webflow injects Nohemi + Gilroy via its own shared.css',
+      '       (Project Settings -> Fonts). The <style> block below is',
+      '       for local dev + dist/preview only; /fonts/* paths 404 in prod.',
+      '  ============================================================ -->',
+      `  <style>\n${indented}\n  </style>`,
+    ].join('\n');
+  }
+  return `  <!-- ${filename} -->\n  <style>\n${indented}\n  </style>`;
+}
+
 function buildCssStyleBlocks(cssImports) {
   const blocks = [];
   for (const filename of cssImports) {
+    const base = filename.replace(/\.css$/, '');
+    const part1 = join(CSS_DIR, `${base}-1.css`);
+    const part2 = join(CSS_DIR, `${base}-2.css`);
+
+    if (existsSync(part1) && existsSync(part2)) {
+      blocks.push(makeStyleBlock(`${base}-1.css`, readFileSync(part1, 'utf8')));
+      blocks.push(makeStyleBlock(`${base}-2.css`, readFileSync(part2, 'utf8')));
+      continue;
+    }
+
     const cssPath = join(CSS_DIR, filename);
     if (!existsSync(cssPath)) {
       console.warn(`[assemble-preview] CSS not found for inlining: ${cssPath}`);
       continue;
     }
-    const css = readFileSync(cssPath, 'utf8').trim();
-    const indented = css.split('\n').map(line => line ? `    ${line}` : line).join('\n');
-    if (filename === 'fonts.css') {
-      blocks.push([
-        '  <!-- ============================================================',
-        '       PREVIEW-ONLY - DO NOT PASTE INTO WEBFLOW',
-        '       Webflow injects Nohemi + Gilroy via its own shared.css',
-        '       (Project Settings -> Fonts). The <style> block below is',
-        '       for local dev + dist/preview only; /fonts/* paths 404 in prod.',
-        '  ============================================================ -->',
-        `  <style>\n${indented}\n  </style>`,
-      ].join('\n'));
-    } else {
-      blocks.push(`  <!-- ${filename} -->\n  <style>\n${indented}\n  </style>`);
-    }
+    blocks.push(makeStyleBlock(filename, readFileSync(cssPath, 'utf8')));
   }
   return blocks.join('\n');
 }
