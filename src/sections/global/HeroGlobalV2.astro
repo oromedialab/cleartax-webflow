@@ -38,9 +38,16 @@ const trustLogos = [
     <div class="flex flex-row flex-nowrap items-start justify-between gap-10 max-lg:flex-col max-lg:flex-wrap max-lg:gap-12">
       <div class="basis-[593px] w-1/2 text-left max-lg:w-full max-lg:max-w-full max-lg:basis-auto">
         <h1 class="text-[56px]! leading-[1.12]! font-medium! text-white! m-0! mb-6! tracking-[-1.5px]! max-lg:text-[32px]!">
-          <span class="text-[#CC9DFF]">100% e-Invoicing Compliance Today.</span> <br />Tax Assurance for Tomorrow.
+          <span
+            class="animated-gradient-text inline-flex"
+            data-gradient-colors="#CC9DFF, #CC9DFF, #FFFFFF, #CC9DFF, #CC9DFF"
+            data-animation-speed="4"
+          >
+            <span class="text-content">100% e-Invoicing Compliance Today.</span>
+          </span>
+          <br />Tax Assurance for Tomorrow.
         </h1>
-        <p class="text-[17px]! leading-[1.7]! text-white mb-10! max-w-148 max-lg:max-w-full">
+        <p class="text-lg! leading-[1.6]! text-white/80 font-medium mb-10! max-w-148 max-lg:max-w-full">
           ClearTax helps you do more than meet the e-invoicing deadline. We prepare you for a future of automated tax scrutiny and always-on compliance.
         </p>
         <a
@@ -103,6 +110,52 @@ const trustLogos = [
       wrap.appendChild(iframe);
     });
   })();
+
+  // Gradient Text Animation Logic
+  (function () {
+    const elements = document.querySelectorAll('.animated-gradient-text');
+    
+    elements.forEach(el => {
+      const textContent = el.querySelector('.text-content');
+      if (!textContent) return;
+
+      const colors = el.dataset.gradientColors || '#5227FF, #FF9FFC, #B497CF';
+      const speed = parseFloat(el.dataset.animationSpeed) || 8;
+      const animationDuration = speed * 1000;
+      
+      // Setup Initial Styles
+      const gradientColors = colors.split(',').map(c => c.trim());
+      // Design a cleaner shimmer: Purple -> Purple -> White -> Purple -> Purple
+      const shimmerColors = `${gradientColors[0]}, ${gradientColors[0]}, ${gradientColors[2] || '#FFFFFF'}, ${gradientColors[0]}, ${gradientColors[0]}`;
+      
+      textContent.style.backgroundImage = `linear-gradient(110deg, ${shimmerColors})`;
+      textContent.style.backgroundSize = '200% 100%';
+      textContent.style.backgroundRepeat = 'repeat';
+
+      let elapsed = 0;
+      let lastTime = null;
+
+      function update(time) {
+        if (!lastTime) {
+          lastTime = time;
+          requestAnimationFrame(update);
+          return;
+        }
+
+        const deltaTime = time - lastTime;
+        lastTime = time;
+        elapsed += deltaTime;
+
+        // Use continuous increment instead of modulo to prevent the 100->0 jump flicker
+        const p = (elapsed / animationDuration) * 100;
+        textContent.style.backgroundPosition = `${p}% 50%`;
+
+        requestAnimationFrame(update);
+      }
+
+      requestAnimationFrame(update);
+    });
+  })();
 </script>
 
 <style is:global>
@@ -118,5 +171,24 @@ const trustLogos = [
     border-radius: 9999px;
     text-decoration: none;
     transition: transform 0.3s ease;
+}
+
+.animated-gradient-text {
+  position: relative;
+  display: inline-flex;
+  max-width: fit-content;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.text-content {
+  display: inline-block;
+  position: relative;
+  z-index: 2;
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+  will-change: background-position;
 }
 </style>
