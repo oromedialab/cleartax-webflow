@@ -51,8 +51,13 @@ function doPost(e) {
     
     // 5. Append to the next empty row
     sheet.appendRow(rowData);
+
+    // 6. Send Email Automation
+    if (data.email) {
+      sendReportEmail(data.email);
+    }
     
-    // 6. Return a successful CORS-enabled response
+    // 7. Return a successful CORS-enabled response
     return ContentService.createTextOutput(JSON.stringify({ "status": "success" }))
       .setMimeType(ContentService.MimeType.JSON);
       
@@ -64,9 +69,43 @@ function doPost(e) {
 }
 
 /**
+ * Sends the report PDF via email
+ */
+function sendReportEmail(recipientEmail) {
+  try {
+    // PDF File ID from Google Drive
+    var fileId = "1s-8ODzsJzQGoPJ1p_8Qz9u9Pz0ojzzem"; 
+    var file = DriveApp.getFileById(fileId);
+    
+    var subject = "[Download] Your State of Tax Assurance 2026 Report is Here";
+    
+    var htmlBody = 
+      "<div style='font-family: sans-serif; line-height: 1.6; color: #333;'>" +
+        "<p>Hello,</p>" +
+        "<p>Thank you for downloading <strong>The Readiness Illusion: State of Tax Assurance Report 2026</strong>.</p>" +
+        "<p>Please find the PDF attached to this email for your reference.</p>" +
+        "<p><a href='https://cleartax.com/about-us#contact' style='display: inline-block; padding: 10px 20px; background-color: #301B5E; color: #ffffff; text-decoration: none; border-radius: 5px; font-weight: bold;'>Talk to an expert</a> to discuss how ClearTax can help automate your tax compliance and eliminate notices.</p>" +
+        "<br>" +
+        "<p>Best,<br><strong>Team ClearTax</strong></p>" +
+      "</div>";
+
+    GmailApp.sendEmail(recipientEmail, subject, "", {
+      htmlBody: htmlBody,
+      attachments: [file.getAs(MimeType.PDF)],
+      name: "ClearTax"
+    });
+    
+    console.log("Email sent successfully to: " + recipientEmail);
+  } catch (e) {
+    console.error("Failed to send email: " + e.toString());
+  }
+}
+
+/**
  * Handle CORS Preflight requests if needed
  */
 function doOptions(e) {
   return ContentService.createTextOutput("")
     .setMimeType(ContentService.MimeType.TEXT);
 }
+
