@@ -28,7 +28,7 @@
 
 // ---------- CONFIG ----------
 var PDF_FILE_ID  = '1s-8ODzsJzQGoPJ1p_8Qz9u9Pz0ojzzem';
-var PDF_LINK     = 'https://drive.google.com/uc?export=download&id=' + PDF_FILE_ID;
+var PDF_LINK     = 'https://drive.google.com/file/d/' + PDF_FILE_ID + '/view?usp=sharing';
 var SENDER_NAME  = 'Team ClearTax';
 var REPLY_TO     = 'support@cleartax.in'; 
 var EMAIL_SUBJECT = '[Download] Your State of Tax Assurance 2026 Report is Here';
@@ -173,7 +173,7 @@ function doOptions(e) {
    3) checkQuota()       — logs remaining daily mail quota.
    ============================================================ */
 
-var TEST_RECIPIENT = 'mafas.s@clear.in';   // <-- change before running
+var TEST_RECIPIENT = 'products@cleartaxmailer.com';   // <-- change before running
 
 function testEmail() {
   sendReportEmail(TEST_RECIPIENT);
