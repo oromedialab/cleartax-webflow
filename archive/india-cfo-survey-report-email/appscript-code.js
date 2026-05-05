@@ -29,9 +29,9 @@
 // ---------- CONFIG ----------
 var PDF_FILE_ID  = '1s-8ODzsJzQGoPJ1p_8Qz9u9Pz0ojzzem';
 var PDF_LINK     = 'https://drive.google.com/uc?export=download&id=' + PDF_FILE_ID;
-var SENDER_NAME  = 'ClearTax';
-var REPLY_TO     = 'noreply@cleartax.com';   // change to a monitored inbox if needed
-var EMAIL_SUBJECT = 'Your State of Tax Assurance 2026 Report';
+var SENDER_NAME  = 'Team ClearTax';
+var REPLY_TO     = 'support@cleartax.in'; 
+var EMAIL_SUBJECT = '[Download] Your State of Tax Assurance 2026 Report is Here';
 // ---------------------------
 
 
@@ -95,15 +95,24 @@ function doPost(e) {
 function sendReportEmail(to) {
   if (!to) throw new Error("missing recipient email");
 
-  var html = buildEmailHtml({
-    download_link: PDF_LINK
-  });
+  try {
+    // 1. Build the HTML (Using button instead of attachment to avoid size limits)
+    var html = buildEmailHtml({
+      download_link: PDF_LINK
+    });
 
-  GmailApp.sendEmail(to, EMAIL_SUBJECT, htmlToPlainText(html), {
-    htmlBody: html,
-    name:    SENDER_NAME,
-    replyTo: REPLY_TO
-  });
+    // 2. Send the email
+    GmailApp.sendEmail(to, EMAIL_SUBJECT, htmlToPlainText(), {
+      htmlBody: html,
+      name:    SENDER_NAME,
+      replyTo: REPLY_TO
+    });
+
+    Logger.log("Email sent successfully with download button to: " + to);
+  } catch (err) {
+    Logger.log("ERROR: " + err.toString());
+    throw err;
+  }
 }
 
 
@@ -119,51 +128,35 @@ function sendReportEmail(to) {
  *        return draft.getMessage().getBody().replace(/{{download_link}}/g, vars.download_link);
  */
 function buildEmailHtml(vars) {
-  var html = ''
-    + '<!doctype html><html><body style="margin:0;padding:0;background:#f5f5f7;font-family:Arial,Helvetica,sans-serif;color:#1a1a1a;">'
+  return ''
+    + '<!doctype html><html><body style="margin:0;padding:0;background:#f5f5f7;font-family:Arial,sans-serif;color:#333;">'
     + '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#f5f5f7;padding:32px 16px;">'
     +   '<tr><td align="center">'
     +     '<table role="presentation" width="560" cellpadding="0" cellspacing="0" style="background:#ffffff;border-radius:12px;overflow:hidden;max-width:560px;width:100%;">'
-
-    +       '<tr><td style="background:#0a0e1a;padding:28px 32px;">'
-    +         '<div style="color:#8B5CF6;font-size:13px;font-weight:600;letter-spacing:0.5px;text-transform:uppercase;">State of Tax Assurance 2026</div>'
-    +         '<div style="color:#ffffff;font-size:22px;font-weight:700;margin-top:6px;">Your report is ready.</div>'
-    +       '</td></tr>'
-
-    +       '<tr><td style="padding:32px;">'
-    +         '<p style="margin:0 0 16px;font-size:15px;line-height:1.6;color:#333;">Thanks for requesting the <strong>State of Tax Assurance 2026 Report</strong> — the first data-backed benchmark of enterprise tax compliance in India.</p>'
-    +         '<p style="margin:0 0 24px;font-size:15px;line-height:1.6;color:#333;">Click below to download your copy.</p>'
-
+    +       '<tr><td style="padding:40px 32px;">'
+    +         '<p style="margin:0 0 16px;">Hello,</p>'
+    +         '<p style="margin:0 0 16px;">Thank you for downloading <strong>The Readiness Illusion: State of Tax Assurance Report 2026</strong>.</p>'
+    +         '<p style="margin:0 0 24px;">Please click the button below to download your copy of the report.</p>'
     +         '<table role="presentation" cellpadding="0" cellspacing="0"><tr><td style="border-radius:8px;background:#8B5CF6;">'
     +           '<a href="' + vars.download_link + '" style="display:inline-block;padding:14px 28px;font-size:15px;font-weight:600;color:#ffffff;text-decoration:none;border-radius:8px;">Download PDF Report</a>'
     +         '</td></tr></table>'
-
-    +         '<p style="margin:28px 0 0;font-size:13px;line-height:1.6;color:#666;">Inside the report:</p>'
-    +         '<ul style="margin:8px 0 0;padding-left:20px;font-size:13px;line-height:1.8;color:#666;">'
-    +           '<li>5 industries covered</li>'
-    +           '<li>500 companies studied</li>'
-    +           '<li>100+ CFO interviews</li>'
-    +           '<li>12 Cr+ tax transactions analyzed</li>'
-    +         '</ul>'
+    +         '<p style="margin:32px 0 0;font-size:14px;"><a href="https://cleartax.in/s/contact-sales/lp?utm_source=Email&utm_medium=Organic&utm_campaign=India_CFO_Survey_State_of_Tax_Assurance_2026_Report_Thank_you_Email" style="color:#8B5CF6;text-decoration:none;font-weight:600;">Talk to an expert</a> to discuss how ClearTax can help automate your tax compliance and eliminate notices.</p>'
+    +         '<p style="margin:32px 0 0;">Best,<br>Team ClearTax</p>'
     +       '</td></tr>'
-
-    +       '<tr><td style="padding:20px 32px;background:#fafafa;border-top:1px solid #ececec;">'
-    +         '<p style="margin:0;font-size:12px;line-height:1.5;color:#888;">You received this because you requested the report on cleartax.com. Questions? Reply to this email.</p>'
-    +       '</td></tr>'
-
     +     '</table>'
     +   '</td></tr>'
     + '</table>'
     + '</body></html>';
-  return html;
 }
 
 
-function htmlToPlainText(html) {
-  return html.replace(/<style[\s\S]*?<\/style>/gi, '')
-             .replace(/<[^>]+>/g, ' ')
-             .replace(/\s+/g, ' ')
-             .trim();
+function htmlToPlainText() {
+  return "Hello,\n\n"
+       + "Thank you for downloading The Readiness Illusion: State of Tax Assurance Report 2026.\n\n"
+       + "You can download your copy here: " + PDF_LINK + "\n\n"
+       + "Talk to an expert (https://cleartax.in/s/contact-sales/lp) to discuss how ClearTax can help automate your tax compliance and eliminate notices.\n\n"
+       + "Best,\n"
+       + "Team ClearTax";
 }
 
 
@@ -180,7 +173,7 @@ function doOptions(e) {
    3) checkQuota()       — logs remaining daily mail quota.
    ============================================================ */
 
-var TEST_RECIPIENT = 'YOUR_EMAIL_HERE@example.com';   // <-- change before running
+var TEST_RECIPIENT = 'mafas.s@clear.in';   // <-- change before running
 
 function testEmail() {
   sendReportEmail(TEST_RECIPIENT);
