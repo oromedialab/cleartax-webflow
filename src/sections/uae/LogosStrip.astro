@@ -1,139 +1,71 @@
 ---
 /**
- * UAE logos marquee — ported from uae-landing-page/index.html:569-701.
- * The 25 logos are rendered twice in a row so the keyframe `marquee` (translateX -50%)
- * loops seamlessly. Pause-on-hover is preserved.
+ * Global logos marquee V2 — Tailwind optimized
+ * Different visual from the UAE marquee (white bg, multiply blend, soft mask edges).
  */
-export interface Logo { src: string; alt: string; }
-
-export interface Props {
-  label?: string;
-  logos?: Logo[];
-}
-
-const DEFAULT_LOGOS: Logo[] = [
-  { src: 'https://cdn.prod.website-files.com/63ede4a3da6dbd6b05c4612f/69de21c3ee8365e68e3d4fe0_volvo-logo-DE2AD4747B-seeklogo.com%20%5BVectorized%5D.svg', alt: 'Volvo' },
-  { src: 'https://cdn.prod.website-files.com/63ede4a3da6dbd6b05c4612f/69de21c3bb5063d4bcaee6ee_toyota-logo.svg', alt: 'Toyota' },
-  { src: 'https://cdn.prod.website-files.com/63ede4a3da6dbd6b05c4612f/69de21c36fb2e2fa4d26a2b1_Standard_Chartered_(2021).svg%20%5BVectorized%5D.svg', alt: 'Standard Chartered' },
-  { src: 'https://cdn.prod.website-files.com/63ede4a3da6dbd6b05c4612f/69de21c3e08d34c44d4a5d28_SkodaAutoVolkswagenIndia%20%5BVectorized%5D.svg', alt: 'Skoda Auto Volkswagen India' },
-  { src: 'https://cdn.prod.website-files.com/63ede4a3da6dbd6b05c4612f/69de21c35ec2e51250d16ac8_Reckitt_logo.svg.svg', alt: 'Reckitt' },
-  { src: 'https://cdn.prod.website-files.com/63ede4a3da6dbd6b05c4612f/69de21c191499a81969e7c3a_PepsiCo_logo.svg%20%5BVectorized%5D.svg', alt: 'PepsiCo' },
-  { src: 'https://cdn.prod.website-files.com/63ede4a3da6dbd6b05c4612f/69de21c1f0bedc9175f6a757_nestle-logo-black-and-white%20%5BVectorized%5D.svg', alt: 'Nestle' },
-  { src: 'https://cdn.prod.website-files.com/63ede4a3da6dbd6b05c4612f/69de21c10a006333d8697fbe_PUMA.svg', alt: 'Puma' },
-  { src: 'https://cdn.prod.website-files.com/63ede4a3da6dbd6b05c4612f/69de21c146794f27756a834a_MICHELIN.svg', alt: 'Michelin' },
-  { src: 'https://cdn.prod.website-files.com/63ede4a3da6dbd6b05c4612f/69de21c0832d3cc30972ac6a_Lufthansa_Logo_2018.svg%20%5BVectorized%5D.svg', alt: 'Lufthansa' },
-  { src: 'https://cdn.prod.website-files.com/63ede4a3da6dbd6b05c4612f/69de21c02268f00668d13e8a_marriott%20logo.svg', alt: 'Marriott' },
-  { src: "https://cdn.prod.website-files.com/63ede4a3da6dbd6b05c4612f/69de21c0b43a86373f64c81f_L%27OrC%E2%95%A0%C2%BAal_logo.svg%20%5BVectorized%5D.svg", alt: "L'Oreal" },
-  { src: 'https://cdn.prod.website-files.com/63ede4a3da6dbd6b05c4612f/69de21bf4fd625db0f6f0e9f_Logo-Saint-Gobain%20%5BVectorized%5D.svg', alt: 'Saint-Gobain' },
-  { src: 'https://cdn.prod.website-files.com/63ede4a3da6dbd6b05c4612f/69de21bf7d8e4a95151857d1_apollo%20tyres.svg', alt: 'Apollo Tyres' },
-  { src: 'https://cdn.prod.website-files.com/63ede4a3da6dbd6b05c4612f/69de21be1fbed3f2ae8297f9_ikea9726%20%5BVectorized%5D.svg', alt: 'Ikea' },
-  { src: 'https://cdn.prod.website-files.com/63ede4a3da6dbd6b05c4612f/69de21befffd9c55242f7bf4_Honda%20logo.svg', alt: 'Honda' },
-  { src: 'https://cdn.prod.website-files.com/63ede4a3da6dbd6b05c4612f/69de21be070999038b99f449_Intel_logo_(2006-2020).svg%20%5BVectorized%5D.svg', alt: 'Intel' },
-  { src: 'https://cdn.prod.website-files.com/63ede4a3da6dbd6b05c4612f/69de21be132e1a64a340a93d_Decathlon_Logo24.svg%20%5BVectorized%5D.svg', alt: 'Decathlon' },
-  { src: 'https://cdn.prod.website-files.com/63ede4a3da6dbd6b05c4612f/69de21bdb1538268de1cdff4_Daimler-Logo-Background-PNG-Image%20%5BVectorized%5D.svg', alt: 'Daimler' },
-  { src: 'https://cdn.prod.website-files.com/63ede4a3da6dbd6b05c4612f/69de21bd684c57d961517cbf_Coca-Cola_logo.svg.svg', alt: 'Coca-Cola' },
-  { src: 'https://cdn.prod.website-files.com/63ede4a3da6dbd6b05c4612f/69de21bd2088c152ed20aa1b_ExxonMobil-Logo.svg', alt: 'ExxonMobil' },
-  { src: 'https://cdn.prod.website-files.com/63ede4a3da6dbd6b05c4612f/69de21bd6fb2e2fa4d26a1ed_Bosch_logo.svg', alt: 'Bosch' },
-  { src: 'https://cdn.prod.website-files.com/63ede4a3da6dbd6b05c4612f/69de21bcb742d5f81e19be70_Adidas_logo%20%5BVectorized%5D.svg', alt: 'Adidas' },
-  { src: 'https://cdn.prod.website-files.com/63ede4a3da6dbd6b05c4612f/69de21bc86e3b48ae84606f6_BMW.svg', alt: 'BMW' },
-  { src: 'https://cdn.prod.website-files.com/63ede4a3da6dbd6b05c4612f/69de21bc534d58b0b09c64d3_3M_wordmark.svg%20%5BVectorized%5D.svg', alt: '3M' },
+const logos = [
+  'https://cdn.prod.website-files.com/6141e3720a248d2024615d96/68c004b7cd20663ea68375e2_Group%2018.avif',
+  'https://cdn.prod.website-files.com/6141e3720a248d2024615d96/68c004b7cd20663ea683760b_Group%203.avif',
+  'https://cdn.prod.website-files.com/6141e3720a248d2024615d96/68c004b7cd20663ea6837629_Group%2028.avif',
+  'https://cdn.prod.website-files.com/6141e3720a248d2024615d96/68c004b7cd20663ea68375f1_Group%2016.avif',
+  'https://cdn.prod.website-files.com/6141e3720a248d2024615d96/68c004b7cd20663ea6837615_Group%2023.avif',
+  'https://cdn.prod.website-files.com/6141e3720a248d2024615d96/68c004b7cd20663ea68375d8_Group%206.avif',
+  'https://cdn.prod.website-files.com/6141e3720a248d2024615d96/68c004b7cd20663ea6837638_Group%2027.avif',
+  'https://cdn.prod.website-files.com/6141e3720a248d2024615d96/68c004b7cd20663ea6837633_Group%2036.avif',
+  'https://cdn.prod.website-files.com/6141e3720a248d2024615d96/68c004b7cd20663ea683763d_Group%2026.avif',
+  'https://cdn.prod.website-files.com/6141e3720a248d2024615d96/68c004b7cd20663ea683761a_Group%2024.avif',
+  'https://cdn.prod.website-files.com/6141e3720a248d2024615d96/68c004b7cd20663ea68375ce_Group%207.avif',
+  'https://cdn.prod.website-files.com/6141e3720a248d2024615d96/68c004b7cd20663ea6837601_Group%2019.avif',
+  'https://cdn.prod.website-files.com/6141e3720a248d2024615d96/68c004b7cd20663ea68375e7_Group%2015.avif',
+  'https://cdn.prod.website-files.com/6141e3720a248d2024615d96/68c004b7cd20663ea683762e_Group%2025.avif',
+  'https://cdn.prod.website-files.com/6141e3720a248d2024615d96/68c004b7cd20663ea6837642_Group%2029.avif',
+  'https://cdn.prod.website-files.com/6141e3720a248d2024615d96/68c004b7cd20663ea68375fc_Group%2013.avif',
+  'https://cdn.prod.website-files.com/6141e3720a248d2024615d96/68c004b7cd20663ea6837610_Group%209.avif',
+  'https://cdn.prod.website-files.com/6141e3720a248d2024615d96/68c004b7cd20663ea68375dd_Group%205.avif',
+  'https://cdn.prod.website-files.com/6141e3720a248d2024615d96/68c004b7cd20663ea683761f_Group%2032.avif',
+  'https://cdn.prod.website-files.com/6141e3720a248d2024615d96/68c004b7cd20663ea6837606_Group%2012.avif',
+  'https://cdn.prod.website-files.com/6141e3720a248d2024615d96/68c004b7cd20663ea6837624_Group%2030.avif',
+  'https://cdn.prod.website-files.com/6141e3720a248d2024615d96/68c004b7cd20663ea68375d3_Group%2011.avif',
+  'https://cdn.prod.website-files.com/6141e3720a248d2024615d96/68c004b7cd20663ea68375ec_Group%2022.avif',
+  'https://cdn.prod.website-files.com/6141e3720a248d2024615d96/68c004b7cd20663ea68375f7_Group%208.avif',
 ];
 
-const {
-  label = 'Trusted by over 5,000 enterprises across the UAE',
-  logos = DEFAULT_LOGOS,
-} = Astro.props as Props;
-
-// Render the same array twice so the marquee loop (translateX -50%) is seamless.
 const doubled = [...logos, ...logos];
 ---
 
-<section class="logos-section" aria-label="Customer logos">
-  <div class="logos-label">{label}</div>
-  <div class="logos-overflow">
-    <div class="logos-fade-left" aria-hidden="true"></div>
-    <div class="logos-fade-right" aria-hidden="true"></div>
-    <div class="marquee-track">
-      {doubled.map((logo, i) => (
-        <div class="marquee-item">
-          <img src={logo.src} alt={i < logos.length ? logo.alt : ''} loading="lazy" aria-hidden={i >= logos.length} />
-        </div>
-      ))}
+<section class="bg-white py-12 overflow-hidden w-full">
+  <div class="max-w-[var(--container-max)] mx-auto px-6">
+    <h2 class="v2-logos-title text-center text-[32px] font-normal text-[#171E28] mb-8 tracking-[-0.5px] max-lg:text-2xl max-lg:mb-11 max-sm:text-xl max-sm:mb-9">
+      Trusted by <span class="text-[#1572ED]">5000+</span> Businesses Worldwide
+    </h2>
+    <div class="relative w-full overflow-hidden bg-transparent [mask-image:linear-gradient(to_right,transparent_0%,black_4%,black_96%,transparent_100%)] [-webkit-mask-image:linear-gradient(to_right,transparent_0%,black_4%,black_96%,transparent_100%)] group">
+      <div class="flex items-center gap-8 w-max animate-[scroll-logos-global_45s_linear_infinite] py-2 bg-white group-hover:[animation-play-state:paused] max-lg:gap-16 max-sm:gap-12 motion-reduce:animate-none">
+        {doubled.map((src, i) => (
+          <img src={src} alt={i < logos.length ? 'Customer logo' : ''} aria-hidden={i >= logos.length} class="shrink-0 h-[88px] w-auto object-contain mix-blend-multiply transition-all duration-150 ease-in-out hover:scale-105 max-lg:h-[73px] max-sm:h-14" loading="lazy" />
+        ))}
+      </div>
     </div>
   </div>
 </section>
 
-<style is:global>
-  .logos-section {
-    background: var(--color-dark);
-    padding: 64px 0;
-    border-top: 1px solid rgba(255, 255, 255, 0.05);
-    overflow: hidden;
+<style>
+  .v2-logos-title {
+    text-align: center !important;
+    font-size: 32px !important;
+    font-weight: 400 !important;
+    color: #171E28 !important;
+    margin-bottom: 32px !important;
+    letter-spacing: -0.5px !important;
   }
-  .logos-label {
-    text-align: center;
-    font-size: 11.5px;
-    font-weight: 600;
-    color: rgba(255, 255, 255, 0.3);
-    letter-spacing: 1.5px;
-    text-transform: uppercase;
-    margin-bottom: 40px;
+  @media (max-width: 1024px) {
+    .v2-logos-title { font-size: 24px !important; margin-bottom: 44px !important; }
+  }
+  @media (max-width: 640px) {
+    .v2-logos-title { font-size: 20px !important; margin-bottom: 36px !important; }
   }
 
-  .logos-overflow { position: relative; overflow: hidden; }
-
-  .marquee-track {
-    display: flex;
-    gap: 0;
-    width: max-content;
-    animation: logos-marquee 60s linear infinite;
-    align-items: center;
-  }
-  .marquee-track:hover { animation-play-state: paused; }
-
-  @keyframes logos-marquee {
+  @keyframes scroll-logos-global {
     0% { transform: translateX(0); }
     100% { transform: translateX(-50%); }
-  }
-
-  .marquee-item {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 0 44px;
-    border-right: 1px solid rgba(255, 255, 255, 0.05);
-    height: 44px;
-  }
-
-  .marquee-item img {
-    height: 100%;
-    width: auto;
-    max-width: 130px;
-    object-fit: contain;
-    filter: none;
-    mix-blend-mode: normal;
-    opacity: 0.85;
-    transition: all 0.3s ease;
-  }
-
-  .marquee-item:hover img {
-    opacity: 1;
-    transform: scale(1.05);
-  }
-
-  .logos-fade-left,
-  .logos-fade-right {
-    position: absolute;
-    top: 0;
-    bottom: 0;
-    width: 140px;
-    pointer-events: none;
-    z-index: 1;
-  }
-  .logos-fade-left { left: 0; background: linear-gradient(to right, var(--color-dark), transparent); }
-  .logos-fade-right { right: 0; background: linear-gradient(to left, var(--color-dark), transparent); }
-
-  @media (prefers-reduced-motion: reduce) {
-    .marquee-track { animation: none; }
   }
 </style>

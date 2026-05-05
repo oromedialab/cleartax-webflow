@@ -1,336 +1,156 @@
 ---
 /**
- * UAE testimonials carousel — ported from uae-landing-page/index.html:987-1085.
- * Vanilla pixel-translateX carousel with prev/next, dots, and a 5-second autoplay.
- * No Swiper dependency to keep the embed self-contained.
+ * Trusted-leaders testimonials carousel V2 — Tailwind optimized.
+ * Swiper-based.
  */
-interface Story {
+interface Testimonial {
   logoSrc: string;
-  logoAlt: string;
+  logoClass: string;
   quote: string;
   initials: string;
   name: string;
   role: string;
 }
 
-const stories: Story[] = [
+const testimonials: Testimonial[] = [
   {
-    logoSrc: 'https://cdn.prod.website-files.com/63ede4a3da6dbd6b05c4612f/69de2f47ee7a80e36ed2feb4_Puma.png',
-    logoAlt: 'Puma',
-    quote: 'ClearTax is simplifying e-Invoicing. They enabled us to implement the e-Invoicing system in time and handled all our business complexities with ease.',
-    initials: 'R',
-    name: 'Raj Kiran',
-    role: 'Head, Taxation & Retail Finance, Puma',
+    logoSrc: 'https://cdn.prod.website-files.com/6093bce33d9b4bae841b04e3/69df4949e511b373dbb99294_leaders-brand-1.png',
+    logoClass: 'w-[198px] aspect-[198/44]',
+    quote: 'ClearTax has transformed the way we handle GST compliance. Real-time creation of e-Invoices and e-Way bills plays a significant role in providing us with critical insight into our business.',
+    initials: 'P',
+    name: 'Pratush Kumar',
+    role: 'DGM-IT, JK Tyre (India)',
   },
   {
-    logoSrc: 'https://cdn.prod.website-files.com/63ede4a3da6dbd6b05c4612f/69df166c75f96428d73fafc5_zamil-industrial.png',
-    logoAlt: 'Zamil Industrial',
-    quote: 'We appreciate ClearTax for successfully completing the complex ZATCA Integration. Their platform enabled seamless management of multiple units.',
-    initials: 'A',
-    name: 'Abdulbary Atassi',
-    role: 'DIRECTOR OF IT, Zamil Industrial',
+    logoSrc: 'https://cdn.prod.website-files.com/6093bce33d9b4bae841b04e3/69df494a80821e2087576b23_leaders-brand-2.png',
+    logoClass: 'w-[88px] aspect-[88/44]',
+    quote: 'ClearTax is simplifying e-Invoicing. They enabled us to implement the e-Invoicing system in time and handled all our business complexities with ease. Thank you for the effort and good job!',
+    initials: 'R',
+    name: 'Raj Kiran',
+    role: 'Head, Taxation & Retail Finance, Puma (India)',
+  },
+  {
+    logoSrc: 'https://cdn.prod.website-files.com/6093bce33d9b4bae841b04e3/69df494a067e75f8309b363b_leaders-brand-3.png',
+    logoClass: 'w-[260px] aspect-[260/30] object-cover',
+    quote: 'We appreciate ClearTax for successfully completing the complex ZATCA E-Invoicing Phase II Integration project. Their platform enabled seamless management of multiple business units. Kudos to the team for their timely delivery.',
+    initials: 'P',
+    name: 'Pratush Kumar',
+    role: 'DGM-IT, JK Tyre (India)',
   },
   {
     logoSrc: 'https://cdn.prod.website-files.com/63ede4a3da6dbd6b05c4612f/69de2f46ea62c039f7e81c4d_gamuda-land.png',
-    logoAlt: 'Gamuda Land',
+    logoClass: 'w-[260px] aspect-[260/30] object-cover',
     quote: 'Collaborating with ClearTax was an exceptional experience. They streamlined the entire process, even under tight deadlines, for our diverse ERP systems.',
     initials: 'V',
     name: 'V Bharathy',
     role: 'Manager, Finance Applications, Gamuda Land',
   },
   {
-    logoSrc: 'https://cdn.prod.website-files.com/63ede4a3da6dbd6b05c4612f/69de2f471b9bc75e10f68e36_JK-Tyre.png',
-    logoAlt: 'JK Tyre',
-    quote: 'ClearTax has transformed the way we handle GST compliance. Realtime creation of e-Invoices plays a significant role in providing critical insight.',
-    initials: 'P',
-    name: 'Pratush Kumar',
-    role: 'DGM-IT, JK Tyre',
-  },
-  {
     logoSrc: 'https://cdn.prod.website-files.com/63ede4a3da6dbd6b05c4612f/69df166cc8fd06a5b99629c5_salam-removebg-preview.png',
-    logoAlt: 'Salam Telco',
+    logoClass: 'w-[140px] aspect-[140/44] object-cover',
     quote: "Salam's search for a reliable partner ended with ClearTax. Their tailored solutions ensured a smooth transition for all 8 of our systems in just 3 months.",
     initials: 'A',
     name: 'Arslan Choudhary',
     role: 'Director of Enterprise Enablement, Salam Telco',
   },
 ];
+
+const cardColors = ['#F6E0C5', '#D8EFF2', '#DEDAF6'];
+const shuffledColors = [...cardColors].sort(() => Math.random() - 0.5);
 ---
 
-<section class="case-studies-section" id="testimonials" data-cs-total={stories.length}>
-  <div class="section-inner">
-    <div>
-      <div class="section-eyebrow">Customer Stories</div>
-      <h2 class="section-h2">Real results from <em>UAE enterprises</em></h2>
-      <p class="section-sub">See how leading UAE businesses achieved full FTA compliance with ClearTax.</p>
-    </div>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
 
-    <div class="cs-carousel">
-      <div class="cs-track" data-cs-track>
-        {stories.map((s) => (
-          <div class="cs-card">
-            <img src={s.logoSrc} alt={s.logoAlt} class="cs-logo-img" loading="lazy" />
-            <p class="cs-quote">{s.quote}</p>
-            <div class="cs-author">
-              <div class="cs-avatar">{s.initials}</div>
-              <div>
-                <div class="cs-author-name">{s.name}</div>
-                <div class="cs-author-role">{s.role}</div>
-              </div>
-            </div>
-          </div>
-        ))}
+<section class="bg-[linear-gradient(180deg,_rgba(243,241,249,0.8)_0%,_#FFFFFF_31.12%)] py-[100px] max-lg:py-[60px] max-lg:pb-20 max-sm:py-10 max-sm:pb-[50px] overflow-x-hidden w-full">
+  <div class="max-w-[var(--container-max)] mx-auto px-6">
+    <div class="flex justify-between items-end mb-12 max-lg:mb-10 max-sm:flex-col max-sm:items-start max-sm:gap-6 max-sm:mb-8">
+      <div>
+        <span class="inline-flex text-xs text-[#8159BA] mb-6 bg-[linear-gradient(90deg,rgba(45,10,78,0.15)_0%,rgba(129,89,186,0.05)_100%)] px-3 py-1 rounded-full">Customer Stories</span>
+        <h2 class="v2-leaders-title text-[44px]! font-semibold! leading-[1.18]! text-black! m-0! text-balance max-lg:text-[36px]! max-sm:text-[28px]!">
+          Real results from <span class="text-[#655DFF]">UAE enterprises</span>
+        </h2>
+        <p class="text-base lg:text-lg! text-black mt-4!">See how leading UAE businesses achieved full FTA compliance with ClearTax.</p>
+      </div>
+      <div class="flex gap-3">
+        <button class="tl-swipper-left w-12! h-12! rounded-full! cursor-pointer! flex items-center justify-center border-none! bg-[#2D0A4E]! transition-opacity hover:opacity-80 max-lg:w-[42px]! max-lg:h-[42px]! max-sm:w-8! max-sm:h-8!" aria-label="Previous">
+          <svg width="7" height="14" viewBox="0 0 9 16" fill="none"><path d="M8 15L1 8L8 1" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" /></svg>
+        </button>
+        <button class="tl-swipper-right w-12! h-12! rounded-full! cursor-pointer! flex items-center justify-center border-none! bg-[#2D0A4E]! transition-opacity hover:opacity-80 max-lg:w-[42px]! max-lg:h-[42px]! max-sm:w-8! max-sm:h-8!" aria-label="Next">
+          <svg width="7" height="14" viewBox="0 0 9 16" fill="none"><path d="M8 15L1 8L8 1" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" /></svg>
+        </button>
       </div>
     </div>
-
-    <div class="cs-controls">
-      <button class="cs-btn" data-cs-prev aria-label="Previous testimonial">
-        <svg viewBox="0 0 18 18"><path d="M11 4l-5 5 5 5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-      </button>
-      <button class="cs-btn" data-cs-next aria-label="Next testimonial">
-        <svg viewBox="0 0 18 18"><path d="M7 4l5 5-5 5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-      </button>
-      <div class="cs-dots" data-cs-dots>
-        {stories.map((_, i) => (
-          <button class:list={['cs-dot', i === 0 && 'active']} data-cs-go={i} aria-label={`Go to slide ${i + 1}`}></button>
-        ))}
+  </div>
+  
+  <div class="ml-20 max-[1280px]:ml-10 max-lg:ml-6 max-sm:ml-4">
+    <div class="tl-swiper overflow-visible! m-0">
+      <div class="swiper-wrapper">
+        {testimonials.map((t, i) => {
+          const cardColor = shuffledColors[i % shuffledColors.length];
+          return (
+            <div class="swiper-slide w-fit!">
+              <div class="max-w-[630px] w-full p-7 rounded-[20px] flex flex-col h-[375px] max-lg:p-6 max-lg:h-[330px] max-sm:p-4 max-sm:rounded-[14px] max-sm:h-[270px]" style={`background-color: ${cardColor}`}>
+                <img class={`${t.logoClass} object-contain mb-7`} src={t.logoSrc} alt="" />
+                <p class="text-xl! leading-[1.5]! mb-4! text-[#343A40]! max-sm:text-sm!">{t.quote}</p>
+                <div class="flex gap-3 items-center mt-auto">
+                  <div class="w-11 h-11 flex justify-center items-center rounded-full bg-[#3025A0] text-white font-bold">{t.initials}</div>
+                  <div>
+                    <div class="max-w-[167px] flex items-center gap-2">
+                      <p class="m-0! font-bold! text-base! text-[#171E28]!">{t.name}</p>
+                    </div>
+                    <p class="text-[#6C757D]! text-sm! mt-[2px]! mb-0!">{t.role}</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          );
+        })}
       </div>
     </div>
   </div>
 </section>
 
-<style is:global>
-  .case-studies-section {
-    background: var(--color-white);
-    padding: 100px 0;
-    overflow: hidden;
-  }
-
-  .section-inner {
-    max-width: 1200px;
-    margin: 0 auto !important;
-    padding: 0 40px;
-  }
-
-  .section-eyebrow {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    background: rgba(99, 85, 216, 0.10);
-    border: 1px solid rgba(99, 85, 216, 0.25);
-    color: var(--color-purple);
-    font-size: 12px;
-    font-weight: 700;
-    padding: 5px 14px;
-    border-radius: 100px;
-    letter-spacing: 0.5px;
-    text-transform: uppercase;
-    margin-bottom: 16px;
-  }
-
-  .case-studies-section .section-h2 {
-    font-size: clamp(30px, 3.5vw, 46px);
-    font-weight: 900;
-    color: #0F1020;
-    letter-spacing: -1.2px;
+<style>
+  .v2-leaders-title {
+    font-size: 44px;
+    font-weight: 600;
     line-height: 1.18;
-    margin-bottom: 16px;
-  }
-  .section-h2 em {
-    font-style: normal;
-    color: var(--color-purple);
-  }
-
-  .case-studies-section .section-sub {
-    font-size: 17px;
-    color: #0F1020;
-    line-height: 1.72;
-    max-width: 540px;
+    color: #000000;
     margin: 0;
+    font-size: 44px !important;
+    font-weight: 600 !important;
+    line-height: 1.18 !important;
+    color: #000000 !important;
+    margin: 0 !important;
   }
-
-  .cs-carousel {
-    position: relative;
-    margin-top: 56px;
-    overflow: hidden;
-  }
-
-  .cs-track {
-    display: flex;
-    gap: 24px;
-    transition: transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-  }
-
-  .cs-card {
-    flex-shrink: 0;
-    width: 360px;
-    background: var(--color-offwhite);
-    border: 1px solid var(--color-border);
-    border-radius: 22px;
-    padding: 32px 28px;
-    position: relative;
-    overflow: hidden;
-    display: flex;
-    flex-direction: column;
-  }
-
-  .cs-card::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 4px;
-    background: var(--grad-btn);
-  }
-
-  .cs-card-logo {
-    font-size: 16px;
-    font-weight: 800;
-    color: var(--color-text);
-    margin-bottom: 16px;
-    opacity: 0.65;
-  }
-
-  .cs-quote {
-    font-size: 15.5px;
-    color: var(--color-text);
-    line-height: 1.68;
-    margin-bottom: 24px;
-    font-style: italic;
-    padding-bottom: 24px;
-  }
-
-  .cs-quote::before {
-    content: '"';
-    font-size: 42px;
-    color: var(--color-purple);
-    opacity: 0.3;
-    line-height: 0;
-    vertical-align: -14px;
-    margin-right: 4px;
-  }
-
-  .cs-author {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding-top: 20px;
-    margin-top: auto;
-    border-top: 1px solid var(--color-border);
-  }
-
-  .cs-avatar {
-    width: 38px;
-    height: 38px;
-    border-radius: 50%;
-    background: var(--grad-btn);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: white;
-    font-size: 14px;
-    font-weight: 700;
-  }
-
-  .cs-author-name {
-    font-size: 13px;
-    font-weight: 700;
-    color: var(--color-text);
-  }
-
-  .cs-author-role {
-    font-size: 11.5px;
-    color: var(--color-muted);
-  }
-
-  .cs-controls {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    margin-top: 32px;
-    justify-content: start;
-  }
-
-  .cs-btn {
-    width: 44px;
-    height: 44px;
-    border-radius: 50%;
-    background: var(--color-white);
-    border: 1.5px solid var(--color-border);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    transition: all 0.2s;
-  }
-  .cs-btn:hover { background: var(--color-purple); border-color: var(--color-purple); }
-  .cs-btn:hover svg { stroke: white; }
-  .cs-btn svg {
-    width: 18px;
-    height: 18px;
-    stroke: var(--color-muted);
-    fill: none;
-    stroke-width: 2;
-  }
-
-  .cs-logo-img {
-    width: 100%;
-    height: 50px;
-    max-width: 130px;
-    object-fit: contain;
-    margin-bottom: 12px;
-    display: block;
-  }
-
-  .cs-dots { display: flex; gap: 6px; }
-  .cs-dot {
-    width: 8px;
-    height: 8px;
-    border-radius: 100px;
-    background: var(--color-border);
-    transition: all 0.3s;
-    cursor: pointer;
-    border: none;
-    padding: 0;
-  }
-  .cs-dot.active {
-    background: var(--color-purple);
-    width: 24px;
-  }
-
   @media (max-width: 1024px) {
-    .case-studies-section { padding: 48px 0; }
+    .v2-leaders-title { font-size: 36px !important; }
   }
+  @media (max-width: 640px) {
+    .v2-leaders-title { font-size: 28px !important; }
+  }
+
+  .tl-swipper-right svg { transform: rotate(180deg); }
 </style>
 
+<script is:inline src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
 <script is:inline>
   (function () {
-    const section = document.currentScript.previousElementSibling;
-    if (!section) return;
-    const track = section.querySelector('[data-cs-track]');
-    const dots = Array.from(section.querySelectorAll('[data-cs-go]'));
-    const total = parseInt(section.getAttribute('data-cs-total'), 10) || dots.length;
-    const cardWidth = 384; // 360px card + 24px gap
-    let idx = 0;
-
-    function update() {
-      if (track) track.style.transform = `translateX(-${idx * cardWidth}px)`;
-      dots.forEach((d, i) => d.classList.toggle('active', i === idx));
+    function boot() {
+      if (typeof Swiper === 'undefined') { setTimeout(boot, 50); return; }
+      new Swiper('.tl-swiper', {
+        loop: true,
+        navigation: { nextEl: '.tl-swipper-right', prevEl: '.tl-swipper-left' },
+        slidesPerView: 1,
+        spaceBetween: 10,
+        breakpoints: {
+          768: { slidesPerView: 'auto', spaceBetween: 16 },
+          1024: { slidesPerView: 2.2, spaceBetween: 20 },
+        },
+      });
     }
-    function go(dir) {
-      idx = Math.max(0, Math.min(idx + dir, total - 1));
-      update();
-    }
-    section.querySelector('[data-cs-prev]')?.addEventListener('click', () => go(-1));
-    section.querySelector('[data-cs-next]')?.addEventListener('click', () => go(1));
-    dots.forEach((d, i) => d.addEventListener('click', () => { idx = i; update(); }));
-
-    if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-      setInterval(() => {
-        idx = idx < total - 1 ? idx + 1 : 0;
-        update();
-      }, 5000);
-    }
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', boot);
+    } else boot();
   })();
 </script>
