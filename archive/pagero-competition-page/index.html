@@ -11,6 +11,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
 <script src="https://www.google.com/recaptcha/api.js?render=6Lc5ZG0mAAAAAGwClrZwtcyttcUMYDUPxg4MM4p3"></script>
 <!-- Google Tag Manager -->
 <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
@@ -320,6 +321,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
   border-color: #6355D8;
   box-shadow: 0 0 0 3px rgba(99,85,216,0.15);
 }
+
 #ct-page .form-group select {
   appearance: none;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='rgba(255,255,255,0.5)' viewBox='0 0 16 16'%3E%3Cpath d='M8 11L3 6h10z'/%3E%3C/svg%3E");
@@ -868,15 +870,9 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       <div class="form-card-title">Get a Tailored Demo</div>
       <div class="form-card-sub">See how ClearTax handles your specific compliance needs</div>
       <form id="ctLeadForm" onsubmit="ctHandleSubmit(event)">
-        <div class="form-row">
-          <div class="form-group">
-            <label>First Name *</label>
-            <input type="text" id="ct-first-name" placeholder="John" required>
-          </div>
-          <div class="form-group">
-            <label>Last Name *</label>
-            <input type="text" id="ct-last-name" placeholder="Smith" required>
-          </div>
+        <div class="form-group">
+          <label>Full Name *</label>
+          <input type="text" id="ct-name" placeholder="John Smith" required>
         </div>
         <div class="form-group">
           <label>Work Email *</label>
@@ -884,24 +880,29 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         </div>
         <div class="form-group">
           <label>Phone Number *</label>
-          <input type="tel" id="ct-phone" placeholder="+971 50 XXX XXXX" required>
+          <div style="display: flex; gap: 10px;">
+            <select id="ct-isd" style="width: 100px; flex-shrink: 0;" required>
+              <option value="+971" selected>🇦🇪 +971</option>
+              <option value="+966">🇸🇦 +966</option>
+              <option value="+91">🇮🇳 +91</option>
+              <option value="+1">🇺🇸 +1</option>
+              <option value="+44">🇬🇧 +44</option>
+              <option value="+973">🇧🇭 +973</option>
+              <option value="+968">🇴🇲 +968</option>
+              <option value="+974">🇶🇦 +974</option>
+              <option value="+965">🇰🇼 +965</option>
+            </select>
+            <input type="tel" id="ct-phone" placeholder="50 XXX XXXX" required>
+          </div>
         </div>
         <div class="form-group">
           <label>Company Name *</label>
           <input type="text" id="ct-company" placeholder="Your company" required>
         </div>
         <div class="form-group">
-            <label>Designation</label>
-            <select id="ct-designation">
-              <option value="">Select role</option>
-              <option>CFO</option>
-              <option>VP Finance</option>
-              <option>Tax Director</option>
-              <option>Finance Manager</option>
-              <option>IT Director</option>
-              <option>Other</option>
-            </select>
-          </div>
+          <label>Designation *</label>
+          <input type="text" id="ct-designation" placeholder="e.g. Tax Manager" required>
+        </div>
         <button type="submit" class="form-submit">Get a Tailored Demo →</button>
         <div class="form-disclaimer">
           By submitting, you agree to ClearTax's privacy policy. No spam — just a one-on-one consultation with a compliance expert.
@@ -1330,8 +1331,11 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
   </div>
 </div>
 
+
 <script>
 // Namespace all functions with ct prefix to avoid conflicts with Webflow's JS
+
+
 
 // Navbar scroll effect
 var ctNav = document.getElementById('mainNav');
@@ -1380,15 +1384,12 @@ function ctHandleSubmit(e) {
   var btn = form.querySelector('.form-submit');
   var originalBtnText = btn.textContent;
   
-  // Gathering form data
-  var firstName = document.getElementById('ct-first-name').value;
-  var lastName = document.getElementById('ct-last-name').value;
+  var fullName = document.getElementById('ct-name').value;
   var email = document.getElementById('ct-email').value;
-  var phone = document.getElementById('ct-phone').value;
   var company = document.getElementById('ct-company').value;
   var designation = document.getElementById('ct-designation').value;
-  
-  var fullName = firstName + ' ' + lastName;
+  var phoneNumber = document.getElementById('ct-phone').value.trim().replace(/\s+/g, '');
+  var isdCode = document.getElementById('ct-isd').value;
   
   // Prepare payload
   var urlParams = new URLSearchParams(window.location.search);
@@ -1400,22 +1401,22 @@ function ctHandleSubmit(e) {
     },
     extra_payload: { 
       origin_country: "UAE",
-      designation: designation
-    },
-    lead_data: {
-      name: fullName,
-      phone_number: phone,
-      email: email,
-      company_name: company,
-      ISD: "971", 
-      form_type: "GCC-comparison-page",
-      lead_type: "GCC",
-      lead_source_url: window.location.href,
+      designation: designation,
       utm_source: urlParams.get('utm_source') || "",
       utm_medium: urlParams.get('utm_medium') || "",
       utm_campaign: urlParams.get('utm_campaign') || "",
       utm_term: urlParams.get('utm_term') || "",
       utm_content: urlParams.get('utm_content') || ""
+    },
+    lead_data: {
+      name: fullName,
+      phone_number: phoneNumber,
+      email: email,
+      company_name: company,
+      ISD: isdCode,
+      form_type: "GCC-contact-sales-form",
+      lead_type: "GCC",
+      lead_source_url: window.location.href
     }
   };
 
@@ -1441,6 +1442,7 @@ function ctHandleSubmit(e) {
         if (response.ok || response.status === 201) {
           // Success
           form.reset();
+          document.getElementById('ct-isd').value = '+971';
           btn.textContent = originalBtnText;
           btn.disabled = false;
           
