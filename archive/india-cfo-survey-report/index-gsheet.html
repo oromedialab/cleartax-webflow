@@ -7,6 +7,9 @@
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700&display=swap" rel="stylesheet"/>
+<link rel="icon" type="image/png" sizes="32x32" href="https://cdn.prod.website-files.com/63ede4a3da6dbd6b05c4612f/63ede4a3da6dbd7162c46439_32by32.png" />
+<link rel="icon" type="image/png" sizes="256x256" href="https://cdn.prod.website-files.com/63ede4a3da6dbd6b05c4612f/63ede4a3da6dbd8997c46450_256by256.png" />
+<link rel="apple-touch-icon" href="https://cdn.prod.website-files.com/63ede4a3da6dbd6b05c4612f/63ede4a3da6dbd8997c46450_256by256.png" />
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 html { scroll-behavior: smooth; }
@@ -357,6 +360,7 @@ footer { background: #08041A; border-top: 1px solid var(--border-subtle); }
         <div class="fg">
           <label>Company Email ID <span class="req">*</span></label>
           <input type="email" placeholder="you@company.com" required style="font-size:15px;padding:13px 16px;"/>
+          <div class="err-msg" style="color:#ff4d4d;font-size:11px;margin-top:4px;display:none;">Please use your work email ID</div>
         </div>
         <button type="submit" class="btn-form-submit" style="margin-top:14px;">Download Report →</button>
       </form>
@@ -576,6 +580,7 @@ footer { background: #08041A; border-top: 1px solid var(--border-subtle); }
         <div class="fg">
           <label>Company Email ID <span class="req">*</span></label>
           <input type="email" placeholder="you@company.com" required style="font-size:14px;padding:13px 16px;"/>
+          <div class="err-msg" style="color:#ff4d4d;font-size:11px;margin-top:4px;display:none;">Please use your work email ID</div>
         </div>
         <button type="submit" class="btn-form-submit" style="margin-top:14px;">Download Report →</button>
         <p class="form-legal">By submitting you agree to cleartax's Privacy Policy.</p>
@@ -646,6 +651,15 @@ async function submitLeadData(email) {
   }
 }
 
+function isCompanyEmail(email) {
+  const publicDomains = [
+    'gmail.com', 'yahoo.com', 'hotmail.com', 'outlook.com', 'live.com', 'icloud.com', 'aol.com', 'msn.com', 'protonmail.com', 'me.com', 'ymail.com', 'rediffmail.com'
+  ];
+  const domain = email.split('@')[1];
+  if (!domain) return false;
+  return !publicDomains.includes(domain.toLowerCase());
+}
+
 async function handleModalForm(e) {
   e.preventDefault();
   const form = e.target;
@@ -653,6 +667,17 @@ async function handleModalForm(e) {
   const btn = form.querySelector('button[type="submit"]');
   const originalText = btn.innerHTML;
   
+  if (!isCompanyEmail(emailInput.value)) {
+    const errMsg = form.querySelector('.err-msg');
+    emailInput.style.borderColor = '#ff4d4d';
+    if (errMsg) errMsg.style.display = 'block';
+    setTimeout(() => {
+      emailInput.style.borderColor = '';
+      if (errMsg) errMsg.style.display = 'none';
+    }, 3000);
+    return;
+  }
+
   btn.innerHTML = 'Submitting...';
   btn.disabled = true;
 
@@ -678,6 +703,17 @@ async function handleHeroForm(e) {
   const btn = form.querySelector('button[type="submit"]');
   const originalText = btn.innerHTML;
   
+  if (!isCompanyEmail(emailInput.value)) {
+    const errMsg = form.querySelector('.err-msg');
+    emailInput.style.borderColor = '#ff4d4d';
+    if (errMsg) errMsg.style.display = 'block';
+    setTimeout(() => {
+      emailInput.style.borderColor = '';
+      if (errMsg) errMsg.style.display = 'none';
+    }, 3000);
+    return;
+  }
+
   btn.innerHTML = 'Submitting...';
   btn.disabled = true;
 
