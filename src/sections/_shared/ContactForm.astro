@@ -20,337 +20,326 @@ export interface Props {
 }
 
 const {
-  recaptchaSiteKey = '6Lc5ZG0mAAAAAGwClrZwtcyttcUMYDUPxg4MM4p3',
-  defaultCountryCode = '+1',
-  sheetName = 'uaeRAD',
-  originCountry = 'UAE',
-  thankYouUrl = 'https://cleartax.com/ae/en-e-invoicing/thank-you/',
-  formType = 'GCC-contact-sales-form',
-  leadType = 'GCC',
+  recaptchaSiteKey = "6Lc5ZG0mAAAAAGwClrZwtcyttcUMYDUPxg4MM4p3",
+  defaultCountryCode = "+1",
+  sheetName = "uaeRAD",
+  originCountry = "UAE",
+  thankYouUrl = "https://cleartax.com/ae/en-e-invoicing/thank-you/",
+  formType = "GCC-contact-sales-form",
+  leadType = "GCC",
 } = Astro.props as Props;
 
 const countryCodes: { value: string; label: string }[] = [
-  { value: '+1', label: 'USA (+1)' },
-  { value: '+971', label: 'UAE (+971)' },
-  { value: '+966', label: 'Saudi (+966)' },
-  { value: '+33', label: 'France (+33)' },
-  { value: '+968', label: 'Oman (+968)' },
-  { value: '+973', label: 'Bahrain (+973)' },
-  { value: '+965', label: 'Kuwait (+965)' },
-  { value: '+974', label: 'Qatar (+974)' },
-  { value: '+91', label: 'India (+91)' },
-  { value: '+34', label: 'Spain (+34)' },
-  { value: '+48', label: 'Poland (+48)' },
-  { value: '+60', label: 'Malaysia (+60)' },
+  { value: "+1", label: "USA (+1)" },
+  { value: "+971", label: "UAE (+971)" },
+  { value: "+966", label: "Saudi (+966)" },
+  { value: "+33", label: "France (+33)" },
+  { value: "+968", label: "Oman (+968)" },
+  { value: "+973", label: "Bahrain (+973)" },
+  { value: "+965", label: "Kuwait (+965)" },
+  { value: "+974", label: "Qatar (+974)" },
+  { value: "+91", label: "India (+91)" },
+  { value: "+34", label: "Spain (+34)" },
+  { value: "+48", label: "Poland (+48)" },
+  { value: "+60", label: "Malaysia (+60)" },
 ];
 
 const points = [
-  { icon: '🚀', title: 'Fast Onboarding', desc: 'Most enterprises go live in under 2 weeks with dedicated implementation support.' },
-  { icon: '🇦🇪', title: 'UAE-Based Team', desc: 'Local implementation consultants and FTA compliance specialists in Dubai and Abu Dhabi.' },
-  { icon: '🔧', title: 'Tailored Integration', desc: 'Custom-fit to your ERP and business processes — no one-size-fits-all approach.' },
+  {
+    icon: '<svg width="22" height="22" viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M7.48746 4.38983H5.23729C3.83318 4.38983 2.69492 5.52809 2.69492 6.9322V17.6102M2.69492 17.6102C1.75886 17.6102 1 18.369 1 19.3051C1 20.2411 1.75886 21 2.69492 21H19.3051C20.2411 21 21 20.2411 21 19.3051C21 18.369 20.2411 17.6102 19.3051 17.6102M2.69492 17.6102H19.3051M19.3051 10.8359V17.6102M21 2.69492V6.08475C21 7.02081 20.2411 7.77966 19.3051 7.77966H12.5254L10.8305 9.47458V2.69492C10.8305 1.75886 11.5894 1 12.5254 1H19.3051C20.2411 1 21 1.75886 21 2.69492Z" stroke="#655DFF" stroke-width="2" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/><path d="M7.77963 14.5593C8.71571 14.5593 9.47455 13.8004 9.47455 12.8643C9.47455 11.9283 8.71571 11.1694 7.77963 11.1694C6.84356 11.1694 6.08472 11.9283 6.08472 12.8643C6.08472 13.8004 6.84356 14.5593 7.77963 14.5593Z" stroke="#655DFF" stroke-width="2" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+
+    title: "Fast Onboarding",
+    desc: "Most enterprises go live in under 2 weeks with dedicated implementation support.",
+  },
+  {
+    icon: '<svg width="30" height="25" viewBox="0 0 30 25" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12.2982 24.0005C11.1706 22.0532 9.06309 20.743 6.64916 20.743C4.23524 20.743 2.1278 22.0532 1.00012 24.0005" stroke="#655DFF" stroke-width="2" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/><path d="M9.91006 17.4906C9.91006 15.6896 8.45013 14.2297 6.64918 14.2297C4.84824 14.2297 3.38831 15.6896 3.38831 17.4906C3.38831 19.2915 4.84824 20.7515 6.64918 20.7515C8.45013 20.7515 9.91006 19.2915 9.91006 17.4906Z" stroke="#655DFF" stroke-width="2" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/><path d="M16.9097 24.0005C18.0373 22.0532 20.1448 20.743 22.5587 20.743C24.9726 20.743 27.0801 22.0532 28.2077 24.0005" stroke="#655DFF" stroke-width="2" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/><path d="M19.2979 17.4906C19.2979 15.6896 20.7578 14.2297 22.5587 14.2297C24.3597 14.2297 25.8196 15.6896 25.8196 17.4906C25.8196 19.2915 24.3597 20.7515 22.5587 20.7515C20.7578 20.7515 19.2979 19.2915 19.2979 17.4906Z" stroke="#655DFF" stroke-width="2" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/><path d="M8.95483 10.771C10.0825 8.82173 12.1899 7.51012 14.6039 7.51012C17.0178 7.51012 19.1252 8.82173 20.2529 10.771" stroke="#655DFF" stroke-width="2" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/><path d="M11.343 4.25772C11.343 2.45867 12.8029 1.00024 14.6039 1.00024C16.4048 1.00024 17.8648 2.45867 17.8648 4.25772C17.8648 6.0567 16.4048 7.51514 14.6039 7.51514C12.8029 7.51514 11.343 6.0567 11.343 4.25772Z" stroke="#655DFF" stroke-width="2" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+
+    title: "UAE-Based Team",
+    desc: "Local implementation consultants and FTA compliance specialists in Dubai and Abu Dhabi.",
+  },
+  {
+    icon: '<svg width="25" height="25" viewBox="0 0 25 25" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M14.5758 21.6392C15.6112 21.4015 16.5793 20.9926 17.4533 20.4448L19.0944 22.0859L22.0861 19.0942L20.445 17.4531C20.9928 16.5791 21.4015 15.6091 21.6391 14.5737H23.9586V10.3428H21.6391C21.4015 9.30738 20.9928 8.3374 20.445 7.46343L22.0861 5.82232L19.0944 2.83059L17.4533 4.4717C16.5793 3.92395 15.6094 3.51527 14.5739 3.27762V0.958166H10.343V3.27762C9.30754 3.51527 8.33761 3.92395 7.46364 4.4717L5.82253 2.83059L2.8308 5.82232L4.47186 7.46343C3.92416 8.3374 3.51543 9.30738 3.27782 10.3428H0.958374V14.5737H3.27782C3.51543 15.6091 3.92416 16.5791 4.47186 17.4531L2.8308 19.0942L5.82253 22.0859L7.46364 20.4448C8.33761 20.9926 9.30754 21.4013 10.343 21.6389" stroke="#655DFF" stroke-width="1.91668" stroke-miterlimit="10"/><path d="M14.5758 23.958H10.343L10.3426 16.852C8.69974 16.0627 7.56555 14.3831 7.56555 12.4386C7.56555 10.4064 8.80428 8.66375 10.5678 7.92403V12.1465L12.4592 13.2832L14.3506 12.1465V7.92403C16.1141 8.66375 17.3529 10.4064 17.3529 12.4386C17.3529 14.3831 16.2187 16.0627 14.5758 16.852V23.958Z" stroke="#655DFF" stroke-width="1.91668" stroke-miterlimit="10"/></svg>',
+
+    title: "Tailored Integration",
+    desc: "Custom-fit to your ERP and business processes — no one-size-fits-all approach.",
+  },
 ];
 ---
 
-<script is:inline src={`https://www.google.com/recaptcha/api.js?render=${recaptchaSiteKey}`}></script>
+<script
+  is:inline
+  src={`https://www.google.com/recaptcha/api.js?render=${recaptchaSiteKey}`}
+></script>
 
-<section class="contact-section" id="contact"
+<section
+  id="contact"
+  class="bg-[#F3F1F9] py-[60px] lg:py-[100px]"
   data-recaptcha-key={recaptchaSiteKey}
   data-sheet-name={sheetName}
   data-origin-country={originCountry}
   data-thankyou-url={thankYouUrl}
   data-form-type={formType}
-  data-lead-type={leadType}>
-  <div class="section-inner">
-    <div class="contact-grid">
-      <div class="contact-left">
-        <div class="section-eyebrow" style="color:#A89FF0">Talk to Us</div>
-        <h2 class="section-h2" style="color:white; text-align:left;">
-          Ready to become<br/>
-          <em style="color:#8B7EE8">FTA compliant?</em>
+  data-lead-type={leadType}
+>
+  <div class="mx-auto w-full max-w-[1200px] px-5 lg:px-10">
+    <div class="grid items-start gap-6 lg:grid-cols-[1fr_1.1fr]">
+      <div>
+        <h2
+          class="mb-4 text-left text-[clamp(30px,3.5vw,46px)] font-black leading-[1.18] tracking-[-1.2px] text-black"
+        >
+          Ready to become<br />
+          <em class="not-italic text-[#8B7EE8]">FTA compliant?</em>
         </h2>
-        <p class="section-sub" style="color:rgba(255,255,255,0.5); text-align:left; max-width:420px; margin: 0;">
-          Speak with our UAE e-invoicing specialists. We'll assess your current setup and map out a tailored compliance roadmap — typically live within 2 weeks.
+        <p
+          class="m-0 max-w-[420px] text-left text-[17px] leading-[1.72] text-black"
+        >
+          Speak with our UAE e-invoicing specialists. We'll assess your current
+          setup and map out a tailored compliance roadmap — typically live
+          within 2 weeks.
         </p>
 
-        <div class="contact-points">
-          {points.map((p) => (
-            <div class="contact-point">
-              <div class="cp-icon">{p.icon}</div>
-              <div>
-                <div class="cp-title">{p.title}</div>
-                <div class="cp-desc">{p.desc}</div>
+        <div class="mt-30 flex flex-col gap-6">
+          {
+            points.map((p) => (
+              <div class="flex items-start gap-4">
+                <div class="flex h-[44px] w-[44px] shrink-0 items-start justify-center rounded-[12px] text-[20px] [&_svg]:h-[24px] [&_svg]:w-[24px]">
+                  <Fragment set:html={p.icon} />
+                </div>
+                <div>
+                  <div class="mb-1 text-[15px] font-bold text-black">
+                    {p.title}
+                  </div>
+                  <div class="text-[13.5px] leading-[1.6] text-black">
+                    {p.desc}
+                  </div>
+                </div>
               </div>
-            </div>
-          ))}
+            ))
+          }
         </div>
       </div>
 
-      <div class="form-card">
-        <h3>Book a Demo</h3>
-        <p>Our UAE specialists will walk you through the platform and build your compliance roadmap.</p>
+      <div
+        class="rounded-[24px] border border-[rgba(255,255,255,0.1)] bg-white px-10 py-[30px] shadow-[0_40px_80px_rgba(0,0,0,0.3)] lg:px-9 lg:py-10"
+      >
+        <h3 class="mb-2 text-[24px] font-extrabold text-black">Book a Demo</h3>
+        <p class="mb-[30px] text-[14.5px] leading-[1.6] text-black">
+          Our UAE specialists will walk you through the platform and build your
+          compliance roadmap.
+        </p>
         <form data-lead-form>
-          <div class="fg">
-            <label for="cf-name">Full Name *</label>
-            <input id="cf-name" type="text" required placeholder="Ahmed Al Mansouri" data-field="name" />
+          <div class="mb-5">
+            <label
+              for="cf-name"
+              class="mb-2 block text-[13px] font-semibold text-black/80"
+              >Name</label
+            >
+            <input
+              id="cf-name"
+              type="text"
+              required
+              placeholder=""
+              data-field="name"
+              class="w-full rounded-[12px] border border-[rgba(255,255,255,0.12)] bg-[#F5F5F5] px-[18px] py-[14px] text-[14.5px] text-black/80 outline-none"
+            />
           </div>
 
-          <div class="fg">
-            <label for="cf-phone">Phone Number *</label>
-            <div class="fg-row">
-              <div class="select-wrap">
-                <select id="cf-isd" data-field="isd">
-                  {countryCodes.map((c) => (
-                    <option value={c.value} selected={c.value === defaultCountryCode}>{c.label}</option>
-                  ))}
+          <div class="mb-5">
+            <label
+              for="cf-phone"
+              class="mb-2 block text-[13px] font-semibold text-black/80"
+              >Phone Number *</label
+            >
+            <div class="grid grid-cols-[100px_1fr] gap-[10px]">
+              <div
+                class="relative w-full after:pointer-events-none bg-[#F5F5F5] after:absolute after:right-[18px] after:top-1/2 after:z-[2] after:-translate-y-1/2 after:border-l-[5px] after:border-r-[5px] after:border-t-[6px] after:border-l-transparent after:border-r-transparent after:content-['']"
+              >
+                <select
+                  id="cf-isd"
+                  data-field="isd"
+                  class="absolute inset-0 z-[2] h-full text-black w-full bg-[#F5F5F5] cursor-pointer appearance-none opacity-0"
+                >
+                  {
+                    countryCodes.map((c) => (
+                      <option
+                        value={c.value}
+                        selected={c.value === defaultCountryCode}
+                      >
+                        {c.label}
+                      </option>
+                    ))
+                  }
                 </select>
-                <span class="select-display" data-isd-display aria-hidden="true">{defaultCountryCode}</span>
+                <span
+                  class="pointer-events-none z-[1] block rounded-[12px] border border-[rgba(255,255,255,0.12)] bg-[rgba(255,255,255,0.06)] px-[14px] py-[14px] pr-6 text-[14.5px] text-black"
+                  data-isd-display
+                  aria-hidden="true">{defaultCountryCode}</span
+                >
               </div>
-              <input id="cf-phone" type="tel" required placeholder="50 123 4567" data-field="phone" />
+              <input
+                id="cf-phone"
+                type="tel"
+                required
+                placeholder=""
+                data-field="phone"
+                class="w-full rounded-[12px] border border-[rgba(255,255,255,0.12)] bg-[#F5F5F5] px-[18px] py-[14px] text-[14.5px] text-black/80 outline-none"
+              />
             </div>
           </div>
 
-          <div class="fg">
-            <label for="cf-email">Company Email *</label>
-            <input id="cf-email" type="email" required placeholder="ahmed@company.ae" data-field="email" />
+          <div class="mb-5 grid grid-cols-1 gap-[10px] sm:grid-cols-2">
+            <div>
+              <label
+                for="cf-email"
+                class="mb-2 block text-[13px] font-semibold text-black/80"
+                >Company Email *</label
+              >
+              <input
+                id="cf-email"
+                type="email"
+                required
+                placeholder=""
+                data-field="email"
+                class="w-full rounded-[12px] border border-[rgba(255,255,255,0.12)] bg-[#F5F5F5] px-[18px] py-[14px] text-[14.5px] text-black/80 outline-none"
+              />
+            </div>
+            <div>
+              <label
+                for="cf-company"
+                class="mb-2 block text-[13px] font-semibold text-black/80"
+                >Company Name *</label
+              >
+              <input
+                id="cf-company"
+                type="text"
+                required
+                placeholder=""
+                data-field="company"
+                class="w-full rounded-[12px] border border-[rgba(255,255,255,0.12)] bg-[#F5F5F5] px-[18px] py-[14px] text-[14.5px] text-black/80 outline-none"
+              />
+            </div>
           </div>
 
-          <div class="fg">
-            <label for="cf-company">Company Name *</label>
-            <input id="cf-company" type="text" required placeholder="Your company name" data-field="company" />
-          </div>
-
-          <div class="consent-row">
-            <input id="cf-consent" type="checkbox" required />
-            <label for="cf-consent">
-              I agree to ClearTax's <a href="#">Privacy Policy</a> and <a href="#">Terms of Service</a>.
-              I consent to receiving communications about ClearTax products and UAE e-invoicing updates.
+          <div class="mb-6 flex items-start gap-3">
+            <input id="cf-consent" type="checkbox" required class="mt-1" />
+            <label
+              for="cf-consent"
+              class="m-0 text-[12px] leading-[1.6] text-black"
+            >
+              I agree to ClearTax's <a href="#" class="text-black no-underline"
+                >Privacy Policy</a
+              > and <a href="#" class="text-black no-underline"
+                >Terms of Service</a
+              >. I consent to receiving communications about ClearTax products
+              and UAE e-invoicing updates.
             </label>
           </div>
 
-          <button type="submit" class="btn-submit" data-submit>Book a Demo →</button>
-          <p class="form-note">No spam. Just a 30-min call with our UAE specialists.</p>
+          <button
+            type="submit"
+            class="w-full cursor-pointer rounded-[100px] border-none bg- px-4 py-4 text-[15px] bg-gradient-to-r! from-[#110072]! to-[#7a5698]! text-white! font-bold text-white transition-all duration-200"
+            data-submit>Get in Touch</button
+          >
+          <p class="mt-4 text-center text-[12px] text-black">
+            No spam. Just a 30-min call with our UAE specialists.
+          </p>
         </form>
       </div>
     </div>
   </div>
 </section>
 
-<style is:global>
-  .contact-section { background: var(--color-dark); padding: 100px 0; }
-  .section-inner { max-width: 1200px; margin: 0 auto; padding: 0 40px; }
-
-  .section-eyebrow {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    background: rgba(99, 85, 216, 0.10);
-    border: 1px solid rgba(99, 85, 216, 0.25);
-    color: var(--color-purple);
-    font-size: 12px;
-    font-weight: 700;
-    padding: 5px 14px;
-    border-radius: 100px;
-    letter-spacing: 0.5px;
-    text-transform: uppercase;
-    margin-bottom: 16px;
-  }
-  .section-h2 {
-    font-size: clamp(30px, 3.5vw, 46px);
-    font-weight: 900;
-    color: var(--color-white);
-    letter-spacing: -1.2px;
-    line-height: 1.18;
-    margin-bottom: 16px;
-  }
-  .section-h2 em { font-style: normal; }
-  .section-sub { font-size: 17px; color: rgba(255, 255, 255, 0.5); line-height: 1.72; margin: 0; }
-
-  .contact-grid { display: grid; grid-template-columns: 1fr 1.1fr; gap: 24px; align-items: start; }
-  .contact-points { display: flex; flex-direction: column; gap: 24px; margin-top: 40px; }
-  .contact-point { display: flex; gap: 16px; align-items: flex-start; }
-  .cp-icon { width: 44px; height: 44px; border-radius: 12px; background: rgba(99, 85, 216, 0.15); display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0; }
-  .cp-title { font-size: 15px; font-weight: 700; color: var(--color-white); margin-bottom: 4px; }
-  .cp-desc { font-size: 13.5px; color: rgba(255, 255, 255, 0.5); line-height: 1.6; }
-
-  .form-card {
-    background: var(--color-dark-2);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 24px;
-    padding: 40px 36px;
-    box-shadow: 0 40px 80px rgba(0, 0, 0, 0.3);
-  }
-  .form-card h3 { color: white; font-size: 24px; margin-bottom: 8px; font-weight: 800; }
-  .form-card p { color: rgba(255, 255, 255, 0.5); font-size: 14.5px; margin-bottom: 30px; line-height: 1.6; }
-
-  .fg { margin-bottom: 20px; }
-  .fg label { display: block; font-size: 13px; font-weight: 600; color: rgba(255, 255, 255, 0.7); margin-bottom: 8px; }
-  .fg input,
-  .fg select {
-    width: 100%;
-    padding: 14px 18px;
-    background: rgba(255, 255, 255, 0.06);
-    border: 1px solid rgba(255, 255, 255, 0.12);
-    border-radius: 12px;
-    color: white;
-    font-size: 14.5px;
-    outline: none;
-    font-family: inherit;
-  }
-  .fg-row { display: grid; grid-template-columns: 100px 1fr; gap: 10px; }
-
-  .select-wrap { position: relative; width: 100%; }
-  .select-wrap::after {
-    content: "";
-    position: absolute;
-    right: 18px;
-    top: 50%;
-    transform: translateY(-50%);
-    border-left: 5px solid transparent;
-    border-right: 5px solid transparent;
-    border-top: 6px solid rgba(255, 255, 255, 0.8);
-    pointer-events: none;
-    z-index: 2;
-  }
-  .select-wrap select {
-    position: absolute;
-    inset: 0;
-    width: 100%;
-    height: 100%;
-    opacity: 0;
-    cursor: pointer;
-    z-index: 2;
-    appearance: none;
-    -webkit-appearance: none;
-  }
-  .select-wrap select option {
-    background-color: var(--color-dark-2);
-    color: white;
-  }
-  .select-wrap .select-display {
-    display: block;
-    padding: 14px;
-    padding-right: 24px;
-    background: rgba(255, 255, 255, 0.06);
-    border: 1px solid rgba(255, 255, 255, 0.12);
-    border-radius: 12px;
-    color: white;
-    font-size: 14.5px;
-    pointer-events: none;
-    z-index: 1;
-  }
-
-  .consent-row { display: flex; align-items: flex-start; gap: 12px; margin-bottom: 24px; }
-  .consent-row input[type="checkbox"] { margin-top: 4px; }
-  .consent-row label { font-size: 12px; color: rgba(255, 255, 255, 0.45); line-height: 1.6; margin: 0; }
-  .consent-row a { color: #A89FF0; text-decoration: none; }
-
-  .btn-submit {
-    width: 100%;
-    padding: 16px;
-    background: var(--grad-btn);
-    border-radius: 100px;
-    color: white;
-    font-size: 15px;
-    font-weight: 700;
-    border: none;
-    cursor: pointer;
-    transition: all 0.25s;
-  }
-  .form-note { font-size: 12px; color: rgba(255, 255, 255, 0.3); text-align: center; margin-top: 16px; }
-
-  @media (max-width: 1024px) {
-    .contact-section { padding: 48px 0; }
-    .contact-grid { grid-template-columns: 1fr; gap: 24px; }
-    .section-h2,
-    .section-sub { text-align: left; }
-    .contact-points { align-items: flex-start; margin-left: auto; margin-right: auto; }
-  }
-  @media (max-width: 768px) {
-    .contact-section { padding: 60px 0; }
-    .form-card { padding: 30px 20px; }
-  }
-</style>
-
 <script is:inline>
   (function () {
     const section = document.currentScript.previousElementSibling;
     if (!section) return;
-    const form = section.querySelector('[data-lead-form]');
+    const form = section.querySelector("[data-lead-form]");
     const isdSelect = section.querySelector('[data-field="isd"]');
-    const isdDisplay = section.querySelector('[data-isd-display]');
+    const isdDisplay = section.querySelector("[data-isd-display]");
     if (!form) return;
 
     if (isdSelect && isdDisplay) {
-      const sync = () => { isdDisplay.textContent = isdSelect.value; };
-      isdSelect.addEventListener('change', sync);
+      const sync = () => {
+        isdDisplay.textContent = isdSelect.value;
+      };
+      isdSelect.addEventListener("change", sync);
       sync();
     }
 
-    form.addEventListener('submit', function (e) {
+    form.addEventListener("submit", function (e) {
       e.preventDefault();
-      const btn = form.querySelector('[data-submit]');
+      const btn = form.querySelector("[data-submit]");
       const originalText = btn.textContent;
-      btn.textContent = 'Connecting...';
+      btn.textContent = "Connecting...";
       btn.disabled = true;
 
-      const recaptchaKey = section.getAttribute('data-recaptcha-key');
-      const sheetName = section.getAttribute('data-sheet-name');
-      const originCountry = section.getAttribute('data-origin-country');
-      const thankYouUrl = section.getAttribute('data-thankyou-url');
-      const formType = section.getAttribute('data-form-type');
-      const leadType = section.getAttribute('data-lead-type');
+      const recaptchaKey = section.getAttribute("data-recaptcha-key");
+      const sheetName = section.getAttribute("data-sheet-name");
+      const originCountry = section.getAttribute("data-origin-country");
+      const thankYouUrl = section.getAttribute("data-thankyou-url");
+      const formType = section.getAttribute("data-form-type");
+      const leadType = section.getAttribute("data-lead-type");
 
       function readField(name) {
         const el = form.querySelector(`[data-field="${name}"]`);
-        return el ? el.value : '';
+        return el ? el.value : "";
       }
 
       function submitWithToken(token) {
         const payload = {
-          lead_platforms: { google_sheet: { sheet_name: sheetName }, pardot: true, salesforce: true },
+          lead_platforms: {
+            google_sheet: { sheet_name: sheetName },
+            pardot: true,
+            salesforce: true,
+          },
           extra_payload: { origin_country: originCountry },
           lead_data: {
-            name: readField('name'),
-            phone_number: readField('phone'),
-            email: readField('email'),
-            company_name: readField('company'),
-            ISD: readField('isd'),
+            name: readField("name"),
+            phone_number: readField("phone"),
+            email: readField("email"),
+            company_name: readField("company"),
+            ISD: readField("isd"),
             form_type: formType,
             lead_type: leadType,
             lead_source_url: window.location.href,
           },
         };
 
-        fetch(`https://www.cleartax.com/f/common-lead/lead/?captcha_token=${token}`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(payload),
-        })
+        fetch(
+          `https://www.cleartax.com/f/common-lead/lead/?captcha_token=${token}`,
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload),
+          },
+        )
           .then((response) => {
             if (response.status === 201) {
               window.location.href = thankYouUrl;
             } else {
-              throw new Error('API Error');
+              throw new Error("API Error");
             }
           })
           .catch(() => {
-            btn.textContent = '✕ Submission Failed';
-            btn.style.background = '#EF4444';
+            btn.textContent = "✕ Submission Failed";
+            btn.style.background = "#EF4444";
             btn.disabled = false;
             setTimeout(() => {
               btn.textContent = originalText;
-              btn.style.background = '';
+              btn.style.background = "";
             }, 4000);
           });
       }
 
-      if (typeof grecaptcha === 'undefined') {
+      if (typeof grecaptcha === "undefined") {
         // Recaptcha not loaded yet — submit without token; backend will reject if required.
-        submitWithToken('');
+        submitWithToken("");
         return;
       }
       grecaptcha.ready(function () {
-        grecaptcha.execute(recaptchaKey, { action: 'submit' }).then(submitWithToken);
+        grecaptcha
+          .execute(recaptchaKey, { action: "submit" })
+          .then(submitWithToken);
       });
     });
   })();
