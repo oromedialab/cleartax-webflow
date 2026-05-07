@@ -145,9 +145,9 @@ const items: FaqItem[] = [
     </div>
 
     <div class="faq-list flex flex-col gap-3" data-faq-root>
-      {items.map((it) => (
+      {items.map((it, i) => (
         <div
-          class="faq-item group overflow-hidden rounded-[14px] border border-[rgba(15,16,32,0.08)] bg-white transition-[border-color,box-shadow] duration-300 ease-in-out [box-sizing:border-box] [&.faq-open]:border-[rgba(99,85,216,0.35)] [&.faq-open]:shadow-[0_6px_24px_-12px_rgba(99,85,216,0.25)]"
+          class={`faq-item group overflow-hidden rounded-[14px] border border-[rgba(15,16,32,0.08)] bg-white transition-[border-color,box-shadow] duration-300 ease-in-out [box-sizing:border-box] [&.faq-open]:border-[rgba(99,85,216,0.35)] [&.faq-open]:shadow-[0_6px_24px_-12px_rgba(99,85,216,0.25)] ${i >= 5 ? 'hidden hidden-faq' : ''}`}
         >
           <button
             class="faq-trigger flex w-full appearance-none items-center justify-between gap-4 border-0 bg-transparent px-[18px] py-[18px] text-left text-[15.5px] font-bold leading-[1.4] text-[#0F1020] [box-sizing:border-box] cursor-pointer focus-visible:rounded-[14px] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-[#6355D8] sm:px-6 sm:py-[22px] sm:text-[17px]"
@@ -186,6 +186,20 @@ const items: FaqItem[] = [
         </div>
       ))}
     </div>
+
+    {items.length > 5 && (
+      <div class="mt-6 mx-auto flex items-center justify-center" id="faq-load-more-container">
+        <button id="faq-load-more-btn" class="inline-flex h-10 items-center gap-2 justify-center rounded-3xl bg-white px-10 py-4 text-base font-bold leading-[1.4] text-[#1C0976] outline-offset-[-2px] transition-all duration-300 ease-in-out hover:scale-105 active:scale-95 focus:outline focus:outline-2 focus:outline-[#6355D8]">
+          Load More
+          <span class="flex items-center justify-center">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M8 3V12M8 12L12 8M8 12L4 8" stroke="#1C0976" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </span>
+        </button>
+      </div>
+    )}
+
   </div>
 </section>
 
@@ -194,6 +208,20 @@ const items: FaqItem[] = [
     const root = document.querySelector('[data-faq-root]');
     if (!root) return;
     const items = root.querySelectorAll('.faq-item');
+
+    const loadMoreBtn = document.getElementById('faq-load-more-btn');
+    const loadMoreContainer = document.getElementById('faq-load-more-container');
+    if (loadMoreBtn) {
+      loadMoreBtn.addEventListener('click', function () {
+        const hiddenItems = root.querySelectorAll('.hidden-faq');
+        hiddenItems.forEach(function (item) {
+          item.classList.remove('hidden', 'hidden-faq');
+        });
+        if (loadMoreContainer) {
+          loadMoreContainer.style.display = 'none';
+        }
+      });
+    }
     items.forEach(function (item) {
       const trigger = item.querySelector('.faq-trigger');
       const panel = item.querySelector('.faq-panel');
