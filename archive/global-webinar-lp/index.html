@@ -146,8 +146,11 @@
 
     /* time zones strip */
     .timezone-strip {
-      display: flex; flex-wrap: wrap; gap: 10px;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
       margin-bottom: 36px;
+      max-width: 560px;
     }
     .tz-chip {
       display: flex; align-items: center; gap: 7px;
@@ -277,7 +280,7 @@
     .stat-desc { font-size: 13px; color: var(--muted); line-height: 1.5; }
 
     /* ─── SECTION SHELL ─── */
-    .section { padding: 80px 56px; }
+    .section { padding: 64px 56px; }
     .section-inner { max-width: 1200px; margin: 0 auto; }
     .sec-tag {
       font-size: 11px; font-weight: 700; letter-spacing: 0.12em;
@@ -341,26 +344,43 @@
     /* ─── SPEAKERS ─── */
     .speakers-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-      gap: 20px;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
     }
     .speaker-card {
       background: var(--bg-card);
       border: 1px solid var(--border-dim);
-      border-radius: 10px; overflow: hidden;
-      transition: border-color 0.2s, transform 0.2s;
+      border-radius: 12px; overflow: hidden;
+      transition: all 0.3s ease;
+      display: flex;
+      flex-direction: column;
     }
-    .speaker-card:hover { border-color: rgba(124,92,252,0.4); transform: translateY(-3px); }
+    .speaker-card:hover { 
+      border-color: rgba(124,92,252,0.4); 
+      transform: translateY(-5px);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+    }
     .speaker-img {
       height: 160px;
       background: linear-gradient(160deg, #1e1640 0%, #0d0d20 100%);
       display: flex; align-items: center; justify-content: center;
       position: relative; overflow: hidden;
     }
-    .speaker-img::after {
-      content: '';
-      position: absolute; bottom: 0; left: 0; right: 0; height: 40px;
-      background: linear-gradient(to bottom, transparent, var(--bg-card));
+    .speaker-img img {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      object-fit: cover;
+      object-position: center top;
+      border: 2px solid rgba(124, 92, 252, 0.4);
+      background: var(--bg-card);
+      transition: all 0.3s ease;
+      z-index: 2;
+    }
+    .speaker-card:hover .speaker-img img {
+      transform: scale(1.1);
+      border-color: var(--purple-hi);
+      box-shadow: 0 0 20px var(--purple-glow);
     }
     .spk-initials {
       width: 64px; height: 64px; border-radius: 50%;
@@ -369,14 +389,16 @@
       display: flex; align-items: center; justify-content: center;
       font-size: 20px; font-weight: 700; color: #b39dfc;
     }
-    .speaker-info { padding: 16px; }
-    .spk-name { font-size: 14px; font-weight: 700; margin-bottom: 3px; }
-    .spk-title { font-size: 11px; color: var(--muted); margin-bottom: 8px; line-height: 1.4; }
+    .speaker-info { padding: 20px; flex-grow: 1; display: flex; flex-direction: column; }
+    .spk-name { font-size: 16px; font-weight: 700; margin-bottom: 4px; color: var(--white); }
+    .spk-title { font-size: 12px; color: var(--muted); margin-bottom: 12px; line-height: 1.5; flex-grow: 1; }
     .spk-country {
-      display: inline-flex; align-items: center; gap: 5px;
+      align-self: flex-start;
+      display: inline-flex; align-items: center; gap: 6px;
       font-size: 11px; font-weight: 600;
+      background: rgba(255,255,255,0.03);
       border: 1px solid var(--border-dim);
-      border-radius: 4px; padding: 3px 8px;
+      border-radius: 4px; padding: 4px 10px;
       color: var(--muted);
     }
     .spk-country .flag { font-size: 13px; }
@@ -454,6 +476,7 @@
       nav { padding: 0 24px; }
       .section { padding: 60px 28px; }
       .stats-row { grid-template-columns: repeat(2,1fr); }
+      .speakers-grid { grid-template-columns: repeat(2,1fr); }
       footer { flex-direction: column; gap: 16px; text-align: center; }
       .cta-band { padding: 48px 28px; }
     }
@@ -463,7 +486,74 @@
       .form-row-2 { grid-template-columns: 1fr; }
       .country-tabs { gap: 6px; }
       .ctab { font-size: 12px; padding: 7px 12px; }
+      .speakers-grid { grid-template-columns: 1fr; }
+      .timezone-strip { grid-template-columns: repeat(2, 1fr); }
     }
+
+    /* ─── THANK YOU MODAL ─── */
+    .modal-overlay {
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(7, 6, 15, 0.85);
+      backdrop-filter: blur(12px);
+      display: flex; align-items: center; justify-content: center;
+      z-index: 2000; opacity: 0; pointer-events: none;
+      transition: opacity 0.4s ease;
+    }
+    .modal-overlay.active { opacity: 1; pointer-events: auto; }
+    .thank-you-card {
+      background: var(--bg-card);
+      border: 1px solid var(--purple-hi);
+      border-radius: 20px;
+      padding: 48px 32px;
+      max-width: 480px; width: 90%;
+      text-align: center;
+      position: relative;
+      transform: scale(0.9);
+      transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+      box-shadow: 0 20px 80px rgba(124, 92, 252, 0.3);
+    }
+    .modal-overlay.active .thank-you-card { transform: scale(1); }
+    .success-icon {
+      width: 80px; height: 80px; background: rgba(109, 255, 176, 0.1);
+      border-radius: 50%; display: flex; align-items: center; justify-content: center;
+      margin: 0 auto 24px; color: #6dffb0; border: 1px solid rgba(109, 255, 176, 0.3);
+    }
+    .thank-you-card h2 { font-size: 28px; font-weight: 800; margin-bottom: 12px; color: var(--white); }
+    .thank-you-card p { font-size: 15px; color: var(--muted); line-height: 1.6; margin-bottom: 32px; }
+    .close-modal {
+      background: var(--purple-hi); color: var(--white); border: none; padding: 12px 32px;
+      border-radius: 8px; font-weight: 700; cursor: pointer; transition: all 0.2s;
+    }
+    .close-modal:hover { background: #9070ff; transform: translateY(-2px); box-shadow: 0 4px 20px rgba(124, 92, 252, 0.4); }
+
+    .modal-close-btn {
+      position: absolute; top: 20px; right: 20px;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid var(--border-dim);
+      color: var(--muted);
+      width: 36px; height: 36px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; transition: all 0.2s;
+      z-index: 10;
+    }
+    .modal-close-btn:hover {
+      background: rgba(124,92,252,0.15);
+      color: var(--white);
+      border-color: var(--purple-hi);
+      transform: rotate(90deg);
+    }
+
+    /* ─── LOADING STATE ─── */
+    .form-submit.loading {
+      color: transparent; pointer-events: none; position: relative;
+    }
+    .form-submit.loading::after {
+      content: '';
+      position: absolute; width: 20px; height: 20px; top: calc(50% - 10px); left: calc(50% - 10px);
+      border: 2px solid var(--white); border-top-color: transparent; border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
   </style>
 </head>
 <body>
@@ -509,14 +599,6 @@
       <div class="tz-chip"><span class="tz-flag">🇮🇳</span><span class="tz-time">2:30 PM</span><span class="tz-label">IST</span></div>
       <div class="tz-chip"><span class="tz-flag">🇫🇷</span><span class="tz-flag">🇩🇪</span><span class="tz-time">11:00 AM</span><span class="tz-label">CEST</span></div>
     </div>
-
-    <div class="hero-trust">
-      <span class="trust-stat"><strong>5,000+</strong> enterprises trust ClearTax</span>
-      <span class="trust-divider"></span>
-      <span class="trust-stat"><strong>50+</strong> countries covered</span>
-      <span class="trust-divider"></span>
-      <span class="trust-stat"><strong>5Bn+</strong> transactions/year</span>
-    </div>
   </div>
 
   <!-- FORM -->
@@ -537,20 +619,42 @@
         </div>
       </div>
       <div class="form-body">
-        <!-- Demio Embed -->
-        <div id="demio-form-container"></div>
+        <!-- Demio Integration (Background Tracking) -->
+        <div id="demio-form-container" style="display:none;">
+          <script async id="demio-js" type="text/javascript" src="https://cdn.demio.com/production/dashboard/embed.bundle.js"></script> 
+          <span class="demio-embed-registration" data-hash="Bgi5WN5BsVQH7Ldv" data-api="api/v1" data-base-uri="https://my.demio.com/" data-form-width="100%" data-color="#0065ff" data-text="REGISTER"></span>
+        </div>
 
-        <!-- Fallback form shown until Demio loads -->
-        <div id="fallback-form" class="register-form">
+        <!-- Custom Form -->
+        <form id="webinar-form" class="register-form">
           <div class="form-row-2">
-            <div class="fg"><label>First Name</label><input type="text" placeholder="Sarah"/></div>
-            <div class="fg"><label>Last Name</label><input type="text" placeholder="Chen"/></div>
+            <div class="fg"><label>First Name</label><input type="text" name="firstName" id="firstName" placeholder="Sarah" required/></div>
+            <div class="fg"><label>Last Name</label><input type="text" name="lastName" id="lastName" placeholder="Chen" required/></div>
           </div>
-          <div class="fg"><label>Business Email</label><input type="email" placeholder="sarah@company.com"/></div>
-          <div class="fg"><label>Company</label><input type="text" placeholder="Your organisation"/></div>
+          <div class="fg"><label>Business Email</label><input type="email" name="email" id="email" placeholder="sarah@company.com" required/></div>
+          
+          <div class="fg">
+            <label>Phone Number</label>
+            <div style="display: flex; gap: 8px;">
+              <select name="isd" id="isd" style="width: 100px; flex-shrink: 0;" required>
+                <option value="91" selected>+91 (IN)</option>
+                <option value="971">+971 (UAE)</option>
+                <option value="966">+966 (KSA)</option>
+                <option value="968">+968 (Oman)</option>
+                <option value="60">+60 (MY)</option>
+                <option value="33">+33 (FR)</option>
+                <option value="49">+49 (DE)</option>
+                <option value="1">+1 (US)</option>
+                <option value="44">+44 (UK)</option>
+              </select>
+              <input type="tel" name="phone" id="phone" placeholder="50 123 4567" style="flex-grow: 1;" required/>
+            </div>
+          </div>
+
+          <div class="fg"><label>Company</label><input type="text" name="company" id="company" placeholder="Your organisation" required/></div>
           <div class="fg">
             <label>Role</label>
-            <select>
+            <select name="role" id="role" required>
               <option value="" disabled selected>Select your role</option>
               <option>CFO / Group CFO</option>
               <option>VP / SVP Finance</option>
@@ -561,9 +665,16 @@
               <option>Other Finance Leader</option>
             </select>
           </div>
-          <button class="form-submit">Reserve My Seat &rarr;</button>
-          <p class="form-note">Free to attend. Recording shared with all registrants.</p>
-        </div>
+          
+          <!-- Hidden UTM Fields -->
+          <input type="hidden" name="utm_source" id="utm_source">
+          <input type="hidden" name="utm_medium" id="utm_medium">
+          <input type="hidden" name="utm_campaign" id="utm_campaign">
+          <input type="hidden" name="utm_term" id="utm_term">
+          <input type="hidden" name="utm_content" id="utm_content">
+
+          <button type="submit" class="form-submit" id="submit-btn">Reserve My Seat &rarr;</button>
+        </form>
       </div>
     </div>
   </div>
@@ -572,7 +683,7 @@
 <!-- ═══ STATS ═══ -->
 <div class="stats-row reveal">
   <div class="stat-cell">
-    <div class="stat-num">80+</div>
+    <div class="stat-num">90+</div>
     <div class="stat-desc">Countries with active or announced e-invoicing mandates</div>
   </div>
   <div class="stat-cell">
@@ -651,7 +762,9 @@
     <h2 class="sec-h2 reveal">Regional practitioners. <em>Real mandates.</em></h2>
     <div class="speakers-grid">
       <div class="speaker-card reveal">
-        <div class="speaker-img"><div class="spk-initials">VG</div></div>
+        <div class="speaker-img">
+          <img src="https://cdn.prod.website-files.com/63ede4a3da6dbd6b05c4612f/69fc58dfeed5a45fac6d5c72_vignesh%20iyer.png" alt="Vignesh Iyer"/>
+        </div>
         <div class="speaker-info">
           <div class="spk-name">Vignesh Iyer</div>
           <div class="spk-title">Strategic Account Manager – UAE</div>
@@ -659,7 +772,9 @@
         </div>
       </div>
       <div class="speaker-card reveal">
-        <div class="speaker-img"><div class="spk-initials">AR</div></div>
+        <div class="speaker-img">
+          <img src="https://cdn.prod.website-files.com/63ede4a3da6dbd6b05c4612f/69fc5842469ba5a858debff4_abdel-rahman.png" alt="Abdel Rahman"/>
+        </div>
         <div class="speaker-info">
           <div class="spk-name">Abdel Rahman</div>
           <div class="spk-title">Regional Expert – KSA & Oman</div>
@@ -667,7 +782,9 @@
         </div>
       </div>
       <div class="speaker-card reveal">
-        <div class="speaker-img"><div class="spk-initials">SS</div></div>
+        <div class="speaker-img">
+          <img src="https://cdn.prod.website-files.com/63ede4a3da6dbd6b05c4612f/69fc5841efe1d3130f243e82_shailja-sood.png" alt="Shailja Sood"/>
+        </div>
         <div class="speaker-info">
           <div class="spk-name">Shailja Sood</div>
           <div class="spk-title">India E-Invoicing Expert</div>
@@ -675,15 +792,9 @@
         </div>
       </div>
       <div class="speaker-card reveal">
-        <div class="speaker-img"><div class="spk-initials">MF</div></div>
-        <div class="speaker-info">
-          <div class="spk-name">Mohammed Farhan</div>
-          <div class="spk-title">Malaysia Compliance Expert</div>
-          <div class="spk-country"><span class="flag">🇲🇾</span> Malaysia · 5:00 PM MYT</div>
+        <div class="speaker-img">
+          <img src="https://cdn.prod.website-files.com/63ede4a3da6dbd6b05c4612f/69fc584185df83c1fac9bb30_Khushbu-baiti.png" alt="Khushbu Bhati"/>
         </div>
-      </div>
-      <div class="speaker-card reveal">
-        <div class="speaker-img"><div class="spk-initials">KB</div></div>
         <div class="speaker-info">
           <div class="spk-name">Khushbu Bhati</div>
           <div class="spk-title">Malaysia Compliance Expert</div>
@@ -691,7 +802,9 @@
         </div>
       </div>
       <div class="speaker-card reveal">
-        <div class="speaker-img"><div class="spk-initials">AH</div></div>
+        <div class="speaker-img">
+          <img src="https://cdn.prod.website-files.com/63ede4a3da6dbd6b05c4612f/69fc584022b3501371f2024e_ayush-hingar.png" alt="Ayush Hingar"/>
+        </div>
         <div class="speaker-info">
           <div class="spk-name">Ayush Hingar</div>
           <div class="spk-title">Europe E-Invoicing Expert</div>
@@ -699,7 +812,6 @@
         </div>
       </div>
     </div>
-    <p style="margin-top:18px;font-size:12px;color:var(--muted);">Full speaker bios sent to all registered attendees ahead of the session.</p>
   </div>
 </section>
 
@@ -733,7 +845,6 @@
   <h2>Your mandate clock is already running.</h2>
   <p>60 minutes with this panel could save your team months of costly uncertainty.</p>
   <a class="cta-btn" href="#register">Reserve My Free Seat &rarr;</a>
-  <div class="cta-sub">Free to attend &nbsp;·&nbsp; Recording shared with all registrants &nbsp;·&nbsp; No product pitch</div>
 </div>
 
 <!-- ═══ FOOTER ═══ -->
@@ -749,22 +860,7 @@
   </div>
 </footer>
 
-<!-- ═══ DEMIO EMBED ═══ -->
-<script>
-(function(d,s,id){
-  var js,fjs=d.getElementsByTagName(s)[0];
-  if(d.getElementById(id))return;
-  js=d.createElement(s);js.id=id;
-  js.src="https://my.demio.com/embed/form/Bgi5WN5BsVQH7Ldv";
-  fjs.parentNode.insertBefore(js,fjs);
-}(document,'script','demio-form-js'));
-
-setTimeout(function(){
-  var dc=document.getElementById('demio-form-container');
-  var fb=document.getElementById('fallback-form');
-  if(dc&&dc.children.length>0&&fb){fb.style.display='none';}
-},2500);
-</script>
+<!-- ═══ SCRIPTS ═══ -->
 
 <!-- ═══ COUNTRY TABS ═══ -->
 <script>
@@ -785,5 +881,102 @@ var obs=new IntersectionObserver(function(entries){
 },{threshold:0.1});
 document.querySelectorAll('.reveal').forEach(function(el){obs.observe(el);});
 </script>
+<!-- ═══ THANK YOU MODAL ═══ -->
+<div class="modal-overlay" id="thank-you-modal">
+  <div class="thank-you-card">
+    <button class="modal-close-btn" onclick="closeModal()" aria-label="Close modal">
+      <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+    </button>
+    <div class="success-icon">
+      <svg viewBox="0 0 24 24" width="40" height="40" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+    </div>
+    <h2>Registration Confirmed!</h2>
+    <p style="margin-bottom:0;">Thank you for registering.<br/> We'll send a confirmation email with the session details.</p>
+  </div>
+</div>
+
+<script>
+/* ─── CUSTOM FORM LOGIC ─── */
+const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbzHFlqwgIsKTGlmMI7mi5yhZyfPDwHQgYxAGlU_YKAbL_XTJwct59wzJ-KnKiVaDGxDGQ/exec';
+
+function getUTMs() {
+  const params = new URLSearchParams(window.location.search);
+  return {
+    utm_source: params.get('utm_source') || '',
+    utm_medium: params.get('utm_medium') || '',
+    utm_campaign: params.get('utm_campaign') || '',
+    utm_term: params.get('utm_term') || '',
+    utm_content: params.get('utm_content') || ''
+  };
+}
+
+const form = document.getElementById('webinar-form');
+const submitBtn = document.getElementById('submit-btn');
+const modal = document.getElementById('thank-you-modal');
+
+if (form) {
+  // Pre-fill hidden UTM fields
+  const utms = getUTMs();
+  for (const key in utms) {
+    const input = document.getElementById(key);
+    if (input) input.value = utms[key];
+  }
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    submitBtn.classList.add('loading');
+    submitBtn.disabled = true;
+    
+    const formData = new FormData(form);
+    const submissionData = Object.fromEntries(formData.entries());
+    
+    // Combine ISD and Phone for clarity in Sheets/Demio
+    submissionData.full_phone = `+${submissionData.isd}${submissionData.phone.replace(/\s+/g, '')}`;
+    
+    // Demio Registration Data (Ensure these match what your Apps Script expects)
+    submissionData.demio_hash = "Bgi5WN5BsVQH7Ldv"; 
+
+    try {
+      const response = await fetch(WEB_APP_URL, {
+        method: 'POST',
+        mode: 'no-cors',
+        cache: 'no-cache',
+        redirect: 'follow',
+        headers: { 'Content-Type': 'text/plain' },
+        body: JSON.stringify(submissionData),
+        keepalive: true
+      });
+      
+      // Since mode is no-cors, we won't get a readable response body,
+      // but we can assume success if no error is thrown.
+      showModal();
+      form.reset();
+    } catch (error) {
+      console.error('Submission error:', error);
+      // Still show modal to user for better UX, or show error message
+      showModal(); 
+      form.reset();
+    } finally {
+      submitBtn.classList.remove('loading');
+      submitBtn.disabled = false;
+    }
+  });
+}
+
+function showModal() {
+  if (modal) {
+    modal.classList.add('active');
+    document.body.style.overflow = 'hidden';
+  }
+}
+
+function closeModal() {
+  if (modal) {
+    modal.classList.remove('active');
+    document.body.style.overflow = 'auto';
+  }
+}
+</script>
+
 </body>
 </html>
