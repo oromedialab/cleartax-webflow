@@ -27,8 +27,7 @@
  */
 
 // ---------- CONFIG ----------
-var PDF_FILE_ID  = '1s-8ODzsJzQGoPJ1p_8Qz9u9Pz0ojzzem';
-var PDF_LINK     = 'https://drive.google.com/file/d/' + PDF_FILE_ID + '/view?usp=sharing';
+var PDF_LINK     = 'https://cleartax-media.s3.amazonaws.com/finfo/wg-utils/cms-tool/271cfef7-2dfb-45be-b139-93d11a778e39.pdf';
 var SENDER_NAME  = 'Team ClearTax';
 var REPLY_TO     = 'support@cleartax.in'; 
 var EMAIL_SUBJECT = '[Download] Your State of Tax Assurance 2026 Report is Here';
