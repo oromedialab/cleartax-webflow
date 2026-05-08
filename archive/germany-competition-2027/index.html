@@ -1,0 +1,623 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ClearTax vs Thomson Reuters — Germany E-Invoicing 2027</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --ct-navy:      #0A1628;
+      --ct-navy-mid:  #122040;
+      --ct-purple:    #6B4EFF;
+      --ct-purple-dk: #5B3EEF;
+      --ct-purple-lt: #F0EEFF;
+      --ct-green:     #00A67E;
+      --ct-green-lt:  #E6F7F3;
+      --ct-amber:     #F59E0B;
+      --ct-red:       #DC2626;
+      --ct-gray-50:   #F7F9FC;
+      --ct-gray-100:  #EEF2F7;
+      --ct-gray-200:  #DDE4EE;
+      --ct-gray-400:  #8A9BB5;
+      --ct-gray-600:  #4A5F7A;
+      --ct-gray-800:  #192A3E;
+      --ct-white:     #FFFFFF;
+      --font:         'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      --radius-sm:    6px;
+      --radius-md:    12px;
+      --radius-lg:    18px;
+      --shadow-sm:    0 1px 4px rgba(7,21,38,.07);
+      --shadow-md:    0 4px 20px rgba(7,21,38,.12);
+      --shadow-lg:    0 12px 40px rgba(7,21,38,.18);
+    }
+
+    html { scroll-behavior: smooth; }
+    body { font-family: var(--font); color: var(--ct-gray-800); background: var(--ct-white); line-height: 1.6; }
+
+    /* ── NAV WRAPPER ── */
+    .nav-wrapper { position: sticky; top: 0; z-index: 200; background: var(--ct-navy); padding: 12px 24px; }
+    nav { max-width: 1200px; margin: 0 auto; background: #fff; border-radius: 50px; padding: 8px 8px 8px 28px; display: flex; align-items: center; justify-content: space-between; height: 56px; box-shadow: 0 2px 16px rgba(0,0,0,.15); }
+    .nav-logo { display: flex; align-items: center; }
+    .nav-wordmark { font-size: 20px; font-weight: 700; color: var(--ct-navy); letter-spacing: -0.5px; font-family: var(--font); }
+    .nav-links { display: flex; gap: 28px; align-items: center; }
+    .nav-link { color: var(--ct-gray-800); font-size: 14px; text-decoration: none; font-weight: 500; transition: color .15s; }
+    .nav-link:hover { color: var(--ct-purple); }
+    .nav-country { display: flex; align-items: center; gap: 6px; font-size: 14px; font-weight: 500; color: var(--ct-gray-800); cursor: pointer; }
+    .nav-cta { background: var(--ct-purple); color: var(--ct-white); border: none; padding: 11px 22px; border-radius: 50px; font-size: 14px; font-weight: 700; cursor: pointer; text-decoration: none; display: inline-block; transition: background 0.18s; white-space: nowrap; }
+    .nav-cta:hover { background: var(--ct-purple-dk); }
+
+    /* ── RIBBON ── */
+    .ribbon { background: var(--ct-navy-mid); padding: 10px 48px; text-align: center; font-size: 13px; font-weight: 600; color: rgba(255,255,255,.85); border-bottom: 1px solid rgba(107,78,255,.25); }
+    .ribbon strong { font-weight: 800; color: #fff; }
+
+    /* ── HERO ── */
+    .hero { background: var(--ct-navy); background-image: radial-gradient(ellipse 80% 60% at 60% 0%, rgba(107,78,255,.15) 0%, transparent 70%), radial-gradient(ellipse 40% 40% at 95% 80%, rgba(107,78,255,.08) 0%, transparent 60%); padding: 72px 48px 80px; }
+    .hero-inner { max-width: 1120px; margin: 0 auto; display: grid; grid-template-columns: 1fr 420px; gap: 64px; align-items: start; }
+    .hero-eyebrow { display: inline-flex; align-items: center; gap: 8px; background: rgba(107,78,255,.12); color: var(--ct-purple); font-size: 12px; font-weight: 700; letter-spacing: 0.08em; padding: 6px 14px; border-radius: 20px; margin-bottom: 22px; text-transform: uppercase; border: 1px solid rgba(107,78,255,.25); }
+    .hero h1 { font-size: clamp(28px, 3.4vw, 46px); font-weight: 800; color: var(--ct-white); line-height: 1.16; letter-spacing: -0.5px; margin-bottom: 20px; }
+    .hero h1 span { color: var(--ct-purple); }
+    .hero-sub { font-size: 17px; color: rgba(255,255,255,.72); margin-bottom: 32px; line-height: 1.65; max-width: 520px; }
+    .hero-bullets { list-style: none; display: flex; flex-direction: column; gap: 12px; margin-bottom: 36px; }
+    .hero-bullets li { display: flex; gap: 12px; align-items: flex-start; font-size: 15px; color: rgba(255,255,255,.85); }
+    .bul-icon { width: 22px; height: 22px; min-width: 22px; background: var(--ct-green); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; color: #fff; font-weight: 800; margin-top: 1px; }
+    .hero-trust { display: flex; gap: 24px; flex-wrap: wrap; }
+    .hero-trust-item { display: flex; align-items: center; gap: 6px; font-size: 13px; color: rgba(255,255,255,.55); }
+    .hero-trust-item .dot { width: 6px; height: 6px; background: var(--ct-green); border-radius: 50%; }
+
+    /* ── FORM CARD ── */
+    .form-card { background: var(--ct-white); border-radius: var(--radius-lg); padding: 32px 28px; box-shadow: var(--shadow-lg); }
+    .form-card h3 { font-size: 18px; font-weight: 800; color: var(--ct-navy); margin-bottom: 6px; }
+    .form-card p { font-size: 13px; color: var(--ct-gray-600); margin-bottom: 22px; }
+    .form-field { display: flex; flex-direction: column; gap: 5px; margin-bottom: 14px; }
+    .form-field label { font-size: 12px; font-weight: 600; color: var(--ct-gray-600); }
+    .form-field input, .form-field select { border: 1.5px solid var(--ct-gray-200); border-radius: var(--radius-sm); padding: 10px 14px; font-size: 14px; color: var(--ct-gray-800); font-family: var(--font); outline: none; transition: border-color .15s; background: var(--ct-white); width: 100%; }
+    .form-field input:focus, .form-field select:focus { border-color: var(--ct-purple); }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .btn-form { width: 100%; background: var(--ct-purple); color: var(--ct-white); border: none; padding: 14px; border-radius: var(--radius-sm); font-size: 15px; font-weight: 700; cursor: pointer; transition: background .18s; margin-top: 6px; font-family: var(--font); }
+    .btn-form:hover { background: var(--ct-purple-dk); }
+    .form-disclaimer { font-size: 11px; color: var(--ct-gray-400); text-align: center; margin-top: 10px; line-height: 1.5; }
+
+    /* ── TRUST BAR ── */
+    .trust-bar { background: var(--ct-gray-50); border-top: 1px solid var(--ct-gray-200); border-bottom: 1px solid var(--ct-gray-200); padding: 28px 48px; }
+    .trust-bar-inner { max-width: 1120px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 24px; }
+    .trust-label { font-size: 12px; font-weight: 700; color: var(--ct-gray-400); text-transform: uppercase; letter-spacing: 0.08em; }
+    .trust-stats { display: flex; gap: 48px; flex-wrap: wrap; }
+    .trust-stat { text-align: center; }
+    .trust-stat .num { font-size: 24px; font-weight: 800; color: var(--ct-navy); display: block; line-height: 1; }
+    .trust-stat .lbl { font-size: 12px; color: var(--ct-gray-600); margin-top: 4px; }
+
+    /* ── SECTION ── */
+    .section { padding: 80px 48px; }
+    .section-inner { max-width: 1120px; margin: 0 auto; }
+    .section-eyebrow { font-size: 12px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ct-purple); margin-bottom: 10px; }
+    .section-title { font-size: clamp(22px, 2.8vw, 34px); font-weight: 800; color: var(--ct-navy); letter-spacing: -0.3px; margin-bottom: 14px; line-height: 1.22; }
+    .section-sub { font-size: 17px; color: var(--ct-gray-600); max-width: 600px; line-height: 1.65; }
+
+    /* ── REALITY SECTION ── */
+    .reality-section { background: var(--ct-navy); }
+    .reality-section .section-eyebrow { color: var(--ct-purple); }
+    .reality-section .section-title { color: #fff; }
+    .reality-section .section-sub { color: rgba(255,255,255,.65); }
+    .reality-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 18px; margin-top: 44px; }
+    .reality-card { background: rgba(255,255,255,.05); border: 1px solid rgba(255,255,255,.1); border-radius: var(--radius-md); padding: 26px 22px; }
+    .reality-card .rc-icon { font-size: 26px; margin-bottom: 14px; }
+    .reality-card .rc-title { font-size: 16px; font-weight: 700; color: #fff; margin-bottom: 8px; }
+    .reality-card .rc-body { font-size: 14px; color: rgba(255,255,255,.58); line-height: 1.6; }
+    .reality-callout { background: rgba(107,78,255,.15); border: 1px solid rgba(107,78,255,.3); border-radius: var(--radius-md); padding: 28px 32px; margin-top: 40px; }
+    .reality-callout p { font-size: 17px; color: rgba(255,255,255,.85); line-height: 1.65; }
+    .reality-callout p strong { color: #fff; font-size: 18px; }
+    .reality-list { margin-top: 40px; display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 14px; }
+    .reality-item { display: flex; gap: 12px; align-items: flex-start; }
+    .ri-dot { min-width: 28px; height: 28px; background: var(--ct-purple); border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 800; color: #fff; margin-top: 1px; }
+    .ri-label { font-size: 14px; color: rgba(255,255,255,.75); line-height: 1.55; }
+    .ri-label strong { color: #fff; }
+
+    /* ── COMPARISON TABLE ── */
+    .comp-section { background: var(--ct-gray-50); }
+    .table-wrap { margin-top: 44px; border-radius: var(--radius-lg); overflow: hidden; box-shadow: var(--shadow-md); border: 1px solid var(--ct-gray-200); overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; background: var(--ct-white); min-width: 600px; }
+    thead th { padding: 18px 24px; font-size: 14px; font-weight: 700; text-align: left; }
+    .th-feat { color: var(--ct-gray-400); font-size: 12px; letter-spacing: 0.06em; text-transform: uppercase; background: var(--ct-gray-50); width: 28%; border-bottom: 2px solid var(--ct-gray-200); }
+    .th-ct { background: var(--ct-navy); color: #fff; width: 36%; border-bottom: 2px solid var(--ct-navy); }
+    .th-ct-sub { font-size: 11px; font-weight: 500; color: rgba(255,255,255,.55); margin-top: 3px; }
+    .th-comp { background: var(--ct-gray-100); color: var(--ct-gray-600); width: 36%; border-bottom: 2px solid var(--ct-gray-200); }
+    tbody tr { border-bottom: 1px solid var(--ct-gray-100); }
+    tbody tr:last-child { border-bottom: none; }
+    tbody tr:hover td { background: #FAFBFD; }
+    tbody td { padding: 15px 24px; font-size: 14px; vertical-align: middle; }
+    .td-feat { color: var(--ct-gray-600); font-weight: 500; background: var(--ct-gray-50); }
+    .td-ct { background: #F0F6FF; color: var(--ct-navy); font-weight: 500; }
+    .td-comp { color: var(--ct-gray-600); }
+    .chip { display: inline-flex; align-items: center; gap: 5px; padding: 3px 10px; border-radius: 20px; font-size: 12px; font-weight: 600; }
+    .chip-green { background: var(--ct-green-lt); color: #065F46; }
+    .chip-amber { background: #FEF3C7; color: #92400E; }
+    .chip-gray  { background: var(--ct-gray-100); color: var(--ct-gray-600); }
+
+    /* ── WHY CARDS ── */
+    .why-section { background: var(--ct-white); }
+    .why-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 22px; margin-top: 48px; }
+    .why-card { border: 1.5px solid var(--ct-gray-200); border-radius: var(--radius-lg); padding: 28px 24px; transition: box-shadow .2s, border-color .2s; }
+    .why-card:hover { box-shadow: var(--shadow-md); border-color: var(--ct-purple); }
+    .wc-icon { width: 46px; height: 46px; background: var(--ct-purple-lt); border-radius: var(--radius-md); display: flex; align-items: center; justify-content: center; font-size: 20px; margin-bottom: 16px; }
+    .why-card h3 { font-size: 16px; font-weight: 700; color: var(--ct-navy); margin-bottom: 10px; }
+    .why-card p { font-size: 14px; color: var(--ct-gray-600); line-height: 1.65; }
+
+    /* ── CFO READINESS ── */
+    .readiness-section { background: var(--ct-navy); }
+    .readiness-section .section-title { color: #fff; }
+    .readiness-section .section-sub { color: rgba(255,255,255,.65); }
+    .readiness-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-top: 44px; }
+    .readiness-item { background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.1); border-radius: var(--radius-md); padding: 22px 20px; display: flex; gap: 14px; align-items: flex-start; }
+    .rn-num { min-width: 32px; height: 32px; background: var(--ct-purple); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 800; color: #fff; flex-shrink: 0; }
+    .rn-text { font-size: 14px; color: rgba(255,255,255,.78); line-height: 1.6; }
+    .rn-text strong { color: #fff; }
+
+    /* ── CTA ── */
+    .cta-section { background: linear-gradient(135deg, var(--ct-navy) 0%, var(--ct-navy-mid) 100%); padding: 80px 48px; text-align: center; border-top: 1px solid rgba(107,78,255,.2); }
+    .cta-section h2 { font-size: clamp(24px, 3vw, 38px); font-weight: 800; color: #fff; letter-spacing: -0.3px; margin-bottom: 14px; }
+    .cta-section h2 span { color: var(--ct-purple); }
+    .cta-section p { font-size: 17px; color: rgba(255,255,255,.70); max-width: 560px; margin: 0 auto 36px; }
+    .cta-checklist { display: flex; gap: 28px; justify-content: center; flex-wrap: wrap; margin-bottom: 40px; }
+    .cta-check { display: flex; align-items: center; gap: 8px; font-size: 14px; color: rgba(255,255,255,.80); }
+    .cta-check::before { content: '✓'; font-weight: 800; font-size: 15px; color: var(--ct-purple); }
+    .cta-btns { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; margin-bottom: 20px; }
+    .btn-primary-cta { background: var(--ct-purple); color: #fff; padding: 16px 44px; border-radius: var(--radius-sm); font-size: 16px; font-weight: 800; text-decoration: none; border: none; cursor: pointer; display: inline-block; transition: background .2s; box-shadow: 0 4px 24px rgba(107,78,255,.3); }
+    .btn-primary-cta:hover { background: var(--ct-purple-dk); }
+    .btn-secondary-cta { background: transparent; color: #fff; padding: 16px 44px; border-radius: var(--radius-sm); font-size: 16px; font-weight: 700; text-decoration: none; border: 2px solid rgba(255,255,255,.25); cursor: pointer; display: inline-block; transition: all .2s; }
+    .btn-secondary-cta:hover { border-color: rgba(255,255,255,.6); background: rgba(255,255,255,.05); }
+    .cta-note { font-size: 13px; color: rgba(255,255,255,.4); }
+
+    /* ── FOOTER ── */
+    footer { background: #111316; padding: 64px 48px 0; }
+    .footer-top { max-width: 1200px; margin: 0 auto; display: grid; grid-template-columns: 260px 160px 1fr 180px 180px; gap: 48px; padding-bottom: 60px; }
+    .footer-col-logo .ft-wordmark { font-size: 28px; font-weight: 700; color: #fff; letter-spacing: -0.5px; display: block; margin-bottom: 20px; }
+    .footer-col-logo address { font-style: normal; font-size: 13px; color: rgba(255,255,255,.45); line-height: 1.7; margin-bottom: 24px; }
+    .footer-social-label { font-size: 13px; font-weight: 600; color: rgba(255,255,255,.55); margin-bottom: 12px; }
+    .footer-social { display: flex; gap: 10px; }
+    .social-icon { width: 36px; height: 36px; border-radius: 8px; background: rgba(255,255,255,.08); display: flex; align-items: center; justify-content: center; text-decoration: none; color: rgba(255,255,255,.65); font-size: 14px; font-weight: 700; transition: background .15s; }
+    .social-icon:hover { background: rgba(255,255,255,.16); color: #fff; }
+    .footer-col h4 { font-size: 14px; font-weight: 600; color: #fff; margin-bottom: 18px; }
+    .footer-col ul { list-style: none; display: flex; flex-direction: column; gap: 12px; }
+    .footer-col ul li a { font-size: 13px; color: rgba(255,255,255,.5); text-decoration: none; transition: color .15s; }
+    .footer-col ul li a:hover { color: #fff; }
+    .footer-col .ft-subhead { font-size: 13px; font-weight: 700; color: rgba(255,255,255,.85); margin: 0 0 10px; }
+    .footer-col .ft-subhead + ul { margin-bottom: 20px; }
+    .footer-bottom { max-width: 1200px; margin: 0 auto; border-top: 1px solid rgba(255,255,255,.08); padding: 20px 0; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; }
+    .footer-bottom-left p { font-size: 11px; font-weight: 600; color: rgba(255,255,255,.3); letter-spacing: 0.05em; text-transform: uppercase; margin-bottom: 8px; }
+    .footer-bottom-links { display: flex; gap: 20px; }
+    .footer-bottom-links a { font-size: 12px; color: rgba(255,255,255,.35); text-decoration: none; transition: color .15s; }
+    .footer-bottom-links a:hover { color: rgba(255,255,255,.7); }
+    .footer-badges { display: flex; gap: 16px; align-items: center; }
+    .footer-badge { background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.1); border-radius: 10px; padding: 8px 14px; display: flex; align-items: center; gap: 10px; }
+    .footer-badge .badge-icon { font-size: 22px; }
+    .footer-badge .badge-text { font-size: 11px; color: rgba(255,255,255,.55); line-height: 1.4; }
+    .footer-badge .badge-text strong { display: block; color: rgba(255,255,255,.8); font-weight: 700; font-size: 12px; }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 1100px) {
+      .footer-top { grid-template-columns: 220px 1fr 1fr 1fr; }
+      .footer-col:last-child { grid-column: 2; }
+    }
+    @media (max-width: 900px) {
+      .nav-wrapper { padding: 10px 16px; }
+      .hero { padding: 52px 20px 60px; }
+      .hero-inner { grid-template-columns: 1fr; gap: 40px; }
+      .section, .cta-section { padding-left: 20px; padding-right: 20px; }
+      .trust-bar { padding: 20px; }
+      .nav-links { display: none; }
+      .readiness-grid { grid-template-columns: repeat(2, 1fr); }
+      footer { padding: 40px 20px 0; }
+      .footer-top { grid-template-columns: 1fr 1fr; gap: 32px; }
+      .footer-bottom { flex-direction: column; align-items: flex-start; gap: 20px; padding: 20px 0; }
+    }
+    @media (max-width: 560px) {
+      .readiness-grid { grid-template-columns: 1fr; }
+      .trust-stats { gap: 24px; }
+      .footer-top { grid-template-columns: 1fr; }
+    }
+
+    /* ── LOGO MACRO ── */
+    .ct-logo-paths { fill: #fff; }
+  </style>
+</head>
+<body>
+
+<!-- Nav -->
+<div class="nav-wrapper">
+  <nav>
+    <div class="nav-logo">
+      <span class="nav-wordmark">cleartax</span>
+    </div>
+    <div class="nav-links">
+      <a href="#why" class="nav-link">Why Cleartax</a>
+      <a href="#reality" class="nav-link">Testimonials</a>
+      <a href="#comparison" class="nav-link">Security</a>
+      <span class="nav-country">🇩🇪 Germany</span>
+    </div>
+    <a href="#demo" class="nav-cta">Book a Demo →</a>
+  </nav>
+</div>
+
+<!-- Hero -->
+<section class="hero">
+  <div class="hero-inner">
+    <div>
+      <div class="hero-eyebrow">ClearTax vs Thomson Reuters &nbsp;·&nbsp; Germany 2027</div>
+      <h1>Don't Just Send Invoices.<br><span>Get Them Right, Every Time.</span></h1>
+      <p class="hero-sub">Germany's mandate doesn't stop at transmission. There's no central validation layer — no safety net. Errors mean rejected invoices. Rejections mean delayed cash flow. Mistakes mean denied VAT deductions.</p>
+      <ul class="hero-bullets">
+        <li><span class="bul-icon">✓</span>Deep validation — schema + tax logic + edge cases, all pre-submission</li>
+        <li><span class="bul-icon">✓</span>Continuous reconciliation — built-in, no separate workflows</li>
+        <li><span class="bul-icon">✓</span>AI-led ERP mapping — ERP-agnostic, no custom logic required</li>
+        <li><span class="bul-icon">✓</span>Regulatory updates managed within the platform — zero client-side projects</li>
+      </ul>
+      <div class="hero-trust">
+        <div class="hero-trust-item"><span class="dot"></span>10B+ invoices processed globally</div>
+        <div class="hero-trust-item"><span class="dot"></span>ISO 27001:2013 · SOC 2 Type 2</div>
+        <div class="hero-trust-item"><span class="dot"></span>GoBD archiving built-in</div>
+      </div>
+    </div>
+    <!-- Form -->
+    <div class="form-card">
+      <h3>Book a Personalised Demo</h3>
+      <p>See ClearTax handle Germany e-invoicing with your ERP, your formats, your transaction volumes.</p>
+      <div class="form-row">
+        <div class="form-field"><label>First Name *</label><input type="text" placeholder="Hans" /></div>
+        <div class="form-field"><label>Last Name *</label><input type="text" placeholder="Müller" /></div>
+      </div>
+      <div class="form-field"><label>Work Email *</label><input type="email" placeholder="hans@company.de" /></div>
+      <div class="form-field"><label>Phone Number *</label><input type="tel" placeholder="+49 30 000 0000" /></div>
+      <div class="form-field"><label>Company Name *</label><input type="text" placeholder="Your company" /></div>
+      <div class="form-field">
+        <label>ERP System</label>
+        <select>
+          <option value="">Select your ERP</option>
+          <option>SAP</option>
+          <option>Oracle</option>
+          <option>Microsoft Dynamics</option>
+          <option>Other</option>
+        </select>
+      </div>
+      <button class="btn-form">Book a Demo →</button>
+      <p class="form-disclaimer">By submitting, you agree to our Privacy Policy. No spam, ever.</p>
+    </div>
+  </div>
+</section>
+
+<!-- Trust Bar -->
+<div class="trust-bar">
+  <div class="trust-bar-inner">
+    <span class="trust-label">Trusted by enterprises across EU, GCC &amp; APAC</span>
+    <div class="trust-stats">
+      <div class="trust-stat"><span class="num">10B+</span><span class="lbl">Invoices processed</span></div>
+      <div class="trust-stat"><span class="num">50+</span><span class="lbl">Countries covered</span></div>
+      <div class="trust-stat"><span class="num">100+</span><span class="lbl">ERP connectors</span></div>
+      <div class="trust-stat"><span class="num">GoBD ✓</span><span class="lbl">Archiving built-in</span></div>
+      <div class="trust-stat"><span class="num">ISO ✓</span><span class="lbl">27001:2013 certified</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- Reality Section -->
+<section class="section reality-section" id="reality">
+  <div class="section-inner">
+    <div class="section-eyebrow">The Reality of Germany E-Invoicing</div>
+    <h2 class="section-title">Most Platforms Look Identical in Week One</h2>
+    <p class="section-sub">Then reality hits. And in Germany, you — not the government — are responsible for compliance. This is where most solutions start to break.</p>
+
+    <div class="reality-grid">
+      <div class="reality-card">
+        <div class="rc-icon">📈</div>
+        <div class="rc-title">Invoice volumes scale</div>
+        <div class="rc-body">What works at low volume breaks under enterprise load. Deep validation and high-throughput processing can't be an afterthought.</div>
+      </div>
+      <div class="reality-card">
+        <div class="rc-icon">🔍</div>
+        <div class="rc-title">Validation complexity increases</div>
+        <div class="rc-body">Schema-level checks aren't enough. Germany requires accurate tax determination and edge-case handling — before the invoice leaves your system.</div>
+      </div>
+      <div class="reality-card">
+        <div class="rc-icon">⚙️</div>
+        <div class="rc-title">ERP inconsistencies surface</div>
+        <div class="rc-body">Multi-ERP environments expose mapping gaps that basic connectors miss. ClearTax uses AI-led mapping to resolve inconsistencies without ERP changes.</div>
+      </div>
+      <div class="reality-card">
+        <div class="rc-icon">📊</div>
+        <div class="rc-title">Reconciliation gaps appear</div>
+        <div class="rc-body">Platforms that handle reconciliation outside the core flow create manual work and audit exposure. ClearTax reconciliation is continuous and built-in.</div>
+      </div>
+    </div>
+
+    <div class="reality-callout">
+      <p>The real question isn't who can <em>send</em> invoices.<br><strong>It's who ensures they're correct, compliant, and audit-ready.</strong></p>
+    </div>
+
+    <div class="reality-list">
+      <div class="reality-item">
+        <div class="ri-dot">1</div>
+        <div class="ri-label"><strong>Accurate tax determination —</strong> correct VAT rates and tax codes validated pre-submission, not post-rejection</div>
+      </div>
+      <div class="reality-item">
+        <div class="ri-dot">2</div>
+        <div class="ri-label"><strong>Correct ERP data mapping —</strong> AI-led connectors handle multi-ERP environments without custom development</div>
+      </div>
+      <div class="reality-item">
+        <div class="ri-dot">3</div>
+        <div class="ri-label"><strong>Pre-submission validation —</strong> EN 16931 schema + tax logic + edge cases caught before transmission</div>
+      </div>
+      <div class="reality-item">
+        <div class="ri-dot">4</div>
+        <div class="ri-label"><strong>GoBD-compliant audit records —</strong> 8-year unalterable archiving built into the platform from day one</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Comparison Table -->
+<section class="section comp-section" id="comparison">
+  <div class="section-inner">
+    <div class="section-eyebrow">Side-by-Side Comparison</div>
+    <h2 class="section-title">ClearTax vs Thomson Reuters — What the Difference Looks Like in Production</h2>
+    <p class="section-sub">Both platforms can send invoices. The gap opens when volumes scale, regulations change, and reconciliation gaps need closing.</p>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th class="th-feat">Criteria</th>
+            <th class="th-ct">ClearTax Germany e-Invoicing<div class="th-ct-sub">★ Built for compliance-first enterprises</div></th>
+            <th class="th-comp">Thomson Reuters Germany e-Invoicing</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="td-feat">Core approach</td>
+            <td class="td-ct"><span class="chip chip-green">End-to-end compliance platform</span></td>
+            <td class="td-comp">EDI-led document exchange network</td>
+          </tr>
+          <tr>
+            <td class="td-feat">Mandate readiness</td>
+            <td class="td-ct"><span class="chip chip-green">Built for EU formats, Peppol, and tax logic</span></td>
+            <td class="td-comp"><span class="chip chip-amber">Strong global connectivity, compliance layered</span></td>
+          </tr>
+          <tr>
+            <td class="td-feat">Validation depth</td>
+            <td class="td-ct"><span class="chip chip-green">Deep — schema + tax + edge cases</span></td>
+            <td class="td-comp"><span class="chip chip-amber">Primarily schema-level. Tax validation often external</span></td>
+          </tr>
+          <tr>
+            <td class="td-feat">ERP integration</td>
+            <td class="td-ct"><span class="chip chip-green">Pre-built connectors — ERP-agnostic</span></td>
+            <td class="td-comp"><span class="chip chip-amber">Broad connectivity. Often requires custom logic</span></td>
+          </tr>
+          <tr>
+            <td class="td-feat">Reconciliation</td>
+            <td class="td-ct"><span class="chip chip-green">Built-in and continuous</span></td>
+            <td class="td-comp"><span class="chip chip-amber">Typically handled outside the core flow</span></td>
+          </tr>
+          <tr>
+            <td class="td-feat">Regulatory changes</td>
+            <td class="td-ct"><span class="chip chip-green">Managed within platform — no client project</span></td>
+            <td class="td-comp"><span class="chip chip-amber">Requires updates and configuration layers</span></td>
+          </tr>
+          <tr>
+            <td class="td-feat">Scale handling</td>
+            <td class="td-ct"><span class="chip chip-green">Designed for high-volume environments</span></td>
+            <td class="td-comp"><span class="chip chip-amber">Network scales, internal ops effort increases</span></td>
+          </tr>
+          <tr>
+            <td class="td-feat">Implementation effort</td>
+            <td class="td-ct"><span class="chip chip-green">Lower — AI-led mapping</span></td>
+            <td class="td-comp"><span class="chip chip-amber">Moderate to high depending on setup</span></td>
+          </tr>
+          <tr>
+            <td class="td-feat">Local tax context</td>
+            <td class="td-ct"><span class="chip chip-green">Strong EU and Germany-specific coverage</span></td>
+            <td class="td-comp"><span class="chip chip-gray">Global strength, local depth varies</span></td>
+          </tr>
+          <tr>
+            <td class="td-feat">Post go-live effort</td>
+            <td class="td-ct"><span class="chip chip-green">Minimal ongoing intervention</span></td>
+            <td class="td-comp"><span class="chip chip-amber">Continuous monitoring and adjustments required</span></td>
+          </tr>
+          <tr>
+            <td class="td-feat">Best fit</td>
+            <td class="td-ct" style="font-size:13px;">Enterprises prioritising <strong>control and accuracy</strong></td>
+            <td class="td-comp" style="font-size:13px;">Enterprises prioritising network reach</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- Why ClearTax -->
+<section class="section why-section" id="why">
+  <div class="section-inner">
+    <div class="section-eyebrow">With ClearTax, You Get</div>
+    <h2 class="section-title">Germany E-Invoicing Isn't a Connectivity Problem.<br>It's a <em style="font-style:normal;color:var(--ct-purple);">Compliance Problem at Scale.</em></h2>
+    <p class="section-sub">If your business deals with multiple ERPs, high invoice volumes, cross-border transactions, and tight compliance requirements — your challenge isn't connectivity. It's control.</p>
+
+    <div class="why-grid">
+      <div class="why-card">
+        <div class="wc-icon">🛡️</div>
+        <h3>Pre-Validation Before Submission</h3>
+        <p>Reduce rejections before they happen. ClearTax validates every invoice against EN 16931 schema, German tax logic, and known edge cases — before it leaves your system, not after a rejection lands in your inbox.</p>
+      </div>
+      <div class="why-card">
+        <div class="wc-icon">🔄</div>
+        <h3>Continuous Reconciliation</h3>
+        <p>No separate workflows. No manual chasing. Reconciliation is built into the core compliance flow — invoice data matches VAT records automatically and continuously, reducing audit risk from day one.</p>
+      </div>
+      <div class="why-card">
+        <div class="wc-icon">🤖</div>
+        <h3>AI-Led Data Mapping</h3>
+        <p>Faster implementation, fewer errors. ClearTax's AI handles ERP field mapping across SAP, Oracle, Microsoft Dynamics, and 100+ connectors — no custom logic, no dedicated IT project required per mandate change.</p>
+      </div>
+      <div class="why-card">
+        <div class="wc-icon">📋</div>
+        <h3>Built-In Regulatory Updates</h3>
+        <p>Stay compliant without operational overhead. When ZUGFeRD versions update, when GoBD guidance shifts, when ViDA requirements arrive — ClearTax absorbs the change on the platform side. No new project for your team.</p>
+      </div>
+      <div class="why-card">
+        <div class="wc-icon">🗄️</div>
+        <h3>Audit-Ready Records — GoBD Aligned</h3>
+        <p>Germany mandates 8-year unalterable e-invoice storage. ClearTax handles GoBD-compliant archiving natively — no separate module, no additional subscription, no gap in your compliance posture.</p>
+      </div>
+      <div class="why-card">
+        <div class="wc-icon">🌍</div>
+        <h3>One Platform. 50+ Countries.</h3>
+        <p>Germany today. France, Saudi Arabia, Italy, and ViDA tomorrow. ClearTax runs EU, GCC, and APAC mandates from a single API. Thomson Reuters' EDI network model adds coordination overhead as your compliance footprint grows.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CFO Readiness -->
+<section class="section readiness-section">
+  <div class="section-inner">
+    <div class="section-eyebrow">CFO Readiness Checklist</div>
+    <h2 class="section-title">What a Safe Germany Rollout Requires</h2>
+    <p class="section-sub">Don't rely on feature lists. Test with your ERP, your invoice formats, your transaction volumes. These are the six things that need to be in place before January 2027.</p>
+
+    <div class="readiness-grid">
+      <div class="readiness-item">
+        <div class="rn-num">1</div>
+        <div class="rn-text"><strong>Deep validation confirmed</strong> — EN 16931 schema + German tax logic + edge cases passing pre-submission</div>
+      </div>
+      <div class="readiness-item">
+        <div class="rn-num">2</div>
+        <div class="rn-text"><strong>ERP mapped without custom logic</strong> — AI-led connectors handling all source systems, no IT project per regulation change</div>
+      </div>
+      <div class="readiness-item">
+        <div class="rn-num">3</div>
+        <div class="rn-text"><strong>Continuous reconciliation live</strong> — invoice data matched to VAT records automatically from go-live, not as a post-process</div>
+      </div>
+      <div class="readiness-item">
+        <div class="rn-num">4</div>
+        <div class="rn-text"><strong>GoBD archiving active</strong> — 8-year unalterable storage built into platform, not a separate module or subscription</div>
+      </div>
+      <div class="readiness-item">
+        <div class="rn-num">5</div>
+        <div class="rn-text"><strong>High-volume throughput tested</strong> — platform validated at enterprise invoice volumes without ops overhead increase</div>
+      </div>
+      <div class="readiness-item">
+        <div class="rn-num">6</div>
+        <div class="rn-text"><strong>Regulatory update process confirmed</strong> — mandate changes absorbed by vendor, not triggering new client-side ERP projects</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta-section" id="demo">
+  <h2>See the Difference in <span>Your Own Data</span></h2>
+  <p>Don't rely on feature lists. Test with your ERP, your invoice formats, and your transaction volumes.</p>
+  <div class="cta-checklist">
+    <span class="cta-check">Your ERP environment</span>
+    <span class="cta-check">Your invoice formats</span>
+    <span class="cta-check">Your transaction volumes</span>
+    <span class="cta-check">Your Germany compliance timeline</span>
+  </div>
+  <div class="cta-btns">
+    <a href="#" class="btn-primary-cta">Book a Personalised Demo →</a>
+  </div>
+  <div class="cta-note">No commitment required · Available in English &amp; German · Local Germany specialist on every call</div>
+</section>
+
+<!-- Footer -->
+<footer>
+  <div class="footer-top">
+
+    <!-- Col 1: Logo + Address + Social -->
+    <div class="footer-col-logo">
+      <span class="ft-wordmark">cleartax</span>
+      <address>Plot No: JLT-PH2-RET-R6<br>Jumeirah Lakes Towers, Dubai,<br>United Arab Emirates</address>
+      <p class="footer-social-label">Follow us on</p>
+      <div class="footer-social">
+        <a href="#" class="social-icon" aria-label="LinkedIn">in</a>
+        <a href="#" class="social-icon" aria-label="Facebook">f</a>
+        <a href="#" class="social-icon" aria-label="Twitter">𝕏</a>
+        <a href="#" class="social-icon" aria-label="Instagram">◎</a>
+      </div>
+    </div>
+
+    <!-- Col 2: Company -->
+    <div class="footer-col">
+      <h4>Company</h4>
+      <ul>
+        <li><a href="#">About us</a></li>
+        <li><a href="#">Contact us</a></li>
+        <li><a href="#">Media &amp; Press</a></li>
+        <li><a href="#">Trust &amp; Safety</a></li>
+      </ul>
+    </div>
+
+    <!-- Col 3: Products & Solutions -->
+    <div class="footer-col">
+      <h4>Products &amp; Solutions</h4>
+      <p class="ft-subhead">Germany</p>
+      <ul>
+        <li><a href="#">E-invoicing Software</a></li>
+        <li><a href="#">ClearTax Compliance Cloud</a></li>
+      </ul>
+      <p class="ft-subhead">Global</p>
+      <ul>
+        <li><a href="#">E-invoicing Software (Malaysia)</a></li>
+        <li><a href="#">E-invoicing Software (Saudi Arabia)</a></li>
+        <li><a href="#">E-invoicing Software (Singapore)</a></li>
+        <li><a href="#">E-invoicing Software (India)</a></li>
+        <li><a href="#">E-invoicing Software (UAE)</a></li>
+      </ul>
+    </div>
+
+    <!-- Col 4: Resources -->
+    <div class="footer-col">
+      <h4>Resources</h4>
+      <ul>
+        <li><a href="#">Resource Centre</a></li>
+        <li><a href="#">Case studies</a></li>
+        <li><a href="#">Whitepapers</a></li>
+      </ul>
+    </div>
+
+    <!-- Col 5: Why ClearTax -->
+    <div class="footer-col">
+      <h4>Why ClearTax</h4>
+      <ul>
+        <li><a href="#">For Business</a></li>
+        <li><a href="#">For Partners</a></li>
+      </ul>
+    </div>
+
+  </div>
+
+  <!-- Bottom bar -->
+  <div class="footer-bottom">
+    <div class="footer-bottom-left">
+      <p>ClearTax is a product by Defmacro Software Pvt. Ltd.</p>
+      <div class="footer-bottom-links">
+        <a href="#">Company Policy</a>
+        <a href="#">Terms of use</a>
+      </div>
+    </div>
+    <div class="footer-badges">
+      <div class="footer-badge">
+        <div class="badge-icon">🔒</div>
+        <div class="badge-text"><strong>ISO 27001</strong>Data Center</div>
+      </div>
+      <div class="footer-badge">
+        <div class="badge-icon">🛡️</div>
+        <div class="badge-text"><strong>SSL Certified</strong>128-bit encryption</div>
+      </div>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>
