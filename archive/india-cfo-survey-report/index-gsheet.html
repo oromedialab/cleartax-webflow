@@ -309,7 +309,6 @@ footer { background: #08041A; border-top: 1px solid var(--border-subtle); }
         <a href="https://cleartax.com/about-us#contact" target="_blank" class="nav-link-btn" style="text-decoration:none;display:flex;align-items:center;">Contact</a>
       </div>
     </div>
-    </div>
   </nav>
 </div>
 
@@ -588,7 +587,7 @@ footer { background: #08041A; border-top: 1px solid var(--border-subtle); }
       <div class="success-ring">✓</div>
       <h4>You're all set!</h4>
       <p style="margin-bottom: 24px;">The State of Tax Assurance 2026 Report is ready. Click below to download your copy instantly.</p>
-      <button class="btn-success-dl" onclick="closeModal()">↓ &nbsp;Download PDF Now</button>
+      <button class="btn-success-dl" onclick="triggerDownload()">↓ &nbsp;Download PDF Now</button>
       <p style="font-size:12px;color:rgba(255,255,255,0.3);margin-top:14px;">A copy has also been sent to your email.</p>
     </div>
   </div>
@@ -614,34 +613,94 @@ function closeModal() {
   }, 350);
 }
 function handleBgClick(e) { if (e.target === document.getElementById('modalBg')) closeModal(); }
+async function triggerDownload() {
+  const url = 'https://cleartax-media.s3.amazonaws.com/finfo/wg-utils/cms-tool/271cfef7-2dfb-45be-b139-93d11a778e39.pdf';
+  const btn = document.querySelector('.btn-success-dl');
+  if (!btn) return;
+  const originalText = '↓ &nbsp;Download PDF Now';
+  btn.disabled = true;
+
+  try {
+    const response = await fetch(url);
+    if (!response.ok) throw new Error('Fetch failed');
+    const contentLength = response.headers.get('content-length');
+    const total = contentLength ? parseInt(contentLength, 10) : 0;
+    const reader = response.body.getReader();
+    let loaded = 0;
+    let chunks = [];
+    while(true) {
+      const {done, value} = await reader.read();
+      if (done) break;
+      chunks.push(value);
+      loaded += value.byteLength;
+      if (total > 0) {
+        btn.innerHTML = `Downloading ${Math.round((loaded / total) * 100)}%`;
+      } else {
+        btn.innerHTML = `Downloading... ${(loaded / (1024*1024)).toFixed(1)}MB`;
+      }
+    }
+    const blob = new Blob(chunks);
+    const blobUrl = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = blobUrl;
+    a.download = 'State_of_Tax_Assurance_2026_Report.pdf';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    window.URL.revokeObjectURL(blobUrl);
+    btn.disabled = false;
+    btn.innerHTML = originalText;
+
+    // Automatically close modal after download completes
+    setTimeout(() => {
+      closeModal();
+    }, 1000);
+
+  } catch (err) {
+    btn.disabled = false;
+    btn.innerHTML = originalText;
+    window.open(url, '_blank');
+    // Still close modal if it fails and opens in new tab
+    setTimeout(() => {
+      closeModal();
+    }, 1500);
+  }
+}
+
 async function submitLeadData(email) {
   const urlParams = new URLSearchParams(window.location.search);
   
-  // 🔥 IMPORTANT: Replace this with your Google Apps Script Web App URL
+  // Google Apps Script Web App URL
   const APP_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzQglusZHMfsYRnjxkzKrsG-IczcvnbFs_DDW4FwPUQvH_s5Tk8_dKfMOUzwclsaw9Hqw/exec';
 
-  // Format data as URLSearchParams so Apps Script can read it via e.parameter
-  const formData = new URLSearchParams();
+  // Use FormData for better compatibility with Google Apps Script
+  const formData = new FormData();
   formData.append('email', email);
+  formData.append('region', 'India'); // Used by Apps Script to select the tab
   formData.append('form_type', 'India CFO Survey Report');
   formData.append('lead_source_page', document.title || "India CFO Survey Report");
   formData.append('lead_source_url', window.location.href);
-  formData.append('region', 'India'); // To route to the "India" tab in your GSHEET
 
-  ['utm_source', 'utm_medium', 'utm_campaign'].forEach(param => {
-    if (urlParams.get(param)) formData.append(param, urlParams.get(param));
+  // UTM Parameters
+  const utms = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 'utm_content'];
+  utms.forEach(param => {
+    const val = urlParams.get(param);
+    if (val) formData.append(param, val);
   });
+
+  // Debugging: Log the data being sent (User can see this in Browser Console)
+  console.log("Submitting lead data to Google Sheet...", Object.fromEntries(formData));
 
   try {
     // Send request to Google Apps Script
-    const response = await fetch(APP_SCRIPT_URL, {
+    // Mode 'no-cors' is required as Apps Script doesn't return CORS headers
+    await fetch(APP_SCRIPT_URL, {
       method: "POST",
       body: formData,
-      // Note: if you get CORS errors, you may need to add: mode: 'no-cors'
-      // but if you do, `response.ok` will be false, so just assume true
       mode: 'no-cors'
     });
     
+    console.log("Data sent to Apps Script endpoint.");
     return true; 
   } catch (err) {
     console.error("Integration Error:", err);
@@ -655,6 +714,8 @@ function isCompanyEmail(email) {
   ];
   const domain = email.split('@')[1];
   if (!domain) return false;
+  // For testing, if user wants to bypass, they can add ?test=true to URL
+  if (new URLSearchParams(window.location.search).get('test') === 'true') return true;
   return !publicDomains.includes(domain.toLowerCase());
 }
 
@@ -662,7 +723,7 @@ async function handleModalForm(e) {
   e.preventDefault();
   const form = e.target;
   const emailInput = form.querySelector('input[type="email"]');
-  const btn = form.querySelector('button[type="submit"]');
+  const btn = form.querySelector('.btn-form-submit');
   const originalText = btn.innerHTML;
   
   if (!isCompanyEmail(emailInput.value)) {
@@ -686,7 +747,6 @@ async function handleModalForm(e) {
     btn.disabled = false;
     document.getElementById('modalForm').style.display = 'none';
     document.getElementById('modalSuccess').style.display = 'block';
-    // emailInput.value = '';
   } else {
     btn.innerHTML = 'Error. Try again.';
     btn.disabled = false;
@@ -698,7 +758,7 @@ async function handleHeroForm(e) {
   e.preventDefault();
   const form = e.target;
   const emailInput = form.querySelector('input[type="email"]');
-  const btn = form.querySelector('button[type="submit"]');
+  const btn = form.querySelector('.btn-form-submit');
   const originalText = btn.innerHTML;
   
   if (!isCompanyEmail(emailInput.value)) {
@@ -720,16 +780,20 @@ async function handleHeroForm(e) {
   if (success) {
     btn.innerHTML = originalText;
     btn.disabled = false;
+    // Prepare modal success state
     document.getElementById('modalForm').style.display = 'none';
     document.getElementById('modalSuccess').style.display = 'block';
+    // Open modal to show success
     openModal();
-    // emailInput.value = '';
   } else {
     btn.innerHTML = 'Error. Try again.';
     btn.disabled = false;
     setTimeout(() => { btn.innerHTML = originalText; }, 3000);
   }
 }
+
+
+
 document.addEventListener('keydown', e => {
   if (e.key === 'Escape') { closeModal(); closeAllDropdowns(); }
 });
