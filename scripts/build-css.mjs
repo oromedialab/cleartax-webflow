@@ -19,6 +19,7 @@ const TARGETS = [
   { name: 'shared', input: 'src/styles/shared.css' },
   { name: 'fonts',  input: 'src/styles/fonts.css' },
   { name: 'uae',    input: 'src/styles/uae.css' },
+  { name: 'uaev2',  input: 'src/styles/uaev2.css' },
   { name: 'global', input: 'src/styles/global.css' },
 ];
 
