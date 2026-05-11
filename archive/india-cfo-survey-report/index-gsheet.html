@@ -615,6 +615,10 @@ function closeModal() {
 function handleBgClick(e) { if (e.target === document.getElementById('modalBg')) closeModal(); }
 async function triggerDownload() {
   const url = 'https://cleartax-media.s3.amazonaws.com/finfo/wg-utils/cms-tool/271cfef7-2dfb-45be-b139-93d11a778e39.pdf';
+  
+  // Open in new tab immediately
+  window.open(url, '_blank');
+
   const btn = document.querySelector('.btn-success-dl');
   if (!btn) return;
   const originalText = '↓ &nbsp;Download PDF Now';
@@ -659,8 +663,8 @@ async function triggerDownload() {
   } catch (err) {
     btn.disabled = false;
     btn.innerHTML = originalText;
-    window.open(url, '_blank');
-    // Still close modal if it fails and opens in new tab
+    // Fallback: if fetch/blob fail, the window.open at the top already tried to open it.
+    // If it was blocked, we can try one more time as a fallback, but usually it's better to just close modal.
     setTimeout(() => {
       closeModal();
     }, 1500);
