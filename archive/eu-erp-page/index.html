@@ -1650,7 +1650,7 @@ a  { color: inherit; text-decoration: none; }
           </div>
         </div>
         <div class="field-row">
-          <div class="field"><label>Company email <span class="req">*</span></label><input type="email" data-field="email" placeholder="you@company.com" required></div>
+          <div class="field"><label>Company email <span class="req">*</span></label><input type="email" data-field="email" placeholder="you@company.com" required><div class="email-error" style="color: #EF4444; font-size: 11px; margin-top: 4px; display: none; font-weight: 500;">Work email required</div></div>
           <div class="field"><label>Company name <span class="req">*</span></label><input type="text" data-field="company" placeholder="Company name" required></div>
         </div>
         <div class="field"><label>Designation <span class="req">*</span></label><input type="text" data-field="role" placeholder="Designation" required></div>
@@ -2232,6 +2232,31 @@ a  { color: inherit; text-decoration: none; }
           form.querySelectorAll('[data-field]').forEach(el => {
             formData[el.getAttribute('data-field')] = el.value;
           });
+
+          const personalDomains = [
+            'gmail.com', 'yahoo.com', 'hotmail.com', 'outlook.com', 'live.com', 
+            'icloud.com', 'me.com', 'msn.com', 'aol.com', 'rediffmail.com',
+            'yandex.com', 'zoho.com', 'mail.com', 'gmx.com', 'protonmail.com', 
+            'fastmail.com', 'hushmail.com', 'tutanota.com', 'mail.ru', 'rambler.ru',
+            'gmx.net', 'web.de', 'libero.it', 'virgilio.it', 'tiscali.it',
+            'wanadoo.fr', 'orange.fr', 'free.fr', 'sfr.fr', 'rocketmail.com'
+          ];
+          const emailValue = formData.email?.trim() || '';
+          const domain = emailValue.split('@')[1]?.toLowerCase();
+
+          if (personalDomains.includes(domain)) {
+            const emailEl = form.querySelector('[data-field="email"]');
+            const errorEl = form.querySelector('.email-error');
+            emailEl.style.borderColor = '#EF4444';
+            if (errorEl) errorEl.style.display = 'block';
+            setTimeout(() => {
+              emailEl.style.borderColor = '';
+              if (errorEl) errorEl.style.display = 'none';
+            }, 3000);
+            submitBtn.innerHTML = originalBtnText;
+            submitBtn.disabled = false;
+            return;
+          }
 
           // UTM Capture
           const urlParams = new URLSearchParams(window.location.search);

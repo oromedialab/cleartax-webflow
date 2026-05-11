@@ -767,7 +767,11 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       <form onsubmit="fwdSubmit(event)">
         <div class="fwd-form-row">
           <div class="fwd-fg"><label for="fwd-name">Full Name *</label><input type="text" id="fwd-name" placeholder="Your full name" required></div>
-          <div class="fwd-fg"><label for="fwd-email">Work Email *</label><input type="email" id="fwd-email" placeholder="name@company.com" required></div>
+          <div class="fwd-fg">
+            <label for="fwd-email">Work Email *</label>
+            <input type="email" id="fwd-email" placeholder="name@company.com" required>
+            <div class="email-error" style="color: #ff5050; font-size: 11px; margin-top: 4px; display: none; font-weight: 500;">Work email required</div>
+          </div>
         </div>
         <div class="fwd-form-row">
           <div class="fwd-fg"><label for="fwd-co">Company *</label><input type="text" id="fwd-co" placeholder="Your company" required></div>
@@ -1049,6 +1053,29 @@ async function fwdSubmit(e) {
 
   const name = document.getElementById('fwd-name').value;
   const email = document.getElementById('fwd-email').value;
+
+  const personalDomains = [
+    'gmail.com', 'yahoo.com', 'hotmail.com', 'outlook.com', 'live.com', 
+    'icloud.com', 'me.com', 'msn.com', 'aol.com', 'rediffmail.com',
+    'yandex.com', 'zoho.com', 'mail.com', 'gmx.com', 'protonmail.com', 
+    'fastmail.com', 'hushmail.com', 'tutanota.com', 'mail.ru', 'rambler.ru',
+    'gmx.net', 'web.de', 'libero.it', 'virgilio.it', 'tiscali.it',
+    'wanadoo.fr', 'orange.fr', 'free.fr', 'sfr.fr', 'rocketmail.com'
+  ];
+  const domain = email.split('@')[1]?.toLowerCase();
+
+  if (personalDomains.includes(domain)) {
+    const emailEl = document.getElementById('fwd-email');
+    const errorEl = emailEl.parentElement.querySelector('.email-error');
+    emailEl.style.borderColor = '#ff5050';
+    if (errorEl) errorEl.style.display = 'block';
+    setTimeout(() => {
+      emailEl.style.borderColor = '';
+      if (errorEl) errorEl.style.display = 'none';
+    }, 3000);
+    return;
+  }
+
   const company = document.getElementById('fwd-co').value;
   const designation = document.getElementById('fwd-role').value;
   const phone = document.getElementById('fwd-phone').value;
