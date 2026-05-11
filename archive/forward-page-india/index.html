@@ -154,6 +154,33 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 #fwd-hero .fwd-submit{width:100%!important;padding:1rem!important;background:linear-gradient(135deg,#5A0FA8 0%,#7B2FE0 40%,#9B4DFF 100%)!important;color:#fff!important;border:none!important;border-radius:10px!important;font-size:0.925rem!important;font-weight:700!important;cursor:pointer!important;transition:all 0.3s!important;box-shadow:0 4px 20px rgba(123,47,224,0.45)!important;display:block!important}
 #fwd-hero .fwd-submit:hover{transform:translateY(-2px)!important;box-shadow:0 10px 35px rgba(123,47,224,0.55)!important}
 
+/* Custom Select Styling */
+#fwd-hero select{
+  background:rgba(255,255,255,0.05)!important;
+  border:1px solid rgba(255,255,255,0.08)!important;
+  color:var(--text-1)!important;
+  padding:0.75rem 2.5rem 0.75rem 0.875rem!important;
+  border-radius:9px!important;
+  font-size:0.875rem!important;
+  width:100%!important;
+  display:block!important;
+  transition:border-color 0.2s,box-shadow 0.2s!important;
+  cursor:pointer!important;
+  background-image:url("data:image/svg+xml,%3Csvg width='10' height='6' viewBox='0 0 10 6' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1L5 5L9 1' stroke='%23C4B8DC' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E")!important;
+  background-repeat:no-repeat!important;
+  background-position:right 1rem center!important;
+}
+#fwd-hero select:focus{
+  outline:none!important;
+  border-color:rgba(155,77,255,0.5)!important;
+  background-color:rgba(255,255,255,0.07)!important;
+  box-shadow:0 0 0 3px rgba(123,47,224,0.15)!important;
+}
+#fwd-hero select option{
+  background:#120B26!important;
+  color:var(--text-1)!important;
+}
+
 /* ─── SECTIONS ─── */
 #fwd-root section{padding:4rem 1.25rem!important;position:relative!important}
 @media(min-width:768px){#fwd-root section{padding:5rem 2rem!important}}
@@ -425,15 +452,24 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
           <div class="fwd-fg"><label for="fwd-role">Designation *</label><input type="text" id="fwd-role" placeholder="e.g. CFO, Head of Tax" required></div>
         </div>
         <!-- Change 2: Phone mandatory — removed (Optional), added required -->
-        <div class="fwd-fg"><label for="fwd-phone">Phone *</label><input type="tel" id="fwd-phone" placeholder="+91 98765 43210" required></div>
+        <div class="fwd-fg">
+          <label for="fwd-phone">Phone Number *</label>
+          <div style="display: flex; gap: 8px;">
+            <div style="width: 100px; flex-shrink: 0;">
+              <select id="fwd-country" required style="padding-right: 2rem!important;">
+                <option value="IN" selected>IN (+91)</option>
+                <option value="AE">AE (+971)</option>
+                <option value="SA">SA (+966)</option>
+                <option value="US">US (+1)</option>
+                <option value="GB">UK (+44)</option>
+                <option value="SG">SG (+65)</option>
+              </select>
+            </div>
+            <input type="tel" id="fwd-phone" placeholder="98765 43210" required style="flex: 1;">
+          </div>
+        </div>
         <div class="fwd-info-bar"><span>📅</span><span>Thursday, 12 May 2026 · 10:00 AM IST · 75 Minutes · Online</span></div>
         <button type="submit" class="fwd-submit">Reserve My Seat →</button>
-
-        <!-- Demio Integration (Hidden background sync) -->
-        <div id="demio-integration" style="position: absolute; opacity: 0; pointer-events: none; width: 1px; height: 1px; overflow: hidden;">
-          <script async id="demio-js" type="text/javascript" src="https://cdn.demio.com/production/dashboard/embed.bundle.js"></script> 
-          <span class="demio-embed-registration" data-hash="RBx5qX6d8t8q9ZjI" data-api="api/v1" data-base-uri="https://my.demio.com/" data-form-width="100%" data-color="#7B2FE0" data-text="REGISTER"></span>
-        </div>
       </form>
     </div>
   </div>
@@ -689,82 +725,62 @@ async function fwdSubmit(e) {
   const originalText = btn.textContent;
 
   // 1. Capture Form Data
-  const name = document.getElementById('fwd-name').value;
-  const email = document.getElementById('fwd-email').value;
-  const company = document.getElementById('fwd-co').value;
-  const role = document.getElementById('fwd-role').value;
-  const phone = document.getElementById('fwd-phone').value;
+  const name = document.getElementById('fwd-name').value.trim();
+  const email = document.getElementById('fwd-email').value.trim();
+  const company = document.getElementById('fwd-co').value.trim();
+  const role = document.getElementById('fwd-role').value.trim();
+  const phone = document.getElementById('fwd-phone').value.trim();
+  const country = document.getElementById('fwd-country').value;
   
   // 2. UTM Tracking
   const urlParams = new URLSearchParams(window.location.search);
   const utmData = {
     utm_source: urlParams.get('utm_source') || '',
     utm_medium: urlParams.get('utm_medium') || '',
-    utm_campaign: urlParams.get('utm_campaign') || ''
+    utm_campaign: urlParams.get('utm_campaign') || '',
+    country: country
   };
 
   btn.disabled = true;
   btn.textContent = 'Registering...';
   btn.style.opacity = '0.7';
 
-  console.log("--- DEBUG START ---");
-  console.log("Captured Data:", { name, email, company, role, phone, ...utmData });
+  const payload = { name, email, company, role, phone, ...utmData };
+  console.log("Submitting lead via Backend Proxy:", payload);
 
   try {
-    // 3. STEP A: SUBMIT TO GOOGLE SHEETS
-    const G_SHEET_URL = 'https://script.google.com/macros/s/AKfycbzrctz2_ekTdU3yOeVt_RsraLnHDAUa98rEhEktiUYyEDDImSf_qA9zlQ_O9kcdMPvF/exec'; 
+    // 3. SEND TO APPS SCRIPT (Handles Google Sheets + Demio API)
+    const G_SHEET_URL = 'https://script.google.com/macros/s/AKfycbz-rbY_ztuyd7jJ6Vq69ywUwiESHdxUFI8CgasctLfflTRRjrTcOsGuQS6QwrpYAB7LBw/exec'; 
     
-    console.log("Sending to Google Sheets...");
     fetch(G_SHEET_URL, {
       method: 'POST',
       mode: 'no-cors',
       headers: { 'Content-Type': 'text/plain' },
-      body: JSON.stringify({ name, email, company, role, phone, ...utmData })
-    }).then(() => console.log("Google Sheets submission sent."));
-
-    // 4. STEP B: SYNC WITH DEMIO WIDGET
-    const demioContainer = document.querySelector('.demio-embed-registration');
-    const dName = demioContainer.querySelector('input[name="name"]');
-    const dEmail = demioContainer.querySelector('input[name="email"]');
-    const dSubmit = demioContainer.querySelector('button');
-
-    if (dName && dEmail && dSubmit) {
-      console.log("Syncing with Demio widget...");
-      dName.value = name;
-      dEmail.value = email;
-
-      // Sync extra fields if they exist in Demio form
-      const dCompany = demioContainer.querySelector('input[name="company"]') || demioContainer.querySelector('input[data-label*="Company"]');
-      const dPhone = demioContainer.querySelector('input[name="phone"]') || demioContainer.querySelector('input[data-label*="Phone"]');
-      
-      if (dCompany) dCompany.value = company;
-      if (dPhone) dPhone.value = phone;
-
-      dSubmit.click(); // Trigger Demio Registration
-      console.log("Demio submit button clicked.");
-
-      // Show Success Modal
-      document.getElementById('fwd-res-name').textContent = name;
-      document.getElementById('fwd-modal-wrap').classList.add('active');
+      body: JSON.stringify(payload)
+    }).then(() => {
+      console.log("Registration request sent to backend.");
+      showSuccess(name);
       form.reset();
-    } else {
-      console.warn("Demio widget not found or inaccessible. Falling back to redirect.");
-      let demioUrl = `https://my.demio.com/ref/RBx5qX6d8t8q9ZjI?name=${encodeURIComponent(name)}&email=${encodeURIComponent(email)}`;
-      const utmString = urlParams.toString();
-      if (utmString) demioUrl += `&${utmString}`;
-      window.location.href = demioUrl;
-    }
+    }).catch(err => {
+      console.error("Submission Error:", err);
+      alert("Submission failed. Please try again.");
+    });
 
   } catch (err) {
-    console.error("Critical Sync Error:", err);
+    alert("Registration service is temporarily unavailable. Please try again or contact support.");
   } finally {
     console.log("--- DEBUG END ---");
     setTimeout(() => {
       btn.disabled = false;
       btn.textContent = originalText;
       btn.style.opacity = '1';
-    }, 1200);
+    }, 2000);
   }
+}
+
+function showSuccess(name) {
+  document.getElementById('fwd-res-name').textContent = name;
+  document.getElementById('fwd-modal-wrap').classList.add('active');
 }
 
 function fwdShare(e) {
