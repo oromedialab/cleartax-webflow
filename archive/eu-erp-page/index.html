@@ -1,0 +1,2242 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>ClearTax e-invoicing for every EU ERP — SAP, Oracle, Dynamics, NetSuite, Sage &amp; 60+ more</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="description" content="ClearTax delivers compliant e-invoicing across every major EU mandate — France, Belgium, Poland, Germany, Spain, Italy — through pre-built certified connectors for SAP, Oracle, Microsoft Dynamics, NetSuite, Sage, and 60+ other ERP and business systems." />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Manrope:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* ────────────────────────────────────────────────────────────────────────────
+   ClearTax — Brand tokens (shared)
+   ──────────────────────────────────────────────────────────────────────────── */
+:root {
+  --ct-purple-deep: #301B5E;
+  --ct-purple-dark: #1A0B3B;
+  --ct-purple-deeper: #0E0524;
+  --ct-purple-mid: #4B2EA0;
+  --ct-magenta: #C4399F;
+  --ct-magenta-2: #E0418A;
+  --ct-pastel-lavender: #EDEBFA;
+  --ct-pastel-peach: #FDF2ED;
+  --ct-pastel-orange: #F6E0C5;
+  --ct-pastel-teal: #D8EFF2;
+  --ct-pastel-mint: #ECF7ED;
+  --ct-pastel-sky: #EAF4FF;
+  --ct-tech-blue: #2A4FE5;
+  --ct-tech-violet: #8B7CFF;
+  --ct-tech-mint: #5DD4A0;
+  --ct-ink: #1A0B3B;
+  --ct-muted: #6B5E89;
+  --ct-line: rgba(48, 27, 94, 0.08);
+  --sap-blue: #0070F2;          /* SAP brand-adjacent for accents */
+  --sap-blue-dark: #0040B5;
+  --font-display: 'Plus Jakarta Sans', system-ui, sans-serif;
+  --font-body: 'Manrope', system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+  --max-w: 1280px;
+}
+
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; }
+body {
+  font-family: var(--font-body);
+  color: var(--ct-ink);
+  background: #fff;
+  font-size: 16px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+h1, h2, h3, h4 { font-family: var(--font-display); font-weight: 500; letter-spacing: -0.015em; line-height: 1.05; margin: 0; }
+h1 { font-size: clamp(40px, 5.2vw, 64px); line-height: 1.0; }
+h2 { font-size: clamp(30px, 3.8vw, 46px); }
+h3 { font-size: clamp(22px, 2.2vw, 30px); }
+p  { margin: 0; }
+a  { color: inherit; text-decoration: none; }
+
+.h1-grad {
+  background: linear-gradient(96deg, #E0418A 0%, #C4399F 30%, #5B2BAD 65%, #301B5E 100%);
+  -webkit-background-clip: text; background-clip: text;
+  -webkit-text-fill-color: transparent; color: transparent;
+}
+
+.eyebrow {
+  display: inline-flex; align-items: center; gap: 8px; padding: 7px 14px; border-radius: 999px;
+  font-family: var(--font-body); font-weight: 600; font-size: 12px; letter-spacing: .08em;
+  text-transform: uppercase; color: #3B2070;
+  background: rgba(255,255,255,.7); border: 1px solid rgba(255,255,255,.85);
+  backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+}
+.eyebrow .dot { width: 6px; height: 6px; border-radius: 999px; background: var(--ct-tech-mint); }
+.eyebrow.dark { background: rgba(255,255,255,.06); border-color: rgba(255,255,255,.16); color: rgba(255,255,255,.92); }
+
+.pill {
+  display: inline-flex; align-items: center; gap: 10px;
+  padding: 16px 28px; border-radius: 999px; border: 0; cursor: pointer;
+  background: var(--ct-purple-deep); color: #fff;
+  font-family: var(--font-body); font-weight: 600; font-size: 15px;
+  transition: transform .2s ease, box-shadow .2s ease, background .2s ease;
+  box-shadow: 0 8px 28px rgba(48,27,94,.32), 0 1px 0 rgba(255,255,255,.15) inset;
+}
+.pill:hover { transform: translateY(-1px); box-shadow: 0 14px 36px rgba(48,27,94,.4); }
+.pill .arr { transition: transform .25s ease; }
+.pill:hover .arr { transform: translateX(4px); }
+.pill.ghost {
+  background: transparent; color: var(--ct-purple-deep);
+  border: 1px solid rgba(48,27,94,.18); box-shadow: none;
+}
+.pill.ghost:hover { background: rgba(48,27,94,.04); }
+.pill.lg { padding: 18px 32px; font-size: 16px; }
+
+.linkarrow {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-family: var(--font-body); font-weight: 600; font-size: 14px;
+  color: var(--ct-purple-deep);
+}
+.linkarrow .arr { transition: transform .2s ease; }
+.linkarrow:hover .arr { transform: translate(2px, -2px); }
+
+.container { max-width: var(--max-w); margin: 0 auto; padding: 0 32px; }
+.section-eyebrow {
+  text-align: center; font-family: var(--font-body); font-weight: 600;
+  font-size: 13px; letter-spacing: .14em; text-transform: uppercase;
+  color: var(--ct-magenta); margin-bottom: 16px;
+}
+.section-title { text-align: center; max-width: 880px; margin: 0 auto; }
+.section-sub {
+  text-align: center; max-width: 720px; margin: 20px auto 0;
+  font-size: 18px; color: var(--ct-muted); line-height: 1.55;
+}
+
+/* ────────────────────────────────────────────────────────────────────────────
+   NAV — real ClearTax logo
+   ──────────────────────────────────────────────────────────────────────────── */
+.nav-wrap {
+  position: fixed; top: 16px; left: 50%; transform: translateX(-50%);
+  width: calc(100% - 32px); max-width: 1320px; z-index: 100;
+}
+.nav {
+  display: flex; align-items: center; gap: 28px; padding: 10px 10px 10px 26px;
+  background: rgba(255,255,255,.72); backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border: 1px solid rgba(255,255,255,.7); border-radius: 999px;
+  box-shadow: 0 8px 30px rgba(48,27,94,.10);
+}
+.nav-logo { display: inline-block; line-height: 0; }
+.nav-logo img { height: 28px; width: auto; display: block; }
+.nav-links { display: flex; align-items: center; gap: 28px; margin-left: auto;
+  font-family: var(--font-body); font-weight: 500; font-size: 14px; color: rgba(26,11,59,.72); }
+.nav-links a:hover { color: var(--ct-ink); }
+.nav-erp-tag {
+  display: flex; align-items: center; gap: 8px; padding: 8px 12px; border-radius: 999px;
+  background: rgba(196,57,159,.08); border: 1px solid rgba(196,57,159,.18);
+  font-family: var(--font-body); font-weight: 700; font-size: 12px; color: var(--ct-magenta);
+  letter-spacing: .04em;
+}
+.nav-erp-tag .ic { width: 14px; height: 14px; }
+.nav .pill { padding: 12px 20px; font-size: 14px; }
+@media (max-width: 960px) { .nav-links, .nav-erp-tag { display: none; } }
+
+/* ────────────────────────────────────────────────────────────────────────────
+   HERO
+   ──────────────────────────────────────────────────────────────────────────── */
+.hero {
+  position: relative; padding: 152px 0 0; overflow: hidden;
+  background:
+    radial-gradient(ellipse 1200px 600px at 75% 0%, rgba(255,200,230,.55), transparent 60%),
+    radial-gradient(ellipse 900px 700px at 18% 30%, rgba(196,166,255,.45), transparent 60%),
+    linear-gradient(180deg, #FFF6FB 0%, #F1E8FF 40%, #E9DEFE 100%);
+}
+.hero-inner {
+  position: relative; z-index: 5; padding: 16px 0 80px;
+  display: grid; grid-template-columns: 1.15fr 1fr; gap: 56px; align-items: center;
+}
+.hero h1 { margin: 22px 0 0; max-width: 720px; }
+.hero h1 .small { display: block; font-size: 0.42em; font-weight: 600; color: var(--ct-purple-mid); letter-spacing: -.005em; line-height: 1.1; margin-top: 14px; }
+.hero-sub { margin-top: 22px; max-width: 580px; font-size: 19px; line-height: 1.55; color: #3B2C5E; }
+.hero-cta-row { margin-top: 36px; display: flex; align-items: center; gap: 18px; flex-wrap: wrap; }
+.hero-meta {
+  margin-top: 36px; display: flex; flex-wrap: wrap; gap: 24px;
+  padding-top: 28px; border-top: 1px solid rgba(48,27,94,.1);
+  font-family: var(--font-mono); font-size: 12px; letter-spacing: .04em; color: var(--ct-purple-mid);
+}
+.hero-meta b { color: var(--ct-purple-deep); font-weight: 700; }
+
+/* Right side — SAP architecture diagram card */
+.arch-card {
+  position: relative; padding: 28px;
+  border-radius: 24px;
+  background: rgba(255,255,255,.78); backdrop-filter: blur(18px) saturate(180%);
+  -webkit-backdrop-filter: blur(18px) saturate(180%);
+  border: 1px solid rgba(255,255,255,.85);
+  box-shadow: 0 30px 80px rgba(48,27,94,.18);
+}
+.arch-card .hdr {
+  display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px;
+}
+.arch-card .hdr .lbl {
+  font-family: var(--font-mono); font-size: 11px; font-weight: 600; letter-spacing: .14em;
+  text-transform: uppercase; color: var(--ct-muted);
+}
+.arch-card .hdr .live {
+  display: inline-flex; align-items: center; gap: 6px; font-family: var(--font-mono);
+  font-size: 11px; color: #1F8A5B; font-weight: 600;
+}
+.arch-card .hdr .live::before {
+  content: ''; width: 7px; height: 7px; border-radius: 999px; background: var(--ct-tech-mint);
+  box-shadow: 0 0 0 4px rgba(93,212,160,.2);
+  animation: pulse 2s ease-in-out infinite;
+}
+@keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: .4; } }
+
+.arch-flow {
+  display: grid; grid-template-columns: 1fr; gap: 10px;
+  max-height: 380px; overflow-y: auto;
+  padding-right: 4px;
+}
+.arch-flow::-webkit-scrollbar { width: 4px; }
+.arch-flow::-webkit-scrollbar-thumb { background: rgba(48,27,94,.2); border-radius: 4px; }
+.arch-node {
+  display: flex; align-items: center; gap: 12px; padding: 14px 16px;
+  border-radius: 14px; border: 1px solid rgba(48,27,94,.08);
+  background: #fff;
+}
+.arch-node.sap { background: linear-gradient(135deg, rgba(0,112,242,.05), rgba(0,112,242,.02)); border-color: rgba(0,112,242,.18); }
+.arch-node.ct { background: linear-gradient(135deg, var(--ct-pastel-lavender), #fff); border-color: rgba(48,27,94,.15); }
+.arch-node.dgfip { background: linear-gradient(135deg, var(--ct-pastel-peach), #fff); border-color: rgba(196,57,159,.18); }
+.arch-node .ico {
+  flex: 0 0 auto; width: 36px; height: 36px; border-radius: 10px;
+  display: grid; place-items: center; color: #fff; font-weight: 700; font-size: 11px;
+  font-family: var(--font-mono);
+}
+.arch-node.sap .ico { background: var(--sap-blue); }
+.arch-node.ct .ico { background: var(--ct-purple-deep); }
+.arch-node.dgfip .ico { background: var(--ct-magenta); }
+.arch-node .nm { font-family: var(--font-display); font-weight: 600; font-size: 14px; color: var(--ct-ink); }
+.arch-node .sb { font-family: var(--font-mono); font-size: 11px; color: var(--ct-muted); margin-top: 2px; }
+.arch-arrow {
+  display: grid; place-items: center; margin: -6px 0;
+}
+.arch-arrow svg { color: rgba(48,27,94,.3); }
+
+@media (max-width: 980px) { .hero-inner { grid-template-columns: 1fr; } }
+
+/* ────────────────────────────────────────────────────────────────────────────
+   WHO IT'S FOR (Basware-style intro block)
+   ──────────────────────────────────────────────────────────────────────────── */
+.intro { padding: 100px 0 80px; background: #fff; }
+.intro-grid { display: grid; grid-template-columns: 1.1fr 1fr; gap: 56px; align-items: start; }
+.intro h2 { margin-bottom: 20px; }
+.intro p { font-size: 17px; color: #4D3F6E; margin-bottom: 16px; line-height: 1.7; }
+.intro p b { color: var(--ct-purple-deep); }
+.intro .for-box {
+  padding: 32px; border-radius: 24px;
+  background: linear-gradient(180deg, var(--ct-pastel-lavender) 0%, #fff 100%);
+  border: 1px solid var(--ct-line);
+}
+.intro .for-box h4 {
+  font-family: var(--font-display); font-weight: 500; font-size: 18px;
+  color: var(--ct-purple-deep); margin-bottom: 18px;
+}
+.intro .for-box ul { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 14px; }
+.intro .for-box ul li {
+  display: flex; gap: 12px; align-items: flex-start; font-size: 15px; color: #3B2C5E; line-height: 1.55;
+}
+.intro .for-box ul li .ck {
+  flex: 0 0 auto; width: 22px; height: 22px; border-radius: 999px;
+  background: var(--ct-purple-deep); color: #fff;
+  display: grid; place-items: center; margin-top: 1px;
+}
+.intro .for-box ul li b { color: var(--ct-purple-deep); font-weight: 700; }
+@media (max-width: 880px) { .intro-grid { grid-template-columns: 1fr; } }
+
+/* ────────────────────────────────────────────────────────────────────────────
+   IN-PAGE ANCHOR NAV (Basware-style)
+   ──────────────────────────────────────────────────────────────────────────── */
+.anchors {
+  padding: 28px 0; background: #FBF9FF;
+  border-top: 1px solid var(--ct-line); border-bottom: 1px solid var(--ct-line);
+}
+.anchors ul {
+  list-style: none; padding: 0; margin: 0;
+  display: flex; flex-wrap: wrap; gap: 28px; justify-content: center;
+}
+.anchors a {
+  font-family: var(--font-body); font-weight: 600; font-size: 14px;
+  color: var(--ct-muted); display: inline-flex; align-items: center; gap: 8px;
+  transition: color .2s;
+}
+.anchors a:hover { color: var(--ct-purple-deep); }
+.anchors a::before {
+  content: ''; width: 6px; height: 6px; border-radius: 999px;
+  background: var(--ct-magenta); opacity: .5;
+}
+
+/* ────────────────────────────────────────────────────────────────────────────
+   HOW IT WORKS — main capability section
+   ──────────────────────────────────────────────────────────────────────────── */
+.how { padding: 120px 0; background: #fff; }
+.how .head { text-align: center; margin-bottom: 48px; }
+.how h2 .em { font-style: italic; }
+
+/* ────────────────────────────────────────────────────────────────────────────
+   ERP HUB — tier-1 (large cards) + tier-2 (compact cards)
+   ──────────────────────────────────────────────────────────────────────────── */
+.erps { padding: 120px 0; background: #FBF9FF; }
+.erps .head { text-align: center; margin-bottom: 56px; }
+
+.tier-h {
+  text-align: center; font-family: var(--font-body); font-weight: 600;
+  font-size: 12px; letter-spacing: .14em; text-transform: uppercase;
+  color: var(--ct-magenta); margin: 0 0 24px;
+  display: flex; align-items: center; gap: 14px; justify-content: center;
+}
+.tier-h::before, .tier-h::after {
+  content: ''; flex: 0 0 60px; height: 1px;
+  background: linear-gradient(to right, transparent, rgba(196,57,159,.3), transparent);
+}
+
+/* Tier 1 — 5 large cards in a row */
+.erp-hub-t1 {
+  display: grid; grid-template-columns: repeat(5, 1fr); gap: 18px;
+  max-width: 1180px; margin: 0 auto 64px;
+}
+.erp-hub-card {
+  display: flex; flex-direction: column;
+  padding: 28px 24px 24px; border-radius: 22px;
+  background: #fff; border: 1px solid var(--ct-line);
+  transition: all .25s ease;
+  text-decoration: none; color: inherit;
+  position: relative;
+  min-height: 320px;
+}
+.erp-hub-card::after {
+  content: ''; position: absolute; inset: 0; border-radius: 22px;
+  border: 1.5px solid transparent;
+  background: linear-gradient(135deg, var(--ct-magenta), var(--ct-purple-deep)) border-box;
+  -webkit-mask: linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor; mask-composite: exclude;
+  opacity: 0; transition: opacity .25s;
+  pointer-events: none;
+}
+.erp-hub-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 24px 50px rgba(48,27,94,.10);
+}
+.erp-hub-card:hover::after { opacity: 1; }
+
+.erp-hub-card .erp-logo {
+  height: 40px; display: flex; align-items: center;
+  margin-bottom: 18px;
+  font-family: var(--font-display); font-weight: 700; font-size: 24px;
+  letter-spacing: -.02em; color: var(--ct-purple-deep);
+}
+.erp-hub-card .erp-tagline {
+  font-family: var(--font-mono); font-size: 11px; font-weight: 600;
+  color: var(--ct-magenta); letter-spacing: .06em; margin-bottom: 12px;
+  text-transform: uppercase;
+}
+.erp-hub-card h3 {
+  font-family: var(--font-display); font-weight: 500; font-size: 18px;
+  color: var(--ct-purple-deep); margin: 0 0 12px; line-height: 1.25;
+  letter-spacing: -.01em;
+}
+.erp-hub-card .erp-desc {
+  font-size: 13px; color: #4D3F6E; line-height: 1.55; margin-bottom: 18px;
+  flex: 1;
+}
+.erp-hub-card .erp-versions {
+  display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 18px;
+}
+.erp-hub-card .erp-versions .v {
+  font-family: var(--font-mono); font-size: 10px; font-weight: 600;
+  padding: 3px 8px; border-radius: 999px;
+  background: var(--ct-pastel-lavender); color: var(--ct-purple-deep);
+}
+.erp-hub-card .erp-cta {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-family: var(--font-body); font-weight: 600; font-size: 13px;
+  color: var(--ct-purple-deep);
+  padding-top: 16px; border-top: 1px solid var(--ct-line);
+  margin-top: auto;
+}
+.erp-hub-card .erp-cta .arr { transition: transform .2s; }
+.erp-hub-card:hover .erp-cta .arr { transform: translateX(4px); }
+
+@media (max-width: 1100px) { .erp-hub-t1 { grid-template-columns: repeat(3, 1fr); } }
+@media (max-width: 720px)  { .erp-hub-t1 { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 480px)  { .erp-hub-t1 { grid-template-columns: 1fr; } }
+
+/* Tier 2 — 5 compact cards */
+.erp-hub-t2 {
+  display: grid; grid-template-columns: repeat(5, 1fr); gap: 14px;
+  max-width: 1100px; margin: 0 auto 48px;
+}
+.erp-hub-mini {
+  display: flex; flex-direction: column; gap: 6px;
+  padding: 22px 20px; border-radius: 16px;
+  background: rgba(255,255,255,.7); border: 1px solid var(--ct-line);
+  text-decoration: none; color: inherit;
+  transition: all .25s;
+}
+.erp-hub-mini:hover {
+  background: #fff; transform: translateY(-2px);
+  box-shadow: 0 14px 30px rgba(48,27,94,.08);
+  border-color: rgba(48,27,94,.15);
+}
+.erp-hub-mini .nm {
+  font-family: var(--font-display); font-weight: 700; font-size: 16px;
+  color: var(--ct-purple-deep); letter-spacing: -.01em;
+}
+.erp-hub-mini .desc {
+  font-size: 12px; color: var(--ct-muted); line-height: 1.45;
+}
+.erp-hub-mini .lk {
+  display: inline-flex; align-items: center; gap: 4px;
+  font-family: var(--font-body); font-weight: 600; font-size: 11px;
+  color: var(--ct-magenta); margin-top: 4px;
+}
+.erp-hub-mini:hover .lk .arr { transform: translateX(3px); }
+.erp-hub-mini .lk .arr { transition: transform .2s; }
+
+@media (max-width: 1100px) { .erp-hub-t2 { grid-template-columns: repeat(3, 1fr); } }
+@media (max-width: 720px)  { .erp-hub-t2 { grid-template-columns: repeat(2, 1fr); } }
+
+/* "Don't see yours" footnote */
+.erp-other-cta {
+  max-width: 800px; margin: 0 auto;
+  padding: 28px 36px; border-radius: 18px;
+  background: linear-gradient(135deg, var(--ct-purple-deep) 0%, #4B2EA0 100%);
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 28px; color: #fff;
+}
+.erp-other-cta .txt h4 { font-family: var(--font-display); font-weight: 600; font-size: 18px; color: #fff; margin: 0 0 4px; }
+.erp-other-cta .txt p { font-size: 13px; color: rgba(255,255,255,.75); margin: 0; line-height: 1.5; }
+.erp-other-cta .pill { background: #fff; color: var(--ct-purple-deep); box-shadow: 0 8px 24px rgba(0,0,0,.2); flex: 0 0 auto; }
+@media (max-width: 720px) {
+  .erp-other-cta { flex-direction: column; align-items: stretch; text-align: center; padding: 24px; }
+  .erp-other-cta .pill { justify-content: center; }
+}
+
+/* ────────────────────────────────────────────────────────────────────────────
+   EU MANDATE MAP — country grid
+   ──────────────────────────────────────────────────────────────────────────── */
+.mandates {
+  padding: 120px 0;
+  background: linear-gradient(180deg, #fff 0%, var(--ct-pastel-lavender) 100%);
+}
+.mandates .head { text-align: center; margin-bottom: 60px; }
+.mandate-grid {
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px;
+  max-width: 1100px; margin: 0 auto;
+}
+.mandate-card {
+  position: relative; padding: 28px; border-radius: 20px;
+  background: #fff; border: 1px solid var(--ct-line);
+  transition: transform .25s, box-shadow .25s, border-color .25s;
+}
+.mandate-card:hover { transform: translateY(-3px); box-shadow: 0 20px 40px rgba(48,27,94,.08); }
+.mandate-card .flag-row {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 18px;
+}
+.mandate-card .flag {
+  width: 32px; height: 22px; border-radius: 4px;
+  overflow: hidden; box-shadow: 0 1px 2px rgba(0,0,0,.1);
+}
+.mandate-card .status {
+  display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px; border-radius: 999px;
+  font-family: var(--font-mono); font-size: 10px; font-weight: 700; letter-spacing: .08em;
+}
+.mandate-card .status.live { background: rgba(93,212,160,.18); color: #1F8A5B; }
+.mandate-card .status.imminent { background: rgba(229,172,130,.22); color: #9A6300; }
+.mandate-card .status.future { background: rgba(48,27,94,.06); color: var(--ct-muted); }
+.mandate-card .status .pulse {
+  width: 6px; height: 6px; border-radius: 999px; background: currentColor;
+  animation: pulse 2s ease-in-out infinite;
+}
+.mandate-card .country { font-family: var(--font-display); font-weight: 600; font-size: 22px; color: var(--ct-purple-deep); line-height: 1.1; }
+.mandate-card .auth { font-family: var(--font-mono); font-size: 11px; color: var(--ct-muted); margin-top: 4px; }
+.mandate-card .when { margin-top: 14px; font-size: 13px; color: #4D3F6E; line-height: 1.5; }
+.mandate-card .when b { color: var(--ct-purple-deep); font-weight: 700; }
+.mandate-card .specs {
+  margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--ct-line);
+  display: flex; flex-wrap: wrap; gap: 6px;
+}
+.mandate-card .specs .tag {
+  display: inline-flex; padding: 3px 9px; border-radius: 999px;
+  background: var(--ct-pastel-lavender); color: var(--ct-purple-deep);
+  font-family: var(--font-mono); font-size: 10px; font-weight: 600;
+}
+@media (max-width: 880px) { .mandate-grid { grid-template-columns: 1fr 1fr; } }
+@media (max-width: 480px) { .mandate-grid { grid-template-columns: 1fr; } }
+
+/* Architecture hero diagram (the big SAP flow image equivalent) */
+.flow-diagram {
+  margin: 0 auto 80px; max-width: 1100px;
+  padding: 40px; border-radius: 28px;
+  background: linear-gradient(135deg, #1A0B3B 0%, #2A155A 60%, #4B2EA0 100%);
+  position: relative; overflow: hidden;
+}
+.flow-diagram::before {
+  content: ''; position: absolute; inset: 0;
+  background:
+    radial-gradient(ellipse 500px 250px at 20% 0%, rgba(196,57,159,.18), transparent 60%),
+    radial-gradient(ellipse 500px 250px at 80% 100%, rgba(0,112,242,.18), transparent 60%);
+  pointer-events: none;
+}
+.flow-diagram .fd-inner {
+  position: relative; display: grid; grid-template-columns: 1fr 60px 1fr 60px 1fr;
+  align-items: center; gap: 0;
+}
+.fd-col {
+  padding: 24px 20px; border-radius: 18px;
+  background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.12);
+  backdrop-filter: blur(6px);
+}
+.fd-col.sap { background: linear-gradient(180deg, rgba(0,112,242,.22), rgba(0,112,242,.08)); border-color: rgba(0,112,242,.35); }
+.fd-col.ct { background: linear-gradient(180deg, rgba(196,57,159,.18), rgba(196,57,159,.06)); border-color: rgba(196,57,159,.35); }
+.fd-col.tax { background: linear-gradient(180deg, rgba(93,212,160,.18), rgba(93,212,160,.06)); border-color: rgba(93,212,160,.35); }
+.fd-col h5 {
+  font-family: var(--font-mono); font-size: 11px; font-weight: 600;
+  letter-spacing: .14em; text-transform: uppercase; color: rgba(255,255,255,.6);
+  margin: 0 0 12px;
+}
+.fd-col h4 {
+  font-family: var(--font-display); font-weight: 600; font-size: 18px; color: #fff;
+  margin: 0 0 14px; line-height: 1.2;
+}
+.fd-col ul { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 8px; }
+.fd-col ul li {
+  font-family: var(--font-mono); font-size: 12px; color: rgba(255,255,255,.78);
+  padding-left: 14px; position: relative; line-height: 1.5;
+}
+.fd-col ul li::before {
+  content: ''; position: absolute; left: 0; top: 8px; width: 6px; height: 1px;
+  background: rgba(255,255,255,.4);
+}
+.fd-arrow {
+  display: grid; place-items: center; color: rgba(255,255,255,.4);
+}
+.fd-arrow svg { width: 60px; height: 24px; }
+@media (max-width: 880px) {
+  .flow-diagram .fd-inner { grid-template-columns: 1fr; gap: 14px; }
+  .fd-arrow { transform: rotate(90deg); }
+}
+
+/* Capability blocks */
+.how-grid {
+  display: grid; grid-template-columns: repeat(2, 1fr); gap: 24px;
+  max-width: 1100px; margin: 0 auto;
+}
+.how-card {
+  padding: 32px; border-radius: 22px; background: #fff;
+  border: 1px solid var(--ct-line);
+  transition: transform .25s, box-shadow .25s, border-color .25s;
+}
+.how-card:hover {
+  transform: translateY(-4px); border-color: rgba(48,27,94,.15);
+  box-shadow: 0 24px 50px rgba(48,27,94,.08);
+}
+.how-card .ic-box {
+  width: 52px; height: 52px; border-radius: 14px;
+  display: grid; place-items: center; margin-bottom: 20px;
+  background: linear-gradient(135deg, var(--ct-magenta), var(--ct-purple-deep)); color: #fff;
+}
+.how-card h3 { font-size: 22px; color: var(--ct-purple-deep); margin-bottom: 12px; line-height: 1.2; }
+.how-card p { font-size: 15px; color: #4D3F6E; line-height: 1.6; }
+.how-card .tag-list {
+  display: flex; flex-wrap: wrap; gap: 8px; margin-top: 16px;
+}
+.how-card .tag {
+  display: inline-flex; padding: 5px 11px; border-radius: 999px;
+  background: var(--ct-pastel-lavender); color: var(--ct-purple-deep);
+  font-family: var(--font-mono); font-size: 11px; font-weight: 600;
+}
+.how-card .docs {
+  margin-top: 18px; padding-top: 18px; border-top: 1px solid var(--ct-line);
+}
+@media (max-width: 720px) { .how-grid { grid-template-columns: 1fr; } }
+
+/* ────────────────────────────────────────────────────────────────────────────
+   KPI BAND (Basware-style 3 big numbers)
+   ──────────────────────────────────────────────────────────────────────────── */
+.kpis {
+  padding: 100px 0;
+  background: linear-gradient(135deg, var(--ct-purple-dark) 0%, #2A155A 100%);
+  color: #fff; position: relative; overflow: hidden;
+}
+.kpis::before {
+  content: ''; position: absolute; inset: 0;
+  background:
+    radial-gradient(ellipse 700px 340px at 15% 0%, rgba(196,57,159,.18), transparent 60%),
+    radial-gradient(ellipse 700px 340px at 85% 100%, rgba(0,112,242,.22), transparent 60%);
+  pointer-events: none;
+}
+.kpis .container { position: relative; }
+.kpis .head { text-align: center; margin-bottom: 72px; }
+.kpis .head .section-eyebrow { color: rgba(255,255,255,.55); }
+.kpis .head h2 { color: #fff; max-width: 760px; margin: 0 auto; }
+.kpis .head h2 .gr {
+  background: linear-gradient(96deg, #FFB8DD, #C4A6FF 50%, #5B7BFF);
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+}
+.kpis-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
+.kpi-cell {
+  padding: 32px; border-radius: 24px;
+  background: rgba(255,255,255,.04); border: 1px solid rgba(255,255,255,.1);
+  text-align: left;
+}
+.kpi-cell .big {
+  font-family: var(--font-display); font-size: 72px; font-weight: 600;
+  line-height: 1; letter-spacing: -0.025em; color: #fff;
+  background: linear-gradient(180deg, #fff, rgba(255,255,255,.6));
+  -webkit-background-clip: text; background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+.kpi-cell .lbl { font-size: 15px; color: rgba(255,255,255,.7); margin-top: 16px; font-weight: 500; line-height: 1.5; }
+.kpi-cell .src { font-family: var(--font-mono); font-size: 11px; color: rgba(255,255,255,.4); margin-top: 12px; letter-spacing: .06em; }
+@media (max-width: 880px) { .kpis-grid { grid-template-columns: 1fr; } .kpi-cell .big { font-size: 56px; } }
+
+/* ────────────────────────────────────────────────────────────────────────────
+   VALUE DRIVERS (3 columns)
+   ──────────────────────────────────────────────────────────────────────────── */
+.value { padding: 120px 0; background: #fff; }
+.value .head { text-align: center; margin-bottom: 64px; }
+.value-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 32px; max-width: 1100px; margin: 0 auto; }
+.value-col h3 { font-size: 22px; color: var(--ct-purple-deep); margin-bottom: 14px; line-height: 1.2; }
+.value-col p { font-size: 15px; color: #4D3F6E; line-height: 1.65; }
+.value-col .num {
+  font-family: var(--font-display); font-style: italic; font-weight: 500;
+  font-size: 36px; color: var(--ct-magenta); margin-bottom: 16px; line-height: 1;
+}
+@media (max-width: 880px) { .value-grid { grid-template-columns: 1fr; } }
+
+/* ────────────────────────────────────────────────────────────────────────────
+   DOWNLOAD CTA (mid-page Basware-style)
+   ──────────────────────────────────────────────────────────────────────────── */
+.download-cta {
+  padding: 80px 0; background: var(--ct-pastel-lavender);
+}
+.download-cta-inner {
+  max-width: 1100px; margin: 0 auto;
+  display: flex; align-items: center; justify-content: space-between; gap: 40px;
+  padding: 48px; border-radius: 28px;
+  background: linear-gradient(135deg, #fff 0%, #FBF9FF 100%);
+  border: 1px solid var(--ct-line);
+  box-shadow: 0 30px 80px rgba(48,27,94,.08);
+}
+.download-cta h3 { font-size: 26px; color: var(--ct-purple-deep); margin-bottom: 10px; line-height: 1.2; max-width: 480px; }
+.download-cta p { font-size: 15px; color: var(--ct-muted); max-width: 480px; }
+.download-cta .doc-ic {
+  flex: 0 0 auto; width: 64px; height: 64px; border-radius: 16px;
+  background: linear-gradient(135deg, var(--ct-magenta), var(--ct-purple-deep)); color: #fff;
+  display: grid; place-items: center; margin-right: 20px;
+}
+.download-cta .row { display: flex; align-items: flex-start; flex: 1; }
+@media (max-width: 880px) {
+  .download-cta-inner { flex-direction: column; align-items: flex-start; padding: 32px; }
+}
+
+/* ────────────────────────────────────────────────────────────────────────────
+   TESTIMONIALS
+   ──────────────────────────────────────────────────────────────────────────── */
+.testimonials { padding: 120px 0; background: #fff; }
+.testimonials .head { text-align: center; margin-bottom: 64px; }
+.testimonials-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; max-width: 1100px; margin: 0 auto; }
+.testimonial {
+  padding: 36px; border-radius: 22px;
+  background: linear-gradient(180deg, #FBF9FF 0%, #fff 100%);
+  border: 1px solid var(--ct-line);
+}
+.testimonial .logo-row {
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  height: 36px; margin-bottom: 24px;
+}
+.testimonial .logo-row .erp-stack {
+  display: inline-flex; align-items: center; gap: 6px; padding: 5px 11px; border-radius: 999px;
+  background: rgba(0,112,242,.08); color: var(--sap-blue-dark);
+  font-family: var(--font-mono); font-size: 11px; font-weight: 600;
+}
+.testimonial blockquote {
+  font-family: var(--font-display); font-weight: 400; font-style: italic;
+  font-size: 20px; line-height: 1.4; letter-spacing: -.01em; color: var(--ct-ink);
+  margin: 0 0 24px; padding: 0;
+}
+.testimonial blockquote::before { content: '"'; color: var(--ct-magenta); font-size: 28px; margin-right: 4px; }
+.testimonial .who {
+  display: flex; align-items: center; gap: 14px;
+}
+.testimonial .who .av {
+  width: 42px; height: 42px; border-radius: 999px;
+  background: var(--ct-purple-deep); color: #fff;
+  display: grid; place-items: center;
+  font-family: var(--font-display); font-weight: 600; font-size: 16px;
+}
+.testimonial .who .nm { font-family: var(--font-display); font-weight: 600; font-size: 15px; color: var(--ct-ink); }
+.testimonial .who .ttl { font-size: 13px; color: var(--ct-muted); margin-top: 2px; }
+@media (max-width: 720px) { .testimonials-grid { grid-template-columns: 1fr; } }
+
+/* ────────────────────────────────────────────────────────────────────────────
+   "WHAT MAKES IT POSSIBLE" — 3 pillars
+   ──────────────────────────────────────────────────────────────────────────── */
+.pillars { padding: 120px 0; background: linear-gradient(180deg, #fff 0%, var(--ct-pastel-lavender) 100%); }
+.pillars .head { text-align: center; margin-bottom: 64px; }
+.pillars-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 28px; max-width: 1100px; margin: 0 auto; }
+.pillar-card {
+  padding: 36px; border-radius: 24px;
+  background: #fff; border: 1px solid var(--ct-line);
+  display: flex; flex-direction: column; gap: 16px;
+  transition: transform .25s, box-shadow .25s;
+}
+.pillar-card:hover { transform: translateY(-4px); box-shadow: 0 24px 50px rgba(48,27,94,.10); }
+.pillar-card .ill {
+  width: 64px; height: 64px; border-radius: 16px;
+  display: grid; place-items: center;
+  background: linear-gradient(135deg, var(--ct-magenta), var(--ct-purple-deep)); color: #fff;
+}
+.pillar-card.b .ill { background: linear-gradient(135deg, var(--sap-blue), var(--ct-purple-deep)); }
+.pillar-card.c .ill { background: linear-gradient(135deg, var(--ct-tech-mint), var(--ct-purple-deep)); }
+.pillar-card h3 { font-size: 22px; color: var(--ct-purple-deep); line-height: 1.2; }
+.pillar-card p { font-size: 15px; color: #4D3F6E; line-height: 1.6; }
+@media (max-width: 880px) { .pillars-grid { grid-template-columns: 1fr; } }
+
+/* ────────────────────────────────────────────────────────────────────────────
+   FINAL CTA + FORM
+   ──────────────────────────────────────────────────────────────────────────── */
+.final-cta { padding: 120px 0; background: var(--ct-pastel-lavender); }
+.final-cta .section-head { text-align: center; margin-bottom: 60px; }
+.cta-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 48px; align-items: stretch; max-width: 1100px; margin: 0 auto; }
+.cta-points { display: flex; flex-direction: column; gap: 18px; }
+.cta-pt {
+  display: flex; gap: 16px; padding: 20px; border-radius: 18px;
+  background: rgba(255,255,255,.7); border: 1px solid rgba(255,255,255,.85);
+  backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+}
+.cta-pt .ic-lg {
+  flex: 0 0 auto; width: 48px; height: 48px; border-radius: 14px;
+  display: grid; place-items: center; color: #fff;
+  background: linear-gradient(135deg, var(--ct-magenta) 0%, var(--ct-purple-deep) 100%);
+}
+.cta-pt h4 { font-family: var(--font-display); font-weight: 500; font-size: 18px; color: var(--ct-purple-deep); margin: 0; }
+.cta-pt p { font-size: 14px; color: #4D3F6E; margin-top: 6px; line-height: 1.5; }
+
+.demo-form {
+  padding: 32px; border-radius: 24px; background: #fff;
+  border: 1px solid var(--ct-line);
+  box-shadow: 0 30px 80px rgba(48,27,94,.12);
+  display: flex; flex-direction: column; gap: 16px;
+}
+.demo-form h3 { font-family: var(--font-display); font-weight: 500; font-size: 24px; color: var(--ct-purple-deep); margin: 0 0 4px; }
+.demo-form .sub { font-size: 13px; color: var(--ct-muted); margin-bottom: 8px; }
+.field { display: flex; flex-direction: column; gap: 6px; }
+.field label { font-family: var(--font-body); font-weight: 600; font-size: 12px; color: #3B2C5E; }
+.field label .req { color: #E0418A; }
+.field input, .field select, .phone-input input, .phone-input select {
+  width: 100%; padding: 12px 14px; border-radius: 10px;
+  border: 1px solid rgba(48,27,94,.14); background: #fff;
+  font-family: var(--font-body); font-size: 14px; color: var(--ct-ink);
+  transition: border-color .2s, box-shadow .2s;
+}
+.field input:focus, .field select:focus { outline: none; border-color: var(--ct-purple-deep); box-shadow: 0 0 0 3px rgba(48,27,94,.1); }
+.field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.phone-input { display: grid; grid-template-columns: 110px 1fr; gap: 8px; }
+.demo-form .pill { width: 100%; justify-content: center; margin-top: 8px; }
+.demo-form .agree { display: flex; align-items: flex-start; gap: 8px; font-size: 12px; color: var(--ct-muted); line-height: 1.5; }
+.demo-form .agree input { width: 16px; height: 16px; margin-top: 2px; flex: 0 0 auto; accent-color: var(--ct-purple-deep); }
+.demo-form .footnote { text-align: center; font-size: 12px; color: var(--ct-muted); margin-top: 4px; }
+.demo-form a { color: var(--ct-purple-deep); font-weight: 600; }
+@media (max-width: 880px) {
+  .cta-grid { grid-template-columns: 1fr; }
+  .field-row { grid-template-columns: 1fr; }
+}
+
+/* ────────────────────────────────────────────────────────────────────────────
+   FAQ
+   ──────────────────────────────────────────────────────────────────────────── */
+.faq { padding: 120px 0; background: #fff; }
+.faq .head { text-align: center; margin-bottom: 60px; }
+.faq-list { max-width: 880px; margin: 0 auto; display: flex; flex-direction: column; gap: 10px; }
+.faq-item {
+  border: 1px solid var(--ct-line); border-radius: 16px; background: #fff;
+  overflow: hidden; transition: border-color .2s, box-shadow .2s;
+}
+.faq-item[open] { border-color: rgba(48,27,94,.18); box-shadow: 0 12px 30px rgba(48,27,94,.06); }
+.faq-item summary {
+  list-style: none; cursor: pointer; padding: 22px 24px;
+  display: flex; align-items: center; justify-content: space-between; gap: 16px;
+  font-family: var(--font-display); font-weight: 500; font-size: 18px; color: var(--ct-ink);
+}
+.faq-item summary::-webkit-details-marker { display: none; }
+.faq-item .chev {
+  flex: 0 0 auto; width: 28px; height: 28px; border-radius: 999px;
+  background: var(--ct-pastel-lavender); color: var(--ct-purple-deep);
+  display: grid; place-items: center; transition: transform .25s, background .2s;
+}
+.faq-item[open] .chev { transform: rotate(45deg); background: var(--ct-purple-deep); color: #fff; }
+.faq-body { padding: 0 24px 24px; font-size: 15px; line-height: 1.65; color: #4D3F6E; }
+.faq-body ul, .faq-body ol { padding-left: 18px; margin: 8px 0; }
+.faq-body li { margin-bottom: 4px; }
+.faq-body b { color: var(--ct-purple-deep); }
+.faq-body code {
+  font-family: var(--font-mono); font-size: 13px; padding: 2px 6px; border-radius: 4px;
+  background: var(--ct-pastel-lavender); color: var(--ct-purple-deep);
+}
+
+/* ────────────────────────────────────────────────────────────────────────────
+   MERGED ERP DETAILS — all 10 deep-dives stacked at bottom of page
+   ──────────────────────────────────────────────────────────────────────────── */
+.erp-details {
+  background: linear-gradient(180deg, #fff 0%, #FBF9FF 100%);
+  padding: 120px 0 80px;
+  border-top: 1px solid var(--ct-line);
+}
+.erp-details .section-head { text-align: center; margin-bottom: 80px; }
+
+.erp-detail-block {
+  max-width: 1100px; margin: 0 auto;
+  padding: 64px 0;
+  scroll-margin-top: 100px;
+  border-top: 1px solid var(--ct-line);
+}
+.erp-detail-block:first-of-type { border-top: 0; padding-top: 0; }
+
+.erp-detail-head {
+  display: flex; align-items: flex-end; justify-content: space-between;
+  gap: 24px; margin-bottom: 36px; flex-wrap: wrap;
+}
+.erp-detail-head .left .erp-tier-tag {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 5px 11px; border-radius: 999px;
+  font-family: var(--font-mono); font-size: 11px; font-weight: 700;
+  letter-spacing: .06em; text-transform: uppercase;
+  margin-bottom: 14px;
+}
+.erp-detail-head .left .erp-tier-tag.t1 { background: var(--ct-pastel-lavender); color: var(--ct-purple-deep); }
+.erp-detail-head .left .erp-tier-tag.t2 { background: rgba(196,57,159,.08); color: var(--ct-magenta); }
+.erp-detail-head .left h3 {
+  font-family: var(--font-display); font-weight: 500;
+  font-size: clamp(28px, 3.4vw, 40px); line-height: 1.05; letter-spacing: -.015em;
+  color: var(--ct-ink); margin: 0;
+}
+.erp-detail-head .left h3 .em { font-style: italic; }
+.erp-detail-head .left .erp-strap {
+  font-family: var(--font-mono); font-size: 12px; font-weight: 600;
+  color: var(--ct-muted); letter-spacing: .06em; margin-top: 8px;
+}
+.erp-detail-head .pill { flex: 0 0 auto; }
+
+.erp-detail-body {
+  display: grid; grid-template-columns: 1.4fr 1fr; gap: 48px;
+  align-items: start;
+}
+.erp-detail-body .copy p {
+  font-size: 16px; color: #4D3F6E; line-height: 1.7; margin: 0 0 16px;
+}
+.erp-detail-body .copy p b { color: var(--ct-purple-deep); }
+.erp-detail-body .copy p code {
+  font-family: var(--font-mono); font-size: 13px;
+  padding: 2px 6px; border-radius: 4px;
+  background: var(--ct-pastel-lavender); color: var(--ct-purple-deep);
+}
+.erp-spec-card-merged {
+  padding: 28px; border-radius: 18px;
+  background: linear-gradient(180deg, var(--ct-pastel-lavender) 0%, #fff 100%);
+  border: 1px solid rgba(48,27,94,.06);
+}
+.erp-spec-card-merged h4 {
+  font-family: var(--font-mono); font-size: 11px; font-weight: 700;
+  letter-spacing: .14em; text-transform: uppercase; color: var(--ct-purple-mid);
+  margin-bottom: 18px;
+}
+.erp-spec-card-merged .spec-row {
+  display: flex; justify-content: space-between; gap: 12px;
+  padding: 10px 0; border-bottom: 1px solid rgba(48,27,94,.06);
+}
+.erp-spec-card-merged .spec-row:last-child { border-bottom: 0; }
+.erp-spec-card-merged .spec-row .k { font-size: 13px; color: var(--ct-muted); font-weight: 500; flex: 0 0 38%; }
+.erp-spec-card-merged .spec-row .v {
+  font-family: var(--font-mono); font-size: 11.5px; color: var(--ct-purple-deep);
+  font-weight: 600; text-align: right; line-height: 1.45;
+}
+@media (max-width: 880px) {
+  .erp-detail-body { grid-template-columns: 1fr; gap: 28px; }
+  .erp-detail-head { flex-direction: column; align-items: flex-start; }
+}
+
+/* ────────────────────────────────────────────────────────────────────────────
+   FOOTER
+   ──────────────────────────────────────────────────────────────────────────── */
+.footer { background: #000; color: #fff; padding: 80px 0 40px; }
+.footer-grid {
+  display: grid; grid-template-columns: 1.4fr 1fr 1.4fr 1fr 1fr; gap: 40px;
+  padding-bottom: 60px; border-bottom: 1px solid rgba(255,255,255,.08);
+}
+.footer-brand .logo { display: inline-block; line-height: 0; margin-bottom: 18px; }
+.footer-brand .logo img { height: 32px; width: auto; display: block; filter: brightness(0) invert(1); }
+.footer-brand .addr { font-size: 13px; color: rgba(255,255,255,.55); line-height: 1.65; max-width: 260px; }
+.footer-brand .follow { font-family: var(--font-display); font-weight: 600; font-size: 14px; color: #fff; margin-top: 32px; margin-bottom: 12px; }
+.footer-brand .socials { display: flex; gap: 10px; }
+.footer-brand .soc {
+  width: 36px; height: 36px; border-radius: 8px; background: rgba(255,255,255,.06);
+  display: grid; place-items: center; color: rgba(255,255,255,.7);
+  transition: background .2s, color .2s;
+}
+.footer-brand .soc img { width: 16px; height: 16px; opacity: .7; transition: opacity .2s; filter: brightness(0) invert(1); }
+.footer-brand .soc:hover { background: rgba(255,255,255,.12); color: #fff; }
+.footer-brand .soc:hover img { opacity: 1; }
+.footer-col h5 { font-family: var(--font-display); font-weight: 600; font-size: 14px; color: #fff; margin: 0 0 18px; }
+.footer-col .group-h { font-family: var(--font-display); font-weight: 600; font-size: 13px; color: #fff; margin-top: 20px; margin-bottom: 10px; }
+.footer-col ul { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 10px; }
+.footer-col a { font-size: 13px; color: rgba(255,255,255,.55); transition: color .2s; }
+.footer-col a:hover { color: #fff; }
+.footer-bottom {
+  display: flex; align-items: end; justify-content: space-between; gap: 24px;
+  padding-top: 32px; flex-wrap: wrap;
+}
+.footer-bottom .legal { font-size: 12px; color: rgba(255,255,255,.45); letter-spacing: .04em; text-transform: uppercase; }
+.footer-bottom .legal-links { display: flex; gap: 16px; margin-top: 8px; }
+.footer-bottom .legal-links a { font-size: 13px; color: rgba(255,255,255,.55); }
+.footer-bottom .seals { display: flex; gap: 14px; }
+.seal {
+  display: flex; align-items: center; gap: 10px; padding: 10px 14px; border-radius: 12px;
+  background: rgba(255,255,255,.04); border: 1px solid rgba(255,255,255,.08);
+  font-size: 11px; color: rgba(255,255,255,.7); line-height: 1.3;
+}
+.seal .ic { width: 28px; height: 28px; border-radius: 6px; background: rgba(255,255,255,.08); display: grid; place-items: center; }
+@media (max-width: 980px) { .footer-grid { grid-template-columns: 1fr 1fr; } }
+@media (max-width: 600px) { .footer-grid { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+
+<!-- ──────────── NAV (ported from cleartax.com/ae) ──────────── -->
+<div class="nav-wrap">
+  <nav class="nav">
+    <a href="https://www.cleartax.com/" class="nav-logo" aria-label="ClearTax">
+      <img src="https://assets1.cleartax-cdn.com/finfo/wg-utils/retool/d9f36ac3-77a9-40c6-94fc-20c2e3855457.svg" alt="ClearTax" />
+    </a>
+    <div class="nav-links">
+      <a href="#erps">ERPs</a>
+      <a href="#how">How it works</a>
+      <a href="#mandates">EU mandates</a>
+      <a href="#faq">FAQ</a>
+    </div>
+    <div class="nav-erp-tag">
+      <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="14" height="14"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15 15 0 0 1 0 20M12 2a15 15 0 0 0 0 20"/></svg>
+      Pan-EU · 60+ ERPs
+    </div>
+    <a href="#contact" class="pill">Book a Demo <span class="arr">→</span></a>
+  </nav>
+</div>
+
+<!-- ──────────── HERO ──────────── -->
+<header class="hero">
+  <div class="container">
+    <div class="hero-inner">
+      <div>
+        <div class="eyebrow"><span class="dot"></span>Built for every EU ERP</div>
+        <h1>
+          One platform for <span class="h1-grad">EU e-invoicing.</span> Every ERP. Every mandate.
+          <span class="small">Pre-built certified connectors for SAP, Oracle, Microsoft Dynamics, NetSuite, Sage and 60+ more. Live in 4–6 weeks.</span>
+        </h1>
+        <p class="hero-sub">
+          ClearTax delivers compliant e-invoicing across every EU mandate that matters — France (DGFiP), Belgium (Peppol), Poland (KSeF), Germany, Spain (Verifactu), Italy (SDI) and more — through pre-built, certified connectors for the ERP you already run, and a single global API.
+        </p>
+        <div class="hero-cta-row">
+          <a href="#contact" class="pill lg">Book a Demo <span class="arr">→</span></a>
+          <a href="#erps" class="pill ghost">Find your ERP</a>
+        </div>
+        <div class="hero-meta">
+          <span><b>60+ ERPs</b> · pre-built connectors</span>
+          <span><b>15+ mandates</b> · single API</span>
+          <span><b>4–6 wk</b> typical go-live</span>
+        </div>
+      </div>
+
+      <!-- Right side: EU mandate coverage card -->
+      <div class="arch-card" id="architecture">
+        <div class="hdr">
+          <span class="lbl">EU mandate coverage</span>
+          <span class="live">Live</span>
+        </div>
+        <div class="arch-flow">
+          <div class="arch-node ct">
+            <div class="ico">FR</div>
+            <div>
+              <div class="nm">France — DGFiP</div>
+              <div class="sb">Confirmed PA · UBL/CII/Factur-X · Sep 2026</div>
+            </div>
+          </div>
+          <div class="arch-node ct">
+            <div class="ico">BE</div>
+            <div>
+              <div class="nm">Belgium — Peppol</div>
+              <div class="sb">Live · BIS 3.0 · 5-corner model</div>
+            </div>
+          </div>
+          <div class="arch-node ct">
+            <div class="ico">PL</div>
+            <div>
+              <div class="nm">Poland — KSeF</div>
+              <div class="sb">FA(2) XML · Feb 2026 large · Apr 2026 SME</div>
+            </div>
+          </div>
+          <div class="arch-node dgfip">
+            <div class="ico">DE</div>
+            <div>
+              <div class="nm">Germany — phased rollout</div>
+              <div class="sb">EN 16931 · Peppol · 2025–2028</div>
+            </div>
+          </div>
+          <div class="arch-node dgfip">
+            <div class="ico">ES</div>
+            <div>
+              <div class="nm">Spain — Verifactu + B2B</div>
+              <div class="sb">Verifactu live · B2B pending</div>
+            </div>
+          </div>
+          <div class="arch-node sap">
+            <div class="ico">IT</div>
+            <div>
+              <div class="nm">Italy — SDI</div>
+              <div class="sb">Live since 2019 · FatturaPA</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- ──────────── WHO IT'S FOR ──────────── -->
+<section class="intro">
+  <div class="container">
+    <div class="intro-grid">
+      <div>
+        <h2>What's the case for an <span class="h1-grad">embedded connector?</span></h2>
+        <p>If your goal is to move from <b>middleware-and-spreadsheet workarounds</b> to a fully embedded e-invoicing posture inside the ERP you already run, ClearTax is built for that. We don't sit outside your finance system poking at it through batch jobs — we deploy a <b>certified, ERP-native connector</b> that ingests data through standard interfaces and writes status back to fields your AR team already uses.</p>
+        <p>Whether you run SAP, Oracle, Microsoft Dynamics, NetSuite, Sage, or any of 55+ other systems, the integration follows the same pattern: native ingestion, validation inside ClearTax, structured submission to the tax authority in the format your jurisdiction demands, and lifecycle status sync back to the ERP.</p>
+        <p>The result: every invoice your ERP creates becomes a compliant, structured e-invoice — for every EU mandate you operate under — without your finance team leaving the system they know.</p>
+      </div>
+      <div class="for-box">
+        <h4>ClearTax is purpose-built for:</h4>
+        <ul>
+          <li><span class="ck"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span><span><b>Any major ERP</b> — SAP, Oracle, Microsoft Dynamics, NetSuite, Sage, Infor, Odoo, Workday and 50+ more</span></li>
+          <li><span class="ck"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span><span><b>Mid-market to enterprise</b> with 50K+ invoices/year across multiple entities and countries</span></li>
+          <li><span class="ck"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span><span><b>Multi-country EU footprints</b> — one integration, every mandate from France to Poland</span></li>
+          <li><span class="ck"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span><span><b>Heavily customised ERP environments</b> with custom tables, extensions and bespoke output flows</span></li>
+          <li><span class="ck"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span><span><b>Shared-service centres</b> consolidating finance across multiple ERPs and geographies</span></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ──────────── ANCHOR NAV ──────────── -->
+<nav class="anchors">
+  <div class="container">
+    <ul>
+      <li><a href="#erps">Find your ERP</a></li>
+      <li><a href="#mandates">EU mandate map</a></li>
+      <li><a href="#how">How it works</a></li>
+      <li><a href="#kpis">KPIs</a></li>
+      <li><a href="#testimonials">Customer wins</a></li>
+      <li><a href="#faq">FAQ</a></li>
+    </ul>
+  </div>
+</nav>
+
+<!-- ──────────── ERP HUB ──────────── -->
+<section id="erps" class="erps">
+  <div class="container">
+    <div class="head">
+      <div class="section-eyebrow">Find your ERP</div>
+      <h2 class="section-title">Pick your ERP — <span class="h1-grad em">we'll show you exactly how it works</span></h2>
+      <p class="section-sub">Pre-built, certified connectors for 60+ ERPs. Each one gets its own technical deep-dive: architecture, deployment path, supported versions, FAQ.</p>
+    </div>
+
+    <div class="tier-h">Tier 1 — Enterprise ERPs</div>
+    <div class="erp-hub-t1">
+
+      <a class="erp-hub-card" href="#erp-sap">
+        <div class="erp-logo">SAP</div>
+        <div class="erp-tagline">Native ABAP add-on</div>
+        <h3>For SAP customers</h3>
+        <div class="erp-desc">Certified ABAP add-on in the <code style="font-family:var(--font-mono);font-size:11px;color:var(--ct-purple-deep);background:var(--ct-pastel-lavender);padding:1px 5px;border-radius:3px">/CLEARTAX/*</code> namespace. STMS-deployable, Fiori cockpit, BAdI-extensible.</div>
+        <div class="erp-versions">
+          <span class="v">ECC EHP7+</span><span class="v">S/4HANA 1709–2023</span><span class="v">Private Cloud</span><span class="v">Public Cloud</span><span class="v">B1 · ByD</span>
+        </div>
+        <span class="erp-cta">See the SAP architecture <span class="arr">→</span></span>
+      </a>
+
+      <a class="erp-hub-card" href="#erp-oracle">
+        <div class="erp-logo">Oracle</div>
+        <div class="erp-tagline">Fusion · EBS · NetSuite</div>
+        <h3>For Oracle customers</h3>
+        <div class="erp-desc">REST + FBDI for Fusion, concurrent programs for EBS R12, managed SuiteApp on SuiteCloud for NetSuite. One platform, three integration paths.</div>
+        <div class="erp-versions">
+          <span class="v">Fusion Cloud</span><span class="v">EBS R12</span><span class="v">NetSuite</span><span class="v">JD Edwards</span><span class="v">PeopleSoft</span>
+        </div>
+        <span class="erp-cta">See the Oracle architecture <span class="arr">→</span></span>
+      </a>
+
+      <a class="erp-hub-card" href="#erp-dynamics">
+        <div class="erp-logo">Microsoft</div>
+        <div class="erp-tagline">Dynamics F&amp;O · BC</div>
+        <h3>For Dynamics 365 customers</h3>
+        <div class="erp-desc">X++ extension via LCS for Finance &amp; Operations. AppSource-listed AL extension for Business Central. Native to the Dynamics client.</div>
+        <div class="erp-versions">
+          <span class="v">D365 F&amp;O</span><span class="v">D365 BC</span><span class="v">AppSource</span><span class="v">Multi-tenant</span>
+        </div>
+        <span class="erp-cta">See the Dynamics architecture <span class="arr">→</span></span>
+      </a>
+
+      <a class="erp-hub-card" href="#erp-netsuite">
+        <div class="erp-logo">NetSuite</div>
+        <div class="erp-tagline">Managed SuiteApp</div>
+        <h3>For NetSuite customers</h3>
+        <div class="erp-desc">A managed SuiteApp listed on SuiteCloud. SuiteScript 2.1 triggers on invoice creation, custom records for compliance state, native role-based access.</div>
+        <div class="erp-versions">
+          <span class="v">NetSuite 2024.1+</span><span class="v">OneWorld</span><span class="v">SuiteScript 2.1</span><span class="v">SDF-packaged</span>
+        </div>
+        <span class="erp-cta">See the NetSuite architecture <span class="arr">→</span></span>
+      </a>
+
+      <a class="erp-hub-card" href="#erp-sage">
+        <div class="erp-logo">Sage</div>
+        <div class="erp-tagline">X3 · 100 · 50</div>
+        <h3>For Sage customers</h3>
+        <div class="erp-desc">4GL extension for Sage X3, Sage e-Business API for 100/100c, import-export channels for Sage 50. Best for multi-country Sage deployments.</div>
+        <div class="erp-versions">
+          <span class="v">Sage X3</span><span class="v">Sage 100 · 100c</span><span class="v">Sage 50</span><span class="v">Multi-country</span>
+        </div>
+        <span class="erp-cta">See the Sage architecture <span class="arr">→</span></span>
+      </a>
+
+    </div>
+
+    <div class="tier-h">Tier 2 — Mid-market &amp; specialist ERPs</div>
+    <div class="erp-hub-t2">
+
+      <a class="erp-hub-mini" href="#erp-infor">
+        <div class="nm">Infor</div>
+        <div class="desc">Infor M3 &amp; Infor LN. ION-based integration, native M3 add-ons.</div>
+        <span class="lk">See details <span class="arr">→</span></span>
+      </a>
+
+      <a class="erp-hub-mini" href="#erp-workday">
+        <div class="nm">Workday</div>
+        <div class="desc">Workday Financials via REST API + EIB inbound, custom report extractions.</div>
+        <span class="lk">See details <span class="arr">→</span></span>
+      </a>
+
+      <a class="erp-hub-mini" href="#erp-odoo">
+        <div class="nm">Odoo</div>
+        <div class="desc">Odoo module on the official store. Works with Community and Enterprise.</div>
+        <span class="lk">See details <span class="arr">→</span></span>
+      </a>
+
+      <a class="erp-hub-mini" href="#erp-cegid">
+        <div class="nm">Cegid</div>
+        <div class="desc">Native integration with Cegid XRP Flex &amp; Quadra. Strong in France.</div>
+        <span class="lk">See details <span class="arr">→</span></span>
+      </a>
+
+      <a class="erp-hub-mini" href="#erp-unit4">
+        <div class="nm">Unit4</div>
+        <div class="desc">Unit4 ERP / Business World. REST API ingestion with native field mapping.</div>
+        <span class="lk">See details <span class="arr">→</span></span>
+      </a>
+
+    </div>
+
+    <div class="erp-other-cta">
+      <div class="txt">
+        <h4>Run something else? 50+ more certified connectors</h4>
+        <p>Epicor · IFS · SYSPRO · QAD · Acumatica · Priority · JD Edwards · PeopleSoft — plus a global REST API for custom and in-house systems.</p>
+      </div>
+      <a href="#contact" class="pill">Talk to us <span class="arr">→</span></a>
+    </div>
+  </div>
+</section>
+
+<!-- ──────────── EU MANDATE MAP ──────────── -->
+<section id="mandates" class="mandates">
+  <div class="container">
+    <div class="head">
+      <div class="section-eyebrow">EU mandate map</div>
+      <h2 class="section-title">One platform. <span class="h1-grad em">Every EU jurisdiction</span> that matters.</h2>
+      <p class="section-sub">Coverage that already exists today — plus mandates going live this year and next, all on the same global API.</p>
+    </div>
+    <div class="mandate-grid">
+
+      <div class="mandate-card">
+        <div class="flag-row">
+          <div class="flag"><svg width="32" height="22" viewBox="0 0 6 4" preserveAspectRatio="none"><rect width="2" height="4" x="0" fill="#0055A4"/><rect width="2" height="4" x="2" fill="#fff"/><rect width="2" height="4" x="4" fill="#EF4135"/></svg></div>
+          <span class="status imminent"><span class="pulse"></span>SEP 2026</span>
+        </div>
+        <div class="country">France</div>
+        <div class="auth">DGFiP · Plateforme Agréée</div>
+        <div class="when"><b>Sep 2026:</b> all businesses receive; large + ETI issue. <b>Sep 2027:</b> SMEs &amp; micro fully compliant.</div>
+        <div class="specs"><span class="tag">UBL 2.1</span><span class="tag">CII</span><span class="tag">Factur-X</span><span class="tag">Confirmed PA</span></div>
+      </div>
+
+      <div class="mandate-card">
+        <div class="flag-row">
+          <div class="flag"><svg width="32" height="22" viewBox="0 0 3 2" preserveAspectRatio="none"><rect width="1" height="2" x="0" fill="#000"/><rect width="1" height="2" x="1" fill="#FFD90C"/><rect width="1" height="2" x="2" fill="#EF3340"/></svg></div>
+          <span class="status live"><span class="pulse"></span>LIVE</span>
+        </div>
+        <div class="country">Belgium</div>
+        <div class="auth">Peppol · BIS 3.0</div>
+        <div class="when">B2B mandate live <b>January 2026</b> for VAT-registered businesses. Cross-border via Peppol network.</div>
+        <div class="specs"><span class="tag">Peppol BIS 3.0</span><span class="tag">5-corner</span><span class="tag">UBL 2.1</span></div>
+      </div>
+
+      <div class="mandate-card">
+        <div class="flag-row">
+          <div class="flag"><svg width="32" height="22" viewBox="0 0 8 5" preserveAspectRatio="none"><rect width="8" height="2.5" y="0" fill="#fff"/><rect width="8" height="2.5" y="2.5" fill="#DC143C"/></svg></div>
+          <span class="status imminent"><span class="pulse"></span>FEB 2026</span>
+        </div>
+        <div class="country">Poland</div>
+        <div class="auth">KSeF · National E-Invoicing</div>
+        <div class="when"><b>Feb 2026:</b> large taxpayers. <b>Apr 2026:</b> SMEs. Mandatory issuance via KSeF platform.</div>
+        <div class="specs"><span class="tag">FA(2) XML</span><span class="tag">KSeF UPO</span><span class="tag">CTC model</span></div>
+      </div>
+
+      <div class="mandate-card">
+        <div class="flag-row">
+          <div class="flag"><svg width="32" height="22" viewBox="0 0 5 3" preserveAspectRatio="none"><rect width="5" height="1" y="0" fill="#000"/><rect width="5" height="1" y="1" fill="#DD0000"/><rect width="5" height="1" y="2" fill="#FFCE00"/></svg></div>
+          <span class="status imminent"><span class="pulse"></span>2025–2028</span>
+        </div>
+        <div class="country">Germany</div>
+        <div class="auth">BMF · Phased rollout</div>
+        <div class="when"><b>Jan 2025:</b> receive obligation. <b>Jan 2027:</b> issuance for &gt; €800K turnover. <b>Jan 2028:</b> all businesses.</div>
+        <div class="specs"><span class="tag">EN 16931</span><span class="tag">Peppol</span><span class="tag">XRechnung</span><span class="tag">ZUGFeRD</span></div>
+      </div>
+
+      <div class="mandate-card">
+        <div class="flag-row">
+          <div class="flag"><svg width="32" height="22" viewBox="0 0 3 2" preserveAspectRatio="none"><rect width="3" height="0.5" y="0" fill="#AA151B"/><rect width="3" height="1" y="0.5" fill="#F1BF00"/><rect width="3" height="0.5" y="1.5" fill="#AA151B"/></svg></div>
+          <span class="status imminent"><span class="pulse"></span>VERIFACTU LIVE</span>
+        </div>
+        <div class="country">Spain</div>
+        <div class="auth">AEAT · Verifactu + B2B</div>
+        <div class="when"><b>Verifactu live</b> (invoice billing system reqs). <b>B2B mandate</b> approved, awaiting technical regs — expected 2026/27.</div>
+        <div class="specs"><span class="tag">Verifactu</span><span class="tag">TicketBAI</span><span class="tag">FacturaE</span></div>
+      </div>
+
+      <div class="mandate-card">
+        <div class="flag-row">
+          <div class="flag"><svg width="32" height="22" viewBox="0 0 3 2" preserveAspectRatio="none"><rect width="1" height="2" x="0" fill="#009246"/><rect width="1" height="2" x="1" fill="#fff"/><rect width="1" height="2" x="2" fill="#CE2B37"/></svg></div>
+          <span class="status live"><span class="pulse"></span>LIVE</span>
+        </div>
+        <div class="country">Italy</div>
+        <div class="auth">SDI · Agenzia delle Entrate</div>
+        <div class="when">Mandatory B2B e-invoicing <b>since 2019</b>. All invoices flow through SDI exchange system in FatturaPA format.</div>
+        <div class="specs"><span class="tag">FatturaPA</span><span class="tag">SDI</span><span class="tag">XML</span></div>
+      </div>
+
+      <div class="mandate-card">
+        <div class="flag-row">
+          <div class="flag"><svg width="32" height="22" viewBox="0 0 2 3" preserveAspectRatio="none"><rect width="2" height="3" fill="#fff"/><rect width="2" height="0.6" y="1.2" fill="#D52B1E"/></svg></div>
+          <span class="status future"><span class="pulse"></span>EXPLORATORY</span>
+        </div>
+        <div class="country">Netherlands</div>
+        <div class="auth">Peppol-based · ViDA aligned</div>
+        <div class="when">No domestic B2B mandate yet, but heavy Peppol adoption for B2G and cross-border. Aligned to EU ViDA timeline.</div>
+        <div class="specs"><span class="tag">Peppol BIS 3.0</span><span class="tag">UBL 2.1</span></div>
+      </div>
+
+      <div class="mandate-card">
+        <div class="flag-row">
+          <div class="flag"><svg width="32" height="22" viewBox="0 0 3 2" preserveAspectRatio="none"><rect width="1" height="2" x="0" fill="#002B7F"/><rect width="1" height="2" x="1" fill="#FCD116"/><rect width="1" height="2" x="2" fill="#CE1126"/></svg></div>
+          <span class="status live"><span class="pulse"></span>LIVE · CTC</span>
+        </div>
+        <div class="country">Romania</div>
+        <div class="auth">ANAF · RO e-Factura</div>
+        <div class="when">B2B mandate <b>live since July 2024</b>. CTC model with mandatory clearance through RO e-Factura system.</div>
+        <div class="specs"><span class="tag">RO_CIUS</span><span class="tag">UBL 2.1</span><span class="tag">CTC</span></div>
+      </div>
+
+      <div class="mandate-card">
+        <div class="flag-row">
+          <div class="flag"><svg width="32" height="22" viewBox="0 0 3 2" preserveAspectRatio="none"><rect width="3" height="2" fill="#fff"/><path d="M0 0 L3 2 M3 0 L0 2" stroke="#C8102E" stroke-width="0.3"/></svg></div>
+          <span class="status future"><span class="pulse"></span>2024–2026</span>
+        </div>
+        <div class="country">Croatia &amp; more</div>
+        <div class="auth">Peppol · cross-EU rollouts</div>
+        <div class="when">Croatia mandate phased through 2026. Plus Portugal, Hungary, Slovakia, Bulgaria — all covered on the same platform.</div>
+        <div class="specs"><span class="tag">Peppol BIS</span><span class="tag">Local CIUS</span><span class="tag">Multi-country</span></div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ──────────── HOW IT WORKS — capabilities ──────────── -->
+<section id="how" class="how">
+  <div class="container">
+    <div class="head">
+      <div class="section-eyebrow">How it works</div>
+      <h2 class="section-title">A compliant e-invoice, <span class="em h1-grad">end to end</span></h2>
+      <p class="section-sub">Six capabilities, one platform. The same architecture works for every ERP — only the ingestion connector changes.</p>
+    </div>
+
+    <!-- Architecture flow diagram -->
+    <div class="flow-diagram">
+      <div class="fd-inner">
+        <div class="fd-col sap">
+          <h5>1. Source</h5>
+          <h4>Your ERP</h4>
+          <ul>
+            <li>SAP · Oracle · Dynamics</li>
+            <li>NetSuite · Sage · 55+ more</li>
+            <li>Native connector or REST API</li>
+            <li>Real-time or batch ingestion</li>
+          </ul>
+        </div>
+        <div class="fd-arrow"><svg viewBox="0 0 60 24" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="0" y1="12" x2="55" y2="12" stroke-dasharray="3 3"/><polyline points="48 6 55 12 48 18"/></svg></div>
+        <div class="fd-col ct">
+          <h5>2. Transform &amp; validate</h5>
+          <h4>ClearTax Compliance Cloud</h4>
+          <ul>
+            <li>Format engine (UBL/CII/Factur-X)</li>
+            <li>Schema &amp; business validation</li>
+            <li>AI-assisted field mapping</li>
+            <li>Error correction &amp; resubmit</li>
+          </ul>
+        </div>
+        <div class="fd-arrow"><svg viewBox="0 0 60 24" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="0" y1="12" x2="55" y2="12" stroke-dasharray="3 3"/><polyline points="48 6 55 12 48 18"/></svg></div>
+        <div class="fd-col tax">
+          <h5>3. Submit &amp; sync</h5>
+          <h4>Tax authority</h4>
+          <ul>
+            <li>DGFiP · KSeF · SDI · ANAF</li>
+            <li>Peppol network (BIS 3.0)</li>
+            <li>Lifecycle status back to ERP</li>
+            <li>Mandatory archival per local rules</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- Six capability cards -->
+    <div class="how-grid">
+      <div class="how-card">
+        <div class="ic-box"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg></div>
+        <h3>ERP-native ingestion</h3>
+        <p>Pre-built certified connectors for SAP, Oracle, Microsoft Dynamics, NetSuite, Sage and 55+ more business systems. Deployed via each ERP's native extension model — STMS transport for SAP, LCS for Dynamics, SuiteCloud for NetSuite — with zero core modifications.</p>
+        <div class="tag-list">
+          <span class="tag">SAP ABAP add-on</span>
+          <span class="tag">Dynamics LCS</span>
+          <span class="tag">NetSuite SuiteApp</span>
+          <span class="tag">Oracle OIC</span>
+        </div>
+      </div>
+
+      <div class="how-card">
+        <div class="ic-box"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg></div>
+        <h3>Format engine</h3>
+        <p>Every mandate has its own format. ClearTax converts your ERP output into UBL 2.1, CII, Factur-X (France); FA(2) XML (KSeF Poland); FatturaPA (Italy SDI); XRechnung &amp; ZUGFeRD (Germany); Verifactu &amp; FacturaE (Spain); RO_CIUS (Romania); Peppol BIS 3.0 (cross-border). One source object, every output format.</p>
+        <div class="tag-list">
+          <span class="tag">UBL 2.1</span>
+          <span class="tag">CII</span>
+          <span class="tag">Factur-X</span>
+          <span class="tag">Peppol BIS</span>
+          <span class="tag">FA(2) · FatturaPA</span>
+        </div>
+      </div>
+
+      <div class="how-card">
+        <div class="ic-box"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg></div>
+        <h3>Real-time status sync</h3>
+        <p>Every invoice carries its lifecycle state back into the ERP. The 14-status DGFiP lifecycle, KSeF UPO references, SDI delivery codes, ZATCA QR codes, FTA acknowledgement IDs — written back to the AR team's existing fields. Your finance team sees compliance status without leaving the system they already use.</p>
+        <div class="tag-list">
+          <span class="tag">14-status DGFiP</span>
+          <span class="tag">KSeF UPO</span>
+          <span class="tag">SDI codes</span>
+          <span class="tag">Webhook events</span>
+        </div>
+      </div>
+
+      <div class="how-card">
+        <div class="ic-box"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 9h6v6H9z"/></svg></div>
+        <h3>Unified compliance cockpit</h3>
+        <p>A single pane of glass across every ERP and every mandate: failed validations, pending submissions, status by entity, by country, by VAT registration. Mass resubmission, exception management, audit trails — accessible inside your ERP launchpad or as a standalone web app, with SSO and role-based access.</p>
+        <div class="tag-list">
+          <span class="tag">SAP Fiori</span>
+          <span class="tag">Dynamics workspaces</span>
+          <span class="tag">NetSuite portlets</span>
+          <span class="tag">Web app + SSO</span>
+        </div>
+      </div>
+
+      <div class="how-card">
+        <div class="ic-box"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2 4 5v7c0 5 3.5 9 8 10 4.5-1 8-5 8-10V5l-8-3z"/></svg></div>
+        <h3>One platform, every mandate</h3>
+        <p>A single integration serves every supported jurisdiction. A new country goes live? It's a configuration change, not a new development project. When DGFiP publishes External Specs v3.2, KSeF updates a schema, or Germany finalises its phase-2 rules, you get an automatic update — not a re-implementation.</p>
+        <div class="tag-list">
+          <span class="tag">France · Belgium · Poland</span>
+          <span class="tag">Germany · Italy · Spain</span>
+          <span class="tag">Romania · Croatia · NL</span>
+          <span class="tag">Config not code</span>
+        </div>
+      </div>
+
+      <div class="how-card">
+        <div class="ic-box"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>
+        <h3>4–6 week deployment</h3>
+        <p>Standard ERP environments go live in 4–6 weeks: 1 week scoping, 2 weeks connector deployment &amp; mapping, 1 week UAT in QA, 1 week parallel run, go-live. ClearTax's AI integration agent reads your custom fields and output flows and pre-builds the mapping draft — typically cutting mapping effort by 70%.</p>
+        <div class="tag-list">
+          <span class="tag">DEV → QA → Prod</span>
+          <span class="tag">AI mapping agent</span>
+          <span class="tag">Sandbox testing</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ──────────── KPI BAND ──────────── -->
+<section id="kpis" class="kpis">
+  <div class="container">
+    <div class="head">
+      <div class="section-eyebrow">KPIs you can hit</div>
+      <h2>Numbers our customers <span class="gr">actually deliver</span></h2>
+    </div>
+    <div class="kpis-grid">
+      <div class="kpi-cell">
+        <div class="big">99.8%</div>
+        <div class="lbl">First-pass acceptance rate at the tax authority, averaged across all live mandates</div>
+        <div class="src">SOURCE · CLEARTAX PLATFORM, ROLLING 90 DAYS</div>
+      </div>
+      <div class="kpi-cell">
+        <div class="big">4–6 wk</div>
+        <div class="lbl">Typical go-live across standard SAP, Oracle, Dynamics and NetSuite environments for single-country mandates</div>
+        <div class="src">SOURCE · CLEARTAX ONBOARDING BENCHMARKS</div>
+      </div>
+      <div class="kpi-cell">
+        <div class="big">4×</div>
+        <div class="lbl">Faster integration vs. conventional middleware-based approaches, via the AI mapping agent</div>
+        <div class="src">SOURCE · CLEARTAX VS MIDDLEWARE BASELINE</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ──────────── VALUE DRIVERS ──────────── -->
+<section id="value" class="value">
+  <div class="container">
+    <div class="head">
+      <div class="section-eyebrow">Value drivers</div>
+      <h2 class="section-title">How ClearTax pays back <span class="h1-grad em">your ERP investment</span></h2>
+      <p class="section-sub">Three reasons finance organisations choose an embedded connector over middleware or stand-alone tools.</p>
+    </div>
+    <div class="value-grid">
+      <div class="value-col">
+        <div class="num">i.</div>
+        <h3>Lower compliance TCO</h3>
+        <p>No bolt-on iPaaS to license. No third-party gateway sitting between your ERP and the tax authority — which means fewer moving parts, fewer interfaces to monitor, and fewer support hand-offs when something fails. The connector runs through your ERP's native extension model, on the same hardware, through the same change-management process.</p>
+      </div>
+      <div class="value-col">
+        <div class="num">ii.</div>
+        <h3>Compliance that travels</h3>
+        <p>Your ERP's own native compliance tools cover a narrow set of mandates, and adding new geographies often means new licences or new vendors. ClearTax's single platform covers France, Belgium, Poland, Germany, Spain, Italy, Romania, Croatia, Netherlands — plus the wider international stack — with new mandates added through configuration. You scale into new countries without reopening the integration project.</p>
+      </div>
+      <div class="value-col">
+        <div class="num">iii.</div>
+        <h3>ERP-skilled support</h3>
+        <p>Our delivery teams are staffed with consultants certified in the ERP you run — ABAP for SAP, X++/AL for Dynamics, SuiteScript for NetSuite, OIC for Oracle, 4GL for Sage X3. When you raise a ticket, it lands with someone who's already shipped this same connector into dozens of similar landscapes — not a generic CSM.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ──────────── DOWNLOAD CTA (mid-page) ──────────── -->
+<section class="download-cta">
+  <div class="container">
+    <div class="download-cta-inner">
+      <div class="row">
+        <div class="doc-ic"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="8" y1="13" x2="16" y2="13"/><line x1="8" y1="17" x2="16" y2="17"/></svg></div>
+        <div>
+          <h3>Want to see the architecture in detail?</h3>
+          <p>Download the EU e-invoicing integration guide — ERP-by-ERP connector inventory, mandate-by-mandate format reference, mapping methodology, and a sample 4-week deployment plan.</p>
+        </div>
+      </div>
+      <a href="#" class="pill ghost">Download fact sheet <span class="arr">↓</span></a>
+    </div>
+  </div>
+</section>
+
+<!-- ──────────── TESTIMONIALS ──────────── -->
+<section id="testimonials" class="testimonials">
+  <div class="container">
+    <div class="head">
+      <div class="section-eyebrow">Customer wins</div>
+      <h2 class="section-title">Enterprises live <span class="h1-grad em">across every major ERP</span></h2>
+      <p class="section-sub">Real deployments in real ERP environments — across multiple geographies, mandates, and integration models.</p>
+    </div>
+    <div class="testimonials-grid">
+      <div class="testimonial">
+        <div class="logo-row">
+          <div style="font-family: var(--font-display); font-weight: 700; font-size: 20px; color: var(--ct-purple-deep);">Salam Telco</div>
+          <span class="erp-stack">SAP S/4HANA · 8 systems</span>
+        </div>
+        <blockquote>Salam's search for a reliable partner ended with ClearTax. Their tailored solutions ensured a smooth transition for all 8 of our systems in just 3 months.</blockquote>
+        <div class="who">
+          <div class="av">A</div>
+          <div>
+            <div class="nm">Arslan Choudhary</div>
+            <div class="ttl">Director of Enterprise Enablement, Salam Telco</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="testimonial">
+        <div class="logo-row">
+          <div style="font-family: var(--font-display); font-weight: 700; font-size: 20px; color: var(--ct-purple-deep);">Gamuda Land</div>
+          <span class="erp-stack">Multi-ERP · mixed landscape</span>
+        </div>
+        <blockquote>Collaborating with ClearTax was an exceptional experience. They streamlined the entire process, even under tight deadlines, for our diverse ERP systems.</blockquote>
+        <div class="who">
+          <div class="av">V</div>
+          <div>
+            <div class="nm">V Bharathy</div>
+            <div class="ttl">Manager, Finance Applications, Gamuda Land</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="testimonial">
+        <div class="logo-row">
+          <div style="font-family: var(--font-display); font-weight: 700; font-size: 20px; color: var(--ct-purple-deep);">Puma</div>
+          <span class="erp-stack">SAP S/4HANA</span>
+        </div>
+        <blockquote>ClearTax is simplifying e-invoicing. They enabled us to implement the e-invoicing system in time and handled all our business complexities with ease.</blockquote>
+        <div class="who">
+          <div class="av">R</div>
+          <div>
+            <div class="nm">Raj Kiran</div>
+            <div class="ttl">Head of Taxation &amp; Retail Finance, Puma</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="testimonial">
+        <div class="logo-row">
+          <div style="font-family: var(--font-display); font-weight: 700; font-size: 20px; color: var(--ct-purple-deep);">Zamil Industrial</div>
+          <span class="erp-stack">SAP ECC · Multi-entity</span>
+        </div>
+        <blockquote>We appreciate ClearTax for successfully completing the complex integration. Their platform enabled seamless management of multiple ERP units.</blockquote>
+        <div class="who">
+          <div class="av">A</div>
+          <div>
+            <div class="nm">Abdulbary Atassi</div>
+            <div class="ttl">Director of IT, Zamil Industrial</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ──────────── PILLARS — what makes it possible ──────────── -->
+<section id="pillars" class="pillars">
+  <div class="container">
+    <div class="head">
+      <div class="section-eyebrow">Why ClearTax</div>
+      <h2 class="section-title">What it takes to make this <span class="h1-grad em">actually work across ERPs</span></h2>
+      <p class="section-sub">Three pillars that separate a real, ERP-native connector from a glued-on integration.</p>
+    </div>
+    <div class="pillars-grid">
+      <div class="pillar-card">
+        <div class="ill">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2 2 7l10 5 10-5-10-5z"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg>
+        </div>
+        <h3>Native to every ERP</h3>
+        <p>Each connector uses the target ERP's own extension model — ABAP namespace for SAP, LCS package for Dynamics, SuiteApp for NetSuite, 4GL for Sage X3, OIC for Oracle Fusion. No external middleware to maintain, no proprietary connector layer between your finance system and ClearTax.</p>
+      </div>
+      <div class="pillar-card b">
+        <div class="ill">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15 15 0 0 1 0 20M12 2a15 15 0 0 0 0 20"/></svg>
+        </div>
+        <h3>One integration. Every mandate.</h3>
+        <p>Once any ClearTax connector is in your ERP landscape, every supported geography is config — not code. France goes live this year, Germany next, Poland the year after — all from the same integration. You never re-open the ERP project to bolt on a new country.</p>
+      </div>
+      <div class="pillar-card c">
+        <div class="ill">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2 4 5v7c0 5 3.5 9 8 10 4.5-1 8-5 8-10V5l-8-3z"/><path d="m9 12 2 2 4-4"/></svg>
+        </div>
+        <h3>Full compliance, full control</h3>
+        <p>Every transaction is auditable end-to-end inside your ERP. Status writeback to standard or custom fields, mandatory archival per local rules, role-based access mapped to your ERP's existing roles, and a full audit trail of who submitted what — all stored where your auditors already look, not in a black-box third-party cloud.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ──────────── FINAL CTA + FORM ──────────── -->
+<section id="contact" class="final-cta">
+  <div class="container">
+    <div class="section-head">
+      <div class="section-eyebrow">Talk to us</div>
+      <h2 class="section-title">Get a walkthrough <span class="h1-grad em">tailored to your ERP and mandates</span></h2>
+      <p class="section-sub">Our certified specialists will scope your environment, demo the relevant connector inside a sandbox, and give you an honest 4–6 week deployment plan.</p>
+    </div>
+    <div class="cta-grid">
+      <div class="cta-points">
+        <div class="cta-pt">
+          <div class="ic-lg"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 10h18M9 4v16"/></svg></div>
+          <div><h4>ERP-certified delivery</h4><p>Consultants certified on your ERP — ABAP, X++/AL, SuiteScript, OIC, 4GL. Not generic CSMs.</p></div>
+        </div>
+        <div class="cta-pt">
+          <div class="ic-lg"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>
+          <div><h4>4–6 week go-live</h4><p>Standard SAP, Oracle, Dynamics and NetSuite setups deploy in 4–6 weeks via native extension models.</p></div>
+        </div>
+        <div class="cta-pt">
+          <div class="ic-lg"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15 15 0 0 1 0 20M12 2a15 15 0 0 0 0 20"/></svg></div>
+          <div><h4>One platform · every EU mandate</h4><p>France, Belgium, Poland, Germany, Spain, Italy, Romania, Netherlands — one connector covers them all.</p></div>
+        </div>
+        <div class="cta-pt">
+          <div class="ic-lg"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg></div>
+          <div><h4>Zero ERP disruption</h4><p>Deployed through your ERP's native extension model. No core modifications. ERP support stays unaffected.</p></div>
+        </div>
+      </div>
+
+      <form class="demo-form" onsubmit="event.preventDefault(); document.getElementById('demo-success').style.display='block'; this.style.display='none';">
+        <h3>Book a demo</h3>
+        <div class="sub">Our specialists will walk you through the connector and scope your deployment.</div>
+        <div class="field"><label>Full name <span class="req">*</span></label><input type="text" placeholder="Your name" required></div>
+        <div class="field"><label>Phone number <span class="req">*</span></label>
+          <div class="phone-input">
+            <select>
+              <option>France (+33)</option><option>Belgium (+32)</option><option>Germany (+49)</option>
+              <option>Spain (+34)</option><option>Italy (+39)</option><option>Poland (+48)</option>
+              <option>Netherlands (+31)</option><option>UK (+44)</option><option>Romania (+40)</option>
+              <option>Portugal (+351)</option><option>Croatia (+385)</option><option>Hungary (+36)</option>
+              <option>USA (+1)</option><option>UAE (+971)</option><option>Saudi (+966)</option><option>India (+91)</option>
+            </select>
+            <input type="tel" placeholder="Phone number" required>
+          </div>
+        </div>
+        <div class="field-row">
+          <div class="field"><label>Company email <span class="req">*</span></label><input type="email" placeholder="you@company.com" required></div>
+          <div class="field"><label>Company name <span class="req">*</span></label><input type="text" placeholder="Company name" required></div>
+        </div>
+        <div class="field-row">
+          <div class="field"><label>Your ERP <span class="req">*</span></label>
+            <select required>
+              <option value="">Select your ERP</option>
+              <optgroup label="SAP">
+                <option>SAP S/4HANA Cloud (Private Edition)</option>
+                <option>SAP S/4HANA on-premise</option>
+                <option>SAP S/4HANA Public Cloud</option>
+                <option>SAP ECC 6.0 (EHP7+)</option>
+                <option>SAP Business One</option>
+                <option>SAP ByDesign</option>
+              </optgroup>
+              <optgroup label="Oracle">
+                <option>Oracle Fusion Cloud</option>
+                <option>Oracle E-Business Suite (EBS)</option>
+                <option>Oracle NetSuite</option>
+                <option>Oracle PeopleSoft</option>
+                <option>Oracle JD Edwards</option>
+              </optgroup>
+              <optgroup label="Microsoft">
+                <option>Dynamics 365 Finance &amp; Operations</option>
+                <option>Dynamics 365 Business Central</option>
+              </optgroup>
+              <optgroup label="Sage">
+                <option>Sage X3</option>
+                <option>Sage 100 / 100c</option>
+                <option>Sage 50</option>
+              </optgroup>
+              <optgroup label="Other ERPs">
+                <option>Infor M3</option>
+                <option>Infor LN</option>
+                <option>Workday Financials</option>
+                <option>Odoo</option>
+                <option>Cegid</option>
+                <option>Unit4</option>
+                <option>Epicor</option>
+                <option>IFS</option>
+                <option>SYSPRO</option>
+                <option>QAD</option>
+                <option>Acumatica</option>
+                <option>Multi-ERP / mixed landscape</option>
+                <option>Custom / in-house</option>
+                <option>Other</option>
+              </optgroup>
+            </select>
+          </div>
+          <div class="field"><label>Mandate scope</label>
+            <select>
+              <option>France (DGFiP)</option>
+              <option>Belgium (Peppol)</option>
+              <option>Poland (KSeF)</option>
+              <option>Germany (XRechnung/ZUGFeRD)</option>
+              <option>Spain (Verifactu / B2B)</option>
+              <option>Italy (SDI)</option>
+              <option>Romania (RO e-Factura)</option>
+              <option>Netherlands (Peppol)</option>
+              <option>Multi-country EU</option>
+              <option>EU + GCC (KSA, UAE)</option>
+            </select>
+          </div>
+        </div>
+        <label class="agree">
+          <input type="checkbox" required>
+          <span>I agree to ClearTax's <a href="#">Privacy Policy</a> and <a href="#">Terms of Service</a>, and consent to receiving communications about ClearTax products and e-invoicing updates.</span>
+        </label>
+        <button type="submit" class="pill">Book a Demo <span class="arr">→</span></button>
+        <div class="footnote">No spam. Just a 30-min call with our certified specialists.</div>
+      </form>
+      <div id="demo-success" style="display:none;background:#fff;border-radius:24px;padding:48px;text-align:center;border:1px solid var(--ct-line);box-shadow:0 30px 80px rgba(48,27,94,.12)">
+        <div style="width:64px;height:64px;border-radius:50%;background:var(--ct-purple-deep);color:#fff;display:grid;place-items:center;margin:0 auto 20px;">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+        </div>
+        <h3 style="font-family:var(--font-display);font-weight:500;font-size:24px;color:var(--ct-purple-deep);margin-bottom:10px">Thanks!</h3>
+        <p style="color:var(--ct-muted);font-size:14px;line-height:1.6">Our team will reach out within one business day with a tailored onboarding scope and a sandbox walkthrough for your ERP.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ──────────── FAQ ──────────── -->
+<section id="faq" class="faq">
+  <div class="container">
+    <div class="head">
+      <div class="section-eyebrow">FAQ</div>
+      <h2 class="section-title">Multi-ERP, multi-mandate — <span class="h1-grad em">straight answers</span></h2>
+      <p class="section-sub">The questions we get asked most by finance leads, ERP architects and CIOs scoping their EU e-invoicing project.</p>
+    </div>
+    <div class="faq-list">
+
+      <details class="faq-item" open>
+        <summary>How does ClearTax integrate with my ERP, exactly?<span class="chev"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></span></summary>
+        <div class="faq-body">
+          It depends on which ERP you run — but the pattern is consistent: ClearTax uses your ERP's native extension model, so deployment looks like any other change in your existing release process.
+          <ul>
+            <li><b>SAP</b> — ABAP add-on in the <code>/CLEARTAX/*</code> namespace, transported via STMS like any support pack</li>
+            <li><b>Oracle Fusion</b> — REST API ingestion + FBDI bulk loads, deployed through Oracle Integration Cloud (OIC)</li>
+            <li><b>Oracle EBS</b> — concurrent programs invoked from AR/AP open interfaces, with custom EXT-table writeback</li>
+            <li><b>NetSuite</b> — managed SuiteApp listed on SuiteCloud, SuiteScript triggers on invoice creation</li>
+            <li><b>Dynamics 365 F&amp;O</b> — X++ extension deployed through LCS, with event handlers on invoice posting</li>
+            <li><b>Dynamics 365 Business Central</b> — AppSource extension in AL, with page and table extensions</li>
+            <li><b>Sage X3</b> — 4GL extension on SINVOICE / PINVOICE, transported through standard Sage patches</li>
+            <li><b>Other ERPs</b> — REST API push (JSON/XML), OData v4 endpoint, or iPaaS integration (MuleSoft, Boomi, CPI, Azure Logic Apps)</li>
+          </ul>
+          Whichever path, the result is the same: no core ERP modifications, no proprietary middleware, no impact on your ERP vendor support.
+        </div>
+      </details>
+
+      <details class="faq-item">
+        <summary>Which ERPs do you support?<span class="chev"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></span></summary>
+        <div class="faq-body">
+          <b>60+ certified connectors</b>, plus a global REST API for everything else. The top tier:
+          <ul>
+            <li><b>SAP</b> — ECC 6.0 EHP7+, S/4HANA 1709–2023, S/4HANA Cloud (Private &amp; Public Editions), Business One, ByDesign</li>
+            <li><b>Oracle</b> — Fusion Cloud Financials, E-Business Suite R12, NetSuite, PeopleSoft, JD Edwards</li>
+            <li><b>Microsoft Dynamics</b> — 365 Finance &amp; Operations, 365 Business Central</li>
+            <li><b>Sage</b> — X3, 100, 100c, 50</li>
+            <li><b>Mid-market &amp; vertical</b> — Infor M3, Infor LN, Workday Financials, Odoo, Cegid, Unit4, Epicor, IFS, SYSPRO, QAD, Acumatica, Priority, Tally, Zoho Books</li>
+          </ul>
+          Don't see yours? The global REST API works with any system that can emit invoice data — including custom in-house ERPs and home-grown billing platforms.
+        </div>
+      </details>
+
+      <details class="faq-item">
+        <summary>We run multiple ERPs across subsidiaries. Can ClearTax consolidate them?<span class="chev"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></span></summary>
+        <div class="faq-body">
+          Yes — this is one of the most common patterns we deploy. A typical multi-ERP setup: SAP S/4HANA at HQ, NetSuite at acquired subsidiaries, Sage in a regional finance shared-service centre. Each entity uses its own connector, but everything funnels into the <b>same ClearTax Compliance Cloud</b>, with the same unified cockpit, the same audit trail, the same compliance reporting.<br><br>
+          Your tax team sees one consolidated view of pending submissions, failed validations, and status by entity — regardless of which ERP issued the invoice. Auditors get one trail. CFOs get one dashboard. Most importantly: you don't license a separate compliance vendor for each ERP.
+        </div>
+      </details>
+
+      <details class="faq-item">
+        <summary>How does this compare to my ERP's native compliance tooling?<span class="chev"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></span></summary>
+        <div class="faq-body">
+          Every major ERP vendor has built some flavour of native compliance tooling — SAP has Document &amp; Reporting Compliance (DRC), Oracle has Tax Reporting Cloud, Microsoft has Electronic Reporting (ER), Sage bundles a France PA. They work well in narrow scenarios. <b>ClearTax is the alternative when:</b>
+          <ul>
+            <li>You need <b>mandates the native tool doesn't yet cover</b> (or covers with significant limitations)</li>
+            <li>You want <b>one platform for all geographies</b> — not separate country licences from each ERP vendor</li>
+            <li>You operate <b>multiple ERPs</b> and need a single compliance posture across them</li>
+            <li>You need <b>confirmed PA accreditation in France</b> — most ERP-native tools are not Plateformes Agréées</li>
+            <li>You want a <b>faster go-live</b> than the ERP vendor's own integration partner typically delivers</li>
+          </ul>
+          ClearTax also coexists fine with native tools — run native for one country, ClearTax for the rest. We see this often.
+        </div>
+      </details>
+
+      <details class="faq-item">
+        <summary>Which EU mandates are covered?<span class="chev"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></span></summary>
+        <div class="faq-body">
+          Every major EU mandate, live or imminent:
+          <ul>
+            <li><b>France</b> — DGFiP, mandatory September 2026. ClearTax is a confirmed Plateforme Agréée (PA)</li>
+            <li><b>Belgium</b> — Peppol BIS 3.0, B2B mandate live January 2026</li>
+            <li><b>Poland</b> — KSeF, mandatory February 2026 (large) / April 2026 (SME)</li>
+            <li><b>Germany</b> — Phased rollout 2025–2028 (receive obligation already in force, issuance phased by turnover)</li>
+            <li><b>Spain</b> — Verifactu live for invoice systems, B2B mandate approved (technical regs pending)</li>
+            <li><b>Italy</b> — SDI (live since 2019), FatturaPA format</li>
+            <li><b>Romania</b> — RO e-Factura (CTC model, live since July 2024)</li>
+            <li><b>Croatia</b> — Phased through 2026</li>
+            <li><b>Netherlands</b> — Peppol-based, aligned to EU ViDA timeline</li>
+            <li><b>Plus</b> — Portugal, Hungary, Slovakia, Bulgaria, and the wider international stack (UAE FTA, Saudi ZATCA, India GST IRP)</li>
+          </ul>
+          New mandates are added through configuration in the Compliance Cloud — not as new development projects in your ERP.
+        </div>
+      </details>
+
+      <details class="faq-item">
+        <summary>What about Germany's phased rollout and Spain's Verifactu vs B2B regime?<span class="chev"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></span></summary>
+        <div class="faq-body">
+          <b>Germany</b> phases the e-invoicing obligation by turnover and date:
+          <ul>
+            <li><b>Jan 2025</b> — all VAT-registered businesses must be able to <i>receive</i> structured e-invoices (EN 16931 / XRechnung / ZUGFeRD)</li>
+            <li><b>Jan 2027</b> — issuance becomes mandatory for businesses with &gt;€800K annual turnover</li>
+            <li><b>Jan 2028</b> — issuance becomes mandatory for all businesses</li>
+          </ul>
+          ClearTax supports both XRechnung and ZUGFeRD formats, and routes via Peppol for cross-border flows.<br><br>
+          <b>Spain</b> runs two parallel regimes:
+          <ul>
+            <li><b>Verifactu</b> (the invoice-billing-system requirements under Royal Decree 1007/2023) — already live, voluntary in 2026, mandatory phased thereafter</li>
+            <li><b>B2B mandate</b> — approved under the Crea y Crece law, awaiting final technical regulations (expected 2026/27)</li>
+          </ul>
+          ClearTax covers both — including the regional TicketBAI regimes in the Basque Country and Navarre, plus FacturaE for B2G.
+        </div>
+      </details>
+
+      <details class="faq-item">
+        <summary>What's the architecture between our ERP and the ClearTax cloud?<span class="chev"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></span></summary>
+        <div class="faq-body">
+          <b>Outbound (ERP → ClearTax):</b> the ERP-native connector triggers on invoice creation and pushes a structured payload over an authenticated HTTPS connection to the ClearTax Compliance Cloud. Real-time for high-priority flows, batch for bulk runs.<br><br>
+          <b>ClearTax cloud:</b> converts to the target format (UBL 2.1 / CII / Factur-X / FA(2) / FatturaPA / XRechnung / ZUGFeRD / Peppol BIS), validates against the relevant schema and business rules, submits to the tax authority (DGFiP / KSeF / SDI / ANAF / BMF / AEAT / Peppol AP), and persists the lifecycle status.<br><br>
+          <b>Inbound (ClearTax → ERP):</b> status writeback through the same authenticated channel, updating ERP-specific fields (Z-tables in SAP, EXT tables in Oracle EBS, custom records in NetSuite, table extensions in Business Central).<br><br>
+          Hosting: ClearTax runs in the geographic region your data residency requirements demand. For EU customers, the EU AWS regions.
+        </div>
+      </details>
+
+      <details class="faq-item">
+        <summary>How is data residency and security handled for EU customers?<span class="chev"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></span></summary>
+        <div class="faq-body">
+          ClearTax is <b>ISO 27001</b> and <b>SOC 2 Type II</b> certified. For EU customers, all production data stays in EU AWS regions and never crosses the boundary. Transit is TLS 1.3, at rest is AES-256. GDPR-compliant data handling throughout — DPA available, sub-processor list published, right-to-erasure workflows in place. Authentication is OAuth 2.0 with rotating tokens, optionally hardened with mTLS for high-sensitivity deployments. Role-based access in the cockpit maps to your ERP's existing role model (SAP PFCG, Oracle roles, Dynamics security roles, NetSuite roles).
+        </div>
+      </details>
+
+      <details class="faq-item">
+        <summary>What does a typical 4–6 week deployment actually look like?<span class="chev"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></span></summary>
+        <div class="faq-body">
+          <ol>
+            <li><b>Week 1 — Scope &amp; design.</b> Workshop with your ERP, finance and tax leads. Output flow review. Custom field inventory. Sign-off on field-mapping draft from the AI agent.</li>
+            <li><b>Week 2 — Deploy to DEV.</b> Connector installed via the ERP's native deployment path. API destinations configured. Field mapping refined. First test invoices submitted to sandbox tax authority.</li>
+            <li><b>Week 3 — Deploy to QA.</b> UAT with your tax and AR teams using real production-shape data. Edge cases identified and resolved.</li>
+            <li><b>Week 4 — Parallel run.</b> Production invoices submitted in parallel (mirror mode), comparing ClearTax output to your existing process.</li>
+            <li><b>Week 5–6 — Go-live.</b> Production cutover. Hypercare period with daily check-ins. Handover to ongoing support.</li>
+          </ol>
+          Multi-entity, multi-country, or heavily customised environments take longer — a 10-week plan is realistic for 5+ entities across 3+ mandates. Honest scoping happens on the first call.
+        </div>
+      </details>
+
+      <details class="faq-item">
+        <summary>What happens when the mandate changes — does that need a new ERP project?<span class="chev"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></span></summary>
+        <div class="faq-body">
+          No. Mandate changes are handled <b>in the ClearTax cloud</b>, not in your ERP. When DGFiP publishes External Specs v3.2, when KSeF adds a validation rule, when Germany finalises its phase-2 schemas — ClearTax updates the format engine and validation library, and your ERP connector continues sending the same structured payload it always did. The translation layer absorbs the change. Your ERP team rarely needs to ship a new release. This is the core architectural value of keeping mandate-specific complexity outside your ERP.
+        </div>
+      </details>
+
+      <details class="faq-item">
+        <summary>Can we test against sandbox tax authorities before going live?<span class="chev"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></span></summary>
+        <div class="faq-body">
+          Yes — and we strongly recommend it. ClearTax's DEV and QA environments connect to the official sandbox endpoints for every supported mandate (DGFiP PiSte, KSeF demo, ANAF test, BMF test bed, AEAT pre-production, Peppol test corner). You can run your real ERP invoices through the full pipeline before flipping production. This is also where AI-mapped fields get validated against real schema responses.
+        </div>
+      </details>
+
+      <details class="faq-item">
+        <summary>What is your pricing model?<span class="chev"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></span></summary>
+        <div class="faq-body">
+          Subscription-based, scaling with annual invoice volume, the number of mandates in scope, and the number of distinct ERPs to integrate. The model is predictable: a platform fee, a volume tier, per-mandate enablement, and per-connector deployment. One-time professional services for the ERP integration project, scoped after the workshop in week 1. <b>Contact our team</b> for a tailored quote, an ROI simulation against your current state, and a deployment scope for your specific ERP landscape and target mandates.
+        </div>
+      </details>
+
+    </div>
+  </div>
+</section>
+
+
+<!-- ──────────── MERGED ERP DETAILS — all 10 deep-dives ──────────── -->
+<section id="erp-details" class="erp-details">
+  <div class="container">
+    <div class="section-head">
+      <div class="section-eyebrow">ERP deep-dive</div>
+      <h2 class="section-title">Architecture &amp; integration details — <span class="h1-grad em">all 10 ERPs</span></h2>
+      <p class="section-sub">How ClearTax integrates with each ERP, what versions are supported, and what your basis or IT team needs to know.</p>
+    </div>
+
+    <div class="erp-detail-block" id="erp-sap">
+      <div class="erp-detail-head">
+        <div class="left">
+          <span class="erp-tier-tag t1">Tier 1 — Enterprise ERP</span>
+          <h3>ClearTax for <span class='em h1-grad'>SAP</span></h3>
+          <div class="erp-strap">Native ABAP add-on · /CLEARTAX/* namespace</div>
+        </div>
+        <a href="#contact" class="pill">Book a Demo <span class="arr">→</span></a>
+      </div>
+      <div class="erp-detail-body">
+        <div class="copy">
+            <p>ClearTax for SAP ships as a <b>native ABAP add-on</b> in the dedicated <code>/CLEARTAX/*</code> namespace, transported through your existing STMS landscape like any other support pack. Your basis team treats deployment as a standard transport — no core SAP modifications, no impact on SAP vendor support.</p>
+            <p>Under the hood, the add-on reads from <b>VBRK, BSEG, BKPF, ACDOCA</b> through standard SAP objects, with BAdI hooks at every key extension point (output determination, document creation, status update). Real-time ingestion via OData and RFC; batch via IDoc INVOIC02. The AI mapping agent reads your output determination and Z-fields, producing a draft mapping for your team to review.</p>
+            <p>A Fiori-style cockpit launched from SAP launchpad gives tax and AR teams a single pane of glass — failed validations, pending submissions, status by company code, by VAT registration, by mandate — with role-based access via PFCG. <b>Coexists with SAP Document & Reporting Compliance (DRC)</b>: run DRC for one country, ClearTax for the rest.</p>
+        </div>
+        <div class="erp-spec-card-merged">
+          <h4>Technical reference</h4>
+          <div class="spec-row"><span class="k">Versions</span><span class="v">ECC 6.0 EHP7+ · S/4HANA 1709–2023</span></div>
+          <div class="spec-row"><span class="k">Cloud editions</span><span class="v">S/4HANA Cloud Private &amp; Public</span></div>
+          <div class="spec-row"><span class="k">Deployment</span><span class="v">STMS · SAINT/SPAM import</span></div>
+          <div class="spec-row"><span class="k">Primary tables</span><span class="v">VBRK · BSEG · BKPF · ACDOCA</span></div>
+          <div class="spec-row"><span class="k">Interfaces</span><span class="v">IDoc INVOIC02 · BAPI · OData · RFC</span></div>
+          <div class="spec-row"><span class="k">Extensibility</span><span class="v">BAdI hooks · BTE 00503301</span></div>
+          <div class="spec-row"><span class="k">Auth</span><span class="v">PFCG roles · SAP IAM</span></div>
+          <div class="spec-row"><span class="k">Typical go-live</span><span class="v">4–6 weeks</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="erp-detail-block" id="erp-oracle">
+      <div class="erp-detail-head">
+        <div class="left">
+          <span class="erp-tier-tag t1">Tier 1 — Enterprise ERP</span>
+          <h3>ClearTax for <span class='em h1-grad'>Oracle</span></h3>
+          <div class="erp-strap">Fusion · EBS · NetSuite · JD Edwards · PeopleSoft</div>
+        </div>
+        <a href="#contact" class="pill">Book a Demo <span class="arr">→</span></a>
+      </div>
+      <div class="erp-detail-body">
+        <div class="copy">
+            <p>ClearTax integrates with Oracle's full enterprise stack through native interfaces the Oracle community already trusts. For <b>Oracle Fusion Cloud Financials</b>, the connector ingests invoices via REST API and FBDI bulk loads, deploying through Oracle Integration Cloud (OIC).</p>
+            <p>For <b>Oracle E-Business Suite R12</b>, ClearTax uses concurrent programs invoked from the AR/AP open interface tables — the same pattern your team already uses for any custom EBS integration. Status writeback happens through <code>GL_INTERFACE_CONTROL</code> and custom EXT tables, linked to your existing invoice lifecycle.</p>
+            <p>Multi-mandate coverage is the same as everywhere else on ClearTax: France, Belgium, Poland, Germany, Spain, Italy, Romania, and the wider international stack — all from the same Oracle connector.</p>
+        </div>
+        <div class="erp-spec-card-merged">
+          <h4>Technical reference</h4>
+          <div class="spec-row"><span class="k">Products</span><span class="v">Fusion Cloud · EBS R12 · JD Edwards · PeopleSoft</span></div>
+          <div class="spec-row"><span class="k">Fusion ingestion</span><span class="v">REST API · FBDI · OIC</span></div>
+          <div class="spec-row"><span class="k">EBS ingestion</span><span class="v">Concurrent programs · AP/AR open interface</span></div>
+          <div class="spec-row"><span class="k">Status writeback</span><span class="v">GL_INTERFACE_CONTROL · EXT tables</span></div>
+          <div class="spec-row"><span class="k">Auth</span><span class="v">OAuth 2.0 · role-based</span></div>
+          <div class="spec-row"><span class="k">Typical go-live</span><span class="v">4–6 wk (Fusion) · 6–8 wk (EBS)</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="erp-detail-block" id="erp-dynamics">
+      <div class="erp-detail-head">
+        <div class="left">
+          <span class="erp-tier-tag t1">Tier 1 — Enterprise ERP</span>
+          <h3>ClearTax for <span class='em h1-grad'>Microsoft Dynamics</span></h3>
+          <div class="erp-strap">F&amp;O · Business Central</div>
+        </div>
+        <a href="#contact" class="pill">Book a Demo <span class="arr">→</span></a>
+      </div>
+      <div class="erp-detail-body">
+        <div class="copy">
+            <p>ClearTax for Dynamics ships as a certified extension through each product's native deployment path. For <b>Dynamics 365 Finance &amp; Operations</b>, it's an X++ extension deployed via LCS as a versioned package, with event handlers on Invoice posting and Electronic Reporting (ER) configurations for the local mandate formats.</p>
+            <p>For <b>Dynamics 365 Business Central</b>, ClearTax is published on AppSource as a managed extension in AL. Page extensions add lifecycle status to the Customer Invoice page, table extensions persist compliance data alongside standard records, and OnAfterPostInvoice event subscribers trigger submission automatically.</p>
+            <p>Multi-company support works out of the box — operating across <code>DataAreaId</code> boundaries in F&amp;O and across Tenant/Environment in Business Central. Same Compliance Cloud, same EU mandate coverage.</p>
+        </div>
+        <div class="erp-spec-card-merged">
+          <h4>Technical reference</h4>
+          <div class="spec-row"><span class="k">Products</span><span class="v">D365 F&amp;O · D365 Business Central</span></div>
+          <div class="spec-row"><span class="k">F&amp;O language</span><span class="v">X++ · ER configurations</span></div>
+          <div class="spec-row"><span class="k">F&amp;O deployment</span><span class="v">LCS deployable package</span></div>
+          <div class="spec-row"><span class="k">BC language</span><span class="v">AL · page &amp; table extensions</span></div>
+          <div class="spec-row"><span class="k">BC deployment</span><span class="v">AppSource-listed extension</span></div>
+          <div class="spec-row"><span class="k">Primary tables</span><span class="v">CustInvoiceJour · VendInvoiceJour</span></div>
+          <div class="spec-row"><span class="k">Typical go-live</span><span class="v">4–6 weeks</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="erp-detail-block" id="erp-netsuite">
+      <div class="erp-detail-head">
+        <div class="left">
+          <span class="erp-tier-tag t1">Tier 1 — Enterprise ERP</span>
+          <h3>ClearTax for <span class='em h1-grad'>NetSuite</span></h3>
+          <div class="erp-strap">Managed SuiteApp · SuiteScript 2.1</div>
+        </div>
+        <a href="#contact" class="pill">Book a Demo <span class="arr">→</span></a>
+      </div>
+      <div class="erp-detail-body">
+        <div class="copy">
+            <p>ClearTax for NetSuite is a <b>managed SuiteApp</b> listed on SuiteCloud — installed from your NetSuite account in a few clicks, updated automatically when ClearTax ships releases. No bundle imports to manage, no script files to maintain.</p>
+            <p>Under the hood, SuiteScript 2.1 user-event scripts trigger on Invoice creation and editing. Custom records persist compliance state — submission status, lifecycle codes, mandate-specific identifiers — alongside the standard invoice transaction. Role-based access uses NetSuite's native role model, so your authorisation team controls who sees what.</p>
+            <p>OneWorld customers benefit most: a single SuiteApp covers every subsidiary's mandates, with consolidated reporting at the parent level. Same EU mandate coverage as the rest of the ClearTax platform.</p>
+        </div>
+        <div class="erp-spec-card-merged">
+          <h4>Technical reference</h4>
+          <div class="spec-row"><span class="k">Product</span><span class="v">Oracle NetSuite (cloud)</span></div>
+          <div class="spec-row"><span class="k">Distribution</span><span class="v">Managed SuiteApp on SuiteCloud</span></div>
+          <div class="spec-row"><span class="k">Language</span><span class="v">SuiteScript 2.1</span></div>
+          <div class="spec-row"><span class="k">Packaging</span><span class="v">SDF-packaged · IDE-ready</span></div>
+          <div class="spec-row"><span class="k">Editions</span><span class="v">Standard · OneWorld · multi-subsidiary</span></div>
+          <div class="spec-row"><span class="k">Auth</span><span class="v">OAuth 2.0 · role-based</span></div>
+          <div class="spec-row"><span class="k">Typical go-live</span><span class="v">4 weeks</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="erp-detail-block" id="erp-sage">
+      <div class="erp-detail-head">
+        <div class="left">
+          <span class="erp-tier-tag t1">Tier 1 — Enterprise ERP</span>
+          <h3>ClearTax for <span class='em h1-grad'>Sage</span></h3>
+          <div class="erp-strap">Sage X3 · 100 · 100c · 50</div>
+        </div>
+        <a href="#contact" class="pill">Book a Demo <span class="arr">→</span></a>
+      </div>
+      <div class="erp-detail-body">
+        <div class="copy">
+            <p>Sage's product portfolio spans tiers, and ClearTax integrates with each through its native extension model. <b>Sage X3</b> gets a 4GL extension on Sales Invoicing (SINVOICE) and Supplier Invoicing (PINVOICE) functions, with subprograms for lifecycle status writeback.</p>
+            <p><b>Sage 100 and 100c</b> use the Sage e-Business API for real-time invoice push, with scheduled batch processing available for high-volume cycles. <b>Sage 50</b> integrates through standard import/export channels.</p>
+            <p>ClearTax is often chosen by Sage customers who need <b>multi-country coverage</b> beyond what Sage's bundled France PA delivers — France + Belgium + Poland + Germany on one platform. The two coexist fine: use Sage's native PA for domestic French flows, ClearTax for cross-border and Peppol-routed cases.</p>
+        </div>
+        <div class="erp-spec-card-merged">
+          <h4>Technical reference</h4>
+          <div class="spec-row"><span class="k">Products</span><span class="v">Sage X3 · 100 · 100c · 50</span></div>
+          <div class="spec-row"><span class="k">X3 extension</span><span class="v">4GL · SADOSSIER patches</span></div>
+          <div class="spec-row"><span class="k">Sage 100 API</span><span class="v">Sage e-Business API · ObjetSage</span></div>
+          <div class="spec-row"><span class="k">Primary functions</span><span class="v">SINVOICE · PINVOICE</span></div>
+          <div class="spec-row"><span class="k">Mode</span><span class="v">Real-time push · scheduled batch</span></div>
+          <div class="spec-row"><span class="k">vs Sage's native PA</span><span class="v">Best for multi-country</span></div>
+          <div class="spec-row"><span class="k">Typical go-live</span><span class="v">3–5 weeks</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="erp-detail-block" id="erp-infor">
+      <div class="erp-detail-head">
+        <div class="left">
+          <span class="erp-tier-tag t2">Tier 2 — Mid-market & specialist</span>
+          <h3>ClearTax for <span class='em h1-grad'>Infor</span></h3>
+          <div class="erp-strap">Infor M3 · Infor LN · ION-integrated</div>
+        </div>
+        <a href="#contact" class="pill">Book a Demo <span class="arr">→</span></a>
+      </div>
+      <div class="erp-detail-body">
+        <div class="copy">
+            <p>Infor's stack is built around <b>ION as the integration backbone</b>, and ClearTax plugs in there. For <b>Infor M3</b>, a native add-on handles real-time invoice extraction with MEC-style mappings for custom fields. For <b>Infor LN</b>, integration runs through BOD (Business Object Documents) exchanged via ION.</p>
+            <p>Status writeback flows back through ION to the source ERP, keeping the AR team's view consistent with what they already use. Multi-tenant and multi-entity setups are handled natively — common for the manufacturing and distribution customers who run Infor at scale.</p>
+        </div>
+        <div class="erp-spec-card-merged">
+          <h4>Technical reference</h4>
+          <div class="spec-row"><span class="k">Products</span><span class="v">Infor M3 · Infor LN · SyteLine</span></div>
+          <div class="spec-row"><span class="k">Integration backbone</span><span class="v">Infor ION (OS Portal)</span></div>
+          <div class="spec-row"><span class="k">M3 ingestion</span><span class="v">Native add-on · MEC mapping</span></div>
+          <div class="spec-row"><span class="k">LN ingestion</span><span class="v">BOD-based via ION</span></div>
+          <div class="spec-row"><span class="k">Status writeback</span><span class="v">Through ION to source ERP</span></div>
+          <div class="spec-row"><span class="k">Typical go-live</span><span class="v">5–7 weeks</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="erp-detail-block" id="erp-workday">
+      <div class="erp-detail-head">
+        <div class="left">
+          <span class="erp-tier-tag t2">Tier 2 — Mid-market & specialist</span>
+          <h3>ClearTax for <span class='em h1-grad'>Workday</span></h3>
+          <div class="erp-strap">Workday Financials · REST + EIB</div>
+        </div>
+        <a href="#contact" class="pill">Book a Demo <span class="arr">→</span></a>
+      </div>
+      <div class="erp-detail-body">
+        <div class="copy">
+            <p>ClearTax for Workday Financials uses Workday's published REST API for invoice extraction in real time, combined with <b>Enterprise Interface Builder (EIB)</b> for high-volume scheduled batch flows. Custom report extractions handle the inevitable non-standard fields that finance teams accumulate.</p>
+            <p>Status writeback uses the same EIB pattern in the inbound direction, updating Workday business objects with lifecycle status. OAuth 2.0 with a dedicated service tenant keeps the integration cleanly scoped. Particularly common in customers consolidating from legacy ERPs onto Workday — multi-mandate coverage means no re-integration when new EU countries come online.</p>
+        </div>
+        <div class="erp-spec-card-merged">
+          <h4>Technical reference</h4>
+          <div class="spec-row"><span class="k">Product</span><span class="v">Workday Financials</span></div>
+          <div class="spec-row"><span class="k">Outbound</span><span class="v">REST API · custom report extractions</span></div>
+          <div class="spec-row"><span class="k">Inbound</span><span class="v">Enterprise Interface Builder (EIB)</span></div>
+          <div class="spec-row"><span class="k">Auth</span><span class="v">OAuth 2.0 · service tenant</span></div>
+          <div class="spec-row"><span class="k">Mode</span><span class="v">Real-time API · scheduled batch</span></div>
+          <div class="spec-row"><span class="k">Typical go-live</span><span class="v">5–7 weeks</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="erp-detail-block" id="erp-odoo">
+      <div class="erp-detail-head">
+        <div class="left">
+          <span class="erp-tier-tag t2">Tier 2 — Mid-market & specialist</span>
+          <h3>ClearTax for <span class='em h1-grad'>Odoo</span></h3>
+          <div class="erp-strap">Odoo Community · Enterprise · Apps Store</div>
+        </div>
+        <a href="#contact" class="pill">Book a Demo <span class="arr">→</span></a>
+      </div>
+      <div class="erp-detail-body">
+        <div class="copy">
+            <p>ClearTax for Odoo is published as a module on the <b>official Odoo Apps Store</b>, working with both Community and Enterprise editions from version 15 onwards. Installation is one click from your Odoo Apps menu; the module appears immediately in the standard Apps catalogue.</p>
+            <p>Under the hood, OnPost invoice triggers fire submission to ClearTax, custom fields persist compliance state on <code>account.move</code> records, and the standard Invoice form gets a status badge showing where each invoice sits in its mandate lifecycle. Multi-company is fully native — common pattern for SMBs operating across multiple EU jurisdictions on one Odoo instance.</p>
+            <p>Typical go-live is faster here than enterprise ERPs: <b>2–4 weeks</b> for a clean Odoo deployment, longer if your environment has heavy customisations or third-party modules to coexist with.</p>
+        </div>
+        <div class="erp-spec-card-merged">
+          <h4>Technical reference</h4>
+          <div class="spec-row"><span class="k">Product</span><span class="v">Odoo Community · Enterprise</span></div>
+          <div class="spec-row"><span class="k">Distribution</span><span class="v">Odoo Apps Store module</span></div>
+          <div class="spec-row"><span class="k">Versions</span><span class="v">Odoo 15 · 16 · 17 · 18</span></div>
+          <div class="spec-row"><span class="k">Hooks</span><span class="v">OnPost invoice triggers · custom fields</span></div>
+          <div class="spec-row"><span class="k">Multi-company</span><span class="v">Native</span></div>
+          <div class="spec-row"><span class="k">Typical go-live</span><span class="v">2–4 weeks</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="erp-detail-block" id="erp-cegid">
+      <div class="erp-detail-head">
+        <div class="left">
+          <span class="erp-tier-tag t2">Tier 2 — Mid-market & specialist</span>
+          <h3>ClearTax for <span class='em h1-grad'>Cegid</span></h3>
+          <div class="erp-strap">Cegid XRP Flex · Quadra · Yourcegid</div>
+        </div>
+        <a href="#contact" class="pill">Book a Demo <span class="arr">→</span></a>
+      </div>
+      <div class="erp-detail-body">
+        <div class="copy">
+            <p>Cegid is the dominant ERP for French mid-market — particularly in retail, professional services, and accounting firm portfolios. ClearTax integrates natively through the Cegid API, with a dedicated connector for <b>Cegid XRP Flex</b> and <b>Cegid Quadra</b>.</p>
+            <p>Cegid offers its own France-native compliance tooling for DGFiP — ClearTax coexists with it without conflict. The typical pattern: customers with multi-country footprints (France HQ + EU subsidiaries) use Cegid's native compliance for domestic French flows and ClearTax for everything else, all reporting into one unified cockpit.</p>
+            <p>Particularly relevant for Cegid customers preparing for <b>DGFiP September 2026</b> alongside Belgium (live), Poland (Feb 2026), and Germany (phased 2025–2028).</p>
+        </div>
+        <div class="erp-spec-card-merged">
+          <h4>Technical reference</h4>
+          <div class="spec-row"><span class="k">Products</span><span class="v">Cegid XRP Flex · Cegid Quadra · Yourcegid</span></div>
+          <div class="spec-row"><span class="k">Strength</span><span class="v">Heavy France market presence</span></div>
+          <div class="spec-row"><span class="k">Integration</span><span class="v">Native connector + Cegid API</span></div>
+          <div class="spec-row"><span class="k">Coexistence</span><span class="v">Works alongside Cegid France-native compliance</span></div>
+          <div class="spec-row"><span class="k">Typical go-live</span><span class="v">3–5 weeks</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="erp-detail-block" id="erp-unit4">
+      <div class="erp-detail-head">
+        <div class="left">
+          <span class="erp-tier-tag t2">Tier 2 — Mid-market & specialist</span>
+          <h3>ClearTax for <span class='em h1-grad'>Unit4</span></h3>
+          <div class="erp-strap">Unit4 ERP · Business World (Agresso)</div>
+        </div>
+        <a href="#contact" class="pill">Book a Demo <span class="arr">→</span></a>
+      </div>
+      <div class="erp-detail-body">
+        <div class="copy">
+            <p>ClearTax for Unit4 uses the platform's REST API for real-time invoice extraction, with native field-mapping support for the customisations Unit4 customers typically run. Status writeback uses the same channel, updating Unit4's invoice records with lifecycle state.</p>
+            <p>Unit4's strongest verticals — <b>public sector, professional services, non-profit</b> — overlap closely with where Peppol-based EU mandates land first. Belgium's live mandate, the Netherlands' Peppol-aligned approach, and the wider EU ViDA trajectory all play directly to Unit4 customer needs.</p>
+            <p>Multi-entity is native, which matters for Unit4's group-finance customer base where consolidated reporting across subsidiaries is a baseline expectation.</p>
+        </div>
+        <div class="erp-spec-card-merged">
+          <h4>Technical reference</h4>
+          <div class="spec-row"><span class="k">Products</span><span class="v">Unit4 ERP · Business World (Agresso)</span></div>
+          <div class="spec-row"><span class="k">Integration</span><span class="v">REST API + ExcelerateXT</span></div>
+          <div class="spec-row"><span class="k">Field mapping</span><span class="v">Native</span></div>
+          <div class="spec-row"><span class="k">Common verticals</span><span class="v">Public sector · services · non-profit</span></div>
+          <div class="spec-row"><span class="k">Multi-entity</span><span class="v">Native</span></div>
+          <div class="spec-row"><span class="k">Typical go-live</span><span class="v">4–6 weeks</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ──────────── FOOTER (ported from cleartax.com/ae) ──────────── -->
+<footer class="footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <a href="https://www.cleartax.com/" class="logo" aria-label="ClearTax">
+          <img src="https://cdn.prod.website-files.com/63ede4a3da6dbd6b05c4612f/63ede4a3da6dbd8437c46595_logo-cleartax.svg" alt="ClearTax" />
+        </a>
+        <div class="addr">ClearTax<br>Pan-EU delivery teams across<br>Paris · Brussels · Warsaw · Madrid · Bengaluru</div>
+        <div class="follow">Follow us on</div>
+        <div class="socials">
+          <a href="https://www.linkedin.com/company/cleartax" class="soc" aria-label="LinkedIn"><img src="https://cdn.prod.website-files.com/63ede4a3da6dbd6b05c4612f/63ede4a3da6dbd3cc9c465c5_linkedin.png" alt=""></a>
+          <a href="https://www.facebook.com/Cleartax" class="soc" aria-label="Facebook"><img src="https://cdn.prod.website-files.com/63ede4a3da6dbd6b05c4612f/63ede4a3da6dbd3cb0c4668f_facebook.png" alt=""></a>
+          <a href="https://twitter.com/ClearTaxIndia" class="soc" aria-label="Twitter"><img src="https://cdn.prod.website-files.com/63ede4a3da6dbd6b05c4612f/63ede4a3da6dbd149dc46692_twitter.png" alt=""></a>
+          <a href="https://www.instagram.com/cleartaxindia/" class="soc" aria-label="Instagram"><img src="https://cdn.prod.website-files.com/63ede4a3da6dbd6b05c4612f/63ede4a3da6dbd30f8c46705_instagram.png" alt=""></a>
+        </div>
+      </div>
+
+      <div class="footer-col">
+        <h5>Company</h5>
+        <ul>
+          <li><a href="#">About us</a></li>
+          <li><a href="#">Contact us</a></li>
+          <li><a href="#">Our Team</a></li>
+          <li><a href="#">Media &amp; Press</a></li>
+          <li><a href="https://cleartax.in/s/trust">Trust &amp; Safety</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-col">
+        <h5>Products &amp; Solutions</h5>
+        <div class="group-h">By ERP</div>
+        <ul>
+          <li><a href="#">ClearTax for SAP</a></li>
+          <li><a href="#">ClearTax for Oracle</a></li>
+          <li><a href="#">ClearTax for Microsoft Dynamics</a></li>
+          <li><a href="#">ClearTax for NetSuite</a></li>
+          <li><a href="#">ClearTax for Sage</a></li>
+        </ul>
+        <div class="group-h">By geography</div>
+        <ul>
+          <li><a href="#">E-invoicing France</a></li>
+          <li><a href="https://www.cleartax.com/be/en">E-invoicing Belgium</a></li>
+          <li><a href="https://www.cleartax.com/pl/en">E-invoicing Poland</a></li>
+          <li><a href="#">E-invoicing Germany</a></li>
+          <li><a href="#">E-invoicing Spain</a></li>
+          <li><a href="#">E-invoicing Italy</a></li>
+          <li><a href="#">E-invoicing Romania</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-col">
+        <h5>Resources</h5>
+        <ul>
+          <li><a href="#">EU e-invoicing integration guide</a></li>
+          <li><a href="#">ERP connector library</a></li>
+          <li><a href="#">Reference architecture (PDF)</a></li>
+          <li><a href="#">Case studies</a></li>
+          <li><a href="#">Whitepapers</a></li>
+          <li><a href="#">Regulatory updates</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-col">
+        <h5>Why ClearTax</h5>
+        <ul>
+          <li><a href="#">For Business</a></li>
+          <li><a href="#">For Partners</a></li>
+          <li><a href="#">For ERP integrators</a></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="footer-bottom">
+      <div>
+        <div class="legal">Cleartax is a product by Defmacro Software Pvt. Ltd.</div>
+        <div class="legal-links">
+          <a href="https://www.cleartax.com/sa/legal">Company Policy</a>
+          <a href="https://www.cleartax.com/sa/legal">Terms of use</a>
+          <a href="#">Legal notice</a>
+        </div>
+      </div>
+      <div class="seals">
+        <div class="seal">
+          <div class="ic"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="9 12 11 14 15 10"/></svg></div>
+          <div><b>ISO 27001</b><br>Information security</div>
+        </div>
+        <div class="seal">
+          <div class="ic"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></div>
+          <div><b>SOC 2 Type II</b><br>Independently audited</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>

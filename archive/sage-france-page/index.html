@@ -8,6 +8,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Manrope:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://www.google.com/recaptcha/api.js?render=6Lc5ZG0mAAAAAGwClrZwtcyttcUMYDUPxg4MM4p3"></script>
 <style>
 /* ────────────────────────────────────────────────────────────────────────────
    ClearTax — Brand tokens (shared with UAE landing page)
@@ -566,7 +567,7 @@ a  { color: inherit; text-decoration: none; }
 .footer-brand .logo {
   display: inline-block; line-height: 0; margin-bottom: 18px;
 }
-.footer-brand .logo img { height: 32px; width: auto; display: block; filter: brightness(0) invert(1); }
+.footer-brand .logo img { height: 32px; width: auto; display: block; }
 .footer-brand .addr { font-size: 13px; color: rgba(255,255,255,.55); line-height: 1.65; max-width: 260px; }
 .footer-brand .follow { font-family: var(--font-display); font-weight: 600; font-size: 14px; color: #fff; margin-top: 32px; margin-bottom: 12px; }
 .footer-brand .socials { display: flex; gap: 10px; }
@@ -575,7 +576,7 @@ a  { color: inherit; text-decoration: none; }
   display: grid; place-items: center; color: rgba(255,255,255,.7);
   transition: background .2s, color .2s;
 }
-.footer-brand .soc img { width: 16px; height: 16px; opacity: .7; transition: opacity .2s; filter: brightness(0) invert(1); }
+.footer-brand .soc img { width: 16px; height: 16px; opacity: .7; transition: opacity .2s; }
 .footer-brand .soc:hover { background: rgba(255,255,255,.12); color: #fff; }
 .footer-brand .soc:hover img { opacity: 1; }
 .footer-col h5 {
@@ -630,7 +631,13 @@ a  { color: inherit; text-decoration: none; }
 </div>
 
 <!-- ──────────── HERO ──────────── -->
-<header class="hero">
+<header class="hero" 
+        data-form-type="FR-vs-sage-lp-form" 
+        data-lead-type="FR" 
+        data-origin-country="France"
+        data-recaptcha-key="6Lc5ZG0mAAAAAGwClrZwtcyttcUMYDUPxg4MM4p3" 
+        data-sheet-name="sageFrance"
+        data-thankyou-url="https://cleartax.com/fr/thank-you/">
   <div class="container">
     <div class="hero-inner">
       <div>
@@ -988,48 +995,30 @@ a  { color: inherit; text-decoration: none; }
         </div>
       </div>
 
-      <form class="demo-form" onsubmit="event.preventDefault(); document.getElementById('demo-success').style.display='block'; this.style.display='none';">
+      <form id="lead-form" class="demo-form" data-lead-form>
         <h3>Book a free demo</h3>
         <div class="sub">Our France specialists will walk you through the platform and build your compliance roadmap.</div>
-        <div class="field"><label>Full name <span class="req">*</span></label><input type="text" placeholder="Your name" required></div>
+        <div class="field"><label>Full name <span class="req">*</span></label><input type="text" data-field="name" placeholder="Your name" required></div>
         <div class="field"><label>Phone number <span class="req">*</span></label>
           <div class="phone-input">
-            <select>
-              <option>France (+33)</option><option>Belgium (+32)</option><option>Spain (+34)</option>
-              <option>Germany (+49)</option><option>Italy (+39)</option><option>Poland (+48)</option>
-              <option>Netherlands (+31)</option><option>UK (+44)</option><option>USA (+1)</option>
+            <select data-field="isd">
+              <option value="+33">France (+33)</option><option value="+32">Belgium (+32)</option><option value="+34">Spain (+34)</option>
+              <option value="+49">Germany (+49)</option><option value="+39">Italy (+39)</option><option value="+48">Poland (+48)</option>
+              <option value="+31">Netherlands (+31)</option><option value="+44">UK (+44)</option><option value="+1">USA (+1)</option>
             </select>
-            <input type="tel" placeholder="Phone number" required>
+            <input type="tel" data-field="phone" placeholder="Phone number" required>
           </div>
         </div>
         <div class="field-row">
-          <div class="field"><label>Company email <span class="req">*</span></label><input type="email" placeholder="you@company.com" required></div>
-          <div class="field"><label>Company name <span class="req">*</span></label><input type="text" placeholder="Company name" required></div>
+          <div class="field"><label>Company email <span class="req">*</span></label><input type="email" data-field="email" placeholder="you@company.com" required></div>
+          <div class="field"><label>Company name <span class="req">*</span></label><input type="text" data-field="company" placeholder="Company name" required></div>
         </div>
-        <div class="field-row">
-          <div class="field"><label>ERP <span class="req">*</span></label>
-            <select required>
-              <option value="">Select your ERP</option>
-              <option>SAP ECC</option><option>SAP S/4HANA</option>
-              <option>Oracle Fusion</option><option>Oracle EBS</option>
-              <option>Microsoft Dynamics F&amp;O</option><option>Microsoft Dynamics 365 BC</option>
-              <option>Sage X3</option><option>Sage 100</option><option>Sage 50</option>
-              <option>NetSuite</option><option>Custom / in-house</option><option>Other</option>
-            </select>
-          </div>
-          <div class="field"><label>Country</label>
-            <select>
-              <option>France</option><option>Belgium</option><option>Spain</option>
-              <option>Germany</option><option>Italy</option><option>Poland</option>
-              <option>Netherlands</option><option>Multi-country</option>
-            </select>
-          </div>
-        </div>
+        <div class="field"><label>Designation <span class="req">*</span></label><input type="text" data-field="role" placeholder="Designation" required></div>
         <label class="agree">
           <input type="checkbox" required>
           <span>I agree to ClearTax's <a href="#">Privacy Policy</a> and <a href="#">Terms of Service</a>, and consent to receiving communications about ClearTax products and France e-invoicing updates.</span>
         </label>
-        <button type="submit" class="pill">Book a Free Demo <span class="arr">→</span></button>
+        <button type="submit" data-submit class="pill">Book a Free Demo <span class="arr">→</span></button>
         <div class="footnote">No spam. Just a 30-min call with our France specialists.</div>
       </form>
       <div id="demo-success" style="display:none;background:#fff;border-radius:24px;padding:48px;text-align:center;border:1px solid var(--ct-line);box-shadow:0 30px 80px rgba(48,27,94,.12)">
@@ -1222,6 +1211,98 @@ a  { color: inherit; text-decoration: none; }
     if (els.s) els.s.textContent = pad(s);
   }
   tick(); setInterval(tick, 1000);
+})();
+
+// Lead Capture API Integration
+(function () {
+    const section = document.querySelector('header.hero[data-recaptcha-key]');
+    if (!section) return;
+
+    const form = section.parentElement.querySelector('[data-lead-form]');
+    if (!form) return;
+
+    form.addEventListener('submit', function (e) {
+        e.preventDefault();
+        const submitBtn = form.querySelector('[data-submit]');
+        const originalText = submitBtn.innerHTML;
+        submitBtn.innerHTML = 'Connecting...';
+        submitBtn.disabled = true;
+
+        const config = {
+            recaptchaKey: section.getAttribute('data-recaptcha-key'),
+            sheetName: section.getAttribute('data-sheet-name'),
+            originCountry: section.getAttribute('data-origin-country'),
+            thankYouUrl: section.getAttribute('data-thankyou-url'),
+            formType: section.getAttribute('data-form-type'),
+            leadType: section.getAttribute('data-lead-type')
+        };
+
+        const getFieldValue = (name) => {
+            const el = form.querySelector(`[data-field="${name}"]`);
+            return el ? el.value : '';
+        };
+
+        const processSubmission = (token) => {
+            const payload = {
+                lead_platforms: {
+                    google_sheet: { sheet_name: config.sheetName },
+                    pardot: true,
+                    salesforce: true
+                },
+                extra_payload: {
+                    origin_country: config.originCountry
+                },
+                lead_data: {
+                    name: getFieldValue('name'),
+                    phone_number: getFieldValue('isd') + " " + getFieldValue('phone'),
+                    email: getFieldValue('email'),
+                    company_name: getFieldValue('company'),
+                    designation: getFieldValue('role'),
+                    ISD: getFieldValue('isd'),
+                    form_type: config.formType,
+                    lead_type: config.leadType,
+                    lead_source_url: window.location.href
+                }
+            };
+
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.get('utm_source')) payload.lead_data.utm_source = urlParams.get('utm_source');
+            if (urlParams.get('utm_medium')) payload.lead_data.utm_medium = urlParams.get('utm_medium');
+            if (urlParams.get('utm_campaign')) payload.lead_data.utm_campaign = urlParams.get('utm_campaign');
+
+            fetch(`https://www.cleartax.com/f/common-lead/lead/?captcha_token=${token}`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            })
+            .then(response => {
+                if (response.status === 201) {
+                    form.style.display = 'none';
+                    document.getElementById('demo-success').style.display = 'block';
+                    window.scrollTo({ top: document.getElementById('contact').offsetTop - 100, behavior: 'smooth' });
+                } else {
+                    throw new Error('API rejection');
+                }
+            })
+            .catch(() => {
+                submitBtn.innerHTML = '✕ Submission Failed';
+                submitBtn.style.background = '#EF4444';
+                submitBtn.disabled = false;
+                setTimeout(() => {
+                    submitBtn.innerHTML = originalText;
+                    submitBtn.style.background = '';
+                }, 4000);
+            });
+        };
+
+        if (typeof grecaptcha !== 'undefined') {
+            grecaptcha.ready(function () {
+                grecaptcha.execute(config.recaptchaKey, { action: 'submit' }).then(processSubmission);
+            });
+        } else {
+            processSubmission('');
+        }
+    });
 })();
 </script>
 </body>
