@@ -804,6 +804,8 @@
       align-items: center;
       justify-content: center;
       padding: 24px;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
       opacity: 0;
       visibility: hidden;
       transition: opacity .3s ease, visibility .3s ease;
@@ -821,6 +823,7 @@
       width: 100%;
       max-width: 480px;
       position: relative;
+      margin: auto;
       transform: translateY(24px) scale(0.97);
       transition: transform .35s cubic-bezier(.2, .8, .2, 1);
       box-shadow: 0 32px 80px rgba(4, 6, 26, 0.28);
@@ -889,6 +892,12 @@
     .tc-form-row {
       display: grid;
       grid-template-columns: 1fr;
+      gap: 12px;
+    }
+
+    .tc-form-grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
       gap: 12px;
     }
 
@@ -1209,6 +1218,32 @@
         flex-direction: column;
         align-items: flex-start;
       }
+
+      /* Modal Responsiveness */
+      .tc-modal {
+        padding: 32px 24px !important;
+        border-radius: 20px !important;
+        max-width: 90% !important;
+      }
+
+      .tc-modal h3 {
+        font-size: 22px !important;
+      }
+
+      .tc-modal-sub {
+        font-size: 13px !important;
+        margin-bottom: 20px !important;
+      }
+
+      .tc-modal-overlay {
+        padding: 16px !important;
+      }
+
+      .tc-form-row,
+      .tc-form-grid-2 {
+        grid-template-columns: 1fr !important;
+        gap: 10px !important;
+      }
     }
 
     @media (max-width: 540px) {
@@ -1230,11 +1265,21 @@
       }
 
       .tc-modal {
-        padding: 32px 24px;
+        padding: 24px 16px !important;
+        border-radius: 16px !important;
       }
 
-      .tc-form-row {
-        grid-template-columns: 1fr;
+      .tc-modal h3 {
+        font-size: 20px !important;
+      }
+
+      .tc-field label {
+        font-size: 11px !important;
+      }
+
+      .tc-form-group {
+        gap: 12px !important;
+        margin-bottom: 16px !important;
       }
     }
   </style>
@@ -1703,9 +1748,9 @@
   </footer>
 
   <!-- ─── DEMO MODAL HTML ────────────────────────────────────────── -->
-  <section class="tc-modal-overlay" id="demoModal" data-form-type="GCC-contact-sales-form" data-lead-type="GCC"
-    data-origin-country="Oman" data-recaptcha-key=6Lc5ZG0mAAAAAGwClrZwtcyttcUMYDUPxg4MM4p3 data-sheet-name=omanFawtara
-    data-thankyou-url=https://cleartax.com/ae/en-e-invoicing/thank-you />
+  <section class="tc-modal-overlay" id="demoModal" data-form-type="Trust-Center-form" data-lead-type="Global"
+    data-origin-country="Global" data-recaptcha-key="6Lc5ZG0mAAAAAGwClrZwtcyttcUMYDUPxg4MM4p3" data-sheet-name="trustCenterLeads"
+    data-thankyou-url="https://www.cleartax.com/thank-you">
   <div class="tc-modal">
     <button class="tc-modal-close" id="closeModal">✕</button>
     <div class="tc-modal-content" id="modalContent">
@@ -1728,29 +1773,31 @@
             <div class="tc-form-row">
               <label for="phone">Phone Number</label>
               <div class="tc-phone-number">
-                <select class=phone-code data-field=isd>
-                  <option value=+968>🇴🇲 +968
-                  <option value=+971>🇦🇪 +971
-                  <option value=+966>🇸🇦 +966
-                  <option value=+974>🇶🇦 +974
-                  <option value=+973>🇧🇭 +973
-                  <option value=+965>🇰🇼 +965
-                  <option value=+91>🇮🇳 +91
-                  <option value=+44>🇬🇧 +44
-                  <option value=+1>🇺🇸 +1
-                  <option value=+49>🇩🇪 +49
+                <select class="phone-code" data-field="isd">
+                  <option value="+91" selected>🇮🇳 +91</option>
+                  <option value="+971">🇦🇪 +971</option>
+                  <option value="+966">🇸🇦 +966</option>
+                  <option value="+974">🇶🇦 +974</option>
+                  <option value="+973">🇧🇭 +973</option>
+                  <option value="+968">🇴🇲 +968</option>
+                  <option value="+965">🇰🇼 +965</option>
+                  <option value="+44">🇬🇧 +44</option>
+                  <option value="+1">🇺🇸 +1</option>
+                  <option value="+49">🇩🇪 +49</option>
                 </select>
                 <input type="tel" data-field="phone" placeholder="99xxx xxxxx" required style="flex: 1">
               </div>
             </div>
           </div>
-          <div class=" tc-field">
-            <label for="company">Company Name</label>
-            <input type="text" data-field="company" placeholder="Your organization" required>
-          </div>
-          <div class="tc-field">
-            <label for="designation">Designation</label>
-            <input type="text" data-field="designation" placeholder="e.g. Finance Manager" required>
+          <div class="tc-form-grid-2">
+            <div class="tc-field">
+              <label for="company">Company Name</label>
+              <input type="text" data-field="company" placeholder="Your organization" required>
+            </div>
+            <div class="tc-field">
+              <label for="designation">Designation</label>
+              <input type="text" data-field="designation" placeholder="e.g. Finance Manager" required>
+            </div>
           </div>
         </div>
         <button data-submit type="submit" class="tc-form-submit">Get Started</button>
@@ -1850,11 +1897,11 @@
             },
             lead_data: {
               name: getFieldValue('name'),
-              phone_number: getFieldValue('phone'),
+              phone_number: getFieldValue('phone').replace(/\s+/g, ''),
               email: getFieldValue('email'),
               company_name: getFieldValue('company'),
               designation: getFieldValue('designation'),
-              ISD: getFieldValue('isd'),
+              ISD: getFieldValue('isd').replace('+', ''),
               form_type: config.formType,
               lead_type: config.leadType,
               lead_source_url: window.location.href
