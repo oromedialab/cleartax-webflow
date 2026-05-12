@@ -165,13 +165,13 @@ const securityCards = [
     <div class="max-w-[var(--container-max)] mx-auto lg:px-6 px-4 w-full">
         <div class="text-center">
             <h2
-                class="text-[26px] sm:text-[36px] lg:text-[44px] font-semibold text-black leading-[1.18] mb-4 text-balance max-w-[732px] w-full mx-auto"
+                class="text-[26px] sm:text-[36px] lg:text-[44px] font-semibold text-black leading-[1.18] mb-4 text-balance max-w-[732px] w-full mx-auto blur-reveal"
             >
                 Built for scale,
                 <span class="text-[#655DFF]"> security &amp; reliability </span>
             </h2>
             <p
-                class="lg:text-lg text-base font-normal text-black/80 leading-[1.4] mb-12 max-w-[750px] w-full mx-auto"
+                class="lg:text-lg text-base font-normal text-black/80 leading-[1.4] mb-12 max-w-[750px] w-full mx-auto premium-reveal [transition-delay:150ms]"
             >
                 ClearTax's infrastructure is purpose-built for enterprise-grade
                 compliance — from single entities to multi-city conglomerates.
@@ -365,7 +365,7 @@ const securityCards = [
                                                     />
                                                 )}
                                                 <div class="text-[20px] mt-auto leading-[1.4] mt-[19px] font-medium text-black">
-                                                    {card.value}
+                                                    <span data-count-to={card.value.replace(/[^0-9.]/g, '')} data-count-suffix={card.value.replace(/[0-9.]/g, '')}>{card.value}</span>
                                                     <p class="m-0 mt-2 lg:text-[16px] text-[14px] leading-[1.4] text-black/40">
                                                         {card.label}
                                                     </p>
@@ -581,7 +581,7 @@ const securityCards = [
     @keyframes ssrFadeIn {
         from {
             opacity: 0;
-            transform: translateY(8px);
+            transform: translateY(12px);
         }
         to {
             opacity: 1;
@@ -628,7 +628,6 @@ const securityCards = [
         const items = root.querySelectorAll("[data-ssr]");
         const graphics = root.querySelectorAll("[data-ssr-graphic]");
         items.forEach((item) => {
-            // The header is the first child of the item (the div containing the label and chevron)
             const header = item.firstElementChild;
             header?.addEventListener("click", () => {
                 const key = item.getAttribute("data-ssr");
@@ -636,10 +635,50 @@ const securityCards = [
                 items.forEach((i) => i.classList.remove("active"));
                 graphics.forEach((g) => g.classList.remove("active"));
                 item.classList.add("active");
-                root.querySelector(
-                    `[data-ssr-graphic="${key}"]`,
-                )?.classList.add("active");
+                const targetGraphic = root.querySelector(`[data-ssr-graphic="${key}"]`);
+                if (targetGraphic) {
+                    targetGraphic.classList.add("active");
+                    // Trigger count-up if applicable
+                    initCountUp(targetGraphic);
+                }
             });
         });
+
+        function initCountUp(container) {
+            const counters = container.querySelectorAll('[data-count-to]');
+            counters.forEach(counter => {
+                const target = parseFloat(counter.getAttribute('data-count-to'));
+                const suffix = counter.getAttribute('data-count-suffix') || '';
+                const duration = 2000; // 2 seconds
+                const start = 0;
+                let startTime = null;
+
+                function animate(currentTime) {
+                    if (!startTime) startTime = currentTime;
+                    const progress = Math.min((currentTime - startTime) / duration, 1);
+                    // Premium easeOutExpo
+                    const easeProgress = progress === 1 ? 1 : 1 - Math.pow(2, -10 * progress);
+                    const currentCount = (easeProgress * (target - start) + start);
+                    
+                    if (target % 1 === 0) {
+                        counter.textContent = Math.floor(currentCount) + suffix;
+                    } else {
+                        counter.textContent = currentCount.toFixed(1) + suffix;
+                    }
+
+                    if (progress < 1) {
+                        requestAnimationFrame(animate);
+                    }
+                }
+                requestAnimationFrame(animate);
+            });
+        }
+
+        // Initial count-up for active panel
+        const activeGraphic = root.querySelector('[data-ssr-graphic].active');
+        if (activeGraphic) {
+            // Wait for intersection or just run if visible
+            setTimeout(() => initCountUp(activeGraphic), 500);
+        }
     })();
 </script>

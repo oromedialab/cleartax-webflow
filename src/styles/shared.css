@@ -67,4 +67,117 @@
   .tw-block {
     display: block !important;
   }
+
+  /* Premium Animation Utilities */
+  .premium-reveal {
+    opacity: 0;
+    transform: translateY(8px);
+    transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), 
+                transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+    will-change: opacity, transform;
+  }
+
+  .premium-reveal.is-visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .cta-shimmer {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .cta-shimmer::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: -150%;
+    width: 50%;
+    height: 100%;
+    background: linear-gradient(
+      to right,
+      rgba(255, 255, 255, 0) 0%,
+      rgba(255, 255, 255, 0.2) 50%,
+      rgba(255, 255, 255, 0) 100%
+    );
+    transform: skewX(-25deg);
+    animation: shimmer 6s infinite;
+  }
+
+  @keyframes shimmer {
+    0% { left: -150%; }
+    20% { left: 150%; }
+    100% { left: 150%; }
+  }
+
+  /* ReactBits Inspired: Shiny Text */
+  .shiny-text {
+    background: linear-gradient(
+      120deg,
+      rgba(255, 255, 255, 0) 30%,
+      rgba(255, 255, 255, 1) 50%,
+      rgba(255, 255, 255, 0) 70%
+    );
+    background-size: 200% 100%;
+    background-clip: text;
+    -webkit-background-clip: text;
+    color: transparent;
+    display: inline-block;
+    animation: shiny-sweep 4s infinite linear;
+  }
+
+  @keyframes shiny-sweep {
+    0% { background-position: 100% 0; }
+    100% { background-position: -100% 0; }
+  }
+
+  /* ReactBits Inspired: Blur Reveal */
+  .blur-reveal {
+    opacity: 0;
+    filter: blur(10px);
+    transform: scale(0.95);
+    transition: opacity 1.2s cubic-bezier(0.16, 1, 0.3, 1),
+                filter 1.2s cubic-bezier(0.16, 1, 0.3, 1),
+                transform 1.2s cubic-bezier(0.16, 1, 0.3, 1);
+    will-change: opacity, filter, transform;
+  }
+
+  .blur-reveal.is-visible {
+    opacity: 1;
+    filter: blur(0);
+    transform: scale(1);
+  }
+
+  /* ReactBits Inspired: SVG Drawing Effect */
+  .svg-draw-reveal svg path,
+  .svg-draw-reveal svg circle,
+  .svg-draw-reveal svg rect,
+  .svg-draw-reveal path,
+  .svg-draw-reveal circle,
+  .svg-draw-reveal rect {
+    stroke-dasharray: 1;
+    stroke-dashoffset: 1;
+    transition: stroke-dashoffset 2s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.8s ease, fill-opacity 0.8s ease;
+    opacity: 0;
+    fill-opacity: 0;
+  }
+
+  .svg-draw-reveal.is-visible svg path,
+  .svg-draw-reveal.is-visible svg circle,
+  .svg-draw-reveal.is-visible svg rect,
+  .svg-draw-reveal.is-visible path,
+  .svg-draw-reveal.is-visible circle,
+  .svg-draw-reveal.is-visible rect,
+  .active .svg-draw-reveal path {
+    stroke-dashoffset: 0;
+    opacity: 1;
+    fill-opacity: 0.15; /* Subtle fill reveal after drawing */
+    transition-delay: 0s, 0s, 1s; /* Delay fill reveal */
+  }
+
+  /* Delay drawing for complex icons with multiple paths */
+  .svg-draw-reveal.is-visible path:nth-child(2) { transition-delay: 0.2s; }
+  .svg-draw-reveal.is-visible path:nth-child(3) { transition-delay: 0.4s; }
+  .svg-draw-reveal.is-visible path:nth-child(4) { transition-delay: 0.6s; }
 }
+
