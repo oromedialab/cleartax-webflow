@@ -28,6 +28,60 @@ import FAQ from "../sections/uae/FAQ.astro";
       href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800;900&display=swap"
       rel="stylesheet"
     />
+    <!-- Premium Interactions -->
+    <script is:inline src="https://unpkg.com/lenis@1.1.13/dist/lenis.min.js"></script>
+    <script is:inline>
+      (function() {
+        // Prepare reveals immediately to prevent FOUC but keep content visible if JS fails
+        const setup = () => {
+          const elements = document.querySelectorAll('.premium-reveal, .blur-reveal, .clip-reveal');
+          elements.forEach(el => el.classList.add('is-ready'));
+
+          // 1. Lenis Smooth Scroll
+          if (typeof Lenis !== 'undefined') {
+            const lenis = new Lenis({
+              duration: 1.2,
+              easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+              smoothWheel: true
+            });
+            function raf(time) {
+              lenis.raf(time);
+              requestAnimationFrame(raf);
+            }
+            requestAnimationFrame(raf);
+          }
+
+          // 2. Ambient Aura
+          const aura = document.querySelector('.ambient-aura');
+          let mouseX = 0, mouseY = 0, auraX = 0, auraY = 0;
+          window.addEventListener('mousemove', (e) => { mouseX = e.clientX; mouseY = e.clientY; });
+          function updateInteractive() {
+            auraX += (mouseX - auraX) * 0.05;
+            auraY += (mouseY - auraY) * 0.05;
+            if (aura) { aura.style.left = auraX + 'px'; aura.style.top = auraY + 'px'; }
+            requestAnimationFrame(updateInteractive);
+          }
+          updateInteractive();
+
+          // 3. Reveal Observer
+          const revealObserver = new IntersectionObserver((entries) => {
+            entries.forEach((entry) => {
+              if (entry.isIntersecting) {
+                entry.target.classList.add('is-visible');
+                revealObserver.unobserve(entry.target);
+              }
+            });
+          }, { threshold: 0.1 });
+          elements.forEach(el => revealObserver.observe(el));
+        };
+
+        if (document.readyState === 'loading') {
+          document.addEventListener('DOMContentLoaded', setup);
+        } else {
+          setup();
+        }
+      })();
+    </script>
   </head>
   <body class="bg-[#FCFCFD]">
     <div class="ambient-aura"></div>
@@ -44,68 +98,5 @@ import FAQ from "../sections/uae/FAQ.astro";
       thankYouUrl="https://cleartax.com/ae/en-e-invoicing/thank-you/"
     />
     <FAQ />
-
-    <script is:inline src="https://unpkg.com/lenis@1.1.13/dist/lenis.min.js"></script>
-    <script is:inline>
-      // 1. Lenis Smooth Scroll
-      const lenis = new Lenis({
-        duration: 1.2,
-        easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
-        smoothWheel: true
-      });
-      function raf(time) {
-        lenis.raf(time);
-        requestAnimationFrame(raf);
-      }
-      requestAnimationFrame(raf);
-
-      // 2. Ambient Aura
-      const aura = document.querySelector('.ambient-aura');
-      
-      let mouseX = 0, mouseY = 0;
-      let auraX = 0, auraY = 0;
-
-      window.addEventListener('mousemove', (e) => {
-        mouseX = e.clientX;
-        mouseY = e.clientY;
-      });
-
-      function updateInteractive() {
-        // Very smooth follow for aura
-        auraX += (mouseX - auraX) * 0.05;
-        auraY += (mouseY - auraY) * 0.05;
-        if (aura) aura.style.left = `${auraX}px`;
-        if (aura) aura.style.top = `${auraY}px`;
-
-        requestAnimationFrame(updateInteractive);
-      }
-      updateInteractive();
-
-      // 3. Intersection Observer for Premium Reveals
-      const revealObserver = new IntersectionObserver((entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            entry.target.classList.add('is-visible');
-            revealObserver.unobserve(entry.target);
-          }
-        });
-      }, {
-        threshold: 0.1,
-        rootMargin: '0px 0px -50px 0px'
-      });
-
-      document.querySelectorAll('.premium-reveal, .blur-reveal, .svg-draw-reveal, .clip-reveal').forEach((el) => {
-        revealObserver.observe(el);
-      });
-
-      // Scroll Progress Bar
-      const progress = document.getElementById('scroll-progress');
-      window.addEventListener('scroll', () => {
-        const winScroll = document.body.scrollTop || document.documentElement.scrollTop;
-        const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
-        const scrolled = (winScroll / height) * 100;
-        if (progress) progress.style.width = scrolled + "%";
-      });
-    </script>
   </body>
 </html>
