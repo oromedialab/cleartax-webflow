@@ -8,6 +8,8 @@ import ScaleStats from "../sections/scale-and-security/ScaleStats.astro";
 import SecurityFeatures from "../sections/scale-and-security/SecurityFeatures.astro";
 import ContactForm from "../sections/_shared/ContactForm.astro";
 import Footer from "../sections/_shared/Footer.astro";
+import LogoStripScale from "../sections/scale-and-security/LogoStripScale.astro";
+import Infrastructure from "../sections/scale-and-security/Infrastructure.astro";
 ---
 
 <!doctype html>
@@ -23,21 +25,22 @@ import Footer from "../sections/_shared/Footer.astro";
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800;900&display=swap"
       rel="stylesheet"
     />
-    
+
     <!-- Premium Interactions -->
-    <script is:inline src="https://unpkg.com/lenis@1.1.13/dist/lenis.min.js"></script>
+    <script is:inline src="https://unpkg.com/lenis@1.1.13/dist/lenis.min.js"
+    ></script>
     <script is:inline>
-      (function() {
+      (function () {
         const setup = () => {
           // 1. Lenis Smooth Scroll
-          if (typeof Lenis !== 'undefined') {
+          if (typeof Lenis !== "undefined") {
             const lenis = new Lenis({
               duration: 1.2,
               easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
-              smoothWheel: true
+              smoothWheel: true,
             });
             function raf(time) {
               lenis.raf(time);
@@ -47,31 +50,38 @@ import Footer from "../sections/_shared/Footer.astro";
           }
 
           // 2. Reveal Observer
-          const elements = document.querySelectorAll('.premium-reveal, .blur-reveal, .clip-reveal');
-          const revealObserver = new IntersectionObserver((entries) => {
-            entries.forEach((entry) => {
-              if (entry.isIntersecting) {
-                entry.target.classList.add('is-visible');
-                revealObserver.unobserve(entry.target);
-              }
-            });
-          }, { threshold: 0.1 });
-          elements.forEach(el => revealObserver.observe(el));
+          const elements = document.querySelectorAll(
+            ".premium-reveal, .blur-reveal, .clip-reveal",
+          );
+          const revealObserver = new IntersectionObserver(
+            (entries) => {
+              entries.forEach((entry) => {
+                if (entry.isIntersecting) {
+                  entry.target.classList.add("is-visible");
+                  revealObserver.unobserve(entry.target);
+                }
+              });
+            },
+            { threshold: 0.1 },
+          );
+          elements.forEach((el) => revealObserver.observe(el));
         };
 
-        if (document.readyState === 'loading') {
-          document.addEventListener('DOMContentLoaded', setup);
+        if (document.readyState === "loading") {
+          document.addEventListener("DOMContentLoaded", setup);
         } else {
           setup();
         }
       })();
     </script>
   </head>
-  <body class="bg-white font-['Inter',sans-serif]">
+  <body class="bg-white">
     <Navbar countryLabel="Global" />
     <main>
       <Hero />
+      <LogoStripScale />
       <ScaleStats />
+      <Infrastructure />
       <SecurityFeatures />
       <div id="contact">
         <ContactForm

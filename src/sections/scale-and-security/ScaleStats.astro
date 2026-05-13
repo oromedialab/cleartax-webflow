@@ -1,48 +1,86 @@
 ---
-/**
- * Scale Stats Section
- */
-const stats = [
-  { value: "500M+", label: "Invoices Processed Annually", color: "from-blue-500 to-cyan-400" },
-  { value: "99.99%", label: "Uptime SLA Guaranteed", color: "from-green-500 to-emerald-400" },
-  { value: "10ms", label: "Average API Latency", color: "from-purple-500 to-indigo-400" },
-  { value: "5000+", label: "Enterprise Customers", color: "from-orange-500 to-amber-400" },
+export interface Props {
+  headline: string;
+  description: string;
+  stats: Array<{
+    value: string;
+    label: string;
+    bg: string;
+  }>;
+}
+
+const features = [
+  {
+    title: "Disaster Recovery",
+    description:
+      "Instant failover across local providers keeps operations running without single-vendor dependency.",
+    bg: "bg-[#EDF7F1]",
+    iconBg: "bg-[#338878]/16",
+    icon: `<svg width="27" height="32" viewBox="0 0 27 32" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M25.6486 8.72128C25.6341 8.39308 25.6246 8.06469 25.6201 7.73621C25.6018 6.50237 24.6311 5.49542 23.399 5.42654C19.6308 5.21609 16.6837 3.96267 14.1945 1.53633C13.7779 1.15456 13.1532 1.15456 12.7366 1.53633C10.2474 3.96267 7.30037 5.21609 3.53213 5.42654C2.30004 5.49542 1.32931 6.50237 1.31099 7.73621C1.30655 8.06469 1.29704 8.39308 1.28248 8.72128C1.144 15.9928 0.93639 25.9588 13.0313 30.1763C13.0892 30.1964 13.1484 30.2125 13.2086 30.2245L13.2092 30.2246C13.3785 30.2585 13.5527 30.2585 13.722 30.2246C13.7823 30.2125 13.8422 30.1963 13.9004 30.176C25.9602 25.9585 25.7871 16.0273 25.6486 8.72128Z" stroke="#338878" stroke-width="2.5" stroke-miterlimit="10"/><path d="M14.9662 16.2526C15.97 15.7157 16.653 14.6573 16.653 13.4393C16.653 11.6787 15.2257 10.2513 13.4649 10.2513C11.7041 10.2513 10.2767 11.6787 10.2767 13.4393C10.2767 14.6643 10.9675 15.7278 11.9808 16.2617" stroke="#338878" stroke-width="2.5" stroke-miterlimit="10" stroke-linecap="round"/><path d="M14.9759 16.2706L14.9513 19.688C14.9513 20.5157 14.2803 21.1866 13.4527 21.1866C12.625 21.1866 11.954 20.5157 11.954 19.688L11.9787 16.266" stroke="#338878" stroke-width="2.5" stroke-miterlimit="10" stroke-linecap="round"/</svg>`,
+  },
+  {
+    title: "Data Sovereignty",
+    description:
+      "Data is processed and stored within your designated region to meet local compliance requirements.",
+    bg: "bg-[#FAF1ED]",
+    iconBg: "bg-[#E5AC82]/20",
+    icon: `<svg width="25" height="32" viewBox="0 0 25 32" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M22.9097 4.86001C22.9097 6.85373 18.061 8.46997 12.0799 8.46997C6.09872 8.46997 1.25 6.85373 1.25 4.86001C1.25 2.86629 6.09872 1.25005 12.0799 1.25005C18.061 1.25005 22.9097 2.86629 22.9097 4.86001Z" stroke="#DC8F56" stroke-width="2.5" stroke-miterlimit="10" stroke-linecap="square"/><path d="M22.9097 12.14C22.9097 14.1338 18.061 15.75 12.0799 15.75C6.09872 15.75 1.25 14.1338 1.25 12.14" stroke="#DC8F56" stroke-width="2.5" stroke-miterlimit="10" stroke-linecap="square"/><path d="M22.9097 19.36C22.9097 21.3537 18.061 22.97 12.0799 22.97C6.09872 22.97 1.25 21.3537 1.25 19.36" stroke="#DC8F56" stroke-width="2.5" stroke-miterlimit="10" stroke-linecap="square"/><path d="M1.25 4.85996V26.64C1.25 28.6338 6.09872 30.25 12.0799 30.25C18.061 30.25 22.9097 28.6338 22.9097 26.64V4.85996" stroke="#DC8F56" stroke-width="2.5" stroke-miterlimit="10"/></svg>`,
+  },
+  {
+    title: "High-Scale Performance",
+    description:
+      "Proven infrastructure supports high-volume e-invoicing across regulated markets.",
+    bg: "bg-[#EBF5FF]",
+    iconBg: "bg-[#1F89FF]/20",
+    icon: '<svg width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M26.25 25.3571C26.25 25.8503 25.8503 26.25 25.3571 26.25H2.14286C1.64975 26.25 1.25 25.8503 1.25 25.3571V2.14286C1.25 1.64975 1.64975 1.25 2.14286 1.25H25.3571C25.8503 1.25 26.25 1.64975 26.25 2.14286V25.3571Z" stroke="#1F89FF" stroke-width="2.5" stroke-miterlimit="10"/><path d="M1.25 9.58337H26.25" stroke="#1F89FF" stroke-width="2.5" stroke-miterlimit="10"/><path d="M1.25 17.9166H26.25" stroke="#1F89FF" stroke-width="2.5" stroke-miterlimit="10"/><path d="M3.58594 13.75H5.1432" stroke="#1F89FF" stroke-width="2.5" stroke-miterlimit="10"/><path d="M6.70044 13.75H8.2577" stroke="#1F89FF" stroke-width="2.5" stroke-miterlimit="10"/><path d="M15.3074 13.75H23.9142" stroke="#1F89FF" stroke-width="2.5" stroke-miterlimit="10"/><path d="M3.58594 5.4165H5.1432" stroke="#1F89FF" stroke-width="2.5" stroke-miterlimit="10"/><path d="M6.70044 5.4165H8.2577" stroke="#1F89FF" stroke-width="2.5" stroke-miterlimit="10"/><path d="M15.3074 5.4165H23.9142" stroke="#1F89FF" stroke-width="2.5" stroke-miterlimit="10"/><path d="M3.58594 22.0833H5.1432" stroke="#1F89FF" stroke-width="2.5" stroke-miterlimit="10"/><path d="M6.70044 22.0833H8.2577" stroke="#1F89FF" stroke-width="2.5" stroke-miterlimit="10"/><path d="M15.3074 22.0833H23.9142" stroke="#1F89FF" stroke-width="2.5" stroke-miterlimit="10"/></svg>',
+  },
 ];
 ---
 
-<section class="py-24 bg-white overflow-hidden">
-  <div class="container mx-auto px-6">
-    <div class="flex flex-col lg:flex-row items-center gap-16">
-      <div class="lg:w-1/2">
-        <h2 class="text-3xl md:text-5xl font-bold text-gray-900 leading-tight mb-6 blur-reveal">
-          Infrastructure built for the <span class="text-blue-600">world's largest</span> tax operations.
-        </h2>
-        <p class="text-lg text-gray-600 mb-8 premium-reveal">
-          Our cloud-native platform automatically scales to handle peak volumes without breaking a sweat. 
-          Whether it's the end of the quarter or a nationwide tax deadline, we've got you covered.
-        </p>
-        <ul class="space-y-4 mb-10">
-          {['Auto-scaling architecture', 'High-availability multi-region clusters', 'Real-time monitoring and alerts'].map(item => (
-            <li class="flex items-center gap-3 text-gray-700 font-medium premium-reveal">
-              <svg class="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
-              {item}
-            </li>
-          ))}
-        </ul>
-      </div>
-      
-      <div class="lg:w-1/2 grid grid-cols-1 sm:grid-cols-2 gap-6">
-        {stats.map((stat, idx) => (
-          <div class="p-8 rounded-3xl border border-gray-100 bg-gray-50/50 hover:bg-white hover:shadow-xl hover:shadow-gray-200/50 transition-all duration-500 group premium-reveal" style={`transition-delay: ${idx * 100}ms`}>
-            <div class={`text-4xl md:text-5xl font-bold mb-2 bg-gradient-to-r ${stat.color} bg-clip-text text-transparent`}>
-              {stat.value}
+<div
+  class="scale-ss relative overflow-hidden lg:py-25 py-12 bg-[#FCFCFD] bg-cover bg-center md:bg-right lg:bg-center bg-no-repeat"
+>
+  <div
+    class="mx-auto max-w-[1280px] px-4 lg:px-6 flex flex-col items-center gap-12"
+  >
+    <div class="text-center">
+      <h2
+        class="text-[26px] sm:text-[36px] lg:text-[44px] font-semibold text-black leading-[1.18] mb-4 text-balance max-w-[732px] w-full mx-auto blur-reveal"
+      >
+        Sovereign infrastructure.
+        <span class="text-[#655DFF]"> Zero single points of failure. </span>
+      </h2>
+      <p
+        class="lg:text-lg text-base font-normal text-black/80 leading-[1.4] mb-12 max-w-[750px] w-full mx-auto premium-reveal [transition-delay:150ms]"
+      >
+        Deploy across AWS, OCI, or GCP based on each country’s regulatory,
+        performance, and data residency needs.
+      </p>
+    </div>
+    <div class="grid lg:grid-cols-3 md:grid-cols-2 gap-6 w-full">
+      {
+        features.map((item, index) => (
+          <div
+            class={`relative p-8 rounded-[24px] overflow-hidden transition-all duration-300 hover:-translate-y-1 ${item.bg} premium-reveal`}
+            style={`transition-delay: ${index * 150}ms`}
+          >
+            <div
+              class={`w-14 h-14 rounded-xl flex items-center justify-center mb-10 ${item.iconBg} ${item.iconColor}`}
+            >
+              <Fragment set:html={item.icon} />
             </div>
-            <div class="text-gray-500 font-medium tracking-wide">
-              {stat.label}
+
+            <div class="relative z-10">
+              <h3 class="text-[22px] leading-[1.36] font-medium text-black mb-4 tracking-tight">
+                {item.title}
+              </h3>
+              <p class="text-base leading-[1.5] text-black/70 font-normal">
+                {item.description}
+              </p>
             </div>
           </div>
-        ))}
-      </div>
+        ))
+      }
     </div>
   </div>
-</section>
+</div>
