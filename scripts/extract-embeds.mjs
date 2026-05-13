@@ -117,7 +117,8 @@ for (const file of files) {
   const { path: sourcePath, name: sectionName } = entry;
 
   const html = readFileSync(file, 'utf8');
-  const root = parseHtml(html);
+  const cleanHtml = html.replace(/<style\b[^>]*>[\s\S]*?<\/style>/gi, '');
+  const root = parseHtml(cleanHtml);
   const body = root.querySelector('body');
   if (!body) {
     console.error(`[extract-embeds] no <body> in ${file}`);
