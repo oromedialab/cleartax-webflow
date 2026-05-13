@@ -420,147 +420,229 @@ const checklistItems = [
 
 <script is:inline>
   (() => {
-    // 1. More robust section targeting
-    const section = document.querySelector('.hero-uae') || document.querySelector('section[data-video-id]');
-    if (!section) return;
+    const bootHero = () => {
+      // 1. More robust section targeting
+      const section = document.querySelector('.hero-uae') || document.querySelector('section[data-video-id]');
+      if (!section) return;
 
-    // 2. Load YouTube API if not present
-    if (!window.onYouTubeIframeAPIReady) {
-      window.onYouTubeIframeAPIReady = () => {
-        window.YT_READY = true;
-      };
-      const tag = document.createElement('script');
-      tag.src = "https://www.youtube.com/iframe_api";
-      const firstScriptTag = document.getElementsByTagName('script')[0];
-      firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
-    }
-
-    function createPlayer(wrap, placeholder, videoId) {
-      const playerDiv = document.createElement('div');
-      playerDiv.className = "absolute inset-0 w-full h-full z-30 bg-black rounded-2xl overflow-hidden shadow-2xl transition-opacity duration-300";
-      wrap.appendChild(playerDiv);
-      
-      // Close Button
-      const closeBtn = document.createElement('button');
-      closeBtn.innerHTML = '✕';
-      closeBtn.className = "absolute top-4 right-4 z-40 w-10 h-10 bg-black/50 backdrop-blur-md text-white rounded-full flex items-center justify-center border border-white/20 hover:bg-black/80 transition-all duration-300 cursor-pointer text-lg";
-      closeBtn.title = "Close Video";
-      wrap.appendChild(closeBtn);
-
-      placeholder.style.opacity = "0";
-      placeholder.style.pointerEvents = "none";
-
-      const player = new window.YT.Player(playerDiv, {
-        height: '100%',
-        width: '100%',
-        videoId: videoId,
-        playerVars: {
-          'autoplay': 1,
-          'rel': 0,
-          'modestbranding': 1,
-          'origin': window.location.origin
-        },
-        events: {
-          'onStateChange': (event) => {
-            if (event.data === window.YT.PlayerState.ENDED) {
-              closeVideo();
-            }
-          }
-        }
-      });
-
-      function closeVideo() {
-        player.destroy(); 
-        playerDiv.remove();
-        closeBtn.remove();
-        placeholder.style.opacity = "1";
-        placeholder.style.pointerEvents = "auto";
-      }
-
-      closeBtn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        closeVideo();
-      });
-    }
-
-    // 3. Click Handler
-    section.addEventListener('click', (e) => {
-      const placeholder = e.target.closest('[data-video-placeholder]');
-      if (!placeholder) return;
-
-      const videoId = section.getAttribute("data-video-id");
-      const wrap = placeholder.parentElement;
-
-      const startVideo = () => {
-        if (window.YT && window.YT.Player) {
-          createPlayer(wrap, placeholder, videoId);
-        } else {
-          setTimeout(startVideo, 200);
-        }
-      };
-
-      startVideo();
-    });
-
-    // Countdown
-    const targetStr = section.getAttribute("data-countdown-target");
-    const [datePart, timePart] = targetStr.split("T");
-    const [y, mo, d] = datePart.split("-").map(Number);
-    const [h, mi, s] = timePart.split(":").map(Number);
-    const target = new Date(y, mo - 1, d, h, mi, s).getTime();
-    const nodes = {
-      days: section.querySelector('[data-ct="days"]'),
-      hours: section.querySelector('[data-ct="hours"]'),
-      mins: section.querySelector('[data-ct="mins"]'),
-      secs: section.querySelector('[data-ct="secs"]'),
-    };
-    const label = section.querySelector(".hero-countdown");
-
-    function tick() {
-      const dist = target - Date.now();
-      if (dist < 0) {
-        if (label)
-          label.innerHTML =
-            "<span class='text-sm font-bold text-[#110072]/60 uppercase tracking-[1.5px]'>Pilot Program is Live!</span>";
-        return;
-      }
-      const days = Math.floor(dist / 86400000);
-      const hours = Math.floor((dist % 86400000) / 3600000);
-      const mins = Math.floor((dist % 3600000) / 60000);
-      const secs = Math.floor((dist % 60000) / 1000);
-      if (nodes.days) nodes.days.textContent = String(days).padStart(2, "0");
-      if (nodes.hours) nodes.hours.textContent = String(hours).padStart(2, "0");
-      if (nodes.mins) nodes.mins.textContent = String(mins).padStart(2, "0");
-      if (nodes.secs) nodes.secs.textContent = String(secs).padStart(2, "0");
-    }
-    tick();
-    setInterval(tick, 1000);
-
-    // Force reveal Hero elements immediately
-    setTimeout(() => {
-      section.querySelectorAll('.premium-reveal, .clip-reveal').forEach(el => {
-        el.classList.add('is-visible');
-      });
-    }, 100);
-
-    // Special: Magnetic Buttons
-    const magneticBtns = section.querySelectorAll('[data-magnetic]');
-    magneticBtns.forEach(btn => {
-      btn.addEventListener('mousemove', (e) => {
-        const rect = btn.getBoundingClientRect();
-        const x = e.clientX - rect.left - rect.width / 2;
-        const y = e.clientY - rect.top - rect.height / 2;
+      // 2. Load YouTube API on demand (Hover/Interaction)
+      let apiPromise = null;
+      const loadAPI = () => {
+        if (apiPromise) return apiPromise;
         
-        btn.style.transform = `translate(${x * 0.3}px, ${y * 0.3}px)`;
-        const inner = btn.querySelector('span');
-        if (inner) inner.style.transform = `translate(${x * 0.1}px, ${y * 0.1}px)`;
-      });
+        apiPromise = new Promise((resolve) => {
+          if (window.YT && window.YT.Player) {
+            resolve();
+            return;
+          }
+          
+          console.log('HeroUAE: Starting YouTube API injection...');
+          
+          // Inject script if missing
+          if (!document.querySelector('script[src*="youtube.com/iframe_api"]')) {
+            const tag = document.createElement('script');
+            tag.src = "https://www.youtube.com/iframe_api";
+            // Inform CMP that this is YouTube
+            tag.setAttribute('data-usercentrics', 'YouTube');
+            const firstScriptTag = document.getElementsByTagName('script')[0];
+            if (firstScriptTag) firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+            else document.head.appendChild(tag);
+          }
+
+          // Polling check
+          let polls = 0;
+          const pollInterval = setInterval(() => {
+            polls++;
+            if (window.YT && window.YT.Player) {
+              console.log('HeroUAE: API detected via polling');
+              clearInterval(pollInterval);
+              resolve();
+            }
+            if (polls > 150) { // 15 seconds
+              console.warn('HeroUAE: Polling timeout');
+              clearInterval(pollInterval);
+              resolve(); // Resolve anyway to let the click handler decide
+            }
+          }, 100);
+
+          // Standard callback
+          const prevReady = window.onYouTubeIframeAPIReady;
+          window.onYouTubeIframeAPIReady = () => {
+            if (prevReady) prevReady();
+            console.log('HeroUAE: API Ready via event');
+            resolve();
+          };
+        });
+        
+        return apiPromise;
+      };
+
+      // 3. Setup Video Interactions
+      const videoId = section.getAttribute("data-video-id");
+      const videoPlaceholders = section.querySelectorAll('[data-video-placeholder]');
       
-      btn.addEventListener('mouseleave', () => {
-        btn.style.transform = `translate(0, 0)`;
-        const inner = btn.querySelector('span');
-        if (inner) inner.style.transform = `translate(0, 0)`;
+      videoPlaceholders.forEach(placeholder => {
+        // Pre-load on hover/touch
+        placeholder.addEventListener('mouseenter', () => loadAPI(), { once: true });
+        placeholder.addEventListener('touchstart', () => loadAPI(), { once: true });
+
+        // Direct click handler
+        placeholder.addEventListener('click', async (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          console.log('HeroUAE: Video clicked, checking API...');
+          
+          const wrap = placeholder.parentElement;
+          
+          // Wait for API (or timeout)
+          await loadAPI();
+          
+          if (window.YT && window.YT.Player) {
+            createPlayer(wrap, placeholder, videoId);
+          } else {
+            console.error('HeroUAE: API still not available, opening fallback');
+            window.open(`https://www.youtube.com/watch?v=${videoId}`, '_blank');
+          }
+        });
       });
-    });
+
+      function createPlayer(wrap, placeholder, videoId) {
+        if (wrap.querySelector('.yt-player-container')) return; // Already exists
+
+        const playerDiv = document.createElement('div');
+        playerDiv.className = "yt-player-container absolute inset-0 w-full h-full z-30 bg-black rounded-2xl overflow-hidden shadow-2xl transition-opacity duration-300";
+        wrap.appendChild(playerDiv);
+        
+        const closeBtn = document.createElement('button');
+        closeBtn.innerHTML = '✕';
+        closeBtn.className = "absolute top-4 right-4 z-40 w-10 h-10 bg-black/50 backdrop-blur-md text-white rounded-full flex items-center justify-center border border-white/20 hover:bg-black/80 transition-all duration-300 cursor-pointer text-lg";
+        wrap.appendChild(closeBtn);
+
+        placeholder.style.opacity = "0";
+        placeholder.style.pointerEvents = "none";
+
+        const origin = window.location.origin.includes('file://') ? '*' : window.location.origin;
+        console.log('HeroUAE: Creating player', { videoId, origin });
+        
+        let player;
+        try {
+          player = new window.YT.Player(playerDiv, {
+            height: '100%',
+            width: '100%',
+            videoId: videoId,
+            playerVars: {
+              'autoplay': 1,
+              'rel': 0,
+              'modestbranding': 1,
+              'enablejsapi': 1,
+              'origin': origin
+            },
+            events: {
+              'onReady': (event) => {
+                console.log('HeroUAE: Player fully ready');
+                event.target.playVideo();
+              },
+              'onStateChange': (event) => {
+                if (event.data === window.YT.PlayerState.ENDED) closeVideo();
+              },
+              'onError': (e) => {
+                console.error('HeroUAE: Player Error', e.data);
+                if (e.data === 153 || e.data === 101) {
+                   // Often origin or embedding issues
+                   console.warn('HeroUAE: Fallback to YouTube direct');
+                }
+              }
+            }
+          });
+        } catch (e) {
+          console.error('HeroUAE: Player creation failed', e);
+          closeVideo();
+        }
+
+        function closeVideo() {
+          if (player && player.destroy) player.destroy(); 
+          playerDiv.remove();
+          closeBtn.remove();
+          placeholder.style.opacity = "1";
+          placeholder.style.pointerEvents = "auto";
+        }
+
+        closeBtn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          closeVideo();
+        });
+      }
+
+      // Countdown
+      try {
+        const targetStr = section.getAttribute("data-countdown-target");
+        if (targetStr) {
+          const [datePart, timePart] = targetStr.split("T");
+          const [y, mo, d] = datePart.split("-").map(Number);
+          const [h, mi, s] = timePart.split(":").map(Number);
+          const target = new Date(y, mo - 1, d, h, mi, s).getTime();
+          const nodes = {
+            days: section.querySelector('[data-ct="days"]'),
+            hours: section.querySelector('[data-ct="hours"]'),
+            mins: section.querySelector('[data-ct="mins"]'),
+            secs: section.querySelector('[data-ct="secs"]'),
+          };
+          const label = section.querySelector(".hero-countdown");
+
+          function tick() {
+            const dist = target - Date.now();
+            if (dist < 0) {
+              if (label)
+                label.innerHTML =
+                  "<span class='text-sm font-bold text-[#110072]/60 uppercase tracking-[1.5px]'>Pilot Program is Live!</span>";
+              return;
+            }
+            const days = Math.floor(dist / 86400000);
+            const hours = Math.floor((dist % 86400000) / 3600000);
+            const mins = Math.floor((dist % 3600000) / 60000);
+            const secs = Math.floor((dist % 60000) / 1000);
+            if (nodes.days) nodes.days.textContent = String(days).padStart(2, "0");
+            if (nodes.hours) nodes.hours.textContent = String(hours).padStart(2, "0");
+            if (nodes.mins) nodes.mins.textContent = String(mins).padStart(2, "0");
+            if (nodes.secs) nodes.secs.textContent = String(secs).padStart(2, "0");
+          }
+          tick();
+          setInterval(tick, 1000);
+        }
+      } catch (e) { console.error('Countdown failed', e); }
+
+      // Force reveal Hero elements immediately
+      setTimeout(() => {
+        section.querySelectorAll('.premium-reveal, .clip-reveal').forEach(el => {
+          el.classList.add('is-visible');
+        });
+      }, 100);
+
+      // Special: Magnetic Buttons
+      const magneticBtns = section.querySelectorAll('[data-magnetic]');
+      magneticBtns.forEach(btn => {
+        btn.addEventListener('mousemove', (e) => {
+          const rect = btn.getBoundingClientRect();
+          const x = e.clientX - rect.left - rect.width / 2;
+          const y = e.clientY - rect.top - rect.height / 2;
+          
+          btn.style.transform = `translate(${x * 0.3}px, ${y * 0.3}px)`;
+          const inner = btn.querySelector('span');
+          if (inner) inner.style.transform = `translate(${x * 0.1}px, ${y * 0.1}px)`;
+        });
+        
+        btn.addEventListener('mouseleave', () => {
+          btn.style.transform = `translate(0, 0)`;
+          const inner = btn.querySelector('span');
+          if (inner) inner.style.transform = `translate(0, 0)`;
+        });
+      });
+    };
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', bootHero);
+    } else {
+      bootHero();
+    }
   })();
 </script>

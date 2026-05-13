@@ -129,21 +129,23 @@ const shuffledColors = [...cardColors].sort(() => Math.random() - 0.5);
   </div>
 
   <div class="ml-20 max-[1280px]:ml-10 max-lg:ml-6 max-sm:ml-4">
-    <div class="tl-swiper overflow-visible! m-0">
-      <div class="swiper-wrapper">
+    <div class="tl-swiper swiper overflow-visible! m-0">
+      <div class="swiper-wrapper flex flex-nowrap">
         {
           testimonials.map((t, i) => {
             const cardColor = shuffledColors[i % shuffledColors.length];
             return (
-              <div class="swiper-slide w-fit!">
+              <div class="swiper-slide w-fit! shrink-0">
                 <div
-                  class="max-w-[630px] w-full p-7 rounded-[20px] flex flex-col min-h-[320px] lg:min-h-[375px] h-full max-lg:p-6 max-lg:h-[330px] max-sm:p-4 max-sm:rounded-[14px] max-sm:h-[270px] transition-transform duration-500 hover:scale-[1.01]"
+                  class="max-w-[630px] w-full p-7 rounded-[20px] flex flex-col min-h-[320px] lg:min-h-[375px] h-auto max-lg:p-6 max-lg:h-[330px] max-sm:p-4 max-sm:rounded-[14px] max-sm:h-[270px] transition-transform duration-500 hover:scale-[1.01]"
                   style={`background-color: ${cardColor}`}
                 >
                   <img
                     class={`${t.logoClass} object-contain mb-7`}
                     src={t.logoSrc}
                     alt=""
+                    loading="lazy"
+                    decoding="async"
                   />
                   <p class="text-xl! leading-[1.5]! mb-4! text-[#343A40]! max-sm:text-base!">
                     {t.quote}
@@ -174,6 +176,15 @@ const shuffledColors = [...cardColors].sort(() => Math.random() - 0.5);
 </section>
 
 <style is:global>
+  /* Base Swiper Styles for Stability */
+  .tl-swiper:not(.swiper-initialized) .swiper-wrapper {
+    display: flex;
+    overflow: hidden;
+  }
+  .tl-swiper:not(.swiper-initialized) .swiper-slide {
+    flex-shrink: 0;
+  }
+
   .v2-leaders-title {
     font-size: 44px;
     font-weight: 600;
@@ -202,29 +213,72 @@ const shuffledColors = [...cardColors].sort(() => Math.random() - 0.5);
   }
 </style>
 
-<script
-  is:inline
-  src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
 <script is:inline>
   (function () {
-    function boot() {
+    let swiperInstance = null;
+    const section = document.getElementById('testimonials');
+
+    function bootSwiper() {
+      if (swiperInstance) return;
+      
+      // Load Swiper JS dynamically
       if (typeof Swiper === "undefined") {
-        setTimeout(boot, 50);
-        return;
+        if (!document.querySelector('script[src*="swiper-bundle"]')) {
+          const s = document.createElement('script');
+          s.src = "https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js";
+          s.async = true;
+          s.onload = init;
+          document.head.appendChild(s);
+        } else {
+          // Script exists but maybe not executed? Check periodically
+          let check = setInterval(() => {
+            if (typeof Swiper !== "undefined") {
+              clearInterval(check);
+              init();
+            }
+          }, 100);
+        }
+      } else {
+        init();
       }
-      new Swiper(".tl-swiper", {
-        loop: true,
-        navigation: { nextEl: ".tl-swipper-right", prevEl: ".tl-swipper-left" },
-        slidesPerView: 1,
-        spaceBetween: 10,
-        breakpoints: {
-          768: { slidesPerView: "auto", spaceBetween: 16 },
-          1024: { slidesPerView: 2.2, spaceBetween: 20 },
-        },
-      });
     }
-    if (document.readyState === "loading") {
-      document.addEventListener("DOMContentLoaded", boot);
-    } else boot();
+
+    function init() {
+      try {
+        const swiperEl = document.querySelector(".tl-swiper");
+        if (!swiperEl || swiperInstance) return;
+
+        swiperInstance = new Swiper(".tl-swiper", {
+          loop: true,
+          navigation: { nextEl: ".tl-swipper-right", prevEl: ".tl-swipper-left" },
+          slidesPerView: 1,
+          spaceBetween: 10,
+          breakpoints: {
+            768: { slidesPerView: "auto", spaceBetween: 16 },
+            1024: { slidesPerView: 2.2, spaceBetween: 20 },
+          },
+        });
+      } catch (e) {
+        console.error('Swiper init failed', e);
+      }
+    }
+
+    // Load on hover or scroll
+    if (section) {
+      section.addEventListener('mouseenter', bootSwiper, { once: true });
+      section.addEventListener('touchstart', bootSwiper, { once: true });
+      
+      if ('IntersectionObserver' in window) {
+        const obs = new IntersectionObserver((entries) => {
+          if (entries[0].isIntersecting) {
+            bootSwiper();
+            obs.disconnect();
+          }
+        }, { rootMargin: '300px' });
+        obs.observe(section);
+      } else {
+        bootSwiper();
+      }
+    }
   })();
 </script>

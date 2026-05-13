@@ -176,11 +176,11 @@ const securityCards = [
                 ClearTax's infrastructure is purpose-built for enterprise-grade
                 compliance — from single entities to multi-city conglomerates.
             </p>
-        </div>
-        <div
+        </div>        <div
             class="tw-grid grid-cols-1 lg:grid-cols-[340px_1fr] gap-6 items-start lg:gap-8"
+            data-ssr-root
         >
-            <div class="flex flex-col" data-ssr-root>
+            <div class="flex flex-col">
                 <div
                     class="group relative border-b border-black/10 first:border-t before:content-[''] before:absolute before:left-0 before:top-0 before:bottom-0 before:w-[3px] before:bg-[var(--color-purple)] before:rounded-r-[3px] before:scale-y-0 before:transition-transform before:duration-300 before:ease flex flex-col [&.active]:before:scale-y-100 active"
                     data-ssr="Scale"
@@ -266,8 +266,9 @@ const securityCards = [
                         <h2
                             class="text-[18px] font-semibold text-black/45 transition-[color,font-size] duration-300 group-[.active]:text-black group-[.active]:text-[20px] group-[.active]:font-bold m-0"
                         >
-                            Reliablity
+                            Reliability
                         </h2>
+
                         <svg
                             viewBox="0 0 22 22"
                             fill="none"
@@ -365,7 +366,13 @@ const securityCards = [
                                                     />
                                                 )}
                                                 <div class="text-[20px] mt-auto leading-[1.4] mt-[19px] font-medium text-black">
-                                                    <span data-count-to={card.value.replace(/[^0-9.]/g, '')} data-count-suffix={card.value.replace(/[0-9.]/g, '')}>{card.value}</span>
+                                                    <span 
+                                                        data-count-to={card.value.match(/[0-9.]+/)?.[0] || "0"} 
+                                                        data-count-prefix={card.value.match(/^[^0-9.]+/)?.[0] || ""}
+                                                        data-count-suffix={card.value.match(/[^0-9.]+$/)?.[0] || ""}
+                                                    >
+                                                        {card.value}
+                                                    </span>
                                                     <p class="m-0 mt-2 lg:text-[16px] text-[14px] leading-[1.4] text-black/40">
                                                         {card.label}
                                                     </p>
@@ -395,6 +402,8 @@ const securityCards = [
                                                         src={card.icon}
                                                         alt=""
                                                         class={`mb-4 object-contain ${card.className || "h-14 w-14"}`}
+                                                        loading="lazy"
+                                                        decoding="async"
                                                     />
                                                 ) : (
                                                     <div class="h-11 w-11 mb-4 rounded-[10px] border border-black/12" />
@@ -426,6 +435,8 @@ const securityCards = [
                                     src="https://cdn.prod.website-files.com/63ede4a3da6dbd6b05c4612f/69f32b6da57aa7edb2979353_mandate-logos.png"
                                     alt=""
                                     class="w-full h-full md:min-h-0 object-cover"
+                                    loading="lazy"
+                                    decoding="async"
                                 />
                             </div>
                         </div>
@@ -537,6 +548,8 @@ const securityCards = [
                                     src="https://cdn.prod.website-files.com/63ede4a3da6dbd6b05c4612f/69f32b6d22f58630b6926564_mandate-logos-1.png"
                                     alt=""
                                     class="w-full h-full object-contain"
+                                    loading="lazy"
+                                    decoding="async"
                                 />
                             </div>
                         </div>
@@ -544,7 +557,7 @@ const securityCards = [
                 </div>
             </div>
         </div>
-        <div class="mt-[48px] flex items-center justify-center">
+        <!-- <div class="mt-[48px] flex items-center justify-center">
             <a
                 href="#"
                 class="flex items-center cursor-pointer no-underline group duration-300 transition-all hover:translate-y-[-8px]"
@@ -573,7 +586,7 @@ const securityCards = [
                     </span>
                 </div>
             </a>
-        </div>
+        </div> -->
     </div>
 </section>
 
@@ -623,62 +636,79 @@ const securityCards = [
 
 <script is:inline>
     (function () {
-        const root = document.currentScript.previousElementSibling;
-        if (!root) return;
-        const items = root.querySelectorAll("[data-ssr]");
-        const graphics = root.querySelectorAll("[data-ssr-graphic]");
-        items.forEach((item) => {
-            const header = item.firstElementChild;
-            header?.addEventListener("click", () => {
-                const key = item.getAttribute("data-ssr");
-                if (item.classList.contains("active")) return;
-                items.forEach((i) => i.classList.remove("active"));
-                graphics.forEach((g) => g.classList.remove("active"));
-                item.classList.add("active");
-                const targetGraphic = root.querySelector(`[data-ssr-graphic="${key}"]`);
-                if (targetGraphic) {
-                    targetGraphic.classList.add("active");
-                    // Trigger count-up if applicable
-                    initCountUp(targetGraphic);
-                }
-            });
-        });
+        let initialized = false;
+        const section = document.getElementById('platform');
+        if (!section) return;
 
-        function initCountUp(container) {
-            const counters = container.querySelectorAll('[data-count-to]');
-            counters.forEach(counter => {
-                const target = parseFloat(counter.getAttribute('data-count-to'));
-                const suffix = counter.getAttribute('data-count-suffix') || '';
-                const duration = 2000; // 2 seconds
-                const start = 0;
-                let startTime = null;
+        function initPlatformJS() {
+            if (initialized) return;
+            initialized = true;
 
-                function animate(currentTime) {
-                    if (!startTime) startTime = currentTime;
-                    const progress = Math.min((currentTime - startTime) / duration, 1);
-                    // Premium easeOutExpo
-                    const easeProgress = progress === 1 ? 1 : 1 - Math.pow(2, -10 * progress);
-                    const currentCount = (easeProgress * (target - start) + start);
-                    
-                    if (target % 1 === 0) {
-                        counter.textContent = Math.floor(currentCount) + suffix;
-                    } else {
-                        counter.textContent = currentCount.toFixed(1) + suffix;
+            const root = section.querySelector("[data-ssr-root]") || section;
+            const items = root.querySelectorAll("[data-ssr]");
+            const graphics = root.querySelectorAll("[data-ssr-graphic]");
+            
+            items.forEach((item) => {
+                const header = item.firstElementChild;
+                header?.addEventListener("click", () => {
+                    const key = item.getAttribute("data-ssr");
+                    if (item.classList.contains("active")) return;
+                    items.forEach((i) => i.classList.remove("active"));
+                    graphics.forEach((g) => g.classList.remove("active"));
+                    item.classList.add("active");
+                    const targetGraphic = root.querySelector(`[data-ssr-graphic="${key}"]`);
+                    if (targetGraphic) {
+                        targetGraphic.classList.add("active");
+                        initCountUp(targetGraphic);
                     }
-
-                    if (progress < 1) {
-                        requestAnimationFrame(animate);
-                    }
-                }
-                requestAnimationFrame(animate);
+                });
             });
+
+            function initCountUp(container) {
+                const counters = container.querySelectorAll('[data-count-to]');
+                counters.forEach(counter => {
+                    const target = parseFloat(counter.getAttribute('data-count-to'));
+                    const prefix = counter.getAttribute('data-count-prefix') || '';
+                    const suffix = counter.getAttribute('data-count-suffix') || '';
+                    const duration = 2000;
+                    const start = 0;
+                    let startTime = null;
+
+                    function animate(currentTime) {
+                        if (!startTime) startTime = currentTime;
+                        const progress = Math.min((currentTime - startTime) / duration, 1);
+                        const easeProgress = progress === 1 ? 1 : 1 - Math.pow(2, -10 * progress);
+                        const currentCount = (easeProgress * (target - start) + start);
+                        
+                        let displayValue = "";
+                        if (target % 1 === 0) {
+                            displayValue = Math.floor(currentCount);
+                        } else {
+                            displayValue = currentCount.toFixed(1);
+                        }
+                        
+                        counter.textContent = prefix + displayValue + suffix;
+
+                        if (progress < 1) requestAnimationFrame(animate);
+                    }
+                    requestAnimationFrame(animate);
+                });
+            }
+
+            const activeGraphic = root.querySelector('[data-ssr-graphic].active');
+            if (activeGraphic) {
+                setTimeout(() => initCountUp(activeGraphic), 500);
+            }
         }
 
-        // Initial count-up for active panel
-        const activeGraphic = root.querySelector('[data-ssr-graphic].active');
-        if (activeGraphic) {
-            // Wait for intersection or just run if visible
-            setTimeout(() => initCountUp(activeGraphic), 500);
-        }
+        // Defer until interaction or scroll
+        section.addEventListener('mouseenter', initPlatformJS, { once: true });
+        section.addEventListener('touchstart', initPlatformJS, { once: true });
+        if ('IntersectionObserver' in window) {
+            const obs = new IntersectionObserver((entries) => {
+                if (entries[0].isIntersecting) { initPlatformJS(); obs.disconnect(); }
+            }, { rootMargin: '200px' });
+            obs.observe(section);
+        } else { initPlatformJS(); }
     })();
 </script>
