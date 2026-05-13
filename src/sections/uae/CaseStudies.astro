@@ -144,6 +144,8 @@ const shuffledColors = [...cardColors].sort(() => Math.random() - 0.5);
                     class={`${t.logoClass} object-contain mb-7`}
                     src={t.logoSrc}
                     alt=""
+                    loading="lazy"
+                    decoding="async"
                   />
                   <p class="text-xl! leading-[1.5]! mb-4! text-[#343A40]! max-sm:text-base!">
                     {t.quote}
@@ -202,20 +204,34 @@ const shuffledColors = [...cardColors].sort(() => Math.random() - 0.5);
   }
 </style>
 
-<script
-  is:inline
-  src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
 <script is:inline>
   (function () {
+    let swiperLoaded = false;
+    const section = document.getElementById('testimonials');
+
     function bootSwiper() {
-      try {
-        if (typeof Swiper === "undefined") {
+      if (swiperLoaded) return;
+      
+      // Load Swiper JS dynamically
+      if (typeof Swiper === "undefined") {
+        if (!document.querySelector('script[src*="swiper-bundle"]')) {
+          const s = document.createElement('script');
+          s.src = "https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js";
+          s.onload = init;
+          document.head.appendChild(s);
+        } else {
           setTimeout(bootSwiper, 100);
-          return;
         }
-        
+        return;
+      }
+      init();
+    }
+
+    function init() {
+      try {
         const swiperEl = document.querySelector(".tl-swiper");
-        if (!swiperEl) return;
+        if (!swiperEl || swiperLoaded) return;
+        swiperLoaded = true;
 
         new Swiper(".tl-swiper", {
           loop: true,
@@ -228,14 +244,26 @@ const shuffledColors = [...cardColors].sort(() => Math.random() - 0.5);
           },
         });
       } catch (e) {
-        console.error('Swiper boot failed', e);
+        console.error('Swiper init failed', e);
       }
     }
 
-    if (document.readyState === "loading") {
-      document.addEventListener("DOMContentLoaded", bootSwiper);
-    } else {
-      bootSwiper();
+    // Load on hover or scroll
+    if (section) {
+      section.addEventListener('mouseenter', bootSwiper, { once: true });
+      section.addEventListener('touchstart', bootSwiper, { once: true });
+      
+      if ('IntersectionObserver' in window) {
+        const obs = new IntersectionObserver((entries) => {
+          if (entries[0].isIntersecting) {
+            bootSwiper();
+            obs.disconnect();
+          }
+        }, { rootMargin: '200px' });
+        obs.observe(section);
+      } else {
+        bootSwiper();
+      }
     }
   })();
 </script>

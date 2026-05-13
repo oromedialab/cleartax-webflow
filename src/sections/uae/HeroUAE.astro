@@ -425,22 +425,41 @@ const checklistItems = [
       const section = document.querySelector('.hero-uae') || document.querySelector('section[data-video-id]');
       if (!section) return;
 
-      // 2. Load YouTube API if not present
-      try {
-        if (!window.onYouTubeIframeAPIReady) {
-          window.onYouTubeIframeAPIReady = () => {
-            window.YT_READY = true;
-          };
-          if (!document.querySelector('script[src*="youtube.com/iframe_api"]')) {
-            const tag = document.createElement('script');
-            tag.src = "https://www.youtube.com/iframe_api";
-            const firstScriptTag = document.getElementsByTagName('script')[0];
-            firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+      // 2. Load YouTube API on demand (Hover/Interaction)
+      let apiLoading = false;
+      const loadAPI = () => {
+        if (apiLoading || window.YT_READY) return;
+        apiLoading = true;
+        try {
+          if (!window.onYouTubeIframeAPIReady) {
+            window.onYouTubeIframeAPIReady = () => {
+              window.YT_READY = true;
+            };
+            if (!document.querySelector('script[src*="youtube.com/iframe_api"]')) {
+              const tag = document.createElement('script');
+              tag.src = "https://www.youtube.com/iframe_api";
+              const firstScriptTag = document.getElementsByTagName('script')[0];
+              if (firstScriptTag) firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+              else document.head.appendChild(tag);
+            }
           }
-        }
-      } catch (e) { console.error('YouTube API load failed', e); }
+        } catch (e) { console.error('YouTube API load failed', e); }
+      };
+
+      // Hover to pre-load API
+      const videoPlaceholders = section.querySelectorAll('[data-video-placeholder]');
+      videoPlaceholders.forEach(p => {
+        p.addEventListener('mouseenter', loadAPI, { once: true });
+        p.addEventListener('touchstart', loadAPI, { once: true });
+      });
 
       function createPlayer(wrap, placeholder, videoId) {
+        if (!window.YT || !window.YT.Player) {
+          loadAPI();
+          setTimeout(() => createPlayer(wrap, placeholder, videoId), 100);
+          return;
+        }
+
         const playerDiv = document.createElement('div');
         playerDiv.className = "absolute inset-0 w-full h-full z-30 bg-black rounded-2xl overflow-hidden shadow-2xl transition-opacity duration-300";
         wrap.appendChild(playerDiv);
@@ -459,7 +478,6 @@ const checklistItems = [
         
         let player;
         try {
-          // Ensure container is visible
           playerDiv.style.opacity = '1';
           
           player = new window.YT.Player(playerDiv, {
@@ -487,11 +505,6 @@ const checklistItems = [
               },
               'onError': (e) => {
                 console.error('HeroUAE: YT Player Error Code', e.data);
-                if (e.data === 150 || e.data === 101 || e.data === 153) {
-                  console.error('HeroUAE: This video might have embedding restrictions or configuration issues.');
-                }
-                // Don't close immediately so user can see the error if they want, 
-                // but 153 usually shows a big error screen in the iframe.
               }
             }
           });

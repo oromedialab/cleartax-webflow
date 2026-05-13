@@ -23,24 +23,26 @@ import FAQ from "../sections/uae/FAQ.astro";
       content="Stay compliant with UAE's FTA-mandated e-invoicing regulations. ClearTax helps UAE businesses automate, generate, and submit e-invoices seamlessly."
     />
     <meta name="referrer" content="strict-origin-when-cross-origin" />
+    <link rel="preload" as="image" href="https://cdn.prod.website-files.com/63ede4a3da6dbd6b05c4612f/69fb0e1e59fcac212140457b_hero-v2.png" fetchpriority="high" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
       href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800;900&display=swap"
       rel="stylesheet"
     />
+
+
     <!-- Premium Interactions -->
     <script is:inline src="https://cdn.jsdelivr.net/npm/lenis@1.1.13/dist/lenis.min.js"></script>
     <script is:inline>
       (function() {
         document.documentElement.classList.add('js-enabled');
         
-        // Prepare reveals immediately to prevent FOUC but keep content visible if JS fails
-        const setup = () => {
+        // 1. Lenis Smooth Scroll (Immediate but defensive)
+        const setupCritical = () => {
           const elements = document.querySelectorAll('.premium-reveal, .blur-reveal, .clip-reveal');
           elements.forEach(el => el.classList.add('is-ready'));
 
-          // 1. Lenis Smooth Scroll
           try {
             if (typeof Lenis !== 'undefined') {
               const lenis = new Lenis({
@@ -56,7 +58,49 @@ import FAQ from "../sections/uae/FAQ.astro";
             }
           } catch (e) { console.error('Lenis init failed', e); }
 
-          // 2. Ambient Aura
+          // Reveal Observer
+          try {
+            const revealObserver = new IntersectionObserver((entries) => {
+              entries.forEach((entry) => {
+                if (entry.isIntersecting) {
+                  entry.target.classList.add('is-visible');
+                  revealObserver.unobserve(entry.target);
+                }
+              });
+            }, { threshold: 0.1 });
+            elements.forEach(el => revealObserver.observe(el));
+          } catch (e) { console.error('Observer init failed', e); }
+        };
+
+        // 2. Deferred Non-Critical JS & Tracking (Load on interaction/idle)
+        const setupDeferred = () => {
+          if (window.DEFERRED_LOADED) return;
+          window.DEFERRED_LOADED = true;
+
+          // Load Usercentrics CMP
+          try {
+            const cmpBlocker = document.createElement('script');
+            cmpBlocker.src = "https://web.cmp.usercentrics.eu/modules/autoblocker.js";
+            document.head.appendChild(cmpBlocker);
+
+            const cmpLoader = document.createElement('script');
+            cmpLoader.id = "usercentrics-cmp";
+            cmpLoader.src = "https://web.cmp.usercentrics.eu/ui/loader.js";
+            cmpLoader.setAttribute('data-settings-id', 'utqqyaEbvbzrTk');
+            cmpLoader.async = true;
+            document.head.appendChild(cmpLoader);
+          } catch (e) { console.error('CMP load failed', e); }
+
+          // Load Google Tag Manager
+          try {
+            (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+            new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+            j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+            'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+            })(window,document,'script','dataLayer','GTM-P5NDQXGH');
+          } catch (e) { console.error('GTM load failed', e); }
+
+          // Ambient Aura
           try {
             const aura = document.querySelector('.ambient-aura');
             if (aura) {
@@ -72,20 +116,7 @@ import FAQ from "../sections/uae/FAQ.astro";
             }
           } catch (e) { console.error('Aura init failed', e); }
 
-          // 3. Reveal Observer
-          try {
-            const revealObserver = new IntersectionObserver((entries) => {
-              entries.forEach((entry) => {
-                if (entry.isIntersecting) {
-                  entry.target.classList.add('is-visible');
-                  revealObserver.unobserve(entry.target);
-                }
-              });
-            }, { threshold: 0.1 });
-            elements.forEach(el => revealObserver.observe(el));
-          } catch (e) { console.error('Observer init failed', e); }
-
-          // 4. Scroll Progress
+          // Scroll Progress
           const prog = document.getElementById('scroll-progress');
           if (prog) {
             window.addEventListener('scroll', () => {
@@ -98,14 +129,23 @@ import FAQ from "../sections/uae/FAQ.astro";
         };
 
         if (document.readyState === 'loading') {
-          document.addEventListener('DOMContentLoaded', setup);
+          document.addEventListener('DOMContentLoaded', setupCritical);
         } else {
-          setup();
+          setupCritical();
         }
+
+        // Interaction Listeners for Deferral
+        ['mousemove', 'touchstart', 'scroll', 'keydown'].forEach(ev => {
+          window.addEventListener(ev, setupDeferred, { once: true, passive: true });
+        });
       })();
     </script>
   </head>
   <body class="bg-[#FCFCFD]">
+    <!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-P5NDQXGH"
+height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<!-- End Google Tag Manager (noscript) -->
     <div class="ambient-aura"></div>
     <div id="scroll-progress" class="fixed top-0 left-0 h-0.5 bg-gradient-to-r from-[#110072] to-[#7A5698] z-[100] w-0 transition-[width] duration-150 ease-out"></div>
     <Navbar countryLabel="UAE" />
