@@ -63,20 +63,43 @@ import FAQ from "../sections/uae/FAQ.astro";
             }
           } catch (e) { console.error('CMP load failed', e); }
 
+          // 1. Lenis Smooth Scroll (Improved Stability)
           try {
             if (typeof Lenis !== 'undefined') {
-              const lenis = new Lenis({
+              window.lenis = new Lenis({
                 duration: 1.2,
                 easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
-                smoothWheel: true
+                smoothWheel: true,
+                touchMultiplier: 1.5 // Better mobile feel
               });
+
               function raf(time) {
-                lenis.raf(time);
+                window.lenis.raf(time);
                 requestAnimationFrame(raf);
               }
               requestAnimationFrame(raf);
+
+              // Force refresh after a delay to catch lazy-loaded content
+              setTimeout(() => {
+                window.lenis.resize();
+              }, 1500);
+
+              // Global refresh on window resize
+              window.addEventListener('resize', () => window.lenis.resize());
             }
           } catch (e) { console.error('Lenis init failed', e); }
+
+          // 2. Scroll Unlocker Safety
+          try {
+            document.documentElement.style.overflow = 'auto';
+            document.body.style.overflow = 'auto';
+            // Ensure no other scripts locked it
+            setTimeout(() => {
+              if (window.getComputedStyle(document.body).overflow === 'hidden') {
+                document.body.style.overflow = 'auto';
+              }
+            }, 500);
+          } catch (e) {}
 
           // Reveal Observer
           try {
