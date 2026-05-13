@@ -23,7 +23,7 @@ const {
   secondaryCtaLabel = "Explore Platform",
   secondaryCtaHref = "#platform",
   countdownTarget = "2026-10-30T00:00:00",
-  videoId = "LO3uyvcbJSI",
+  videoId = "w-4S5MkpIJs",
 } = Astro.props as Props;
 
 const checklistItems = [
@@ -58,7 +58,7 @@ const checklistItems = [
         {
           checklistItems.map((item, index) => (
             <li 
-              class="inline-flex items-center lg:gap-5 gap-3 bg-white border-2 border-[#F5F5F533] rounded-lg sm:rounded-full p-2 lg:p-3 [box-shadow:_1px_1px_4px_0px_#00000014] transition-all hover:-translate-y-1 cursor-pointer premium-reveal"
+              class="inline-flex items-center lg:gap-5 gap-3 bg-white border-2 border-[#F5F5F533] rounded-lg sm:rounded-full p-2 lg:p-3 [box-shadow:_1px_1px_4px_0px_#00000014] transition-all cursor-pointer premium-reveal"
               style={`transition-delay: ${200 + index * 100}ms`}
             >
               <div class="shrink-0 text-[#27127A] flex">
@@ -235,7 +235,6 @@ const checklistItems = [
       <div class="flex lg:gap-6 gap-3 flex-wrap premium-reveal [transition-delay:500ms]">
         <a
           href={primaryCtaHref}
-          data-magnetic
           class="lg:py-4 lg:px-10 py-3 w-full sm:w-fit px-10 bg-[linear-gradient(90deg,_#110072_0%,_#7A5698_100%)] rounded-full text-white text-sm lg:text-base font-normal inline-flex justify-center items-center gap-2 transition-all duration-250 hover:-translate-y-0.5 hover:shadow-[0_10px_28px_rgba(99,85,216,0.45)] no-underline"
         >
           <span class="relative z-10 flex items-center gap-2">
@@ -257,7 +256,6 @@ const checklistItems = [
         </a>
         <a
           href={secondaryCtaHref}
-          data-magnetic
           class="lg:py-4 lg:px-10 py-3 px-10 w-full sm:w-fit border-2 text-center border-white/80 lg:border-[#140373] rounded-full text-white lg:text-[#1D0A76] text-sm lg:text-base font-normal transition-all duration-250 hover:-translate-y-0.5 no-underline"
         >
           <span class="relative z-10">{secondaryCtaLabel}</span>
@@ -426,57 +424,44 @@ const checklistItems = [
       if (!section) return;
 
       // 2. Load YouTube API on demand (Hover/Interaction)
-      // 2. Setup Video Interactions (Final "Perfect" Version)
+      // 2. Setup Video Interactions (Final Universal Version)
       const sectionVideoId = section.getAttribute("data-video-id");
       const videoPlaceholders = section.querySelectorAll('[data-video-placeholder]');
       
+      // Load YT API if not present
+      if (!window.YT_API_LOADED) {
+        const tag = document.createElement('script');
+        tag.src = "https://www.youtube.com/iframe_api";
+        document.head.appendChild(tag);
+        window.YT_API_LOADED = true;
+      }
+
       videoPlaceholders.forEach(placeholder => {
         placeholder.addEventListener('click', (e) => {
           e.preventDefault();
           e.stopPropagation();
           
           const videoId = placeholder.getAttribute('data-video-id') || sectionVideoId;
-          console.log('HeroUAE: Initializing video', videoId);
-          
           const wrap = placeholder.parentElement;
           if (!wrap || !videoId) return;
 
-          // Prevent duplicate players
           if (wrap.querySelector('.yt-player-container')) return;
 
-          // Create Container
-          const container = document.createElement('div');
-          container.className = "yt-player-container absolute inset-0 w-full h-full z-30 bg-black rounded-2xl overflow-hidden shadow-2xl animate-[ssrFadeIn_0.3s_ease]";
-          
-          // Create IFrame
-          const iframe = document.createElement('iframe');
-          const origin = window.location.origin;
-          const videoSrc = `https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0&enablejsapi=1&origin=${encodeURIComponent(origin)}`;
-          
-          iframe.setAttribute('frameborder', '0');
-          iframe.setAttribute('allow', 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share');
-          iframe.setAttribute('allowfullscreen', 'true');
-          iframe.className = "w-full h-full";
-          
-          // Usercentrics/CMP Support
-          if (window.UC_UI || document.querySelector('script[src*="usercentrics"]')) {
-            iframe.setAttribute('data-src', videoSrc);
-            iframe.setAttribute('data-usercentrics', 'YouTube');
-            iframe.src = 'about:blank'; 
-          } else {
-            iframe.src = videoSrc;
-          }
+          wrap.classList.add('relative');
 
-          container.appendChild(iframe);
+          const container = document.createElement('div');
+          container.className = "yt-player-container absolute inset-0 w-full h-full z-30 bg-black rounded-2xl overflow-hidden shadow-2xl";
+          
+          const playerElement = document.createElement('div');
+          playerElement.className = "w-full h-full"; // Ensure the div fills the container
+          container.appendChild(playerElement);
           wrap.appendChild(container);
 
-          // Close Button
           const closeBtn = document.createElement('button');
           closeBtn.innerHTML = '✕';
-          closeBtn.className = "absolute top-4 right-4 z-40 w-10 h-10 bg-black/60 backdrop-blur-md text-white rounded-full flex items-center justify-center border border-white/20 hover:bg-black/90 transition-all duration-300 cursor-pointer text-lg";
+          closeBtn.className = "absolute top-4 right-4 z-40 w-10 h-10 bg-black/70 backdrop-blur-md text-white rounded-full flex items-center justify-center border border-white/20 hover:bg-black/90 transition-all duration-300 cursor-pointer text-lg";
           wrap.appendChild(closeBtn);
 
-          // UI Cleanup
           placeholder.style.opacity = "0";
           placeholder.style.pointerEvents = "none";
 
@@ -486,6 +471,36 @@ const checklistItems = [
             placeholder.style.opacity = "1";
             placeholder.style.pointerEvents = "auto";
           };
+
+          const startPlayer = () => {
+            new YT.Player(playerElement, {
+              height: '100%',
+              width: '100%',
+              videoId: videoId,
+              playerVars: {
+                autoplay: 1,
+                rel: 0,
+                modestbranding: 1,
+                enablejsapi: 1,
+                origin: window.location.origin,
+                iv_load_policy: 3
+              },
+              events: {
+                onStateChange: (event) => {
+                  if (event.data === 0) closeVideo(); // 0 is ENDED
+                },
+                onReady: (event) => {
+                  event.target.playVideo();
+                }
+              }
+            });
+          };
+
+          if (window.YT && window.YT.Player) {
+            startPlayer();
+          } else {
+            window.onYouTubeIframeAPIReady = startPlayer;
+          }
 
           closeBtn.addEventListener('click', (ev) => {
             ev.stopPropagation();

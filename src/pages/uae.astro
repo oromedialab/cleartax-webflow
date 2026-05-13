@@ -37,12 +37,11 @@ import FAQ from "../sections/uae/FAQ.astro";
     <link rel="apple-touch-icon" href="https://cdn.prod.website-files.com/63ede4a3da6dbd6b05c4612f/63ede4a3da6dbd8997c46450_256by256.png" />
 
     <!-- Premium Interactions -->
-    <script is:inline src="https://cdn.jsdelivr.net/npm/lenis@1.1.13/dist/lenis.min.js"></script>
     <script is:inline>
       (function() {
         document.documentElement.classList.add('js-enabled');
         
-        // 1. Lenis Smooth Scroll & CMP (Immediate but defensive)
+        // 1. Critical setup & CMP (Immediate but defensive)
         const setupCritical = () => {
           const elements = document.querySelectorAll('.premium-reveal, .blur-reveal, .clip-reveal');
           elements.forEach(el => el.classList.add('is-ready'));
@@ -63,33 +62,7 @@ import FAQ from "../sections/uae/FAQ.astro";
             }
           } catch (e) { console.error('CMP load failed', e); }
 
-          // 1. Lenis Smooth Scroll (Improved Stability)
-          try {
-            if (typeof Lenis !== 'undefined') {
-              window.lenis = new Lenis({
-                duration: 1.2,
-                easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
-                smoothWheel: true,
-                touchMultiplier: 1.5 // Better mobile feel
-              });
-
-              function raf(time) {
-                window.lenis.raf(time);
-                requestAnimationFrame(raf);
-              }
-              requestAnimationFrame(raf);
-
-              // Force refresh after a delay to catch lazy-loaded content
-              setTimeout(() => {
-                window.lenis.resize();
-              }, 1500);
-
-              // Global refresh on window resize
-              window.addEventListener('resize', () => window.lenis.resize());
-            }
-          } catch (e) { console.error('Lenis init failed', e); }
-
-          // 2. Scroll Unlocker Safety
+          // 2. Scroll Unlocker Safety (Ensures page is always scrollable)
           try {
             document.documentElement.style.overflow = 'auto';
             document.body.style.overflow = 'auto';
@@ -185,7 +158,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     <ContactForm
       sheetName="uaeRAD"
       originCountry="UAE"
-      thankYouUrl="https://cleartax.com/ae/en-e-invoicing/thank-you/"
+      thankYouUrl="https://www.cleartax.com/thank-you"
     />
     <FAQ />
   </body>
