@@ -437,15 +437,17 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       <span class="fwd-form-sub">Join CFOs and finance leaders from UAE enterprises</span>
       <form onsubmit="fwdSubmit(event)">
         <div class="fwd-form-row">
-          <div class="fwd-fg"><label for="fwd-name">Full Name *</label><input type="text" id="fwd-name" placeholder="Your full name" required></div>
+          <div class="fwd-fg"><label for="fwd-fname">First Name *</label><input type="text" id="fwd-fname" placeholder="First name" required></div>
+          <div class="fwd-fg"><label for="fwd-lname">Last Name *</label><input type="text" id="fwd-lname" placeholder="Last name" required></div>
+        </div>
+        <div class="fwd-form-row">
           <div class="fwd-fg"><label for="fwd-email">Work Email *</label><input type="email" id="fwd-email" placeholder="name@company.com" required></div>
+          <div class="fwd-fg"><label for="fwd-phone">Phone *</label><input type="tel" id="fwd-phone" placeholder="+971 50 123 4567" required></div>
         </div>
         <div class="fwd-form-row">
           <div class="fwd-fg"><label for="fwd-co">Company *</label><input type="text" id="fwd-co" placeholder="Your company" required></div>
           <div class="fwd-fg"><label for="fwd-role">Designation *</label><input type="text" id="fwd-role" placeholder="e.g. CFO, Head of Tax" required></div>
         </div>
-        <!-- Change 2: Phone number is now mandatory (removed "Optional" label, added required) -->
-        <div class="fwd-fg"><label for="fwd-phone">Phone *</label><input type="tel" id="fwd-phone" placeholder="+971 50 123 4567" required></div>
         <div class="fwd-info-bar"><span>📅</span><span>Thursday, 21 May 2026 · 01:00 PM GST · 75 Minutes · Online</span></div>
         <button type="submit" class="fwd-submit">Reserve My Seat →</button>
       </form>
@@ -679,24 +681,27 @@ async function fwdSubmit(e) {
   const originalBtnText = btn.textContent;
   const originalBtnBg = btn.style.background || '';
   
-  const name = document.getElementById('fwd-name').value;
+  const fname = document.getElementById('fwd-fname').value;
+  const lname = document.getElementById('fwd-lname').value;
   const email = document.getElementById('fwd-email').value;
   const company = document.getElementById('fwd-co').value;
   const designation = document.getElementById('fwd-role').value;
   const phone = document.getElementById('fwd-phone').value;
   
-  const scriptURL = 'https://script.google.com/macros/s/AKfycbyLs1LetWMzpNVHtYGHnqauECOKWLYDnqjwnP751wjVNET7bVEcwPugWKK9RKMZRpNT/exec';
+  const scriptURL = 'https://script.google.com/macros/s/AKfycbw62uMAxDJu11UT7LU3vnbt1D_2YSqcP_fBltpDT8VjlxkG59StwS_YLNMAZA2py86-/exec';
   
   btn.textContent = 'Submitting...';
   btn.style.opacity = '0.7';
   btn.disabled = true;
   
   const formData = new FormData();
-  formData.append('name', name);
+  formData.append('first_name', fname);
+  formData.append('last_name', lname);
   formData.append('email', email);
   formData.append('company', company);
   formData.append('designation', designation);
   formData.append('phone', phone);
+  formData.append('country', 'AE');
   formData.append('sheetName', 'Forward UAE');
   
   const urlParams = new URLSearchParams(window.location.search);
@@ -706,8 +711,18 @@ async function fwdSubmit(e) {
   formData.append('utm_term', urlParams.get('utm_term') || '');
   formData.append('utm_content', urlParams.get('utm_content') || '');
   
+  // --- DEBUGGING BLOCK ---
+  console.log('--- DEBUG: FORM SUBMISSION STARTED ---');
+  console.log('Target Script URL:', scriptURL);
+  const debugObj = {};
+  formData.forEach((value, key) => { debugObj[key] = value; });
+  console.table(debugObj);
+  // ------------------------
+
   try {
-    await fetch(scriptURL, { 
+    // 1. SUBMIT TO BACKEND (Handles Google Sheets + Demio API)
+    console.log("Submitting to backend...");
+    fetch(scriptURL, { 
       method: 'POST', 
       body: formData,
       mode: 'no-cors'
@@ -718,7 +733,7 @@ async function fwdSubmit(e) {
     btn.style.opacity = '1';
     
     setTimeout(() => {
-      document.getElementById('fwd-modal-msg').innerHTML = 'Thank you, <strong>' + name + '</strong>!<br>Your seat is reserved for ClearTax Forward UAE Edition.<br>📅 Thursday, 21 May 2026 &middot; 01:00 PM GST';
+      document.getElementById('fwd-modal-msg').innerHTML = 'Thank you, <strong>' + fname + ' ' + lname + '</strong>!<br>Your seat is reserved for ClearTax Forward UAE Edition.<br>📅 Thursday, 21 May 2026 &middot; 01:00 PM GST';
       document.getElementById('fwd-modal-wrap').style.display = 'flex';
       
       form.reset();

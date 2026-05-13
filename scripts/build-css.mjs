@@ -21,6 +21,7 @@ const TARGETS = [
   { name: 'uae',    input: 'src/styles/uae.css' },
   { name: 'uaev2',  input: 'src/styles/uaev2.css' },
   { name: 'global', input: 'src/styles/global.css' },
+  { name: 'scale-and-security', input: 'src/styles/scale-and-security.css' },
 ];
 
 const OUT_DIR = resolve(ROOT, 'public/css');

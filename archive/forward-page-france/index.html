@@ -258,12 +258,12 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 }
 #fwd-hero .fwd-form-sub{font-size:0.85rem!important;color:var(--text-3)!important;margin-bottom:1.5rem!important;display:block!important}
 #fwd-hero .fwd-form-row{
-  display:grid!important;grid-template-columns:1fr!important;gap:0!important
+  display:grid!important;grid-template-columns:1fr!important;gap:0!important;margin-bottom:0.85rem!important
 }
 @media(min-width:480px){
   #fwd-hero .fwd-form-row{grid-template-columns:1fr 1fr!important;gap:0.875rem!important}
 }
-#fwd-hero .fwd-fg{display:flex!important;flex-direction:column!important;gap:0.4rem!important;margin-bottom:0.85rem!important}
+#fwd-hero .fwd-fg{display:flex!important;flex-direction:column!important;gap:0.4rem!important;margin-bottom:0!important}
 #fwd-hero .fwd-fg label{font-size:0.8rem!important;font-weight:600!important;color:var(--text-2)!important;display:block!important}
 #fwd-hero .fwd-fg .opt{font-weight:400!important;color:var(--text-3)!important;font-size:0.75rem!important}
 #fwd-hero .fwd-fg input{
@@ -764,17 +764,16 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       <span class="fwd-form-sub">Join CFOs and finance leaders from European enterprises</span>
       <form onsubmit="fwdSubmit(event)">
         <div class="fwd-form-row">
-          <div class="fwd-fg"><label for="fwd-name">Full Name *</label><input type="text" id="fwd-name" placeholder="Your full name" required></div>
+          <div class="fwd-fg"><label for="fwd-fname">First Name *</label><input type="text" id="fwd-fname" placeholder="First name" required></div>
+          <div class="fwd-fg"><label for="fwd-lname">Last Name *</label><input type="text" id="fwd-lname" placeholder="Last name" required></div>
+        </div>
+        <div class="fwd-form-row">
           <div class="fwd-fg"><label for="fwd-email">Work Email *</label><input type="email" id="fwd-email" placeholder="name@company.com" required></div>
+          <div class="fwd-fg"><label for="fwd-phone">Phone *</label><input type="tel" id="fwd-phone" placeholder="+33 6 12 34 56 78" required></div>
         </div>
         <div class="fwd-form-row">
           <div class="fwd-fg"><label for="fwd-co">Company *</label><input type="text" id="fwd-co" placeholder="Your company" required></div>
           <div class="fwd-fg"><label for="fwd-role">Designation *</label><input type="text" id="fwd-role" placeholder="e.g. CFO, Head of Tax" required></div>
-        </div>
-        <!-- Change 2: Phone mandatory — removed (Optional), added required -->
-        <div class="fwd-fg">
-          <label for="fwd-phone">Phone *</label>
-          <input type="tel" id="fwd-phone" placeholder="+49 30 1234 5678" required>
         </div>
         <div class="fwd-info-bar"><span>📅</span><span>Thursday, 21 May 2026 · 11:00 AM CEST · 75 Minutes · Online</span></div>
         <button type="submit" class="fwd-submit">Reserve My Seat →</button>
@@ -1047,24 +1046,27 @@ async function fwdSubmit(e) {
   const originalBtnText = btn.textContent;
   const originalBtnBg = btn.style.background || '';
 
-  const name = document.getElementById('fwd-name').value;
+  const fname = document.getElementById('fwd-fname').value;
+  const lname = document.getElementById('fwd-lname').value;
   const email = document.getElementById('fwd-email').value;
   const company = document.getElementById('fwd-co').value;
   const designation = document.getElementById('fwd-role').value;
   const phone = document.getElementById('fwd-phone').value;
 
-  const scriptURL = 'https://script.google.com/macros/s/AKfycbyLs1LetWMzpNVHtYGHnqauECOKWLYDnqjwnP751wjVNET7bVEcwPugWKK9RKMZRpNT/exec';
+  const scriptURL = 'https://script.google.com/macros/s/AKfycbw62uMAxDJu11UT7LU3vnbt1D_2YSqcP_fBltpDT8VjlxkG59StwS_YLNMAZA2py86-/exec';
 
   btn.textContent = 'Submitting...';
   btn.style.opacity = '0.7';
   btn.disabled = true;
 
   const formData = new FormData();
-  formData.append('name', name);
+  formData.append('first_name', fname);
+  formData.append('last_name', lname);
   formData.append('email', email);
   formData.append('company', company);
   formData.append('designation', designation);
   formData.append('phone', phone);
+  formData.append('country', 'FR');
   formData.append('sheetName', 'Forward France');
 
   const urlParams = new URLSearchParams(window.location.search);
@@ -1074,9 +1076,18 @@ async function fwdSubmit(e) {
   formData.append('utm_term', urlParams.get('utm_term') || '');
   formData.append('utm_content', urlParams.get('utm_content') || '');
 
+  // --- DEBUGGING BLOCK ---
+  console.log('--- DEBUG: FORM SUBMISSION STARTED ---');
+  console.log('Target Script URL:', scriptURL);
+  const debugObj = {};
+  formData.forEach((value, key) => { debugObj[key] = value; });
+  console.table(debugObj);
+  // ------------------------
+
   try {
-    await fetch(scriptURL, {
-      method: 'POST',
+    // 1. SUBMIT TO BACKEND (Handles Google Sheets + Demio API)
+    fetch(scriptURL, { 
+      method: 'POST', 
       body: formData,
       mode: 'no-cors'
     });
@@ -1084,17 +1095,17 @@ async function fwdSubmit(e) {
     btn.textContent = '✓ Seat Reserved!';
     btn.style.background = 'linear-gradient(135deg,#00A396,#00C4B0)';
     btn.style.opacity = '1';
-
+    
     setTimeout(() => {
-      document.getElementById('fwd-modal-msg').innerHTML = 'Thank you, <strong>' + name + '</strong>!<br>Your seat is reserved for ClearTax Forward France Edition.<br>📅 Thursday, 21 May 2026 &middot; 11:00 AM CEST';
+      document.getElementById('fwd-modal-msg').innerHTML = 'Thank you, <strong>' + fname + ' ' + lname + '</strong>!<br>Your seat is reserved for ClearTax Forward France Edition.<br>📅 Thursday, 21 May 2026 &middot; 11:00 AM CEST';
       document.getElementById('fwd-modal-wrap').style.display = 'flex';
-
+      
       form.reset();
       btn.textContent = originalBtnText;
       btn.style.background = originalBtnBg;
       btn.disabled = false;
     }, 800);
-
+    
   } catch (error) {
     console.error('Submission Error!', error.message);
     btn.textContent = 'Error! Try Again';
