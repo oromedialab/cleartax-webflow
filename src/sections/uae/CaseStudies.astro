@@ -207,24 +207,35 @@ const shuffledColors = [...cardColors].sort(() => Math.random() - 0.5);
   src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
 <script is:inline>
   (function () {
-    function boot() {
-      if (typeof Swiper === "undefined") {
-        setTimeout(boot, 50);
-        return;
+    function bootSwiper() {
+      try {
+        if (typeof Swiper === "undefined") {
+          setTimeout(bootSwiper, 100);
+          return;
+        }
+        
+        const swiperEl = document.querySelector(".tl-swiper");
+        if (!swiperEl) return;
+
+        new Swiper(".tl-swiper", {
+          loop: true,
+          navigation: { nextEl: ".tl-swipper-right", prevEl: ".tl-swipper-left" },
+          slidesPerView: 1,
+          spaceBetween: 10,
+          breakpoints: {
+            768: { slidesPerView: "auto", spaceBetween: 16 },
+            1024: { slidesPerView: 2.2, spaceBetween: 20 },
+          },
+        });
+      } catch (e) {
+        console.error('Swiper boot failed', e);
       }
-      new Swiper(".tl-swiper", {
-        loop: true,
-        navigation: { nextEl: ".tl-swipper-right", prevEl: ".tl-swipper-left" },
-        slidesPerView: 1,
-        spaceBetween: 10,
-        breakpoints: {
-          768: { slidesPerView: "auto", spaceBetween: 16 },
-          1024: { slidesPerView: 2.2, spaceBetween: 20 },
-        },
-      });
     }
+
     if (document.readyState === "loading") {
-      document.addEventListener("DOMContentLoaded", boot);
-    } else boot();
+      document.addEventListener("DOMContentLoaded", bootSwiper);
+    } else {
+      bootSwiper();
+    }
   })();
 </script>
