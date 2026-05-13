@@ -129,13 +129,13 @@ const shuffledColors = [...cardColors].sort(() => Math.random() - 0.5);
   </div>
 
   <div class="ml-20 max-[1280px]:ml-10 max-lg:ml-6 max-sm:ml-4">
-    <div class="tl-swiper overflow-visible! m-0">
-      <div class="swiper-wrapper">
+    <div class="tl-swiper swiper overflow-visible! m-0">
+      <div class="swiper-wrapper flex flex-nowrap">
         {
           testimonials.map((t, i) => {
             const cardColor = shuffledColors[i % shuffledColors.length];
             return (
-              <div class="swiper-slide w-fit!">
+              <div class="swiper-slide w-fit! shrink-0">
                 <div
                   class="max-w-[630px] w-full p-7 rounded-[20px] flex flex-col min-h-[320px] lg:min-h-[375px] h-full max-lg:p-6 max-lg:h-[330px] max-sm:p-4 max-sm:rounded-[14px] max-sm:h-[270px] transition-transform duration-500 hover:scale-[1.01]"
                   style={`background-color: ${cardColor}`}
@@ -176,6 +176,15 @@ const shuffledColors = [...cardColors].sort(() => Math.random() - 0.5);
 </section>
 
 <style is:global>
+  /* Base Swiper Styles for Stability */
+  .tl-swiper:not(.swiper-initialized) .swiper-wrapper {
+    display: flex;
+    overflow: hidden;
+  }
+  .tl-swiper:not(.swiper-initialized) .swiper-slide {
+    flex-shrink: 0;
+  }
+
   .v2-leaders-title {
     font-size: 44px;
     font-weight: 600;
@@ -206,34 +215,40 @@ const shuffledColors = [...cardColors].sort(() => Math.random() - 0.5);
 
 <script is:inline>
   (function () {
-    let swiperLoaded = false;
+    let swiperInstance = null;
     const section = document.getElementById('testimonials');
 
     function bootSwiper() {
-      if (swiperLoaded) return;
+      if (swiperInstance) return;
       
       // Load Swiper JS dynamically
       if (typeof Swiper === "undefined") {
         if (!document.querySelector('script[src*="swiper-bundle"]')) {
           const s = document.createElement('script');
           s.src = "https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js";
+          s.async = true;
           s.onload = init;
           document.head.appendChild(s);
         } else {
-          setTimeout(bootSwiper, 100);
+          // Script exists but maybe not executed? Check periodically
+          let check = setInterval(() => {
+            if (typeof Swiper !== "undefined") {
+              clearInterval(check);
+              init();
+            }
+          }, 100);
         }
-        return;
+      } else {
+        init();
       }
-      init();
     }
 
     function init() {
       try {
         const swiperEl = document.querySelector(".tl-swiper");
-        if (!swiperEl || swiperLoaded) return;
-        swiperLoaded = true;
+        if (!swiperEl || swiperInstance) return;
 
-        new Swiper(".tl-swiper", {
+        swiperInstance = new Swiper(".tl-swiper", {
           loop: true,
           navigation: { nextEl: ".tl-swipper-right", prevEl: ".tl-swipper-left" },
           slidesPerView: 1,
@@ -259,7 +274,7 @@ const shuffledColors = [...cardColors].sort(() => Math.random() - 0.5);
             bootSwiper();
             obs.disconnect();
           }
-        }, { rootMargin: '200px' });
+        }, { rootMargin: '300px' });
         obs.observe(section);
       } else {
         bootSwiper();

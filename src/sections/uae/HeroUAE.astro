@@ -426,60 +426,106 @@ const checklistItems = [
       if (!section) return;
 
       // 2. Load YouTube API on demand (Hover/Interaction)
-      let apiLoading = false;
+      let apiPromise = null;
       const loadAPI = () => {
-        if (apiLoading || window.YT_READY) return;
-        apiLoading = true;
-        try {
-          if (!window.onYouTubeIframeAPIReady) {
-            window.onYouTubeIframeAPIReady = () => {
-              window.YT_READY = true;
-            };
-            if (!document.querySelector('script[src*="youtube.com/iframe_api"]')) {
-              const tag = document.createElement('script');
-              tag.src = "https://www.youtube.com/iframe_api";
-              const firstScriptTag = document.getElementsByTagName('script')[0];
-              if (firstScriptTag) firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
-              else document.head.appendChild(tag);
-            }
+        if (apiPromise) return apiPromise;
+        
+        apiPromise = new Promise((resolve) => {
+          if (window.YT && window.YT.Player) {
+            resolve();
+            return;
           }
-        } catch (e) { console.error('YouTube API load failed', e); }
+          
+          console.log('HeroUAE: Starting YouTube API injection...');
+          
+          // Inject script if missing
+          if (!document.querySelector('script[src*="youtube.com/iframe_api"]')) {
+            const tag = document.createElement('script');
+            tag.src = "https://www.youtube.com/iframe_api";
+            // Inform CMP that this is YouTube
+            tag.setAttribute('data-usercentrics', 'YouTube');
+            const firstScriptTag = document.getElementsByTagName('script')[0];
+            if (firstScriptTag) firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+            else document.head.appendChild(tag);
+          }
+
+          // Polling check
+          let polls = 0;
+          const pollInterval = setInterval(() => {
+            polls++;
+            if (window.YT && window.YT.Player) {
+              console.log('HeroUAE: API detected via polling');
+              clearInterval(pollInterval);
+              resolve();
+            }
+            if (polls > 150) { // 15 seconds
+              console.warn('HeroUAE: Polling timeout');
+              clearInterval(pollInterval);
+              resolve(); // Resolve anyway to let the click handler decide
+            }
+          }, 100);
+
+          // Standard callback
+          const prevReady = window.onYouTubeIframeAPIReady;
+          window.onYouTubeIframeAPIReady = () => {
+            if (prevReady) prevReady();
+            console.log('HeroUAE: API Ready via event');
+            resolve();
+          };
+        });
+        
+        return apiPromise;
       };
 
-      // Hover to pre-load API
+      // 3. Setup Video Interactions
+      const videoId = section.getAttribute("data-video-id");
       const videoPlaceholders = section.querySelectorAll('[data-video-placeholder]');
-      videoPlaceholders.forEach(p => {
-        p.addEventListener('mouseenter', loadAPI, { once: true });
-        p.addEventListener('touchstart', loadAPI, { once: true });
+      
+      videoPlaceholders.forEach(placeholder => {
+        // Pre-load on hover/touch
+        placeholder.addEventListener('mouseenter', () => loadAPI(), { once: true });
+        placeholder.addEventListener('touchstart', () => loadAPI(), { once: true });
+
+        // Direct click handler
+        placeholder.addEventListener('click', async (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          console.log('HeroUAE: Video clicked, checking API...');
+          
+          const wrap = placeholder.parentElement;
+          
+          // Wait for API (or timeout)
+          await loadAPI();
+          
+          if (window.YT && window.YT.Player) {
+            createPlayer(wrap, placeholder, videoId);
+          } else {
+            console.error('HeroUAE: API still not available, opening fallback');
+            window.open(`https://www.youtube.com/watch?v=${videoId}`, '_blank');
+          }
+        });
       });
 
       function createPlayer(wrap, placeholder, videoId) {
-        if (!window.YT || !window.YT.Player) {
-          loadAPI();
-          setTimeout(() => createPlayer(wrap, placeholder, videoId), 100);
-          return;
-        }
+        if (wrap.querySelector('.yt-player-container')) return; // Already exists
 
         const playerDiv = document.createElement('div');
-        playerDiv.className = "absolute inset-0 w-full h-full z-30 bg-black rounded-2xl overflow-hidden shadow-2xl transition-opacity duration-300";
+        playerDiv.className = "yt-player-container absolute inset-0 w-full h-full z-30 bg-black rounded-2xl overflow-hidden shadow-2xl transition-opacity duration-300";
         wrap.appendChild(playerDiv);
         
-        // Close Button
         const closeBtn = document.createElement('button');
         closeBtn.innerHTML = '✕';
         closeBtn.className = "absolute top-4 right-4 z-40 w-10 h-10 bg-black/50 backdrop-blur-md text-white rounded-full flex items-center justify-center border border-white/20 hover:bg-black/80 transition-all duration-300 cursor-pointer text-lg";
-        closeBtn.title = "Close Video";
         wrap.appendChild(closeBtn);
 
         placeholder.style.opacity = "0";
         placeholder.style.pointerEvents = "none";
 
-        console.log('HeroUAE: Initializing video', { videoId, origin: window.location.origin });
+        const origin = window.location.origin.includes('file://') ? '*' : window.location.origin;
+        console.log('HeroUAE: Creating player', { videoId, origin });
         
         let player;
         try {
-          playerDiv.style.opacity = '1';
-          
           player = new window.YT.Player(playerDiv, {
             height: '100%',
             width: '100%',
@@ -489,27 +535,27 @@ const checklistItems = [
               'rel': 0,
               'modestbranding': 1,
               'enablejsapi': 1,
-              'origin': window.location.origin
+              'origin': origin
             },
             events: {
               'onReady': (event) => {
-                console.log('HeroUAE: Player ready');
-                try {
-                  event.target.playVideo();
-                } catch (e) { console.warn('HeroUAE: Autoplay blocked', e); }
+                console.log('HeroUAE: Player fully ready');
+                event.target.playVideo();
               },
               'onStateChange': (event) => {
-                if (event.data === window.YT.PlayerState.ENDED) {
-                  closeVideo();
-                }
+                if (event.data === window.YT.PlayerState.ENDED) closeVideo();
               },
               'onError': (e) => {
-                console.error('HeroUAE: YT Player Error Code', e.data);
+                console.error('HeroUAE: Player Error', e.data);
+                if (e.data === 153 || e.data === 101) {
+                   // Often origin or embedding issues
+                   console.warn('HeroUAE: Fallback to YouTube direct');
+                }
               }
             }
           });
         } catch (e) {
-          console.error('HeroUAE: YT Player creation failed', e);
+          console.error('HeroUAE: Player creation failed', e);
           closeVideo();
         }
 
@@ -526,25 +572,6 @@ const checklistItems = [
           closeVideo();
         });
       }
-
-      // 3. Click Handler
-      section.addEventListener('click', (e) => {
-        const placeholder = e.target.closest('[data-video-placeholder]');
-        if (!placeholder) return;
-
-        const videoId = section.getAttribute("data-video-id");
-        const wrap = placeholder.parentElement;
-
-        const startVideo = () => {
-          if (window.YT && window.YT.Player) {
-            createPlayer(wrap, placeholder, videoId);
-          } else {
-            setTimeout(startVideo, 200);
-          }
-        };
-
-        startVideo();
-      });
 
       // Countdown
       try {
