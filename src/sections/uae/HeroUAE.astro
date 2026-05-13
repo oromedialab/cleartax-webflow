@@ -455,8 +455,13 @@ const checklistItems = [
         placeholder.style.opacity = "0";
         placeholder.style.pointerEvents = "none";
 
+        console.log('HeroUAE: Initializing video', { videoId, origin: window.location.origin });
+        
         let player;
         try {
+          // Ensure container is visible
+          playerDiv.style.opacity = '1';
+          
           player = new window.YT.Player(playerDiv, {
             height: '100%',
             width: '100%',
@@ -466,14 +471,14 @@ const checklistItems = [
               'rel': 0,
               'modestbranding': 1,
               'enablejsapi': 1,
-              'origin': window.location.origin,
-              'widget_referrer': window.location.href
+              'origin': window.location.origin
             },
             events: {
               'onReady': (event) => {
+                console.log('HeroUAE: Player ready');
                 try {
                   event.target.playVideo();
-                } catch (e) { console.warn('Autoplay failed', e); }
+                } catch (e) { console.warn('HeroUAE: Autoplay blocked', e); }
               },
               'onStateChange': (event) => {
                 if (event.data === window.YT.PlayerState.ENDED) {
@@ -481,13 +486,17 @@ const checklistItems = [
                 }
               },
               'onError': (e) => {
-                console.error('YT Player Error', e);
-                closeVideo();
+                console.error('HeroUAE: YT Player Error Code', e.data);
+                if (e.data === 150 || e.data === 101 || e.data === 153) {
+                  console.error('HeroUAE: This video might have embedding restrictions or configuration issues.');
+                }
+                // Don't close immediately so user can see the error if they want, 
+                // but 153 usually shows a big error screen in the iframe.
               }
             }
           });
         } catch (e) {
-          console.error('YT Player creation failed', e);
+          console.error('HeroUAE: YT Player creation failed', e);
           closeVideo();
         }
 
