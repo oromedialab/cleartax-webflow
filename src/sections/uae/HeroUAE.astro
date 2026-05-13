@@ -465,9 +465,16 @@ const checklistItems = [
               'autoplay': 1,
               'rel': 0,
               'modestbranding': 1,
-              'origin': window.location.origin
+              'enablejsapi': 1,
+              'origin': window.location.origin,
+              'widget_referrer': window.location.href
             },
             events: {
+              'onReady': (event) => {
+                try {
+                  event.target.playVideo();
+                } catch (e) { console.warn('Autoplay failed', e); }
+              },
               'onStateChange': (event) => {
                 if (event.data === window.YT.PlayerState.ENDED) {
                   closeVideo();
