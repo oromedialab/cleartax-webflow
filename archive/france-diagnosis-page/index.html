@@ -1,0 +1,1213 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8" />
+<title>Diagnostic Facturation Électronique 2026 — Êtes-vous prêt ? | ClearTax</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="description" content="Évaluez en 2 minutes votre conformité à la facturation électronique 2026. Score de préparation, gaps identifiés, prochaines étapes. Sans formulaire." />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Manrope:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* ────────────────────────────────────────────────────────────────────────────
+   ClearTax — Brand tokens (carried over from v1)
+   ──────────────────────────────────────────────────────────────────────────── */
+:root {
+  --ct-purple-deep: #301B5E;
+  --ct-purple-dark: #1A0B3B;
+  --ct-purple-mid: #4B2EA0;
+  --ct-magenta: #C4399F;
+  --ct-magenta-2: #E0418A;
+  --ct-pastel-lavender: #EDEBFA;
+  --ct-pastel-peach: #FDF2ED;
+  --ct-pastel-sky: #EAF4FF;
+  --ct-tech-mint: #5DD4A0;
+  --ct-tech-amber: #F5B266;
+  --ct-tech-rose: #E07A8E;
+  --ct-tech-red: #D9486A;
+  --ct-ink: #1A0B3B;
+  --ct-muted: #6B5E89;
+  --ct-line: rgba(48,27,94,.08);
+  --font-display: 'Plus Jakarta Sans', system-ui, sans-serif;
+  --font-body: 'Manrope', system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+}
+
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; height: 100%; }
+body {
+  font-family: var(--font-body);
+  color: var(--ct-ink);
+  font-size: 16px;
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  overflow-x: hidden;
+}
+
+h1, h2, h3, h4 { font-family: var(--font-display); font-weight: 500; letter-spacing: -.015em; line-height: 1.05; margin: 0; }
+a { color: inherit; text-decoration: none; }
+p { margin: 0; }
+
+.h1-grad {
+  background: linear-gradient(96deg, #E0418A 0%, #C4399F 30%, #5B2BAD 65%, #301B5E 100%);
+  -webkit-background-clip: text; background-clip: text;
+  -webkit-text-fill-color: transparent; color: transparent;
+}
+
+/* ────────────────────────────────────────────────────────────────────────────
+   Page background — soft pastel canvas (matches v1's hero gradient)
+   ──────────────────────────────────────────────────────────────────────────── */
+.canvas {
+  min-height: 100vh;
+  background:
+    radial-gradient(ellipse 1200px 700px at 75% -5%, rgba(255,200,230,.55), transparent 60%),
+    radial-gradient(ellipse 900px 800px at 10% 50%, rgba(196,166,255,.45), transparent 60%),
+    radial-gradient(ellipse 700px 500px at 90% 95%, rgba(255,220,200,.4), transparent 60%),
+    linear-gradient(180deg, #FFF6FB 0%, #F1E8FF 50%, #E9DEFE 100%);
+  position: relative;
+}
+
+/* ────────────────────────────────────────────────────────────────────────────
+   Top bar — minimal, no glass card chrome
+   ──────────────────────────────────────────────────────────────────────────── */
+.top {
+  position: relative; z-index: 10;
+  padding: 24px 40px;
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 20px;
+}
+.top .brand img { height: 26px; display: block; }
+.top .deadline {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 8px 14px; border-radius: 999px;
+  background: rgba(255,255,255,.65); border: 1px solid rgba(255,255,255,.85);
+  backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+  font-family: var(--font-mono); font-weight: 600; font-size: 11px;
+  letter-spacing: .04em; color: var(--ct-magenta);
+}
+.top .deadline .dot {
+  width: 6px; height: 6px; border-radius: 999px; background: var(--ct-magenta);
+  box-shadow: 0 0 0 3px rgba(196,57,159,.2);
+  animation: pulse 2s ease-in-out infinite;
+}
+@keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: .35; } }
+
+@media (max-width: 720px) {
+  .top { padding: 18px 24px; }
+  .top .deadline { display: none; }
+}
+
+/* ────────────────────────────────────────────────────────────────────────────
+   STAGE — fills the viewport. Each "stage" is a full-page screen.
+   ──────────────────────────────────────────────────────────────────────────── */
+.stage {
+  display: none;
+  min-height: calc(100vh - 80px);
+  padding: 24px 0 60px;
+}
+.stage.active { display: block; }
+
+/* ────────────────────────────────────────────────────────────────────────────
+   STAGE: WELCOME (full-screen hero with one big CTA)
+   ──────────────────────────────────────────────────────────────────────────── */
+.welcome {
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) minmax(0, .85fr);
+  gap: 72px;
+  max-width: 1280px; margin: 0 auto;
+  padding: 40px 56px 0;
+  align-items: center;
+  min-height: calc(100vh - 120px);
+}
+.welcome-left .badge {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 7px 14px; border-radius: 999px;
+  background: rgba(255,255,255,.7); border: 1px solid rgba(255,255,255,.85);
+  backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+  font-family: var(--font-body); font-weight: 600; font-size: 12px;
+  letter-spacing: .08em; text-transform: uppercase; color: #3B2070;
+  margin-bottom: 28px;
+}
+.welcome-left .badge .dot { width: 6px; height: 6px; border-radius: 999px; background: var(--ct-tech-mint); }
+
+.welcome-left h1 {
+  font-size: clamp(40px, 5.4vw, 72px);
+  line-height: .98; max-width: 720px;
+  margin: 0 0 28px;
+}
+.welcome-left h1 .small {
+  display: block; font-size: 0.38em; font-weight: 500;
+  color: var(--ct-purple-mid); letter-spacing: -.005em;
+  line-height: 1.3; margin-top: 22px; max-width: 540px;
+}
+.welcome-left .lead {
+  font-size: 18px; line-height: 1.6; color: #3B2C5E;
+  max-width: 560px; margin-bottom: 40px;
+}
+
+.start-btn {
+  display: inline-flex; align-items: center; gap: 14px;
+  padding: 20px 36px 20px 28px; border-radius: 999px;
+  background: linear-gradient(135deg, var(--ct-purple-deep), var(--ct-purple-mid));
+  color: #fff; border: 0; cursor: pointer;
+  font-family: var(--font-body); font-weight: 600; font-size: 17px;
+  box-shadow: 0 14px 40px rgba(48,27,94,.32);
+  transition: transform .2s, box-shadow .2s;
+}
+.start-btn:hover { transform: translateY(-2px); box-shadow: 0 20px 50px rgba(48,27,94,.4); }
+.start-btn .arr {
+  width: 28px; height: 28px; border-radius: 999px;
+  background: rgba(255,255,255,.18); display: grid; place-items: center;
+  transition: transform .2s;
+}
+.start-btn:hover .arr { transform: translateX(4px); }
+.start-btn .kbd-hint {
+  font-family: var(--font-mono); font-size: 11px; opacity: .65;
+  letter-spacing: .04em; margin-left: 8px;
+}
+
+.welcome-left .meta {
+  margin-top: 28px;
+  display: flex; flex-wrap: wrap; gap: 24px;
+  font-family: var(--font-mono); font-size: 12px;
+  color: var(--ct-purple-mid); letter-spacing: .04em;
+}
+.welcome-left .meta b { color: var(--ct-purple-deep); font-weight: 700; }
+.welcome-left .meta span { display: inline-flex; align-items: center; gap: 8px; }
+
+/* Right side — what you get cards, vertically stacked */
+.welcome-right {
+  display: flex; flex-direction: column; gap: 16px;
+}
+.promise {
+  padding: 24px 28px; border-radius: 22px;
+  background: rgba(255,255,255,.7); border: 1px solid rgba(255,255,255,.85);
+  backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+  display: flex; gap: 18px; align-items: flex-start;
+  transition: transform .25s;
+}
+.promise:hover { transform: translateY(-3px); }
+.promise .nb {
+  flex: 0 0 auto;
+  width: 36px; height: 36px; border-radius: 999px;
+  background: linear-gradient(135deg, var(--ct-magenta), var(--ct-purple-deep)); color: #fff;
+  display: grid; place-items: center;
+  font-family: var(--font-display); font-weight: 700; font-size: 15px;
+}
+.promise h4 {
+  font-family: var(--font-display); font-weight: 600; font-size: 17px;
+  color: var(--ct-purple-deep); margin: 0 0 6px;
+}
+.promise p { font-size: 14px; color: #4D3F6E; line-height: 1.5; }
+
+@media (max-width: 980px) {
+  .welcome { grid-template-columns: 1fr; gap: 40px; padding: 24px 32px 0; min-height: auto; }
+  .welcome-right { order: -1; flex-direction: row; overflow-x: auto; padding-bottom: 8px; }
+  .welcome-right .promise { flex: 0 0 280px; }
+}
+@media (max-width: 640px) {
+  .welcome-right { flex-direction: column; }
+  .welcome-right .promise { flex: 1; }
+}
+
+/* ────────────────────────────────────────────────────────────────────────────
+   STAGE: DIAGNOSTIC (one-question-at-a-time, side-by-side)
+   Left: contextual panel that updates per question
+   Right: the question itself, large, focused
+   ──────────────────────────────────────────────────────────────────────────── */
+.diag {
+  max-width: 1280px; margin: 0 auto;
+  padding: 0 56px;
+  display: grid; grid-template-columns: minmax(0, 380px) minmax(0, 1fr);
+  gap: 80px;
+  align-items: center;
+  min-height: calc(100vh - 80px);
+}
+
+/* LEFT CONTEXT PANEL */
+.context {
+  padding: 36px;
+  border-radius: 28px;
+  background: rgba(255,255,255,.55);
+  border: 1px solid rgba(255,255,255,.85);
+  backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+  position: sticky; top: 100px;
+}
+.context-num {
+  font-family: var(--font-display); font-weight: 300;
+  font-size: 80px; line-height: 1; letter-spacing: -.04em;
+  color: var(--ct-purple-deep);
+  margin-bottom: 14px;
+  display: flex; align-items: baseline; gap: 6px;
+}
+.context-num .total {
+  font-size: 24px; color: var(--ct-muted); font-weight: 500;
+}
+.context-step-label {
+  font-family: var(--font-mono); font-size: 11px; font-weight: 600;
+  color: var(--ct-magenta); letter-spacing: .12em; text-transform: uppercase;
+  margin-bottom: 8px;
+}
+.context-step-topic {
+  font-family: var(--font-display); font-weight: 500; font-size: 22px;
+  color: var(--ct-purple-deep); line-height: 1.2; margin-bottom: 24px;
+  min-height: 53px; /* avoids layout shift across questions */
+}
+
+/* Dot-strip progress indicator */
+.dots {
+  display: flex; gap: 8px; margin-bottom: 28px;
+}
+.dot-step {
+  flex: 1; height: 4px; border-radius: 2px;
+  background: rgba(48,27,94,.1);
+  position: relative; overflow: hidden;
+  transition: background .3s;
+}
+.dot-step.done { background: var(--ct-purple-deep); }
+.dot-step.active::after {
+  content: ''; position: absolute; inset: 0;
+  background: linear-gradient(90deg, var(--ct-magenta), var(--ct-purple-deep));
+  border-radius: 2px;
+}
+
+/* Why this matters block */
+.context-hint {
+  padding: 18px 20px; border-radius: 14px;
+  background: linear-gradient(135deg, var(--ct-pastel-lavender), #fff);
+  border: 1px solid var(--ct-line);
+}
+.context-hint .hl {
+  font-family: var(--font-mono); font-size: 10px; font-weight: 700;
+  color: var(--ct-magenta); letter-spacing: .14em; text-transform: uppercase;
+  margin-bottom: 8px; display: flex; align-items: center; gap: 6px;
+}
+.context-hint .hl::before {
+  content: ''; width: 12px; height: 1px; background: var(--ct-magenta);
+}
+.context-hint p { font-size: 13px; line-height: 1.55; color: #4D3F6E; }
+
+/* RIGHT QUESTION PANEL */
+.q-panel {
+  position: relative;
+}
+.question {
+  display: none;
+}
+.question.active { display: block; animation: fadeUp .45s cubic-bezier(.4,0,.2,1); }
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.q-text {
+  font-family: var(--font-display); font-weight: 400;
+  font-size: clamp(32px, 4.4vw, 56px);
+  line-height: 1.05; letter-spacing: -.025em;
+  color: var(--ct-ink);
+  margin: 0 0 44px;
+  max-width: 720px;
+}
+
+.q-options {
+  display: flex; flex-direction: column; gap: 14px;
+  max-width: 640px;
+}
+.opt {
+  display: flex; align-items: center; gap: 18px;
+  padding: 22px 28px; border-radius: 18px;
+  background: rgba(255,255,255,.55);
+  border: 1.5px solid rgba(255,255,255,.85);
+  backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+  cursor: pointer; transition: all .2s ease;
+  font-family: var(--font-body); font-weight: 500; font-size: 16px;
+  color: var(--ct-ink); text-align: left;
+  position: relative;
+}
+.opt:hover {
+  background: rgba(255,255,255,.85);
+  border-color: rgba(48,27,94,.2);
+  transform: translateX(4px);
+  box-shadow: 0 12px 30px rgba(48,27,94,.1);
+}
+.opt.selected {
+  background: linear-gradient(135deg, rgba(255,255,255,.95), rgba(237,235,250,.7));
+  border-color: var(--ct-purple-deep);
+  box-shadow: 0 14px 40px rgba(48,27,94,.18), inset 0 0 0 1px var(--ct-purple-deep);
+}
+.opt .key {
+  flex: 0 0 auto;
+  width: 32px; height: 32px; border-radius: 8px;
+  background: rgba(48,27,94,.06);
+  border: 1px solid rgba(48,27,94,.12);
+  display: grid; place-items: center;
+  font-family: var(--font-mono); font-size: 13px; font-weight: 700;
+  color: var(--ct-purple-deep);
+  transition: all .2s;
+}
+.opt.selected .key {
+  background: var(--ct-purple-deep); color: #fff; border-color: var(--ct-purple-deep);
+}
+.opt .lbl { flex: 1; }
+.opt .chk {
+  flex: 0 0 auto; opacity: 0; width: 22px; height: 22px;
+  color: var(--ct-purple-deep);
+  transition: opacity .2s, transform .2s;
+}
+.opt.selected .chk { opacity: 1; transform: scale(1.1); }
+
+/* Bottom action row */
+.q-actions {
+  margin-top: 44px; display: flex; align-items: center; gap: 16px;
+  flex-wrap: wrap;
+}
+.btn-pill {
+  display: inline-flex; align-items: center; gap: 10px;
+  padding: 16px 30px; border-radius: 999px;
+  background: var(--ct-purple-deep); color: #fff; border: 0; cursor: pointer;
+  font-family: var(--font-body); font-weight: 600; font-size: 15px;
+  transition: all .2s;
+  box-shadow: 0 10px 30px rgba(48,27,94,.3);
+}
+.btn-pill:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 14px 40px rgba(48,27,94,.4); }
+.btn-pill:disabled { opacity: .3; cursor: not-allowed; box-shadow: none; }
+.btn-pill .arr { transition: transform .2s; }
+.btn-pill:hover:not(:disabled) .arr { transform: translateX(4px); }
+.btn-ghost {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 14px 22px; border-radius: 999px;
+  background: transparent; color: var(--ct-purple-deep); border: 1px solid rgba(48,27,94,.2);
+  font-family: var(--font-body); font-weight: 600; font-size: 14px; cursor: pointer;
+  transition: all .15s;
+}
+.btn-ghost:hover:not(:disabled) { background: rgba(48,27,94,.04); }
+.btn-ghost:disabled { opacity: .3; cursor: not-allowed; }
+.q-hint {
+  margin-left: auto;
+  font-family: var(--font-mono); font-size: 12px; color: var(--ct-muted);
+  letter-spacing: .04em;
+}
+.q-hint kbd {
+  display: inline-block; padding: 2px 7px; border-radius: 4px;
+  background: rgba(48,27,94,.06); border: 1px solid rgba(48,27,94,.15);
+  font-family: var(--font-mono); font-size: 11px; font-weight: 700;
+  color: var(--ct-purple-deep); margin: 0 2px;
+}
+
+@media (max-width: 980px) {
+  .diag { grid-template-columns: 1fr; gap: 32px; padding: 24px 32px; min-height: auto; }
+  .context { position: static; padding: 24px; }
+  .context-num { font-size: 60px; }
+  .context-step-topic { min-height: auto; margin-bottom: 18px; }
+  .q-hint { display: none; }
+}
+
+/* ────────────────────────────────────────────────────────────────────────────
+   STAGE: RESULTS
+   ──────────────────────────────────────────────────────────────────────────── */
+.results {
+  max-width: 1100px; margin: 0 auto;
+  padding: 24px 40px 80px;
+}
+.results-head {
+  text-align: center; margin-bottom: 40px;
+}
+.results-head .eyebrow {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 6px 14px; border-radius: 999px;
+  background: rgba(255,255,255,.7); border: 1px solid rgba(255,255,255,.85);
+  backdrop-filter: blur(12px);
+  font-family: var(--font-mono); font-size: 11px; font-weight: 700;
+  letter-spacing: .12em; text-transform: uppercase;
+  color: var(--ct-magenta);
+}
+
+/* Score hero — gauge + headline side-by-side */
+.score-card {
+  padding: 56px 48px;
+  border-radius: 32px;
+  background: linear-gradient(135deg, rgba(255,255,255,.85), rgba(237,235,250,.6));
+  border: 1px solid rgba(255,255,255,.9);
+  backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+  box-shadow: 0 30px 80px rgba(48,27,94,.12);
+  margin-bottom: 24px;
+  display: grid; grid-template-columns: 220px 1fr; gap: 56px;
+  align-items: center;
+}
+
+/* SVG radial gauge */
+.gauge { width: 220px; height: 220px; position: relative; }
+.gauge svg { width: 100%; height: 100%; transform: rotate(-90deg); }
+.gauge .gauge-bg { stroke: rgba(48,27,94,.08); fill: none; stroke-width: 14; }
+.gauge .gauge-fill {
+  fill: none; stroke-width: 14; stroke-linecap: round;
+  stroke-dasharray: 0 1000;
+  transition: stroke-dasharray 1.2s cubic-bezier(.4,0,.2,1);
+}
+.gauge .gauge-fill.risk    { stroke: url(#gradRisk); }
+.gauge .gauge-fill.behind  { stroke: url(#gradBehind); }
+.gauge .gauge-fill.track   { stroke: url(#gradTrack); }
+.gauge .gauge-fill.ready   { stroke: url(#gradReady); }
+.gauge-center {
+  position: absolute; inset: 0; display: grid; place-items: center;
+  flex-direction: column; text-align: center;
+}
+.gauge-center > div { width: 100%; text-align: center; }
+.gauge-num {
+  font-family: var(--font-display); font-weight: 300;
+  font-size: 64px; line-height: 1; letter-spacing: -.03em;
+  color: var(--ct-purple-deep);
+}
+.gauge-num .suf { font-size: 22px; color: var(--ct-muted); }
+.gauge-lbl {
+  font-family: var(--font-mono); font-size: 10px; font-weight: 600;
+  color: var(--ct-muted); letter-spacing: .12em; text-transform: uppercase;
+  margin-top: 6px;
+}
+
+.score-text { padding: 8px 0; }
+.bucket-tag {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 5px 12px; border-radius: 999px;
+  font-family: var(--font-mono); font-size: 10px; font-weight: 700;
+  letter-spacing: .14em; text-transform: uppercase;
+  margin-bottom: 16px;
+}
+.bucket-tag.risk    { background: rgba(217,72,106,.12);  color: var(--ct-tech-red);   border: 1px solid rgba(217,72,106,.25); }
+.bucket-tag.behind  { background: rgba(245,178,102,.15); color: #B86F1B;              border: 1px solid rgba(245,178,102,.3); }
+.bucket-tag.track   { background: rgba(196,57,159,.1);   color: var(--ct-magenta);    border: 1px solid rgba(196,57,159,.25); }
+.bucket-tag.ready   { background: rgba(93,212,160,.15);  color: #1F8A5B;              border: 1px solid rgba(93,212,160,.3); }
+.bucket-tag .pulse { width: 6px; height: 6px; border-radius: 999px; background: currentColor; animation: pulse 2s ease-in-out infinite; }
+
+.score-text h2 {
+  font-family: var(--font-display); font-weight: 500;
+  font-size: clamp(28px, 3.4vw, 38px); line-height: 1.1; letter-spacing: -.02em;
+  color: var(--ct-ink); margin: 0 0 14px;
+}
+.score-text p {
+  font-size: 16px; color: #3B2C5E; line-height: 1.6; max-width: 580px;
+}
+
+@media (max-width: 720px) {
+  .score-card { grid-template-columns: 1fr; gap: 32px; justify-items: center; text-align: center; padding: 36px 28px; }
+}
+
+/* Gap cards */
+.gaps {
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px;
+  margin-bottom: 24px;
+}
+.gap-card {
+  padding: 28px;
+  border-radius: 22px;
+  background: rgba(255,255,255,.7); border: 1px solid rgba(255,255,255,.85);
+  backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+}
+.gap-card .gap-h {
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  margin-bottom: 14px;
+}
+.gap-card .gap-h .nm {
+  font-family: var(--font-display); font-weight: 600; font-size: 15px;
+  color: var(--ct-purple-deep);
+}
+.gap-card .gap-h .val {
+  font-family: var(--font-mono); font-size: 16px; font-weight: 700;
+  color: var(--ct-purple-deep);
+}
+.gap-card .gap-bar {
+  height: 6px; background: rgba(48,27,94,.08); border-radius: 999px;
+  overflow: hidden; margin-bottom: 14px;
+}
+.gap-card .gap-bar-fill {
+  height: 100%; width: 0%; border-radius: 999px;
+  transition: width 1s cubic-bezier(.4,0,.2,1);
+}
+.gap-card .gap-bar-fill.low    { background: linear-gradient(90deg, var(--ct-tech-red), var(--ct-tech-rose)); }
+.gap-card .gap-bar-fill.mid    { background: linear-gradient(90deg, var(--ct-tech-amber), var(--ct-magenta)); }
+.gap-card .gap-bar-fill.high   { background: linear-gradient(90deg, var(--ct-magenta), var(--ct-purple-deep)); }
+.gap-card .gap-bar-fill.full   { background: linear-gradient(90deg, var(--ct-tech-mint), var(--ct-purple-deep)); }
+.gap-card .gap-lbl {
+  font-family: var(--font-display); font-weight: 500; font-size: 14px;
+  color: var(--ct-ink); margin-bottom: 6px;
+}
+.gap-card .gap-note {
+  font-size: 13px; color: #4D3F6E; line-height: 1.55;
+}
+@media (max-width: 720px) { .gaps { grid-template-columns: 1fr; } }
+
+/* Next steps */
+.steps {
+  padding: 36px 40px;
+  border-radius: 26px;
+  background: rgba(255,255,255,.7); border: 1px solid rgba(255,255,255,.85);
+  backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+  margin-bottom: 24px;
+}
+.steps h3 {
+  font-family: var(--font-display); font-weight: 500; font-size: 24px;
+  color: var(--ct-purple-deep); margin-bottom: 24px;
+}
+.step-item {
+  display: grid; grid-template-columns: 36px 1fr; gap: 18px;
+  padding: 18px 0; border-bottom: 1px dashed var(--ct-line);
+}
+.step-item:last-child { border-bottom: 0; }
+.step-item .num {
+  width: 32px; height: 32px; border-radius: 999px;
+  background: linear-gradient(135deg, var(--ct-magenta), var(--ct-purple-deep)); color: #fff;
+  display: grid; place-items: center;
+  font-family: var(--font-display); font-weight: 700; font-size: 14px;
+}
+.step-item .body h4 {
+  font-family: var(--font-display); font-weight: 600; font-size: 16px;
+  color: var(--ct-purple-deep); margin: 4px 0 6px; line-height: 1.3;
+}
+.step-item .body p { font-size: 14px; color: #4D3F6E; line-height: 1.6; }
+
+/* CTA + Restart row */
+.cta-card {
+  padding: 32px 40px;
+  border-radius: 24px;
+  background: linear-gradient(135deg, var(--ct-pastel-lavender), rgba(255,255,255,.5));
+  border: 1px solid rgba(255,255,255,.85);
+  backdrop-filter: blur(14px);
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 24px; flex-wrap: wrap;
+}
+.cta-card h4 {
+  font-family: var(--font-display); font-weight: 500; font-size: 22px;
+  color: var(--ct-purple-deep); margin: 0 0 6px;
+}
+.cta-card p { font-size: 14px; color: #4D3F6E; }
+.cta-card .actions { display: flex; gap: 10px; flex-wrap: wrap; }
+
+.restart-row {
+  margin-top: 32px; text-align: center;
+  font-family: var(--font-mono); font-size: 11px; color: var(--ct-muted);
+  letter-spacing: .04em;
+}
+.restart-row a {
+  color: var(--ct-purple-deep); cursor: pointer; font-weight: 600;
+  border-bottom: 1px dashed var(--ct-purple-deep);
+  padding-bottom: 1px;
+}
+.restart-row a:hover { color: var(--ct-magenta); border-color: var(--ct-magenta); }
+
+@media (max-width: 720px) {
+  .results { padding: 24px 24px 60px; }
+  .steps, .cta-card { padding: 24px; }
+}
+
+/* Footer */
+.foot {
+  padding: 32px 40px;
+  border-top: 1px solid rgba(48,27,94,.06);
+  text-align: center;
+  font-family: var(--font-mono); font-size: 11px;
+  color: var(--ct-muted); letter-spacing: .04em;
+}
+</style>
+</head>
+<body>
+
+<div class="canvas">
+
+  <!-- ──────────── TOP BAR ──────────── -->
+  <div class="top">
+    <a href="https://www.cleartax.com/" class="brand" aria-label="ClearTax">
+      <img src="https://assets1.cleartax-cdn.com/finfo/wg-utils/retool/d9f36ac3-77a9-40c6-94fc-20c2e3855457.svg" alt="ClearTax">
+    </a>
+    <div class="deadline">
+      <span class="dot"></span>
+      <span>Mandat DGFiP · 1<sup>er</sup> sept. 2026</span>
+    </div>
+  </div>
+
+  <!-- ─────── STAGE 1: WELCOME ─────── -->
+  <section class="stage active" id="stageWelcome">
+    <div class="welcome">
+      <div class="welcome-left">
+        <div class="badge"><span class="dot"></span>Diagnostic gratuit · 2 minutes · sans formulaire</div>
+        <h1>
+          <span class="h1-grad">Êtes-vous prêt</span> pour le 1<sup>er</sup> septembre 2026 ?
+          <span class="small">7 questions courtes, un score immédiat, et un plan d'action concret. Sans engagement.</span>
+        </h1>
+        <p class="lead">
+          La plupart des équipes que nous rencontrons sont soit en exploration, soit en pleine planification, soit déjà confrontées à la complexité de l'intégration. Ce diagnostic vous situe — sans formulaire, sans suivi commercial sauf si vous le souhaitez.
+        </p>
+        <button class="start-btn" id="startBtn">
+          Démarrer le diagnostic
+          <span class="kbd-hint">↵</span>
+          <span class="arr">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+          </span>
+        </button>
+        <div class="meta">
+          <span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> <b>2 min</b> en moyenne</span>
+          <span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> <b>7 questions</b></span>
+          <span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg> <b>0 donnée</b> collectée</span>
+        </div>
+      </div>
+
+      <div class="welcome-right">
+        <div class="promise">
+          <div class="nb">1</div>
+          <div>
+            <h4>Score de préparation</h4>
+            <p>Une note de 0 à 100 calibrée sur les exigences DGFiP et la maturité du marché.</p>
+          </div>
+        </div>
+        <div class="promise">
+          <div class="nb">2</div>
+          <div>
+            <h4>Gaps par domaine</h4>
+            <p>Vos écarts sur données, systèmes &amp; validation, et calendrier de conformité.</p>
+          </div>
+        </div>
+        <div class="promise">
+          <div class="nb">3</div>
+          <div>
+            <h4>Plan d'action priorisé</h4>
+            <p>Recommandations concrètes, adaptées à votre score et à vos gaps spécifiques.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─────── STAGE 2: DIAGNOSTIC ─────── -->
+  <section class="stage" id="stageDiag">
+    <div class="diag">
+
+      <!-- Context panel (left) -->
+      <aside class="context">
+        <div class="context-num"><span id="ctxNum">01</span><span class="total">/07</span></div>
+        <div class="context-step-label" id="ctxLabel">Préparation</div>
+        <div class="context-step-topic" id="ctxTopic">État d'avancement</div>
+
+        <div class="dots" id="dots">
+          <span class="dot-step active"></span>
+          <span class="dot-step"></span>
+          <span class="dot-step"></span>
+          <span class="dot-step"></span>
+          <span class="dot-step"></span>
+          <span class="dot-step"></span>
+          <span class="dot-step"></span>
+        </div>
+
+        <div class="context-hint">
+          <div class="hl">Le saviez-vous</div>
+          <p id="ctxHint">À partir du 1<sup>er</sup> septembre 2026, toutes les entreprises françaises doivent pouvoir recevoir des factures électroniques.</p>
+        </div>
+      </aside>
+
+      <!-- Question panel (right) -->
+      <div class="q-panel">
+
+        <!-- Q1 -->
+        <div class="question active" data-q="0">
+          <h2 class="q-text">Où en êtes-vous dans la préparation de la facturation électronique ?</h2>
+          <div class="q-options" data-question-id="q1">
+            <button class="opt" data-value="0"><span class="key">1</span><span class="lbl">Pas encore commencé</span><svg class="chk" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></button>
+            <button class="opt" data-value="33"><span class="key">2</span><span class="lbl">En cours d'analyse des besoins</span><svg class="chk" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></button>
+            <button class="opt" data-value="66"><span class="key">3</span><span class="lbl">Approche définie, pas encore mise en œuvre</span><svg class="chk" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></button>
+            <button class="opt" data-value="100"><span class="key">4</span><span class="lbl">Déjà en cours</span><svg class="chk" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></button>
+          </div>
+        </div>
+
+        <!-- Q2 -->
+        <div class="question" data-q="1">
+          <h2 class="q-text">Quels sont les systèmes impliqués dans votre processus de facturation ?</h2>
+          <div class="q-options" data-question-id="q2">
+            <button class="opt" data-value="100"><span class="key">1</span><span class="lbl">Un seul ERP</span><svg class="chk" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></button>
+            <button class="opt" data-value="66"><span class="key">2</span><span class="lbl">Plusieurs ERP</span><svg class="chk" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></button>
+            <button class="opt" data-value="33"><span class="key">3</span><span class="lbl">ERP + outils externes</span><svg class="chk" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></button>
+            <button class="opt" data-value="0"><span class="key">4</span><span class="lbl">Pas entièrement centralisé</span><svg class="chk" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></button>
+          </div>
+        </div>
+
+        <!-- Q3 -->
+        <div class="question" data-q="2">
+          <h2 class="q-text">Comment vos données de facturation sont-elles structurées ?</h2>
+          <div class="q-options" data-question-id="q3">
+            <button class="opt" data-value="100"><span class="key">1</span><span class="lbl">Standardisées et propres</span><svg class="chk" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></button>
+            <button class="opt" data-value="66"><span class="key">2</span><span class="lbl">Partiellement standardisées</span><svg class="chk" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></button>
+            <button class="opt" data-value="33"><span class="key">3</span><span class="lbl">Variables selon les entités / systèmes</span><svg class="chk" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></button>
+            <button class="opt" data-value="0"><span class="key">4</span><span class="lbl">Je ne sais pas</span><svg class="chk" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></button>
+          </div>
+        </div>
+
+        <!-- Q4 -->
+        <div class="question" data-q="3">
+          <h2 class="q-text">Avez-vous commencé à mettre vos données en conformité avec Factur-X / PA ?</h2>
+          <div class="q-options" data-question-id="q4">
+            <button class="opt" data-value="100"><span class="key">1</span><span class="lbl">Oui, terminé</span><svg class="chk" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></button>
+            <button class="opt" data-value="66"><span class="key">2</span><span class="lbl">En cours</span><svg class="chk" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></button>
+            <button class="opt" data-value="33"><span class="key">3</span><span class="lbl">Prévu</span><svg class="chk" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></button>
+            <button class="opt" data-value="0"><span class="key">4</span><span class="lbl">Pas encore commencé</span><svg class="chk" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></button>
+          </div>
+        </div>
+
+        <!-- Q5 -->
+        <div class="question" data-q="4">
+          <h2 class="q-text">Quelle est votre confiance sur le suivi des 14 statuts de facture ?</h2>
+          <div class="q-options" data-question-id="q5">
+            <button class="opt" data-value="100"><span class="key">1</span><span class="lbl">Très confiant</span><svg class="chk" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></button>
+            <button class="opt" data-value="66"><span class="key">2</span><span class="lbl">Assez confiant</span><svg class="chk" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></button>
+            <button class="opt" data-value="33"><span class="key">3</span><span class="lbl">Pas confiant</span><svg class="chk" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></button>
+            <button class="opt" data-value="0"><span class="key">4</span><span class="lbl">Je ne connais pas cette exigence</span><svg class="chk" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></button>
+          </div>
+        </div>
+
+        <!-- Q6 -->
+        <div class="question" data-q="5">
+          <h2 class="q-text">Comment comptez-vous gérer la conformité fiscale ?</h2>
+          <div class="q-options" data-question-id="q6">
+            <button class="opt" data-value="100"><span class="key">1</span><span class="lbl">Validation automatisée en place</span><svg class="chk" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></button>
+            <button class="opt" data-value="66"><span class="key">2</span><span class="lbl">Partiellement automatisée</span><svg class="chk" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></button>
+            <button class="opt" data-value="33"><span class="key">3</span><span class="lbl">Vérifications manuelles</span><svg class="chk" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></button>
+            <button class="opt" data-value="0"><span class="key">4</span><span class="lbl">Pas encore abordé</span><svg class="chk" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></button>
+          </div>
+        </div>
+
+        <!-- Q7 -->
+        <div class="question" data-q="6">
+          <h2 class="q-text">Quel est votre calendrier cible pour être prêt ?</h2>
+          <div class="q-options" data-question-id="q7">
+            <button class="opt" data-value="100"><span class="key">1</span><span class="lbl">Avant juin 2026</span><svg class="chk" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></button>
+            <button class="opt" data-value="66"><span class="key">2</span><span class="lbl">Avant septembre 2026</span><svg class="chk" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></button>
+            <button class="opt" data-value="0"><span class="key">3</span><span class="lbl">Après l'entrée en vigueur (réactif)</span><svg class="chk" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></button>
+            <button class="opt" data-value="0"><span class="key">4</span><span class="lbl">Non défini</span><svg class="chk" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></button>
+          </div>
+        </div>
+
+        <div class="q-actions">
+          <button class="btn-ghost" id="btnBack" disabled>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+            Précédent
+          </button>
+          <button class="btn-pill" id="btnNext" disabled>
+            <span id="btnNextLabel">Suivant</span>
+            <span class="arr">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+            </span>
+          </button>
+          <div class="q-hint">Tapez <kbd>1</kbd><kbd>2</kbd><kbd>3</kbd><kbd>4</kbd> puis <kbd>↵</kbd></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─────── STAGE 3: RESULTS ─────── -->
+  <section class="stage" id="stageResults">
+    <div class="results">
+
+      <div class="results-head">
+        <div class="eyebrow">✓ Diagnostic terminé · Votre rapport</div>
+      </div>
+
+      <!-- SVG gradient defs for gauge -->
+      <svg width="0" height="0" style="position: absolute;">
+        <defs>
+          <linearGradient id="gradRisk" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stop-color="#D9486A"/><stop offset="100%" stop-color="#E07A8E"/>
+          </linearGradient>
+          <linearGradient id="gradBehind" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stop-color="#F5B266"/><stop offset="100%" stop-color="#C4399F"/>
+          </linearGradient>
+          <linearGradient id="gradTrack" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stop-color="#C4399F"/><stop offset="100%" stop-color="#301B5E"/>
+          </linearGradient>
+          <linearGradient id="gradReady" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stop-color="#5DD4A0"/><stop offset="100%" stop-color="#301B5E"/>
+          </linearGradient>
+        </defs>
+      </svg>
+
+      <!-- Score card -->
+      <div class="score-card">
+        <div class="gauge">
+          <svg viewBox="0 0 120 120">
+            <circle class="gauge-bg" cx="60" cy="60" r="50"/>
+            <circle class="gauge-fill" id="gaugeFill" cx="60" cy="60" r="50"/>
+          </svg>
+          <div class="gauge-center">
+            <div>
+              <div class="gauge-num"><span id="scoreVal">0</span><span class="suf">/100</span></div>
+              <div class="gauge-lbl">Score global</div>
+            </div>
+          </div>
+        </div>
+        <div class="score-text">
+          <div class="bucket-tag" id="bucketTag"><span class="pulse"></span><span id="bucketLabel">—</span></div>
+          <h2 id="scoreHeadline">—</h2>
+          <p id="scoreSubline">—</p>
+        </div>
+      </div>
+
+      <!-- Gap cards -->
+      <div class="gaps">
+        <div class="gap-card">
+          <div class="gap-h">
+            <div class="nm">Données &amp; format</div>
+            <div class="val" id="gapDataVal">0%</div>
+          </div>
+          <div class="gap-bar"><div class="gap-bar-fill" id="gapDataBar"></div></div>
+          <div class="gap-lbl" id="gapDataLbl">—</div>
+          <div class="gap-note" id="gapDataNote">Structure, propreté, mappage Factur-X / PA</div>
+        </div>
+        <div class="gap-card">
+          <div class="gap-h">
+            <div class="nm">Systèmes &amp; validation</div>
+            <div class="val" id="gapSysVal">0%</div>
+          </div>
+          <div class="gap-bar"><div class="gap-bar-fill" id="gapSysBar"></div></div>
+          <div class="gap-lbl" id="gapSysLbl">—</div>
+          <div class="gap-note" id="gapSysNote">Architecture ERP &amp; automatisation des contrôles</div>
+        </div>
+        <div class="gap-card">
+          <div class="gap-h">
+            <div class="nm">Calendrier &amp; maturité</div>
+            <div class="val" id="gapTimeVal">0%</div>
+          </div>
+          <div class="gap-bar"><div class="gap-bar-fill" id="gapTimeBar"></div></div>
+          <div class="gap-lbl" id="gapTimeLbl">—</div>
+          <div class="gap-note" id="gapTimeNote">Maturité, connaissance du référentiel, échéance</div>
+        </div>
+      </div>
+
+      <!-- Next steps -->
+      <div class="steps">
+        <h3>Vos prochaines étapes</h3>
+        <div id="stepsList"></div>
+      </div>
+
+      <!-- CTA -->
+      <div class="cta-card">
+        <div>
+          <h4>Vous souhaitez en discuter ?</h4>
+          <p>30 minutes avec un expert ClearTax pour cadrer un plan d'action concret. Sans engagement.</p>
+        </div>
+        <div class="actions">
+          <a href="https://www.cleartax.com/fr/en/e-invoicing-france" class="btn-pill">Parler à un expert <span class="arr"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></span></a>
+          <a href="#" class="btn-ghost" onclick="window.print(); return false;">Exporter en PDF</a>
+        </div>
+      </div>
+
+      <div class="restart-row">
+        <span>Diagnostic généré localement · aucune donnée transmise</span><br>
+        <a id="restartBtn">↺ Recommencer le diagnostic</a>
+      </div>
+    </div>
+  </section>
+
+  <footer class="foot">
+    Cleartax is a product by Defmacro Software Pvt. Ltd.
+  </footer>
+
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+  const TOTAL_Q = 7;
+  let currentQ = 0;
+  const answers = {};
+
+  // ─── Google Sheet Integration ───────────────────────────────────────────────
+  const SHEET_WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbxl67w52AEfTg52pfHUnr7SKLMrOa6erbOTjydPwx1u4po3JJyQAezfziWy53l_lOxT8A/exec';
+
+  async function sendToSheet(payload) {
+    if (!SHEET_WEB_APP_URL || SHEET_WEB_APP_URL.includes('YOUR_APP_SCRIPT_URL')) return;
+    try {
+      await fetch(SHEET_WEB_APP_URL, {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: new URLSearchParams(payload).toString()
+      });
+    } catch (e) { console.error('Sheet submission failed', e); }
+  }
+
+  // Per-question context (left panel)
+  const ctxData = [
+    { label: 'Préparation',    topic: "État d'avancement",                  hint: "À partir du 1<sup>er</sup> septembre 2026, toutes les entreprises françaises doivent pouvoir <b>recevoir</b> des factures électroniques." },
+    { label: 'Systèmes',       topic: "Architecture ERP",                   hint: "Multi-ERP est la règle : la moitié des grandes entreprises gèrent <b>3+ systèmes</b> de facturation en parallèle." },
+    { label: 'Données',        topic: "Qualité &amp; structure",            hint: "Une donnée sale en amont = une facture rejetée en aval. La standardisation est le <b>vrai préalable</b> au mandat." },
+    { label: 'Format',         topic: "Mappage Factur-X / PA",              hint: "Trois formats acceptés : <b>UBL 2.1</b>, <b>CII</b>, et <b>Factur-X</b> (hybride PDF + XML)." },
+    { label: 'Cycle de vie',   topic: "Suivi des 14 statuts",               hint: "La DGFiP impose un suivi en temps réel sur <b>14 statuts</b> par facture (déposée, refusée, encaissée, etc.)." },
+    { label: 'Validation',     topic: "Conformité fiscale",                 hint: "Sanctions : <b>15 € par facture non conforme</b>, jusqu'à <b>15 000 € / an</b>." },
+    { label: 'Calendrier',     topic: "Échéance cible",                     hint: "Grandes entreprises &amp; ETI : <b>1<sup>er</sup> sept. 2026</b>. PME &amp; micro : <b>1<sup>er</sup> sept. 2027</b>." }
+  ];
+
+  const stageWelcome = document.getElementById('stageWelcome');
+  const stageDiag    = document.getElementById('stageDiag');
+  const stageResults = document.getElementById('stageResults');
+  const questions    = Array.from(document.querySelectorAll('.question'));
+  const btnBack      = document.getElementById('btnBack');
+  const btnNext      = document.getElementById('btnNext');
+  const btnNextLabel = document.getElementById('btnNextLabel');
+  const dotsEl       = document.getElementById('dots');
+  const startBtn     = document.getElementById('startBtn');
+
+  // Welcome → diagnostic
+  function showStage(name) {
+    [stageWelcome, stageDiag, stageResults].forEach(s => s.classList.remove('active'));
+    if (name === 'welcome') stageWelcome.classList.add('active');
+    if (name === 'diag')    stageDiag.classList.add('active');
+    if (name === 'results') stageResults.classList.add('active');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  startBtn.addEventListener('click', () => {
+    showStage('diag');
+    setTimeout(() => updateContext(), 100);
+  });
+
+  // Wire up options
+  document.querySelectorAll('.q-options').forEach(group => {
+    const qId = group.getAttribute('data-question-id');
+    group.querySelectorAll('.opt').forEach(opt => {
+      opt.addEventListener('click', () => {
+        group.querySelectorAll('.opt').forEach(o => o.classList.remove('selected'));
+        opt.classList.add('selected');
+        answers[qId] = parseInt(opt.getAttribute('data-value'), 10);
+        btnNext.disabled = false;
+      });
+    });
+  });
+
+  // Keyboard nav
+  document.addEventListener('keydown', (e) => {
+    if (stageWelcome.classList.contains('active')) {
+      if (e.key === 'Enter') startBtn.click();
+      return;
+    }
+    if (stageResults.classList.contains('active')) return;
+    const activeQ = questions[currentQ];
+    if (!activeQ) return;
+    if (e.key >= '1' && e.key <= '4') {
+      const opts = activeQ.querySelectorAll('.opt');
+      const idx = parseInt(e.key, 10) - 1;
+      if (opts[idx]) opts[idx].click();
+    }
+    if (e.key === 'Enter' && !btnNext.disabled) { e.preventDefault(); btnNext.click(); }
+    if ((e.key === 'Backspace' || e.key === 'ArrowLeft') && !btnBack.disabled && e.target.tagName !== 'INPUT') {
+      e.preventDefault(); btnBack.click();
+    }
+  });
+
+  function goToQuestion(n) {
+    if (n < 0 || n >= TOTAL_Q) return;
+    questions[currentQ].classList.remove('active');
+    currentQ = n;
+    questions[currentQ].classList.add('active');
+    updateContext();
+    btnBack.disabled = currentQ === 0;
+    const qId = `q${currentQ + 1}`;
+    btnNext.disabled = !(qId in answers);
+    btnNextLabel.textContent = currentQ === TOTAL_Q - 1 ? 'Voir mon score' : 'Suivant';
+  }
+
+  function updateContext() {
+    const d = ctxData[currentQ];
+    document.getElementById('ctxNum').textContent = String(currentQ + 1).padStart(2, '0');
+    document.getElementById('ctxLabel').textContent = d.label;
+    document.getElementById('ctxTopic').innerHTML = d.topic;
+    document.getElementById('ctxHint').innerHTML = d.hint;
+    // Update dots
+    Array.from(dotsEl.children).forEach((d, i) => {
+      d.classList.remove('done', 'active');
+      if (i < currentQ) d.classList.add('done');
+      else if (i === currentQ) d.classList.add('active');
+    });
+  }
+
+  btnNext.addEventListener('click', () => {
+    if (currentQ === TOTAL_Q - 1) computeAndShowResults();
+    else goToQuestion(currentQ + 1);
+  });
+  btnBack.addEventListener('click', () => goToQuestion(currentQ - 1));
+
+  // ─── Scoring ────────────────────────────────────────────────────────────────
+  function computeAndShowResults() {
+    const vals = Object.values(answers);
+    const overall = Math.round(vals.reduce((a, b) => a + b, 0) / vals.length);
+    const dataScore = Math.round((answers.q3 + answers.q4) / 2);
+    const sysScore  = Math.round((answers.q2 + answers.q6) / 2);
+    const timeScore = Math.round((answers.q1 + answers.q5 + answers.q7) / 3);
+
+    let bucket, bucketLabel, headline, subline;
+    if (overall <= 30) {
+      bucket = 'risk';   bucketLabel = 'Risque élevé';
+      headline = "Action urgente requise.";
+      subline = "Votre niveau de préparation est insuffisant pour respecter l'échéance du 1ᵉʳ septembre 2026. Sans plan d'action immédiat, le risque de sanction est réel (15 € par facture, jusqu'à 15 000 € / an).";
+    } else if (overall <= 60) {
+      bucket = 'behind'; bucketLabel = 'En retard';
+      headline = "Calendrier serré.";
+      subline = "Vous avez démarré, mais le rythme actuel ne permet pas une mise en conformité sereine. Accélérez sur les sujets critiques (données, mappage, intégration ERP) pour rattraper le retard.";
+    } else if (overall <= 85) {
+      bucket = 'track';  bucketLabel = 'En bonne voie';
+      headline = "Trajectoire solide.";
+      subline = "Votre démarche est cohérente. Quelques ajustements ciblés permettront de fiabiliser entièrement votre dispositif avant la date butoir.";
+    } else {
+      bucket = 'ready';  bucketLabel = 'Prêt';
+      headline = "Préparation excellente.";
+      subline = "Votre niveau de préparation est exemplaire. Concentrez-vous maintenant sur l'optimisation continue et l'extension aux autres mandats UE à venir.";
+    }
+
+    document.getElementById('scoreVal').textContent = overall;
+    document.getElementById('bucketTag').className = `bucket-tag ${bucket}`;
+    document.getElementById('bucketLabel').textContent = bucketLabel;
+    document.getElementById('scoreHeadline').textContent = headline;
+    document.getElementById('scoreSubline').textContent = subline;
+
+    // Animate gauge
+    const gaugeFill = document.getElementById('gaugeFill');
+    const circumference = 2 * Math.PI * 50;
+    gaugeFill.setAttribute('class', `gauge-fill ${bucket}`);
+    const dashLen = (overall / 100) * circumference;
+    setTimeout(() => { gaugeFill.style.strokeDasharray = `${dashLen} ${circumference}`; }, 100);
+
+    animateScore(overall);
+
+    setGap('Data', dataScore);
+    setGap('Sys',  sysScore);
+    setGap('Time', timeScore);
+
+    renderNextSteps(overall, dataScore, sysScore, timeScore);
+
+    // Auto-submit anonymous diagnostic data
+    const urlParams = new URLSearchParams(window.location.search);
+    sendToSheet({
+      overall, dataScore, sysScore, timeScore,
+      bucketLabel,
+      answers: JSON.stringify(answers),
+      page_url: window.location.href,
+      utm_source: urlParams.get('utm_source') || '',
+      utm_medium: urlParams.get('utm_medium') || '',
+      utm_campaign: urlParams.get('utm_campaign') || '',
+      utm_content: urlParams.get('utm_content') || '',
+      utm_term: urlParams.get('utm_term') || ''
+    });
+
+    showStage('results');
+  }
+
+  function setGap(prefix, score) {
+    const valEl = document.getElementById(`gap${prefix}Val`);
+    const barEl = document.getElementById(`gap${prefix}Bar`);
+    const lblEl = document.getElementById(`gap${prefix}Lbl`);
+    let cls, label;
+    if (score <= 30)      { cls = 'low';  label = prefix === 'Data' ? 'Données fragmentées' : prefix === 'Sys' ? 'Architecture éclatée' : 'Faible maturité'; }
+    else if (score <= 60) { cls = 'mid';  label = prefix === 'Data' ? 'Standardisation partielle' : prefix === 'Sys' ? 'Automatisation limitée' : 'Calendrier flou'; }
+    else if (score <= 85) { cls = 'high'; label = prefix === 'Data' ? 'Mappage avancé' : prefix === 'Sys' ? 'Architecture cohérente' : 'Plan clair'; }
+    else                  { cls = 'full'; label = prefix === 'Data' ? 'Données prêtes' : prefix === 'Sys' ? 'Automatisation totale' : 'Calendrier maîtrisé'; }
+    valEl.textContent = `${score}%`;
+    barEl.className = `gap-bar-fill ${cls}`;
+    lblEl.textContent = label;
+    setTimeout(() => { barEl.style.width = `${score}%`; }, 200);
+  }
+
+  function animateScore(target) {
+    const el = document.getElementById('scoreVal');
+    const dur = 1400;
+    const startT = performance.now();
+    function tick(now) {
+      const t = Math.min(1, (now - startT) / dur);
+      const ease = 1 - Math.pow(1 - t, 3);
+      el.textContent = Math.round(target * ease);
+      if (t < 1) requestAnimationFrame(tick);
+      else el.textContent = target;
+    }
+    requestAnimationFrame(tick);
+  }
+
+  function renderNextSteps(overall, dataScore, sysScore, timeScore) {
+    const steps = [];
+    if (answers.q3 <= 33) steps.push({ prio: 100 - answers.q3, h: 'Auditer et standardiser vos données de facturation', p: "Lancez un audit ciblé (1-2 semaines) sur la qualité, la cohérence et la complétude des données issues de vos ERP. Identifiez les écarts critiques pour Factur-X." });
+    if (answers.q4 <= 33) steps.push({ prio: 100 - answers.q4, h: 'Démarrer le mappage Factur-X / PA', p: "Établissez le mapping de vos champs vers les exigences DGFiP et les formats Factur-X / UBL 2.1 / CII. Ajoutez les champs manquants : SIREN, codes nature de transaction." });
+    else if (answers.q4 == 66) steps.push({ prio: 55, h: 'Finaliser le mappage et valider sur un échantillon', p: "Complétez le mappage et faites tester la sortie sur des cas réels en environnement sandbox avant un déploiement complet." });
+    if (answers.q2 <= 33) steps.push({ prio: 100 - answers.q2, h: 'Centraliser le flux de facturation', p: "Définissez une PA cible capable d'ingérer toutes vos sources : ERP principal, ERP secondaires, outils externes. Une intégration native évite les workarounds manuels." });
+    if (answers.q6 <= 33) steps.push({ prio: 100 - answers.q6, h: 'Mettre en place une validation automatisée', p: "Les contrôles manuels ne tiennent pas à l'échelle d'un mandat temps réel. Automatisez la validation (schéma, règles métier, contrôles fiscaux) avant la soumission DGFiP." });
+    if (answers.q1 == 0) steps.push({ prio: 95, h: 'Cadrer le projet de mise en conformité', p: "Constituez un comité projet (Finance + IT + Tax) et fixez les jalons : analyse des besoins, choix de PA, implémentation, UAT, parallel run, go-live. Visez 4-6 mois." });
+    if (answers.q5 <= 33) steps.push({ prio: 70, h: "Vous former sur le cycle des 14 statuts DGFiP", p: "Cartographiez chaque statut, son trigger, son impact sur votre AR / AP. Le suivi du cycle de vie est obligatoire — pas optionnel." });
+    if (answers.q7 == 0) steps.push({ prio: 90, h: 'Fixer une date cible de mise en conformité', p: "Sans date cible, le projet glisse. Visez une mise en production au plus tard fin Q2 2026 pour disposer de marge avant le 1ᵉʳ septembre 2026." });
+
+    if (overall <= 30) steps.push({ prio: 80, h: 'Choisir rapidement une Plateforme Agréée (PA)', p: "Le choix de la PA débloque tout le reste. Privilégiez une PA déjà accréditée DGFiP avec connecteurs ERP éprouvés (SAP, Oracle, Dynamics, Sage, NetSuite)." });
+    else if (overall <= 60) steps.push({ prio: 60, h: 'Lancer un pilote sur une entité', p: "Identifiez une entité ou un flux pilote pour valider l'intégration de bout en bout (ERP → PA → DGFiP → retour de statut) avant un déploiement multi-entités." });
+    else if (overall <= 85) steps.push({ prio: 50, h: 'Préparer un parallel run', p: "Planifiez 4 à 6 semaines de parallel run avant le go-live. C'est l'étape qui fiabilise définitivement la mise en production." });
+    else steps.push({ prio: 40, h: 'Anticiper les autres mandats UE', p: "Belgique (en vigueur), Pologne (KSeF, fév. 2026), Allemagne (phases 2025-2028), Espagne (B2B en attente). Une PA pan-UE évite de relancer un projet par pays." });
+
+    steps.sort((a, b) => b.prio - a.prio);
+    const top = steps.slice(0, 5);
+    document.getElementById('stepsList').innerHTML = top.map((s, i) => `
+      <div class="step-item">
+        <div class="num">${i + 1}</div>
+        <div class="body">
+          <h4>${s.h}</h4>
+          <p>${s.p}</p>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  // Lead Form handling
+  const leadForm = document.getElementById('leadForm');
+  if (leadForm) {
+    leadForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const email = document.getElementById('userEmail').value;
+      const btn = document.getElementById('leadSubmitBtn');
+      
+      // Re-submit with email
+      const vals = Object.values(answers);
+      const overall = Math.round(vals.reduce((a, b) => a + b, 0) / vals.length);
+      const dataScore = Math.round((answers.q3 + answers.q4) / 2);
+      const sysScore  = Math.round((answers.q2 + answers.q6) / 2);
+      const timeScore = Math.round((answers.q1 + answers.q5 + answers.q7) / 3);
+      const bucketLabel = document.getElementById('bucketLabel').textContent;
+
+      btn.disabled = true;
+      btn.textContent = 'Envoi...';
+
+      const urlParams = new URLSearchParams(window.location.search);
+      sendToSheet({
+        email, overall, dataScore, sysScore, timeScore,
+        bucketLabel,
+        answers: JSON.stringify(answers),
+        page_url: window.location.href,
+        utm_source: urlParams.get('utm_source') || '',
+        utm_medium: urlParams.get('utm_medium') || '',
+        utm_campaign: urlParams.get('utm_campaign') || '',
+        utm_content: urlParams.get('utm_content') || '',
+        utm_term: urlParams.get('utm_term') || ''
+      }).then(() => {
+        leadForm.style.display = 'none';
+        document.getElementById('leadSuccess').style.display = 'flex';
+      });
+    });
+  }
+
+  // Restart
+  document.getElementById('restartBtn').addEventListener('click', () => {
+    currentQ = 0;
+    for (const k in answers) delete answers[k];
+    document.querySelectorAll('.opt').forEach(o => o.classList.remove('selected'));
+    questions.forEach((q, i) => q.classList.toggle('active', i === 0));
+    btnBack.disabled = true; btnNext.disabled = true;
+    btnNextLabel.textContent = 'Suivant';
+    document.getElementById('gaugeFill').style.strokeDasharray = '0 1000';
+    showStage('welcome');
+  });
+
+  // Init
+  updateContext();
+})();
+</script>
+
+</body>
+</html>
