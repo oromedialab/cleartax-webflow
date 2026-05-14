@@ -1,0 +1,84 @@
+---
+import "../styles/fonts.css";
+import "../styles/shared.css";
+import Navbar from "../sections/_shared/Navbar.astro";
+import Footer from "../sections/_shared/Footer.astro";
+import Hero from "../sections/racon-ai-agent/Hero.astro";
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Recon AI Agent</title>
+    <meta
+      name="description"
+      content="The most robust and secure e-invoicing platform for global enterprises. Built for massive scale, 99.99% uptime, and SOC2 compliance."
+    />
+    <meta name="referrer" content="strict-origin-when-cross-origin" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800;900&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- Premium Interactions -->
+    <script is:inline>
+      (function () {
+        document.documentElement.classList.add("js-enabled");
+
+        const setup = () => {
+          const elements = document.querySelectorAll(
+            ".premium-reveal, .blur-reveal, .clip-reveal",
+          );
+          elements.forEach((el) => el.classList.add("is-ready"));
+
+          // 1. Reveal Observer
+          try {
+            const revealObserver = new IntersectionObserver(
+              (entries) => {
+                entries.forEach((entry) => {
+                  if (entry.isIntersecting) {
+                    entry.target.classList.add("is-visible");
+                    revealObserver.unobserve(entry.target);
+                  }
+                });
+              },
+              { threshold: 0.1 },
+            );
+            elements.forEach((el) => revealObserver.observe(el));
+          } catch (e) {
+            console.error("Observer init failed", e);
+          }
+        };
+
+        if (document.readyState === "loading") {
+          document.addEventListener("DOMContentLoaded", setup);
+        } else {
+          setup();
+        }
+      })();
+    </script>
+    <style is:global>
+      :root {
+        --font-heading: "Nohemi", sans-serif;
+        --font-body: "Gilroy", sans-serif;
+      }
+      .font-nohemi {
+        font-family: "Nohemi", sans-serif;
+      }
+      .font-gilroy {
+        font-family: "Gilroy", sans-serif;
+      }
+    </style>
+  </head>
+  <body class="bg-white font-['Gilroy',sans-serif]">
+    <Navbar countryLabel="Global" />
+    <main>
+      <Hero />
+    </main>
+    <Footer />
+  </body>
+</html>
