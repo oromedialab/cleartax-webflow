@@ -473,34 +473,41 @@ const checklistItems = [
           };
 
           const startPlayer = () => {
-            new YT.Player(playerElement, {
-              height: '100%',
-              width: '100%',
-              videoId: videoId,
-              playerVars: {
-                autoplay: 1,
-                rel: 0,
-                modestbranding: 1,
-                enablejsapi: 1,
-                origin: window.location.origin,
-                iv_load_policy: 3
-              },
-              events: {
-                onStateChange: (event) => {
-                  if (event.data === 0) closeVideo(); // 0 is ENDED
-                },
-                onReady: (event) => {
-                  event.target.playVideo();
-                }
+            const iframe = document.createElement('iframe');
+            const origin = window.location.origin;
+            iframe.src = `https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0&modestbranding=1&enablejsapi=1&origin=${encodeURIComponent(origin)}&iv_load_policy=3`;
+            iframe.allow = "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture";
+            iframe.allowFullscreen = true;
+            iframe.className = "w-full h-full border-0";
+            
+            // Replace the playerElement placeholder with the actual iframe
+            if (playerElement.parentNode) {
+              playerElement.parentNode.replaceChild(iframe, playerElement);
+            } else {
+              container.appendChild(iframe);
+            }
+
+            // Optional: Attach API for auto-close behavior if it loads
+            const attachAPI = () => {
+              if (!iframe.parentElement) return; // Stop if user closed the video
+              if (window.YT && window.YT.Player) {
+                try {
+                  new YT.Player(iframe, {
+                    events: {
+                      onStateChange: (event) => {
+                        if (event.data === 0) closeVideo(); // 0 is ENDED
+                      }
+                    }
+                  });
+                } catch (e) { console.warn("YT API attach failed", e); }
+              } else {
+                setTimeout(attachAPI, 500);
               }
-            });
+            };
+            attachAPI();
           };
 
-          if (window.YT && window.YT.Player) {
-            startPlayer();
-          } else {
-            window.onYouTubeIframeAPIReady = startPlayer;
-          }
+          startPlayer();
 
           closeBtn.addEventListener('click', (ev) => {
             ev.stopPropagation();
@@ -554,25 +561,6 @@ const checklistItems = [
         });
       }, 100);
 
-      // Special: Magnetic Buttons
-      const magneticBtns = section.querySelectorAll('[data-magnetic]');
-      magneticBtns.forEach(btn => {
-        btn.addEventListener('mousemove', (e) => {
-          const rect = btn.getBoundingClientRect();
-          const x = e.clientX - rect.left - rect.width / 2;
-          const y = e.clientY - rect.top - rect.height / 2;
-          
-          btn.style.transform = `translate(${x * 0.3}px, ${y * 0.3}px)`;
-          const inner = btn.querySelector('span');
-          if (inner) inner.style.transform = `translate(${x * 0.1}px, ${y * 0.1}px)`;
-        });
-        
-        btn.addEventListener('mouseleave', () => {
-          btn.style.transform = `translate(0, 0)`;
-          const inner = btn.querySelector('span');
-          if (inner) inner.style.transform = `translate(0, 0)`;
-        });
-      });
     };
 
     if (document.readyState === 'loading') {
