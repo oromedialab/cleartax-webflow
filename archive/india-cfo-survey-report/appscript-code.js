@@ -32,7 +32,7 @@ function doPost(e) {
     if (!sheet) {
       sheet = spreadSheet.insertSheet(region);
       // Initialize Header Row if new sheet
-      var headers = ["Timestamp", "Email", "Form Type", "Lead Source Page", "Lead Source URL", "UTM Source", "UTM Medium", "UTM Campaign"];
+      var headers = ["Timestamp", "Email", "Form Type", "Lead Source Page", "Lead Source URL", "UTM Source", "UTM Medium", "UTM Campaign", "UTM Content", "UTM Term"];
       sheet.getRange(1, 1, 1, headers.length).setValues([headers]);
       sheet.getRange(1, 1, 1, headers.length).setFontWeight("bold");
     }
@@ -46,7 +46,9 @@ function doPost(e) {
       data.lead_source_url || "",     // Source URL
       data.utm_source || "",          // UTM Source
       data.utm_medium || "",          // UTM Medium
-      data.utm_campaign || ""         // UTM Campaign
+      data.utm_campaign || "",        // UTM Campaign
+      data.utm_content || "",         // UTM Content
+      data.utm_term || ""             // UTM Term
     ];
     
     // 5. Append to the next empty row
