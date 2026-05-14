@@ -76,32 +76,30 @@ const tabs = [
 ];
 ---
 
-<div class="infrastructure-section relative bg-[#FCFCFD] py-12 lg:py-25 overflow-hidden border-t border-[#E5E5E5]">
-  <div class="mx-auto max-w-[1280px] px-4 md:px-6">
+<link
+  rel="stylesheet"
+  href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css"
+/>
+
+<div class="infrastructure-section relative bg-[#FFFFFF] py-12 lg:py-25 overflow-hidden [&_button]:font-[inherit]">
+  <div class="mx-auto max-w-[1280px] w-full px-4 md:px-6">
     <div class="text-center mb-16">
       <h2 class="text-[26px] lg:text-[44px] font-semibold text-black leading-[1.1] mb-4 blur-reveal">
         Infrastructure That <span class="text-[#655DFF]">Grows With You</span>
       </h2>
-      <p class="text-base lg:text-lg text-black/60 max-w-[750px] mx-auto premium-reveal [transition-delay:100ms]">
+      <p class="text-base lg:text-lg text-black max-w-[750px] mx-auto premium-reveal [transition-delay:100ms]">
         From the first return to millions of invoices across every jurisdiction — our platform handles it without blinking.
       </p>
     </div>
 
-    <!-- Tab Bar -->
-    <div class="flex justify-center mb-7 overflow-x-auto pb-2 hide-scrollbar">
-      <div class="inline-flex bg-white border w-full justify-evenly border-[#E5E5E5] rounded-full p-1.5 gap-1">
+    <!-- Tab Bar Desktop Only -->
+    <div class="!hidden lg:!flex justify-center mb-7 overflow-x-auto pb-2 [scrollbar-width:_none] [-ms-overflow-style:_none] [&::-webkit-scrollbar]:hidden">
+      <div class="inline-flex border w-full justify-evenly border-[#000000]/12 rounded-full p-2">
         {tabs.map((tab, index) => (
           <button
-            class={`flex items-center w-full justify-center gap-2 px-6 py-3 rounded-full text-sm font-medium transition-all duration-300 infra-tab-btn ${index === 0 ? 'active-tab text-black' : 'text-black/40'}`}
+            class={`flex items-center w-full justify-center gap-2 px-6 py-3 rounded-full text-sm font-medium transition-all duration-300 infra-tab-btn cursor-pointer border-none bg-transparent outline-none ${index === 0 ? 'active-tab text-black shadow-[0_4px_12px_rgba(0,0,0,0.05)]' : 'text-black/40'}`}
+            data-index={index}
             data-tab={tab.id}
-            data-active-bg={
-              index === 0 ? 'bg-[#E5AB82]/20' : 
-              index === 1 ? 'bg-[#338878]/20' : 
-              index === 2 ? 'bg-[#13859F]/20' : 
-              index === 3 ? 'bg-[#9878AF]/20' :
-              'bg-[#655DFF]/20'
-            }
-            style={index === 0 ? `background-color: ${['rgba(229, 171, 130, 0.2)', 'rgba(51, 136, 120, 0.2)', 'rgba(19, 133, 159, 0.2)', 'rgba(152, 120, 175, 0.2)', 'rgba(101, 93, 255, 0.2)'][index]}` : ''}
           >
             <span class="icon-wrapper opacity-60 transition-all duration-300" set:html={tab.icon}></span>
             {tab.label}
@@ -110,49 +108,98 @@ const tabs = [
       </div>
     </div>
 
-    <!-- Content Area -->
-    <div class="relative bg-white border border-[#E5E5E5] rounded-[32px] p-6 lg:p-10 min-h-[440px] grid overflow-hidden shadow-[0_4px_24px_rgba(0,0,0,0.02)]">
-      {tabs.map((tab, index) => (
-        <div 
-          class={`infra-tab-content grid grid-cols-1 sm:grid-cols-2 gap-12 lg:gap-20 items-center transition-all duration-500 [grid-area:1/1] ${index === 0 ? 'opacity-100 scale-100 z-10' : 'opacity-0 scale-[0.98] pointer-events-none z-0'}`}
-          id={`content-${tab.id}`}
-        >
-          <!-- Left: Text -->
-          <div>
-            <h3 class="text-[24px] md:text-[32px] font-semibold text-black leading-[1.2] mb-6">
-              {tab.title}
-            </h3>
-            <p class="text-base lg:text-lg text-black/70 leading-relaxed mb-10">
-              {tab.description}
-            </p>
-            
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-y-6 gap-x-8">
-              {tab.points.map((point) => (
-                <div class="flex items-center gap-2 group">
-                  <div class="w-10 h-10 rounded-lg flex items-center justify-center text-[#D97D54] group-hover:scale-110 transition-transform">
-                   <span set:html={point.cardIcon}></span>
-                  </div>
-                  <span class="text-base font-medium text-black/80">{point.label}</span>
+
+    <div class="!hidden lg:!block infra-swiper swiper relative bg-white border border-[#000000]/12 rounded-[12px] overflow-hidden w-full h-auto">
+      <div class="swiper-wrapper">
+        {tabs.map((tab) => (
+          <div class="swiper-slide !h-auto p-6 lg:p-10 min-h-[440px] flex items-center">
+            <div 
+              class="infra-tab-content grid grid-cols-1 sm:grid-cols-2 gap-12 lg:gap-20 items-center w-full"
+              id={`content-${tab.id}`}
+            >
+              <!-- Left: Text -->
+              <div>
+                <h3 class="text-[24px] md:text-[32px] font-semibold text-black leading-[1.2] mb-6">
+                  {tab.title}
+                </h3>
+                <p class="text-base lg:text-lg text-black/70 leading-relaxed mb-10">
+                  {tab.description}
+                </p>
+                
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-y-6 gap-x-8">
+                  {tab.points.map((point) => (
+                    <div class="flex items-center gap-2 group">
+                      <div class="w-10 h-10 rounded-lg flex items-center justify-center text-[#000000] transition-transform">
+                       <span set:html={point.cardIcon}></span>
+                      </div>
+                      <span class="text-base font-medium text-black/80">{point.label}</span>
+                    </div>
+                  ))}
                 </div>
-              ))}
+              </div>
+
+              <!-- Right: Visual Area -->
+              <div class="relative group">
+                <div class="aspect-[4/3] rounded-[12px] flex items-center justify-center overflow-hidden">
+                   {tab.image ? (
+                      <img 
+                        src={tab.image} 
+                        alt={tab.label}
+                        class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                        onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
+                      />
+                   ) : null}
+                </div>
+              </div>
             </div>
           </div>
+        ))}
+      </div>
+    </div>
 
-          <!-- Right: Visual Area -->
-          <div class="relative group">
-            <div class="aspect-[4/3] rounded-3xl bg-[#FAF1ED] border border-[#F5E6DE] flex items-center justify-center overflow-hidden">
-               {tab.image ? (
-                  <img 
-                    src={tab.image} 
-                    alt={tab.label}
-                    class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-                    onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
-                  />
-               ) : null}
-               
-               
+    <!-- Mobile Accordion -->
+    <div class="!flex lg:!hidden flex-col gap-4">
+      {tabs.map((tab, index) => (
+        <div 
+          class={`infra-acc-item border border-[#000000]/12 rounded-[12px] bg-white transition-all duration-500 overflow-hidden ${index === 0 ? 'acc-active shadow-sm' : ''}`}
+          style={index === 0 ? `background-color: ${['rgba(229, 171, 130, 0.1)', 'rgba(51, 136, 120, 0.1)', 'rgba(19, 133, 159, 0.1)', 'rgba(152, 120, 175, 0.1)', 'rgba(101, 93, 255, 0.1)'][index]}` : ''}
+        >
+          <button 
+            class="infra-acc-trigger w-full flex items-center justify-between p-5 text-left border-none bg-transparent outline-none cursor-pointer"
+            data-index={index}
+          >
+            <div class="flex items-center gap-3 pointer-events-none">
+              <span class={`icon-wrapper transition-all duration-300 ${index === 0 ? 'opacity-100' : 'opacity-40 grayscale'}`} set:html={tab.icon}></span>
+              <span class={`text-base font-semibold transition-colors duration-300 ${index === 0 ? 'text-black' : 'text-black/60'}`}>{tab.label}</span>
             </div>
-            
+            <svg class={`acc-chevron w-5 h-5 transition-transform duration-500 pointer-events-none ${index === 0 ? 'rotate-180' : ''}`} viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="6 9 12 15 18 9"></polyline>
+            </svg>
+          </button>
+          
+          <div 
+            class="infra-acc-content transition-all duration-500 ease-in-out overflow-hidden"
+            style={index === 0 ? 'max-height: 2000px; opacity: 1;' : 'max-height: 0px; opacity: 0;'}
+          >
+            <div class="px-5 pb-6">
+              <h3 class="text-[20px] font-semibold text-black leading-[1.2] mb-4">{tab.title}</h3>
+              <p class="text-sm text-black/70 leading-relaxed mb-6">{tab.description}</p>
+              
+              <div class="grid grid-cols-1 gap-4 mb-8">
+                {tab.points.map((point) => (
+                  <div class="flex items-center gap-3">
+                    <div class="w-8 h-8 rounded-lg flex items-center justify-center text-[#D97D54] bg-black/5">
+                      <span class="scale-90" set:html={point.cardIcon}></span>
+                    </div>
+                    <span class="text-sm font-medium text-black/80">{point.label}</span>
+                  </div>
+                ))}
+              </div>
+
+              <div class="aspect-[4/3] rounded-2xl bg-[#FAF1ED] border border-[#F5E6DE] flex items-center justify-center overflow-hidden">
+                {tab.image && <img src={tab.image} alt={tab.label} class="w-full h-full object-cover" />}
+              </div>
+            </div>
           </div>
         </div>
       ))}
@@ -160,124 +207,124 @@ const tabs = [
   </div>
 </div>
 
+<script is:inline src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
 <script is:inline>
   (function() {
-    const initTabs = () => {
+    function initInfrastructure() {
       const section = document.querySelector('.infrastructure-section');
       if (!section) return;
 
-      const btns = section.querySelectorAll('.infra-tab-btn');
-      const contents = section.querySelectorAll('.infra-tab-content');
-      let isTransitioning = false;
+      const colors = [
+        'rgba(229, 171, 130, 0.1)', 
+        'rgba(51, 136, 120, 0.1)', 
+        'rgba(19, 133, 159, 0.1)', 
+        'rgba(152, 120, 175, 0.1)', 
+        'rgba(101, 93, 255, 0.1)'
+      ];
 
-      // Function to switch tabs
-      const switchTab = (targetId) => {
-        if (isTransitioning) return;
-        
-        const targetContent = section.querySelector(`#content-${targetId}`);
-        const activeContent = section.querySelector('.infra-tab-content:not(.hidden)');
-        
-        if (targetContent === activeContent) return;
-        isTransitioning = true;
+      // --- Desktop Swiper Logic ---
+      const initSwiper = () => {
+        const swiperEl = section.querySelector('.infra-swiper');
+        if (!swiperEl || typeof Swiper === 'undefined') {
+          if (typeof Swiper === 'undefined') setTimeout(initSwiper, 50);
+          return;
+        }
 
-        // 1. Update Buttons
-        btns.forEach(btn => {
-          if (btn.getAttribute('data-tab') === targetId) {
-            btn.classList.add('active-tab');
-            btn.classList.remove('text-black/40');
-            
-            // Apply dynamic background
-            const bgClass = btn.getAttribute('data-active-bg');
-            if (bgClass) {
-              // Remove all bg classes from other buttons
-              btns.forEach(b => {
-                const allBgClasses = [
-                  'bg-[#E5AB82]/20', 'bg-[#338878]/20', 'bg-[#13859F]/20', 
-                  'bg-[#9878AF]/20', 'bg-[#655DFF]/20'
-                ];
-                b.classList.remove(...allBgClasses);
-              });
-              btn.classList.add(bgClass);
-            }
-            
-            // Reset styles
-            btn.style.removeProperty('background-color');
-            
-            // Update icons
-            const iconWrapper = btn.querySelector('.icon-wrapper');
-            if (iconWrapper) {
-              iconWrapper.style.filter = 'grayscale(0)';
-              iconWrapper.style.opacity = '1';
-            }
-          } else {
-            btn.classList.remove('active-tab');
-            btn.classList.add('text-black/40');
-            
-            // Reset styles
-            const allBgClasses = [
-              'bg-[#E5AB82]/20', 'bg-[#338878]/20', 'bg-[#13859F]/20', 
-              'bg-[#9878AF]/20', 'bg-[#655DFF]/20'
-            ];
-            btn.classList.remove(...allBgClasses);
-            btn.style.removeProperty('background-color');
-            
-            // Reset icons
-            const iconWrapper = btn.querySelector('.icon-wrapper');
-            if (iconWrapper) {
-              iconWrapper.style.filter = 'grayscale(1)';
-              iconWrapper.style.opacity = '0.4';
+        const btns = section.querySelectorAll('.infra-tab-btn');
+        const swiper = new Swiper('.infra-swiper', {
+          effect: 'fade',
+          fadeEffect: { crossFade: true },
+          speed: 500,
+          allowTouchMove: true,
+          autoHeight: true,
+          on: {
+            slideChange: function () {
+              updateTabs(this.activeIndex);
             }
           }
         });
 
-        // 2. Transition Content
-        contents.forEach(content => {
-          if (content.id === `content-${targetId}`) {
-            content.classList.remove('opacity-0', 'scale-[0.98]', 'pointer-events-none', 'z-0');
-            content.classList.add('opacity-100', 'scale-100', 'z-10');
-          } else {
-            content.classList.add('opacity-0', 'scale-[0.98]', 'pointer-events-none', 'z-0');
-            content.classList.remove('opacity-100', 'scale-100', 'z-10');
-          }
+        function updateTabs(index) {
+          btns.forEach((btn, i) => {
+            const iconWrapper = btn.querySelector('.icon-wrapper');
+            if (i === index) {
+              btn.classList.add('active-tab', 'shadow-[0_4px_12px_rgba(0,0,0,0.05)]');
+              btn.classList.remove('text-black/40');
+              btn.style.backgroundColor = colors[i].replace('0.1', '0.2');
+              if (iconWrapper) {
+                iconWrapper.style.filter = 'grayscale(0)';
+                iconWrapper.style.opacity = '1';
+              }
+            } else {
+              btn.classList.remove('active-tab', 'shadow-[0_4px_12px_rgba(0,0,0,0.05)]');
+              btn.classList.add('text-black/40');
+              btn.style.backgroundColor = 'transparent';
+              if (iconWrapper) {
+                iconWrapper.style.filter = 'grayscale(1)';
+                iconWrapper.style.opacity = '0.4';
+              }
+            }
+          });
+        }
+
+        btns.forEach((btn, index) => {
+          btn.addEventListener('click', () => swiper.slideTo(index));
         });
-        
-        setTimeout(() => {
-          isTransitioning = false;
-        }, 500);
+
+        updateTabs(0);
       };
 
-      // Add click listeners
-      btns.forEach(btn => {
-        btn.addEventListener('click', () => switchTab(btn.getAttribute('data-tab')));
-      });
-    };
+      // --- Mobile Accordion Logic ---
+      const initAccordion = () => {
+        const items = section.querySelectorAll('.infra-acc-item');
+        if (!items.length) return;
+        
+        items.forEach((item, index) => {
+          const trigger = item.querySelector('.infra-acc-trigger');
+          const content = item.querySelector('.infra-acc-content');
+          const icon = item.querySelector('.icon-wrapper');
+          const label = item.querySelector('.text-base');
+          const chevron = item.querySelector('.acc-chevron');
 
-    // Initialize on load
+          trigger.addEventListener('click', () => {
+            const isActive = item.classList.contains('acc-active');
+
+            if (isActive) return;
+
+            items.forEach((otherItem) => {
+              otherItem.classList.remove('acc-active', 'shadow-sm');
+              otherItem.style.backgroundColor = 'white';
+              const otherContent = otherItem.querySelector('.infra-acc-content');
+              otherContent.style.maxHeight = '0px';
+              otherContent.style.opacity = '0';
+              
+              const otherIcon = otherItem.querySelector('.icon-wrapper');
+              if (otherIcon) otherIcon.classList.add('opacity-40', 'grayscale');
+              const otherLabel = otherItem.querySelector('.text-base');
+              if (otherLabel) otherLabel.classList.add('text-black/60');
+              const otherChevron = otherItem.querySelector('.acc-chevron');
+              if (otherChevron) otherChevron.classList.remove('rotate-180');
+            });
+
+            item.classList.add('acc-active', 'shadow-sm');
+            item.style.backgroundColor = colors[index];
+            content.style.maxHeight = '2000px';
+            content.style.opacity = '1';
+            if (icon) icon.classList.remove('opacity-40', 'grayscale');
+            if (label) label.classList.remove('text-black/60');
+            if (chevron) chevron.classList.add('rotate-180');
+          });
+        });
+      };
+
+      initSwiper();
+      initAccordion();
+    }
+
     if (document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', initTabs);
+      document.addEventListener('DOMContentLoaded', initInfrastructure);
     } else {
-      initTabs();
+      initInfrastructure();
     }
   })();
 </script>
-
-<style>
-  .hide-scrollbar::-webkit-scrollbar {
-    display: none;
-  }
-  .hide-scrollbar {
-    -ms-overflow-style: none;
-    scrollbar-width: none;
-  }
-  .active-tab {
-     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-  }
-  .infra-tab-btn:not(.active-tab) .icon-wrapper {
-    filter: grayscale(1);
-    opacity: 0.4;
-  }
-  .infra-tab-btn.active-tab .icon-wrapper {
-    filter: grayscale(0);
-    opacity: 1;
-  }
-</style>
