@@ -1,0 +1,394 @@
+---
+/**
+ * Comparison Section
+ * 4-column capability comparison: Capability | ERP Native | Desktop Tool | ClearTax Seamless
+ * Column titles sit OUTSIDE the cards; only the row data is wrapped in the grey/white cards.
+ */
+interface Row {
+    capability: string;
+    erp: string;
+    desktop: string;
+    clear: string;
+    erpCross?: boolean;
+    desktopCross?: boolean;
+}
+
+const rows: Row[] = [
+    {
+        capability: "Trial Balance & GL Reconciliation",
+        erp: "Not For TDS",
+        erpCross: true,
+        desktop: "",
+        desktopCross: true,
+        clear: "Automated",
+    },
+    {
+        capability: "Net-Off Advances, Provisions, Reversals",
+        erp: "Manual",
+        desktop: "Manual Excel",
+        clear: "Auto",
+    },
+    {
+        capability: "200+ Pre-Filing Validations",
+        erp: "",
+        erpCross: true,
+        desktop: "Partial",
+        clear: "",
+    },
+    {
+        capability: "FVU For 5M+ Deductions",
+        erp: "",
+        erpCross: true,
+        desktop: "Crashes",
+        desktopCross: true,
+        clear: "30 Mins",
+    },
+    {
+        capability: "26AS Many:Many Reconciliation",
+        erp: "",
+        erpCross: true,
+        desktop: "",
+        desktopCross: true,
+        clear: "Best-Fit AI",
+    },
+    {
+        capability: "AI Section Variance Detection",
+        erp: "",
+        erpCross: true,
+        desktop: "",
+        desktopCross: true,
+        clear: "Clause 34",
+    },
+    {
+        capability: "Cloud-Based, No Crashes",
+        erp: "N/A",
+        desktop: "",
+        desktopCross: true,
+        clear: "99.9% Uptime",
+    },
+];
+
+const CrossIcon = `<svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M1.5 1.5L12.5 12.5M12.5 1.5L1.5 12.5" stroke="#E04545" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+
+const CheckIcon = `<svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M20 9.9339C20 15.4202 15.5228 19.8677 10 19.8677C4.47716 19.8677 0 15.4202 0 9.9339C0 4.44763 4.47716 0.00012207 10 0.00012207C15.5228 0.00012207 20 4.44763 20 9.9339Z" fill="#655DFF"/><path d="M14.198 7.1111L8.51264 12.7588L5.80615 10.0703" stroke="white" stroke-width="1.66667" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+---
+
+<section id="comparison-comp" class="bg-white py-12 lg:py-[100px] w-full">
+    <div class="max-w-[var(--container-max)] mx-auto px-4 lg:px-6">
+        <!-- Centered header -->
+        <div class="text-center mb-12 lg:mb-16">
+            <h2
+                id="comparison-comp-title"
+                class="!font-semibold text-[#000000] !leading-[1.18] !m-0 max-md:text-[28px] max-lg:text-[26px]"
+            >
+                Not An ERP Module.
+                <span class="text-[#655DFF]">Not A Desktop Tool.</span>
+            </h2>
+            <p
+                class="text-[#000000]/80 text-lg max-md:text-base leading-[1.44] max-w-[760px] mx-auto mt-4 lg:mt-6"
+            >
+                Every step from ERP data extraction to government filing and
+                audit readiness — one platform.
+            </p>
+        </div>
+
+        <!-- Comparison: 3 column groups, each with its own header(s) above the card -->
+        <div class="cmp-grid">
+            <!-- Column 1: Capability (no card) -->
+            <div class="cmp-column cmp-column-cap">
+                <h3 class="cmp-head">Capability</h3>
+                <ul class="cmp-list">
+                    {
+                        rows.map((row) => (
+                            <li class="cmp-cell">{row.capability}</li>
+                        ))
+                    }
+                </ul>
+            </div>
+
+            <!-- Column 2: ERP Native + Desktop Tool (grouped under one grey card) -->
+            <div class="cmp-column cmp-column-mid">
+                <div class="cmp-head-row">
+                    <h3 class="cmp-head cmp-head-center">
+                        ERP Native
+                        <span class="cmp-head-sub">SAP / Oracle</span>
+                    </h3>
+                    <h3 class="cmp-head cmp-head-center">
+                        Desktop Tool
+                        <span class="cmp-head-sub">Winman / KDK</span>
+                    </h3>
+                </div>
+                <div
+                    class="cmp-card cmp-card-grey lg:shadow-[0px_4px_8px_rgba(0,0,0,0.08)_inset]"
+                >
+                    <ul class="cmp-table cmp-table-grey">
+                        {
+                            rows.map((row) => (
+                                <li class="cmp-trow">
+                                    <div class="cmp-tcell">
+                                        {row.erpCross && (
+                                            <span
+                                                class="cmp-icon"
+                                                set:html={CrossIcon}
+                                            />
+                                        )}
+                                        {row.erp && <span>{row.erp}</span>}
+                                    </div>
+                                    <div class="cmp-tcell">
+                                        {row.desktopCross && (
+                                            <span
+                                                class="cmp-icon"
+                                                set:html={CrossIcon}
+                                            />
+                                        )}
+                                        {row.desktop && (
+                                            <span>{row.desktop}</span>
+                                        )}
+                                    </div>
+                                </li>
+                            ))
+                        }
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Column 3: ClearTax Seamless (white elevated card) -->
+            <div class="cmp-column cmp-column-clear">
+                <h3 class="cmp-head cmp-head-clear row">
+                    ClearTax <span class="text-[#655DFF]">Seamless</span>
+                </h3>
+                <div class="cmp-card cmp-card-white">
+                    <ul class="cmp-table cmp-table-white">
+                        {
+                            rows.map((row) => (
+                                <li class="cmp-trow cmp-trow-clear">
+                                    <div class="cmp-tcell cmp-tcell-clear">
+                                        <span
+                                            class="cmp-icon"
+                                            set:html={CheckIcon}
+                                        />
+                                        {row.clear && (
+                                            <span>{row.clear}</span>
+                                        )}
+                                    </div>
+                                </li>
+                            ))
+                        }
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<style>
+    #comparison-comp-title {
+        font-size: 44px !important;
+        line-height: 1.18 !important;
+        font-weight: 600 !important;
+        margin: 0 !important;
+    }
+    @media (max-width: 1024px) {
+        #comparison-comp-title {
+            font-size: 28px !important;
+        }
+    }
+
+    .cmp-grid {
+        display: grid;
+        grid-template-columns:
+            minmax(0, 1.2fr)
+            minmax(0, 2fr)
+            minmax(0, 1.1fr);
+        align-items: start;
+        gap: 0;
+    }
+
+    .cmp-column {
+        display: flex;
+        flex-direction: column;
+        min-width: 0;
+    }
+
+    /* Column titles (live OUTSIDE cards) */
+    .cmp-head {
+        font-size: 20px;
+        font-weight: 600;
+        line-height: 1.3;
+        color: #000;
+        margin: 0 0 32px 0;
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-start;
+        gap: 4px;
+        min-height: 48px;
+    }
+    .cmp-head.row {
+        display: block;
+    }
+
+    .cmp-head-sub {
+        font-size: 14px;
+        font-weight: 400;
+        color: rgba(0, 0, 0, 0.5);
+    }
+
+    .cmp-head-center {
+        text-align: left;
+        align-items: flex-start;
+    }
+
+    /* Two side-by-side headers above the grey card */
+    .cmp-head-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 32px;
+        padding: 0 32px;
+    }
+
+    /* ClearTax header — inset to align with the white card's inner content */
+    .cmp-head-clear {
+        padding-left: 32px;
+    }
+
+    /* Lists & cells */
+    .cmp-list {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .cmp-cell {
+        font-size: 16px;
+        line-height: 1.4;
+        color: rgba(0, 0, 0, 0.8);
+        padding: 22px 0;
+        min-height: 72px;
+        display: flex;
+        align-items: center;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+    }
+
+    .cmp-cell:last-child {
+        border-bottom: none;
+    }
+
+    /* Capability column */
+    .cmp-column-cap .cmp-cell {
+        font-weight: 400;
+        padding-right: 16px;
+    }
+
+    /* Grey card (wraps only the ERP + Desktop row lists) */
+    .cmp-card-grey {
+        background: #f5f3f8;
+        border-radius: 16px;
+        padding: 8px 0;
+        border: 1px solid rgba(0, 0, 0, 0.08);
+        position: relative;
+        z-index: 1;
+    }
+
+    /* White ClearTax card — flush with grey card vertically, overlaps on the left */
+    .cmp-card-white {
+        background: #ffffff;
+        border-radius: 16px;
+        padding: 8px 0;
+        border: 1px solid rgba(0, 0, 0, 0.06);
+        box-shadow:
+            0 24px 60px rgba(15, 17, 49, 0.08),
+            0 4px 14px rgba(15, 17, 49, 0.04);
+        margin-left: -16px;
+        position: relative;
+        z-index: 2;
+    }
+
+    /* Full-width row tables: each row has a single bottom border that spans card edge to edge */
+    .cmp-table {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .cmp-table-grey .cmp-trow {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .cmp-trow {
+        min-height: 72px;
+        border-bottom: 1px solid rgba(101, 93, 255, 0.12);
+    }
+
+    .cmp-trow:last-child {
+        border-bottom: none;
+    }
+
+    .cmp-tcell {
+        padding: 22px 32px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 16px;
+        line-height: 1.4;
+        color: rgba(0, 0, 0, 0.8);
+    }
+
+    .cmp-tcell-clear {
+        gap: 12px;
+        color: #000;
+        font-weight: 500;
+    }
+
+    .cmp-icon {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+    }
+
+    /* Mobile */
+    @media (max-width: 1024px) {
+        .cmp-grid {
+            grid-template-columns: 1fr;
+            gap: 20px;
+        }
+        .cmp-card-grey {
+            padding: 8px 0;
+        }
+        .cmp-card-white {
+            margin: 0;
+            padding: 8px 0;
+        }
+        .cmp-head,
+        .cmp-head-clear {
+            padding: 0 16px;
+            font-size: 17px;
+            margin-bottom: 16px;
+            min-height: 0;
+        }
+        .cmp-head-row {
+            padding: 0;
+            gap: 0;
+        }
+        .cmp-head-row .cmp-head {
+            padding: 0 16px;
+        }
+        .cmp-cell {
+            padding: 16px 0;
+            font-size: 14px;
+            min-height: 56px;
+        }
+        .cmp-trow {
+            min-height: 56px;
+        }
+        .cmp-tcell {
+            padding: 14px 16px;
+            font-size: 14px;
+        }
+    }
+</style>
