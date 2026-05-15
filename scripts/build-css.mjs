@@ -23,6 +23,8 @@ const TARGETS = [
   { name: 'global', input: 'src/styles/global.css' },
   { name: 'scale-and-security', input: 'src/styles/scale-and-security.css' },
   { name: 'erp-connectivity', input: 'src/styles/erp-connectivity.css' },
+  { name: 'clear-compliance-cloud', input: 'src/styles/clear-compliance-cloud.css' },
+  { name: 'recon-ai-agent', input: 'src/styles/recon-ai-agent.css' },
 ];
 
 const OUT_DIR = resolve(ROOT, 'public/css');
