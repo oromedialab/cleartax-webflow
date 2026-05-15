@@ -22,6 +22,7 @@ const TARGETS = [
   { name: 'uaev2',  input: 'src/styles/uaev2.css' },
   { name: 'global', input: 'src/styles/global.css' },
   { name: 'scale-and-security', input: 'src/styles/scale-and-security.css' },
+  { name: 'erp-connectivity', input: 'src/styles/erp-connectivity.css' },
 ];
 
 const OUT_DIR = resolve(ROOT, 'public/css');

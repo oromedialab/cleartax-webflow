@@ -1,0 +1,129 @@
+---
+/**
+ * UAE Hero section — ported from uae-landing-page/index.html:326-567.
+ * Left: eyebrow, H1 w/ gradient, checklist, CTA.
+ * Right: hero object visual.
+ */
+export interface Props {
+  headline?: string;
+  eyebrow?: string;
+  primaryCtaLabel?: string;
+  primaryCtaHref?: string;
+}
+
+const {
+  headline = "Connect Your ERP in Days, Not Months",
+  eyebrow = "Seamless ERP Connectivity",
+} = Astro.props as Props;
+
+const checklistItems = [
+  { label: "1B+ E-Invoices annually", icon: "badge" },
+  { label: "10K/s Peak invoice throughput", icon: "sparkles" },
+  { label: "50+ Countries covered", icon: "sync" },
+  { label: "$500B+ Invoices processed", icon: "sync" },
+];
+
+const bgImage =
+  "/images/erp-connectivity/hero-bg-erp.png";
+---
+
+<section
+  class="hero-ss relative overflow-hidden pt-[140px] pb-[100px] max-lg:pt-[100px] max-md:pt-[96px] max-md:pb-[48px] bg-cover bg-center md:bg-right lg:bg-center bg-no-repeat"
+  style={{ backgroundImage: `url(${bgImage})` }}
+>
+  <div
+    class="relative z-10 mx-auto max-w-[1280px] w-full px-4 md:px-6 grid grid-cols-1 sm:grid-cols-2 gap-12 items-center"
+  >
+    <div class="hero-left">
+      <div
+        class="inline-flex items-center py-1.5 px-3.5 bg-[linear-gradient(90deg,_rgba(144,_68,_169,_0.2)_0%,_rgba(184,_126,_200,_0.2)_100%)] rounded-full mb-5"
+      >
+        <span
+          class="text-xs leading-[1.67] font-normal text-[#8841A0] shiny-text"
+          >{eyebrow}</span
+        >
+      </div>
+      <h1
+        class="text-[36px] lg:!text-[56px] font-medium leading-[1.14] mb-7 text-balance bg-gradient-to-b from-[#AA50C8] to-[#030203] bg-clip-text text-transparent [&_.gradient-text]:bg-gradient-to-br [&_.gradient-text]:from-[#8B7EE8] [&_.gradient-text]:via-[#6355D8] [&_.gradient-text]:to-[#4338CA] [&_.gradient-text]:bg-clip-text [&_.gradient-text]:text-transparent clip-reveal"
+        set:html={headline}
+      />
+
+      <!-- Mobile Image (Shown below checklist on mobile only) -->
+      <div
+        class="lg:hidden block mb-10 premium-reveal [transition-delay:400ms]"
+      >
+        <div
+          class="max-w-[436px] w-full mx-auto relative group transition-all duration-700 block cursor-pointer"
+        >
+          <img
+            src="/images/erp-connectivity/hero-right-image.png"
+            alt="Security Illustration"
+            class="w-full h-full"
+          />
+        </div>
+      </div>
+
+      <div
+        class="max-w-[564px] w-full text-start lg:text-left text-base lg:text-lg font-normal text-[#27127A] premium-reveal [transition-delay:300ms]"
+      >
+        <p>
+          GL Stream, a unique integration technology, plugs directly into your ERP environment. Automate e-invoice compliance with zero ongoing IT effort from your side.
+        </p>
+      </div>
+
+      <div
+        class="flex lg:gap-6 gap-3 mt-12 flex-wrap premium-reveal [transition-delay:500ms]"
+      >
+        <a
+          href="#get started"
+          class="lg:py-4 lg:px-10 py-3 sm:w-fit px-10 bg-[linear-gradient(90deg,_#110072_0%,_#7A5698_100%)] rounded-full text-white text-sm lg:text-base font-normal inline-flex justify-center items-center gap-2 transition-all duration-250 hover:-translate-y-0.5 hover:shadow-[0_10px_28px_rgba(99,85,216,0.45)] no-underline"
+        >
+          <span class="relative z-10 flex items-center gap-2">
+            Talk to an expert 
+          </span>
+        </a>
+      </div>
+    </div>
+
+    <!-- Desktop Image (Hidden on mobile) -->
+    <div class="hidden lg:flex flex-1 relative items-center justify-end">
+      <div
+        class="max-w-[436px] w-full relative group transition-all duration-700 hover:-translate-y-2 block cursor-pointer"
+      >
+        <img
+          src="/images/erp-connectivity/hero-right-image.png"
+          alt="Security Illustration"
+          class="w-full h-full"
+        />
+      </div>
+    </div>
+  </div>
+</section>
+
+<style is:global>
+  @keyframes hero-blink {
+    0%,
+    100% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0.3;
+    }
+  }
+</style>
+
+<script is:inline>
+  (() => {
+    const section = document.querySelector(".hero-ss");
+    if (!section) return;
+
+    // Force reveal Hero elements immediately
+    setTimeout(() => {
+      section
+        .querySelectorAll(".premium-reveal, .clip-reveal")
+        .forEach((el) => {
+          el.classList.add("is-visible");
+        });
+    }, 100);
+  })();
+</script>
