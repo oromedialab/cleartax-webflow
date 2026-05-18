@@ -1,306 +1,256 @@
 /**
- * Site-wide CSS bundle — paste into every Webflow page's <head>.
- * Tailwind v4: utilities only (no preflight). Reset + base lives in @layer base
- * so utilities (in @layer utilities) cascade above. Explicit layer order
- * declared on line 1 so any stylesheet loaded after this one inherits it.
+ * Site-wide CSS — paste into every Webflow page's <head> BEFORE the per-page
+ * bundle. Contains:
+ *   - design tokens (CSS variables from tokens.css)
+ *   - element reset
+ *   - custom helpers (.tw-block, .tw-grid, animation classes, etc.)
+ *
+ * No Tailwind utility compilation here — utilities live in each per-page
+ * bundle, scoped to the components that page actually uses. Everything in
+ * this file is emitted unlayered so it competes with Webflow defaults at
+ * full cascade priority.
+ *
  * Do not hand-name Webflow classes after Tailwind utilities
  * (flex, block, grid, container, w-*, p-*, text-*, …).
  */
-@layer theme, base, utilities;
-
 @import './tokens.css';
-@import 'tailwindcss/theme.css' layer(theme);
-@import 'tailwindcss/utilities.css' source(none);
 
-@source '../sections/_shared/**/*.astro';
-@source '../sections/global/**/*.astro';
+/* ==========================================================================
+   Element reset
+   ========================================================================== */
 
-@config '../../tailwind.config.js';
-
-@layer base {
-
-  *,
-  *::before,
-  *::after {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
-  }
-
-  html {
-    scroll-behavior: smooth;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-  }
-
-  body {
-    font-family: var(--font-body);
-    font-size: 16px;
-    color: var(--color-text);
-    background-color: var(--color-offwhite);
-    overflow-x: hidden;
-  }
-
-  h1,
-  h2,
-  h3,
-  h4,
-  h6 {
-    font-family: var(--font-heading);
-  }
-
-  a {
-    color: inherit;
-    text-decoration: none;
-  }
-
-  img {
-    display: block;
-    max-width: 100%;
-    height: auto;
-  }
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
 }
 
-@layer utilities {
-  .tw-grid {
-    display: grid !important;
-  }
+html {
+  scroll-behavior: smooth;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
 
-  .tw-block {
-    display: block !important;
-  }
+body {
+  font-family: var(--font-body);
+  font-size: 16px;
+  color: var(--color-text);
+  background-color: var(--color-offwhite);
+  overflow-x: hidden;
+}
 
-  .text-gilroy {
-    font-family: var(--font-gilroy) !important;
-  }
+h1, h2, h3, h4, h6 {
+  font-family: var(--font-heading);
+}
 
-  .bg-grad-recon {
-    background: var(--grad-recon) !important;
-  }
+a {
+  color: inherit;
+  text-decoration: none;
+}
 
-  .text-recon-header {
-    background: var(--recon-header) !important;
-    -webkit-background-clip: text !important;
-    color: transparent !important;
-    display: inline-block;
-  }
+img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+}
 
-  /* Premium Animation Utilities */
-  .premium-reveal.is-ready:not(.is-visible) {
-    opacity: 0;
-    transform: translateY(24px);
-  }
+/* ==========================================================================
+   Custom display helpers — use these instead of `block` / `grid` when
+   Webflow's element defaults outrank plain utilities.
+   ========================================================================== */
 
-  .premium-reveal {
-    transition: opacity 1s cubic-bezier(0.16, 1, 0.3, 1),
-      transform 1s cubic-bezier(0.16, 1, 0.3, 1);
-    will-change: opacity, transform;
-  }
+.tw-grid {
+  display: grid !important;
+}
 
-  .premium-reveal.is-visible {
-    opacity: 1;
-    transform: translateY(0);
-  }
+.tw-block {
+  display: block !important;
+}
 
-  .cta-shimmer {
-    position: relative;
-    overflow: hidden;
-  }
+.text-gilroy {
+  font-family: var(--font-gilroy) !important;
+}
 
-  .cta-shimmer::after {
-    content: "";
-    position: absolute;
-    top: 0;
-    left: -150%;
-    width: 50%;
-    height: 100%;
-    background: linear-gradient(to right,
-        rgba(255, 255, 255, 0) 0%,
-        rgba(255, 255, 255, 0.2) 50%,
-        rgba(255, 255, 255, 0) 100%);
-    transform: skewX(-25deg);
-    animation: shimmer 6s infinite;
-  }
+.bg-grad-recon {
+  background: var(--grad-recon) !important;
+}
 
-  @keyframes shimmer {
-    0% {
-      left: -150%;
-    }
+.text-recon-header {
+  background: var(--recon-header) !important;
+  -webkit-background-clip: text !important;
+  color: transparent !important;
+  display: inline-block;
+}
 
-    20% {
-      left: 150%;
-    }
+/* ==========================================================================
+   Premium animations
+   ========================================================================== */
 
-    100% {
-      left: 150%;
-    }
-  }
+.premium-reveal.is-ready:not(.is-visible) {
+  opacity: 0;
+  transform: translateY(24px);
+}
 
-  /* ReactBits Inspired: Shiny Text */
-  .shiny-text {
-    background: linear-gradient(120deg,
-        rgba(255, 255, 255, 0) 30%,
-        rgba(255, 255, 255, 1) 50%,
-        rgba(255, 255, 255, 0) 70%);
-    background-size: 200% 100%;
-    background-clip: text;
-    -webkit-background-clip: text;
-    color: transparent;
-    display: inline-block;
-    animation: shiny-sweep 4s infinite linear;
-  }
+.premium-reveal {
+  transition: opacity 1s cubic-bezier(0.16, 1, 0.3, 1),
+    transform 1s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: opacity, transform;
+}
 
-  @keyframes shiny-sweep {
-    0% {
-      background-position: 100% 0;
-    }
+.premium-reveal.is-visible {
+  opacity: 1 !important;
+  transform: translateY(0) !important;
+}
 
-    100% {
-      background-position: -100% 0;
-    }
-  }
+.cta-shimmer {
+  position: relative;
+  overflow: hidden;
+}
 
-  /* ReactBits Inspired: Blur Reveal */
-  .blur-reveal.is-ready:not(.is-visible) {
-    opacity: 0;
-    filter: blur(10px);
-    transform: scale(0.95);
-  }
+.cta-shimmer::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -150%;
+  width: 50%;
+  height: 100%;
+  background: linear-gradient(to right,
+      rgba(255, 255, 255, 0) 0%,
+      rgba(255, 255, 255, 0.2) 50%,
+      rgba(255, 255, 255, 0) 100%);
+  transform: skewX(-25deg);
+  animation: shimmer 6s infinite;
+}
 
-  .blur-reveal {
-    transition: opacity 1.2s cubic-bezier(0.16, 1, 0.3, 1),
-      filter 1.2s cubic-bezier(0.16, 1, 0.3, 1),
-      transform 1.2s cubic-bezier(0.16, 1, 0.3, 1);
-    will-change: opacity, filter, transform;
-  }
+@keyframes shimmer {
+  0%   { left: -150%; }
+  20%  { left: 150%; }
+  100% { left: 150%; }
+}
 
-  .blur-reveal.is-visible {
-    opacity: 1;
-    filter: blur(0);
-    transform: scale(1);
-  }
+/* ReactBits Inspired: Shiny Text */
+.shiny-text {
+  background: linear-gradient(120deg,
+      rgba(255, 255, 255, 0) 30%,
+      rgba(255, 255, 255, 1) 50%,
+      rgba(255, 255, 255, 0) 70%);
+  background-size: 200% 100%;
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+  display: inline-block;
+  animation: shiny-sweep 4s infinite linear;
+}
 
-  /* ReactBits Inspired: SVG Drawing Effect */
-  .svg-draw-reveal svg path,
-  .svg-draw-reveal svg circle,
-  .svg-draw-reveal svg rect,
-  .svg-draw-reveal path,
-  .svg-draw-reveal circle,
-  .svg-draw-reveal rect {
-    stroke-dasharray: 1;
-    stroke-dashoffset: 1;
-    transition: stroke-dashoffset 2s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.8s ease, fill-opacity 0.8s ease;
-    opacity: 0;
-    fill-opacity: 0;
-  }
+@keyframes shiny-sweep {
+  0%   { background-position: 100% 0; }
+  100% { background-position: -100% 0; }
+}
 
-  .svg-draw-reveal.is-visible svg path,
-  .svg-draw-reveal.is-visible svg circle,
-  .svg-draw-reveal.is-visible svg rect,
-  .svg-draw-reveal.is-visible path,
-  .svg-draw-reveal.is-visible circle,
-  .svg-draw-reveal.is-visible rect,
-  .active .svg-draw-reveal path {
-    stroke-dashoffset: 0;
-    opacity: 1;
-    fill-opacity: 0.15;
-    /* Subtle fill reveal after drawing */
-    transition-delay: 0s, 0s, 1s;
-    /* Delay fill reveal */
-  }
+/* ReactBits Inspired: Blur Reveal */
+.blur-reveal.is-ready:not(.is-visible) {
+  opacity: 0;
+  filter: blur(10px);
+  transform: scale(0.95);
+}
 
-  /* Delay drawing for complex icons with multiple paths */
-  .svg-draw-reveal.is-visible path:nth-child(2) {
-    transition-delay: 0.2s;
-  }
+.blur-reveal {
+  transition: opacity 1.2s cubic-bezier(0.16, 1, 0.3, 1),
+    filter 1.2s cubic-bezier(0.16, 1, 0.3, 1),
+    transform 1.2s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: opacity, filter, transform;
+}
 
-  .svg-draw-reveal.is-visible path:nth-child(3) {
-    transition-delay: 0.4s;
-  }
+.blur-reveal.is-visible {
+  opacity: 1 !important;
+  filter: blur(0px) !important;
+  transform: scale(1) !important;
+}
 
-  .svg-draw-reveal.is-visible path:nth-child(4) {
-    transition-delay: 0.6s;
-  }
+/* ReactBits Inspired: SVG Drawing Effect */
+.svg-draw-reveal svg path,
+.svg-draw-reveal svg circle,
+.svg-draw-reveal svg rect,
+.svg-draw-reveal path,
+.svg-draw-reveal circle,
+.svg-draw-reveal rect {
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  transition: stroke-dashoffset 2s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.8s ease, fill-opacity 0.8s ease;
+  opacity: 0;
+  fill-opacity: 0;
+}
 
-  /* Subtle Infinite Float */
-  /* Initial states (Ready for JS) */
-  .premium-reveal.is-ready:not(.is-visible) {
-    opacity: 0;
-    transform: translateY(24px);
-  }
+.svg-draw-reveal.is-visible svg path,
+.svg-draw-reveal.is-visible svg circle,
+.svg-draw-reveal.is-visible svg rect,
+.svg-draw-reveal.is-visible path,
+.svg-draw-reveal.is-visible circle,
+.svg-draw-reveal.is-visible rect,
+.active .svg-draw-reveal path {
+  stroke-dashoffset: 0;
+  opacity: 1;
+  fill-opacity: 0.15;
+  /* Subtle fill reveal after drawing */
+  transition-delay: 0s, 0s, 1s;
+}
 
-  .premium-reveal.is-visible {
-    opacity: 1 !important;
-    transform: translateY(0) !important;
-  }
+/* Delay drawing for complex icons with multiple paths */
+.svg-draw-reveal.is-visible path:nth-child(2) { transition-delay: 0.2s; }
+.svg-draw-reveal.is-visible path:nth-child(3) { transition-delay: 0.4s; }
+.svg-draw-reveal.is-visible path:nth-child(4) { transition-delay: 0.6s; }
 
-  .clip-reveal.is-ready:not(.is-visible) {
-    opacity: 0;
-    clip-path: inset(0 0 100% 0);
-    transform: translateY(20px);
-  }
+/* Clip reveal */
+.clip-reveal.is-ready:not(.is-visible) {
+  opacity: 0;
+  clip-path: inset(0 0 100% 0);
+  transform: translateY(20px);
+}
 
-  .clip-reveal {
-    transition: clip-path 1.2s cubic-bezier(0.16, 1, 0.3, 1),
-      opacity 1.2s cubic-bezier(0.16, 1, 0.3, 1),
-      transform 1.2s cubic-bezier(0.16, 1, 0.3, 1);
-  }
+.clip-reveal {
+  transition: clip-path 1.2s cubic-bezier(0.16, 1, 0.3, 1),
+    opacity 1.2s cubic-bezier(0.16, 1, 0.3, 1),
+    transform 1.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
 
-  .clip-reveal.is-visible {
-    opacity: 1 !important;
-    clip-path: inset(0 0 0 0) !important;
-    transform: translateY(0) !important;
-  }
+.clip-reveal.is-visible {
+  opacity: 1 !important;
+  clip-path: inset(0 0 0 0) !important;
+  transform: translateY(0) !important;
+}
 
-  .blur-reveal.is-ready:not(.is-visible) {
-    opacity: 0;
-    filter: blur(10px);
-    transform: scale(0.95);
-  }
+/* Subtle Infinite Float */
+.float-slow {
+  animation: float-slow 6s ease-in-out infinite;
+}
 
-  .blur-reveal.is-visible {
-    opacity: 1 !important;
-    filter: blur(0px) !important;
-    transform: scale(1) !important;
-  }
+@keyframes float-slow {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-12px); }
+}
 
-  .float-slow {
-    animation: float-slow 6s ease-in-out infinite;
-  }
+/* Special: Ambient Aura */
+.ambient-aura {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 60vw;
+  height: 60vw;
+  background: radial-gradient(circle, rgba(122, 86, 152, 0.04) 0%, rgba(255, 255, 255, 0) 70%);
+  pointer-events: none;
+  z-index: -1;
+  transform: translate(-50%, -50%);
+  will-change: transform;
+}
 
-  @keyframes float-slow {
+/* Special: 3D Perspective */
+.perspective-3d {
+  perspective: 1000px;
+}
 
-    0%,
-    100% {
-      transform: translateY(0);
-    }
-
-    50% {
-      transform: translateY(-12px);
-    }
-  }
-
-  /* Special: Ambient Aura */
-  .ambient-aura {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 60vw;
-    height: 60vw;
-    background: radial-gradient(circle, rgba(122, 86, 152, 0.04) 0%, rgba(255, 255, 255, 0) 70%);
-    pointer-events: none;
-    z-index: -1;
-    transform: translate(-50%, -50%);
-    will-change: transform;
-  }
-
-  /* Special: 3D Perspective */
-  .perspective-3d {
-    perspective: 1000px;
-  }
-
-  .tilt-card {
-    transition: transform 0.2s cubic-bezier(0.03, 0.98, 0.52, 0.99);
-    transform-style: preserve-3d;
-  }
+.tilt-card {
+  transition: transform 0.2s cubic-bezier(0.03, 0.98, 0.52, 0.99);
+  transform-style: preserve-3d;
 }
