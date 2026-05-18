@@ -17,21 +17,29 @@ npm install
 
 ## Develop
 
-`npm run dev` builds Tailwind CSS bundles once (via `predev` hook), then starts Astro dev server. Component `<style>` blocks hot-reload on edit. Re-run `npm run build:css` after changing `src/styles/tokens.css` or `tailwind.config.js`.
-
 ```bash
-npm run dev          # builds all page bundles, watches all
-npm run dev:uae      # watches shared + fonts + uae only
-npm run dev:global   # watches shared + fonts + global only
+npm run build:css                                  # build all CSS bundles once
+npm run build:css -- --watch                       # rebuild every bundle on change
+npm run build:css -- --watch --page=<name>         # watch only shared + fonts + this page
+npm run dev                                        # start Astro dev server (run in a second terminal)
 ```
+
+Component `<style>` blocks hot-reload via the Astro dev server. CSS bundles do NOT auto-rebuild from `npm run dev` alone — run `build:css` (one-shot or `--watch`) alongside.
+
+After changing `src/styles/tokens.css`, `src/styles/shared.css`, or `tailwind.config.js`, rerun `build:css`.
 
 | URL | Purpose |
 |-----|---------|
 | `http://localhost:4321/uae` | full UAE page preview |
 | `http://localhost:4321/global-mandate` | full Global Mandate preview |
+| `http://localhost:4321/scale-and-security` | full Scale and Security preview |
+| `http://localhost:4321/recon-ai-agent` | full Recon AI Agent preview |
+| `http://localhost:4321/erp-connectivity` | full ERP Connectivity preview |
+| `http://localhost:4321/clear-compliance-cloud` | full Clear Compliance Cloud preview |
+| `http://localhost:4321/test` | cascade test page (utilities vs fake-Webflow defaults) |
 | `http://localhost:4321/thankyou` | thank-you page preview |
-| `http://localhost:4321/embed/uae/hero-uae` | isolated section preview (mirrors Webflow paste, with `/css/uae.css` loaded) |
-| `http://localhost:4321/embed/_shared/navbar` | isolated shared section preview |
+| `http://localhost:4321/embed-build/uae/hero-uae` | isolated section preview (mirrors Webflow paste) |
+| `http://localhost:4321/embed-build/_shared/navbar` | isolated shared section preview |
 
 ## Build
 
@@ -49,7 +57,7 @@ dist/
 │   ├── shared.css           # paste into EVERY Webflow page <head>
 │   ├── fonts.css            # PREVIEW-ONLY, never paste into Webflow
 │   ├── uae.css              # paste into UAE page <head>
-│   └── global.css           # paste into Global Mandate page <head>
+│   └── global-mandate.css   # paste into Global Mandate page <head>
 ├── _embeds/
 │   ├── _shared/             # navbar, footer, contact-form
 │   ├── uae/                 # hero-uae, logos-strip, platform, why-cleartax, security, case-studies, faq, faqv2
@@ -86,7 +94,7 @@ If an Embed exceeds Webflow's size limit, split section into two Embeds or move 
 
 - **One `.astro` file per section.** Lives at `src/sections/_shared/*.astro` (cross-page) or `src/sections/<folder>/*.astro` (page-specific). Folder names are `uae`, `global` (not `global-mandate`).
 - **Every section's `<style>` block uses `<style is:global>`.** No Astro scope hashes in output. Class-name uniqueness across sections sharing a page is the author's responsibility.
-- **Tailwind v4 utilities are emitted bare** (no `tw:` prefix). Each page CSS imports `tailwindcss/utilities.css ... source(none)` and scopes via `@source` to its own sections. Preflight reset is omitted (no `tailwindcss/preflight` import) so Webflow's base styles survive; a minimal reset lives in `shared.css` `@layer base`. Avoid hand-naming Webflow classes after Tailwind utilities (`flex`, `grid`, `container`, `w-*`, `p-*`, `text-*`, …).
+- **Tailwind v4 utilities are emitted bare** (no `tw:` prefix) and **unlayered** so they beat Webflow's element defaults in the cascade. Each page CSS imports `tailwindcss/utilities.css ... source(none)` and scopes via `@source` to its own sections + (auto-injected) the `_shared` components the page imports. Preflight reset is omitted (no `tailwindcss/preflight` import) so Webflow's base styles survive; a minimal reset lives in `shared.css` at top-level (no `@layer` wrapping). Avoid hand-naming Webflow classes after Tailwind utilities (`flex`, `grid`, `container`, `w-*`, `p-*`, `text-*`, …).
 - **Design tokens live in `src/styles/tokens.css` `:root`** as plain CSS vars. Tailwind v4's `@theme` was avoided — v4 tree-shakes `@theme` tokens that no utility references, which broke colors. `tailwind.config.js` is kept (loaded via `@config`) for future plugin / preset use; `theme.extend` is currently empty.
 - **Animation libraries (GSAP, Motion.dev) load via CDN** from the Webflow page's `<head>`, not bundled here. No JS bundling step exists — page-scoped JS goes inside section `<script>` tags or the Webflow page head.
 - **Prefer logical properties** (`margin-inline-start`, `ps-*`) for anything rendering in Arabic (RTL). Tailwind v4 ships logical-property utilities natively.
@@ -115,31 +123,17 @@ Migration later becomes: rename `.astro` → `.tsx`, replace frontmatter with `e
 
 The `embed-build/[page]/[section].astro` route picks up new sections automatically via `import.meta.glob` — no registry updates needed. `dist/embed-build/` is a build-only staging dir, deleted by `extract-embeds`; the paste artifact is always `dist/_embeds/`.
 
+## Docs
+
+- [docs/build-pipeline.md](docs/build-pipeline.md) — full data flow: how `.astro` + Tailwind sources become per-section HTML embeds + per-page CSS bundles.
+- [docs/adding-a-new-page.md](docs/adding-a-new-page.md) — end-to-end walkthrough for scaffolding a new page.
+- [docs/responsive-no-overlap-rule.md](docs/responsive-no-overlap-rule.md) — cascade strategy background (historical; the rule itself is no longer load-bearing).
+
 ## Adding a new page
 
-1. Create `src/pages/<page>.astro`.
-2. Create `src/sections/<folder>/` with section components.
-3. Create `src/styles/<page>.css`:
-   ```css
-   @layer theme, base, utilities;
+See [docs/adding-a-new-page.md](docs/adding-a-new-page.md) for the end-to-end walkthrough — page file, section components, CSS bundle structure, and the `TARGETS` entry in `scripts/build-css.mjs`.
 
-   @import 'tailwindcss/theme.css' layer(theme);
-   @import 'tailwindcss/utilities.css' layer(utilities) source(none);
-
-   @source '../sections/<folder>/**/*.astro';
-   @source '../pages/<page>.astro';
-
-   @config '../../tailwind.config.js';
-   ```
-4. Add target to `scripts/build-css.mjs` `TARGETS`:
-   ```js
-   { name: '<page>', input: 'src/styles/<page>.css' }
-   ```
-5. Add a focused dev script to `package.json` `scripts` so the watcher only rebuilds shared + fonts + this page:
-   ```json
-   "dev:<page>": "PAGE=<page> npm run dev"
-   ```
-6. `npm run build`.
+Short version: create `src/pages/<page>.astro` (importing `shared.css` + your `<page>.css` + each section), create `src/sections/<page>/*.astro` for page-specific sections, create `src/styles/<page>.css` (no `@layer theme, base, utilities;` declaration — see the doc), and add `{ name: '<page>', input: 'src/styles/<page>.css', page: 'src/pages/<page>.astro' }` to `TARGETS`. The build script auto-injects `@source` directives for any `_shared` components your page imports — don't hand-list them in the CSS entry.
 
 ## Brand fonts (Nohemi, Gilroy)
 

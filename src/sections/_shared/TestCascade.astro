@@ -1,0 +1,67 @@
+---
+/**
+ * Cascade test section. Pairs Tailwind utilities with element-level
+ * "fake-Webflow" rules so we can confirm utilities win without `!important`.
+ * Source for the extract-embeds + assemble-preview pipeline so the test page
+ * round-trips through the same flow as real pages.
+ */
+---
+
+<main class="p-10 max-w-3xl mx-auto">
+  <h1 class="text-xl sm:text-2xl lg:text-6xl text-black font-bold">
+    Tailwind h1 — should be black, bold, and resize at sm/lg breakpoints
+  </h1>
+
+  <p class="text-base text-neutral-700 mt-6">
+    Paragraph. Tailwind <code>text-base</code> (16px) and
+    <code>text-neutral-700</code> should beat the 24px purple Webflow-style rule.
+  </p>
+
+  <!--
+    v4 spacing scale accepts multiples of 0.25 (so py-9.25 works, py-9.24
+    does NOT compile). For non-0.25 multiples use bracket form: py-[9.24rem].
+    Both shown side by side below.
+  -->
+  <input
+    type="text"
+    placeholder="py-9.25 (0.25 step) — should work"
+    class="mt-6 px-4 py-9.25 border border-neutral-300 rounded-md w-full bg-white"
+  />
+  <input
+    type="text"
+    placeholder="py-[9.24rem] (bracket arbitrary) — should work"
+    class="mt-3 px-4 py-[9.24rem] border border-neutral-300 rounded-md w-full bg-white"
+  />
+
+  <a href="#" class="block mt-3.5 text-blue-600 no-underline">
+    Tailwind link — should be blue, no underline. mt-3.5 = v4 decimal spacing.
+  </a>
+
+  <img
+    src="https://cdn.prod.website-files.com/6093bce33d9b4bae841b04e3/69dfcff6071b983201f5f097_logo-cleartax.svg"
+    alt="logo"
+    class="mt-6 w-[200px] opacity-100"
+  />
+
+  <hr class="my-10 border-neutral-300" />
+
+  <p class="text-sm text-neutral-500">
+    Pass criteria:
+    h1 black + bold + responsive;
+    paragraph 16px + neutral-700;
+    input compact padding + neutral border;
+    link blue + no underline;
+    image 200px wide + fully opaque.
+  </p>
+</main>
+
+<style is:global>
+  /* fake-Webflow defaults: plain element selectors, unlayered.
+     These compete against Tailwind utilities. Utility must win for the
+     cascade strategy to be valid. */
+  h1 { font-size: 14px; color: red; font-weight: 400; }
+  p  { font-size: 24px; color: purple; }
+  a  { color: orange; text-decoration: underline; }
+  input { padding: 32px; border: 2px solid green; background: #ffe; }
+  img { max-width: 50%; opacity: 0.3; }
+</style>

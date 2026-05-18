@@ -1,9 +1,14 @@
 #!/usr/bin/env node
 /**
  * Tailwind v4 CSS bundles — one shared, one per page.
- * v4 reads config (theme tokens, content scope) from CSS via @theme / @source /
- * @config, so this script just runs the CLI once per input file. No per-target
- * config generation needed.
+ *
+ * Per-page bundles auto-inject `@source` directives for the `_shared/*`
+ * components the page imports, by parsing the page .astro frontmatter.
+ * Generated entries land in `src/styles/.build/` (gitignored) so the original
+ * entry CSS files stay free of hand-maintained source lists.
+ *
+ * `shared.css` is a tokens + reset + helpers bundle with no Tailwind utility
+ * compilation; it runs through the CLI unchanged.
  */
 import { spawn } from 'node:child_process';
 import { mkdirSync, readFileSync, writeFileSync, existsSync, unlinkSync } from 'node:fs';
@@ -15,20 +20,31 @@ const SPLIT_LIMIT = 49000;
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = resolve(__dirname, '..');
 
+/**
+ * Target shape: { name, input, page? }
+ *   - name:  output bundle name (public/css/<name>.css)
+ *   - input: entry CSS file (relative to ROOT)
+ *   - page:  optional path to the page .astro that imports this bundle.
+ *            When set, `_shared/*` imports from that page's frontmatter are
+ *            auto-injected as `@source` directives via a generated entry.
+ */
 const TARGETS = [
-  { name: 'shared', input: 'src/styles/shared.css' },
-  { name: 'fonts',  input: 'src/styles/fonts.css' },
-  { name: 'uae',    input: 'src/styles/uae.css' },
-  { name: 'uaev2',  input: 'src/styles/uaev2.css' },
-  { name: 'global', input: 'src/styles/global.css' },
-  { name: 'scale-and-security', input: 'src/styles/scale-and-security.css' },
-  { name: 'erp-connectivity', input: 'src/styles/erp-connectivity.css' },
-  { name: 'clear-compliance-cloud', input: 'src/styles/clear-compliance-cloud.css' },
-  { name: 'recon-ai-agent', input: 'src/styles/recon-ai-agent.css' },
+  { name: 'shared',                input: 'src/styles/shared.css' },
+  { name: 'fonts',                 input: 'src/styles/fonts.css' },
+  { name: 'uae',                   input: 'src/styles/uae.css',                   page: 'src/pages/uae.astro' },
+  { name: 'uaev2',                 input: 'src/styles/uaev2.css',                 page: 'src/pages/uaev2.astro' },
+  { name: 'global-mandate',        input: 'src/styles/global-mandate.css',        page: 'src/pages/global-mandate.astro' },
+  { name: 'scale-and-security',    input: 'src/styles/scale-and-security.css',    page: 'src/pages/scale-and-security.astro' },
+  { name: 'erp-connectivity',      input: 'src/styles/erp-connectivity.css',      page: 'src/pages/erp-connectivity.astro' },
+  { name: 'clear-compliance-cloud',input: 'src/styles/clear-compliance-cloud.css',page: 'src/pages/clear-compliance-cloud.astro' },
+  { name: 'recon-ai-agent',        input: 'src/styles/recon-ai-agent.css',        page: 'src/pages/recon-ai-agent.astro' },
+  { name: 'test',                  input: 'src/styles/test.css',                  page: 'src/pages/test.astro' },
 ];
 
 const OUT_DIR = resolve(ROOT, 'public/css');
+const BUILD_ENTRY_DIR = resolve(ROOT, 'src/styles/.build');
 mkdirSync(OUT_DIR, { recursive: true });
+mkdirSync(BUILD_ENTRY_DIR, { recursive: true });
 
 const WATCH = process.argv.includes('--watch');
 const PAGE = process.argv.find((a) => a.startsWith('--page='))?.split('=')[1] || 'all';
@@ -43,14 +59,55 @@ if (WATCH && PAGE !== 'all' && ACTIVE.length === 1) {
 }
 
 /**
+ * Extract _shared component imports from a page astro's frontmatter.
+ * Same regex shape used by scripts/assemble-confirmations.mjs.
+ * Returns relative paths from src/styles/ (e.g. '../sections/_shared/Navbar.astro').
+ */
+function discoverSharedSources(pagePath) {
+  const src = readFileSync(resolve(ROOT, pagePath), 'utf8');
+  const parts = src.split('---');
+  const frontmatter = parts.length > 2 ? parts[1] : '';
+  const re = /import\s+[A-Z][A-Za-z0-9]*\s+from\s+['"]\.\.\/sections\/_shared\/([A-Za-z0-9_-]+)\.astro['"]/g;
+  const names = new Set();
+  let m;
+  while ((m = re.exec(frontmatter)) !== null) names.add(m[1]);
+  return Array.from(names);
+}
+
+/**
+ * Build a generated entry CSS file at src/styles/.build/<name>.css that
+ * re-imports the original entry and appends `@source` directives for the
+ * page's _shared imports.
+ *
+ * Path notes: generated entry lives one directory deeper than the original
+ * entry, so any path *inside* the generated file needs an extra `../`. The
+ * `@import '../<name>.css'` reaches the original entry, and `@source` paths
+ * inside the imported original still resolve from the original's location
+ * (Tailwind's `@source` is path-relative to the file it's declared in).
+ * Only the `@source` lines we *emit* into the generated file need the
+ * `../../sections/_shared/...` form.
+ */
+function writeGeneratedEntry(target) {
+  const names = discoverSharedSources(target.page);
+  const lines = [
+    `/* AUTO-GENERATED by scripts/build-css.mjs. Do not edit. */`,
+    `@import '../${target.input.split('/').pop()}';`,
+    ...names.map((n) => `@source '../../sections/_shared/${n}.astro';`),
+    '',
+  ];
+  const out = resolve(BUILD_ENTRY_DIR, `${target.name}.css`);
+  writeFileSync(out, lines.join('\n'), 'utf8');
+  return { entryPath: out, sources: names };
+}
+
+/**
  * Webflow page custom-code field caps each <style> paste at ~50k chars.
  * If a built bundle exceeds SPLIT_LIMIT, emit two parts (-1.css/-2.css)
  * by slicing at the first top-level rule boundary past the file midpoint.
  *
- * The combined <name>.css stays in place. Both parts are valid standalone
- * CSS — no layer-order reconstruction needed because utilities are emitted
- * unlayered (so cascade is purely "later in document wins") and the user
- * pastes both parts in order on the same Webflow page.
+ * Both parts are valid standalone CSS — utilities are emitted unlayered
+ * so cascade is purely "later in document wins", and the user pastes both
+ * parts in order on the same Webflow page.
  */
 function splitIfOverLimit(outPath, name) {
   const partA = outPath.replace(/\.css$/, '-1.css');
@@ -91,9 +148,20 @@ function splitIfOverLimit(outPath, name) {
 
 function runTailwind(target) {
   const out = resolve(OUT_DIR, `${target.name}.css`);
+
+  let inputPath;
+  if (target.page) {
+    const { entryPath, sources } = writeGeneratedEntry(target);
+    inputPath = entryPath;
+    const shortList = sources.map((s) => s.split('/').pop().replace('.astro', '')).join(', ') || '(none)';
+    console.log(`[css:${target.name}] _shared sources: ${shortList}`);
+  } else {
+    inputPath = resolve(ROOT, target.input);
+  }
+
   const args = [
     '@tailwindcss/cli',
-    '-i', resolve(ROOT, target.input),
+    '-i', inputPath,
     '-o', out,
   ];
   if (WATCH) args.push('-w');
