@@ -1246,7 +1246,7 @@ body.modal-open { overflow: hidden; }
     <div class="eyebrow-light">State of Tax Assurance 2026 · cleartax</div>
     <h2>Know where your enterprise stands. Before the next notice arrives.</h2>
     <p>100+ CFO interviews · 12 Cr+ transactions · 500 companies · 5 industries. The benchmark India's finance leaders have been waiting for.</p>
-    <a href="#download" class="btn btn-white btn-lg" data-modal-trigger="download">
+    <a href="#download" id="finalCtaBtn" class="btn btn-white btn-lg" data-modal-trigger="download">
       Download Report
       <svg class="arr" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
     </a>
@@ -1376,6 +1376,16 @@ body.modal-open { overflow: hidden; }
     });
   });
 
+  // Explicit, fail-safe direct handler for the final CTA button to bypass selector delegation edge cases
+  const finalBtn = document.getElementById('finalCtaBtn');
+  if (finalBtn) {
+    finalBtn.addEventListener('click', (e) => {
+      if (e.metaKey || e.ctrlKey || e.shiftKey) return;
+      e.preventDefault();
+      openModal();
+    });
+  }
+
   function openModal() {
     overlay.classList.add('open');
     overlay.setAttribute('aria-hidden', 'false');
@@ -1385,9 +1395,42 @@ body.modal-open { overflow: hidden; }
     form.reset();
     emailField.classList.remove('error');
     emailHelper.textContent = 'Please use your work email ID';
-    // Focus input after transition
-    setTimeout(() => emailInput.focus(), 280);
+    
+    // Focus immediately (synchronously within user click gesture) for mobile keyboard / instant desktop typing
+    emailInput.focus();
+    
+    // Fallback 1: Run mid-way through CSS transition
+    setTimeout(() => {
+      if (document.activeElement !== emailInput) {
+        emailInput.focus();
+      }
+    }, 280);
+
+    // Fallback 2: Run after CSS transition finishes and compositing layer repaint/keyboard shift settles
+    setTimeout(() => {
+      if (document.activeElement !== emailInput) {
+        emailInput.focus();
+      }
+    }, 380);
   }
+
+  // Expose to window for global access
+  window.openModal = openModal;
+  window.closeModal = closeModal;
+
+  // Keep the input focused indefinitely while the modal is open (prevent random blurs from transitions/repaints)
+  emailInput.addEventListener('blur', () => {
+    if (overlay.classList.contains('open') && !modal.classList.contains('is-success')) {
+      setTimeout(() => {
+        const active = document.activeElement;
+        const clickedClose = active && typeof active.closest === 'function' && active.closest('[data-modal-close]');
+        const clickedLinkInsideModal = active && active.tagName === 'A' && overlay.contains(active);
+        if (active !== submitBtn && active !== emailInput && !clickedClose && !clickedLinkInsideModal) {
+          emailInput.focus();
+        }
+      }, 10);
+    }
+  });
 
   function closeModal() {
     overlay.classList.remove('open');
