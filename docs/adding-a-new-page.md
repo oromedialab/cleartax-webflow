@@ -2,6 +2,8 @@
 
 This walk-through shows how to scaffold a new landing page end-to-end: page file, section components, CSS bundle, and build wiring. The build pipeline auto-discovers most things, so the manual surface is small.
 
+For the underlying mechanics — what runs when, what file feeds what — see [docs/build-pipeline.md](./build-pipeline.md).
+
 ## File layout overview
 
 Every page follows the same four-part shape:

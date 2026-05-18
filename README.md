@@ -123,6 +123,12 @@ Migration later becomes: rename `.astro` → `.tsx`, replace frontmatter with `e
 
 The `embed-build/[page]/[section].astro` route picks up new sections automatically via `import.meta.glob` — no registry updates needed. `dist/embed-build/` is a build-only staging dir, deleted by `extract-embeds`; the paste artifact is always `dist/_embeds/`.
 
+## Docs
+
+- [docs/build-pipeline.md](docs/build-pipeline.md) — full data flow: how `.astro` + Tailwind sources become per-section HTML embeds + per-page CSS bundles.
+- [docs/adding-a-new-page.md](docs/adding-a-new-page.md) — end-to-end walkthrough for scaffolding a new page.
+- [docs/responsive-no-overlap-rule.md](docs/responsive-no-overlap-rule.md) — cascade strategy background (historical; the rule itself is no longer load-bearing).
+
 ## Adding a new page
 
 See [docs/adding-a-new-page.md](docs/adding-a-new-page.md) for the end-to-end walkthrough — page file, section components, CSS bundle structure, and the `TARGETS` entry in `scripts/build-css.mjs`.
