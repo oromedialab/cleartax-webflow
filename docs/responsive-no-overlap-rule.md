@@ -81,16 +81,39 @@ Here `.active` is mutually exclusive with the "not active" state by intent, and 
 
 Hover, focus, `aria-*`, `data-*`, `[&.open]:` style variants are all in the same category.
 
-## Pseudo-`!important` helpers
+## Pseudo-`!important` helpers — use these, not the plain utilities
 
-The project defines a few helpers in [src/styles/shared.css](../src/styles/shared.css):
+The project defines display helpers in [src/styles/shared.css](../src/styles/shared.css):
 
 ```css
 .tw-block { display: block !important; }
 .tw-grid  { display: grid  !important; }
 ```
 
-These exist for cases where Webflow's element styles outrank a plain utility. Prefer them for display switches on `<a>` and `<div>` elements that Webflow likes to restyle. They're still subject to the no-overlap rule — pair them with a non-overlapping range partner (`lg:tw-block` + `max-lg:hidden`, etc.).
+**Always use `.tw-block` instead of `block`, and `.tw-grid` instead of `grid`.** Webflow injects its own `display` rules on `<a>`, `<div>`, and other elements; plain `block` / `grid` from Tailwind lose that fight because we emit utilities without `@layer utilities` wrapping. The `!important` in the helpers guarantees the utility wins regardless of cascade order.
+
+`hidden` (display:none) is fine without the helper — Tailwind's `hidden` has high enough specificity to beat Webflow defaults in practice. But for **show** states (`block`, `grid`), always go through the helpers.
+
+They're still subject to the no-overlap rule — pair them with a non-overlapping range partner (`lg:tw-block` + `max-lg:hidden`, `lg:tw-grid` + `max-lg:hidden`, etc.).
+
+For other displays (`flex`, `inline-flex`, `inline`, …) where no helper exists, use Tailwind v4's `!` modifier when Webflow defaults override (`flex!`, `inline-flex!`). Reach for this only when you actually see a Webflow override beating you; default to plain utilities first.
+
+## Always-`!important` properties
+
+Webflow injects element-level rules for typography and color that reliably outrank plain utilities. Always use the `!` modifier on:
+
+- **`font-size`** — `text-sm!`, `text-base!`, `text-[15px]!`, …
+- **`line-height`** — `leading-6!`, `leading-tight!`, `leading-[1.4]!`, …
+- **`color`** (text) — `text-white!`, `text-[#1a1a1a]!`, … when on `<a>`, headings, or anything Webflow sets a color on.
+
+Treat font-size and line-height as **always-important** in this codebase — even if a single test page renders fine without the bang, paste into another Webflow page will eventually surface the override. Adding `!` up front avoids whack-a-mole.
+
+The `!` is per-utility; combine freely with breakpoint variants and the no-overlap rule still applies:
+
+```html
+<!-- GOOD: each viewport owns one rule, both !important -->
+<h2 class="max-lg:text-base! lg:text-xl! leading-tight!">…</h2>
+```
 
 ## Quick checklist when writing a class
 
