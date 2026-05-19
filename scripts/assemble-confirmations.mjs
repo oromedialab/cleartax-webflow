@@ -161,18 +161,29 @@ for (const pageFile of pages) {
   }
 
   // 5. Extract non-link head content (title, meta, preconnect, google fonts).
-  const headMinusLinks = head
+  //    Strip Astro-only directives that leak from raw template (is:inline,
+  //    is:global, is:raw, set:html, define:vars, client:* etc.) — harmless
+  //    in browsers but ugly in preview/Webflow paste.
+  const stripAstroDirectives = (s) =>
+    s.replace(/\s+(?:is|set|define|client|server|transition):[a-z-]+(?:="[^"]*")?/g, '');
+  // Source page astro indents head children by 8 spaces. Re-indent to 2
+  // spaces uniformly so preview head matches the style-block indent.
+  const reindentHead = (s) => s.replace(/^ {8}/gm, '  ');
+  const headMinusLinks = reindentHead(stripAstroDirectives(head))
     .split('\n')
     .filter(line => !/rel="stylesheet"\s+href="\/css\//.test(line))
     .join('\n')
-    .trim();
+    .replace(/\s+$/, '');
+  // First line lost its leading whitespace because head.innerHTML preserves
+  // it relative to the parent — prepend 2 spaces if missing.
+  const headBody = /^\s/.test(headMinusLinks) ? headMinusLinks : `  ${headMinusLinks}`;
 
   const styleBlocks = buildCssStyleBlocks(cssImports);
 
   const finalHtml = `<!DOCTYPE html>
 <html lang="en">
 <head>
-${headMinusLinks}
+${headBody}
 ${styleBlocks}
 </head>
 <body>
