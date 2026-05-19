@@ -29,8 +29,57 @@ import ContactFormScale from '../sections/_shared/ContactFormScale.astro';
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet" />
+    <!-- Preload critical above-the-fold assets -->
+    <link rel="preload" href="https://cdn.prod.website-files.com/6093bce33d9b4bae841b04e3/69dfcff6071b983201f5f097_logo-cleartax.svg" as="image" type="image/svg+xml" fetchpriority="high" />
+    <link rel="preload" href="https://cdn.prod.website-files.com/6093bce33d9b4bae841b04e3/69eb0cf19b34f198b94079cc_globe.webp" as="image" type="image/webp" fetchpriority="high" />
+    <link rel="preload" href="https://cdn.prod.website-files.com/6093bce33d9b4bae841b04e3/69eb0cf1c632b7e1def5a205_globe-gradient.webp" as="image" type="image/webp" fetchpriority="high" />
+    <link rel="preload" href="https://img.youtube.com/vi/UX0Yt61EdfY/maxresdefault.jpg" as="image" type="image/jpeg" fetchpriority="high" />
+
+    <!-- Deferred script loader for performance -->
+    <script is:inline>
+      (function() {
+        let scriptsLoaded = false;
+        function loadHeavyScripts() {
+          if (scriptsLoaded) return;
+          scriptsLoaded = true;
+          
+          // Remove event listeners
+          triggerEvents.forEach(e => window.removeEventListener(e, loadHeavyScripts, { passive: true }));
+          
+          // Load Google Tag Manager
+          (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+          new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+          j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+          'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+          })(window,document,'script','dataLayer','GTM-P5NDQXGH');
+
+          // Load Usercentrics autoblocker
+          var blockScript = document.createElement('script');
+          blockScript.src = 'https://web.cmp.usercentrics.eu/modules/autoblocker.js';
+          document.head.appendChild(blockScript);
+
+          // Load Usercentrics loader
+          var cmpScript = document.createElement('script');
+          cmpScript.id = 'usercentrics-cmp';
+          cmpScript.src = 'https://web.cmp.usercentrics.eu/ui/loader.js';
+          cmpScript.setAttribute('data-settings-id', 'utqqyaEbvbzrTk');
+          cmpScript.async = true;
+          document.head.appendChild(cmpScript);
+        }
+        
+        const triggerEvents = ['mouseover', 'mouseenter', 'mousemove', 'touchstart', 'scroll', 'keydown'];
+        triggerEvents.forEach(e => window.addEventListener(e, loadHeavyScripts, { passive: true }));
+        
+        // Safety timeout to ensure scripts load even without interaction (e.g. for crawlers)
+        setTimeout(loadHeavyScripts, 4000);
+      })();
+    </script>
   </head>
   <body class="font-[Inter,sans-serif]">
+    <!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-P5NDQXGH"
+height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<!-- End Google Tag Manager (noscript) -->
     <NavbarGlobalV2 />
     <HeroGlobalV2 />
     <LogosStripGlobalV2 />

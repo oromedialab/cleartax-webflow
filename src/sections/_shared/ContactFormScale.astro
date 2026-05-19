@@ -66,10 +66,7 @@ const points = [
 ];
 ---
 
-<script
-    is:inline
-    src={`https://www.google.com/recaptcha/api.js?render=${recaptchaSiteKey}`}
-></script>
+
 
 <section
     class="bg-[#F3F1F9] py-[48px] lg:py-[100px]"
@@ -280,6 +277,25 @@ const points = [
         const isdSelect = section.querySelector('[data-field="isd"]');
         const isdDisplay = section.querySelector("[data-isd-display]");
         if (!form) return;
+
+        const recaptchaKey = section.getAttribute("data-recaptcha-key");
+        let recaptchaLoaded = false;
+        function loadRecaptcha() {
+            if (recaptchaLoaded) return;
+            recaptchaLoaded = true;
+
+            // Remove trigger events
+            triggerEvents.forEach(e => window.removeEventListener(e, loadRecaptcha, { passive: true }));
+            form.removeEventListener('focusin', loadRecaptcha);
+
+            const script = document.createElement('script');
+            script.src = `https://www.google.com/recaptcha/api.js?render=${recaptchaKey}`;
+            document.head.appendChild(script);
+        }
+
+        const triggerEvents = ['mouseover', 'mouseenter', 'mousemove', 'touchstart', 'scroll', 'keydown'];
+        triggerEvents.forEach(e => window.addEventListener(e, loadRecaptcha, { passive: true }));
+        form.addEventListener('focusin', loadRecaptcha);
 
         if (isdSelect && isdDisplay) {
             const sync = () => {

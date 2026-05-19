@@ -59,7 +59,6 @@ const cardColors = ['#F6E0C5', '#D8EFF2', '#DEDAF6'];
 const shuffledColors = [...cardColors].sort(() => Math.random() - 0.5);
 ---
 
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
 
 <section class="bg-white py-[100px] max-lg:py-[60px] max-lg:pb-20 max-sm:py-10 max-sm:pb-[50px] overflow-x-hidden w-full">
   <div class="max-w-[var(--container-max)] mx-auto px-6">
@@ -80,13 +79,13 @@ const shuffledColors = [...cardColors].sort(() => Math.random() - 0.5);
   
   <div class="ml-20 max-[1280px]:ml-10 max-lg:ml-6 max-sm:ml-4">
     <div class="tl-swiper overflow-visible! m-0">
-      <div class="swiper-wrapper">
+      <div class="swiper-wrapper flex flex-nowrap">
         {testimonials.map((t, i) => {
           const cardColor = shuffledColors[i % shuffledColors.length];
           return (
-            <div class="swiper-slide w-fit!">
+            <div class="swiper-slide w-fit! shrink-0">
               <div class="max-w-[630px] w-full p-7 rounded-[20px] flex flex-col h-[375px] max-lg:p-6 max-lg:h-[330px] max-sm:p-4 max-sm:rounded-[14px] max-sm:h-[270px]" style={`background-color: ${cardColor}`}>
-                <img class={`${t.logoClass} object-contain mb-7`} src={t.logoSrc} alt="" />
+                <img class={`${t.logoClass} object-contain mb-7`} src={t.logoSrc} alt="" loading="lazy" decoding="async" />
                 <p class="text-xl! leading-[1.5]! mb-4! text-[#343A40]! max-sm:text-sm!">{t.quote}</p>
                 <div class="flex gap-3 items-center mt-auto">
                   <div class="w-11 h-11 flex justify-center items-center rounded-full bg-[#3025A0] text-white font-bold">{t.initials}</div>
@@ -129,24 +128,48 @@ const shuffledColors = [...cardColors].sort(() => Math.random() - 0.5);
   .tl-swipper-right svg { transform: rotate(180deg); }
 </style>
 
-<script is:inline src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
 <script is:inline>
   (function () {
-    function boot() {
-      if (typeof Swiper === 'undefined') { setTimeout(boot, 50); return; }
-      new Swiper('.tl-swiper', {
-        loop: true,
-        navigation: { nextEl: '.tl-swipper-right', prevEl: '.tl-swipper-left' },
-        slidesPerView: 1,
-        spaceBetween: 10,
-        breakpoints: {
-          768: { slidesPerView: 'auto', spaceBetween: 16 },
-          1024: { slidesPerView: 2.2, spaceBetween: 20 },
-        },
-      });
+    const swiperContainer = document.querySelector('.tl-swiper');
+    if (!swiperContainer) return;
+
+    let swiperLoaded = false;
+    function loadSwiper() {
+      if (swiperLoaded) return;
+      swiperLoaded = true;
+
+      // Inject Swiper CSS
+      const link = document.createElement('link');
+      link.rel = 'stylesheet';
+      link.href = 'https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css';
+      document.head.appendChild(link);
+
+      // Inject Swiper JS
+      const script = document.createElement('script');
+      script.src = 'https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js';
+      script.onload = () => {
+        new Swiper('.tl-swiper', {
+          loop: true,
+          navigation: { nextEl: '.tl-swipper-right', prevEl: '.tl-swipper-left' },
+          slidesPerView: 1,
+          spaceBetween: 10,
+          breakpoints: {
+            768: { slidesPerView: 'auto', spaceBetween: 16 },
+            1024: { slidesPerView: 2.2, spaceBetween: 20 },
+          },
+        });
+      };
+      document.head.appendChild(script);
     }
-    if (document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', boot);
-    } else boot();
+
+    // Load Swiper 200px before the testimonials section enters the viewport
+    const observer = new IntersectionObserver((entries) => {
+      if (entries.some(e => e.isIntersecting)) {
+        loadSwiper();
+        observer.disconnect();
+      }
+    }, { rootMargin: '200px' });
+
+    observer.observe(swiperContainer);
   })();
 </script>
