@@ -62,11 +62,6 @@ const tabs = [
 ];
 ---
 
-<link
-  rel="stylesheet"
-  href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css"
-/>
-
 <div class="infra-section relative py-12 lg:py-25 overflow-hidden [&_button]:font-[inherit] bg-gradient-to-r from-[#F3F1F9] to-[#FFFFFF]">
   <div class="mx-auto max-w-[var(--container-max)] w-full px-4 md:px-6">
     <div class="text-center mb-16">
@@ -194,9 +189,25 @@ const tabs = [
   </div>
 </div>
 
-<script is:inline src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
 <script is:inline>
   (function() {
+    // Load Swiper dynamically (Webflow embed paste doesn't reliably block
+    // on direct <script src>; this ensures Swiper is defined before init).
+    function ensureSwiper(cb) {
+      if (typeof Swiper !== 'undefined') return cb();
+      if (!document.querySelector('script[src*="swiper-bundle"]')) {
+        const s = document.createElement('script');
+        s.src = 'https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js';
+        s.async = true;
+        s.onload = cb;
+        document.head.appendChild(s);
+      } else {
+        const t = setInterval(() => {
+          if (typeof Swiper !== 'undefined') { clearInterval(t); cb(); }
+        }, 50);
+      }
+    }
+
     function initInfrastructure() {
       const section = document.querySelector('.infra-section');
       if (!section) return;
@@ -217,10 +228,7 @@ const tabs = [
       // --- Desktop Swiper Logic ---
       const initSwiper = () => {
         const swiperEl = section.querySelector('.infra-swiper');
-        if (!swiperEl || typeof Swiper === 'undefined') {
-          if (typeof Swiper === 'undefined') setTimeout(initSwiper, 50);
-          return;
-        }
+        if (!swiperEl) return;
 
         const btns = section.querySelectorAll('.infra-tab-btn');
         const swiper = new Swiper('.infra-swiper', {
@@ -312,7 +320,7 @@ const tabs = [
         });
       };
 
-      initSwiper();
+      ensureSwiper(initSwiper);
       initAccordion();
     }
 
