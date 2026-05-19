@@ -87,9 +87,13 @@ for (const pageFile of pages) {
   const frontmatter = parts.length > 2 ? parts[1] : '';
   const template = parts.length > 2 ? parts[2] : content;
   
-  // 2. Parse CSS imports from frontmatter (e.g. import '../styles/global.css')
+  // 2. Parse CSS imports from frontmatter. Page astros may import either
+  // '../styles/<name>.css' (entries with no _shared deps, e.g. shared, fonts)
+  // or '../styles/.build/<name>.css' (auto-generated per-page entries that
+  // pull in _shared @sources). Either way we want the bundle name to look
+  // up in dist/css/<name>.css.
   const cssImports = [];
-  const cssImportRegex = /import\s+['"]\.\.\/styles\/([a-z0-9-]+\.css)['"]/g;
+  const cssImportRegex = /import\s+['"]\.\.\/styles\/(?:\.build\/)?([a-z0-9-]+\.css)['"]/g;
   let cssMatch;
   while ((cssMatch = cssImportRegex.exec(frontmatter)) !== null) {
     cssImports.push(cssMatch[1]);
