@@ -1159,22 +1159,30 @@
     return /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(e);
   }
 
-  function emailDomainCheck(e) {
-    return ['gmail', 'yahoo', 'rediffmail', 'hotmail'].some(function(d) {
-      return e.toLowerCase().includes('@' + d);
-    });
-  }
-
   function buildPayload(firstName, lastName, titleVal, email, answers) {
     const p = new URLSearchParams(window.location.search);
+    
+    // Auto-extract company name from business email domain (e.g. name@siemens.com -> Siemens)
+    let companyVal = "";
+    if (email && email.includes('@')) {
+      const domain = email.substring(email.lastIndexOf("@") + 1).toLowerCase();
+      const parts = domain.split('.');
+      if (parts.length > 0) {
+        const rawCompany = parts[0];
+        if (!['gmail', 'yahoo', 'hotmail', 'outlook', 'live', 'gmx', 'web'].includes(rawCompany)) {
+          companyVal = rawCompany.charAt(0).toUpperCase() + rawCompany.slice(1);
+        }
+      }
+    }
+
     const payload = {
-      region: "Germany",
+      region: "germany",
       submitted_at: new Date().toLocaleString(),
       full_name: firstName + ' ' + lastName,
       job_title: titleVal,
-      company: "", // Not present in HTML form content
+      company: companyVal || "TBD",                  // Ensure company is not empty (TBD fallback)
       work_email: email,
-      phone: "",
+      phone: "",                                     // Match working English version empty optional fields
       industry_sector: "",
       annual_revenue: "",
       page_url: window.location.href,
@@ -1236,13 +1244,6 @@
       showToast('Bitte überprüfen Sie alle erforderlichen Felder.');
       return;
     }
-
-    if (emailDomainCheck(email)) {
-      document.getElementById('err_email').style.display = 'block';
-      document.getElementById('err_email').textContent = 'Bitte geben Sie eine geschäftliche E-Mail-Adresse ein.';
-      return;
-    }
-
     const missing = [];
     const answers = {};
     questions.forEach(q => {
@@ -1273,7 +1274,7 @@
 
     try {
       await sendToSheet(buildPayload(firstName, lastName, titleVal, email, answers));
-      window.location.href = 'https://www.cleartax.com/de/en/thank-you/survey-charity?email=' + encodeURIComponent(email);
+      window.location.href = 'https://www.cleartax.com/de/survey/thank-you';
     } catch (err) {
       console.error(err);
       document.getElementById('loadingOverlay').classList.remove('active');
