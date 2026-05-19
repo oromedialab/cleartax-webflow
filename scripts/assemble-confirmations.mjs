@@ -87,9 +87,13 @@ for (const pageFile of pages) {
   const frontmatter = parts.length > 2 ? parts[1] : '';
   const template = parts.length > 2 ? parts[2] : content;
   
-  // 2. Parse CSS imports from frontmatter (e.g. import '../styles/global.css')
+  // 2. Parse CSS imports from frontmatter. Page astros may import either
+  // '../styles/<name>.css' (entries with no _shared deps, e.g. shared, fonts)
+  // or '../styles/.build/<name>.css' (auto-generated per-page entries that
+  // pull in _shared @sources). Either way we want the bundle name to look
+  // up in dist/css/<name>.css.
   const cssImports = [];
-  const cssImportRegex = /import\s+['"]\.\.\/styles\/([a-z0-9-]+\.css)['"]/g;
+  const cssImportRegex = /import\s+['"]\.\.\/styles\/(?:\.build\/)?([a-z0-9-]+\.css)['"]/g;
   let cssMatch;
   while ((cssMatch = cssImportRegex.exec(frontmatter)) !== null) {
     cssImports.push(cssMatch[1]);
@@ -157,18 +161,29 @@ for (const pageFile of pages) {
   }
 
   // 5. Extract non-link head content (title, meta, preconnect, google fonts).
-  const headMinusLinks = head
+  //    Strip Astro-only directives that leak from raw template (is:inline,
+  //    is:global, is:raw, set:html, define:vars, client:* etc.) — harmless
+  //    in browsers but ugly in preview/Webflow paste.
+  const stripAstroDirectives = (s) =>
+    s.replace(/\s+(?:is|set|define|client|server|transition):[a-z-]+(?:="[^"]*")?/g, '');
+  // Source page astro indents head children by 8 spaces. Re-indent to 2
+  // spaces uniformly so preview head matches the style-block indent.
+  const reindentHead = (s) => s.replace(/^ {8}/gm, '  ');
+  const headMinusLinks = reindentHead(stripAstroDirectives(head))
     .split('\n')
     .filter(line => !/rel="stylesheet"\s+href="\/css\//.test(line))
     .join('\n')
-    .trim();
+    .replace(/\s+$/, '');
+  // First line lost its leading whitespace because head.innerHTML preserves
+  // it relative to the parent — prepend 2 spaces if missing.
+  const headBody = /^\s/.test(headMinusLinks) ? headMinusLinks : `  ${headMinusLinks}`;
 
   const styleBlocks = buildCssStyleBlocks(cssImports);
 
   const finalHtml = `<!DOCTYPE html>
 <html lang="en">
 <head>
-${headMinusLinks}
+${headBody}
 ${styleBlocks}
 </head>
 <body>

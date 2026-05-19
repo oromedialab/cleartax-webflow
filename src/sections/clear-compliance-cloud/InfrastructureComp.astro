@@ -2,6 +2,7 @@
 /**
  * Infrastructure Tab Switcher Component
  */
+
 const tabs = [
   {
     id: "gl-stream",
@@ -62,14 +63,9 @@ const tabs = [
 ];
 ---
 
-<link
-  rel="stylesheet"
-  href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css"
-/>
-
 <div class="infra-section relative py-12 lg:py-25 overflow-hidden [&_button]:font-[inherit] bg-gradient-to-r from-[#F3F1F9] to-[#FFFFFF]">
   <div class="mx-auto max-w-[var(--container-max)] w-full px-4 md:px-6">
-    <div class="text-center mb-16">
+    <div class="text-center lg:mb-16 mb-8">
       <h2 class="text-[26px] lg:text-[44px] max-w-172 text-center mx-auto font-semibold text-black leading-[1.1] mb-4 blur-reveal">
         Infrastructure That Powers <span class="text-[#655DFF]"><br />Every TDS Workflow</span>
       </h2>
@@ -106,7 +102,7 @@ const tabs = [
             >
               <!-- Left: Text -->
               <div>
-                <h3 class="text-[24px] md:text-[32px] font-semibold text-black leading-[1.2] mb-6">
+                <h3 class="text-[24px] md:text-[36px] font-semibold text-black leading-[1.2] mb-6">
                   {tab.title}
                 </h3>
                 <p class="text-base lg:text-lg text-black/80 leading-relaxed mb-10">
@@ -194,9 +190,15 @@ const tabs = [
   </div>
 </div>
 
-<script is:inline src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
 <script is:inline>
   (function() {
+    function whenSwiperReady(cb) {
+      if (typeof Swiper !== 'undefined') return cb();
+      const t = setInterval(() => {
+        if (typeof Swiper !== 'undefined') { clearInterval(t); cb(); }
+      }, 50);
+    }
+
     function initInfrastructure() {
       const section = document.querySelector('.infra-section');
       if (!section) return;
@@ -217,18 +219,17 @@ const tabs = [
       // --- Desktop Swiper Logic ---
       const initSwiper = () => {
         const swiperEl = section.querySelector('.infra-swiper');
-        if (!swiperEl || typeof Swiper === 'undefined') {
-          if (typeof Swiper === 'undefined') setTimeout(initSwiper, 50);
-          return;
-        }
+        if (!swiperEl) return;
 
         const btns = section.querySelectorAll('.infra-tab-btn');
         const swiper = new Swiper('.infra-swiper', {
-          // effect: 'fade',
+          effect: 'fade',
           fadeEffect: { crossFade: true },
           speed: 500,
           allowTouchMove: true,
           autoHeight: true,
+          observer: true,
+          observeParents: true,
           on: {
             slideChange: function () {
               updateTabs(this.activeIndex);
@@ -283,7 +284,17 @@ const tabs = [
           trigger.addEventListener('click', () => {
             const isActive = item.classList.contains('acc-active');
 
-            if (isActive) return;
+            if (isActive) {
+              item.classList.remove('acc-active', 'shadow-sm');
+              item.style.backgroundColor = 'white';
+              item.style.color = '';
+              content.style.maxHeight = '0px';
+              content.style.opacity = '0';
+              if (icon) icon.classList.add('opacity-40', 'grayscale');
+              if (label) label.classList.add('text-black/60');
+              if (chevron) chevron.classList.remove('rotate-180');
+              return;
+            }
 
             items.forEach((otherItem) => {
               otherItem.classList.remove('acc-active', 'shadow-sm');
@@ -312,7 +323,7 @@ const tabs = [
         });
       };
 
-      initSwiper();
+      whenSwiperReady(initSwiper);
       initAccordion();
     }
 
@@ -321,6 +332,7 @@ const tabs = [
     } else {
       initInfrastructure();
     }
+    document.addEventListener('astro:page-load', initInfrastructure);
   })();
 </script>
 

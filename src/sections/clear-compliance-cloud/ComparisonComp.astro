@@ -4,6 +4,7 @@
  * 4-column capability comparison: Capability | ERP Native | Desktop Tool | ClearTax Seamless
  * Column titles sit OUTSIDE the cards; only the row data is wrapped in the grey/white cards.
  */
+
 interface Row {
     capability: string;
     erp: string;
@@ -77,7 +78,7 @@ const CheckIcon = `<svg width="20" height="20" viewBox="0 0 20 20" fill="none" x
 <section id="comparison-comp" class="bg-white py-12 pb-0 lg:py-[100px] w-full">
     <div class="max-w-[var(--container-max)] mx-auto px-4 lg:px-6">
         <!-- Centered header -->
-        <div class="text-center mb-12">
+        <div class="text-center mb-8 lg:mb-12">
             <h2
                 id="comparison-comp-title"
                 class="!font-semibold text-[#000000] !leading-[1.18] !m-0 max-md:text-[28px] max-lg:text-[26px] text-[44px]"
@@ -189,7 +190,7 @@ const CheckIcon = `<svg width="20" height="20" viewBox="0 0 20 20" fill="none" x
                                 {
                                     rows.map((row) => (
                                         <li class="border-b border-black/16 last:border-0">
-                                            <div class="py-[16px] px-8 lg:text-lg h-[55px] flex items-center gap-3 text-black font-medium leading-[1.4]">
+                                            <div class="py-[16px] px-8 lg:text-lg h-[55px] flex items-center gap-3 text-black font-semibold leading-[1.4]">
                                                 <span
                                                     class="inline-flex items-center justify-center shrink-0"
                                                     set:html={CheckIcon}
@@ -215,23 +216,25 @@ const CheckIcon = `<svg width="20" height="20" viewBox="0 0 20 20" fill="none" x
             data-active-tab="clear"
         >
             <!-- Mobile Tabs -->
-            <div class="mb-8 flex justify-center">
+            <div class="mb-8 flex justify-center w-full max-w-full">
                 <div
-                    class="flex p-1 rounded-full gap-1 border border-black/[0.08]"
+                    class="cmp-tabs-swiper swiper overflow-hidden w-full max-w-[max-content] p-1 rounded-full border border-black/[0.08]"
                 >
-                    <button
-                        class="cmp-tab-btn border-none bg-transparent py-2 px-4 rounded-full text-[13px] font-semibold text-black/40 cursor-pointer transition-all duration-300 data-[active=true]:bg-[#110072]/20 data-[active=true]:text-[#110072]"
-                        data-tab="erp">ERP Native</button
-                    >
-                    <button
-                        class="cmp-tab-btn border-none bg-transparent py-2 px-4 rounded-full text-[13px] font-semibold text-black/40 cursor-pointer transition-all duration-300 data-[active=true]:bg-[#110072]/20 data-[active=true]:text-[#110072]"
-                        data-tab="desktop">Desktop Tool</button
-                    >
-                    <button
-                        class="cmp-tab-btn border-none bg-transparent py-2 px-4 rounded-full text-[13px] font-semibold text-black/40 cursor-pointer transition-all duration-300 data-[active=true]:bg-[#110072]/20 data-[active=true]:text-[#110072]"
-                        data-tab="clear"
-                        data-active="true">ClearTax Seamless</button
-                    >
+                    <div class="swiper-wrapper flex gap-1 w-max">
+                        <button
+                            class="swiper-slide !w-auto cmp-tab-btn border-none bg-transparent py-2 px-4 rounded-full text-[13px] font-semibold text-black/40 cursor-pointer transition-all duration-300 data-[active=true]:bg-[#110072]/20 data-[active=true]:text-[#110072]"
+                            data-tab="erp">ERP Native</button
+                        >
+                        <button
+                            class="swiper-slide !w-auto cmp-tab-btn border-none bg-transparent py-2 px-4 rounded-full text-[13px] font-semibold text-black/40 cursor-pointer transition-all duration-300 data-[active=true]:bg-[#110072]/20 data-[active=true]:text-[#110072]"
+                            data-tab="desktop">Desktop Tool</button
+                        >
+                        <button
+                            class="swiper-slide !w-auto cmp-tab-btn border-none bg-transparent py-2 px-4 rounded-full text-[13px] font-semibold text-black/40 cursor-pointer transition-all duration-300 data-[active=true]:bg-[#110072]/20 data-[active=true]:text-[#110072]"
+                            data-tab="clear"
+                            data-active="true">ClearTax Seamless</button
+                        >
+                    </div>
                 </div>
             </div>
 
@@ -239,7 +242,7 @@ const CheckIcon = `<svg width="20" height="20" viewBox="0 0 20 20" fill="none" x
                 <!-- Column 1: Capability -->
                 <div class="flex flex-col min-w-0">
                     <h3
-                        class="text-[16px] font-semibold mb-3 flex flex-col justify-center min-h-[40px] px-2 text-center items-center"
+                        class="text-[16px] font-medium mb-3 flex flex-col justify-center min-h-[40px] px-2 text-center items-center"
                     >
                         Capability
                     </h3>
@@ -254,100 +257,115 @@ const CheckIcon = `<svg width="20" height="20" viewBox="0 0 20 20" fill="none" x
                     </ul>
                 </div>
 
-                <!-- Column 2: The Comparison Data (Toggled by JS) -->
-                <div class="flex flex-col min-w-0">
-                    <!-- ERP Native Header -->
-                    <div class="hidden group-data-[active-tab=erp]:block">
-                        <h3
-                            class="text-[16px] font-medium mb-3 flex flex-col justify-center min-h-[40px] px-2 text-center items-center"
-                        >
-                            ERP Native
-                            <span class="text-sm font-normal text-black/50"
-                                >SAP / Oracle</span
+                <!-- Column 2: The Comparison Data (Swiper) -->
+                <div
+                    class="flex flex-col min-w-0 cmp-swiper overflow-hidden w-full relative"
+                >
+                    <div class="swiper-wrapper">
+                        <!-- Slide 1: ERP Native -->
+                        <div class="swiper-slide flex flex-col">
+                            <h3
+                                class="text-[16px] font-medium mb-3 flex flex-col justify-center min-h-[40px] px-2 text-center items-center"
                             >
-                        </h3>
-                    </div>
-                    <!-- Desktop Tool Header -->
-                    <div class="hidden group-data-[active-tab=desktop]:block">
-                        <h3
-                            class="text-[16px] font-medium mb-3 flex flex-col justify-center min-h-[40px] px-2 text-center items-center"
-                        >
-                            Desktop Tool
-                            <span class="text-sm font-normal text-black/50"
-                                >Winman / KDK</span
+                                ERP Native
+                                <span class="text-sm font-normal text-black/50"
+                                    >SAP / Oracle</span
+                                >
+                            </h3>
+                            <div
+                                class="bg-[#FFFFFF] rounded-[12px] border border-[#000000]/16 relative z-[1] flex-1"
                             >
-                        </h3>
-                    </div>
-                    <!-- ClearTax Header -->
-                    <div class="hidden group-data-[active-tab=clear]:block">
-                        <h3
-                            class="text-[16px] font-medium mb-3 flex flex-col justify-center min-h-[40px] px-2 text-center items-center"
-                        >
-                            ClearTax <span class="text-[#655DFF]">Seamless</span
-                            >
-                        </h3>
-                    </div>
-
-                    <!-- Comparison Card -->
-                    <div class="relative">
-                        <!-- Grey Card (ERP/Desktop) -->
-                        <div
-                            class="hidden group-data-[active-tab=erp]:block group-data-[active-tab=desktop]:block bg-[#FFFFFF] rounded-[12px] border border-[#000000]/16 relative z-[1]"
-                        >
-                            <ul class="list-none m-0 p-0 flex flex-col">
-                                {
-                                    rows.map((row) => (
-                                        <li class="min-h-[64px] border-b border-[#000000]/16 last:border-0 grid grid-cols-1">
-                                            <div class="hidden group-data-[active-tab=erp]:flex p-3 text-[13px] items-center gap-[10px] text-black/80 justify-start">
-                                                {row.erpCross && (
-                                                    <img
-                                                        src={CrossIcon}
-                                                        alt="X"
-                                                        class="w-3.5 h-3.5"
-                                                    />
-                                                )}
-                                                {row.erp && (
-                                                    <span>{row.erp}</span>
-                                                )}
-                                            </div>
-                                            <div class="hidden group-data-[active-tab=desktop]:flex p-3 text-[13px] items-center gap-[10px] text-black/80 justify-start">
-                                                {row.desktopCross && (
-                                                    <img
-                                                        src={CrossIcon}
-                                                        alt="X"
-                                                        class="w-3.5 h-3.5"
-                                                    />
-                                                )}
-                                                {row.desktop && (
-                                                    <span>{row.desktop}</span>
-                                                )}
-                                            </div>
-                                        </li>
-                                    ))
-                                }
-                            </ul>
+                                <ul class="list-none m-0 p-0 flex flex-col">
+                                    {
+                                        rows.map((row) => (
+                                            <li class="min-h-[64px] border-b border-[#000000]/16 last:border-0 grid grid-cols-1">
+                                                <div class="flex p-3 text-[13px] items-center gap-[10px] text-black/80 justify-start">
+                                                    {row.erpCross && (
+                                                        <img
+                                                            src={CrossIcon}
+                                                            alt="X"
+                                                            class="w-3.5 h-3.5"
+                                                        />
+                                                    )}
+                                                    {row.erp && (
+                                                        <span>{row.erp}</span>
+                                                    )}
+                                                </div>
+                                            </li>
+                                        ))
+                                    }
+                                </ul>
+                            </div>
                         </div>
-                        <!-- White Card (ClearTax) -->
-                        <div
-                            class="hidden group-data-[active-tab=clear]:block bg-[#F4F2F9] rounded-[12px] py-1 border border-[#000000]/16 relative z-[2]"
-                        >
-                            <ul class="list-none m-0 p-0 flex flex-col">
-                                {
-                                    rows.map((row) => (
-                                        <li class="min-h-[64px] border-b border-[#000000]/10 last:border-0">
-                                            <div class="p-3 text-[16px] font-medium flex items-center gap-3 text-black justify-start">
-                                                <span
-                                                    class="inline-flex items-center justify-center shrink-0"
-                                                    set:html={CheckIcon}
-                                                />
-                                                {row.clear && (
-                                                    <span>{row.clear}</span>
-                                                )}
-                                            </div>
-                                        </li>
-                                    ))
-                                }
-                            </ul>
+
+                        <!-- Slide 2: Desktop Tool -->
+                        <div class="swiper-slide flex flex-col">
+                            <h3
+                                class="text-[16px] font-medium mb-3 flex flex-col justify-center min-h-[40px] px-2 text-center items-center"
+                            >
+                                Desktop Tool
+                                <span class="text-sm font-normal text-black/50"
+                                    >Winman / KDK</span
+                                >
+                            </h3>
+                            <div
+                                class="bg-[#FFFFFF] rounded-[12px] border border-[#000000]/16 relative z-[1] flex-1"
+                            >
+                                <ul class="list-none m-0 p-0 flex flex-col">
+                                    {
+                                        rows.map((row) => (
+                                            <li class="min-h-[64px] border-b border-[#000000]/16 last:border-0 grid grid-cols-1">
+                                                <div class="flex p-3 text-[13px] items-center gap-[10px] text-black/80 justify-start">
+                                                    {row.desktopCross && (
+                                                        <img
+                                                            src={CrossIcon}
+                                                            alt="X"
+                                                            class="w-3.5 h-3.5"
+                                                        />
+                                                    )}
+                                                    {row.desktop && (
+                                                        <span>
+                                                            {row.desktop}
+                                                        </span>
+                                                    )}
+                                                </div>
+                                            </li>
+                                        ))
+                                    }
+                                </ul>
+                            </div>
+                        </div>
+
+                        <!-- Slide 3: ClearTax Seamless -->
+                        <div class="swiper-slide flex flex-col">
+                            <h3
+                                class="text-[16px] font-medium mb-3 flex flex-col justify-center min-h-[40px] px-2 text-center items-center"
+                            >
+                                ClearTax <span class="text-[#655DFF]"
+                                    >Seamless</span
+                                >
+                            </h3>
+                            <div
+                                class="bg-[#F4F2F9] rounded-[12px] border border-[#000000]/16 relative z-[2] flex-1"
+                            >
+                                <ul class="list-none m-0 p-0 flex flex-col">
+                                    {
+                                        rows.map((row) => (
+                                            <li class="min-h-[64px] border-b border-[#000000]/10 last:border-0 grid grid-cols-1">
+                                                <div class="p-3 text-[16px] font-medium flex items-center gap-3 text-black justify-start">
+                                                    <span
+                                                        class="inline-flex items-center justify-center shrink-0"
+                                                        set:html={CheckIcon}
+                                                    />
+                                                    {row.clear && (
+                                                        <span>{row.clear}</span>
+                                                    )}
+                                                </div>
+                                            </li>
+                                        ))
+                                    }
+                                </ul>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -356,29 +374,97 @@ const CheckIcon = `<svg width="20" height="20" viewBox="0 0 20 20" fill="none" x
     </div>
 </section>
 
-<script>
-    function initComparisonTabs() {
-        const grid = document.getElementById("comparison-mobile-container");
-        const tabBtns = document.querySelectorAll(".cmp-tab-btn");
+<script is:inline>
+    (function () {
+        let contentSwiper = null;
+        let tabsSwiper = null;
 
-        if (!grid || !tabBtns.length) return;
+        function initComparisonTabs() {
+            const grid = document.getElementById("comparison-mobile-container");
+            const tabBtns = document.querySelectorAll(".cmp-tab-btn");
 
-        tabBtns.forEach((btn) => {
-            btn.addEventListener("click", () => {
-                const tabId = btn.getAttribute("data-tab");
-                if (tabId) {
-                    tabBtns.forEach((b) => {
-                        b.classList.remove("active");
-                        b.removeAttribute("data-active");
-                    });
-                    btn.classList.add("active");
-                    btn.setAttribute("data-active", "true");
-                    grid.setAttribute("data-active-tab", tabId);
+            if (!grid || !tabBtns.length) return;
+
+            const isDesktop = window.innerWidth >= 1024;
+            if (isDesktop) {
+                if (contentSwiper) {
+                    contentSwiper.destroy(true, true);
+                    contentSwiper = null;
                 }
-            });
-        });
-    }
+                if (tabsSwiper) {
+                    tabsSwiper.destroy(true, true);
+                    tabsSwiper = null;
+                }
+                return;
+            }
 
-    initComparisonTabs();
-    document.addEventListener("DOMContentLoaded", initComparisonTabs);
+            const swiperEl = grid.querySelector(".cmp-swiper");
+            const tabsSwiperEl = grid.querySelector(".cmp-tabs-swiper");
+
+            if (!swiperEl || !tabsSwiperEl || typeof Swiper === "undefined") {
+                if (typeof Swiper === "undefined")
+                    setTimeout(initComparisonTabs, 50);
+                return;
+            }
+
+            if (contentSwiper || tabsSwiper) return;
+
+            if (swiperEl.swiper) swiperEl.swiper.destroy();
+            if (tabsSwiperEl.swiper) tabsSwiperEl.swiper.destroy();
+
+            tabsSwiper = new Swiper(".cmp-tabs-swiper", {
+                slidesPerView: "auto",
+                freeMode: true,
+                watchSlidesProgress: true,
+                observer: true,
+                observeParents: true,
+            });
+
+            contentSwiper = new Swiper(".cmp-swiper", {
+                speed: 400,
+                allowTouchMove: true,
+                autoHeight: true,
+                observer: true,
+                observeParents: true,
+                initialSlide: 2, // Start at ClearTax Seamless
+                thumbs: {
+                    swiper: tabsSwiper,
+                },
+                on: {
+                    slideChange: function () {
+                        const idx = this.activeIndex;
+                        tabBtns.forEach((btn, i) => {
+                            if (i === idx) {
+                                btn.setAttribute("data-active", "true");
+                            } else {
+                                btn.removeAttribute("data-active");
+                            }
+                        });
+                    },
+                },
+            });
+
+            tabBtns.forEach((btn, index) => {
+                if (btn.getAttribute("data-listener-attached")) return;
+                btn.setAttribute("data-listener-attached", "true");
+
+                btn.addEventListener("click", () => {
+                    if (contentSwiper) contentSwiper.slideTo(index);
+                });
+            });
+        }
+
+        function handleResize() {
+            initComparisonTabs();
+        }
+
+        if (document.readyState === "loading") {
+            document.addEventListener("DOMContentLoaded", initComparisonTabs);
+        } else {
+            initComparisonTabs();
+        }
+
+        document.addEventListener("astro:page-load", initComparisonTabs);
+        window.addEventListener("resize", handleResize);
+    })();
 </script>
