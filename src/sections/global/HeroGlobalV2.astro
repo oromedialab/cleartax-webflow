@@ -94,12 +94,12 @@ const trustLogos = [
 
         <!-- Mobile Video Card (Visible only on mobile) -->
         <div
-          class="lg:hidden group/video w-full max-w-156 aspect-video relative overflow-hidden cursor-pointer shadow-[0_24px_80px_rgba(23,30,40,0.25)] mb-10"
+          class="lg:hidden group/video w-full max-w-156 aspect-video rounded-xl relative overflow-hidden cursor-pointer mb-10"
           data-video-card
         >
           <div class="relative z-10 w-full h-full" data-video-placeholder>
             <img
-              class="block w-full h-full object-cover"
+              class="block w-full h-full object-contain"
               src={effectivePoster}
               alt=""
               loading="eager"
@@ -149,7 +149,7 @@ const trustLogos = [
         class="basis-[606px] w-1/2 flex justify-end max-lg:w-full max-lg:max-w-full max-lg:basis-auto max-lg:justify-start max-lg:hidden"
       >
         <div
-          class="group/video w-full max-w-156 aspect-video relative rounded-xl overflow-hidden cursor-pointer"
+          class="group/video w-full max-w-156 aspect-450/450 relative rounded-xl overflow-hidden cursor-pointer"
           data-video-card
         >
           <div class="relative z-10 w-full h-full" data-video-placeholder>
@@ -183,93 +183,22 @@ const trustLogos = [
 
     cards.forEach((card) => {
       card.addEventListener("click", function () {
-        if (window.innerWidth >= 1024) {
-          const videoWrap = card.querySelector("[data-video-wrap]");
-          if (videoWrap) {
-            if (videoWrap.innerHTML.trim() === "") {
-              const iframe = document.createElement("iframe");
-              const origin = window.location.origin;
-              iframe.src = `https://www.youtube-nocookie.com/embed/w-4S5MkpIJs?autoplay=1&rel=0&enablejsapi=1&origin=${encodeURIComponent(origin)}`;
-              iframe.className = "absolute inset-0 w-full h-full border-0";
-              iframe.allow =
-                "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture";
-              iframe.allowFullscreen = true;
-              iframe.referrerPolicy = "strict-origin-when-cross-origin";
-              videoWrap.appendChild(iframe);
-            }
-            videoWrap.classList.remove("hidden", "z-[5]");
-            videoWrap.classList.add("z-[20]");
-            return;
+        const videoWrap = card.querySelector("[data-video-wrap]");
+        if (videoWrap) {
+          if (videoWrap.innerHTML.trim() === "") {
+            const iframe = document.createElement("iframe");
+            const origin = window.location.origin;
+            iframe.src = `https://www.youtube-nocookie.com/embed/w-4S5MkpIJs?autoplay=1&rel=0&enablejsapi=1&origin=${encodeURIComponent(origin)}`;
+            iframe.className = "absolute inset-0 w-full h-full border-0";
+            iframe.allow =
+              "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture";
+            iframe.allowFullscreen = true;
+            iframe.referrerPolicy = "strict-origin-when-cross-origin";
+            videoWrap.appendChild(iframe);
           }
+          videoWrap.classList.remove("hidden", "z-[5]");
+          videoWrap.classList.add("z-[20]");
         }
-
-        // Create modal overlay
-        const overlay = document.createElement("div");
-        overlay.className =
-          "fixed inset-0 z-[9999] bg-black/20 flex items-center justify-center cursor-pointer backdrop-blur-sm transition-opacity duration-300 opacity-0";
-
-        // Close button
-        const closeBtn = document.createElement("div");
-        closeBtn.className =
-          "absolute top-6 right-6 lg:top-10 lg:right-10 text-white/80 hover:text-white transition-colors cursor-pointer w-12 h-12 flex items-center justify-center bg-white/10 hover:bg-white/20 rounded-full backdrop-blur-md";
-        closeBtn.innerHTML = `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>`;
-        overlay.appendChild(closeBtn);
-
-        // Video container
-        const videoContainer = document.createElement("div");
-        videoContainer.className =
-          "relative w-[95%] lg:w-[80%] max-w-6xl aspect-video bg-black rounded-2xl overflow-hidden shadow-[0_20px_60px_rgba(0,0,0,0.5)] transform transition-transform duration-300 scale-95 cursor-auto border border-white/10";
-
-        const iframe = document.createElement("iframe");
-        const origin = window.location.origin;
-        iframe.src = `https://www.youtube-nocookie.com/embed/w-4S5MkpIJs?autoplay=1&rel=0&enablejsapi=1&origin=${encodeURIComponent(origin)}`;
-        iframe.className = "absolute inset-0 w-full h-full border-0";
-        iframe.allow =
-          "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture";
-        iframe.allowFullscreen = true;
-        iframe.referrerPolicy = "strict-origin-when-cross-origin";
-
-        videoContainer.appendChild(iframe);
-        overlay.appendChild(videoContainer);
-
-        // Function to close modal
-        const closeModal = () => {
-          overlay.style.opacity = "0";
-          videoContainer.style.transform = "scale(0.95)";
-          setTimeout(() => {
-            if (document.body.contains(overlay)) {
-              document.body.removeChild(overlay);
-            }
-            document.body.style.overflow = "";
-          }, 300);
-        };
-
-        // Close on click outside or close button
-        overlay.addEventListener("click", function (e) {
-          if (e.target === overlay || closeBtn.contains(e.target)) {
-            closeModal();
-          }
-        });
-
-        // Close on escape key
-        const escHandler = (e) => {
-          if (e.key === "Escape") {
-            closeModal();
-            document.removeEventListener("keydown", escHandler);
-          }
-        };
-        document.addEventListener("keydown", escHandler);
-
-        // Add to DOM and animate in
-        document.body.appendChild(overlay);
-        document.body.style.overflow = "hidden"; // Prevent scrolling
-
-        // Trigger reflow
-        overlay.offsetHeight;
-
-        // Animate
-        overlay.style.opacity = "1";
-        videoContainer.style.transform = "scale(1)";
       });
     });
   })();
