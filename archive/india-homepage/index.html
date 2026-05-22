@@ -1142,7 +1142,7 @@
       </div>
 
       <!-- HubSpot Lead Form (sits on top of the holographic visual) -->
-      <div class="hero-form-card">
+      <div class="hero-form-card" id="hero-form">
         <div class="card-head">
           <span class="card-eyebrow">Book a Demo</span>
           <h3>Talk to a compliance expert.</h3>
@@ -1860,17 +1860,7 @@
 </footer>
 
 <!-- ============ Modal — Book a Demo (with success state + confetti) ============ -->
-<div class="modal-backdrop" id="modal">
-  <div class="modal modal-hs hero-form-card">
-    <button class="modal-close" onclick="closeModal()" aria-label="close">×</button>
-    <div class="modal-head card-head">
-      <span class="card-eyebrow">Book a Demo</span>
-      <h3>Talk to a compliance expert.</h3>
-      <p class="card-sub">A ClearTax representative will reach out within 24 hours.</p>
-    </div>
-    <div id="modal-hubspot-form"></div>
-  </div>
-</div>
+<!-- Modal removed as per request -->
 
 <script>
   const io = new IntersectionObserver((entries) => {
@@ -1882,15 +1872,17 @@
   window.addEventListener('scroll', () => navWrap.classList.toggle('scrolled', window.scrollY > 40));
 
   function openModal(){
-    document.getElementById('modal').classList.add('open');
-    document.body.style.overflow = 'hidden';
+    const form = document.getElementById('hero-form');
+    if (form) {
+      form.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      // Add a subtle premium focus highlight
+      form.style.boxShadow = '0 0 50px rgba(91, 46, 186, 0.4)';
+      setTimeout(() => {
+        form.style.boxShadow = '';
+      }, 1500);
+    }
   }
-  function closeModal(){
-    document.getElementById('modal').classList.remove('open');
-    document.body.style.overflow = '';
-  }
-  document.getElementById('modal').addEventListener('click', (e) => { if(e.target.id === 'modal') closeModal(); });
-  document.addEventListener('keydown', (e) => { if(e.key === 'Escape') closeModal(); });
+  function closeModal(){}
   document.querySelectorAll('.acc-head').forEach(h => h.addEventListener('click', () => h.parentElement.classList.toggle('open')));
 
   // Mobile drawer
@@ -1906,7 +1898,7 @@
   }
   document.addEventListener('keydown', (e) => { if(e.key === 'Escape') closeDrawer(); });
 
-  // Robust HubSpot forms initialization
+  // Robust HubSpot forms initialization with automatic UTM tracking prefill
   function initHubSpotForms() {
     function checkAndCreate() {
       if (window.hbspt && window.hbspt.forms) {
@@ -1918,18 +1910,21 @@
             portalId: "245744706",
             formId: "71533f54-577f-4f7a-8df9-f1b9600026c8",
             region: "na2",
-            target: "#hubspot-form-container"
-          });
-        }
-        // Modal Form
-        var modalContainer = document.getElementById('modal-hubspot-form');
-        if (modalContainer) {
-          modalContainer.innerHTML = '';
-          window.hbspt.forms.create({
-            portalId: "245744706",
-            formId: "71533f54-577f-4f7a-8df9-f1b9600026c8",
-            region: "na2",
-            target: "#modal-hubspot-form"
+            target: "#hubspot-form-container",
+            onFormReady: function($form) {
+              // Automatic prefill of UTM parameters from URL query params
+              const urlParams = new URLSearchParams(window.location.search);
+              const utms = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 'utm_content'];
+              utms.forEach(utm => {
+                const value = urlParams.get(utm);
+                if (value) {
+                  const field = $form.find('input[name="' + utm + '"]');
+                  if (field.length) {
+                    field.val(value).change();
+                  }
+                }
+              });
+            }
           });
         }
       } else {
