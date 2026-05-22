@@ -18,42 +18,113 @@
       </p>
     </div>
   </div>
-  <div
-    class="max-lg:max-w-[95%] lg:max-w-272.5 w-full aspect-16/9 mx-auto bg-[#171E28] rounded-xl relative overflow-hidden cursor-pointer shadow-[0_24px_80px_rgba(23,30,40,0.25)] group/video"
-    data-video-card
-    data-video-id="OWYYXUMvzZ0"
-  >
-    <button 
-      class="absolute top-4 right-4 z-30 w-10 h-10 bg-black/60 hover:bg-black/80 backdrop-blur-md rounded-full flex items-center justify-center text-white transition-all scale-0 opacity-0 group-[.playing]/video:scale-100 group-[.playing]/video:opacity-100 duration-300 cursor-pointer border-0"
-      data-video-close
-      aria-label="Close video"
+  <div class="scroll-scale-wrapper max-lg:max-w-[95%] lg:max-w-272.5 w-full mx-auto pb-16 lg:pb-25 px-4 bg-[#F3F1F9]">
+    <div
+      class="scroll-scale-video w-full aspect-16/9 mx-auto bg-[#171E28] relative overflow-hidden cursor-pointer shadow-[0_24px_80px_rgba(23,30,40,0.25)] group/video"
+      data-video-card
+      data-video-id="OWYYXUMvzZ0"
     >
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-        <line x1="18" y1="6" x2="6" y2="18"></line>
-        <line x1="6" y1="6" x2="18" y2="18"></line>
-      </svg>
-    </button>
-    <div class="absolute inset-0 z-10 group-[.playing]/video:opacity-0 group-[.playing]/video:pointer-events-none transition-opacity duration-300" data-video-placeholder>
-      <img class="absolute inset-0 w-full h-full object-cover" src="https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6a0add7eee0c59004f7979db_Thumbnail2.png" alt="Video Thumbnail" />
-      <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-16 h-16 bg-[rgba(53,_39,_98,_0.5)] backdrop-blur-[2px] rounded-full flex items-center justify-center transition-transform duration-300 group-hover/video:scale-110 [&>svg]:fill-white [&>svg]:w-7 [&>svg]:h-7">
-          <div class="absolute z-10 inset-1.5 rounded-full backdrop-blur-[2px] bg-[rgba(53,_39,_98,_0.8)] "></div>
-          <svg class="absolute z-20" width="28" height="28" viewBox="0 0 24 24"><polygon points="8,5 20,12 8,19"></polygon></svg>
+      <button 
+        class="absolute top-4 right-4 z-30 w-10 h-10 bg-black/60 hover:bg-black/80 backdrop-blur-md rounded-full flex items-center justify-center text-white transition-all scale-0 opacity-0 group-[.playing]/video:scale-100 group-[.playing]/video:opacity-100 duration-300 cursor-pointer border-0"
+        data-video-close
+        aria-label="Close video"
+      >
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="18" y1="6" x2="6" y2="18"></line>
+          <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
+      </button>
+      <div class="absolute inset-0 z-10 group-[.playing]/video:opacity-0 group-[.playing]/video:pointer-events-none transition-opacity duration-300" data-video-placeholder>
+        <img class="absolute inset-0 w-full h-full object-cover" src="https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6a0add7eee0c59004f7979db_Thumbnail2.png" alt="Video Thumbnail" />
+        <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-16 h-16 bg-[rgba(53,_39,_98,_0.5)] backdrop-blur-[2px] rounded-full flex items-center justify-center transition-transform duration-300 group-hover/video:scale-110 [&>svg]:fill-white [&>svg]:w-7 [&>svg]:h-7">
+            <div class="absolute z-10 inset-1.5 rounded-full backdrop-blur-[2px] bg-[rgba(53,_39,_98,_0.8)] "></div>
+            <svg class="absolute z-20" width="28" height="28" viewBox="0 0 24 24"><polygon points="8,5 20,12 8,19"></polygon></svg>
+        </div>
       </div>
+      <div class="absolute inset-0 opacity-0 pointer-events-none group-[.playing]/video:opacity-100 group-[.playing]/video:pointer-events-auto z-[5] transition-opacity duration-300 [&_iframe]:absolute [&_iframe]:inset-0 [&_iframe]:w-full [&_iframe]:h-full [&_iframe]:border-0"
+        data-video-wrap
+      ></div>
     </div>
-    <div class="absolute inset-0 opacity-0 pointer-events-none group-[.playing]/video:opacity-100 group-[.playing]/video:pointer-events-auto z-[5] transition-opacity duration-300 [&_iframe]:absolute [&_iframe]:inset-0 [&_iframe]:w-full [&_iframe]:h-full [&_iframe]:border-0"
-      data-video-wrap
-    ></div>
   </div>
+
+<style is:global>
+  .scroll-scale-wrapper {
+    perspective: 1000px;
+  }
+  .scroll-scale-video {
+    width: 100%;
+    transform: scale(0.92);
+    border-radius: 12px;
+    transform-origin: center center;
+    will-change: transform;
+    transition: transform 0.15s ease-out;
+  }
+  @media (min-width: 768px) {
+    .scroll-scale-video {
+      transform: scale(0.85);
+      border-radius: 24px;
+    }
+  }
+
+  /* Native CSS Scroll-Driven Animations */
+  @supports (animation-timeline: view()) {
+    .scroll-scale-video {
+      /* Disable JS transition when native animation is running to avoid conflict */
+      transition: none;
+      animation: scaleUpVideoMobile linear both;
+      animation-timeline: view();
+      animation-range: entry 10% exit 90%;
+    }
+    @media (min-width: 768px) {
+      .scroll-scale-video {
+        animation-name: scaleUpVideoDesktop;
+      }
+    }
+  }
+
+  @keyframes scaleUpVideoMobile {
+    0% {
+      transform: scale(0.92);
+    }
+    50% {
+      transform: scale(1);
+    }
+    100% {
+      transform: scale(0.92);
+    }
+  }
+
+  @keyframes scaleUpVideoDesktop {
+    0% {
+      transform: scale(0.85);
+    }
+    50% {
+      transform: scale(1);
+    }
+    100% {
+      transform: scale(0.85);
+    }
+  }
+
+  /* Keep at 100% scale when video is playing */
+  .scroll-scale-video.playing {
+    transform: scale(1) !important;
+    animation: none !important;
+    transition: transform 0.3s ease !important;
+  }
+</style>
 
 <script is:inline>
   (function () {
-    const card = document.currentScript.previousElementSibling;
+    const wrapper = document.currentScript.previousElementSibling;
+    if (!wrapper) return;
+    const card = wrapper.querySelector('[data-video-card]');
     if (!card) return;
     const placeholder = card.querySelector('[data-video-placeholder]');
     const wrap = card.querySelector('[data-video-wrap]');
     const closeBtn = card.querySelector('[data-video-close]');
     const videoId = card.getAttribute('data-video-id');
-    if (!card || !placeholder || !wrap || !closeBtn) return;
+    if (!placeholder || !wrap || !closeBtn) return;
 
     card.addEventListener('click', function () {
       if (card.classList.contains('playing')) return;
@@ -80,6 +151,71 @@
       card.classList.remove('playing');
       wrap.innerHTML = '';
     });
+
+    // Check support for CSS Scroll-Driven Animations
+    const hasNativeScrollAnim = window.CSS && window.CSS.supports && (window.CSS.supports('animation-timeline', 'view()') || window.CSS.supports('animation-timeline: view()'));
+    
+    if (!hasNativeScrollAnim) {
+      setupScrollFallback(card);
+    }
+
+    function setupScrollFallback(element) {
+      let isMobile = window.innerWidth < 768;
+      let minScale = isMobile ? 0.92 : 0.85;
+      let scaleRange = 1 - minScale;
+      let ticking = false;
+      
+      function updateScale() {
+        if (element.classList.contains('playing')) {
+          ticking = false;
+          return;
+        }
+        
+        const rect = element.getBoundingClientRect();
+        const viewportHeight = window.innerHeight;
+        const elementHeight = rect.height;
+        
+        // Check if element is in viewport
+        if (rect.bottom < 0 || rect.top > viewportHeight) {
+          ticking = false;
+          return;
+        }
+        
+        // Progress from 0 (enters bottom) to 1 (leaves top)
+        const totalDist = viewportHeight + elementHeight;
+        const currentDist = viewportHeight - rect.top;
+        const progress = Math.max(0, Math.min(1, currentDist / totalDist));
+        
+        // Distance from center (0 to 0.5)
+        const distFromCenter = Math.abs(progress - 0.5);
+        const normDist = distFromCenter * 2; // 0 at center, 1 at edges
+        
+        // Interpolate scale
+        const scale = 1.0 - (normDist * scaleRange);
+        
+        element.style.transform = `scale(${scale.toFixed(4)})`;
+        
+        ticking = false;
+      }
+      
+      function onScroll() {
+        if (!ticking) {
+          requestAnimationFrame(updateScale);
+          ticking = true;
+        }
+      }
+      
+      window.addEventListener('scroll', onScroll, { passive: true });
+      window.addEventListener('resize', function () {
+        isMobile = window.innerWidth < 768;
+        minScale = isMobile ? 0.92 : 0.85;
+        scaleRange = 1 - minScale;
+        onScroll();
+      }, { passive: true });
+      
+      // Run initial check
+      onScroll();
+    }
   })();
 </script>
 </section>
