@@ -2543,7 +2543,21 @@
         portalId: "245744706",
         formId: "71533f54-577f-4f7a-8df9-f1b9600026c8",
         region: "na2",
-        target: "#hero-hubspot-form"
+        target: "#hero-hubspot-form",
+        onFormReady: function($form) {
+          // Manual prefill backup for UTM parameters from URL query params
+          const urlParams = new URLSearchParams(window.location.search);
+          const utms = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 'utm_content'];
+          utms.forEach(utm => {
+            const value = urlParams.get(utm);
+            if (value) {
+              const field = $form.find('input[name="' + utm + '"]');
+              if (field.length) {
+                field.val(value).change();
+              }
+            }
+          });
+        }
       });
 
       if (form && emailInput && emailField && emailHelper && submitBtn && card) {
