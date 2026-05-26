@@ -1556,8 +1556,34 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
   async function triggerDownload() {
     const url = 'https://cdn.prod.website-files.com/6093bce33d9b4bae841b04e3/6a05b97ab0df6c129957b9c6_10.4%20mb.pdf';
     
-    // Open in new tab immediately
-    window.open(url, '_blank');
+    // Open a blank tab immediately inside the click gesture to avoid popup blockers
+    const newTab = window.open('', '_blank');
+    if (newTab) {
+      newTab.document.write(`
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <title>State of Tax Assurance 2026 Report</title>
+          <style>
+            body, html { margin: 0; padding: 0; display: flex; align-items: center; justify-content: center; height: 100%; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background: #0F0E1E; color: #fff; }
+            .loader-wrap { text-align: center; }
+            .spinner { width: 50px; height: 50px; border: 4px solid rgba(196, 57, 159, 0.15); border-top-color: #C4399F; border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 20px; }
+            h3 { margin: 0 0 10px; font-weight: 600; font-size: 20px; color: #FFFFFF; }
+            p { margin: 0; color: rgba(255,255,255,0.6); font-size: 14px; }
+            @keyframes spin { to { transform: rotate(360deg); } }
+          </style>
+        </head>
+        <body>
+          <div class="loader-wrap">
+            <div class="spinner"></div>
+            <h3>State of Tax Assurance 2026</h3>
+            <p>Preparing your PDF report...</p>
+          </div>
+        </body>
+        </html>
+      `);
+      newTab.document.close();
+    }
 
     const btn = document.getElementById('downloadPdfBtn');
     if (!btn) return;
@@ -1583,15 +1609,47 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
           btn.innerHTML = `Downloading... ${(loaded / (1024*1024)).toFixed(1)}MB`;
         }
       }
-      const blob = new Blob(chunks);
-      const blobUrl = window.URL.createObjectURL(blob);
+      const blob = new Blob(chunks, { type: 'application/pdf' });
+      
+      // Convert the Blob to a File object to specify custom name: State_of_Tax_Assurance_2026_Report.pdf
+      const file = new File([blob], 'State_of_Tax_Assurance_2026_Report.pdf', { type: 'application/pdf' });
+      const blobUrl = window.URL.createObjectURL(file);
+      
+      // Point the opened tab to the clean File object blob URL
+      // Point the opened tab to the clean File object blob URL using a full-screen iframe for custom tab title
+      if (newTab && !newTab.closed) {
+        newTab.document.open();
+        newTab.document.write(`
+          <!DOCTYPE html>
+          <html>
+          <head>
+            <title>State of Tax Assurance 2026 Report</title>
+            <style>
+              body, html { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background: #0F0E1E; }
+              iframe { width: 100%; height: 100%; border: none; display: block; }
+            </style>
+          </head>
+          <body>
+            <iframe src="${blobUrl}#toolbar=0"></iframe>
+          </body>
+          </html>
+        `);
+        newTab.document.close();
+      }
+
+      // Also trigger a direct same-origin download with custom filename
       const a = document.createElement('a');
       a.href = blobUrl;
       a.download = 'State_of_Tax_Assurance_2026_Report.pdf';
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
-      window.URL.revokeObjectURL(blobUrl);
+      
+      // Delay revocation so the new tab's PDF viewer has plenty of time to read the blob
+      setTimeout(() => {
+        window.URL.revokeObjectURL(blobUrl);
+      }, 12000);
+
       btn.disabled = false;
       btn.innerHTML = originalText;
 
@@ -1601,8 +1659,17 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       }, 1000);
 
     } catch (err) {
+      console.error('PDF generation error:', err);
       btn.disabled = false;
       btn.innerHTML = originalText;
+      
+      // Fallback: If fetch or File conversion fails, load original direct URL
+      if (newTab && !newTab.closed) {
+        newTab.location.href = url;
+      } else if (!newTab || newTab.closed) {
+        window.open(url, '_blank');
+      }
+
       setTimeout(() => {
         closeModal();
       }, 1500);
