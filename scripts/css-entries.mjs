@@ -16,6 +16,7 @@ import { resolve } from 'node:path';
 export const PAGE_TARGETS = [
   { name: 'uae',                    input: 'src/styles/uae.css',                    page: 'src/pages/uae.astro' },
   { name: 'uaev2',                  input: 'src/styles/uaev2.css',                  page: 'src/pages/uaev2.astro' },
+  { name: 'oman-e-invoicing',       input: 'src/styles/oman-e-invoicing.css',       page: 'src/pages/oman-e-invoicing.astro' },
   { name: 'global-mandate',         input: 'src/styles/global-mandate.css',         page: 'src/pages/global-mandate.astro' },
   { name: 'scale-and-security',     input: 'src/styles/scale-and-security.css',     page: 'src/pages/scale-and-security.astro' },
   { name: 'erp-connectivity',       input: 'src/styles/erp-connectivity.css',       page: 'src/pages/erp-connectivity.astro' },
