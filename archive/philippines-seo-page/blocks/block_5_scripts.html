@@ -1,0 +1,186 @@
+<script>
+  // ==========================================================
+  // PILLAR PAGE INTERACTIONS
+  // Vanilla JS — no dependencies. Webflow-safe (place in
+  // Project Settings → Custom Code → Before </body> Tag).
+  // ==========================================================
+
+  /* ---------- 1) Live countdown to BIR EIS next enforcement wave ---------- */
+  (function() {
+    // Wave 1 deadline under BIR RR 11-2025
+    var target = new Date('2026-12-31T23:59:59+08:00').getTime();
+
+    var els = {
+      days:    document.querySelector('.ticker-num[data-unit="days"]'),
+      hours:   document.querySelector('.ticker-num[data-unit="hours"]'),
+      minutes: document.querySelector('.ticker-num[data-unit="minutes"]'),
+      seconds: document.querySelector('.ticker-num[data-unit="seconds"]')
+    };
+
+    if (!els.days && !els.hours && !els.minutes && !els.seconds) return;
+
+    function pad(n, len) {
+      var s = String(n);
+      while (s.length < len) s = '0' + s;
+      return s;
+    }
+
+    function tick() {
+      var diff = target - Date.now();
+      if (diff <= 0) {
+        if (els.days)    els.days.textContent    = '000';
+        if (els.hours)   els.hours.textContent   = '00';
+        if (els.minutes) els.minutes.textContent = '00';
+        if (els.seconds) els.seconds.textContent = '00';
+        return;
+      }
+      var d = Math.floor(diff / 86400000);
+      var h = Math.floor((diff % 86400000) / 3600000);
+      var m = Math.floor((diff % 3600000) / 60000);
+      var s = Math.floor((diff % 60000) / 1000);
+      if (els.days)    els.days.textContent    = pad(d, 3);
+      if (els.hours)   els.hours.textContent   = pad(h, 2);
+      if (els.minutes) els.minutes.textContent = pad(m, 2);
+      if (els.seconds) els.seconds.textContent = pad(s, 2);
+    }
+    tick();
+    setInterval(tick, 1000);
+  })();
+
+  /* ---------- 2) Mobile hamburger menu ---------- */
+  (function() {
+    var btn  = document.getElementById('nav-hamburger');
+    var menu = document.getElementById('mobile-menu');
+    if (!btn || !menu) return;
+
+    function toggle(open) {
+      var isOpen = open !== undefined ? open : !document.body.classList.contains('menu-open');
+      document.body.classList.toggle('menu-open', isOpen);
+      btn.setAttribute('aria-expanded', String(isOpen));
+      menu.setAttribute('aria-hidden', String(!isOpen));
+      btn.setAttribute('aria-label', isOpen ? 'Close menu' : 'Open menu');
+    }
+
+    btn.addEventListener('click', function() { toggle(); });
+
+    // Close on link click inside menu
+    menu.addEventListener('click', function(e) {
+      var t = e.target;
+      if (t && (t.tagName === 'A' || (t.closest && t.closest('a')))) {
+        toggle(false);
+      }
+    });
+
+    // Close on Escape
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape' && document.body.classList.contains('menu-open')) {
+        toggle(false);
+      }
+    });
+
+    // Close on viewport upsize back to desktop
+    var mql = window.matchMedia('(min-width: 961px)');
+    function onChange(e) { if (e.matches) toggle(false); }
+    if (mql.addEventListener) mql.addEventListener('change', onChange);
+    else if (mql.addListener) mql.addListener(onChange);
+  })();
+
+  /* ---------- 3) Touch-friendly nav dropdowns (desktop) ---------- */
+  (function() {
+    // On touch devices, clicking a dropdown trigger toggles instead of relying on :hover
+    var drops = document.querySelectorAll('.nav-mid .nav-item-drop, .country-drop');
+    drops.forEach(function(drop) {
+      var trigger = drop.querySelector('.nav-link, .country-pill');
+      if (!trigger) return;
+      trigger.addEventListener('click', function(e) {
+        // Only intercept on touch / small screens where hover is unreliable
+        if (window.matchMedia('(hover: none)').matches) {
+          e.preventDefault();
+          var isOpen = drop.classList.toggle('is-open');
+          // Close siblings
+          drops.forEach(function(d) { if (d !== drop) d.classList.remove('is-open'); });
+        }
+      });
+    });
+
+    // Close on outside click
+    document.addEventListener('click', function(e) {
+      if (!e.target.closest || !e.target.closest('.nav-item-drop, .country-drop')) {
+        drops.forEach(function(d) { d.classList.remove('is-open'); });
+      }
+    });
+  })();
+
+  /* ---------- 4) HubSpot Form integration with UTM Prefill ---------- */
+  (function() {
+    function initHubSpot() {
+      if (window.hbspt && window.hbspt.forms && typeof window.hbspt.forms.create === 'function') {
+        window.hbspt.forms.create({
+          portalId: "245744706",
+          formId: "51af6b81-aa59-4bd2-b499-ff081e27324d",
+          region: "na2",
+          target: "#philippines-hubspot-form",
+          onFormReady: function ($form) {
+            const formEl = ($form && $form[0]) ? $form[0] : $form;
+            if (formEl && formEl.querySelector) {
+              const urlParams = new URLSearchParams(window.location.search);
+              const utms = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 'utm_content'];
+              utms.forEach(utm => {
+                const value = urlParams.get(utm);
+                if (value) {
+                  const input = formEl.querySelector('input[name="' + utm + '"]');
+                  if (input) {
+                    input.value = value;
+                    if (typeof jQuery !== 'undefined' || window.jQuery) {
+                      const $input = typeof jQuery !== 'undefined' ? jQuery(input) : window.jQuery(input);
+                      $input.change();
+                    } else {
+                      input.dispatchEvent(new Event('input', { bubbles: true }));
+                      input.dispatchEvent(new Event('change', { bubbles: true }));
+                    }
+                  }
+                }
+              });
+            }
+          }
+        });
+      }
+    }
+
+    function loadHubSpotScript() {
+      if (window.hbspt && window.hbspt.forms) {
+        initHubSpot();
+      } else {
+        var existingScript = document.querySelector('script[src*="hsforms.net"]');
+        if (!existingScript) {
+          var script = document.createElement('script');
+          script.src = "https://js-na2.hsforms.net/forms/embed/v2.js";
+          script.charset = "utf-8";
+          script.type = "text/javascript";
+          script.onload = function() {
+            initHubSpot();
+          };
+          document.head.appendChild(script);
+        } else {
+          var interval = setInterval(function() {
+            if (window.hbspt && window.hbspt.forms) {
+              clearInterval(interval);
+              initHubSpot();
+            }
+          }, 50);
+        }
+      }
+    }
+
+    // Wait until target element exists in DOM before loading
+    var mountPoll = setInterval(function() {
+      if (document.querySelector('#philippines-hubspot-form')) {
+        clearInterval(mountPoll);
+        loadHubSpotScript();
+      }
+    }, 50);
+  })();
+</script>
+
+</body>
+</html>
