@@ -22,6 +22,7 @@ export const PAGE_TARGETS = [
   { name: 'erp-connectivity',       input: 'src/styles/erp-connectivity.css',       page: 'src/pages/erp-connectivity.astro' },
   { name: 'clear-compliance-cloud', input: 'src/styles/clear-compliance-cloud.css', page: 'src/pages/clear-compliance-cloud.astro' },
   { name: 'recon-ai-agent',         input: 'src/styles/recon-ai-agent.css',         page: 'src/pages/recon-ai-agent.astro' },
+  { name: 'germany-product',         input: 'src/styles/germany-product.css',         page: 'src/pages/germany-product.astro' },
   { name: 'test',                   input: 'src/styles/test.css',                   page: 'src/pages/test.astro' },
 ];
 

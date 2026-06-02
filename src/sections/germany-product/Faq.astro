@@ -1,0 +1,240 @@
+---
+/**
+ * Germany FAQ accordion — adapted from UAE standard page styling and structure.
+ * Features 6 Germany B2B & ViDA enterprise questions with support for paragraph, list,
+ * and mixed content blocks. Uses native javascript height transition animations that remain resize-safe.
+ */
+interface FaqItem {
+  q: string;
+  /** Plain string OR array of paragraphs / lists. */
+  a:
+    | string
+    | Array<
+        { kind: "p"; html: string } | { kind: "ul" | "ol"; items: string[] }
+      >;
+}
+
+const items: FaqItem[] = [
+  {
+    q: "Is ViDA actually law yet? Or is this an early-mover argument?",
+    a: "ViDA was <strong>formally adopted by the EU Council on 11 March 2025</strong> as Council Directive (EU) 2025/516. Phase 1 implementation deadline is 1 July 2030 for cross-border DRR and the Peppol-based digital invoicing framework. This is not speculative — it is binding EU law with a published timetable. Member states are now in transposition. Validate the directive text on EUR-Lex; the dates below it match what we're showing.",
+  },
+  {
+    q: "We have a 2027-only project already approved. Should we tear it up?",
+    a: [
+      {
+        kind: "p",
+        html: "Not necessarily. Two honest paths are available for teams in this situation:",
+      },
+      {
+        kind: "ol",
+        items: [
+          "<strong>Ship the 2027 project as planned</strong> and run a parallel ViDA evaluation in 2028, accepting you'll likely re-platform later.",
+          "<strong>Pause the 2027 RFP for six weeks</strong> and re-scope it as a ViDA-ready selection. This typically adds 8–10% to the 2027 budget but removes the 2029 re-platform line completely.",
+        ],
+      },
+      {
+        kind: "p",
+        html: "We don't recommend path (1) when total programme spend over five years is the metric — but we don't have your numbers. Bring them to the briefing and we'll model both honestly.",
+      },
+    ],
+  },
+  {
+    q: "Does the platform actually post into our SAP without changes?",
+    a: "Yes — and this is the question we hear most. The ClearTax SAP add-on is <strong>certified on SAP Store</strong> for both S/4HANA and ECC. It posts to your existing chart of accounts using standard BAPIs. <strong>No changes to your COA, no changes to your close calendar, no ABAP changes.</strong> The typical integration in production is 4–8 weeks. Your auditor sees the same general ledger entries they see today.",
+  },
+  {
+    q: "What about GoBD and the Betriebsprüfung specifically?",
+    a: "The archive is <strong>GoBD-compliant with 10-year immutable retention</strong>. Every state change on every invoice is timestamp-logged with cryptographic integrity. The exception command centre exposes a 'tax audit view' that walks a Betriebsprüfung auditor through the trail in the order they'll ask for it. Several of our customers have completed Bundeszentralamt audits using exactly this view. We can put you in touch with one as a reference.",
+  },
+  {
+    q: "Can we run a pilot? What does a 90-day proof look like?",
+    a: [
+      {
+        kind: "p",
+        html: "Our standard 90-day pilot is a structured scope designed for proof-of-value:",
+      },
+      {
+        kind: "ul",
+        items: [
+          "<strong>One legal entity, one ERP, one process flow</strong> (typically AR for the issue mandate).",
+          "We bring a Frankfurt-based delivery lead and a tax tech consultant; you provide a finance owner and an IT contact.",
+          "End-of-pilot deliverable is a production-ready integration plus a written report on what would change for the full rollout.",
+          "Pricing is fixed; success criteria are agreed in week one.",
+        ],
+      },
+    ],
+  },
+  {
+    q: "How is pricing structured? Per invoice, per entity, per seat?",
+    a: "Honestly: it depends. For most German enterprises in our customer base it's an <strong>annual platform subscription</strong> with usage tiers by invoice volume, plus a one-time implementation fee. We do not charge per seat. We do not charge for additional country mandates added later. <strong>If you're at 100k+ annual invoices, we'll quote on the briefing.</strong> If you're under, you'll likely fit a standard tier without bespoke pricing.",
+  },
+];
+---
+
+<section
+  class="faq-section box-border bg-[#FFFFFF] py-12 font-['Manrope'] text-[#0F1020] sm:py-24"
+  id="faq"
+>
+  <div class="faq-container mx-auto max-w-[1200px] px-4 sm:px-6">
+    <div class="faq-header mb-8 max-w-[720px] mx-auto text-center sm:mb-12">
+      <h2
+        class="faq-heading mb-4 lg:text-[44px] sm:text-[32px] text-[26px] font-semibold leading-[1.18] tracking-[-1.2px] text-[#0F1020]"
+      >
+        Frequently asked <em class="not-italic text-[#0057FF]">questions</em>
+      </h2>
+      <p
+        class="faq-sub max-w-[540px] mx-auto lg:text-lg text-base leading-[1.44] text-black/80"
+      >
+        Everything you need to know about German B2B e-invoicing, ViDA 2030, and ClearTax.
+      </p>
+    </div>
+
+    <div class="faq-list flex flex-col gap-3" data-faq-root>
+      {
+        items.map((it, i) => (
+          <div
+            class={`faq-item group overflow-hidden rounded-[14px] border border-[rgba(15,16,32,0.08)] bg-white transition-[border-color,box-shadow] duration-300 ease-in-out [box-sizing:border-box] [&.faq-open]:border-[rgba(0,87,255,0.35)] [&.faq-open]:shadow-[0_6px_24px_-12px_rgba(0,87,255,0.25)] ${i >= 5 ? "hidden hidden-faq" : ""}`}
+            style={`transition-delay: ${200 + (i * 50)}ms`}
+          >
+            <button
+              class="faq-trigger flex w-full appearance-none items-center justify-between gap-4 border-0 bg-transparent px-[18px] py-[18px] text-left text-[15.5px] font-bold leading-[1.4] text-[#0F1020] [box-sizing:border-box] cursor-pointer focus-visible:rounded-[14px] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-[#0057FF] sm:px-6 sm:py-[22px] sm:text-[17px]"
+              type="button"
+              aria-expanded="false"
+            >
+              <h4 class="faq-question min-w-0 flex-1 font-semibold text-[18px] leading-[1.32] break-words text-[#0F172A] text-left">
+                {it.q}
+              </h4>
+              <span
+                class="faq-icon flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-[rgba(0,87,255,0.1)] text-[#0057FF] transition-[transform,background,color] duration-300 ease-in-out group-[.faq-open]:rotate-45 group-[.faq-open]:bg-[#0057FF] group-[.faq-open]:text-white"
+                aria-hidden="true"
+              >
+                <svg class="h-[14px] w-[14px]" viewBox="0 0 14 14" fill="none">
+                  <path
+                    d="M7 1v12M1 7h12"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                  />
+                </svg>
+              </span>
+            </button>
+            <div class="faq-panel h-0 overflow-hidden transition-[height] duration-[320ms] [transition-timing-function:cubic-bezier(.4,0,.2,1)]">
+              <div class="faq-answer px-[18px] pb-[18px] text-[14.5px] leading-[1.7] text-[#5A6070] sm:px-6 sm:pb-[22px] sm:text-[15.5px] [&_li]:mb-1.5 [&_ol]:m-0 [&_ol]:pl-5 [&_p:last-child]:mb-0 [&_p]:mb-2.5 [&_p]:mt-0 [&_strong]:text-[#0F1020] [&_ul]:m-0 [&_ul]:pl-5">
+                {typeof it.a === "string" ? (
+                  <p set:html={it.a} />
+                ) : (
+                  it.a.map((block) =>
+                    block.kind === "p" ? (
+                      <p set:html={block.html} />
+                    ) : block.kind === "ul" ? (
+                      <ul>
+                        {block.items.map((li) => (
+                          <li set:html={li} />
+                        ))}
+                      </ul>
+                    ) : (
+                      <ol>
+                        {block.items.map((li) => (
+                          <li set:html={li} />
+                        ))}
+                      </ol>
+                    ),
+                  )
+                )}
+              </div>
+            </div>
+          </div>
+        ))
+      }
+    </div>
+
+    {
+      items.length > 5 && (
+        <div
+          class="mt-6 mx-auto flex items-center justify-center"
+          id="faq-load-more-container"
+        >
+          <button
+            id="faq-load-more-btn"
+            class="inline-flex h-10 items-center gap-2 justify-center rounded-3xl border border-[#0057FF] bg-white px-10 py-4 text-base font-bold leading-[1.4] text-[#0057FF] outline-offset-[-2px] transition-all duration-300 ease-in-out hover:scale-105 active:scale-95 cursor-pointer"
+          >
+            Mehr laden
+            <span class="flex items-center justify-center">
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 16 16"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M8 3V12M8 12L12 8M8 12L4 8"
+                  stroke="#0057FF"
+                  stroke-width="1.6"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
+              </svg>
+            </span>
+          </button>
+        </div>
+      )
+    }
+  </div>
+</section>
+
+<script is:inline>
+  (function () {
+    const root = document.querySelector("[data-faq-root]");
+    if (!root) return;
+    const items = root.querySelectorAll(".faq-item");
+
+    const loadMoreBtn = document.getElementById("faq-load-more-btn");
+    const loadMoreContainer = document.getElementById(
+      "faq-load-more-container",
+    );
+    if (loadMoreBtn) {
+      loadMoreBtn.addEventListener("click", function () {
+        const hiddenItems = root.querySelectorAll(".hidden-faq");
+        hiddenItems.forEach(function (item) {
+          item.classList.remove("hidden", "hidden-faq");
+        });
+        if (loadMoreContainer) {
+          loadMoreContainer.style.display = "none";
+        }
+      });
+    }
+    items.forEach(function (item) {
+      const trigger = item.querySelector(".faq-trigger");
+      const panel = item.querySelector(".faq-panel");
+      if (!trigger || !panel) return;
+
+      trigger.addEventListener("click", function () {
+        const isOpen = item.classList.contains("faq-open");
+        if (isOpen) {
+          panel.style.height = panel.scrollHeight + "px";
+          requestAnimationFrame(function () {
+            panel.style.height = "0px";
+          });
+          item.classList.remove("faq-open");
+          trigger.setAttribute("aria-expanded", "false");
+        } else {
+          panel.style.height = panel.scrollHeight + "px";
+          item.classList.add("faq-open");
+          trigger.setAttribute("aria-expanded", "true");
+          panel.addEventListener("transitionend", function handler(e) {
+            if (e.propertyName !== "height") return;
+            panel.removeEventListener("transitionend", handler);
+            if (item.classList.contains("faq-open"))
+              panel.style.height = "auto";
+          });
+        }
+      });
+
+      window.addEventListener("resize", function () {
+        if (item.classList.contains("faq-open")) panel.style.height = "auto";
+      });
+    });
+  })();
+</script>
