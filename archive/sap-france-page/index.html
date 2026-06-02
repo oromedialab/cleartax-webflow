@@ -1,7 +1,8 @@
 <!doctype html>
 <html lang="en">
+
 <head>
-<meta charset="utf-8" />
+  <meta charset="utf-8" />
 <title>ClearTax e-invoicing for SAP ERP — ECC, S/4HANA &amp; BTP integration</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <meta name="description" content="ClearTax delivers certified e-invoicing for SAP ECC, S/4HANA and BTP. Pre-built RICEF objects, IDoc/BAPI/OData ingestion, ABAP add-on with TMS transport. Live in 4–6 weeks across 5+ EU mandates." />
@@ -553,29 +554,239 @@ a  { color: inherit; text-decoration: none; }
   box-shadow: 0 30px 80px rgba(48,27,94,.12);
   display: flex; flex-direction: column; gap: 16px;
 }
-.demo-form h3 { font-family: var(--font-display); font-weight: 500; font-size: 24px; color: var(--ct-purple-deep); margin: 0 0 4px; }
-.demo-form .sub { font-size: 13px; color: var(--ct-muted); margin-bottom: 8px; }
-.field { display: flex; flex-direction: column; gap: 6px; }
-.field label { font-family: var(--font-body); font-weight: 600; font-size: 12px; color: #3B2C5E; }
-.field label .req { color: #E0418A; }
-.field input, .field select, .phone-input input, .phone-input select {
-  width: 100%; padding: 12px; padding-right: 20px; border-radius: 10px;
-  border: 1px solid rgba(48,27,94,.14); background: #fff;
-  font-family: var(--font-body); font-size: 14px; color: var(--ct-ink);
-  transition: border-color .2s, box-shadow .2s;
+.demo-form h3 {
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: 24px;
+  color: var(--ct-purple-deep);
+  margin: 0 0 4px;
+  text-align: left;
 }
-.field input:focus, .field select:focus { outline: none; border-color: var(--ct-purple-deep); box-shadow: 0 0 0 3px rgba(48,27,94,.1); }
-.field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
-.phone-input { display: grid; grid-template-columns: 110px 1fr; gap: 8px; }
-.demo-form .pill { width: 100%; justify-content: center; margin-top: 8px; }
-.demo-form .agree { display: flex; align-items: flex-start; gap: 8px; font-size: 12px; color: var(--ct-muted); line-height: 1.5; }
-.demo-form .agree input { width: 16px; height: 16px; margin-top: 2px; flex: 0 0 auto; accent-color: var(--ct-purple-deep); }
-.demo-form .footnote { text-align: center; font-size: 12px; color: var(--ct-muted); margin-top: 4px; }
-.demo-form a { color: var(--ct-purple-deep); font-weight: 600; }
+.demo-form .sub {
+  font-size: 13px;
+  color: var(--ct-muted);
+  margin-bottom: 8px;
+  text-align: left;
+}
+.demo-form .form-note {
+  font-size: 11px;
+  color: var(--ct-muted);
+  text-align: center;
+  font-family: var(--font-body);
+}
+/* ────────────────────────────────────────────────────────────────────────────
+   HubSpot Form Style Overrides (Synced with global-contact-page design system)
+   ──────────────────────────────────────────────────────────────────────────── */
+.demo-form .hs-form-field {
+  margin-bottom: 13px !important;
+  text-align: left;
+}
+.demo-form .hs-form-field > label {
+  display: block !important;
+  font-family: var(--font-body) !important;
+  font-weight: 500 !important;
+  font-size: .78rem !important;
+  color: #5A556E !important;
+  margin-bottom: 5px !important;
+}
+.demo-form .hs-form-field > label .hs-form-required {
+  color: #E0418A !important;
+  margin-left: 2px !important;
+}
+
+/* Base input styles: matches global-contact-page design */
+.demo-form input.hs-input,
+.demo-form select.hs-input,
+.demo-form textarea.hs-input,
+.demo-form input[type=text],
+.demo-form input[type=email],
+.demo-form input[type=tel],
+.demo-form select {
+  width: 100% !important;
+  padding: 11px 13px !important;
+  border: 1px solid #DAD5E6 !important;
+  border-radius: 8px !important;
+  background: #fff !important;
+  font-family: var(--font-body) !important;
+  font-size: .92rem !important;
+  color: var(--ct-ink) !important;
+  transition: .18s !important;
+  box-sizing: border-box !important;
+}
+
+.demo-form input.hs-input:focus,
+.demo-form select.hs-input:focus,
+.demo-form textarea.hs-input:focus,
+.demo-form input:focus,
+.demo-form select:focus {
+  outline: none !important;
+  border-color: var(--ct-purple-deep) !important;
+  box-shadow: 0 0 0 3px rgba(48,27,94,.1) !important;
+}
+
+/* Reset wrapper div.hs-input to prevent double borders or background issues */
+.demo-form div.hs-input {
+  border: none !important;
+  padding: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+/* Completely collapse and hide hidden fields to prevent empty vertical gaps */
+.demo-form .hs-form-field:has(input[type=hidden]):not(:has(input:not([type=hidden]))):not(:has(select)) {
+  display: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  height: 0 !important;
+  overflow: hidden !important;
+}
+
+/* Collapse any fieldset wrapper that only contains hidden fields */
+.demo-form fieldset:not(:has(input:not([type=hidden]))):not(:has(select)):has(input[type=hidden]) {
+  margin: 0 !important;
+  padding: 0 !important;
+  display: none !important;
+  height: 0 !important;
+}
+
+/* Phone input layout: place country select and phone number side-by-side */
+.demo-form .hs-phone-field,
+.demo-form .hs-fieldtype-phonenumber .input {
+  display: flex !important;
+  gap: 8px !important;
+  width: 100% !important;
+}
+.demo-form .hs-phone-field select,
+.demo-form .hs-fieldtype-phonenumber select {
+  width: 120px !important;
+  flex: 0 0 120px !important;
+}
+.demo-form .hs-phone-field input,
+.demo-form .hs-fieldtype-phonenumber input {
+  flex: 1 1 auto !important;
+}
+
+/* Remove list indicators (bullets) from checkboxes */
+.demo-form ul.inputs-list {
+  list-style: none !important;
+  padding: 0 !important;
+  margin: 0 !important;
+}
+.demo-form ul.inputs-list li {
+  list-style: none !important;
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
+/* Style checkboxes and checkbox labels to be inline and premium */
+.demo-form label.hs-form-booleancheckbox-display,
+.demo-form label.hs-form-checkbox-display {
+  display: flex !important;
+  align-items: flex-start !important;
+  gap: 8px !important;
+  font-family: var(--font-body) !important;
+  font-weight: 500 !important;
+  font-size: .74rem !important;
+  color: var(--ct-muted) !important;
+  line-height: 1.4 !important;
+  cursor: pointer !important;
+}
+.demo-form input[type=checkbox] {
+  width: 16px !important;
+  height: 16px !important;
+  margin: 2px 0 0 0 !important;
+  flex: 0 0 auto !important;
+  accent-color: var(--ct-purple-deep) !important;
+  cursor: pointer !important;
+}
+
+.demo-form .hs-field-desc {
+  font-size: 12px !important;
+  color: var(--ct-muted) !important;
+  margin-top: 4px !important;
+}
+.demo-form .hs-error-msg,
+.demo-form .hs-error-msgs label {
+  color: #D33 !important;
+  font-size: .74rem !important;
+  margin-top: 4px !important;
+  font-family: var(--font-body) !important;
+  display: block !important;
+}
+.demo-form ul.hs-error-msgs {
+  list-style: none !important;
+  padding: 0 !important;
+  margin: 4px 0 0 0 !important;
+}
+.demo-form .hs-submit .actions {
+  margin-top: 16px !important;
+  padding: 0 !important;
+  text-align: center !important;
+}
+.demo-form .hs-button,
+.demo-form input[type=submit] {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 100% !important;
+  min-height: 48px !important;
+  padding: 13px 24px !important;
+  font-family: var(--font-body) !important;
+  font-weight: 600 !important;
+  font-size: .96rem !important;
+  color: #fff !important;
+  background: var(--ct-purple-deep) !important;
+  border: none !important;
+  border-radius: 50px !important;
+  cursor: pointer !important;
+  transition: background .2s !important;
+  box-shadow: none !important;
+  margin-top: 6px !important;
+}
+.demo-form .hs-button:hover,
+.demo-form input[type=submit]:hover {
+  background: var(--ct-purple-mid) !important;
+}
+.demo-form .hs-button:active,
+.demo-form input[type=submit]:active {
+  transform: scale(0.985) !important;
+}
+.demo-form .legal-consent-container,
+.demo-form .hs-richtext,
+.demo-form .hs-dependent-field {
+  font-family: var(--font-body) !important;
+  font-size: .74rem !important;
+  color: var(--ct-muted) !important;
+  line-height: 1.4 !important;
+  text-align: left !important;
+}
+.demo-form .legal-consent-container a,
+.demo-form .hs-richtext a {
+  color: var(--ct-purple-deep) !important;
+  font-weight: 600 !important;
+  text-decoration: underline !important;
+}
+.demo-form fieldset {
+  border: none !important;
+  padding: 0 !important;
+  margin: 0 0 13px 0 !important;
+  max-width: 100% !important;
+}
+.demo-form .hs-form-row {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 14px;
+}
+@media (min-width: 600px) {
+  .demo-form .hs-form-row {
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  }
+}
+
 @media (max-width: 880px) {
   .cta-grid { grid-template-columns: 1fr; }
-  .field-row { grid-template-columns: 1fr; }
 }
+
 
 /* ────────────────────────────────────────────────────────────────────────────
    FAQ
@@ -651,819 +862,1046 @@ a  { color: inherit; text-decoration: none; }
 .seal .ic { width: 28px; height: 28px; border-radius: 6px; background: rgba(255,255,255,.08); display: grid; place-items: center; }
 @media (max-width: 980px) { .footer-grid { grid-template-columns: 1fr 1fr; } }
 @media (max-width: 600px) { .footer-grid { grid-template-columns: 1fr; } .pill .arr { display: none; } }
+    .open .car {}
+
+    .car {
+      transform: translateX(3px)
+    }
+
+    .open {
+      display: flex
+    }
+
+    .cft {
+      background: #0a0a0a;
+      color: #fff;
+      font-family: var(--font-body);
+      padding: 72px 0 0
+    }
+
+    .cfi {
+      padding-bottom: 0
+    }
+
+    .cfg {
+      display: grid;
+      grid-template-columns: 1.5fr 1fr 1.4fr 1.2fr;
+      gap: 48px;
+      padding-bottom: 56px;
+      border-bottom: 1px solid rgba(255, 255, 255, .08)
+    }
+
+    .cf2 {}
+
+    .cf3 {
+      height: 30px;
+      margin-bottom: 20px
+    }
+
+    .cf4 {
+      font-size: 13px;
+      color: rgba(255, 255, 255, .5);
+      line-height: 1.7;
+      margin: 0 0 24px
+    }
+
+    .cf5 {
+      font-size: 13px;
+      font-weight: 600;
+      color: rgba(255, 255, 255, .8);
+      margin-bottom: 12px
+    }
+
+    .cf6 {
+      display: flex;
+      gap: 8px
+    }
+
+    .csc {
+      width: 34px;
+      height: 34px;
+      border-radius: 8px;
+      background: rgba(255, 255, 255, .06);
+      border: 1px solid rgba(255, 255, 255, .1);
+      display: grid;
+      place-items: center
+    }
+
+    .csc img {
+      opacity: .7
+    }
+
+    .csc:hover {
+      background: rgba(255, 255, 255, .14)
+    }
+
+    .csc:hover img {
+      opacity: 1
+    }
+
+    .cfc h5 {
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      color: rgba(255, 255, 255, .45);
+      margin: 0 0 16px
+    }
+
+    .cfc ul {
+      list-style: none;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 10px
+    }
+
+    .cfc a {
+      font-size: 13px;
+      color: rgba(255, 255, 255, .65);
+      line-height: 1.4
+    }
+
+    .cfc a:hover {
+      color: #fff
+    }
+
+    .cf1 {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 24px;
+      padding: 24px 0 28px;
+      flex-wrap: wrap
+    }
+
+    .cf8 {
+      display: flex;
+      flex-direction: column;
+      gap: 8px
+    }
+
+    .cf8>span {
+      font-size: 11px;
+      color: rgba(255, 255, 255, .35);
+      letter-spacing: .06em;
+      text-transform: uppercase
+    }
+
+    .cf9 {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px
+    }
+
+    .cf9 a {
+      font-size: 13px;
+      color: rgba(255, 255, 255, .5)
+    }
+
+    .cf9 a:hover {
+      color: #fff
+    }
+
+    .cf7 {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap
+    }
+
+    .csi {
+      height: 36px;
+      opacity: .85;
+      filter: brightness(1.1)
+    }
+
+    .csi:hover {
+      opacity: 1
+    }
+
+    @media (max-width:960px) {
+      .cfg {
+        grid-template-columns: 1fr 1fr
+      }
+    }
+
+    @media (max-width:560px) {
+      .cfg {
+        grid-template-columns: 1fr;
+        gap: 36px
+      }
+
+      .cf1 {
+        flex-direction: column;
+        align-items: flex-start
+      }
+
+      .cf7 {
+        gap: 8px
+      }
+
+      .csi {
+        height: 30px
+      }
+    }
+    #nw {
+      position: fixed;
+      top: 16px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: calc(100% - 32px);
+      max-width: 1280px;
+      z-index: 200;
+      font-family: var(--font-body)
+    }
+
+    #nv {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 10px 10px 10px 24px;
+      background: rgba(255, 255, 255, .92);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, .8);
+      border-radius: 999px;
+      box-shadow: 0 8px 30px rgba(48, 27, 94, .12);
+      width: 100%;
+      box-sizing: border-box;
+      width: 100%;
+      box-sizing: border-box
+    }
+
+    #nl {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      flex: 1
+    }
+
+    #nr {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-left: auto
+    }
+
+    #hb {
+      display: none !important;
+      flex-direction: column;
+      justify-content: center;
+      gap: 5px;
+      width: 38px;
+      height: 38px;
+      border: none;
+      background: rgba(48, 27, 94, .06);
+      cursor: pointer;
+      padding: 8px;
+      margin-left: auto;
+      flex-shrink: 0;
+      border-radius: 10px
+    }
+
+    #hb span {
+      display: block;
+      height: 2px;
+      background: #1a0b3b;
+      border-radius: 2px
+    }
+
+    #mm {
+      display: none;
+      flex-direction: column;
+      background: rgba(255, 255, 255, .97);
+      border-radius: 20px;
+      margin-top: 8px;
+      padding: 10px;
+      box-shadow: 0 8px 30px rgba(48, 27, 94, .12);
+      border: 1px solid rgba(255, 255, 255, .8)
+    }
+
+    #mm.open {
+      display: flex
+    }
+
+    #mm a {
+      padding: 11px 14px;
+      border-radius: 10px;
+      font-size: 15px;
+      font-weight: 500;
+      color: #1a0b3b
+    }
+
+    #mm a:hover {
+      background: #f4f2ff
+    }
+
+    @media(max-width:860px) {
+      #nl {
+        display: none !important
+      }
+
+      #nr {
+        display: none !important
+      }
+
+      .nct {
+        display: none !important
+      }
+
+      #hb {
+        display: flex !important;
+        margin-left: auto
+      }
+
+      #nv {
+        padding: 8px 10px 8px 20px !important;
+        gap: 0 !important
+      }
+    }
 </style>
 </head>
+
 <body>
-
-<!-- ──────────── NAV (ported from cleartax.com/ae) ──────────── -->
-<div class="nav-wrap">
-  <nav class="nav">
-    <a href="https://www.cleartax.com/" class="nav-logo" aria-label="ClearTax">
-      <img src="https://assets1.cleartax-cdn.com/finfo/wg-utils/retool/d9f36ac3-77a9-40c6-94fc-20c2e3855457.svg" alt="ClearTax" />
-    </a>
-    <div class="nav-links">
-      <a href="#architecture">Architecture</a>
-      <a href="#how">How it works</a>
-      <a href="#pillars">Why ClearTax</a>
-      <a href="#faq">FAQ</a>
-    </div>
-    <div class="nav-erp-tag">
-      <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 10h18M9 4v16"/></svg>
-      For SAP ECC &amp; S/4HANA
-    </div>
-    <a href="#contact" class="pill">Book a Demo <span class="arr">→</span></a>
-  </nav>
-</div>
-
-<!-- ──────────── HERO ──────────── -->
-<header class="hero" 
-        data-form-type="FR-contact-sales-form" 
-        data-lead-type="FR" 
-        data-origin-country="France"
-        data-recaptcha-key="6Lc5ZG0mAAAAAGwClrZwtcyttcUMYDUPxg4MM4p3" 
-        data-sheet-name="sapFrance"
-        data-thankyou-url="https://cleartax.com/fr/thank-you/">
-  <div class="container">
-    <div class="hero-inner">
-      <div>
-        <div class="eyebrow"><span class="dot"></span>Built for SAP customers</div>
-        <h1>
-          E-invoicing that <span class="h1-grad">plugs into SAP</span> — not around it.
-          <span class="small">Certified add-on for ECC, S/4HANA &amp; BTP. Live in 4–6 weeks.</span>
-        </h1>
-        <p class="hero-sub">
-          ClearTax delivers compliant e-invoicing for SAP-run enterprises across every mandate that matters — France (DGFiP), Belgium (Peppol), Poland (KSeF), Saudi (ZATCA), UAE (FTA) and more — through one ABAP add-on and a single global API.
-        </p>
-        <div class="hero-cta-row">
-          <a href="#contact" class="pill lg">Book a Demo <span class="arr">→</span></a>
-          <a href="#architecture" class="pill ghost">See the architecture</a>
-        </div>
-        <div class="hero-meta">
-          <span><b>SAP-certified</b> · ABAP add-on · TMS-ready</span>
-          <span><b>4–6 wk</b> typical go-live</span>
-          <span><b>1 integration</b> · all geographies</span>
-        </div>
-      </div>
-
-      <!-- Right side mini-architecture card -->
-      <div class="arch-card" id="architecture">
-        <div class="hdr">
-          <span class="lbl">Reference architecture</span>
-          <span class="live">Live</span>
-        </div>
-        <div class="arch-flow">
-          <div class="arch-node sap">
-            <div class="ico">SAP</div>
-            <div>
-              <div class="nm">SAP ECC / S/4HANA</div>
-              <div class="sb">VBRK · BSEG · BKPF · ACDOCA</div>
-            </div>
+  <div id=nw>
+    <nav id=nv><a href=https://www.cleartax.com/fr/en
+        style="display:inline-flex;align-items:center;flex-shrink:0;line-height:0"><img
+          src=https://cdn.prod.website-files.com/6093bce33d9b4bae841b04e3/69dfcff6071b983201f5f097_logo-cleartax.svg
+          alt=ClearTax style="height:26px;width:auto"></a>
+      <div id=nl><a href=https://www.cleartax.com/fr/en/about-us
+          style="padding:8px 14px;border-radius:8px;font-size:14px;font-weight:500;color:#1a0b3b;white-space:nowrap">About
+          us</a>
+        <div style="position:relative" id=rd><button
+            onclick="var m=document.getElementById('dm');m.style.display=m.style.display==='block'?'none':'block'"
+            style="display:flex;align-items:center;gap:5px;padding:8px 14px;border-radius:8px;border:none;background:none;cursor:pointer;font-size:14px;font-weight:500;color:#1a0b3b;font-family:var(--font-body)">Resources<svg
+              width=10 height=7 viewBox="0 0 10 7" fill=none>
+              <path d="M1 1l4 4 4-4" stroke=currentColor stroke-width=1.5 stroke-linecap=round />
+            </svg></button>
+          <div id=dm
+            style="display:none;position:absolute;top:calc(100% + 8px);left:0;min-width:160px;background:#fff;border-radius:12px;border:1px solid rgba(0,0,0,.08);box-shadow:0 8px 32px rgba(48,27,94,.14);padding:6px;z-index:99">
+            <a href=https://www.cleartax.com/fr/en/e-invoicing-france
+              style="display:block;padding:9px 14px;border-radius:8px;font-size:14px;color:#1a0b3b;font-weight:500">Blogs</a><a
+              href=https://www.airmeet.com/e/9efd03e0-4ffc-11f0-b43c-af31dbfde7be target=_blank rel=noopener
+              style="display:block;padding:9px 14px;border-radius:8px;font-size:14px;color:#1a0b3b;font-weight:500">Webinars</a><a
+              href=https://files.clear.in/08iPqLw4PVz target=_blank rel=noopener
+              style="display:block;padding:9px 14px;border-radius:8px;font-size:14px;color:#1a0b3b;font-weight:500">Case
+              Studies</a><a href=https://files.clear.in/oTna2McaBEM target=_blank rel=noopener
+              style="display:block;padding:9px 14px;border-radius:8px;font-size:14px;color:#1a0b3b;font-weight:500">Whitepapers</a>
           </div>
-          <div class="arch-arrow"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><polyline points="19 12 12 19 5 12"/></svg></div>
-          <div class="arch-node ct">
-            <div class="ico">CT</div>
-            <div>
-              <div class="nm">ClearTax ABAP Add-on</div>
-              <div class="sb">/CLEARTAX/* namespace · OData · IDoc</div>
-            </div>
-          </div>
-          <div class="arch-arrow"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><polyline points="19 12 12 19 5 12"/></svg></div>
-          <div class="arch-node ct">
-            <div class="ico">API</div>
-            <div>
-              <div class="nm">ClearTax Compliance Cloud</div>
-              <div class="sb">Format engine · validation · routing</div>
-            </div>
-          </div>
-          <div class="arch-arrow"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><polyline points="19 12 12 19 5 12"/></svg></div>
-          <div class="arch-node dgfip">
-            <div class="ico">TAX</div>
-            <div>
-              <div class="nm">Tax authority / Peppol</div>
-              <div class="sb">DGFiP · KSeF · ZATCA · FTA · Peppol</div>
-            </div>
-          </div>
-        </div>
+        </div><a href=https://www.cleartax.com/partners
+          style="padding:8px 14px;border-radius:8px;font-size:14px;font-weight:500;color:#1a0b3b;white-space:nowrap">Partners</a><a
+          href=https://www.cleartax.com/fr/en/contact-us
+          style="padding:8px 14px;border-radius:8px;font-size:14px;font-weight:500;color:#1a0b3b;white-space:nowrap">Contact</a>
       </div>
-    </div>
+      <div id=nr>
+        <div
+          style="display:flex;align-items:center;gap:6px;padding:7px 12px;border-radius:8px;border:1px solid rgba(0,0,0,.1);font-size:13px;font-weight:600;color:#1a0b3b;white-space:nowrap">
+          <img src=https://assets.clear.in/cleartax/images/1770656743_twemoji_flagfrance.svg
+            style="height:14px;width:20px;border-radius:2px"> FRANCE</div>
+      </div>
+      <a class=nct href=#contact
+        style="display:inline-flex;align-items:center;gap:8px;padding:12px 22px;border-radius:999px;background:#301B5E;color:#fff;font-size:14px;font-weight:600;white-space:nowrap;box-shadow:0 4px 16px rgba(48,27,94,.3)">Book
+        a demo →</a>
+      <button id=hb
+        onclick="var m=document.getElementById('mm');m.classList.toggle('open')"><span></span><span></span><span></span></button>
+    </nav>
+  <div id=mm><a href=https://www.cleartax.com/fr/en/about-us>About us</a><a
+      href=https://www.cleartax.com/fr/en/e-invoicing-france>Blogs</a><a
+      href=https://www.airmeet.com/e/9efd03e0-4ffc-11f0-b43c-af31dbfde7be target=_blank>Webinars</a><a
+      href=https://files.clear.in/08iPqLw4PVz target=_blank>Case Studies</a><a href=https://files.clear.in/oTna2McaBEM
+      target=_blank>Whitepapers</a><a href=https://www.cleartax.com/partners>Partners</a><a
+      href=https://www.cleartax.com/fr/en/contact-us>Contact</a><a href=#contact
+      style="margin-top:4px;background:#301B5E;color:#fff;font-weight:600;text-align:center">Book a demo →</a></div>
   </div>
-</header>
-
-<!-- ──────────── WHO IT'S FOR ──────────── -->
-<section class="intro">
-  <div class="container">
-    <div class="intro-grid">
-      <div>
-        <h2>What's the case for a <span class="h1-grad">native SAP add-on?</span></h2>
-        <p>If your goal is to move from <b>middleware-and-spreadsheet workarounds</b> to a fully embedded e-invoicing posture inside SAP, ClearTax is built for that. We don't sit outside SAP poking at it through batch jobs — we deploy a <b>certified ABAP add-on inside your SAP system</b>, shipped through STMS like any other transport.</p>
-        <p>This means data extraction happens via standard SAP objects (VBRK, BSEG, BKPF, ACDOCA), validation runs inside your SAP environment, and your tax team works from a Fiori-style cockpit in the same client they already use.</p>
-        <p>The result: every invoice your SAP system creates becomes a compliant, structured e-invoice — in the format your jurisdiction demands — without leaving SAP.</p>
-      </div>
-      <div class="for-box">
-        <h4>ClearTax is purpose-built for:</h4>
-        <ul>
-          <li><span class="ck"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span><span><b>SAP ECC, S/4HANA on-premise, S/4HANA Cloud (Private Edition)</b> and SAP BTP deployments</span></li>
-          <li><span class="ck"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span><span><b>Mid-market to enterprise</b> with 100K+ invoices/year across multiple company codes</span></li>
-          <li><span class="ck"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span><span><b>Multi-country, multi-mandate</b> footprints — one SAP integration, many jurisdictions</span></li>
-          <li><span class="ck"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span><span><b>Heavily customised SAP environments</b> with Z-tables, BAdIs and custom output determination</span></li>
-          <li><span class="ck"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span><span><b>Shared-service centres</b> where speed of go-live and reliability matter most</span></li>
-        </ul>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- ──────────── ANCHOR NAV ──────────── -->
-<nav class="anchors">
-  <div class="container">
-    <ul>
-      <li><a href="#how">How it works</a></li>
-      <li><a href="#kpis">KPIs you can hit</a></li>
-      <li><a href="#value">Value drivers</a></li>
-      <li><a href="#testimonials">Customer wins</a></li>
-      <li><a href="#faq">FAQ</a></li>
-    </ul>
-  </div>
-</nav>
-
-<!-- ──────────── HOW IT WORKS — capabilities ──────────── -->
-<section id="how" class="how">
-  <div class="container">
-    <div class="head">
-      <div class="section-eyebrow">How it works</div>
-      <h2 class="section-title">A compliant e-invoice, <span class="em h1-grad">end to end in SAP</span></h2>
-      <p class="section-sub">Six capabilities, one transport. Here's how data moves from billing document to tax authority — and what ClearTax does at every step.</p>
-    </div>
-
-    <!-- Architecture flow diagram -->
-    <div class="flow-diagram">
-      <div class="fd-inner">
-        <div class="fd-col sap">
-          <h5>1. Source</h5>
-          <h4>SAP ECC / S/4HANA</h4>
-          <ul>
-            <li>SD billing (VBRK)</li>
-            <li>FI postings (BSEG / ACDOCA)</li>
-            <li>MM credit / debit notes</li>
-            <li>Output determination NACE</li>
-          </ul>
-        </div>
-        <div class="fd-arrow"><svg viewBox="0 0 60 24" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="0" y1="12" x2="55" y2="12" stroke-dasharray="3 3"/><polyline points="48 6 55 12 48 18"/></svg></div>
-        <div class="fd-col ct">
-          <h5>2. Extract &amp; transform</h5>
-          <h4>ClearTax ABAP Add-on</h4>
-          <ul>
-            <li>Real-time via OData / RFC</li>
-            <li>Batch via IDoc INVOIC02</li>
-            <li>Field mapping cockpit (Fiori)</li>
-            <li>BAdI-extensible for Z-fields</li>
-          </ul>
-        </div>
-        <div class="fd-arrow"><svg viewBox="0 0 60 24" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="0" y1="12" x2="55" y2="12" stroke-dasharray="3 3"/><polyline points="48 6 55 12 48 18"/></svg></div>
-        <div class="fd-col tax">
-          <h5>3. Validate &amp; submit</h5>
-          <h4>Tax authority</h4>
-          <ul>
-            <li>Format conversion (UBL/CII/Factur-X)</li>
-            <li>Schema &amp; business validation</li>
-            <li>Submission to PA / PPF / KSeF</li>
-            <li>Status sync back to SAP</li>
-          </ul>
-        </div>
-      </div>
-    </div>
-
-    <!-- Six capability cards -->
-    <div class="how-grid">
-      <div class="how-card">
-        <div class="ic-box"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg></div>
-        <h3>SAP-native ingestion</h3>
-        <p>Pre-built RICEF objects (Reports, Interfaces, Conversions, Enhancements, Forms) deployed via STMS. ClearTax reads from VBRK, BSEG, BKPF, ACDOCA and KNA1/LFA1 — no flat-file exports, no third-party middleware. BAdI hooks for output determination ensure invoices route through compliance before printing.</p>
-        <div class="tag-list">
-          <span class="tag">IDoc INVOIC02</span>
-          <span class="tag">OData v2/v4</span>
-          <span class="tag">BAPI_INCOMINGINVOICE</span>
-          <span class="tag">BTE 00503301</span>
-        </div>
-      </div>
-
-      <div class="how-card">
-        <div class="ic-box"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg></div>
-        <h3>Format engine</h3>
-        <p>Every mandate has its own format. ClearTax's format engine converts your SAP output into UBL 2.1, CII, Factur-X (France); FA(2) XML (KSeF Poland); ZATCA Phase-2 XML (Saudi); FTA UBL (UAE); Peppol BIS 3.0 (Belgium and cross-border). One source object, every output format.</p>
-        <div class="tag-list">
-          <span class="tag">UBL 2.1</span>
-          <span class="tag">CII</span>
-          <span class="tag">Factur-X</span>
-          <span class="tag">Peppol BIS</span>
-          <span class="tag">FA(2)</span>
-        </div>
-      </div>
-
-      <div class="how-card">
-        <div class="ic-box"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg></div>
-        <h3>Real-time status sync</h3>
-        <p>Every invoice carries its lifecycle state back into SAP. The 14-status DGFiP lifecycle, KSeF UPO references, ZATCA QR codes, FTA acknowledgement IDs — all written back to dedicated Z-tables linked to your billing documents. Your AR team sees compliance status without ever leaving SAP.</p>
-        <div class="tag-list">
-          <span class="tag">14-status DGFiP</span>
-          <span class="tag">KSeF UPO</span>
-          <span class="tag">ZATCA QR</span>
-          <span class="tag">Z-table writeback</span>
-        </div>
-      </div>
-
-      <div class="how-card">
-        <div class="ic-box"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 9h6v6H9z"/></svg></div>
-        <h3>Fiori-style cockpit</h3>
-        <p>A custom Fiori application gives tax and AR teams a single pane of glass: failed validations, pending submissions, status by company code, by VAT registration, by mandate. Mass resubmission, exception management, and audit trails — all inside SAP launchpad, with role-based authorisations via PFCG.</p>
-        <div class="tag-list">
-          <span class="tag">SAP Fiori 3.0</span>
-          <span class="tag">PFCG roles</span>
-          <span class="tag">Mass resubmit</span>
-          <span class="tag">SAP IAM</span>
-        </div>
-      </div>
-
-      <div class="how-card">
-        <div class="ic-box"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2 4 5v7c0 5 3.5 9 8 10 4.5-1 8-5 8-10V5l-8-3z"/></svg></div>
-        <h3>One add-on, every mandate</h3>
-        <p>A single ABAP add-on serves every supported jurisdiction. A new country goes live? It's a configuration change in the field-mapping cockpit, not a new development project. When DGFiP publishes External Specs v3.2 or ZATCA changes invoice schemas, you get a patch — not a re-implementation.</p>
-        <div class="tag-list">
-          <span class="tag">France · Belgium · Poland</span>
-          <span class="tag">UAE · KSA · India</span>
-          <span class="tag">Config not code</span>
-        </div>
-      </div>
-
-      <div class="how-card">
-        <div class="ic-box"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>
-        <h3>4–6 week deployment</h3>
-        <p>Standard SAP environments — ECC 6.0 EHP7+ or S/4HANA 1909+ — go live in 4–6 weeks: 1 week scoping, 2 weeks transport &amp; mapping, 1 week UAT in QA system, 1 week parallel run, go-live. ClearTax's AI-powered integration agent reads your custom output types and Z-fields and pre-builds the mapping draft.</p>
-        <div class="tag-list">
-          <span class="tag">Dev → QA → Prod</span>
-          <span class="tag">Transport via STMS</span>
-          <span class="tag">AI mapping agent</span>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- ──────────── KPI BAND ──────────── -->
-<section id="kpis" class="kpis">
-  <div class="container">
-    <div class="head">
-      <div class="section-eyebrow">KPIs you can hit</div>
-      <h2>Numbers our SAP customers <span class="gr">actually deliver</span></h2>
-    </div>
-    <div class="kpis-grid">
-      <div class="kpi-cell">
-        <div class="big">99.8%</div>
-        <div class="lbl">First-pass acceptance rate at the tax authority, averaged across all live mandates</div>
-        <div class="src">SOURCE · CLEARTAX PLATFORM, ROLLING 90 DAYS</div>
-      </div>
-      <div class="kpi-cell">
-        <div class="big">4–6 wk</div>
-        <div class="lbl">Typical go-live for standard SAP ECC / S/4HANA configurations across single-country mandates</div>
-        <div class="src">SOURCE · CLEARTAX ONBOARDING BENCHMARKS</div>
-      </div>
-      <div class="kpi-cell">
-        <div class="big">4×</div>
-        <div class="lbl">Faster integration vs. conventional middleware-based approaches, via the AI mapping agent</div>
-        <div class="src">SOURCE · CLEARTAX VS MIDDLEWARE BASELINE</div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- ──────────── VALUE DRIVERS ──────────── -->
-<section id="value" class="value">
-  <div class="container">
-    <div class="head">
-      <div class="section-eyebrow">Value drivers</div>
-      <h2 class="section-title">How ClearTax pays back <span class="h1-grad em">your SAP investment</span></h2>
-      <p class="section-sub">Three reasons SAP-run finance organisations choose an embedded add-on over middleware or stand-alone tools.</p>
-    </div>
-    <div class="value-grid">
-      <div class="value-col">
-        <div class="num">i.</div>
-        <h3>Lower SAP TCO</h3>
-        <p>No bolt-on iPaaS to license. No SAP CPI tenant to size. No third-party gateway sitting between SAP and the tax authority — which means fewer moving parts, fewer interfaces to monitor, and fewer support hand-offs when something fails. The add-on runs in the same client as your finance code, on the same hardware, transported through the same STMS landscape.</p>
-      </div>
-      <div class="value-col">
-        <div class="num">ii.</div>
-        <h3>Compliance that travels</h3>
-        <p>SAP Document Compliance covers a narrow set of mandates, and adding new geographies often means new licences, new connectors, or new vendors. ClearTax's single add-on already covers France, Belgium, Poland, Croatia, Saudi, UAE and India — with new mandates added through configuration. You scale into new countries without reopening the integration project.</p>
-      </div>
-      <div class="value-col">
-        <div class="num">iii.</div>
-        <h3>SAP-skilled support</h3>
-        <p>Our delivery team is staffed with SAP-certified consultants who speak ABAP, debug in SE80, understand your output determination, and won't need a primer on what BSEG is. When you raise a ticket, it lands with someone who has shipped this same add-on into dozens of SAP landscapes — not a generic CSM.</p>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- ──────────── DOWNLOAD CTA (mid-page) ──────────── -->
-<section class="download-cta">
-  <div class="container">
-    <div class="download-cta-inner">
-      <div class="row">
-        <div class="doc-ic"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="8" y1="13" x2="16" y2="13"/><line x1="8" y1="17" x2="16" y2="17"/></svg></div>
+  <header class=hero data-form-type=FR-contact-sales-form data-lead-type=FR data-origin-country=France
+    data-recaptcha-key=6Lc5ZG0mAAAAAGwClrZwtcyttcUMYDUPxg4MM4p3 data-sheet-name=sapFrance
+    data-thankyou-url=https://cleartax.com/fr/thank-you/>
+    <div class=container>
+      <div class=hero-inner>
         <div>
-          <h3>Want to see the architecture in detail?</h3>
-          <p>Download the SAP integration fact sheet — RICEF object inventory, transport landscape, mapping cockpit walkthrough, and a sample 4-week deployment plan.</p>
+          <div class=eyebrow><span class=dot></span>Built for SAP customers</div>
+          <h1>E-invoicing that <span class=h1-grad>plugs into SAP</span> — not around it. <span class=small>Certified
+              add-on for ECC, S/4HANA & BTP. Live in 4–6 weeks.</span></h1>
+          <p class=hero-sub>ClearTax delivers compliant e-invoicing for SAP-run enterprises across every mandate that
+            matters — France (DGFiP), Belgium (Peppol), Poland (KSeF), Saudi (ZATCA), UAE (FTA) and more — through one
+            ABAP add-on and a single global API.
+          <div class=hero-cta-row><a href=#contact class="pill lg">Book a Demo <span class=arr>→</span></a> <a
+              href=#architecture class="pill ghost">See the architecture</a></div>
+          <div class=hero-meta><span><b>SAP-certified</b> · ABAP add-on · TMS-ready</span> <span><b>4–6 wk</b> typical
+              go-live</span> <span><b>1 integration</b> · all geographies</span></div>
         </div>
-      </div>
-      <a href="#" class="pill ghost">Download fact sheet <span class="arr">↓</span></a>
-    </div>
-  </div>
-</section>
-
-<!-- ──────────── TESTIMONIALS ──────────── -->
-<section id="testimonials" class="testimonials">
-  <div class="container">
-    <div class="head">
-      <div class="section-eyebrow">Customer wins</div>
-      <h2 class="section-title">SAP-run enterprises <span class="h1-grad em">already in production</span></h2>
-      <p class="section-sub">Real deployments, real ERP environments — across multiple geographies and mandates.</p>
-    </div>
-    <div class="testimonials-grid">
-      <div class="testimonial">
-        <div class="logo-row">
-          <div style="font-family: var(--font-display); font-weight: 700; font-size: 20px; color: var(--ct-purple-deep);">Salam Telco</div>
-          <span class="erp-stack">SAP S/4HANA · 8 systems</span>
-        </div>
-        <blockquote>Salam's search for a reliable partner ended with ClearTax. Their tailored solutions ensured a smooth transition for all 8 of our systems in just 3 months.</blockquote>
-        <div class="who">
-          <div class="av">A</div>
-          <div>
-            <div class="nm">Arslan Choudhary</div>
-            <div class="ttl">Director of Enterprise Enablement, Salam Telco</div>
-          </div>
-        </div>
-      </div>
-
-      <div class="testimonial">
-        <div class="logo-row">
-          <div style="font-family: var(--font-display); font-weight: 700; font-size: 20px; color: var(--ct-purple-deep);">Zamil Industrial</div>
-          <span class="erp-stack">SAP ECC · Multi-entity</span>
-        </div>
-        <blockquote>We appreciate ClearTax for successfully completing the complex ZATCA integration. Their platform enabled seamless management of multiple SAP units.</blockquote>
-        <div class="who">
-          <div class="av">A</div>
-          <div>
-            <div class="nm">Abdulbary Atassi</div>
-            <div class="ttl">Director of IT, Zamil Industrial</div>
-          </div>
-        </div>
-      </div>
-
-      <div class="testimonial">
-        <div class="logo-row">
-          <div style="font-family: var(--font-display); font-weight: 700; font-size: 20px; color: var(--ct-purple-deep);">Puma</div>
-          <span class="erp-stack">SAP S/4HANA</span>
-        </div>
-        <blockquote>ClearTax is simplifying e-invoicing. They enabled us to implement the e-invoicing system in time and handled all our business complexities with ease.</blockquote>
-        <div class="who">
-          <div class="av">R</div>
-          <div>
-            <div class="nm">Raj Kiran</div>
-            <div class="ttl">Head of Taxation &amp; Retail Finance, Puma</div>
-          </div>
-        </div>
-      </div>
-
-      <div class="testimonial">
-        <div class="logo-row">
-          <div style="font-family: var(--font-display); font-weight: 700; font-size: 20px; color: var(--ct-purple-deep);">JK Tyre</div>
-          <span class="erp-stack">SAP ECC</span>
-        </div>
-        <blockquote>ClearTax has transformed the way we handle GST compliance. Real-time creation of e-invoices from SAP plays a significant role in providing critical insight.</blockquote>
-        <div class="who">
-          <div class="av">P</div>
-          <div>
-            <div class="nm">Pratush Kumar</div>
-            <div class="ttl">DGM-IT, JK Tyre</div>
+        <div class=arch-card id=architecture>
+          <div class=hdr><span class=lbl>Reference architecture</span> <span class=live>Live</span></div>
+          <div class=arch-flow>
+            <div class="arch-node sap">
+              <div class=ico>SAP</div>
+              <div>
+                <div class=nm>SAP ECC / S/4HANA</div>
+                <div class=sb>VBRK · BSEG · BKPF · ACDOCA</div>
+              </div>
+            </div>
+            <div class=arch-arrow><svg fill=none stroke=currentColor stroke-width=2 viewBox="0 0 24 24" height=20
+                width=20>
+                <line x1=12 x2=12 y1=5 y2=19 />
+                <polyline points="19 12 12 19 5 12" />
+              </svg></div>
+            <div class="arch-node ct">
+              <div class=ico>CT</div>
+              <div>
+                <div class=nm>ClearTax ABAP Add-on</div>
+                <div class=sb>/CLEARTAX/* namespace · OData · IDoc</div>
+              </div>
+            </div>
+            <div class=arch-arrow><svg fill=none stroke=currentColor stroke-width=2 viewBox="0 0 24 24" height=20
+                width=20>
+                <line x1=12 x2=12 y1=5 y2=19 />
+                <polyline points="19 12 12 19 5 12" />
+              </svg></div>
+            <div class="arch-node ct">
+              <div class=ico>API</div>
+              <div>
+                <div class=nm>ClearTax Compliance Cloud</div>
+                <div class=sb>Format engine · validation · routing</div>
+              </div>
+            </div>
+            <div class=arch-arrow><svg fill=none stroke=currentColor stroke-width=2 viewBox="0 0 24 24" height=20
+                width=20>
+                <line x1=12 x2=12 y1=5 y2=19 />
+                <polyline points="19 12 12 19 5 12" />
+              </svg></div>
+            <div class="arch-node dgfip">
+              <div class=ico>TAX</div>
+              <div>
+                <div class=nm>Tax authority / Peppol</div>
+                <div class=sb>DGFiP · KSeF · ZATCA · FTA · Peppol</div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
     </div>
-  </div>
-</section>
-
-<!-- ──────────── PILLARS — what makes it possible ──────────── -->
-<section id="pillars" class="pillars">
-  <div class="container">
-    <div class="head">
-      <div class="section-eyebrow">Why ClearTax</div>
-      <h2 class="section-title">What it takes to make this <span class="h1-grad em">actually work in SAP</span></h2>
-      <p class="section-sub">Three pillars that separate a real SAP add-on from a glued-on integration.</p>
-    </div>
-    <div class="pillars-grid">
-      <div class="pillar-card">
-        <div class="ill">
-          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2 2 7l10 5 10-5-10-5z"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg>
+  </header>
+  <section class=intro>
+    <div class=container>
+      <div class=intro-grid>
+        <div>
+          <h2>What's the case for a <span class=h1-grad>native SAP add-on?</span></h2>
+          <p>If your goal is to move from <b>middleware-and-spreadsheet workarounds</b> to a fully embedded e-invoicing
+            posture inside SAP, ClearTax is built for that. We don't sit outside SAP poking at it through batch jobs —
+            we deploy a <b>certified ABAP add-on inside your SAP system</b>, shipped through STMS like any other
+            transport.
+          <p>This means data extraction happens via standard SAP objects (VBRK, BSEG, BKPF, ACDOCA), validation runs
+            inside your SAP environment, and your tax team works from a Fiori-style cockpit in the same client they
+            already use.
+          <p>The result: every invoice your SAP system creates becomes a compliant, structured e-invoice — in the format
+            your jurisdiction demands — without leaving SAP.
         </div>
-        <h3>Native ABAP add-on</h3>
-        <p>The integration lives inside your SAP system in a dedicated <code style="font-family:var(--font-mono);font-size:13px;background:var(--ct-pastel-lavender);color:var(--ct-purple-deep);padding:2px 6px;border-radius:4px">/CLEARTAX/*</code> namespace, transported through your existing STMS landscape. No external connector to maintain, no SAP CPI tenant to license. Your basis team treats it like any other transport.</p>
-      </div>
-      <div class="pillar-card b">
-        <div class="ill">
-          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15 15 0 0 1 0 20M12 2a15 15 0 0 0 0 20"/></svg>
-        </div>
-        <h3>One integration. Every mandate.</h3>
-        <p>Once the add-on is in your SAP landscape, every supported geography is config — not code. France goes live this year, Belgium next quarter, Saudi the year after — all from the same integration. You never re-open the SAP project to bolt on a new country.</p>
-      </div>
-      <div class="pillar-card c">
-        <div class="ill">
-          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2 4 5v7c0 5 3.5 9 8 10 4.5-1 8-5 8-10V5l-8-3z"/><path d="m9 12 2 2 4-4"/></svg>
-        </div>
-        <h3>Full compliance, full control</h3>
-        <p>Every transaction is auditable end-to-end inside SAP. Status writeback to Z-tables, mandatory archival per local rules, role-based access via PFCG, and a full audit trail of who submitted what — all stored in your SAP system, not in a third-party cloud you can't query.</p>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- ──────────── FINAL CTA + FORM ──────────── -->
-<section id="contact" class="final-cta">
-  <div class="container">
-    <div class="section-head">
-      <div class="section-eyebrow">Talk to us</div>
-      <h2 class="section-title">Get a walkthrough <span class="h1-grad em">tailored to your SAP landscape</span></h2>
-      <p class="section-sub">Our SAP-certified specialists will scope your environment, demo the add-on inside a sandbox, and give you an honest 4–6 week deployment plan.</p>
-    </div>
-    <div class="cta-grid">
-      <div class="cta-points">
-        <div class="cta-pt">
-          <div class="ic-lg"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 10h18M9 4v16"/></svg></div>
-          <div><h4>SAP-certified delivery</h4><p>Consultants who know SE80, STMS, and your output determination — not generic CSMs.</p></div>
-        </div>
-        <div class="cta-pt">
-          <div class="ic-lg"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>
-          <div><h4>4–6 week go-live</h4><p>Standard ECC / S/4HANA setups deploy in 4–6 weeks via transport — not a re-implementation.</p></div>
-        </div>
-        <div class="cta-pt">
-          <div class="ic-lg"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15 15 0 0 1 0 20M12 2a15 15 0 0 0 0 20"/></svg></div>
-          <div><h4>One platform · every mandate</h4><p>France, Belgium, Poland, Saudi, UAE, India — one ABAP add-on covers all your geographies.</p></div>
-        </div>
-        <div class="cta-pt">
-          <div class="ic-lg"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg></div>
-          <div><h4>Zero ERP disruption</h4><p>Deployed through STMS like any other transport. No core SAP modifications. SAP support unaffected.</p></div>
-        </div>
-      </div>
-
-      <form id="lead-form" class="demo-form" data-lead-form>
-        <h3>Book a demo</h3>
-        <div class="sub">Our SAP specialists will walk you through the add-on and scope your deployment.</div>
-        <div class="field"><label>Full name <span class="req">*</span></label><input type="text" id="f-name" data-field="name" placeholder="Your name" required></div>
-        <div class="field"><label>Phone number <span class="req">*</span></label>
-          <div class="phone-input">
-            <select id="f-cc" data-field="isd">
-              <option value="+33">France (+33)</option><option value="+32">Belgium (+32)</option><option value="+49">Germany (+49)</option>
-              <option value="+34">Spain (+34)</option><option value="+39">Italy (+39)</option><option value="+48">Poland (+48)</option>
-              <option value="+31">Netherlands (+31)</option><option value="+44">UK (+44)</option><option value="+1">USA (+1)</option>
-              <option value="+971">UAE (+971)</option><option value="+966">Saudi (+966)</option><option value="+91">India (+91)</option>
-            </select>
-            <input type="tel" id="f-phone" data-field="phone" placeholder="Phone number" required>
-          </div>
-        </div>
-        <div class="field-row">
-          <div class="field"><label>Company email <span class="req">*</span></label><input type="email" id="f-email" data-field="email" placeholder="you@company.com" required></div>
-          <div class="field"><label>Company name <span class="req">*</span></label><input type="text" id="f-company" data-field="company" placeholder="Company name" required></div>
-        </div>
-        <div class="field"><label>Designation <span class="req">*</span></label><input type="text" id="f-role" data-field="role" placeholder="Designation" required></div>
-        <label class="agree">
-          <input type="checkbox" id="f-consent" required>
-          <span>I agree to ClearTax's <a href="#">Privacy Policy</a> and <a href="#">Terms of Service</a>, and consent to receiving communications about ClearTax products and e-invoicing updates.</span>
-        </label>
-        <button type="submit" id="f-submit" data-submit class="pill">Book a Demo <span class="arr">→</span></button>
-        <div class="footnote">No spam. Just a 30-min call with our SAP specialists.</div>
-      </form>
-      <div id="demo-success" style="display:none;background:#fff;border-radius:24px;padding:48px;text-align:center;border:1px solid var(--ct-line);box-shadow:0 30px 80px rgba(48,27,94,.12)">
-        <div style="width:64px;height:64px;border-radius:50%;background:var(--ct-purple-deep);color:#fff;display:grid;place-items:center;margin:0 auto 20px;">
-          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-        </div>
-        <h3 style="font-family:var(--font-display);font-weight:500;font-size:24px;color:var(--ct-purple-deep);margin-bottom:10px">Thanks!</h3>
-        <p style="color:var(--ct-muted);font-size:14px;line-height:1.6">Our SAP team will reach out within one business day with a tailored onboarding scope and a sandbox walkthrough.</p>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- ──────────── FAQ ──────────── -->
-<section id="faq" class="faq">
-  <div class="container">
-    <div class="head">
-      <div class="section-eyebrow">FAQ</div>
-      <h2 class="section-title">SAP customers, <span class="h1-grad em">straight answers</span></h2>
-      <p class="section-sub">The questions we get asked most by SAP basis teams, FI leads and CIOs scoping their e-invoicing project.</p>
-    </div>
-    <div class="faq-list">
-
-      <details class="faq-item" open>
-        <summary>How does ClearTax actually deploy into our SAP system?<span class="chev"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></span></summary>
-        <div class="faq-body">
-          ClearTax ships as a <b>native ABAP add-on</b> in the <code>/CLEARTAX/*</code> namespace. Deployment is straightforward for any SAP basis team:
-          <ol>
-            <li><b>SAINT/SPAM import</b> of the add-on package into your development client</li>
-            <li><b>Configuration</b> via SPRO transactions — company codes in scope, mandate selection, output determination, RFC connection to ClearTax Compliance Cloud</li>
-            <li><b>Field mapping</b> in the Fiori cockpit — point-and-click for standard fields, BAdI hooks for custom Z-fields</li>
-            <li><b>Transport through STMS</b> to QA → Prod, exactly like any other change</li>
-          </ol>
-          No core SAP modifications. No SAP Note prerequisites beyond standard support pack levels. SAP support for your base system is unaffected.
-        </div>
-      </details>
-
-      <details class="faq-item">
-        <summary>Which SAP versions are supported?<span class="chev"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></span></summary>
-        <div class="faq-body">
+        <div class=for-box>
+          <h4>ClearTax is purpose-built for:</h4>
           <ul>
-            <li><b>SAP ECC 6.0</b> — supported from EHP7 onwards (earlier EHPs supported on request, may require a backport effort)</li>
-            <li><b>SAP S/4HANA on-premise</b> — 1709, 1809, 1909, 2020, 2021, 2022, 2023</li>
-            <li><b>SAP S/4HANA Cloud, Private Edition</b> — fully supported via standard transport landscape</li>
-            <li><b>SAP S/4HANA Cloud, Public Edition</b> — supported via SAP BTP-side connector + ClearTax API (no in-system code)</li>
-            <li><b>SAP Business One &amp; ByDesign</b> — supported via lighter API-based connectors</li>
+            <li><span class=ck><svg fill=none stroke=currentColor stroke-width=3 viewBox="0 0 24 24" height=12 width=12
+                  stroke-linecap=round stroke-linejoin=round>
+                  <polyline points="20 6 9 17 4 12" />
+                </svg></span><span><b>SAP ECC, S/4HANA on-premise, S/4HANA Cloud (Private Edition)</b> and SAP BTP
+                deployments</span>
+            <li><span class=ck><svg fill=none stroke=currentColor stroke-width=3 viewBox="0 0 24 24" height=12 width=12
+                  stroke-linecap=round stroke-linejoin=round>
+                  <polyline points="20 6 9 17 4 12" />
+                </svg></span><span><b>Mid-market to enterprise</b> with 100K+ invoices/year across multiple company
+                codes</span>
+            <li><span class=ck><svg fill=none stroke=currentColor stroke-width=3 viewBox="0 0 24 24" height=12 width=12
+                  stroke-linecap=round stroke-linejoin=round>
+                  <polyline points="20 6 9 17 4 12" />
+                </svg></span><span><b>Multi-country, multi-mandate</b> footprints — one SAP integration, many
+                jurisdictions</span>
+            <li><span class=ck><svg fill=none stroke=currentColor stroke-width=3 viewBox="0 0 24 24" height=12 width=12
+                  stroke-linecap=round stroke-linejoin=round>
+                  <polyline points="20 6 9 17 4 12" />
+                </svg></span><span><b>Heavily customised SAP environments</b> with Z-tables, BAdIs and custom output
+                determination</span>
+            <li><span class=ck><svg fill=none stroke=currentColor stroke-width=3 viewBox="0 0 24 24" height=12 width=12
+                  stroke-linecap=round stroke-linejoin=round>
+                  <polyline points="20 6 9 17 4 12" />
+                </svg></span><span><b>Shared-service centres</b> where speed of go-live and reliability matter
+                most</span>
           </ul>
-          For multi-version landscapes (e.g. ECC central with S/4HANA satellites), the same add-on can be deployed across all systems with a single configuration model.
         </div>
-      </details>
-
-      <details class="faq-item">
-        <summary>How does the integration handle our heavily customised SAP environment?<span class="chev"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></span></summary>
-        <div class="faq-body">
-          This is where most SAP integrations break, and it's why ClearTax was built differently. The add-on uses <b>BAdI hooks</b> at every key extension point — output determination, document creation, status update — so you can extend the standard logic without touching ClearTax code. Custom Z-fields, Z-tables, and bespoke output types are surfaced in the field-mapping cockpit and bound to e-invoice elements through configuration. For truly unusual cases, the <b>AI-powered integration agent</b> reads your output determination, infers the likely mapping, and produces a draft for your SAP team to review — typically cutting field-mapping effort by 70%.
+      </div>
+    </div>
+  </section>
+  <nav class=anchors>
+    <div class=container>
+      <ul>
+        <li><a href=#how>How it works</a>
+        <li><a href=#kpis>KPIs you can hit</a>
+        <li><a href=#value>Value drivers</a>
+        <li><a href=#testimonials>Customer wins</a>
+        <li><a href=#faq>FAQ</a>
+      </ul>
+    </div>
+  </nav>
+  <section class=how id=how>
+    <div class=container>
+      <div class=head>
+        <div class=section-eyebrow>How it works</div>
+        <h2 class=section-title>A compliant e-invoice, <span class="h1-grad em">end to end in SAP</span></h2>
+        <p class=section-sub>Six capabilities, one transport. Here's how data moves from billing document to tax
+          authority — and what ClearTax does at every step.
+      </div>
+      <div class=flow-diagram>
+        <div class=fd-inner>
+          <div class="fd-col sap">
+            <h5>1. Source</h5>
+            <h4>SAP ECC / S/4HANA</h4>
+            <ul>
+              <li>SD billing (VBRK)
+              <li>FI postings (BSEG / ACDOCA)
+              <li>MM credit / debit notes
+              <li>Output determination NACE
+            </ul>
+          </div>
+          <div class=fd-arrow><svg fill=none stroke=currentColor stroke-width=1.5 viewBox="0 0 60 24">
+              <line x1=0 x2=55 y1=12 y2=12 stroke-dasharray="3 3" />
+              <polyline points="48 6 55 12 48 18" />
+            </svg></div>
+          <div class="ct fd-col">
+            <h5>2. Extract & transform</h5>
+            <h4>ClearTax ABAP Add-on</h4>
+            <ul>
+              <li>Real-time via OData / RFC
+              <li>Batch via IDoc INVOIC02
+              <li>Field mapping cockpit (Fiori)
+              <li>BAdI-extensible for Z-fields
+            </ul>
+          </div>
+          <div class=fd-arrow><svg fill=none stroke=currentColor stroke-width=1.5 viewBox="0 0 60 24">
+              <line x1=0 x2=55 y1=12 y2=12 stroke-dasharray="3 3" />
+              <polyline points="48 6 55 12 48 18" />
+            </svg></div>
+          <div class="fd-col tax">
+            <h5>3. Validate & submit</h5>
+            <h4>Tax authority</h4>
+            <ul>
+              <li>Format conversion (UBL/CII/Factur-X)
+              <li>Schema & business validation
+              <li>Submission to PA / PPF / KSeF
+              <li>Status sync back to SAP
+            </ul>
+          </div>
         </div>
-      </details>
-
-      <details class="faq-item">
-        <summary>How does this compare to SAP Document Compliance (DRC)?<span class="chev"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></span></summary>
-        <div class="faq-body">
-          SAP Document and Reporting Compliance (DRC) is SAP's first-party tool for some mandates. It works well in environments where every supported country is covered and you're willing to license, configure and maintain each country pack separately. <b>ClearTax is the alternative when:</b>
+      </div>
+      <div class=how-grid>
+        <div class=how-card>
+          <div class=ic-box><svg fill=none stroke=currentColor stroke-width=2 viewBox="0 0 24 24" height=24 width=24
+              stroke-linecap=round stroke-linejoin=round>
+              <polyline points="16 18 22 12 16 6" />
+              <polyline points="8 6 2 12 8 18" />
+            </svg></div>
+          <h3>SAP-native ingestion</h3>
+          <p>Pre-built RICEF objects deployed via STMS. ClearTax reads from VBRK, BSEG, BKPF, ACDOCA and KNA1/LFA1 — no
+            flat-file exports, no third-party middleware. BAdI hooks for output determination ensure invoices route
+            through compliance before printing.
+          <div class=tag-list><span class=tag>IDoc INVOIC02</span> <span class=tag>OData v2/v4</span> <span
+              class=tag>BAPI_INCOMINGINVOICE</span> <span class=tag>BTE 00503301</span></div>
+        </div>
+        <div class=how-card>
+          <div class=ic-box><svg fill=none stroke=currentColor stroke-width=2 viewBox="0 0 24 24" height=24 width=24
+              stroke-linecap=round stroke-linejoin=round>
+              <path
+                d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83" />
+            </svg></div>
+          <h3>Format engine</h3>
+          <p>ClearTax converts SAP output into UBL 2.1, CII, Factur-X (France); FA(2) XML (KSeF Poland); ZATCA Phase-2
+            XML (Saudi); FTA UBL (UAE); Peppol BIS 3.0 (Belgium). One source object, every output format.
+          <div class=tag-list><span class=tag>UBL 2.1</span> <span class=tag>CII</span> <span class=tag>Factur-X</span>
+            <span class=tag>Peppol BIS</span> <span class=tag>FA(2)</span></div>
+        </div>
+        <div class=how-card>
+          <div class=ic-box><svg fill=none stroke=currentColor stroke-width=2 viewBox="0 0 24 24" height=24 width=24
+              stroke-linecap=round stroke-linejoin=round>
+              <path
+                d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z" />
+            </svg></div>
+          <h3>Real-time status sync</h3>
+          <p>Every invoice carries lifecycle state back into SAP. The 14-status DGFiP lifecycle, KSeF UPO references,
+            ZATCA QR codes, FTA acknowledgement IDs — all written back to Z-tables linked to your billing documents.
+          <div class=tag-list><span class=tag>14-status DGFiP</span> <span class=tag>KSeF UPO</span> <span
+              class=tag>ZATCA QR</span> <span class=tag>Z-table writeback</span></div>
+        </div>
+        <div class=how-card>
+          <div class=ic-box><svg fill=none stroke=currentColor stroke-width=2 viewBox="0 0 24 24" height=24 width=24
+              stroke-linecap=round stroke-linejoin=round>
+              <rect height=18 rx=2 width=18 x=3 y=3 />
+              <path d="M9 9h6v6H9z" />
+            </svg></div>
+          <h3>Fiori-style cockpit</h3>
+          <p>A custom Fiori application gives tax and AR teams a single pane: failed validations, pending submissions,
+            status by company code, by VAT registration, by mandate. Mass resubmission, exception management, and audit
+            trails — inside SAP launchpad with PFCG authorisations.
+          <div class=tag-list><span class=tag>SAP Fiori 3.0</span> <span class=tag>PFCG roles</span> <span
+              class=tag>Mass resubmit</span> <span class=tag>SAP IAM</span></div>
+        </div>
+        <div class=how-card>
+          <div class=ic-box><svg fill=none stroke=currentColor stroke-width=2 viewBox="0 0 24 24" height=24 width=24
+              stroke-linecap=round stroke-linejoin=round>
+              <path d="M12 2 4 5v7c0 5 3.5 9 8 10 4.5-1 8-5 8-10V5l-8-3z" />
+            </svg></div>
+          <h3>One add-on, every mandate</h3>
+          <p>A single ABAP add-on serves every supported jurisdiction. A new country goes live via configuration — not a
+            new development project. When DGFiP publishes External Specs v3.2 or ZATCA changes schemas, you get a patch
+            — not a re-implementation.
+          <div class=tag-list><span class=tag>France · Belgium · Poland</span> <span class=tag>UAE · KSA · India</span>
+            <span class=tag>Config not code</span></div>
+        </div>
+        <div class=how-card>
+          <div class=ic-box><svg fill=none stroke=currentColor stroke-width=2 viewBox="0 0 24 24" height=24 width=24
+              stroke-linecap=round stroke-linejoin=round>
+              <circle cx=12 cy=12 r=10 />
+              <polyline points="12 6 12 12 16 14" />
+            </svg></div>
+          <h3>4–6 week deployment</h3>
+          <p>Standard SAP environments — ECC 6.0 EHP7+ or S/4HANA 1909+ — go live in 4–6 weeks. ClearTax's AI-powered
+            integration agent reads your custom output types and Z-fields and pre-builds the mapping draft.
+          <div class=tag-list><span class=tag>Dev → QA → Prod</span> <span class=tag>Transport via STMS</span> <span
+              class=tag>AI mapping agent</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+  <section class=kpis id=kpis>
+    <div class=container>
+      <div class=head>
+        <div class=section-eyebrow>KPIs you can hit</div>
+        <h2>Numbers our SAP customers <span class=gr>actually deliver</span></h2>
+      </div>
+      <div class=kpis-grid>
+        <div class=kpi-cell>
+          <div class=big>99.8%</div>
+          <div class=lbl>First-pass acceptance rate at the tax authority, averaged across all live mandates</div>
+          <div class=src>SOURCE · CLEARTAX PLATFORM, ROLLING 90 DAYS</div>
+        </div>
+        <div class=kpi-cell>
+          <div class=big>4–6 wk</div>
+          <div class=lbl>Typical go-live for standard SAP ECC / S/4HANA configurations across single-country mandates
+          </div>
+          <div class=src>SOURCE · CLEARTAX ONBOARDING BENCHMARKS</div>
+        </div>
+        <div class=kpi-cell>
+          <div class=big>4×</div>
+          <div class=lbl>Faster integration vs. conventional middleware-based approaches, via the AI mapping agent</div>
+          <div class=src>SOURCE · CLEARTAX VS MIDDLEWARE BASELINE</div>
+        </div>
+      </div>
+    </div>
+  </section>
+  <section class=value id=value>
+    <div class=container>
+      <div class=head>
+        <div class=section-eyebrow>Value drivers</div>
+        <h2 class=section-title>How ClearTax pays back <span class="h1-grad em">your SAP investment</span></h2>
+        <p class=section-sub>Three reasons SAP-run finance organisations choose an embedded add-on over middleware or
+          stand-alone tools.
+      </div>
+      <div class=value-grid>
+        <div class=value-col>
+          <div class=num>i.</div>
+          <h3>Lower SAP TCO</h3>
+          <p>No bolt-on iPaaS to license. No SAP CPI tenant to size. No third-party gateway between SAP and the tax
+            authority — fewer moving parts, fewer interfaces to monitor, fewer support hand-offs. The add-on runs in the
+            same client as your finance code, on the same hardware, transported through STMS.
+        </div>
+        <div class=value-col>
+          <div class=num>ii.</div>
+          <h3>Compliance that travels</h3>
+          <p>SAP Document Compliance covers a narrow set of mandates. ClearTax's single add-on covers France, Belgium,
+            Poland, Croatia, Saudi, UAE and India — with new mandates added through configuration. Scale into new
+            countries without reopening the integration project.
+        </div>
+        <div class=value-col>
+          <div class=num>iii.</div>
+          <h3>SAP-skilled support</h3>
+          <p>Our delivery team is staffed with SAP-certified consultants who speak ABAP, debug in SE80, understand your
+            output determination. When you raise a ticket, it lands with someone who has shipped this add-on into dozens
+            of SAP landscapes.
+        </div>
+      </div>
+    </div>
+  </section>
+  <section class=download-cta>
+    <div class=container>
+      <div class=download-cta-inner>
+        <div class=row>
+          <div class=doc-ic><svg fill=none stroke=currentColor stroke-width=2 viewBox="0 0 24 24" height=28 width=28
+              stroke-linecap=round stroke-linejoin=round>
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+              <polyline points="14 2 14 8 20 8" />
+              <line x1=8 x2=16 y1=13 y2=13 />
+              <line x1=8 x2=16 y1=17 y2=17 />
+            </svg></div>
+          <div>
+            <h3>Want to see the architecture in detail?</h3>
+            <p>Download the SAP integration fact sheet — RICEF object inventory, transport landscape, mapping cockpit
+              walkthrough, and a sample 4-week deployment plan.
+          </div>
+        </div><a href=# class="pill ghost">Download fact sheet <span class=arr>↓</span></a>
+      </div>
+    </div>
+  </section>
+  <section class=testimonials id=testimonials>
+    <div class=container>
+      <div class=head>
+        <div class=section-eyebrow>Customer wins</div>
+        <h2 class=section-title>SAP-run enterprises <span class="h1-grad em">already in production</span></h2>
+        <p class=section-sub>Real deployments, real ERP environments — across multiple geographies and mandates.
+      </div>
+      <div class=testimonials-grid>
+        <div class=testimonial>
+          <div class=logo-row>
+            <div style=font-family:var(--font-display);font-weight:700;font-size:20px;color:var(--ct-purple-deep)>Salam
+              Telco</div><span class=erp-stack>SAP S/4HANA · 8 systems</span>
+          </div>
+          <blockquote>Salam's search for a reliable partner ended with ClearTax. Their tailored solutions ensured a
+            smooth transition for all 8 of our systems in just 3 months.</blockquote>
+          <div class=who>
+            <div class=av>A</div>
+            <div>
+              <div class=nm>Arslan Choudhary</div>
+              <div class=ttl>Director of Enterprise Enablement, Salam Telco</div>
+            </div>
+          </div>
+        </div>
+        <div class=testimonial>
+          <div class=logo-row>
+            <div style=font-family:var(--font-display);font-weight:700;font-size:20px;color:var(--ct-purple-deep)>Zamil
+              Industrial</div><span class=erp-stack>SAP ECC · Multi-entity</span>
+          </div>
+          <blockquote>We appreciate ClearTax for successfully completing the complex ZATCA integration. Their platform
+            enabled seamless management of multiple SAP units.</blockquote>
+          <div class=who>
+            <div class=av>A</div>
+            <div>
+              <div class=nm>Abdulbary Atassi</div>
+              <div class=ttl>Director of IT, Zamil Industrial</div>
+            </div>
+          </div>
+        </div>
+        <div class=testimonial>
+          <div class=logo-row>
+            <div style=font-family:var(--font-display);font-weight:700;font-size:20px;color:var(--ct-purple-deep)>Puma
+            </div><span class=erp-stack>SAP S/4HANA</span>
+          </div>
+          <blockquote>ClearTax is simplifying e-invoicing. They enabled us to implement the e-invoicing system in time
+            and handled all our business complexities with ease.</blockquote>
+          <div class=who>
+            <div class=av>R</div>
+            <div>
+              <div class=nm>Raj Kiran</div>
+              <div class=ttl>Head of Taxation & Retail Finance, Puma</div>
+            </div>
+          </div>
+        </div>
+        <div class=testimonial>
+          <div class=logo-row>
+            <div style=font-family:var(--font-display);font-weight:700;font-size:20px;color:var(--ct-purple-deep)>JK
+              Tyre</div><span class=erp-stack>SAP ECC</span>
+          </div>
+          <blockquote>ClearTax has transformed the way we handle GST compliance. Real-time creation of e-invoices from
+            SAP plays a significant role in providing critical insight.</blockquote>
+          <div class=who>
+            <div class=av>P</div>
+            <div>
+              <div class=nm>Pratush Kumar</div>
+              <div class=ttl>DGM-IT, JK Tyre</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+  <section class=pillars id=pillars>
+    <div class=container>
+      <div class=head>
+        <div class=section-eyebrow>Why ClearTax</div>
+        <h2 class=section-title>What it takes to make this <span class="h1-grad em">actually work in SAP</span></h2>
+        <p class=section-sub>Three pillars that separate a real SAP add-on from a glued-on integration.
+      </div>
+      <div class=pillars-grid>
+        <div class=pillar-card>
+          <div class=ill><svg fill=none stroke=currentColor stroke-width=2 viewBox="0 0 24 24" height=28 width=28
+              stroke-linecap=round stroke-linejoin=round>
+              <path d="M12 2 2 7l10 5 10-5-10-5z" />
+              <polyline points="2 17 12 22 22 17" />
+              <polyline points="2 12 12 17 22 12" />
+            </svg></div>
+          <h3>Native ABAP add-on</h3>
+          <p>The integration lives inside your SAP system in a dedicated /CLEARTAX/* namespace, transported through your
+            existing STMS landscape. No external connector to maintain, no SAP CPI tenant to license.
+        </div>
+        <div class="pillar-card b">
+          <div class=ill><svg fill=none stroke=currentColor stroke-width=2 viewBox="0 0 24 24" height=28 width=28
+              stroke-linecap=round stroke-linejoin=round>
+              <circle cx=12 cy=12 r=10 />
+              <line x1=2 x2=22 y1=12 y2=12 />
+              <path d="M12 2a15 15 0 0 1 0 20M12 2a15 15 0 0 0 0 20" />
+            </svg></div>
+          <h3>One integration. Every mandate.</h3>
+          <p>Once the add-on is in your SAP landscape, every supported geography is config — not code. France, Belgium,
+            Saudi — all from the same integration. You never re-open the SAP project to add a country.
+        </div>
+        <div class="pillar-card c">
+          <div class=ill><svg fill=none stroke=currentColor stroke-width=2 viewBox="0 0 24 24" height=28 width=28
+              stroke-linecap=round stroke-linejoin=round>
+              <path d="M12 2 4 5v7c0 5 3.5 9 8 10 4.5-1 8-5 8-10V5l-8-3z" />
+              <path d="m9 12 2 2 4-4" />
+            </svg></div>
+          <h3>Full compliance, full control</h3>
+          <p>Every transaction is auditable end-to-end inside SAP. Status writeback to Z-tables, mandatory archival,
+            role-based access via PFCG, and a full audit trail — all stored in your SAP system.
+        </div>
+      </div>
+    </div>
+  </section>
+  <section class=final-cta id=contact>
+    <div class=container>
+      <div class=section-head>
+        <div class=section-eyebrow>Talk to us</div>
+        <h2 class=section-title>Get a walkthrough <span class="h1-grad em">tailored to your SAP landscape</span></h2>
+        <p class=section-sub>Our SAP-certified specialists will scope your environment, demo the add-on inside a
+          sandbox, and give you an honest 4–6 week deployment plan.
+      </div>
+      <div class=cta-grid>
+        <div class=cta-points>
+          <div class=cta-pt>
+            <div class=ic-lg><svg fill=none stroke=currentColor stroke-width=2 viewBox="0 0 24 24" height=22 width=22
+                stroke-linecap=round stroke-linejoin=round>
+                <rect height=16 rx=2 width=18 x=3 y=4 />
+                <path d="M3 10h18M9 4v16" />
+              </svg></div>
+            <div>
+              <h4>SAP-certified delivery</h4>
+              <p>Consultants who know SE80, STMS, and your output determination — not generic CSMs.
+            </div>
+          </div>
+          <div class=cta-pt>
+            <div class=ic-lg><svg fill=none stroke=currentColor stroke-width=2 viewBox="0 0 24 24" height=22 width=22
+                stroke-linecap=round stroke-linejoin=round>
+                <circle cx=12 cy=12 r=10 />
+                <polyline points="12 6 12 12 16 14" />
+              </svg></div>
+            <div>
+              <h4>4–6 week go-live</h4>
+              <p>Standard ECC / S/4HANA setups deploy in 4–6 weeks via transport — not a re-implementation.
+            </div>
+          </div>
+          <div class=cta-pt>
+            <div class=ic-lg><svg fill=none stroke=currentColor stroke-width=2 viewBox="0 0 24 24" height=22 width=22
+                stroke-linecap=round stroke-linejoin=round>
+                <circle cx=12 cy=12 r=10 />
+                <line x1=2 x2=22 y1=12 y2=12 />
+                <path d="M12 2a15 15 0 0 1 0 20M12 2a15 15 0 0 0 0 20" />
+              </svg></div>
+            <div>
+              <h4>One platform · every mandate</h4>
+              <p>France, Belgium, Poland, Saudi, UAE, India — one ABAP add-on covers all your geographies.
+            </div>
+          </div>
+          <div class=cta-pt>
+            <div class=ic-lg><svg fill=none stroke=currentColor stroke-width=2 viewBox="0 0 24 24" height=22 width=22
+                stroke-linecap=round stroke-linejoin=round>
+                <path
+                  d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z" />
+              </svg></div>
+            <div>
+              <h4>Zero ERP disruption</h4>
+              <p>Deployed through STMS like any other transport. No core SAP modifications. SAP support unaffected.
+            </div>
+          </div>
+        </div>
+        <div id="hubspot-form-container" class="demo-form" style="min-height:360px">
+          <h3>Book a demo</h3>
+          <p class="sub">Our SAP specialists will walk you through the add-on and scope your deployment.</p>
+          <div id="hubspot-form-mount"></div>
+          <p class="form-note">No spam. Just a 30-min call with our SAP specialists.</p>
+          <script charset="utf-8" type="text/javascript" src="//js-na2.hsforms.net/forms/embed/v2.js"></script>
+          <script>
+            hbspt.forms.create({
+              portalId: "245744706",
+              formId: "51af6b81-aa59-4bd2-b499-ff081e27324d",
+              region: "na2",
+              target: "#hubspot-form-mount",
+              onFormReady: function($form) {
+                const formEl = $form[0] || $form;
+                const urlParams = new URLSearchParams(window.location.search);
+                const utms = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 'utm_content'];
+                utms.forEach(utm => {
+                  const value = urlParams.get(utm);
+                  if (value) {
+                    const field = formEl.querySelector ? formEl.querySelector('input[name="' + utm + '"]') : null;
+                    if (field) {
+                      field.value = value;
+                      const event = document.createEvent('HTMLEvents');
+                      event.initEvent('change', true, true);
+                      field.dispatchEvent(event);
+                    } else if (typeof $form.find === 'function') {
+                      const jqField = $form.find('input[name="' + utm + '"]');
+                      if (jqField.length) {
+                        jqField.val(value).change();
+                      }
+                    }
+                  }
+                });
+              }
+            });
+          </script>
+        </div>
+      </div>
+    </div>
+  </section>
+  <section class=faq id=faq>
+    <div class=container>
+      <div class=head>
+        <div class=section-eyebrow>FAQ</div>
+        <h2 class=section-title>SAP customers, <span class="h1-grad em">straight answers</span></h2>
+        <p class=section-sub>The questions we get asked most by SAP basis teams, FI leads and CIOs scoping their
+          e-invoicing project.
+      </div>
+      <div class=faq-list>
+        <details class=faq-item open>
+          <summary>How does ClearTax actually deploy into our SAP system?<span class=chev><svg fill=none
+                stroke=currentColor stroke-width=2.5 viewBox="0 0 24 24" height=14 width=14 stroke-linecap=round>
+                <line x1=12 x2=12 y1=5 y2=19 />
+                <line x1=5 x2=19 y1=12 y2=12 />
+              </svg></span></summary>
+          <div class=faq-body>ClearTax ships as a native ABAP add-on in the /CLEARTAX/* namespace. Deployment: (1)
+            SAINT/SPAM import into dev client, (2) SPRO configuration — company codes, mandate selection, RFC
+            connection, (3) field mapping in Fiori cockpit, (4) transport through STMS to QA → Prod. No core SAP
+            modifications. SAP support unaffected.</div>
+        </details>
+        <details class=faq-item>
+          <summary>Which SAP versions are supported?<span class=chev><svg fill=none stroke=currentColor stroke-width=2.5
+                viewBox="0 0 24 24" height=14 width=14 stroke-linecap=round>
+                <line x1=12 x2=12 y1=5 y2=19 />
+                <line x1=5 x2=19 y1=12 y2=12 />
+              </svg></span></summary>
+          <div class=faq-body>SAP ECC 6.0 from EHP7+, SAP S/4HANA on-premise 1709–2023, S/4HANA Cloud Private Edition,
+            S/4HANA Cloud Public Edition via BTP connector, SAP Business One and ByDesign via API connectors.</div>
+        </details>
+        <details class=faq-item>
+          <summary>How does this compare to SAP Document Compliance (DRC)?<span class=chev><svg fill=none
+                stroke=currentColor stroke-width=2.5 viewBox="0 0 24 24" height=14 width=14 stroke-linecap=round>
+                <line x1=12 x2=12 y1=5 y2=19 />
+                <line x1=5 x2=19 y1=12 y2=12 />
+              </svg></span></summary>
+          <div class=faq-body>ClearTax is the alternative when you need mandates DRC doesn't cover, want a single
+            platform for all geographies, need confirmed PA accreditation in France, want faster go-live, or want one
+            vendor handling both submission and the full e-reporting cycle. Many customers run DRC for one or two
+            countries and ClearTax for everything else.</div>
+        </details>
+        <details class=faq-item>
+          <summary>What does a typical 4–6 week deployment look like?<span class=chev><svg fill=none stroke=currentColor
+                stroke-width=2.5 viewBox="0 0 24 24" height=14 width=14 stroke-linecap=round>
+                <line x1=12 x2=12 y1=5 y2=19 />
+                <line x1=5 x2=19 y1=12 y2=12 />
+              </svg></span></summary>
+          <div class=faq-body>Week 1: scope & design workshop. Week 2: transport to DEV, RFC config, first test
+            invoices. Week 3: transport to QA, UAT with real data. Week 4: parallel run in production mirror mode. Weeks
+            5–6: go-live and hypercare. Multi-entity or multi-country environments typically take 10 weeks.</div>
+        </details>
+        <details class=faq-item>
+          <summary>What happens when the mandate changes?<span class=chev><svg fill=none stroke=currentColor
+                stroke-width=2.5 viewBox="0 0 24 24" height=14 width=14 stroke-linecap=round>
+                <line x1=12 x2=12 y1=5 y2=19 />
+                <line x1=5 x2=19 y1=12 y2=12 />
+              </svg></span></summary>
+          <div class=faq-body>Mandate changes are handled in the ClearTax cloud, not your SAP system. When DGFiP
+            publishes new specs or ZATCA changes schemas, ClearTax updates the format engine. Your add-on continues
+            sending the same payload. Your SAP team rarely needs to ship a new transport.</div>
+        </details>
+        <details class=faq-item>
+          <summary>How is data residency and security handled?<span class=chev><svg fill=none stroke=currentColor
+                stroke-width=2.5 viewBox="0 0 24 24" height=14 width=14 stroke-linecap=round>
+                <line x1=12 x2=12 y1=5 y2=19 />
+                <line x1=5 x2=19 y1=12 y2=12 />
+              </svg></span></summary>
+          <div class=faq-body>ISO 27001 and SOC 2 Type II certified. EU data stays in EU AWS regions; UAE in AWS Middle
+            East; KSA in-Kingdom. TLS 1.3 in transit, AES-256 at rest. SAP-side auth via RFC destinations with rotating
+            tokens, optionally mTLS. Fiori cockpit access controlled by SAP PFCG roles.</div>
+        </details>
+      </div>
+    </div>
+  </section>
+  <footer class="cft">
+    <div class="cfi container">
+      <div class="cfg">
+        <div class="cf2"><a href=https://www.cleartax.com/fr/en><img
+              src=https://cdn.prod.website-files.com/6093bce33d9b4bae841b04e3/69dfa05ecb34c38b5b8b5f54_cleartax-logo-light.png
+              alt="ClearTax" class="cf3" /></a>
+          <p class="cf4">42 Rue Cambronne,<br>75015 Paris, France</p>
+          <p class="cf5">Follow us on</p>
+          <div class="cf6"><a href=https://www.linkedin.com/company/cleartaxindia/ target=_blank rel=noopener
+              class="csc"><img
+                src=https://cdn.prod.website-files.com/63ede4a3da6dbd6b05c4612f/63ede4a3da6dbd3cc9c465c5_linkedin.png
+                alt="LinkedIn" width="16" height="16" /></a></div>
+        </div>
+        <div class="cfc">
+          <h5>Company</h5>
           <ul>
-            <li>You need mandates that DRC doesn't yet cover (or covers with limitations)</li>
-            <li>You want a single platform for all geographies — not separate country licences</li>
-            <li>You need confirmed PA accreditation in France (DRC does not act as a PA)</li>
-            <li>You want a faster go-live than DRC + an integration partner typically delivers</li>
-            <li>You want one vendor handling both submission and the full e-reporting cycle</li>
+            <li><a href=https://www.cleartax.com/fr/en/about-us>About us</a></li>
+            <li><a href=https://www.cleartax.com/fr/en/contact-us>Contact us</a></li>
+            <li><a href=https://www.cleartax.com/partners>Partners</a></li>
+            <li><a href=https://www.clear.in/s/press>Media &amp; Press</a></li>
+            <li><a href=https://cleartax.in/s/trust>Trust &amp; Safety</a></li>
           </ul>
-          Many of our customers run DRC for one or two countries and ClearTax for everything else — they coexist fine.
         </div>
-      </details>
-
-      <details class="faq-item">
-        <summary>What is the architecture between SAP and ClearTax Compliance Cloud?<span class="chev"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></span></summary>
-        <div class="faq-body">
-          <b>Outbound (SAP → ClearTax):</b> the ABAP add-on triggers on billing-document creation (typically via BTE 00503301 or output determination NACE) and pushes a structured payload over an authenticated HTTPS RFC destination to the ClearTax Compliance Cloud. Real-time for high-priority flows; batch via IDoc INVOIC02 for bulk runs.<br><br>
-          <b>ClearTax cloud:</b> converts to the target format (UBL 2.1 / CII / Factur-X / FA(2) / Peppol BIS), validates against schema and business rules, submits to the tax authority (PA / PPF / KSeF / ZATCA / FTA), and persists the lifecycle status.<br><br>
-          <b>Inbound (ClearTax → SAP):</b> status writeback through the same RFC, updating Z-tables linked to <code>VBRK-VBELN</code>. The Fiori cockpit surfaces this to your AR team without leaving SAP launchpad.<br><br>
-          Hosting: ClearTax runs in the geographic region your data residency requirements demand (EU, GCC, India, etc.).
+        <div class="cfc">
+          <h5>Products &amp; Solutions</h5>
+          <ul>
+            <li><a href=https://www.cleartax.com/fr/en>E-invoicing Software (France)</a></li>
+            <li><a href=https://www.cleartax.com/be>E-invoicing Software (Belgium)</a></li>
+            <li><a href=https://www.cleartax.com/de/en>E-invoicing Software (Germany)</a></li>
+            <li><a href=https://www.cleartax.com/sa/e-invoicing-software>E-invoicing Software (Saudi Arabia)</a></li>
+            <li><a href=https://www.cleartax.com/ae/e-invoicing-software>E-invoicing Software (UAE)</a></li>
+            <li><a href=https://www.cleartax.com/my/en>E-invoicing Software (Malaysia)</a></li>
+          </ul>
         </div>
-      </details>
-
-      <details class="faq-item">
-        <summary>How is data residency and security handled?<span class="chev"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></span></summary>
-        <div class="faq-body">
-          ClearTax is <b>ISO 27001</b> and <b>SOC 2 Type II</b> certified. Data residency is regional — EU customer data stays in EU AWS regions; UAE data in AWS Middle East; KSA data in-Kingdom — and never crosses the boundary. Transit is TLS 1.3, at rest is AES-256. SAP-side authentication is via RFC destinations with rotating tokens, optionally hardened with mTLS. Role-based access in the Fiori cockpit is mapped to SAP PFCG roles, so your authorisation team controls who sees what.
-        </div>
-      </details>
-
-      <details class="faq-item">
-        <summary>What does a typical 4–6 week deployment actually look like?<span class="chev"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></span></summary>
-        <div class="faq-body">
-          <ol>
-            <li><b>Week 1 — Scope &amp; design.</b> Workshop with your SAP FI/SD/MM leads. Output determination review. Custom field inventory. Sign-off on field-mapping draft from the AI agent.</li>
-            <li><b>Week 2 — Transport to DEV.</b> Add-on imported. RFC destinations configured. Field mapping refined. First test invoices submitted to sandbox tax authority.</li>
-            <li><b>Week 3 — Transport to QA.</b> UAT with your tax and AR teams using real production-shape data. Edge cases identified and resolved.</li>
-            <li><b>Week 4 — Parallel run.</b> Production invoices submitted in parallel (mirror mode) — comparing ClearTax output to your existing process.</li>
-            <li><b>Week 5–6 — Go-live.</b> Production cutover. Hypercare period with daily check-ins. Handover to ongoing support.</li>
-          </ol>
-          Multi-entity, multi-country, or heavily customised environments take longer — a 10-week plan is realistic for 5+ company codes across 3+ mandates. Honest scoping happens on the first call.
-        </div>
-      </details>
-
-      <details class="faq-item">
-        <summary>What happens when the mandate changes — does that need a new SAP project?<span class="chev"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></span></summary>
-        <div class="faq-body">
-          No. Mandate changes are handled <b>in the ClearTax cloud</b>, not in your SAP system. When DGFiP publishes External Specs v3.2, when ZATCA changes invoice schemas, when KSeF adds a new validation rule — ClearTax updates the format engine and validation library, and your add-on continues sending the same structured payload it always did. The translation layer absorbs the change. Your SAP team rarely needs to ship a new transport. This is the core architectural value of putting the mandate-specific complexity outside SAP.
-        </div>
-      </details>
-
-      <details class="faq-item">
-        <summary>Can we test against a sandbox tax authority before going live?<span class="chev"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></span></summary>
-        <div class="faq-body">
-          Yes — and we strongly recommend it. ClearTax's DEV and QA environments connect to the official sandbox endpoints for every supported mandate (DGFiP sandbox, KSeF demo, ZATCA fatoora simulation, FTA pre-production). You can run your real SAP invoices through the full pipeline in QA before flipping production. This is also where AI-mapped fields get validated against real schema responses.
-        </div>
-      </details>
-
-      <details class="faq-item">
-        <summary>What ongoing support do we get post-go-live?<span class="chev"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></span></summary>
-        <div class="faq-body">
-          24×7 support staffed with SAP-certified consultants — when you raise a ticket, the first person reading it can debug in SE80, read your spool requests, and trace BAdI invocations. Hypercare for the first 30 days post-go-live, then steady-state support with named CSM for enterprise accounts. SLA targets: <b>15 min response for P1, 4 hr for P2, next business day for P3.</b> Quarterly health checks include a SAP-side review (transport gaps, performance, error trends) and a regulatory horizon-scan for any mandate changes coming in your geographies.
-        </div>
-      </details>
-
-      <details class="faq-item">
-        <summary>What is your pricing model?<span class="chev"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></span></summary>
-        <div class="faq-body">
-          Subscription-based, scaling with annual invoice volume and the number of mandates in scope. The model is predictable: a platform fee, a volume tier, and per-mandate enablement. One-time professional services for the SAP integration project, scoped after the workshop in week 1. <b>Contact our team</b> for a tailored quote, an ROI simulation against your current state, and a deployment scope for your specific SAP landscape.
-        </div>
-      </details>
-
-    </div>
-  </div>
-</section>
-
-<!-- ──────────── FOOTER (ported from cleartax.com/ae) ──────────── -->
-<footer class="footer">
-  <div class="container">
-    <div class="footer-grid">
-      <div class="footer-brand">
-        <a href="https://www.cleartax.com/" class="logo" aria-label="ClearTax">
-          <img src="https://cdn.prod.website-files.com/63ede4a3da6dbd6b05c4612f/63ede4a3da6dbd8437c46595_logo-cleartax.svg" alt="ClearTax" />
-        </a>
-        <div class="addr">ClearTax<br>Global SAP delivery teams across<br>Paris · Dubai · Riyadh · Bengaluru</div>
-        <div class="follow">Follow us on</div>
-        <div class="socials">
-          <a href="https://www.linkedin.com/company/cleartax" class="soc" aria-label="LinkedIn"><img src="https://cdn.prod.website-files.com/63ede4a3da6dbd6b05c4612f/63ede4a3da6dbd3cc9c465c5_linkedin.png" alt=""></a>
-          <a href="https://www.facebook.com/Cleartax" class="soc" aria-label="Facebook"><img src="https://cdn.prod.website-files.com/63ede4a3da6dbd6b05c4612f/63ede4a3da6dbd3cb0c4668f_facebook.png" alt=""></a>
-          <a href="https://twitter.com/ClearTaxIndia" class="soc" aria-label="Twitter"><img src="https://cdn.prod.website-files.com/63ede4a3da6dbd6b05c4612f/63ede4a3da6dbd149dc46692_twitter.png" alt=""></a>
-          <a href="https://www.instagram.com/cleartaxindia/" class="soc" aria-label="Instagram"><img src="https://cdn.prod.website-files.com/63ede4a3da6dbd6b05c4612f/63ede4a3da6dbd30f8c46705_instagram.png" alt=""></a>
+        <div class="cfc">
+          <h5>Resources</h5>
+          <ul>
+            <li><a href=https://www.airmeet.com/e/9efd03e0-4ffc-11f0-b43c-af31dbfde7be target=_blank
+                rel=noopener>Webinars</a></li>
+            <li><a href=https://www.cleartax.com/fr/en/e-invoicing-france>Blog</a></li>
+            <li><a href=https://files.clear.in/08iPqLw4PVz target=_blank rel=noopener>Case Studies</a></li>
+            <li><a href=https://files.clear.in/oTna2McaBEM target=_blank rel=noopener>Whitepapers</a></li>
+          </ul>
+          <h5 style="margin-top:24px">Ressources (FR)</h5>
+          <ul>
+            <li><a href=https://www.cleartax.com/fr/facturation-electronique-france>Facturation électronique</a></li>
+            <li><a href=https://www.cleartax.com/fr/chorus-pro-france-e-facturation>Chorus Pro</a></li>
+            <li><a href=https://www.cleartax.com/fr/pdp-od-ppf-france-facturation-electronique>PDP, OD et PPF</a></li>
+            <li><a href=https://www.cleartax.com/fr/e-facturation-et-e-reporting>e-Reporting</a></li>
+          </ul>
         </div>
       </div>
-
-      <div class="footer-col">
-        <h5>Company</h5>
-        <ul>
-          <li><a href="#">About us</a></li>
-          <li><a href="#">Contact us</a></li>
-          <li><a href="#">Our Team</a></li>
-          <li><a href="#">Media &amp; Press</a></li>
-          <li><a href="https://cleartax.in/s/trust">Trust &amp; Safety</a></li>
-        </ul>
-      </div>
-
-      <div class="footer-col">
-        <h5>Products &amp; Solutions</h5>
-        <div class="group-h">By ERP</div>
-        <ul>
-          <li><a href="#">ClearTax for SAP</a></li>
-          <li><a href="#">ClearTax for Oracle</a></li>
-          <li><a href="#">ClearTax for Microsoft Dynamics</a></li>
-          <li><a href="#">ClearTax for NetSuite</a></li>
-        </ul>
-        <div class="group-h">By geography</div>
-        <ul>
-          <li><a href="#">E-invoicing France</a></li>
-          <li><a href="https://www.cleartax.com/be/en">E-invoicing Belgium</a></li>
-          <li><a href="https://www.cleartax.com/pl/en">E-invoicing Poland</a></li>
-          <li><a href="https://www.cleartax.com/sa/e-invoicing-software">E-invoicing Saudi Arabia</a></li>
-          <li><a href="https://www.cleartax.com/ae/e-invoicing-software">E-invoicing UAE</a></li>
-          <li><a href="https://cleartax.in/s/e-invoicing-enterprise-software">E-invoicing India</a></li>
-        </ul>
-      </div>
-
-      <div class="footer-col">
-        <h5>Resources</h5>
-        <ul>
-          <li><a href="#">SAP integration fact sheet</a></li>
-          <li><a href="#">Reference architecture (PDF)</a></li>
-          <li><a href="#">Case studies</a></li>
-          <li><a href="#">Whitepapers</a></li>
-          <li><a href="#">Regulatory updates</a></li>
-        </ul>
-      </div>
-
-      <div class="footer-col">
-        <h5>Why ClearTax</h5>
-        <ul>
-          <li><a href="#">For Business</a></li>
-          <li><a href="#">For Partners</a></li>
-          <li><a href="#">For SAP integrators</a></li>
-        </ul>
+      <div class="cf1">
+        <div class="cf8"><span>Cleartax is a product by Defmacro Software Pvt. Ltd.</span>
+          <div class="cf9"><a href=https://www.clear.in/s/legal>Legal</a><a
+              href=https://www.cleartax.com/meta/privacy>Privacy Policy</a></div>
+        </div>
+        <div class="cf7"><img
+            src=https://cdn.prod.website-files.com/6093bce33d9b4bae841b04e3/69fb0ff41b9a63ce3e1f50d9_iso.png
+            alt="ISO 27001" class="csi" /><img
+            src=https://cdn.prod.website-files.com/6093bce33d9b4bae841b04e3/69fad934822abf67d7c25954_soc.png
+            alt="SOC 2 Type II" class="csi" /><img
+            src=https://cdn.prod.website-files.com/6093bce33d9b4bae841b04e3/6a154210439a661bb4313f68_ssll.png
+            alt="SSL Secured" class="csi" /><img
+            src=https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6a153c9e423a6b967412239c_gdpr.png
+            alt="GDPR Compliant" class="csi" /></div>
       </div>
     </div>
-
-    <div class="footer-bottom">
-      <div>
-        <div class="legal">Cleartax is a product by Defmacro Software Pvt. Ltd.</div>
-        <div class="legal-links">
-          <a href="https://www.cleartax.com/sa/legal">Company Policy</a>
-          <a href="https://www.cleartax.com/sa/legal">Terms of use</a>
-          <a href="#">Legal notice</a>
-        </div>
-      </div>
-      <div class="seals">
-        <div class="seal">
-          <div class="ic"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="9 12 11 14 15 10"/></svg></div>
-          <div><b>ISO 27001</b><br>Information security</div>
-        </div>
-        <div class="seal">
-          <div class="ic"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></div>
-          <div><b>SOC 2 Type II</b><br>Independently audited</div>
-        </div>
-      </div>
-    </div>
-  </div>
-</footer>
-
-<script>
-(function () {
-    // Find the hero section which contains the configuration data attributes
-    const section = document.querySelector('header.hero[data-recaptcha-key]');
-    if (!section) return;
-
-    const form = section.parentElement.querySelector('[data-lead-form]');
-    if (!form) return;
-
-    form.addEventListener('submit', function (e) {
-        e.preventDefault();
-        const submitBtn = form.querySelector('[data-submit]');
-        const originalText = submitBtn.innerHTML;
-        submitBtn.innerHTML = 'Connecting...';
-        submitBtn.disabled = true;
-
-        // Extract config from data attributes
-        const config = {
-            recaptchaKey: section.getAttribute('data-recaptcha-key'),
-            sheetName: section.getAttribute('data-sheet-name'),
-            originCountry: section.getAttribute('data-origin-country'),
-            thankYouUrl: section.getAttribute('data-thankyou-url'),
-            formType: section.getAttribute('data-form-type'),
-            leadType: section.getAttribute('data-lead-type')
-        };
-
-        const getFieldValue = (name) => {
-            const el = form.querySelector(`[data-field="${name}"]`);
-            return el ? el.value : '';
-        };
-
-        const processSubmission = (token) => {
-            const payload = {
-                lead_platforms: {
-                    google_sheet: { sheet_name: config.sheetName },
-                    pardot: true,
-                    salesforce: true
-                },
-                extra_payload: {
-                    origin_country: config.originCountry
-                },
-                lead_data: {
-                    name: getFieldValue('name'),
-                    phone_number: getFieldValue('isd') + " " + getFieldValue('phone'),
-                    email: getFieldValue('email'),
-                    company_name: getFieldValue('company'),
-                    designation: getFieldValue('role'),
-                    ISD: getFieldValue('isd'),
-                    form_type: config.formType,
-                    lead_type: config.leadType,
-                    lead_source_url: window.location.href
-                }
-            };
-
-            // Capture UTMs
-            const urlParams = new URLSearchParams(window.location.search);
-            if (urlParams.get('utm_source')) payload.lead_data.utm_source = urlParams.get('utm_source');
-            if (urlParams.get('utm_medium')) payload.lead_data.utm_medium = urlParams.get('utm_medium');
-            if (urlParams.get('utm_campaign')) payload.lead_data.utm_campaign = urlParams.get('utm_campaign');
-
-            fetch(`https://www.cleartax.com/f/common-lead/lead/?captcha_token=${token}`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload)
-            })
-            .then(response => {
-                if (response.status === 201) {
-                    // Success
-                    form.style.display = 'none';
-                    document.getElementById('demo-success').style.display = 'block';
-                    window.scrollTo({ top: document.getElementById('contact').offsetTop - 100, behavior: 'smooth' });
-                } else {
-                    throw new Error('API rejection');
-                }
-            })
-            .catch(() => {
-                submitBtn.innerHTML = '✕ Submission Failed';
-                submitBtn.style.background = '#EF4444';
-                submitBtn.disabled = false;
-                setTimeout(() => {
-                    submitBtn.innerHTML = originalText;
-                    submitBtn.style.background = '';
-                }, 4000);
-            });
-        };
-
-        if (typeof grecaptcha !== 'undefined') {
-            grecaptcha.ready(function () {
-                grecaptcha.execute(config.recaptchaKey, { action: 'submit' }).then(processSubmission);
-            });
-        } else {
-            processSubmission('');
-        }
-    });
-})();
-</script>
+  </footer>
+  <script>!function () { var n = new Date("2026-09-01T00:00:00+02:00").getTime(), r = { d: document.querySelector('[data-cd="d"]'), h: document.querySelector('[data-cd="h"]'), m: document.querySelector('[data-cd="m"]'), s: document.querySelector('[data-cd="s"]') }; function c(e) { return String(Math.max(0, e)).padStart(2, "0") } function e() { var e = Date.now(), t = Math.max(0, n - e), a = Math.floor(t / 1e3), o = Math.floor(a / 86400), e = Math.floor(a % 86400 / 3600), t = Math.floor(a % 3600 / 60), a = a % 60; r.d && (r.d.textContent = c(o)), r.h && (r.h.textContent = c(e)), r.m && (r.m.textContent = c(t)), r.s && (r.s.textContent = c(a)) } e(), setInterval(e, 1e3) }(); (function () { var btn = document.getElementById('cnb'); var menu = document.getElementById('cnc'); if (!btn || !menu) return; btn.addEventListener('click', function () { var open = menu.classList.toggle('open'); btn.setAttribute('aria-expanded', open); menu.setAttribute('aria-hidden', !open) }) })();</script>
 
 </body>
+
 </html>
