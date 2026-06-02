@@ -4,6 +4,67 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
+<!-- Resource Hints: Eagerly preconnect to core CDNs and asset domains -->
+<link rel="preconnect" href="https://js-na2.hsforms.net" crossorigin />
+<link rel="preconnect" href="https://forms.hsforms.com" crossorigin />
+<link rel="preconnect" href="https://forms-na2.hsforms.com" crossorigin />
+<link rel="preconnect" href="https://cdn.prod.website-files.com" crossorigin />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+
+<!-- Load critical font styles early -->
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+
+<!-- Eagerly download the HubSpot embed script asynchronously without blocking parsing -->
+<script src="https://js-na2.hsforms.net/forms/embed/v2.js" async></script>
+
+<!-- Delay loading of heavy third-party consent (Usercentrics) and tracking (GTM) scripts until first interaction -->
+<script>
+  (function() {
+    let interactionTriggered = false;
+    
+    function loadThirdPartyScripts() {
+      if (interactionTriggered) return;
+      interactionTriggered = true;
+      
+      // Cleanup event listeners
+      interactionEvents.forEach(function(event) {
+        window.removeEventListener(event, loadThirdPartyScripts, { passive: true });
+      });
+      
+      // 1. Usercentrics AutoBlocker
+      const autoblocker = document.createElement('script');
+      autoblocker.src = 'https://web.cmp.usercentrics.eu/modules/autoblocker.js';
+      document.head.appendChild(autoblocker);
+      
+      // 2. Usercentrics CMP Loader
+      const cmpLoader = document.createElement('script');
+      cmpLoader.id = 'usercentrics-cmp';
+      cmpLoader.src = 'https://web.cmp.usercentrics.eu/ui/loader.js';
+      cmpLoader.setAttribute('data-settings-id', 'utqqyaEbvbzrTk');
+      cmpLoader.async = true;
+      document.head.appendChild(cmpLoader);
+      
+      // 3. Google Tag Manager
+      (function (w, d, s, l, i) {
+        w[l] = w[l] || []; w[l].push({
+          'gtm.start': new Date().getTime(), event: 'gtm.js'
+        });
+        var f = d.getElementsByTagName(s)[0],
+          j = d.createElement(s), dl = l != 'dataLayer' ? '&l=' + l : '';
+        j.async = true;
+        j.src = 'https://www.googletagmanager.com/gtm.js?id=' + i + dl;
+        f.parentNode.insertBefore(j, f);
+      })(window, document, 'script', 'dataLayer', 'GTM-P5NDQXGH');
+    }
+    
+    const interactionEvents = ['mousemove', 'mouseenter', 'mouseover', 'touchstart', 'scroll', 'keydown'];
+    interactionEvents.forEach(function(event) {
+      window.addEventListener(event, loadThirdPartyScripts, { passive: true });
+    });
+  })();
+</script>
+
 <!-- SEO -->
 <title>Partner with ClearTax — Global E-Invoicing &amp; Compliance Partner Program</title>
 <meta name="description" content="Become a ClearTax partner. Accredited by tax authorities across UAE, KSA, France, India, Germany, Oman and more. Co-sell e-invoicing across 50+ countries with 100+ ERP, accounting and POS integrations." />
@@ -34,9 +95,6 @@
 
 
 
-<link rel="preconnect" href="https://fonts.googleapis.com" />
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
 <style>
   /* ==================== V2 GLASS NAVIGATION ==================== */
   [data-nav-root],
@@ -1707,12 +1765,9 @@
     transform: translateY(-2px);
     box-shadow: 0 8px 28px rgba(105,56,239,0.4);
   }
-
-
 </style>
 </head>
 <body>
-
 <div data-nav-root>
   <div class="nav-outer" aria-label="Primary">
     <div class="nav-inner">
@@ -2102,14 +2157,46 @@
       <p class="sub">Tell us a bit about your firm and our partnerships team will reach out within 2 business days.</p>
 
       <!-- HubSpot Form Embed -->
-      <div class="hs-form-wrap">
-        <script charset="utf-8" type="text/javascript" src="//js-na2.hsforms.net/forms/embed/v2.js"></script>
+      <div class="hs-form-wrap" id="hubspot-form-container">
         <script>
-          hbspt.forms.create({
-            portalId: "245744706",
-            formId: "a84c35f1-414f-43b7-b0be-b2e6d310f4ce",
-            region: "na2"
-          });
+          (function() {
+            function initHubSpotForm() {
+              if (window.hbspt && window.hbspt.forms) {
+                window.hbspt.forms.create({
+                  portalId: "245744706",
+                  formId: "a84c35f1-414f-43b7-b0be-b2e6d310f4ce",
+                  region: "na2",
+                  target: "#hubspot-form-container",
+                  onFormReady: function($form) {
+                    const urlParams = new URLSearchParams(window.location.search);
+                    const utmParams = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 'utm_content'];
+                    utmParams.forEach(function(param) {
+                      let value = urlParams.get(param);
+                      // Fallback to sessionStorage to persist across page navigations
+                      if (!value) {
+                        try {
+                          value = sessionStorage.getItem(param);
+                        } catch (e) {}
+                      } else {
+                        try {
+                          sessionStorage.setItem(param, value);
+                        } catch (e) {}
+                      }
+                      if (value) {
+                        const input = $form.find('input[name="' + param + '"]');
+                        if (input.length) {
+                          input.val(value).change();
+                        }
+                      }
+                    });
+                  }
+                });
+              } else {
+                setTimeout(initHubSpotForm, 30);
+              }
+            }
+            initHubSpotForm();
+          })();
         </script>
       </div>
 
@@ -2686,6 +2773,5 @@
     });
   })();
 </script>
-
 </body>
 </html>
