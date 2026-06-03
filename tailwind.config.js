@@ -11,6 +11,14 @@ export default {
   content: [],
   // theme.extend is honored when this file is loaded via @config in CSS,
   // but prefer @theme in tokens.css for new tokens.
-  theme: { extend: {} },
+  theme: {
+    extend: {
+      container: {
+        screens: {
+          xl: "1328px",
+        },
+      },
+    },
+  },
   plugins: [],
 };
