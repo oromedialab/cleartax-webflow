@@ -3,7 +3,7 @@ import "../styles/fonts.css";
 import "../styles/shared.css";
 import "../styles/.build/germany-product.css";
 
-import NavbarGlobalV2 from "../sections/_shared/NavbarGlobalV2.astro";
+import NavbarGermany from "../sections/germany-product/NavbarGermany.astro";
 import Hero from "../sections/germany-product/Hero.astro";
 import Logostrip from "../sections/_shared/LogosStripGlobalV2.astro";
 import WhyCleartax from "../sections/germany-product/WhyCleartax.astro";
@@ -14,7 +14,7 @@ import GermanyInfra from "../sections/germany-product/GermanyInfra.astro";
 import GermanyTimeline from "../sections/germany-product/GermanyTimeline.astro";
 import GermanyList from "../sections/germany-product/GermanyList.astro";
 import GermanyCta from "../sections/germany-product/GermanyCta.astro";
-import Footer from "../sections/_shared/Footer.astro";
+import FooterGermany from "../sections/germany-product/FooterGermany.astro";
 import Roadmap from "../sections/germany-product/Roadmap.astro";
 import Trust from "../sections/germany-product/Trust.astro";
 import NonCompliance from "../sections/germany-product/NonCompliance.astro";
@@ -23,17 +23,85 @@ import NonCompliance from "../sections/germany-product/NonCompliance.astro";
 <!doctype html>
 <html lang="de">
   <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Germany E-Invoicing for CFOs & Heads of Tax | ClearTax</title>
-    <meta
-      name="description"
-      content="The 2025/2027 German e-invoicing mandate is the easy part. ViDA 2030 is the real story. ClearTax is built for both — one platform, one integration, every European mandate."
-    />
-    <meta name="referrer" content="strict-origin-when-cross-origin" />
-    
+    <!-- Resource Hints: Eagerly preconnect to core CDNs and asset domains -->
+    <link rel="preconnect" href="https://js-na2.hsforms.net" crossorigin />
+    <link rel="preconnect" href="https://forms.hsforms.com" crossorigin />
+    <link rel="preconnect" href="https://forms-na2.hsforms.com" crossorigin />
+    <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
+    <link rel="preconnect" href="https://cdn.prod.website-files.com" crossorigin />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+
+    <!-- Swiper CSS (loaded once globally) -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
+
+    <!-- Preload critical hero background image to improve LCP (Largest Contentful Paint) -->
+    <link
+      rel="preload"
+      as="image"
+      href="https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6a1fb5280c02a51fa5fa98e6_hero-bg.png"
+    />
+
+    <!-- Delay loading of heavy third-party consent (Usercentrics) and tracking (GTM) scripts until first interaction -->
+    <script is:inline>
+      (function() {
+        let interactionTriggered = false;
+        
+        function loadThirdPartyScripts() {
+          if (interactionTriggered) return;
+          interactionTriggered = true;
+          
+          // Cleanup event listeners
+          interactionEvents.forEach(function(event) {
+            window.removeEventListener(event, loadThirdPartyScripts, { passive: true });
+          });
+          
+          // 1. Usercentrics AutoBlocker
+          const autoblocker = document.createElement('script');
+          autoblocker.src = 'https://web.cmp.usercentrics.eu/modules/autoblocker.js';
+          document.head.appendChild(autoblocker);
+          
+          // 2. Usercentrics CMP Loader
+          const cmpLoader = document.createElement('script');
+          cmpLoader.id = 'usercentrics-cmp';
+          cmpLoader.src = 'https://web.cmp.usercentrics.eu/ui/loader.js';
+          cmpLoader.setAttribute('data-settings-id', 'utqqyaEbvbzrTk');
+          cmpLoader.async = true;
+          document.head.appendChild(cmpLoader);
+          
+          // 3. Google Tag Manager
+          (function (w, d, s, l, i) {
+            w[l] = w[l] || []; w[l].push({
+              'gtm.start': new Date().getTime(), event: 'gtm.js'
+            });
+            var f = d.getElementsByTagName(s)[0],
+              j = d.createElement(s), dl = l != 'dataLayer' ? '&l=' + l : '';
+            j.async = true;
+            j.src = 'https://www.googletagmanager.com/gtm.js?id=' + i + dl;
+            f.parentNode.insertBefore(j, f);
+          })(window, document, 'script', 'dataLayer', 'GTM-P5NDQXGH');
+        }
+        
+        const interactionEvents = ['mousemove', 'mouseenter', 'mouseover', 'touchstart', 'scroll', 'keydown'];
+        interactionEvents.forEach(function(event) {
+          window.addEventListener(event, loadThirdPartyScripts, { passive: true });
+        });
+      })();
+    </script>
+
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Best E-Invoicing Software in Germany | X-Rechnung Compliant E-Invoicing Solution Provider - ClearTax</title>
+    <meta
+      name="description"
+      content="Best E-Invoicing Software in Germany: ClearTax provides fully XRechnung and ZUGFeRD-compliant e-invoicing solutions that integrate seamlessly with any ERP to help you send, receive, validate, and archive e-invoices with ease"
+    />
+    <meta name="keywords" content="best e invoicing software, best e invoicing software in germany, e invoicing software, e invoicing solution providers, e invoicing solutions, e-invoicing software, e invoicing solution, e invoicing services​">
+    <meta name="referrer" content="strict-origin-when-cross-origin" />
+    <link rel="canonical" href="https://www.cleartax.com/de/en/e-invoicing-software"/>
+    <meta name="robots" content="index, follow" />
+    <link rel="sitemap" type="application/xml" title="Sitemap" href="https://www.cleartax.com/de/sitemap.xml" />
+    
     <link
       href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Inter:wght@400;500;600&display=swap"
       rel="stylesheet"
@@ -61,10 +129,15 @@ import NonCompliance from "../sections/germany-product/NonCompliance.astro";
       href="https://cdn.prod.website-files.com/63ede4a3da6dbd8997c46450_256by256.png"
     />
 
-    <script charset="utf-8" type="text/javascript" src="https://js-na2.hsforms.net/forms/embed/v2.js" is:inline></script>
+    <!-- Eagerly download the HubSpot embed script asynchronously without blocking parsing -->
+    <script charset="utf-8" type="text/javascript" src="https://js-na2.hsforms.net/forms/embed/v2.js" is:inline async></script>
   </head>
   <body class="bg-white text-[#111827] antialiased">
-    <NavbarGlobalV2 />
+<!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-P5NDQXGH"
+height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<!-- End Google Tag Manager (noscript) -->
+    <NavbarGermany />
     <main id="main">
       <Hero />
       <Logostrip />
@@ -80,6 +153,8 @@ import NonCompliance from "../sections/germany-product/NonCompliance.astro";
       <FAQ />
       <GermanyCta />
     </main>
-    <Footer />
+    <FooterGermany />
+    <!-- Swiper JS Script (deferred to prevent render-blocking) -->
+    <script is:inline src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js" defer></script>
   </body>
 </html>

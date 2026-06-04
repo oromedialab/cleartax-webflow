@@ -6,7 +6,7 @@
  */
 ---
 
-<section class="hero-section relative min-h-[780px] flex items-center pt-28 pb-20 md:pt-36 md:pb-24 lg:pt-40 lg:pb-28" id="hero">
+<section class="hero-section relative min-h-[780px] flex items-center pt-28 pb-20 md:pt-30 md:pb-24 lg:pt-40 lg:pb-28" id="hero">
   <!-- Sunset Skyline Background with dark to soft fade overlays -->
   <div class="absolute inset-0 z-0 bg-cover bg-center bg-no-repeat" style="background-image: url('https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6a1fb5280c02a51fa5fa98e6_hero-bg.png');"></div>
 
@@ -17,18 +17,18 @@
       <div class="hero-left-content flex flex-col items-start">
         
         <!-- Badge Capsule -->
-        <div class="inline-flex items-center gap-1.5 bg-[linear-gradient(90deg,_rgba(144,_68,_169,_0.2)_0%,_rgba(184,_126,_200,_0.2)_100%)] text-[#8841A0] leading-[1] text-xs font-medium px-3 py-2 rounded-full uppercase mb-5">
+        <h5 class="inline-flex items-center gap-1.5 bg-[linear-gradient(90deg,_rgba(144,_68,_169,_0.2)_0%,_rgba(184,_126,_200,_0.2)_100%)] text-[#8841A0] leading-[1] text-xs font-medium px-3 py-2 rounded-full mb-5">
           Best E-invoicing Software in Germany
-        </div>
+        </h5>
         
         <!-- Headline -->
         <h1 class="text-[36px] lg:text-[56px] font-medium leading-[1.14] mb-6 bg-clip-text text-transparent" style="background-image: linear-gradient(180deg, #AA50C8 0%, #030203 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
-          Germany's 2027 mandate is coming. Don't scramble — be ready.
+          Germany's 2027 mandate is coming. Don't scramble be ready.
         </h1>
         
         <!-- Description -->
         <p class="text-base sm:text-lg text-[#27127A]/80 leading-normal mb-10">
-          ClearTax handles XRechnung, ZUGFeRD, and Peppol — all in one platform. Integrate once, stay compliant through e-invoicing, e-reporting, and ViDA 2030. No rebuilds. No surprises.
+          ClearTax handles XRechnung, ZUGFeRD, and Peppol, all in one platform. Integrate once, stay compliant through e-invoicing, e-reporting, and ViDA 2030. No rebuilds. No surprises.
         </p>
 
         <!-- Trust Badges Strip -->
@@ -79,7 +79,36 @@
         <p class="text-base text-black/80 mb-6">Get a personalized walkthrough of our Germany-ready e-invoicing solution.</p>
 
         <!-- HubSpot Form Mount Container -->
-        <div id="hero-hubspot-form" class="hs-form-wrap-light"></div>
+        <div id="hero-hubspot-form" class="hs-form-wrap-light">
+          <!-- Form Skeleton Loader -->
+          <div id="form-skeleton" class="form-skeleton">
+            <div class="skeleton-row-2">
+              <div>
+                <div class="skeleton-label shimmer"></div>
+                <div class="skeleton-input shimmer"></div>
+              </div>
+              <div>
+                <div class="skeleton-label shimmer"></div>
+                <div class="skeleton-input shimmer"></div>
+              </div>
+            </div>
+            <div>
+              <div class="skeleton-label shimmer" style="width: 100px;"></div>
+              <div class="skeleton-input shimmer"></div>
+            </div>
+            <div class="skeleton-row-2">
+              <div>
+                <div class="skeleton-label shimmer"></div>
+                <div class="skeleton-input shimmer"></div>
+              </div>
+              <div>
+                <div class="skeleton-label shimmer"></div>
+                <div class="skeleton-input shimmer"></div>
+              </div>
+            </div>
+            <div class="skeleton-button shimmer"></div>
+          </div>
+        </div>
         
         <p class="text-sm text-black/80 text-center mt-4">No spam. Just a 30-min call with our Germany specialists.</p>
       </aside>
@@ -91,14 +120,24 @@
 <script is:inline>
   // HubSpot form embed with URL parameters auto-prefill
   (() => {
+    let initialized = false;
+    
     const initForm = () => {
+      if (initialized) return;
       if (window.hbspt && window.hbspt.forms) {
+        initialized = true;
         window.hbspt.forms.create({
           portalId: "245744706",
           formId: "51af6b81-aa59-4bd2-b499-ff081e27324d",
           region: "na2",
           target: "#hero-hubspot-form",
           onFormReady: function($form) {
+            // Remove the skeleton loader
+            const skeleton = document.getElementById("form-skeleton");
+            if (skeleton) {
+              skeleton.remove();
+            }
+
             const formEl = ($form && $form[0]) ? $form[0] : $form;
             if (formEl && formEl.querySelector) {
               const urlParams = new URLSearchParams(window.location.search);
@@ -118,10 +157,33 @@
       }
     };
 
+    const checkAndInit = () => {
+      if (window.hbspt && window.hbspt.forms) {
+        initForm();
+      } else {
+        // Look for HubSpot script and attach load listener
+        const script = document.querySelector('script[src*="hsforms.net"]');
+        if (script) {
+          script.addEventListener('load', initForm);
+        }
+        // Also poll as a robust fallback
+        let pollCount = 0;
+        const interval = setInterval(() => {
+          pollCount++;
+          if (window.hbspt && window.hbspt.forms) {
+            clearInterval(interval);
+            initForm();
+          } else if (pollCount > 100) { // Stop polling after 10 seconds
+            clearInterval(interval);
+          }
+        }, 100);
+      }
+    };
+
     if (document.readyState === "loading") {
-      document.addEventListener("DOMContentLoaded", initForm);
+      document.addEventListener("DOMContentLoaded", checkAndInit);
     } else {
-      initForm();
+      checkAndInit();
     }
   })();
 </script>
@@ -284,5 +346,74 @@
   .hs-form-wrap-light fieldset:has([class*="hs_utm_"]),
   .hs-form-wrap-light .hs-form-field[style*="display: none"] {
     display: none !important;
+  }
+
+  /* ==================== FORM SKELETON SHIMMER STYLES ==================== */
+  .form-skeleton {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    width: 100%;
+    min-height: 300px;
+  }
+  .skeleton-row-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+  @media (max-width: 640px) {
+    .skeleton-row-2 {
+      grid-template-columns: 1fr;
+      gap: 16px;
+    }
+  }
+  .skeleton-label {
+    height: 14px;
+    width: 80px;
+    background: rgba(0, 0, 0, 0.08);
+    border-radius: 4px;
+    margin-bottom: 6px;
+  }
+  .skeleton-input {
+    height: 44px;
+    background: rgba(0, 0, 0, 0.03);
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    border-radius: 8px;
+    width: 100%;
+  }
+  .skeleton-button {
+    height: 46px;
+    background: linear-gradient(135deg, rgba(79, 70, 229, 0.25) 0%, rgba(49, 46, 129, 0.25) 100%);
+    border-radius: 30px;
+    width: 100%;
+    margin-top: 8px;
+  }
+  
+  /* Shimmer Animation */
+  .shimmer {
+    position: relative;
+    overflow: hidden;
+  }
+  .shimmer::after {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    transform: translateX(-100%);
+    background-image: linear-gradient(
+      90deg,
+      rgba(255, 255, 255, 0) 0%,
+      rgba(255, 255, 255, 0.6) 20%,
+      rgba(255, 255, 255, 0.6) 60%,
+      rgba(255, 255, 255, 0) 100%
+    );
+    animation: shimmer-anim 1.6s infinite;
+    content: '';
+  }
+  @keyframes shimmer-anim {
+    100% {
+      transform: translateX(100%);
+    }
   }
 </style>
