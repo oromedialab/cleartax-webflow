@@ -116,7 +116,8 @@ for (const pageFile of pages) {
       if (sIdx !== -1 && sIdx < pathParts.length - 1) {
         const folder = pathParts[sIdx + 1];
         const nested = pathParts.slice(sIdx + 2, -1); // intermediate dirs between folder and file
-        componentMap.set(name, { folder, nested });
+        const stem = pathParts[pathParts.length - 1].replace(/\.astro$/, '');
+        componentMap.set(name, { folder, nested, stem });
       }
     }
   }
@@ -131,9 +132,9 @@ for (const pageFile of pages) {
   let match;
   while ((match = componentRegex.exec(template)) !== null) {
     const componentName = match[1];
-    const baseKebab = kebab(componentName);
-
     const entry = componentMap.get(componentName);
+    const baseKebab = entry && entry.stem ? kebab(entry.stem) : kebab(componentName);
+
     const pathsToTry = [];
     if (entry) {
       const prefixedKebab = entry.nested.length
