@@ -1,0 +1,111 @@
+---
+export interface Props {
+    //
+}
+
+const steps = [
+    {
+        dateLine1: "JAN",
+        dateLine2: "2025",
+        phase: "PHASE 1 • COMPLETED",
+        phaseColor: "text-[#4D3BE2]",
+        desc: "All VAT-registered businesses receive e-invoices",
+        active: true,
+        lineSolid: true
+    },
+    {
+        dateLine1: "JAN",
+        dateLine2: "2027",
+        phase: "PHASE 2 • MANDATORY",
+        phaseColor: "text-[#4D3BE2]",
+        desc: "Large enterprises issue EN 16931 e-invoices",
+        active: true,
+        lineSolid: true
+    },
+    {
+        dateLine1: "JAN",
+        dateLine2: "2028",
+        phase: "PHASE 3 • UNIVERSAL",
+        phaseColor: "text-black/60",
+        desc: "All domestic B2B invoices become electronic",
+        active: false,
+        lineSolid: false
+    },
+    {
+        dateLine1: "2028/",
+        dateLine2: "2030",
+        phase: "PHASE 4 • HORIZON",
+        phaseColor: "text-black/60",
+        desc: "Digital reporting and ViDA mandates begin",
+        active: false,
+        lineSolid: false
+    }
+];
+---
+
+<section class="py-20 lg:py-25 lg:pb-0 bg-[#FFFFFF] overflow-hidden">
+    <div class="max-w-[1280px] mx-auto px-4 lg:px-6">
+        <div class="text-center premium-reveal">
+            <h2 class="text-3xl md:text-[40px] lg:text-[44px] font-semibold tracking-tight text-[#030203]">
+                Germany E-Invoicing Implementation <span class="text-[#655DFF]">Timeline</span>
+            </h2>
+            <p class="text-center font-medium text-black/80 mt-3 lg:mt-4 text-base lg:text-lg">
+                Four phased milestones: know what changes and when.
+            </p>
+        </div>
+
+        <div class="flex flex-col gap-12 lg:grid lg:grid-cols-4 lg:gap-10 xl:gap-29 sm:gap-16 mt-12 lg:mt-24 relative z-10 max-w-[400px] lg:max-w-none mx-auto premium-reveal [transition-delay:200ms]">
+            {steps.map((step, index) => (
+                <div class={`relative flex flex-row lg:flex-col w-[370px] lg:w-auto items-start lg:items-start group ${index === 1 || index === 2 ? 'lg:translate-x-7' : ''}`}>
+                    <div class="relative shrink-0 flex justify-center w-[96px]">
+                        <div class={`w-[96px] h-[96px] rounded-full flex flex-col items-center justify-center font-semibold text-white text-base leading-[1.2] transition-transform duration-300 group-hover:-translate-y-1 ${step.active ? 'bg-[#6B5CE7] shadow-[0_0_30px_rgba(101,93,255,0.4)] ring-[6px] ring-[#6B5CE7]/20' : 'bg-[#A198EE]'}`}>
+                            <span>{step.dateLine1}</span>
+                            <span>{step.dateLine2}</span>
+                        </div>
+                    </div>
+                    
+                    <div class="ml-6 lg:ml-0 lg:mt-10 flex-1 lg:text-left pt-2 lg:pt-0">
+                        <div class={`text-[16px] tracking-[1.5px] uppercase font-normal ${step.phaseColor}`}>
+                            {step.phase}
+                        </div>
+                        <div class="text-lg text-black max-w-[253px] font-normal mt-1.5 leading-[1.4] text-wrap lg:mx-auto">
+                            {step.desc}
+                        </div>
+                    </div>
+ 
+                    {index < steps.length - 1 && (
+                        <>
+                            <!-- Desktop Line -->
+                            <div 
+                                class={`hidden lg:block absolute top-[48px] left-[48px] w-75 -z-10 ${step.lineSolid ? 'h-[2px] bg-[#655DFF]' : 'dashed-line-horizontal'}`}
+                                style={
+                                    index === 0 
+                                        ? "width: calc(75% + 160px);" 
+                                        : index === 2 
+                                            ? "width: calc(100% - -40px);" 
+                                            : undefined
+                                }
+                            ></div>
+                            
+                            <!-- Mobile Line -->
+                            <div class={`lg:hidden absolute top-[96px] h-17 left-[48px] -translate-x-1/2 -bottom-12 -z-10 ${step.lineSolid ? 'w-[2px] bg-[#655DFF]' : 'dashed-line-vertical'}`}></div>
+                        </>
+                    )}
+                </div>
+            ))}
+        </div>
+    </div>
+</section>
+
+<style is:global>
+    .dashed-line-horizontal {
+        height: 2px;
+        --clr-border: #A198EE;
+        background-image: repeating-linear-gradient(90deg, var(--clr-border), var(--clr-border) 10px, transparent 10px, transparent 20px);
+    }
+    .dashed-line-vertical {
+        width: 2px;
+        --clr-border: #A198EE;
+        background-image: repeating-linear-gradient(0deg, var(--clr-border), var(--clr-border) 10px, transparent 10px, transparent 20px);
+    }
+</style>

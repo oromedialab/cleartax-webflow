@@ -24,6 +24,7 @@ export const PAGE_TARGETS = [
   { name: 'recon-ai-agent',         input: 'src/styles/recon-ai-agent.css',         page: 'src/pages/recon-ai-agent.astro' },
   { name: 'germany-product',         input: 'src/styles/germany-product.css',         page: 'src/pages/germany-product.astro' },
   { name: 'test',                   input: 'src/styles/test.css',                   page: 'src/pages/test.astro' },
+  { name: 'france-product',          input: 'src/styles/france-product.css',          page: 'src/pages/france-product.astro' },
 ];
 
 const SHARED_IMPORT_RE = /import\s+[A-Z][A-Za-z0-9]*\s+from\s+['"]\.\.\/sections\/_shared\/([A-Za-z0-9_-]+)\.astro['"]/g;
