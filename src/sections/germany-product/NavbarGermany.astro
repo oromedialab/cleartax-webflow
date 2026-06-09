@@ -85,6 +85,7 @@ const countries: CountryOption[] = [
   },
   { name: "GLOBAL", flag: "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%235E46E5' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><circle cx='12' cy='12' r='10'></circle><line x1='2' y1='12' x2='22' y2='12'></line><path d='M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z'></path></svg>", href: "https://www.cleartax.com/global/e-invoicing-solution" },
   { name: "BELGIUM", flag: "https://cdn.prod.website-files.com/6141e3720a248d2024615d96/67e3e6ae1e19488131f26dfd_belgium_flag.png", href: "https://www.cleartax.com/be/en" },
+  { name: "JORDAN", flag: "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6a27ad811aee7102520dd245_Flag-Jordan.webp", href: "https://www.cleartax.com/jo/e-invoicing-software" },
 ];
 ---
 
@@ -216,6 +217,8 @@ const countries: CountryOption[] = [
                       href={c.href}
                       data-country={c.name}
                       data-flag={c.flag}
+                      target="_blank"
+                      rel="noopener noreferrer"
                       class="flex items-center gap-3 px-3 py-2.5 rounded-[10px] transition-colors duration-200 no-underline text-inherit hover:bg-[var(--color-gray-50,#f9fafb)]"
                     >
                       <span class="country-flag text-lg shrink-0 w-6 text-center"><img src={c.flag} alt={`${c.name} flag`} class="inline-block w-full h-auto align-middle max-h-[16px] object-contain" /></span>
@@ -460,6 +463,8 @@ const countries: CountryOption[] = [
               data-country-sheet-option
               data-country={c.name}
               data-flag={c.flag}
+              target="_blank"
+              rel="noopener noreferrer"
               class="flex items-center gap-3 px-3 py-3 rounded-[10px] transition-colors duration-200 no-underline text-inherit hover:bg-[var(--color-gray-50,#f9fafb)]"
             >
               <span class="country-flag text-lg shrink-0 w-6 text-center"><img src={c.flag} alt={`${c.name} flag`} class="inline-block w-full h-auto align-middle max-h-[16px] object-contain" /></span>
@@ -580,7 +585,14 @@ const countries: CountryOption[] = [
           if (currentLabel) currentLabel.textContent = name;
           countrySelector.classList.remove("active");
           const href = option.getAttribute("href");
-          if (href) window.location.href = href;
+          const target = option.getAttribute("target");
+          if (href) {
+            if (target === "_blank") {
+              window.open(href, "_blank");
+            } else {
+              window.location.href = href;
+            }
+          }
         });
       });
     }
@@ -594,7 +606,14 @@ const countries: CountryOption[] = [
           e.preventDefault();
           setSheetOpen(false);
           const href = option.getAttribute("href");
-          if (href) window.location.href = href;
+          const target = option.getAttribute("target");
+          if (href) {
+            if (target === "_blank") {
+              window.open(href, "_blank");
+            } else {
+              window.location.href = href;
+            }
+          }
         });
       });
     }
