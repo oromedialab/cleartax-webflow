@@ -1,70 +1,19 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<script>
-/**
- * BALANCED PERFORMANCE LOADER
- * Blocks only heavy JS to keep main-thread free. 
- * Allows CSS to load for better LCP.
- */
-(function() {
-    var interactionEvents = ['mouseover', 'keydown', 'touchmove', 'touchstart', 'wheel'];
-    var blockedScripts = [];
-    var observer = new MutationObserver(function(mutations) {
-        mutations.forEach(function(mutation) {
-            mutation.addedNodes.forEach(function(node) {
-                if (node.tagName === 'SCRIPT') {
-                    var src = node.src || '';
-                    if (src && /webflow|jquery|webfont|fonts\.googleapis|usercentrics|linkedin|smartlook|gtm/.test(src)) {
-                        blockedScripts.push({
-                            src: src,
-                            attrs: Array.from(node.attributes).reduce(function(a, b) { a[b.name] = b.value; return a; }, {})
-                        });
-                        node.parentNode.removeChild(node);
-                    }
-                }
-            });
-        });
-    });
-    observer.observe(document.documentElement, { childList: true, subtree: true });
+<!-- Google Tag Manager -->
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','GTM-P5NDQXGH');</script>
+<!-- End Google Tag Manager -->
 
-    function loadJS() {
-        if (window.__JS_LOADED) return;
-        window.__JS_LOADED = true;
-        observer.disconnect();
-        interactionEvents.forEach(function(e) { window.removeEventListener(e, loadJS); });
+<script src="https://web.cmp.usercentrics.eu/modules/autoblocker.js"></script>
+<script id="usercentrics-cmp" src="https://web.cmp.usercentrics.eu/ui/loader.js" data-settings-id="utqqyaEbvbzrTk" async></script>
 
-        // Load GTM
-        (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','GTM-MKPDH9');
+<meta content="noindex, nofollow" name="robots"/>
 
-        // Release Blocked Scripts
-        blockedScripts.forEach(function(s) {
-            var script = document.createElement('script');
-            Object.keys(s.attrs).forEach(function(k) { script.setAttribute(k, s.attrs[k]); });
-            script.async = true;
-            document.head.appendChild(script);
-        });
-
-        // Load Optimized Fonts, Images & Usercentrics
-        var f = document.createElement('link'); f.rel = 'stylesheet'; f.href = 'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@600;700;800&family=Playfair+Display:wght@700;800;900&display=swap'; document.head.appendChild(f);
-        var uc = document.createElement('script'); uc.src = "https://web.cmp.usercentrics.eu/ui/loader.js"; uc.setAttribute('data-settings-id', 'utqqyaEbvbzrTk'); uc.async = true; document.head.appendChild(uc);
-        document.querySelectorAll('img[data-src]').forEach(function(img) { img.src = img.dataset.src; });
-    }
-    interactionEvents.forEach(function(e) { window.addEventListener(e, loadJS, { once: true, passive: true }); });
-})();
-</script>
-
-<!-- Final Performance Optimization -->
-<link rel="preload" as="image" href="https://cdn.prod.website-files.com/6093bce33d9b4bae841b04e3/69f9c3a479daad914042df15_image%201.png" fetchpriority="high">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="preconnect" href="https://cdn.prod.website-files.com">
-<link rel="dns-prefetch" href="https://www.googletagmanager.com">
-
-<!-- ASYNC CSS LOADER (Non-blocking) -->
-<link rel="stylesheet" href="https://cdn.prod.website-files.com/6093bce33d9b4bae841b04e3/css/supportctx.webflow.shared.c32039b8f.min.css" media="print" onload="this.media='all'">
-
-<!-- CRITICAL WEBFLOW RESET (Inlined to prevent FOUC) -->
-<style>html{font-family:sans-serif;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%}body{margin:0}article,aside,details,figcaption,figure,footer,header,hgroup,main,menu,nav,section,summary{display:block}.w-container{max-width:940px;margin-left:auto;margin-right:auto}.w-container:after,.w-container:before{content:" ";display:table;grid-area:1/1/2/2}.w-container:after{clear:both}.w-row:after,.w-row:before{content:" ";display:table;grid-area:1/1/2/2}.w-row:after{clear:both}.w-row{margin-left:-10px;margin-right:-10px}.w-col{float:left;min-height:1px;padding-left:10px;padding-right:10px;position:relative;width:100%}@media screen and (max-width:991px){.w-container{max-width:728px}}.w-nav{background:#ddd;position:relative;z-index:1000}.w-nav:after,.w-nav:before{content:" ";display:table;grid-area:1/1/2/2}.w-nav:after{clear:both}.w-nav-brand{color:#333;float:left;position:relative;text-decoration:none}.w-nav-link{display:inline-block;margin-left:auto;margin-right:auto;padding:20px;position:relative;text-align:left;vertical-align:top}</style>
 
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -74,132 +23,45 @@
 <link rel="icon" type="image/png" sizes="256x256" href="https://cdn.prod.website-files.com/63ede4a3da6dbd8997c46450_256by256.png" />
 <link rel="apple-touch-icon" href="https://cdn.prod.website-files.com/63ede4a3da6dbd8997c46450_256by256.png" />
 
-<style>.w-webflow-badge { display: none !important; }</style>
-<script>
-(function(){
-  function strip(){
-    var n = document.body && document.body.firstChild;
-    while(n){
-      var next = n.nextSibling;
-      if(n.nodeType === 3 && /Last Published/i.test(n.textContent)) n.parentNode.removeChild(n);
-      n = next;
-    }
-  }
-  if(document.body) strip();
-  else document.addEventListener('DOMContentLoaded', strip);
-})();
-</script>
+<!-- DNS + preconnect ─────────────────────────────────────── -->
+<link rel="preconnect" href="https://cdn.prod.website-files.com" crossorigin>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="dns-prefetch" href="https://fonts.googleapis.com">
+<link rel="dns-prefetch" href="https://www.googletagmanager.com">
+
+<!-- LCP image preload ────────────────────────────────────── -->
+<link rel="preload" as="image" href="https://cdn.prod.website-files.com/6093bce33d9b4bae841b04e3/69e8784a9d2efaae7a88bb96_beyond-global.png" fetchpriority="high">
+
+<!-- Non-blocking font load (no render blocking) ──────────── -->
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" onload="this.onload=null;this.rel='stylesheet'">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"></noscript>
+
 <style>
+/* ── RESET ────────────────────────────────────────────────── */
+*,*::before,*::after{box-sizing:border-box}
+html{font-family:'Inter',system-ui,-apple-system,sans-serif;-webkit-text-size-adjust:100%;scroll-behavior:smooth}
+body{margin:0;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}
+img{max-width:100%;height:auto}
+
 /* ── NAVBAR ───────────────────────────────────────────────── */
-.ct-nav-wrap {
-  position: sticky;
-  top: 0;
-  z-index: 999;
-  background: #0B0F1A;
-  padding: 12px 24px;
-}
-.ct-nav {
-  max-width: 1200px;
-  margin: 0 auto;
-  background: #ffffff;
-  border-radius: 999px;
-  padding: 0 8px 0 28px;
-  height: 58px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  box-shadow: 0 2px 20px rgba(0,0,0,.22), 0 0 0 1px rgba(255,255,255,.06);
-}
-.ct-nav .nav-logo {
-  display: flex;
-  align-items: center;
-  flex-shrink: 0;
-}
-.ct-nav .nav-logo img {
-  height: 24px;
-  display: block;
-}
-.ct-nav .nav-logo-text {
-  font-family: 'Inter', sans-serif;
-  font-size: 20px;
-  font-weight: 800;
-  color: #1a1f2e;
-  letter-spacing: -.04em;
-}
-.ct-nav .nav-right {
-  display: flex;
-  align-items: center;
-  gap: 2px;
-}
-.ct-nav .nav-links {
-  display: flex;
-  align-items: center;
-  gap: 0;
-  list-style: none;
-  margin: 0;
-  padding: 0;
-}
-.ct-nav .nav-links li a {
-  font-family: 'Inter', sans-serif;
-  font-size: 14.5px;
-  font-weight: 500;
-  color: #3a3f52;
-  text-decoration: none;
-  padding: 8px 16px;
-  border-radius: 999px;
-  transition: background .15s, color .15s;
-  white-space: nowrap;
-  display: block;
-}
-.ct-nav .nav-links li a:hover {
-  background: #f2f3f7;
-  color: #0B0F1A;
-}
-.ct-nav .nav-register {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 11px 22px;
-  border-radius: 999px;
-  background: #6B21C8;
-  color: #fff;
-  font-family: 'Inter', sans-serif;
-  font-size: 14.5px;
-  font-weight: 700;
-  text-decoration: none;
-  transition: background .18s, transform .15s, box-shadow .18s;
-  box-shadow: 0 4px 18px rgba(107,33,200,.4);
-  white-space: nowrap;
-  margin-left: 8px;
-  letter-spacing: -.01em;
-}
-.ct-nav .nav-register:hover {
-  background: #7c2de8;
-  transform: translateY(-1px);
-  box-shadow: 0 8px 28px rgba(107,33,200,.55);
-}
-.ct-nav .nav-register .arr {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 22px;
-  height: 22px;
-  border-radius: 50%;
-  background: rgba(255,255,255,.18);
-  font-size: 13px;
-  flex-shrink: 0;
-}
-@media (max-width: 760px) {
-  .ct-nav .nav-links { display: none; }
-  .ct-nav { padding: 0 8px 0 20px; }
-  .ct-nav-wrap { padding: 10px 14px; }
-}
+.ct-nav-wrap{position:sticky;top:0;z-index:999;background:#0B0F1A;padding:12px 24px}
+.ct-nav{max-width:1200px;margin:0 auto;background:#fff;border-radius:999px;padding:0 8px 0 28px;height:58px;display:flex;align-items:center;justify-content:space-between;box-shadow:0 2px 20px rgba(0,0,0,.22),0 0 0 1px rgba(255,255,255,.06)}
+.ct-nav .nav-logo{display:flex;align-items:center;flex-shrink:0}
+.ct-nav .nav-logo img{height:24px;display:block}
+.ct-nav .nav-logo-text{font-family:'Inter',sans-serif;font-size:20px;font-weight:800;color:#1a1f2e;letter-spacing:-.04em}
+.ct-nav .nav-right{display:flex;align-items:center;gap:2px}
+.ct-nav .nav-links{display:flex;align-items:center;gap:0;list-style:none;margin:0;padding:0}
+.ct-nav .nav-links li a{font-family:'Inter',sans-serif;font-size:14.5px;font-weight:500;color:#3a3f52;text-decoration:none;padding:8px 16px;border-radius:999px;transition:background .15s,color .15s;white-space:nowrap;display:block}
+.ct-nav .nav-links li a:hover{background:#f2f3f7;color:#0B0F1A}
+.ct-nav .nav-register{display:inline-flex;align-items:center;gap:8px;padding:11px 22px;border-radius:999px;background:#6B21C8;color:#fff;font-family:'Inter',sans-serif;font-size:14.5px;font-weight:700;text-decoration:none;transition:background .18s,transform .15s,box-shadow .18s;box-shadow:0 4px 18px rgba(107,33,200,.4);white-space:nowrap;margin-left:8px;letter-spacing:-.01em}
+.ct-nav .nav-register:hover{background:#7c2de8;transform:translateY(-1px);box-shadow:0 8px 28px rgba(107,33,200,.55)}
+.ct-nav .nav-register .arr{display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:50%;background:rgba(255,255,255,.18);font-size:13px;flex-shrink:0}
+@media(max-width:760px){.ct-nav .nav-links{display:none}.ct-nav{padding:0 8px 0 20px}.ct-nav-wrap{padding:10px 14px}}
 
 /* ── BASE ─────────────────────────────────────────────────── */
-.bw *{box-sizing:border-box;word-break:normal !important;overflow-wrap:normal !important}
-.bw{font-family:'Inter',system-ui,-apple-system,sans-serif;color:#0B0F1A;line-height:1.55;font-size:16px}
+.bw *{box-sizing:border-box;word-break:normal!important;overflow-wrap:normal!important}
+.bw{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Inter',sans-serif;color:#0B0F1A;line-height:1.55;font-size:16px}
 .bw h1,.bw h2,.bw h3{font-family:'Inter',system-ui,-apple-system,sans-serif;letter-spacing:-.02em;margin:0}
-.spk-main,.spk-card,.spk-right,.spk-logo-card,.spk-right-head{font-family:'Inter',system-ui,-apple-system,sans-serif}
 .bw .wrap{max-width:1140px;margin:0 auto;padding:0 20px}
 .bw a{color:inherit;text-decoration:none}
 .bw .btn{display:inline-flex;align-items:center;gap:8px;padding:12px 18px;border-radius:10px;font-weight:600;font-size:14.5px;cursor:pointer;border:0;transition:transform .15s,box-shadow .15s}
@@ -209,22 +71,11 @@
 .bw .ghost:hover{background:rgba(255,255,255,.14)}
 .bw .acc{background:#C9A961;color:#0A1A33;font-weight:700;box-shadow:0 14px 34px rgba(201,169,97,.28);width:100%;justify-content:center}
 .bw .hero{min-height:500px;background:radial-gradient(900px 500px at 85% -10%,rgba(201,169,97,.18),transparent 60%),radial-gradient(700px 500px at 0% 110%,rgba(60,110,200,.18),transparent 55%),linear-gradient(180deg,#061023 0%,#0A1A33 55%,#0D2247 100%);color:#fff;padding:48px 0 100px;position:relative;overflow:hidden}
-/* .bw .hero::before{content:'';position:absolute;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");opacity:.4;pointer-events:none} */
 .bw .hero-logo-block{display:flex;flex-direction:column;align-items:flex-start;gap:0;margin-bottom:36px}
 .bw .beyond-logo{display:inline-block}
-.bw .beyond-logo img{height:52px;width:auto;display:block;filter:drop-shadow(0 4px 14px rgba(201,169,97,.18))}
+.bw .beyond-logo img{height:52px!important;width:auto!important;display:block;filter:drop-shadow(0 4px 14px rgba(201,169,97,.18))}
 @media(max-width:600px){.bw .beyond-logo img{height:38px}}
-.bw .hero-badge{
-  display:inline-flex;align-items:center;gap:8px;
-  padding:6px 14px 6px 10px;
-  border-radius:999px;
-  background:rgba(201,169,97,.08);
-  border:1px solid rgba(201,169,97,.25);
-  color:#C9A961;
-  font-size:11.5px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;
-  margin-top:24px;
-  backdrop-filter:blur(8px);
-}
+.bw .hero-badge{display:inline-flex;align-items:center;gap:8px;padding:6px 14px 6px 10px;border-radius:999px;background:rgba(201,169,97,.08);border:1px solid rgba(201,169,97,.25);color:#C9A961;font-size:11.5px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;margin-top:24px;backdrop-filter:blur(8px)}
 .bw .hero-badge .dot{width:6px;height:6px;border-radius:50%;background:#C9A961;box-shadow:0 0 0 3px rgba(201,169,97,.22);flex-shrink:0;animation:pulse-dot 2s infinite}
 .bw .eyb{display:inline-flex;align-items:center;gap:10px;padding:6px 12px;border-radius:999px;background:rgba(201,169,97,.1);border:1px solid rgba(201,169,97,.3);color:#C9A961;font-size:12.5px;font-weight:600;letter-spacing:.08em;text-transform:uppercase}
 .bw .eyb .dt{width:7px;height:7px;border-radius:50%;background:#C9A961;box-shadow:0 0 0 4px rgba(201,169,97,.18)}
@@ -260,9 +111,9 @@
 .bw .ben p{margin:0;color:#4a5566;font-size:15px}
 .bw .agenda{background:#fff}
 .bw .aw{max-width:1060px;margin:0 auto}
-.bw .arow{display:grid !important;grid-template-columns:190px 155px 1fr !important;gap:24px !important;padding:20px 0;border-top:1px solid #EEF1F7;align-items:flex-start;width:100% !important}
+.bw .arow{display:grid!important;grid-template-columns:190px 155px 1fr!important;gap:24px!important;padding:20px 0;border-top:1px solid #EEF1F7;align-items:flex-start;width:100%!important}
 .bw .arow:first-child{border-top:0}
-.bw .arow > div:last-child{min-width:0;overflow-wrap:break-word}
+.bw .arow>div:last-child{min-width:0;overflow-wrap:break-word}
 .bw .atime{font-weight:700;font-size:15px;white-space:nowrap}
 .bw .pil{display:inline-block;padding:5px 10px;border-radius:999px;font-size:12px;font-weight:600;background:#FAF3E3;color:#8A6A00;border:1px solid #F3E3B5;white-space:nowrap}
 .bw .pil.brk{background:#FFF4E5;color:#B8531B;border-color:#FFDDB2}
@@ -271,15 +122,13 @@
 .bw .pil.key{background:#FFEBE6;color:#A3371A;border-color:#FFCCBE}
 .bw .pil.fir{background:#FFF8D9;color:#8A6A00;border-color:#FBE8A8}
 .bw .pil.prt{background:#E3F0FF;color:#1A4FA3;border-color:#B8D4FA}
-.bw .atitle{font-weight:700;font-size:16px;margin:0 0 6px;white-space:normal !important;word-break:normal !important;overflow-wrap:normal !important;word-wrap:normal !important}
-.bw .adesc{color:#556173;font-size:14.5px;margin:0;white-space:normal !important;word-break:normal !important;overflow-wrap:normal !important;word-wrap:normal !important}
-.bw .arow > div{word-break:normal !important;overflow-wrap:normal !important;white-space:normal !important}
-.bw .arow > div > *{word-break:normal !important;overflow-wrap:normal !important}
-.bw .aspk{margin-top:8px;list-style:none;padding:0;}
+.bw .atitle{font-weight:700;font-size:16px;margin:0 0 6px;white-space:normal!important;word-break:normal!important;overflow-wrap:normal!important}
+.bw .adesc{color:#556173;font-size:14.5px;margin:0}
+.bw .aspk{margin-top:8px;list-style:none;padding:0}
 .bw .aspk li{color:#556173;font-size:14px;padding:2px 0;display:flex;align-items:flex-start;gap:6px}
 .bw .aspk li::before{content:'•';color:#C9A961;font-weight:700;flex-shrink:0;margin-top:1px}
 
-/* ── SPEAKERS SECTION ─────────────────────────────────────── */
+/* ── SPEAKERS ─────────────────────────────────────────────── */
 .spk-main{background:linear-gradient(160deg,#07111F 0%,#0C1E38 50%,#0E2345 100%);padding:88px 0;position:relative;overflow:hidden}
 .spk-main::before{content:'';position:absolute;inset:0;background:radial-gradient(600px 400px at 80% 20%,rgba(201,169,97,.1),transparent 60%),radial-gradient(500px 400px at 10% 80%,rgba(60,100,200,.1),transparent 60%);pointer-events:none}
 .spk-main .shead{text-align:left;margin-bottom:0}
@@ -287,23 +136,26 @@
 .spk-main .shead .kick{color:#C9A961}
 .spk-main-inner{display:grid;grid-template-columns:1.3fr 0.7fr;gap:48px;align-items:flex-start}
 .spk-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:36px}
-.spk-card{background:rgba(255,255,255,.04);border:1px solid rgba(201,169,97,.18);border-radius:16px;padding:20px 16px;text-align:center;transition:transform .2s,border-color .2s,background .2s}
+.spk-card{background:rgba(255,255,255,.04);border:1px solid rgba(201,169,97,.18);border-radius:16px;padding:20px 16px;text-align:center;transition:transform .2s,border-color .2s,background .2s;font-family:'Inter',sans-serif}
 .spk-card:hover{transform:translateY(-4px);border-color:rgba(201,169,97,.42);background:rgba(201,169,97,.06)}
 .spk-card .spk-img-wrap{width:80px;height:80px;border-radius:50%;margin:0 auto 12px;overflow:hidden;border:2px solid rgba(201,169,97,.35);box-shadow:0 8px 24px rgba(0,0,0,.35)}
 .spk-card .spk-img-wrap img{width:100%;height:100%;object-fit:cover;object-position:top}
-.spk-card .spk-name{font-family:'Inter',sans-serif;font-weight:700;font-size:14px;color:#fff;margin:0 0 4px;line-height:1.3}
+.spk-card .spk-img-wrap.placeholder{display:flex;align-items:center;justify-content:center;background:rgba(201,169,97,.12);color:#C9A961;font-size:24px;font-weight:700}
+.spk-card .spk-name{font-weight:700;font-size:14px;color:#fff;margin:0 0 4px;line-height:1.3}
 .spk-card .spk-role{font-size:12px;color:#C9A961;font-weight:600;margin:0 0 3px;line-height:1.3}
 .spk-card .spk-company{font-size:11.5px;color:#8a94a8;line-height:1.3}
-.spk-right{margin-top:36px}
-.spk-right-head{font-family:'Inter',sans-serif;font-size:28px;font-weight:800;color:#fff;line-height:1.2;margin-bottom:6px}
+.spk-right{margin-top:36px;font-family:'Inter',sans-serif}
+.spk-right-head{font-size:28px;font-weight:800;color:#fff;line-height:1.2;margin-bottom:6px}
 .spk-right-head em{color:#C9A961;font-style:normal}
 .spk-right-sub{font-size:14px;color:#7a8fa8;margin-bottom:24px;margin-top:4px}
 .spk-right-divider{width:40px;height:3px;background:#C9A961;border-radius:2px;margin-bottom:24px}
 .spk-logo-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}
-.spk-logo-card{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:14px 12px;display:flex;flex-direction:column;align-items:center;gap:8px;transition:border-color .2s,background .2s}
+.spk-logo-card{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:14px 12px;display:flex;flex-direction:column;align-items:center;gap:8px;transition:border-color .2s,background .2s;font-family:'Inter',sans-serif}
 .spk-logo-card:hover{border-color:rgba(201,169,97,.3);background:rgba(201,169,97,.05)}
 .spk-logo-card img{height:36px;width:auto;max-width:90px;object-fit:contain;filter:grayscale(20%) brightness(1.1)}
 .spk-logo-card span{font-size:11px;font-weight:600;color:#8a94a8;text-align:center;line-height:1.3}
+.spk-logo-card.text-only{justify-content:center;min-height:64px}
+.spk-logo-card.text-only span{font-size:12px;font-weight:700;color:#fff;letter-spacing:0.02em}
 .spk-more{margin-top:14px;font-size:12.5px;color:#C9A961;font-weight:600;letter-spacing:.08em;display:flex;align-items:center;gap:6px}
 .spk-more::before{content:'——';letter-spacing:-2px;opacity:.6}
 .bw .cta{color:#fff;background:radial-gradient(700px 400px at 90% 10%,rgba(201,169,97,.22),transparent 60%),radial-gradient(800px 500px at 0% 100%,rgba(60,110,200,.22),transparent 60%),linear-gradient(135deg,#0A1A33,#061023)}
@@ -321,38 +173,42 @@
 .bw .mobile-wrap{display:flex;gap:8px}
 .bw .mobile-wrap select{width:110px;flex-shrink:0}
 .bw .mobile-wrap input{flex:1}
-/* ── CLEARTAX-STYLE FOOTER ────────────────────────────────── */
-.ct-footer{background:#0D0D0D;color:#b8c0d2;padding:56px 0 0}
-.ct-footer .ft-inner{max-width:1140px;margin:0 auto;padding:0 20px}
-.ct-footer .ft-grid{display:grid;grid-template-columns:2fr 1fr 1fr 1fr 1fr;gap:40px;padding-bottom:48px;border-bottom:1px solid rgba(255,255,255,.08)}
-.ct-footer .ft-brand img{height:28px;display:block;filter:brightness(0) invert(1)}
-.ct-footer .ft-brand p{margin-top:14px;font-size:13.5px;color:#7a8499;line-height:1.6;max-width:300px}
-.ct-footer .ft-addr{margin-top:14px;font-size:13px;color:#6a7385;line-height:1.6}
-.ct-footer .ft-social{display:flex;gap:10px;margin-top:18px}
-.ct-footer .ft-social a{width:34px;height:34px;border-radius:8px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.1);display:grid;place-items:center;color:#9aa5ba;font-size:14px;text-decoration:none;transition:background .15s,color .15s}
-.ct-footer .ft-social a:hover{background:rgba(201,169,97,.15);color:#C9A961;border-color:rgba(201,169,97,.3)}
-.ct-footer .ft-col h5{font-family:'Inter',sans-serif;font-size:12px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:#fff;margin:0 0 16px}
-.ct-footer .ft-col a{display:block;font-size:13.5px;color:#8a94a8;text-decoration:none;margin-bottom:10px;transition:color .15s}
-.ct-footer .ft-col a:hover{color:#C9A961}
-.ct-footer .ft-bottom{padding:20px 0;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px}
-.ct-footer .ft-bottom-left{font-size:13px;color:#555e70}
-.ct-footer .ft-bottom-left strong{display:block;font-size:11.5px;font-weight:700;letter-spacing:.05em;color:#444d5e;text-transform:uppercase;margin-bottom:4px}
-.ct-footer .ft-bottom-right{display:flex;align-items:center;gap:20px}
-.ct-footer .ft-bottom-right a{font-size:13px;color:#555e70;text-decoration:none;transition:color .15s}
-.ct-footer .ft-bottom-right a:hover{color:#9aa5ba}
-.ct-footer .ft-badges{display:flex;align-items:center;gap:14px}
-.ct-footer .badge-item{display:flex;align-items:center;gap:8px;padding:6px 12px;border-radius:8px;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.04)}
-.ct-footer .badge-item .badge-icon{width:28px;height:28px;border-radius:50%;border:1px solid rgba(255,255,255,.2);display:grid;place-items:center;font-size:11px;font-weight:800;color:#9aa5ba}
-.ct-footer .badge-item .badge-text{font-size:11px;color:#7a8499;line-height:1.3}
-.ct-footer .badge-item .badge-text strong{display:block;color:#9aa5ba;font-weight:700}
+
+/* ── FOOTER ──────────────────────────────────────────────── */
+.ct-footer{background:#111;color:#b8c0d2;padding:52px 0 0;font-family:'Inter',sans-serif}
+.ct-footer .ft-inner{max-width:1200px;margin:0 auto;padding:0 40px}
+.ct-footer .ft-grid{display:grid;grid-template-columns:1.4fr 1fr 1.8fr 1.2fr;gap:48px;padding-bottom:48px;border-bottom:1px solid rgba(255,255,255,.08)}
+.ct-footer .ft-brand-logo{height:30px;display:block;margin-bottom:24px}
+.ct-footer .ft-follow-label{font-size:13px;font-weight:600;color:#fff;margin-bottom:12px}
+.ct-footer .ft-li-btn{display:inline-flex;align-items:center;justify-content:center;width:38px;height:38px;border-radius:7px;background:#1a6bc5;color:#fff;text-decoration:none;transition:background .15s}
+.ct-footer .ft-li-btn:hover{background:#2278d8}
+.ct-footer .ft-col h5{font-size:13px;font-weight:700;color:#fff;margin:0 0 18px;letter-spacing:0}
+.ct-footer .ft-col a{display:block;font-size:13.5px;color:#9aa5ba;text-decoration:none;margin-bottom:11px;transition:color .15s;line-height:1.4}
+.ct-footer .ft-col a:hover{color:#fff}
+.ct-footer .ft-col h5.arabic-head{margin-top:22px}
+.ct-footer .ft-col a.arabic-link{direction:rtl;text-align:right;font-size:13px}
+.ct-footer .ft-bottom{padding:22px 0 28px;display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:18px}
+.ct-footer .ft-bottom-left{font-size:13px;color:#666;line-height:1.7}
+.ct-footer .ft-bottom-left a{color:#666;text-decoration:none;margin-right:18px;transition:color .15s}
+.ct-footer .ft-bottom-left a:hover{color:#aaa}
+.ct-footer .ft-bottom-left .ft-addr{margin-top:4px;font-size:12.5px;color:#555}
+.ct-footer .ft-badges{display:flex;align-items:center;gap:10px}
+.ct-footer .ft-badges img{height:52px;width:auto;opacity:.92;transition:opacity .15s}
+.ct-footer .ft-badges img:hover{opacity:1}
+.ct-footer .ft-security-note{font-size:12px;color:#555;text-align:right;margin-top:8px}
+
+/* Responsive */
 @media(max-width:900px){
-  .bw .agrid,.bw .ci,.ct-footer .ft-grid{grid-template-columns:1fr}
+  .bw .agrid,.bw .ci{grid-template-columns:1fr}
+  .ct-footer .ft-grid{grid-template-columns:1fr 1fr}
   .bw .bens{grid-template-columns:1fr}
   .bw .meta{grid-template-columns:repeat(2,1fr)}
   .bw section{padding:64px 0}
   .bw .arow{grid-template-columns:1fr;gap:8px}
   .bw .fr{grid-template-columns:1fr}
   .ct-footer .ft-bottom{flex-direction:column;align-items:flex-start}
+  .ct-footer .ft-badges{justify-content:flex-start}
+  .ct-footer .ft-security-note{text-align:left}
   .spk-main-inner{grid-template-columns:1fr}
   .spk-grid{grid-template-columns:repeat(2,1fr)}
   .spk-logo-grid{grid-template-columns:repeat(3,1fr)}
@@ -360,40 +216,31 @@
 @media(max-width:560px){
   .spk-grid{grid-template-columns:repeat(2,1fr)}
   .spk-logo-grid{grid-template-columns:repeat(2,1fr)}
+  .ct-footer .ft-grid{grid-template-columns:1fr}
+  .ct-footer .ft-inner{padding:0 20px}
 }
+
 /* Horizontal Scroll for Agenda */
-.agenda-scroll-container {
-  width: 100%;
-  overflow-x: auto;
-  -webkit-overflow-scrolling: touch;
+.agenda-scroll-container{width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch}
+@media(max-width:900px){
+  .bw .arow{grid-template-columns:140px 130px 1fr!important;min-width:750px;gap:16px!important}
 }
-@media(max-width: 900px) {
-  .bw .arow {
-    grid-template-columns: 140px 130px 1fr !important;
-    min-width: 750px;
-    gap: 16px !important;
-  }
-}
+
 @keyframes pulse-dot{0%,100%{box-shadow:0 0 0 3px rgba(201,169,97,.22)}50%{box-shadow:0 0 0 6px rgba(201,169,97,.08)}}
+.w-webflow-badge{display:none!important}
 </style>
 </head>
-
 <body>
-<!-- Google Tag Manager (noscript) deferred -->
-<script>
-window.addEventListener('DOMContentLoaded', function() {
-    var ns = document.createElement('noscript');
-    ns.innerHTML = '<iframe src="https://www.googletagmanager.com/ns.html?id=GTM-P5NDQXGH" height="0" width="0" style="display:none;visibility:hidden"></iframe>';
-    // We don't actually need to append this for SEO or performance if we are using the JS version, 
-    // but we'll keep the logic deferred.
-});
-</script>
+<!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-P5NDQXGH"
+height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<!-- End Google Tag Manager (noscript) -->
 
 <!-- ── NAVBAR ─────────────────────────────────────────────── -->
 <div class="ct-nav-wrap">
   <nav class="ct-nav">
     <div class="nav-logo">
-      <img src="https://cdn.prod.website-files.com/6093bce33d9b4bae841b04e3/69f9c316ad6a9e6874073bf6_logo%201.png" data-src="https://assets1.cleartax-cdn.com/finfo/wg-utils/retool/d9f36ac3-77a9-40c6-94fc-20c2e3855457.svg" alt="ClearTax" width="120" height="24"
+      <img src="https://cdn.prod.website-files.com/6093bce33d9b4bae841b04e3/69dfcff6071b983201f5f097_logo-cleartax.svg" alt="ClearTax" width="120" height="24" decoding="async"
            onerror="this.style.display='none';this.nextSibling.style.display='inline'">
       <span class="nav-logo-text" style="display:none">cleartax</span>
     </div>
@@ -416,16 +263,16 @@ window.addEventListener('DOMContentLoaded', function() {
   <div class="wrap">
     <div class="hero-logo-block">
       <div class="beyond-logo" aria-label="Beyond Global by ClearTax">
-        <img src="https://cdn.prod.website-files.com/6093bce33d9b4bae841b04e3/69f9c3a479daad914042df15_image%201.png" data-src="https://cdn.prod.website-files.com/6093bce33d9b4bae841b04e3/69e8784a9d2efaae7a88bb96_beyond-global.png" alt="Beyond Global by ClearTax" width="240" height="52" fetchpriority="high" />
+        <img src="https://cdn.prod.website-files.com/6093bce33d9b4bae841b04e3/69e8784a9d2efaae7a88bb96_beyond-global.png" alt="Beyond Global by ClearTax" fetchpriority="high" />
       </div>
       <span class="hero-badge"><span class="dot"></span>UAE · Dubai Chapter · 2026</span>
     </div>
     <h1>UAE E-Invoicing as a <span class="grad">Tax Transformation Lever</span></h1>
     <p class="sub">An exclusive invite-only roundtable for CFOs, Tax Heads, and Finance leaders navigating the UAE e-invoicing mandate.</p>
     <div class="meta">
-      <div class="mc"><div class="ml">Date</div><div class="mv">May 7, 2026</div></div>
+      <div class="mc"><div class="ml">Date</div><div class="mv">June 18, 2026</div></div>
       <div class="mc"><div class="ml">Time</div><div class="mv">8:30 AM – 1:30 PM GST</div></div>
-      <div class="mc"><div class="ml">Location</div><div class="mv">Dusit Thani Dubai, UAE</div></div>
+      <div class="mc"><div class="ml">Location</div><div class="mv">Dusit Thani, Dubai, UAE</div></div>
       <div class="mc"><div class="ml">Format</div><div class="mv">In-person · Invite-only</div></div>
     </div>
     <div class="cta-row">
@@ -447,7 +294,7 @@ window.addEventListener('DOMContentLoaded', function() {
       </div>
       <div class="avis">
         <div style="font-size:12px;letter-spacing:.22em;text-transform:uppercase;color:#C9A961;font-weight:600">A ClearTax Roundtable</div>
-        <div style="font-family:'Inter', Georgia, serif;font-weight:800;font-size:40px;line-height:1;margin-top:10px;color:#C9A961">beyond</div>
+        <div style="font-family:'Inter',Georgia,serif;font-weight:800;font-size:40px;line-height:1;margin-top:10px;color:#C9A961">beyond</div>
         <div style="color:#C9A961;letter-spacing:9px;font-size:11px;margin-top:4px">GLOBAL</div>
         <div style="color:#c2ccde;margin-top:14px">Dubai Chapter · 2026</div>
         <div class="stats">
@@ -464,136 +311,179 @@ window.addEventListener('DOMContentLoaded', function() {
   </div>
 </section>
 
-
-
-<!-- ── SPEAKERS SECTION (after About, before Benefits) ───── -->
+<!-- SPEAKERS -->
 <section id="speakers" class="spk-main">
-    <div class="wrap">
-      <div style="margin-bottom:0">
-        <div style="color:#C9A961;font-weight:700;text-transform:uppercase;letter-spacing:.18em;font-size:12.5px">Speakers</div>
-        <h2 style="font-size:clamp(28px,3.4vw,40px);color:#fff;margin-top:10px;letter-spacing:-.02em">UAE &amp; global tax-tech leaders</h2>
-      </div>
-      <div class="spk-main-inner">
-      <!-- Left: Speaker cards -->
+  <div class="wrap">
+    <div style="margin-bottom:0">
+      <div style="color:#C9A961;font-weight:700;text-transform:uppercase;letter-spacing:.18em;font-size:12.5px">Speakers</div>
+      <h2 style="font-size:clamp(28px,3.4vw,40px);color:#fff;margin-top:10px;letter-spacing:-.02em">UAE &amp; global tax-tech leaders</h2>
+    </div>
+    <div class="spk-main-inner">
       <div>
-        <div style="font-size:13px;color:#7a8fa8;margin-top:6px;margin-bottom:0">On stage at Dubai · May 2026</div>
+        <div style="font-size:13px;color:#7a8fa8;margin-top:6px;margin-bottom:0">On stage at Dubai · June 2026</div>
         <div class="spk-grid">
           <div class="spk-card">
-            <div class="spk-img-wrap"><img src="https://cdn.prod.website-files.com/6093bce33d9b4bae841b04e3/69f9c316ad6a9e6874073bf6_logo%201.png" data-src="https://cdn.prod.website-files.com/6093bce33d9b4bae841b04e3/69eb4cf66ea396a8ca1567fa_Ankur%20Jain%20Final%20(1).jpg" alt="Ankur Jain" width="80" height="80" loading="lazy" decoding="async"></div>
-            <div class="spk-name">Ankur Jain</div>
-            <div class="spk-role">Partner – Tax</div>
-            <div class="spk-company">MMJS Consulting</div>
+            <div class="spk-img-wrap"><img src="https://cdn.prod.website-files.com/6093bce33d9b4bae841b04e3/6a26901c552736c94e5ce279_archit-gupta.png" alt="Archit Gupta" width="80" height="80" loading="lazy" decoding="async"></div>
+            <div class="spk-name">Archit Gupta</div>
+            <div class="spk-role">Founder and CEO</div>
+            <div class="spk-company">ClearTax</div>
           </div>
           <div class="spk-card">
-            <div class="spk-img-wrap"><img src="https://cdn.prod.website-files.com/6093bce33d9b4bae841b04e3/69f9c316ad6a9e6874073bf6_logo%201.png" data-src="https://cdn.prod.website-files.com/6093bce33d9b4bae841b04e3/69eb4cf434f3c3614f012f6d_Harsh%20Kedia%20(2).png" alt="Harsh Kedia" width="80" height="80" loading="lazy" decoding="async"></div>
-            <div class="spk-name">Harsh Kedia</div>
-            <div class="spk-role">Head of Tax</div>
-            <div class="spk-company">United Arab Bank</div>
+            <div class="spk-img-wrap"><img src="https://cdn.prod.website-files.com/6093bce33d9b4bae841b04e3/6a2689a71e1c5b9e41e26636_jawad_shafiq.png" alt="Jawad Shafiq" width="80" height="80" loading="lazy" decoding="async"></div>
+            <div class="spk-name">Jawad Shafiq</div>
+            <div class="spk-role">Group Chief Financial Officer</div>
+            <div class="spk-company">Vitatech Group</div>
           </div>
           <div class="spk-card">
-            <div class="spk-img-wrap"><img src="https://cdn.prod.website-files.com/6093bce33d9b4bae841b04e3/69f9c316ad6a9e6874073bf6_logo%201.png" data-src="https://cdn.prod.website-files.com/6093bce33d9b4bae841b04e3/69eb4cf354053da1ba98d9c9_Amar%20Mehra%20(1).png" alt="Amar Mehra" width="80" height="80" loading="lazy" decoding="async"></div>
-            <div class="spk-name">Amar Mehra</div>
-            <div class="spk-role">Head of Tax</div>
-            <div class="spk-company">Kaplan MENA</div>
+            <div class="spk-img-wrap"><img src="https://cdn.prod.website-files.com/6093bce33d9b4bae841b04e3/6a2689ac691c69495d35a78e_vaibhav_j.png" alt="Vaibhav J." width="80" height="80" loading="lazy" decoding="async"></div>
+            <div class="spk-name">Vaibhav J.</div>
+            <div class="spk-role">Senior Director Internal Audit</div>
+            <div class="spk-company">Americana Foods</div>
           </div>
           <div class="spk-card">
-            <div class="spk-img-wrap"><img src="https://cdn.prod.website-files.com/6093bce33d9b4bae841b04e3/69f9c316ad6a9e6874073bf6_logo%201.png" data-src="https://cdn.prod.website-files.com/6093bce33d9b4bae841b04e3/69eb4cf3a994a78a2227f53a_Ghulam%20S..png" alt="Ghulam Sabir" width="80" height="80" loading="lazy" decoding="async"></div>
-            <div class="spk-name">Ghulam Sabir</div>
-            <div class="spk-role">Group CFO</div>
-            <div class="spk-company">SB Group International</div>
+            <div class="spk-img-wrap"><img src="https://cdn.prod.website-files.com/6093bce33d9b4bae841b04e3/6a2689a7c62c4449fd4f4e32_marwan_chkablo.png" alt="Marwan Chbaklo" width="80" height="80" loading="lazy" decoding="async"></div>
+            <div class="spk-name">Marwan Chbaklo</div>
+            <div class="spk-role">Director of Finance and Investment</div>
+            <div class="spk-company">MEDIN</div>
           </div>
           <div class="spk-card">
-            <div class="spk-img-wrap"><img src="https://cdn.prod.website-files.com/6093bce33d9b4bae841b04e3/69f9c316ad6a9e6874073bf6_logo%201.png" data-src="https://cdn.prod.website-files.com/6093bce33d9b4bae841b04e3/69eb4cf3802675c8cb357a41_Nitin.png" alt="Nitin Agarwal" width="80" height="80" loading="lazy" decoding="async"></div>
+            <div class="spk-img-wrap"><img src="https://cdn.prod.website-files.com/6093bce33d9b4bae841b04e3/6a2689a8b8121ce29e39fe20_naresh_vadditandra.png" alt="Naresh Vadditandra" width="80" height="80" loading="lazy" decoding="async"></div>
+            <div class="spk-name">Naresh Vadditandra</div>
+            <div class="spk-role">Senior Director Business Transformation</div>
+            <div class="spk-company">DAMAC Properties</div>
+          </div>
+          <div class="spk-card">
+            <div class="spk-img-wrap"><img src="https://cdn.prod.website-files.com/6093bce33d9b4bae841b04e3/6a2689a722a065761cfcca91_akhil_kejriwal.png" alt="Akhil Kejriwal" width="80" height="80" loading="lazy" decoding="async"></div>
+            <div class="spk-name">Akhil Kejriwal</div>
+            <div class="spk-role">Chief Financial Officer</div>
+            <div class="spk-company">Green Metal Industries</div>
+          </div>
+          <div class="spk-card">
+            <div class="spk-img-wrap"><img src="https://cdn.prod.website-files.com/6093bce33d9b4bae841b04e3/69eb4cf3802675c8cb357a41_Nitin.png" alt="Nitin Agarwal" width="80" height="80" loading="lazy" decoding="async"></div>
             <div class="spk-name">Nitin Agarwal</div>
-            <div class="spk-role">Director, Indirect Tax Ops</div>
-            <div class="spk-company">Majid AL Futtaim</div>
+            <div class="spk-role">Director Indirect Tax Operations</div>
+            <div class="spk-company">Majid Al Futtaim</div>
           </div>
           <div class="spk-card">
-            <div class="spk-img-wrap"><img src="https://cdn.prod.website-files.com/6093bce33d9b4bae841b04e3/69f9c316ad6a9e6874073bf6_logo%201.png" data-src="https://cdn.prod.website-files.com/6093bce33d9b4bae841b04e3/69eb4ceec1876548f7390d33_Ali%20Abouda%20(2).png" alt="Ali Abouda" width="80" height="80" loading="lazy" decoding="async"></div>
-            <div class="spk-name">Ali Abouda</div>
-            <div class="spk-role">Industry Expert</div>
-            <div class="spk-company"> </div>
-          </div>
-          <div class="spk-card" style="grid-column:span 1">
-            <div class="spk-img-wrap"><img src="https://cdn.prod.website-files.com/6093bce33d9b4bae841b04e3/69f9c316ad6a9e6874073bf6_logo%201.png" data-src="https://cdn.prod.website-files.com/6093bce33d9b4bae841b04e3/69eb503cd10a93479ed85980_Rishabh%20(1)%20(2).jpg" alt="Rishabh Tandon" width="80" height="80" loading="lazy" decoding="async"></div>
-            <div class="spk-name">Rishabh Tandon</div>
-            <div class="spk-role">Associate Partner – Indirect Tax</div>
-            <div class="spk-company">MMJS Consulting</div>
+            <div class="spk-img-wrap"><img src="https://cdn.prod.website-files.com/6093bce33d9b4bae841b04e3/6a2689a79c1d67e7d8373e15_naveen_sharma.png" alt="Naveen Sharma" width="80" height="80" loading="lazy" decoding="async"></div>
+            <div class="spk-name">Naveen Sharma</div>
+            <div class="spk-role">Director - Internal Audit & Taxation</div>
+            <div class="spk-company">Oasis Investment Company</div>
           </div>
           <div class="spk-card">
-            <div class="spk-img-wrap"><img src="https://cdn.prod.website-files.com/6093bce33d9b4bae841b04e3/69f9c316ad6a9e6874073bf6_logo%201.png" data-src="https://cdn.prod.website-files.com/6093bce33d9b4bae841b04e3/69f2fe845afbd045c3c8676c_image.png" alt="Ritwika Chowdhury" width="80" height="80" loading="lazy" decoding="async"></div>
+            <div class="spk-img-wrap"><img src="https://cdn.prod.website-files.com/6093bce33d9b4bae841b04e3/6a2689a704d7e5984aa62741_moynul_islam.png" alt="Moynul Islam" width="80" height="80" loading="lazy" decoding="async"></div>
+            <div class="spk-name">Moynul Islam</div>
+            <div class="spk-role">Group Head of Tax</div>
+            <div class="spk-company">Unifrutti Group</div>
+          </div>
+          <div class="spk-card">
+            <div class="spk-img-wrap"><img src="https://cdn.prod.website-files.com/6093bce33d9b4bae841b04e3/6a2689a6563d93a2d27404be_fuad_shahin.png" alt="Fuad Shahin" width="80" height="80" loading="lazy" decoding="async"></div>
+            <div class="spk-name">Fuad Shahin</div>
+            <div class="spk-role">Head of Tax</div>
+            <div class="spk-company">DHL</div>
+          </div>
+          <div class="spk-card">
+            <div class="spk-img-wrap"><img src="https://cdn.prod.website-files.com/6093bce33d9b4bae841b04e3/6a2689a817a2bfa17b3cae1b_swati_thakur.png" alt="Swati Thakur" width="80" height="80" loading="lazy" decoding="async"></div>
+            <div class="spk-name">Swati Thakur</div>
+            <div class="spk-role">Global Tax Head</div>
+            <div class="spk-company">Gradiant</div>
+          </div>
+          <div class="spk-card">
+            <div class="spk-img-wrap"><img src="https://cdn.prod.website-files.com/6093bce33d9b4bae841b04e3/6a2689a73a1922e703003535_nimish_makvana.png" alt="Nimish Makvana" width="80" height="80" loading="lazy" decoding="async"></div>
+            <div class="spk-name">Nimish Makvana</div>
+            <div class="spk-role">Founder and Managing Partner</div>
+            <div class="spk-company">One X Global</div>
+          </div>
+          <div class="spk-card">
+            <div class="spk-img-wrap"><img src="https://cdn.prod.website-files.com/6093bce33d9b4bae841b04e3/6a2689a63c7887f17d793753_himanshu_tanna.png" alt="Himanshu Tanna" width="80" height="80" loading="lazy" decoding="async"></div>
+            <div class="spk-name">Himanshu Tanna</div>
+            <div class="spk-role">Head of Group Tax</div>
+            <div class="spk-company">Imtiaz Developments</div>
+          </div>
+          <div class="spk-card">
+            <div class="spk-img-wrap"><img src="https://cdn.prod.website-files.com/6093bce33d9b4bae841b04e3/6a2689a7fccf0c150a4c3c3b_khalil_alamad.png" alt="Khalil AlAmad" width="80" height="80" loading="lazy" decoding="async"></div>
+            <div class="spk-name">Khalil AlAmad</div>
+            <div class="spk-role">Head of Finance</div>
+            <div class="spk-company">KONE</div>
+          </div>
+          <div class="spk-card">
+            <div class="spk-img-wrap"><img src="https://cdn.prod.website-files.com/6093bce33d9b4bae841b04e3/6a2689a865f2eec5a9f63f79_seema_sharma.png" alt="Seema Sharma" width="80" height="80" loading="lazy" decoding="async"></div>
+            <div class="spk-name">Seema Sharma</div>
+            <div class="spk-role">Group Head of Tax and ESG</div>
+            <div class="spk-company">Network International</div>
+          </div>
+          <div class="spk-card">
+            <div class="spk-img-wrap"><img src="https://cdn.prod.website-files.com/6093bce33d9b4bae841b04e3/6a2689a8eb2a036750f3ab5a_shiraz_khan.png" alt="Shiraz Khan" width="80" height="80" loading="lazy" decoding="async"></div>
+            <div class="spk-name">Shiraz Khan</div>
+            <div class="spk-role">Partner, Head of Tax</div>
+            <div class="spk-company">Al Tamimi & Company</div>
+          </div>
+          <div class="spk-card">
+            <div class="spk-img-wrap"><img src="https://cdn.prod.website-files.com/6093bce33d9b4bae841b04e3/6a2689a89c1d67e7d8373e8b_venkatakrishnan_rajagopalan.png" alt="Venkatakrishnan Rajagopalan" width="80" height="80" loading="lazy" decoding="async"></div>
+            <div class="spk-name">Venkatakrishnan Rajagopalan</div>
+            <div class="spk-role">Group Head of Taxation</div>
+            <div class="spk-company">Saudi German Health UAE</div>
+          </div>
+          <div class="spk-card">
+            <div class="spk-img-wrap"><img src="https://cdn.prod.website-files.com/6093bce33d9b4bae841b04e3/6a2689a891114a16fc67f30a_rakesh_lata.png" alt="Rakesh Lata" width="80" height="80" loading="lazy" decoding="async"></div>
+            <div class="spk-name">Rakesh Lata</div>
+            <div class="spk-role">Manager - Indirect Taxes</div>
+            <div class="spk-company">MHA</div>
+          </div>
+          <div class="spk-card">
+            <div class="spk-img-wrap"><img src="https://cdn.prod.website-files.com/6093bce33d9b4bae841b04e3/6a2689a6106713f929eb90b6_ali_asgar.png" alt="Ali Asgar" width="80" height="80" loading="lazy" decoding="async"></div>
+            <div class="spk-name">Ali Asgar</div>
+            <div class="spk-role">Group Taxation Manager</div>
+            <div class="spk-company">Dubai Cable Company (Ducab)</div>
+          </div>
+          <div class="spk-card">
+            <div class="spk-img-wrap"><img alt="Ritwika Chowdhury" decoding="async" height="80" loading="lazy" width="80" src="https://cdn.prod.website-files.com/6093bce33d9b4bae841b04e3/69f2fe845afbd045c3c8676c_image.png"></div>
             <div class="spk-name">Ritwika Chowdhury</div>
             <div class="spk-role">Senior E-invoicing Consultant</div>
             <div class="spk-company">ClearTax Middle East</div>
           </div>
           <div class="spk-card">
-            <div class="spk-img-wrap"><img src="https://cdn.prod.website-files.com/6093bce33d9b4bae841b04e3/69f9c316ad6a9e6874073bf6_logo%201.png" data-src="https://cdn.prod.website-files.com/6093bce33d9b4bae841b04e3/69f2fe84f6a08b906a6901c4_image%20(1).png" alt="Arman Iqbal" width="80" height="80" loading="lazy" decoding="async"></div>
+            <div class="spk-img-wrap"><img alt="Arman Iqbal" decoding="async" height="80" loading="lazy" width="80" src="https://cdn.prod.website-files.com/6093bce33d9b4bae841b04e3/69f2fe84f6a08b906a6901c4_image%20(1).png"></div>
             <div class="spk-name">Arman Iqbal</div>
             <div class="spk-role">Senior E-invoicing Consultant</div>
             <div class="spk-company">ClearTax Middle East</div>
           </div>
           <div class="spk-card">
-            <div class="spk-img-wrap"><img src="https://cdn.prod.website-files.com/6093bce33d9b4bae841b04e3/69f9c316ad6a9e6874073bf6_logo%201.png" data-src="https://cdn.prod.website-files.com/6093bce33d9b4bae841b04e3/69f2fe843658f08610cdbb72_image%20(2).png" alt="Shemeem CK" width="80" height="80" loading="lazy" decoding="async"></div>
+            <div class="spk-img-wrap"><img alt="Shemeem CK" decoding="async" height="80" loading="lazy" width="80" src="https://cdn.prod.website-files.com/6093bce33d9b4bae841b04e3/69f2fe843658f08610cdbb72_image%20(2).png"></div>
             <div class="spk-name">Shemeem CK</div>
             <div class="spk-role">Associate Director, Enterprise Business</div>
             <div class="spk-company">ClearTax Middle East</div>
           </div>
-          <!-- NEW SPEAKERS -->
           <div class="spk-card">
-            <div class="spk-img-wrap"><img src="https://cdn.prod.website-files.com/6093bce33d9b4bae841b04e3/69f9c316ad6a9e6874073bf6_logo%201.png" data-src="https://cdn.prod.website-files.com/6093bce33d9b4bae841b04e3/69f9969e2c7c8ec68dbde6ff_asiya.png" alt="Asiya Zargar" width="80" height="80" loading="lazy" decoding="async"></div>
-            <div class="spk-name">Asiya Zargar</div>
-            <div class="spk-role">Group Head of Tax</div>
-            <div class="spk-company">Mantrac Group</div>
-          </div>
-          <div class="spk-card">
-            <div class="spk-img-wrap"><img src="https://cdn.prod.website-files.com/6093bce33d9b4bae841b04e3/69f9c316ad6a9e6874073bf6_logo%201.png" data-src="https://cdn.prod.website-files.com/6093bce33d9b4bae841b04e3/69f9969e10941dc806f83671_akash.png" alt="Akash Hapse" width="80" height="80" loading="lazy" decoding="async"></div>
-            <div class="spk-name">Akash Hapse</div>
-            <div class="spk-role">AGM Group Tax</div>
-            <div class="spk-company">Emirates Shipping Line</div>
-          </div>
-          <div class="spk-card">
-            <div class="spk-img-wrap"><img src="https://cdn.prod.website-files.com/6093bce33d9b4bae841b04e3/69f9c316ad6a9e6874073bf6_logo%201.png" data-src="https://cdn.prod.website-files.com/6093bce33d9b4bae841b04e3/69f9969c26d287aa0db6acd2_kalai.png" alt="Kalaiarasan Manoharan" width="80" height="80" loading="lazy" decoding="async"></div>
-            <div class="spk-name">Kalaiarasan Manoharan</div>
-            <div class="spk-role">VP Tax</div>
-            <div class="spk-company">Noon</div>
-          </div>
-          <div class="spk-card">
-            <div class="spk-img-wrap"><img src="https://cdn.prod.website-files.com/6093bce33d9b4bae841b04e3/69f9c316ad6a9e6874073bf6_logo%201.png" data-src="https://cdn.prod.website-files.com/6093bce33d9b4bae841b04e3/69f9969ba97b081c83ba6144_taha.png" alt="Taha Siddiqui" width="80" height="80" loading="lazy" decoding="async"></div>
+            <div class="spk-img-wrap"><img alt="Taha Siddiqui" decoding="async" height="80" loading="lazy" width="80" src="https://cdn.prod.website-files.com/6093bce33d9b4bae841b04e3/69f9969ba97b081c83ba6144_taha.png"></div>
             <div class="spk-name">Taha Siddiqui</div>
             <div class="spk-role">Senior E-invoicing Consultant</div>
             <div class="spk-company">ClearTax</div>
           </div>
         </div>
       </div>
-      <!-- Right: In the room logos -->
       <div class="spk-right">
         <div class="spk-right-head">Finance leaders<br>from the <em>region's</em><br>most dynamic<br>industries.</div>
         <div class="spk-right-divider"></div>
         <div class="spk-logo-grid">
-          <div class="spk-logo-card">
-            <img src="https://cdn.prod.website-files.com/6093bce33d9b4bae841b04e3/69f9c316ad6a9e6874073bf6_logo%201.png" data-src="https://cdn.prod.website-files.com/6093bce33d9b4bae841b04e3/69eb51cd4044c24f545dc8a8_UAE%20LOGO.jpg" alt="United Arab Bank" height="36" loading="lazy" decoding="async">
-            <span>United Arab Bank</span>
-          </div>
-          <div class="spk-logo-card">
-            <img src="https://cdn.prod.website-files.com/6093bce33d9b4bae841b04e3/69f9c316ad6a9e6874073bf6_logo%201.png" data-src="https://cdn.prod.website-files.com/6093bce33d9b4bae841b04e3/69eb5b5eae4694ea052b30bd_mmjs_consulting_logo%20(1).jpeg" alt="MMJS Consultancy" height="36" loading="lazy" decoding="async">
-            <span>MMJS Consultancy</span>
-          </div>
-          <div class="spk-logo-card">
-            <img src="https://cdn.prod.website-files.com/6093bce33d9b4bae841b04e3/69f9c316ad6a9e6874073bf6_logo%201.png" data-src="https://cdn.prod.website-files.com/6093bce33d9b4bae841b04e3/69eb51cc4649ace587ab9c4b_KAPLAN%20LOGO.jpg" alt="Kaplan" height="36" loading="lazy" decoding="async">
-            <span>Kaplan</span>
-          </div>
-          <div class="spk-logo-card">
-            <img src="https://cdn.prod.website-files.com/6093bce33d9b4bae841b04e3/69f9c316ad6a9e6874073bf6_logo%201.png" data-src="https://cdn.prod.website-files.com/6093bce33d9b4bae841b04e3/69eb51cc8c4daa147b4c2700_GNH%20LOGO.jpg" alt="Gulf Navigation Holding PJSC" height="36" loading="lazy" decoding="async">
-            <span>Gulf Navigation Holding PJSC</span>
-          </div>
-          <div class="spk-logo-card">
-            <img src="https://cdn.prod.website-files.com/6093bce33d9b4bae841b04e3/69f9c316ad6a9e6874073bf6_logo%201.png" data-src="https://cdn.prod.website-files.com/6093bce33d9b4bae841b04e3/69eb51cb6a4581065277622d_MAJID%20AL%20LOGO.jpg" alt="Majid AL Futtaim" height="36" loading="lazy" decoding="async">
-            <span>Majid AL Futtaim</span>
-          </div>
-          <div class="spk-logo-card">
-            <img src="https://cdn.prod.website-files.com/6093bce33d9b4bae841b04e3/69f9c316ad6a9e6874073bf6_logo%201.png" data-src="https://cdn.prod.website-files.com/6093bce33d9b4bae841b04e3/69eb5474796709a8fcaa62bd_sb%20logo.png" alt="SB Group International" height="36" loading="lazy" decoding="async">
-            <span>SB Group International</span>
-          </div>
+          <div class="spk-logo-card"><img src="https://cdn.prod.website-files.com/6093bce33d9b4bae841b04e3/69eb51cb6a4581065277622d_MAJID%20AL%20LOGO.jpg" alt="Majid Al Futtaim" height="36" loading="lazy" decoding="async"><span>Majid Al Futtaim</span></div>
+          <div class="spk-logo-card"><img src="https://cdn.prod.website-files.com/6093bce33d9b4bae841b04e3/6a26809c9a7fa1d8424457e9_DHL_Logo.svg" alt="DHL" height="36" loading="lazy" decoding="async"><span>DHL</span></div>
+          <div class="spk-logo-card"><img src="https://cdn.prod.website-files.com/6093bce33d9b4bae841b04e3/6a26809b22a065761cf5666b_Damac_logo.svg" alt="DAMAC Properties" height="36" loading="lazy" decoding="async"><span>DAMAC Properties</span></div>
+          <div class="spk-logo-card"><img src="https://cdn.prod.website-files.com/6093bce33d9b4bae841b04e3/6a26809c17a2bfa17b352fff_Americana_Group_Logo.svg" alt="Americana Foods" height="36" loading="lazy" decoding="async"><span>Americana Foods</span></div>
+          <div class="spk-logo-card"><img src="https://cdn.prod.website-files.com/6093bce33d9b4bae841b04e3/6a26809baa5c926240dd52fc_NEW-LOGO.png" alt="Vitatech Group" height="36" loading="lazy" decoding="async"><span>Vitatech Group</span></div>
+          <div class="spk-logo-card"><img src="https://cdn.prod.website-files.com/6093bce33d9b4bae841b04e3/6a26809b827167b18e70f6f9_medinlogo.jpg" alt="MEDIN" height="36" loading="lazy" decoding="async"><span>MEDIN</span></div>
+          <div class="spk-logo-card"><img src="https://cdn.prod.website-files.com/6093bce33d9b4bae841b04e3/6a26809cd265329f70a24151_Logo-Transp-copy.png" alt="Green Metal Industries" height="36" loading="lazy" decoding="async"><span>Green Metal Industries</span></div>
+          <div class="spk-logo-card"><img src="https://cdn.prod.website-files.com/6093bce33d9b4bae841b04e3/6a26809b3c7887f17d715560_branding.svg" alt="Oasis Investment Company" height="36" loading="lazy" decoding="async"><span>Oasis Investment Company</span></div>
+          <div class="spk-logo-card"><img src="https://cdn.prod.website-files.com/6093bce33d9b4bae841b04e3/6a26809b9e3530f0276e2b23_unifrutti-pittogramma.png" alt="Unifrutti Group" height="36" loading="lazy" decoding="async"><span>Unifrutti Group</span></div>
+          <div class="spk-logo-card"><img src="https://cdn.prod.website-files.com/6093bce33d9b4bae841b04e3/6a26809b7bc97ca41043ddf9_gradiant-logo-site.jpg" alt="Gradiant" height="36" loading="lazy" decoding="async"><span>Gradiant</span></div>
+          <div class="spk-logo-card"><img src="https://cdn.prod.website-files.com/6093bce33d9b4bae841b04e3/6a26809a3a1922e703f8e7cd_logo-full-DQOfw3jL.svg" alt="One X Global" height="36" loading="lazy" decoding="async"><span>One X Global</span></div>
+          <div class="spk-logo-card"><img src="https://cdn.prod.website-files.com/6093bce33d9b4bae841b04e3/6a26809a17a2bfa17b352f3e_logo_new_png.svg" alt="Imtiaz Developments" height="36" loading="lazy" decoding="async"><span>Imtiaz Developments</span></div>
+          <div class="spk-logo-card"><img src="https://cdn.prod.website-files.com/6093bce33d9b4bae841b04e3/6a26809aacc91890e3537bb5_KONE.svg" alt="KONE" height="36" loading="lazy" decoding="async"><span>KONE</span></div>
+          <div class="spk-logo-card"><img src="https://cdn.prod.website-files.com/6093bce33d9b4bae841b04e3/6a26809a3c7887f17d71544d_Network_International_logo.svg" alt="Network International" height="36" loading="lazy" decoding="async"><span>Network International</span></div>
+          <div class="spk-logo-card"><img src="https://cdn.prod.website-files.com/6093bce33d9b4bae841b04e3/6a26809a1e536a2e9263fa30_Al-Tamimi.png" alt="Al Tamimi &amp; Company" height="36" loading="lazy" decoding="async"><span>Al Tamimi &amp; Company</span></div>
+          <div class="spk-logo-card"><img src="https://cdn.prod.website-files.com/6093bce33d9b4bae841b04e3/6a26809a3b54f86efb2550cc_logo-health-1_0.svg" alt="Saudi German Health UAE" height="36" loading="lazy" decoding="async"><span>Saudi German Health UAE</span></div>
+          <div class="spk-logo-card"><img src="https://cdn.prod.website-files.com/6093bce33d9b4bae841b04e3/6a26809a17a2bfa17b352f41_logo.svg" alt="MHA" height="36" loading="lazy" decoding="async"><span>MHA</span></div>
+          <div class="spk-logo-card"><img src="https://cdn.prod.website-files.com/6093bce33d9b4bae841b04e3/6a26809b8470a43819829eb2_d-logo.svg" alt="Dubai Cable Company (Ducab)" height="36" loading="lazy" decoding="async"><span>Dubai Cable Company (Ducab)</span></div>
         </div>
         <div class="spk-more">+ MORE LEADERS JOINING</div>
       </div>
@@ -620,154 +510,98 @@ window.addEventListener('DOMContentLoaded', function() {
     <div class="shead"><div class="kick">Event agenda</div><h2>A focused half-day for decision-makers</h2></div>
     <div class="agenda-scroll-container">
       <div class="aw">
-
-      <!-- Row 1 -->
-      <div class="arow">
-        <div class="atime">8:30 – 9:30 AM</div>
-        <div><span class="pil net">Networking</span></div>
-        <div>
-          <div class="atitle">Registration, Breakfast &amp; Networking</div>
-          <p class="adesc">Arrivals, refreshments, and peer introductions.</p>
+        <div class="arow">
+          <div class="atime">8:30 – 9:20 AM</div>
+          <div><span class="pil net">Networking</span></div>
+          <div><div class="atitle">Registration, Breakfast &amp; Peer Networking</div><p class="adesc">Arrivals, registration, and networking with fellow peers.</p></div>
+        </div>
+        <div class="arow">
+          <div class="atime">9:20 – 9:30 AM</div>
+          <div><span class="pil">Opening</span></div>
+          <div>
+            <div class="atitle">Opening Welcome Remarks</div>
+            <p class="adesc">Setting the stage for the E-Invoicing Executive Exchange Dubai.</p>
+            <ul class="aspk">
+              <li><strong>Speaker:</strong> Mohammed Sami, Portfolio Director, Plexus Global</li>
+            </ul>
+          </div>
+        </div>
+        <div class="arow">
+          <div class="atime">9:30 – 9:50 AM</div>
+          <div><span class="pil key">Vision Keynote</span></div>
+          <div>
+            <div class="atitle">Vision Keynote | The UAE's Digital Tax Future: What Comes After E-Invoicing?</div>
+            <p class="adesc">Continuous Transaction Controls (CTC), real-time reporting evolution, AI-driven audits, digital VAT administration, and GCC interoperability possibilities.</p>
+            <ul class="aspk">
+              <li><strong>Speaker:</strong> Archit Gupta, CEO, ClearTax</li>
+            </ul>
+          </div>
+        </div>
+        <div class="arow">
+          <div class="atime">9:50 – 10:10 AM</div>
+          <div><span class="pil prt">Session</span></div>
+          <div>
+            <div class="atitle">ASP Selection Playbook: What Enterprises Should Evaluate Before Signing</div>
+            <p class="adesc">Key design considerations, integration architecture, scalability, multi-ERP environments, Peppol readiness, security and uptime expectations, cost structures, and questions CFOs should ask vendors.</p>
+            <ul class="aspk">
+              <li><strong>Speaker:</strong> Shameem CK, Associate Director, Cleartax Middle East</li>
+            </ul>
+          </div>
+        </div>
+        <div class="arow">
+          <div class="atime">10:10 – 11:00 AM</div>
+          <div><span class="pil pan">Panel Discussion-1</span></div>
+          <div>
+            <div class="atitle">Compliance to Competence - Preparing the Enterprise for Continuous Compliance</div>
+            <p class="adesc">Why master data is becoming more strategic than ever before, how finance, tax, IT, and procurement must collaborate, centralized vs decentralized operating models, and what leaders will be prioritizing in the next 12 months.</p>
+            <ul class="aspk">
+              <li><strong>Panelists:</strong> Group CFOs, Tax Heads &amp; CIOs</li>
+            </ul>
+          </div>
+        </div>
+        <div class="arow">
+          <div class="atime">11:00 – 11:30 AM</div>
+          <div><span class="pil brk">Break</span></div>
+          <div><div class="atitle">Networking Coffee Break</div><p class="adesc">Networking, coffee, and informal discussion.</p></div>
+        </div>
+        <div class="arow">
+          <div class="atime">11:30 AM – 12:20 PM</div>
+          <div><span class="pil pan">Panel Discussion-2</span></div>
+          <div>
+            <div class="atitle">Integration, Scalability, and Compliance Considerations for E-Invoicing</div>
+            <p class="adesc">Integration, scalability, and compliance considerations for e-invoicing. Discussion topics include middleware strategies, multi-ERP complexity, shared service centers, custom invoice flows, integration timelines, and internal IT bandwidth issues.</p>
+            <ul class="aspk">
+              <li><strong>Panelists:</strong> Group CFOs, Tax Heads &amp; CIOs</li>
+            </ul>
+          </div>
+        </div>
+        <div class="arow">
+          <div class="atime">12:20 – 1:10 PM</div>
+          <div><span class="pil pan">Leadership Panel</span></div>
+          <div>
+            <div class="atitle">Can E-Invoicing Deliver Business Value Beyond Compliance? | The conversation beyond regulation</div>
+            <p class="adesc">Discussion topics include AP/AR automation, faster reconciliation, working capital visibility, fraud reduction, audit efficiency, data intelligence, supplier collaboration, and finance transformation.</p>
+            <ul class="aspk">
+              <li><strong>Panelists:</strong> Group CFOs, Tax Heads &amp; CIOs</li>
+            </ul>
+          </div>
+        </div>
+        <div class="arow">
+          <div class="atime">1:10 – 1:15 PM</div>
+          <div><span class="pil">Live Polling</span></div>
+          <div><div class="atitle">Live Polling Segment</div><p class="adesc">Real-time audience polling on biggest implementation concerns, ERP systems, and ASP selection.</p></div>
+        </div>
+        <div class="arow">
+          <div class="atime">1:15 – 1:20 PM</div>
+          <div><span class="pil">Closing</span></div>
+          <div><div class="atitle">Closing Remarks, Raffle Draw &amp; Group Photo</div><p class="adesc">Event summary, raffle draw, and group photograph.</p></div>
+        </div>
+        <div class="arow">
+          <div class="atime">1:20 PM</div>
+          <div><span class="pil net">Networking</span></div>
+          <div><div class="atitle">Lunch &amp; Curated Networking</div><p class="adesc">Continued peer-to-peer discussions and networking over lunch.</p></div>
         </div>
       </div>
-
-      <!-- Row 2 -->
-      <div class="arow">
-        <div class="atime">9:30 – 9:40 AM</div>
-        <div><span class="pil">Opening</span></div>
-        <div>
-          <div class="atitle">Welcome &amp; scene-setting</div>
-          <p class="adesc">Setting the "why now" for UAE e-invoicing in 2026–27, what's changing, and the key decisions CFOs need to make early, including ASP selection.</p>
-        </div>
-      </div>
-
-      <!-- Row 3 -->
-      <div class="arow">
-        <div class="atime">9:40 – 10:00 AM</div>
-        <div><span class="pil prt">Prospect Fireside Chat</span></div>
-        <div>
-          <div class="atitle">What UAE enterprises must get right before E-invoicing go-live</div>
-          <p class="adesc">Key design considerations before implementation, data readiness, process alignment, and lessons from global mandates applied to the UAE context.</p>
-        </div>
-      </div>
-
-      <!-- Row 4 -->
-      <div class="arow">
-        <div class="atime">10:00 – 10:15 AM</div>
-        <div><span class="pil key">ClearTax Keynote</span></div>
-        <div>
-          <div class="atitle">Decoding the latest guidelines: fallback endpoints &amp; intra-VAT group transactions</div>
-          <p class="adesc">Connecting ERPs, e-invoicing and VAT to automate end-to-end tax data flow. New risks it introduces, and compliance bottlenecks to avoid.</p>
-          <p class="adesc" style="margin-top:6px">Speakers:</p>
-          <ul class="aspk">
-            <li>Shemeem CK, Associate Director, Enterprise Business, ClearTax Middle East</li>
-          </ul>
-        </div>
-      </div>
-
-      <!-- Row 5 — UAE Partner MMJS Fireside Chat -->
-      <div class="arow">
-        <div class="atime">10:15 – 10:35 AM</div>
-        <div><span class="pil fir">Fireside Chat</span></div>
-        <div>
-          <div class="atitle"><strong>Beyond E-Invoicing: What UAE Enterprises Should Expect Next</strong></div>
-          <p class="adesc">How tax, IT, and finance leaders should prepare for the next phase of digital compliance, real-time reporting, AI-led scrutiny, tighter reconciliations, and the operating model changes now taking shape.</p>
-          <p class="adesc" style="margin-top:6px">Speakers:</p>
-          <ul class="aspk">
-            <li>Ankur Jain, Partner – Tax, MMJS Consulting</li>
-            <li>Rishabh Tandon, Associate Partner – Indirect Tax, MMJS Consulting</li>
-          </ul>
-        </div>
-      </div>
-
-      <!-- Row 6 — Panel 1: CFO Panel -->
-      <div class="arow">
-        <div class="atime">10:35 – 11:15 AM</div>
-        <div><span class="pil pan">Panel discussion-1</span></div>
-        <div>
-          <div class="atitle"><strong>The CFO Agenda for UAE E-Invoicing: Turning Compliance into Competitive Advantage</strong></div>
-          <p class="adesc">How UAE e-invoicing can unlock stronger controls, better cash flow visibility, and smarter finance operations beyond compliance.</p>
-          <p class="adesc" style="margin-top:6px">Speakers:</p>
-          <ul class="aspk">
-            <li>Ghulam Sabir, Group CFO – EMEA, SB Group International</li>
-            <li>Ali Abouda, Industry Expert (CFO, Ex Gulf Nav)</li>
-          </ul>
-          <p class="adesc" style="margin-top:6px">Moderator:</p>
-          <ul class="aspk">
-            <li>Arman Iqbal, Senior E-invoicing Consultant, ClearTax</li>
-          </ul>
-        </div>
-      </div>
-
-      <!-- Row 7 — Coffee & Prayer Break -->
-      <div class="arow">
-        <div class="atime">11:15 – 11:35 AM</div>
-        <div><span class="pil brk">Break</span></div>
-        <div>
-          <div class="atitle">Coffee &amp; Prayer Break</div>
-        </div>
-      </div>
-
-      <!-- Row 8 — Panel 2: Tax Panel -->
-      <div class="arow">
-        <div class="atime">11:35 AM – 12:05 PM</div>
-        <div><span class="pil pan">Panel discussion-2</span></div>
-        <div>
-          <div class="atitle"><strong>Integration, Scalability, and Compliance Considerations for E-invoicing</strong></div>
-          <p class="adesc">How to evaluate ASPs across architecture, UAE readiness, and compliance coverage. Integration with ERP and tax systems, and risks to avoid — vendor lock-in, scalability gaps, and data inconsistencies.</p>
-          <p class="adesc" style="margin-top:6px">Speakers:</p>
-          <ul class="aspk">
-            <li>Asiya Zargar, Group Head of Tax, Mantrac Group</li>
-            <li>Akash Hapse, AGM Group Tax, Emirates Shipping Line</li>
-            <li>Amar Mehra, Head of Tax MENA, Kaplan MENA</li>
-          </ul>
-          <p class="adesc" style="margin-top:6px">Moderator:</p>
-          <ul class="aspk">
-            <li>Taha Siddiqui, Senior E-invoicing Consultant, ClearTax</li>
-          </ul>
-        </div>
-      </div>
-
-      <!-- Row 9 — Panel 3: Tax Panel -->
-      <div class="arow">
-        <div class="atime">12:05 – 12:35 PM</div>
-        <div><span class="pil pan">Panel discussion-3</span></div>
-        <div>
-          <div class="atitle"><strong>Where E-Invoicing Breaks: Data, Ownership, and Execution Challenges</strong></div>
-          <p class="adesc">Clear view of the biggest execution risks, data, ownership, and process gaps and how to address them before they impact compliance.</p>
-          <p class="adesc" style="margin-top:6px">Speakers:</p>
-          <ul class="aspk">
-            <li>Harsh Kedia, Head of Tax, United Arab Bank</li>
-            <li>Nitin Agarwal, Director Indirect Tax Operations, Majid AL Futtaim</li>
-            <li>Kalaiarasan Manoharan, VP Tax, Noon</li>
-          </ul>
-          <p class="adesc" style="margin-top:6px">Moderator:</p>
-          <ul class="aspk">
-            <li>Ritwika Chowdhury, Senior E-invoicing Consultant, ClearTax</li>
-          </ul>
-        </div>
-      </div>
-
-      <!-- Row 10 — Closing remarks -->
-      <div class="arow">
-        <div class="atime">12:35 – 12:45 PM</div>
-        <div><span class="pil">Closing</span></div>
-        <div>
-          <div class="atitle">Closing remarks &amp; photo session</div>
-          <p class="adesc">The way forward and photo session.</p>
-        </div>
-      </div>
-
-      <!-- Row 11 — Lunch & Networking -->
-      <div class="arow">
-        <div class="atime">12:45 PM</div>
-        <div><span class="pil net">Networking</span></div>
-        <div>
-          <div class="atitle">Lunch &amp; Networking</div>
-          <p class="adesc">Continued peer conversations and 1:1 follow-ups with speakers.</p>
-        </div>
-      </div>
-
     </div>
   </div>
 </section>
@@ -780,10 +614,10 @@ window.addEventListener('DOMContentLoaded', function() {
       <h2 style="margin-top:16px">Reserve your seat at Beyond UAE · Dubai</h2>
       <p>Join a focused room of CFOs, Tax Heads, and finance leaders shaping the UAE's e-invoicing future. Breakfast, sessions, and lunch included.</p>
       <div style="display:flex;gap:10px;margin-top:18px;flex-wrap:wrap">
-        <div class="tg">📅 May 7, 2026</div><div class="tg">📍Dusit Thani Dubai, UAE</div><div class="tg">⏱ 8:30 AM – 1:30 PM GST</div>
+        <div class="tg">📅 June 18, 2026</div><div class="tg">📍Dusit Thani, Dubai, UAE</div><div class="tg">⏱ 8:30 AM – 1:30 PM GST</div>
       </div>
     </div>
-    <form class="frm" onsubmit="event.preventDefault(); submitForm(this);">
+    <form class="frm" onsubmit="event.preventDefault();submitForm(this)">
       <div class="fr">
         <div class="fd"><label>First name</label><input type="text" required placeholder="First name" id="f-firstname"/></div>
         <div class="fd"><label>Last name</label><input type="text" required placeholder="Last name" id="f-lastname"/></div>
@@ -815,127 +649,157 @@ window.addEventListener('DOMContentLoaded', function() {
 
 </div><!-- end .bw -->
 
-<!-- ── CLEARTAX-STYLE FOOTER ─────────────────────────────── -->
+<!-- ── FOOTER (cleartax.com/ae) ──────────────────────────────── -->
 <footer class="ct-footer">
   <div class="ft-inner">
     <div class="ft-grid">
-      <div class="ft-brand">
-        <img src="https://cdn.prod.website-files.com/6093bce33d9b4bae841b04e3/69f9c316ad6a9e6874073bf6_logo%201.png" data-src="https://assets1.cleartax-cdn.com/finfo/wg-utils/retool/d9f36ac3-77a9-40c6-94fc-20c2e3855457.svg" alt="ClearTax" width="140" height="28"
-             onerror="this.style.display='none';this.nextSibling.style.display='block'">
-        <span style="display:none;font-family:'Inter',sans-serif;font-size:22px;font-weight:800;color:#fff">cleartax</span>
-        <p>Beyond is ClearTax's flagship roundtable series for CFOs, Tax Heads, and Finance leaders across the GCC.</p>
-        <div class="ft-addr">
-          Plot No: JLT-PH2-RET-R6<br>
-          Jumeirah Lakes Towers, Dubai,<br>
-          United Arab Emirates
-        </div>
-        <div class="ft-social">
-          <a href="https://www.linkedin.com/company/cleartax" target="_blank" rel="noopener" aria-label="LinkedIn">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6zM2 9h4v12H2z"/><circle cx="4" cy="4" r="2"/></svg>
-          </a>
-          <a href="https://www.facebook.com/ClearTaxIndia" target="_blank" rel="noopener" aria-label="Facebook">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg>
-          </a>
-          <a href="https://twitter.com/ClearTax" target="_blank" rel="noopener" aria-label="Twitter / X">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M22 4s-.7 2.1-2 3.4c1.6 10-9.4 17.3-18 11.6 2.2.1 4.4-.6 6-2C3 15.5.5 9.6 3 5c2.2 2.6 5.6 4.1 9 4-.9-4.2 4-6.6 7-3.8 1.1 0 3-1.2 3-1.2z"/></svg>
-          </a>
-          <a href="https://www.instagram.com/cleartax" target="_blank" rel="noopener" aria-label="Instagram">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
-          </a>
-        </div>
+
+      <!-- Col 1: Logo + Follow us -->
+      <div>
+        <img class="ft-brand-logo" src="https://cdn.prod.website-files.com/6093bce33d9b4bae841b04e3/69dfa05ecb34c38b5b8b5f54_cleartax-logo-light.png" alt="ClearTax" loading="lazy" decoding="async">
+        <p class="ft-follow-label">Follow us on</p>
+        <a class="ft-li-btn" href="https://www.linkedin.com/company/cleartax" target="_blank" rel="noopener" aria-label="LinkedIn">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6zM2 9h4v12H2z"/><circle cx="4" cy="4" r="2"/></svg>
+        </a>
       </div>
+
+      <!-- Col 2: Company -->
       <div class="ft-col">
         <h5>Company</h5>
-        <a href="https://www.cleartax.com/ae/about" target="_blank">About us</a>
-        <a href="https://www.cleartax.com/ae/contact" target="_blank">Contact us</a>
-        <a href="https://www.cleartax.com/ae/media" target="_blank">Media &amp; Press</a>
-        <a href="https://www.cleartax.com/ae/trust-and-safety" target="_blank">Trust &amp; Safety</a>
+        <a href="https://www.cleartax.com/ae/about" target="_blank" rel="noopener">About us</a>
+        <a href="https://www.cleartax.com/ae/contact" target="_blank" rel="noopener">Contact us</a>
+        <a href="https://www.cleartax.com/ae/partners" target="_blank" rel="noopener">Partners</a>
+        <a href="https://www.cleartax.com/ae/media" target="_blank" rel="noopener">Media &amp; Press</a>
+        <a href="https://www.cleartax.com/ae/customers" target="_blank" rel="noopener">Customers</a>
+        <a href="https://www.cleartax.com/ae/why-cleartax" target="_blank" rel="noopener">Why Cleartax for UAE</a>
       </div>
+
+      <!-- Col 3: Products & Solutions -->
       <div class="ft-col">
         <h5>Products &amp; Solutions</h5>
-        <a href="https://www.cleartax.com/ae/lp/e-invoicing" target="_blank" style="font-weight:600;color:#C9A961;font-size:12px;letter-spacing:.06em;text-transform:uppercase;margin-bottom:8px">UAE</a>
-        <a href="https://www.cleartax.com/ae/e-invoicing-software" target="_blank">E-Invoicing Software</a>
-        <a href="https://www.cleartax.com/ae/compliance-cloud" target="_blank">ClearTax Compliance Cloud</a>
-        <a href="#" style="font-weight:600;color:#C9A961;font-size:12px;letter-spacing:.06em;text-transform:uppercase;margin-top:10px;margin-bottom:8px">Global</a>
-        <a href="https://www.cleartax.com/my/e-invoicing" target="_blank">E-Invoicing (Malaysia)</a>
-        <a href="https://www.cleartax.com/sa/e-invoicing" target="_blank">E-Invoicing (Saudi Arabia)</a>
-        <a href="https://www.cleartax.com/sg/e-invoicing" target="_blank">E-Invoicing (Singapore)</a>
-        <a href="https://www.cleartax.in/e-invoicing" target="_blank">E-Invoicing (India)</a>
+        <a href="https://www.cleartax.com/be/e-invoicing" target="_blank" rel="noopener">E-invoicing Software(Belgium)</a>
+        <a href="https://www.cleartax.com/fr/e-invoicing" target="_blank" rel="noopener">E-invoicing Software(France)</a>
+        <a href="https://www.cleartax.com/de/e-invoicing" target="_blank" rel="noopener">E-invoicing Software(Germany)</a>
+        <a href="https://www.cleartax.com/sa/e-invoicing" target="_blank" rel="noopener">E-invoicing Software(Saudi Arabia)</a>
+        <a href="https://www.cleartax.com/ae/e-invoicing-software" target="_blank" rel="noopener">E-invoicing Software(UAE)</a>
+        <a href="https://www.cleartax.com/my/e-invoicing" target="_blank" rel="noopener">E-invoicing Software(Malaysia)</a>
+        <a href="https://www.cleartax.com/sg/e-invoicing" target="_blank" rel="noopener">E-invoicing Software(Singapore)</a>
+        <a href="https://www.cleartax.com/om/e-invoicing" target="_blank" rel="noopener">E-invoicing Software(Oman)</a>
+        <a href="https://www.cleartax.in/e-invoicing" target="_blank" rel="noopener">E-invoicing Software(India)</a>
       </div>
+
+      <!-- Col 4: Resources + Resources(Arabic) -->
       <div class="ft-col">
         <h5>Resources</h5>
-        <a href="https://www.cleartax.com/ae/resource-centre" target="_blank">Resource Centre</a>
-        <a href="https://www.cleartax.com/ae/case-studies" target="_blank">Case Studies</a>
-        <a href="https://www.cleartax.com/ae/whitepapers" target="_blank">Whitepapers</a>
+        <a href="https://www.cleartax.com/ae/integrations" target="_blank" rel="noopener">E-invoicing Integration</a>
+        <a href="https://www.cleartax.com/ae/blog" target="_blank" rel="noopener">Blog</a>
+        <a href="https://www.cleartax.com/ae/vat-calculator" target="_blank" rel="noopener">VAT Calculator</a>
+        <a href="https://www.cleartax.com/ae/case-studies" target="_blank" rel="noopener">Case Studies</a>
+        <a href="https://www.cleartax.com/ae/whitepapers" target="_blank" rel="noopener">Whitepapers</a>
+        <h5 class="arabic-head">Resources(Arabic)</h5>
+        <a class="arabic-link" href="https://www.cleartax.com/ae/ar/e-invoicing" target="_blank" rel="noopener">&#x627;&#x644;&#x641;&#x648;&#x627;&#x62A;&#x64A;&#x631; &#x627;&#x644;&#x625;&#x644;&#x643;&#x62A;&#x631;&#x648;&#x646;&#x64A;&#x629; &#x641;&#x64A; &#x627;&#x644;&#x625;&#x645;&#x627;&#x631;&#x627;&#x62A; &#x627;&#x644;&#x639;&#x631;&#x628;&#x64A;&#x629; &#x627;&#x644;&#x645;&#x62A;&#x62D;&#x62F;&#x629;</a>
+        <a class="arabic-link" href="https://www.cleartax.com/ae/ar/vat" target="_blank" rel="noopener">&#x636;&#x631;&#x64A;&#x628;&#x629; &#x627;&#x644;&#x642;&#x64A;&#x645;&#x629; &#x627;&#x644;&#x645;&#x636;&#x627;&#x641;&#x629; &#x641;&#x64A; &#x627;&#x644;&#x625;&#x645;&#x627;&#x631;&#x627;&#x62A; &#x627;&#x644;&#x639;&#x631;&#x628;&#x64A;&#x629; &#x627;&#x644;&#x645;&#x62A;&#x62D;&#x62F;&#x629;</a>
+        <a class="arabic-link" href="https://www.cleartax.com/ae/ar/trn-verification" target="_blank" rel="noopener">&#x627;&#x644;&#x62A;&#x62D;&#x642;&#x642; &#x645;&#x646; &#x631;&#x642;&#x645; &#x627;&#x644;&#x645;&#x639;&#x627;&#x645;&#x644;&#x629; &#x641;&#x64A; &#x627;&#x644;&#x625;&#x645;&#x627;&#x631;&#x627;&#x62A; &#x627;&#x644;&#x639;&#x631;&#x628;&#x64A;&#x629; &#x627;&#x644;&#x645;&#x62A;&#x62D;&#x62F;&#x629;</a>
+        <a class="arabic-link" href="https://www.cleartax.com/ae/ar/vat-calculator" target="_blank" rel="noopener">&#x62D;&#x627;&#x633;&#x628;&#x629; &#x636;&#x631;&#x64A;&#x628;&#x629; &#x627;&#x644;&#x642;&#x64A;&#x645;&#x629; &#x627;&#x644;&#x645;&#x636;&#x627;&#x641;&#x629;</a>
+        <a class="arabic-link" href="https://www.cleartax.com/ae/ar/corporate-tax" target="_blank" rel="noopener">&#x636;&#x631;&#x64A;&#x628;&#x629; &#x627;&#x644;&#x634;&#x631;&#x643;&#x627;&#x62A; &#x641;&#x64A; &#x627;&#x644;&#x625;&#x645;&#x627;&#x631;&#x627;&#x62A; &#x627;&#x644;&#x639;&#x631;&#x628;&#x64A;&#x629; &#x627;&#x644;&#x645;&#x62A;&#x62D;&#x62F;&#x629;</a>
       </div>
-      <div class="ft-col">
-        <h5>Why ClearTax</h5>
-        <a href="https://www.cleartax.com/ae/for-business" target="_blank">For Business</a>
-        <a href="https://www.cleartax.com/ae/partners" target="_blank">For Partners</a>
-      </div>
+
     </div>
+
+    <!-- Bottom: Legal/Privacy + Address (left) | Badges + note (right) -->
     <div class="ft-bottom">
       <div class="ft-bottom-left">
-        <strong>CLEARTAX IS A PRODUCT BY DEFMACRO SOFTWARE PVT. LTD.</strong>
-        <a href="https://www.cleartax.com/ae/company-policy" target="_blank" style="color:#555e70;text-decoration:none;margin-right:16px">Company Policy</a>
-        <a href="https://www.cleartax.com/ae/terms" target="_blank" style="color:#555e70;text-decoration:none">Terms of use</a>
-      </div>
-      <div class="ft-bottom-right">
-        <div class="ft-badges">
-          <div class="badge-item">
-            <div class="badge-icon">ISO</div>
-            <div class="badge-text"><strong>ISO 27001</strong>Data Center</div>
-          </div>
-          <div class="badge-item">
-            <div class="badge-icon" style="font-size:9px;font-weight:800">SSL</div>
-            <div class="badge-text"><strong>SSL Certified</strong>128-bit encryption</div>
-          </div>
+        <div>
+          <a href="https://www.cleartax.com/ae/legal" target="_blank" rel="noopener">Legal</a>
+          <a href="https://www.cleartax.com/ae/privacy-policy" target="_blank" rel="noopener">Privacy Policy</a>
         </div>
+        <div class="ft-addr">Plot No: JLT-PH2-RET-R6Jumeirah Lakes Towers, Dubai, United Arab Emirates</div>
+      </div>
+      <div style="display:flex;flex-direction:column;align-items:flex-end;gap:8px">
+        <div class="ft-badges">
+          <img src="https://cdn.prod.website-files.com/6093bce33d9b4bae841b04e3/69fb0ff41b9a63ce3e1f50d9_iso.png" alt="ISO 27001" loading="lazy" decoding="async">
+          <img src="https://cdn.prod.website-files.com/6093bce33d9b4bae841b04e3/69fad934822abf67d7c25954_soc.png" alt="SOC 2" loading="lazy" decoding="async">
+          <img src="https://cdn.prod.website-files.com/6093bce33d9b4bae841b04e3/6a154210439a661bb4313f68_ssll.png" alt="SSL" loading="lazy" decoding="async">
+        </div>
+        <div class="ft-security-note">Your data security and privacy matter most to us.</div>
       </div>
     </div>
+
   </div>
 </footer>
 
+<!-- GTM (deferred until interaction) -->
 <script>
-async function submitForm(form) {
-  const btn = form.querySelector('button[type="submit"]');
-  btn.textContent = 'Submitting...';
-  btn.disabled = true;
-  const urlParams = new URLSearchParams(window.location.search);
-  const data = {
-    sheetName: 'dubai',
-    firstName: document.getElementById('f-firstname').value,
-    lastName:  document.getElementById('f-lastname').value,
-    jobTitle:  document.getElementById('f-jobtitle').value,
-    company:   document.getElementById('f-company').value,
-    email:     document.getElementById('f-email').value,
-    mobile:    "'" + document.getElementById('f-countrycode').value + ' ' + document.getElementById('f-mobile').value,
-    utm_source:   urlParams.get('utm_source') || '',
-    utm_medium:   urlParams.get('utm_medium') || '',
-    utm_campaign: urlParams.get('utm_campaign') || ''
-  };
-  try {
-    await fetch('https://script.google.com/macros/s/AKfycbyagzKYbBU92AjTD-nvsQmspcLVs5yDpYLYicL1gn40NnITPaBADqDlSshMfWXnv1Rf/exec', {
-      method: 'POST', mode: 'no-cors',
-      headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify(data)
-    });
-    window.location.href = 'https://www.cleartax.com/beyond/thank-you';
-  } catch(err) {
-    console.error('Submission error:', err);
-  } finally {
-    btn.textContent = 'Request invite →';
-    btn.disabled = false;
+(function(){
+  var loaded=false;
+  function loadGTM(){
+    if(loaded)return;loaded=true;
+    (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','GTM-MKPDH9');
   }
+  ['mouseover','keydown','touchstart','scroll'].forEach(function(e){window.addEventListener(e,loadGTM,{once:true,passive:true})});
+})();
+
+async function submitForm(form){
+  var btn=form.querySelector('button[type="submit"]');
+  btn.textContent='Submitting...';btn.disabled=true;
+  var urlParams=new URLSearchParams(window.location.search);
+  var data={
+    sheetName:'Abu Dhabi',
+    firstName:document.getElementById('f-firstname').value,
+    lastName:document.getElementById('f-lastname').value,
+    jobTitle:document.getElementById('f-jobtitle').value,
+    company:document.getElementById('f-company').value,
+    email:document.getElementById('f-email').value,
+    mobile:"'"+document.getElementById('f-countrycode').value+' '+document.getElementById('f-mobile').value,
+    utm_source:urlParams.get('utm_source')||'',
+    utm_medium:urlParams.get('utm_medium')||'',
+    utm_campaign:urlParams.get('utm_campaign')||''
+  };
+  try{
+    await fetch('https://script.google.com/macros/s/AKfycbyagzKYbBU92AjTD-nvsQmspcLVs5yDpYLYicL1gn40NnITPaBADqDlSshMfWXnv1Rf/exec',{
+      method:'POST',mode:'no-cors',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify(data)
+    });
+    window.location.href='https://www.cleartax.com/beyond/thank-you';
+  }catch(err){console.error('Submission error:',err);}
+  finally{btn.textContent='Request invite →';btn.disabled=false;}
 }
-document.querySelectorAll('.ct-nav a[href^="#"], .bw a[href^="#"]').forEach(a => {
-  a.addEventListener('click', e => {
-    const target = document.querySelector(a.getAttribute('href'));
-    if (target) {
-      e.preventDefault();
-      const top = target.getBoundingClientRect().top + window.scrollY;
-      window.scrollTo({ top, behavior: 'smooth' });
+
+// Intersection Observer for below-fold images
+if('IntersectionObserver' in window){
+  var imgObs = new IntersectionObserver(function(entries){
+    entries.forEach(function(e){
+      if(e.isIntersecting){
+        var img = e.target;
+        if(img.dataset.lazysrc){img.src=img.dataset.lazysrc;delete img.dataset.lazysrc;}
+        imgObs.unobserve(img);
+      }
+    });
+  },{rootMargin:'200px'});
+  // All lazy images already handled by browser, but observe badge images
+  document.querySelectorAll('.ft-badges img').forEach(function(img){imgObs.observe(img);});
+}
+
+// Smooth scroll
+document.querySelectorAll('a[href^="#"]').forEach(function(a){
+  a.addEventListener('click',function(e){
+    var target=document.querySelector(a.getAttribute('href'));
+    if(!target)return;
+    e.preventDefault();
+    var navH=document.querySelector('.ct-nav-wrap')?.offsetHeight||0;
+    var targetY=target.getBoundingClientRect().top+window.scrollY-navH-8;
+    var startY=window.scrollY,dist=targetY-startY;
+    var duration=Math.min(600,Math.max(300,Math.abs(dist)*0.4));
+    var start=null;
+    function ease(t){return t<0.5?2*t*t:-1+(4-2*t)*t}
+    function step(ts){
+      if(!start)start=ts;
+      var p=Math.min((ts-start)/duration,1);
+      window.scrollTo(0,startY+dist*ease(p));
+      if(p<1)requestAnimationFrame(step);
     }
+    requestAnimationFrame(step);
   });
 });
 </script>
