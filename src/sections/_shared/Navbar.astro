@@ -355,11 +355,80 @@ const {
   (function () {
     const toggle = document.getElementById("navMobileToggle");
     const links = document.getElementById("navLinks");
-    if (!toggle || !links) return;
-    toggle.addEventListener("click", () => {
-      const open = links.classList.toggle("open");
-      toggle.classList.toggle("open", open);
-      toggle.setAttribute("aria-expanded", open ? "true" : "false");
-    });
+    if (toggle && links) {
+      toggle.addEventListener("click", () => {
+        const open = links.classList.toggle("open");
+        toggle.classList.toggle("open", open);
+        toggle.setAttribute("aria-expanded", open ? "true" : "false");
+      });
+    }
+
+    function handleTicker() {
+      const ticker = document.getElementById("ct-announcement-ticker-inner");
+      const main = document.getElementById("main");
+      const hero = document.getElementById("hero");
+      const navContainer = document.querySelector(".nav-wrap");
+      if (!ticker) return;
+
+      const isVisible = !!(ticker.offsetWidth || ticker.offsetHeight || ticker.getClientRects().length);
+      if (isVisible) {
+        const tickerHeight = ticker.offsetHeight;
+        const isInsideHero = hero && hero.contains(ticker);
+        const width = window.innerWidth;
+        const baseTop = width <= 480 ? 8 : (width <= 1024 ? 12 : 16);
+        const navHeight = width <= 480 ? 60 : (width <= 1024 ? 66 : 74);
+
+        if (isInsideHero) {
+          const heroMarginTop = (navHeight + baseTop) + "px";
+          if (ticker.style.marginTop !== heroMarginTop) {
+            ticker.style.marginTop = heroMarginTop;
+          }
+          if (navContainer) {
+            navContainer.style.top = "";
+          }
+          if (main) {
+            main.style.marginTop = "";
+          }
+        } else {
+          if (ticker.style.marginTop !== "") {
+            ticker.style.marginTop = "";
+          }
+          if (main) {
+            main.style.marginTop = tickerHeight + "px";
+          }
+          if (navContainer) {
+            const tickerRect = ticker.getBoundingClientRect();
+            const isStickyOrFixed = window.scrollY > 5 && tickerRect.top > -10;
+            if (isStickyOrFixed) {
+              navContainer.style.top = (tickerHeight + baseTop) + "px";
+            } else {
+              if (window.scrollY < tickerHeight) {
+                navContainer.style.top = (tickerHeight + baseTop - window.scrollY) + "px";
+              } else {
+                navContainer.style.top = baseTop + "px";
+              }
+            }
+          }
+        }
+      } else {
+        if (ticker) {
+          ticker.style.marginTop = "";
+        }
+        if (main) {
+          main.style.marginTop = "";
+        }
+        if (navContainer) {
+          navContainer.style.top = "";
+        }
+      }
+    }
+
+    window.addEventListener("scroll", handleTicker);
+    window.addEventListener("resize", handleTicker);
+    if (typeof MutationObserver !== "undefined") {
+      const observer = new MutationObserver(handleTicker);
+      observer.observe(document.body, { childList: true, subtree: true, attributes: true });
+    }
+    handleTicker();
   })();
 </script>
