@@ -10,39 +10,16 @@
  * Per-country tuning via props: country code default, sheet name, origin label.
  */
 export interface Props {
-  recaptchaSiteKey?: string;
-  defaultCountryCode?: string;
-  sheetName?: string;
-  originCountry?: string;
-  thankYouUrl?: string;
-  formType?: string;
-  leadType?: string;
+  hubspotPortalId?: string;
+  hubspotFormId?: string;
+  hubspotRegion?: string;
 }
 
 const {
-  recaptchaSiteKey = "6Lc5ZG0mAAAAAGwClrZwtcyttcUMYDUPxg4MM4p3",
-  defaultCountryCode = "+971",
-  sheetName = "uaeRAD",
-  originCountry = "UAE",
-  thankYouUrl = "https://www.cleartax.com/thank-you",
-  formType = "GCC-contact-sales-form",
-  leadType = "GCC",
+  hubspotPortalId = "245744706",
+  hubspotFormId = "51af6b81-aa59-4bd2-b499-ff081e27324d",
+  hubspotRegion = "na2",
 } = Astro.props as Props;
-
-const countryCodes: { value: string; label: string }[] = [
-  { value: "+1", label: "USA (+1)" },
-  { value: "+971", label: "UAE (+971)" },
-  { value: "+966", label: "Saudi (+966)" },
-  { value: "+33", label: "France (+33)" },
-  { value: "+968", label: "Oman (+968)" },
-  { value: "+973", label: "Bahrain (+973)" },
-  { value: "+965", label: "Kuwait (+965)" },
-  { value: "+974", label: "Qatar (+974)" },
-  { value: "+91", label: "India (+91)" },
-  { value: "+34", label: "Spain (+34)" },
-  { value: "+48", label: "Poland (+48)" },
-  { value: "+60", label: "Malaysia (+60)" },
-];
 
 const points = [
   {
@@ -66,20 +43,8 @@ const points = [
 ];
 ---
 
-<script
-  is:inline
-  src={`https://www.google.com/recaptcha/api.js?render=${recaptchaSiteKey}`}
-></script>
 
-<section
-  class="bg-[#F3F1F9] py-[48px] lg:py-[100px]"
-  data-recaptcha-key={recaptchaSiteKey}
-  data-sheet-name={sheetName}
-  data-origin-country={originCountry}
-  data-thankyou-url={thankYouUrl}
-  data-form-type={formType}
-  data-lead-type={leadType}
->
+<section class="bg-[#F3F1F9] py-[48px] lg:py-[100px]">
   <div class="mx-auto w-full max-w-[1200px] px-4 lg:px-10">
     <div class="tw-grid items-start gap-6 lg:grid-cols-[1fr_1.1fr]">
       <div class="flex flex-col h-full">
@@ -120,7 +85,6 @@ const points = [
       </div>
 
       <div
-        id="contact"
         class="rounded-xl border border-[rgba(255,255,255,0.1)] bg-white lg:px-10 lg:py-[30px] px-6 py-6 shadow-[0_40px_80px_rgba(0,0,0,0.3)] lg:px-9 lg:py-10 premium-reveal [transition-delay:500ms] overflow-clip!"
       >
         <h3 class="mb-2 text-[22px] font-semibold leading-[1.36] text-black">
@@ -130,226 +94,348 @@ const points = [
           Our UAE specialists will walk you through the platform and build your
           compliance roadmap.
         </p>
-        <form data-lead-form>
-          <div class="mb-5">
-            <label
-              for="cf-name"
-              class="mb-2 tw-block leading-[1.5] h-auto lg:text-base text-sm text-black/80"
-              >Name</label
-            >
-            <input
-              id="cf-name"
-              type="text"
-              required
-              placeholder="John Doe"
-              data-field="name"
-              class="w-full rounded-lg border border-[rgba(255,255,255,0.12)] bg-[#F5F5F5] px-[18px] py-[14px] text-[14.5px] text-black/80 outline-none"
-            />
-          </div>
 
-          <div class="mb-5">
-            <label
-              for="cf-phone"
-              class="mb-2 tw-block leading-[1.5] h-auto lg:text-base text-sm text-black/80"
-              >Phone Number *</label
-            >
-            <div class="tw-grid grid-cols-[75px_1fr] gap-[10px]">
-              <div
-                class="relative w-full after:pointer-events-none bg-[#F5F5F5] rounded-lg after:absolute after:right-[18px] after:top-1/2 after:z-[2] after:-translate-y-1/2 after:border-l-[5px] after:border-r-[5px] after:border-t-[6px] after:border-l-transparent after:border-r-transparent after:content-['']"
-              >
-                <select
-                  id="cf-isd"
-                  data-field="isd"
-                  class="absolute inset-0 z-[2] h-full text-black w-full bg-[#F5F5F5] cursor-pointer appearance-none opacity-0"
-                >
-                  {
-                    countryCodes.map((c) => (
-                      <option
-                        value={c.value}
-                        selected={c.value === defaultCountryCode}
-                      >
-                        {c.label}
-                      </option>
-                    ))
-                  }
-                </select>
-                <span
-                  class="pointer-events-none z-[1] tw-block rounded-lg border border-[rgba(255,255,255,0.12)] bg-[rgba(255,255,255,0.06)] px-[14px] py-[14px] pr-6 text-[14.5px] text-black"
-                  data-isd-display
-                  aria-hidden="true">{defaultCountryCode}</span
-                >
+        <!-- HubSpot Form Mount Container -->
+        <div id="contact" class="uae-hs-form-wrap" data-portal-id={hubspotPortalId} data-form-id={hubspotFormId} data-region={hubspotRegion}>
+          <!-- Form Skeleton Loader -->
+          <div id="form-skeleton" class="form-skeleton">
+            <div class="skeleton-row-2">
+              <div>
+                <div class="skeleton-label shimmer"></div>
+                <div class="skeleton-input shimmer"></div>
               </div>
-              <input
-                id="cf-phone"
-                type="tel"
-                required
-                placeholder="54345678"
-                data-field="phone"
-                class="w-full rounded-lg border border-[rgba(255,255,255,0.12)] bg-[#F5F5F5] px-[18px] py-[14px] text-[14.5px] text-black/80 outline-none"
-              />
-            </div>
-          </div>
-
-          <div class="mb-5 tw-grid grid-cols-1 gap-[10px] sm:grid-cols-2">
-            <div>
-              <label
-                for="cf-email"
-                class="mb-2 tw-block leading-[1.5] h-auto lg:text-base text-sm text-black/80"
-                >Company Email *</label
-              >
-              <input
-                id="cf-email"
-                type="email"
-                required
-                placeholder="john@company.com"
-                data-field="email"
-                class="w-full rounded-lg border border-[rgba(255,255,255,0.12)] bg-[#F5F5F5] px-[18px] py-[14px] text-[14.5px] text-black/80 outline-none"
-              />
+              <div>
+                <div class="skeleton-label shimmer"></div>
+                <div class="skeleton-input shimmer"></div>
+              </div>
             </div>
             <div>
-              <label
-                for="cf-company"
-                class="mb-2 tw-block leading-[1.5] h-auto lg:text-base text-sm text-black/80"
-                >Company Name *</label
-              >
-              <input
-                id="cf-company"
-                type="text"
-                required
-                placeholder="ABC Company LLC"
-                data-field="company"
-                class="w-full rounded-lg border border-[rgba(255,255,255,0.12)] bg-[#F5F5F5] px-[18px] py-[14px] text-[14.5px] text-black/80 outline-none"
-              />
+              <div class="skeleton-label shimmer" style="width: 100px;"></div>
+              <div class="skeleton-input shimmer"></div>
             </div>
+            <div class="skeleton-row-2">
+              <div>
+                <div class="skeleton-label shimmer"></div>
+                <div class="skeleton-input shimmer"></div>
+              </div>
+              <div>
+                <div class="skeleton-label shimmer"></div>
+                <div class="skeleton-input shimmer"></div>
+              </div>
+            </div>
+            <div class="skeleton-button shimmer"></div>
           </div>
+        </div>
 
-          <div class="mb-6 flex items-start gap-3">
-            <input id="cf-consent" type="checkbox" required class="mt-1" />
-            <label
-              for="cf-consent"
-              class="m-0 text-sm leading-[1.6] text-black/80"
-            >
-              I agree to ClearTax's <a
-                href="https://www.clear.in/meta/privacy"
-                target="_blank"
-                rel="noopener"
-                class="text-[#200D78]">Privacy Policy</a
-              > and <a
-                href="https://www.clear.in/meta/terms"
-                target="_blank"
-                rel="noopener"
-                class="text-[#200D78]">Terms of Service</a
-              >. I consent to receiving communications about ClearTax products
-              and UAE e-invoicing updates.
-            </label>
-          </div>
-
-          <button
-            type="submit"
-            class="w-full cursor-pointer rounded-[100px] border-none px-4 py-4 lg:text-base text-sm bg-gradient-to-r from-[#110072] to-[#7a5698] text-white leading-[1.5] font-bold transition-all duration-200 cta-shimmer"
-            data-submit>Get in Touch</button
-          >
-          <p class="mt-4 text-center text-sm text-black/80">
-            No spam. Just a 30-min call with our UAE specialists.
-          </p>
-        </form>
+        <p class="mt-4 text-center text-sm text-black/80">
+          No spam. Just a 30-min call with our UAE specialists.
+        </p>
       </div>
     </div>
   </div>
 </section>
 
 <script is:inline>
-  (function () {
-    const section = document.currentScript.previousElementSibling;
-    if (!section) return;
-    const form = section.querySelector("[data-lead-form]");
-    const isdSelect = section.querySelector('[data-field="isd"]');
-    const isdDisplay = section.querySelector("[data-isd-display]");
-    if (!form) return;
+  // HubSpot form embed with URL parameters auto-prefill
+  (() => {
+    let initialized = false;
+    
+    const initForm = () => {
+      if (initialized) return;
+      const container = document.getElementById("contact");
+      if (!container) return;
+      const portalId = container.getAttribute("data-portal-id");
+      const formId = container.getAttribute("data-form-id");
+      const region = container.getAttribute("data-region") || "na2";
 
-    if (isdSelect && isdDisplay) {
-      const sync = () => {
-        isdDisplay.textContent = isdSelect.value;
-      };
-      isdSelect.addEventListener("change", sync);
-      sync();
-    }
-
-    form.addEventListener("submit", function (e) {
-      e.preventDefault();
-      const btn = form.querySelector("[data-submit]");
-      const originalText = btn.textContent;
-      btn.textContent = "Connecting...";
-      btn.disabled = true;
-
-      const recaptchaKey = section.getAttribute("data-recaptcha-key");
-      const sheetName = section.getAttribute("data-sheet-name");
-      const originCountry = section.getAttribute("data-origin-country");
-      const thankYouUrl = section.getAttribute("data-thankyou-url");
-      const formType = section.getAttribute("data-form-type");
-      const leadType = section.getAttribute("data-lead-type");
-
-      function readField(name) {
-        const el = form.querySelector(`[data-field="${name}"]`);
-        return el ? el.value : "";
-      }
-
-      function submitWithToken(token) {
-        const payload = {
-          lead_platforms: {
-            google_sheet: { sheet_name: sheetName },
-            pardot: true,
-            salesforce: true,
-          },
-          extra_payload: { origin_country: originCountry },
-          lead_data: {
-            name: readField("name"),
-            phone_number: readField("phone"),
-            email: readField("email"),
-            company_name: readField("company"),
-            ISD: readField("isd"),
-            form_type: formType,
-            lead_type: leadType,
-            lead_source_url: window.location.href,
-          },
-        };
-
-        fetch(
-          `https://www.cleartax.com/f/common-lead/lead/?captcha_token=${token}`,
-          {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(payload),
-          },
-        )
-          .then((response) => {
-            if (response.status === 201) {
-              window.location.href = thankYouUrl;
-            } else {
-              throw new Error("API Error");
+      if (window.hbspt && window.hbspt.forms) {
+        initialized = true;
+        window.hbspt.forms.create({
+          portalId: portalId,
+          formId: formId,
+          region: region,
+          target: "#contact",
+          onFormReady: function($form) {
+            // Remove the skeleton loader
+            const skeleton = document.getElementById("form-skeleton");
+            if (skeleton) {
+              skeleton.remove();
             }
-          })
-          .catch(() => {
-            btn.textContent = "✕ Submission Failed";
-            btn.style.background = "#EF4444";
-            btn.disabled = false;
-            setTimeout(() => {
-              btn.textContent = originalText;
-              btn.style.background = "";
-            }, 4000);
-          });
-      }
 
-      if (typeof grecaptcha === "undefined") {
-        // Recaptcha not loaded yet — submit without token; backend will reject if required.
-        submitWithToken("");
-        return;
+            const formEl = ($form && $form[0]) ? $form[0] : $form;
+            if (formEl && formEl.querySelector) {
+              const urlParams = new URLSearchParams(window.location.search);
+              const utms = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 'utm_content'];
+              utms.forEach(utm => {
+                const value = urlParams.get(utm);
+                if (value) {
+                  const input = formEl.querySelector('input[name="' + utm + '"]');
+                  if (input) {
+                    input.value = value;
+                  }
+                }
+              });
+            }
+          }
+        });
       }
-      grecaptcha.ready(function () {
-        grecaptcha
-          .execute(recaptchaKey, { action: "submit" })
-          .then(submitWithToken);
-      });
-    });
+    };
+
+    const checkAndInit = () => {
+      if (window.hbspt && window.hbspt.forms) {
+        initForm();
+      } else {
+        const script = document.querySelector('script[src*="hsforms.net"]');
+        if (script) {
+          script.addEventListener('load', initForm);
+        }
+        let pollCount = 0;
+        const interval = setInterval(() => {
+          pollCount++;
+          if (window.hbspt && window.hbspt.forms) {
+            clearInterval(interval);
+            initForm();
+          } else if (pollCount > 100) {
+            clearInterval(interval);
+          }
+        }, 100);
+      }
+    };
+
+    if (document.readyState === "loading") {
+      document.addEventListener("DOMContentLoaded", checkAndInit);
+    } else {
+      checkAndInit();
+    }
   })();
 </script>
+
+<style is:global>
+  /* Pixel-perfect styles for light glassmorphism HubSpot Form to match layout */
+  .uae-hs-form-wrap {
+    width: 100%;
+    min-height: 300px;
+  }
+  .uae-hs-form-wrap .inputs-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  .uae-hs-form-wrap form {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 16px !important;
+  }
+  .uae-hs-form-wrap .hs-form-field {
+    margin-bottom: 0 !important;
+  }
+  .uae-hs-form-wrap .hs-form-field > label {
+    display: block !important;
+    font-size: 13px !important;
+    font-weight: 600 !important;
+    color: rgba(0, 0, 0, 0.8) !important;
+    margin-bottom: 5px !important;
+  }
+  .uae-hs-form-wrap .hs-form-field > label .hs-form-required {
+    color: #ef4444 !important;
+    margin-left: 2px !important;
+  }
+  .uae-hs-form-wrap input[type="text"],
+  .uae-hs-form-wrap input[type="email"],
+  .uae-hs-form-wrap input[type="tel"],
+  .uae-hs-form-wrap input[type="number"],
+  .uae-hs-form-wrap select,
+  .uae-hs-form-wrap textarea {
+    width: 100% !important;
+    border-radius: 8px !important;
+    border: 1px solid #e2e8f0 !important;
+    background-color: #ffffff !important;
+    padding: 11px 14px !important;
+    font-size: 14.5px !important;
+    color: #1e1b4b !important;
+    outline: none !important;
+    transition: all 0.25s ease !important;
+    box-sizing: border-box !important;
+    box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.02) !important;
+  }
+  .uae-hs-form-wrap input:focus,
+  .uae-hs-form-wrap select:focus,
+  .uae-hs-form-wrap textarea:focus {
+    border-color: #110072 !important;
+    box-shadow: 0 0 0 3px rgba(17, 0, 114, 0.12) !important;
+  }
+  .uae-hs-form-wrap textarea {
+    min-height: 80px !important;
+    resize: vertical !important;
+  }
+  .uae-hs-form-wrap .hs_phone .hs-fieldtype-intl-phone {
+    display: flex !important;
+    gap: 12px !important;
+    width: 102% !important;
+  }
+  .uae-hs-form-wrap select {
+    appearance: auto !important;
+  }
+  .uae-hs-form-wrap fieldset {
+    max-width: none !important;
+    border: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    display: flex !important;
+    flex-direction: row !important;
+    gap: 12px !important;
+  }
+  @media (max-width: 640px) {
+    .uae-hs-form-wrap fieldset {
+      flex-direction: column !important;
+      gap: 16px !important;
+    }
+  }
+  .uae-hs-form-wrap fieldset .hs-form-field {
+    flex: 1 !important;
+  }
+  .uae-hs-form-wrap .input {
+    margin-right: 0 !important;
+  }
+  .uae-hs-form-wrap .hs-form-booleancheckbox label,
+  .uae-hs-form-wrap .legal-consent-container label {
+    display: flex !important;
+    align-items: flex-start !important;
+    font-size: 14px !important;
+    color: rgba(0, 0, 0, 0.8) !important;
+    line-height: 1.5 !important;
+    font-weight: 400 !important;
+    cursor: pointer !important;
+  }
+  .uae-hs-form-wrap .hs-form-booleancheckbox label a,
+  .uae-hs-form-wrap .legal-consent-container label a {
+    color: #110072 !important;
+    font-weight: 600 !important;
+    text-decoration: underline !important;
+  }
+  .uae-hs-form-wrap input[type="checkbox"] {
+    margin-top: 3px !important;
+    flex-shrink: 0 !important;
+    accent-color: #110072 !important;
+    width: 15px !important;
+    height: 15px !important;
+    cursor: pointer !important;
+  }
+  .uae-hs-form-wrap .hs-submit {
+    margin-top: 8px !important;
+  }
+  .uae-hs-form-wrap input[type="submit"],
+  .uae-hs-form-wrap .hs-button {
+    width: 100% !important;
+    background: linear-gradient(135deg, #110072 0%, #7a5698 100%) !important;
+    color: white !important;
+    padding: 13px !important;
+    border-radius: 30px !important;
+    font-weight: 700 !important;
+    font-size: 15px !important;
+    border: none !important;
+    cursor: pointer !important;
+    font-family: inherit !important;
+    transition: all 0.25s ease !important;
+    box-shadow: 0 4px 14px rgba(17, 0, 114, 0.25) !important;
+  }
+  .uae-hs-form-wrap input[type="submit"]:hover,
+  .uae-hs-form-wrap .hs-button:hover {
+    transform: translateY(-1px) !important;
+    box-shadow: 0 6px 18px rgba(17, 0, 114, 0.35) !important;
+    opacity: 0.95 !important;
+  }
+  .uae-hs-form-wrap .hs-error-msgs {
+    list-style: none !important;
+    padding: 0 !important;
+    margin: 4px 0 0 !important;
+    font-size: 11.5px !important;
+    color: #ef4444 !important;
+  }
+  .uae-hs-form-wrap .hs-error-msg {
+    color: #ef4444 !important;
+  }
+  .uae-hs-form-wrap .submitted-message {
+    background: #eef2f6 !important;
+    color: #1e1b4b !important;
+    padding: 18px !important;
+    border-radius: 8px !important;
+    font-size: 14.5px !important;
+    font-weight: 600 !important;
+    text-align: center !important;
+    border: 1px solid rgba(17, 0, 114, 0.15) !important;
+  }
+  .uae-hs-form-wrap fieldset:has([class*="hs_utm_"]),
+  .uae-hs-form-wrap .hs-form-field[style*="display: none"] {
+    display: none !important;
+  }
+
+  /* ==================== FORM SKELETON SHIMMER STYLES ==================== */
+  .form-skeleton {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    width: 100%;
+    min-height: 300px;
+  }
+  .skeleton-row-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+  @media (max-width: 640px) {
+    .skeleton-row-2 {
+      grid-template-columns: 1fr;
+      gap: 16px;
+    }
+  }
+  .skeleton-label {
+    height: 14px;
+    width: 80px;
+    background: rgba(0, 0, 0, 0.08);
+    border-radius: 4px;
+    margin-bottom: 6px;
+  }
+  .skeleton-input {
+    height: 44px;
+    background: rgba(0, 0, 0, 0.03);
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    border-radius: 8px;
+    width: 100%;
+  }
+  .skeleton-button {
+    height: 46px;
+    background: linear-gradient(135deg, rgba(17, 0, 114, 0.25) 0%, rgba(122, 86, 152, 0.25) 100%);
+    border-radius: 30px;
+    width: 100%;
+    margin-top: 8px;
+  }
+
+  /* Shimmer Animation */
+  .shimmer {
+    position: relative;
+    overflow: hidden;
+  }
+  .shimmer::after {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    transform: translateX(-100%);
+    background-image: linear-gradient(
+      90deg,
+      rgba(255, 255, 255, 0) 0%,
+      rgba(255, 255, 255, 0.6) 20%,
+      rgba(255, 255, 255, 0.6) 60%,
+      rgba(255, 255, 255, 0) 100%
+    );
+    animation: shimmer-anim 1.6s infinite;
+    content: "";
+  }
+  @keyframes shimmer-anim {
+    100% {
+      transform: translateX(100%);
+    }
+  }
+</style>
