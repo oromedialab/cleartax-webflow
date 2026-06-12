@@ -93,6 +93,28 @@ import FooterUAE from "../sections/_shared/FooterUAE.astro";
             }, { threshold: 0.1 });
             elements.forEach(el => revealObserver.observe(el));
           } catch (e) { console.error('Observer init failed', e); }
+
+          // Clean URL hash on anchor link clicks & initial landing
+          try {
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+              anchor.addEventListener('click', function(e) {
+                const targetId = this.getAttribute('href');
+                if (targetId === '#') return;
+                const targetElement = document.querySelector(targetId);
+                if (targetElement) {
+                  e.preventDefault();
+                  targetElement.scrollIntoView({ behavior: 'smooth' });
+                  history.pushState(null, document.title, window.location.pathname + window.location.search);
+                }
+              });
+            });
+
+            if (window.location.hash) {
+              setTimeout(() => {
+                history.replaceState(null, document.title, window.location.pathname + window.location.search);
+              }, 1000);
+            }
+          } catch (e) { console.error('Anchor hash handler failed', e); }
         };
 
         // 2. Deferred Non-Critical JS & Tracking (Load on interaction/idle)

@@ -13,7 +13,7 @@
     <link rel="dns-prefetch" href="https://www.googletagmanager.com">
     <link rel="dns-prefetch" href="https://www.google-analytics.com">
     
-    <link rel="preload" as="image" href="https://cdn.prod.website-files.com/6093bce33d9b4bae841b04e3/69f9c316ad6a9e6874073bf6_logo%201.png" fetchpriority="high">
+    <link rel="preload" as="image" href="https://assets1.cleartax-cdn.com/finfo/wg-utils/retool/d9f36ac3-77a9-40c6-94fc-20c2e3855457.svg" fetchpriority="high">
     
     <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     
@@ -37,29 +37,12 @@
         uc.async = true;
         document.head.appendChild(uc);
 
-        // Load Recaptcha
-        var rc = document.createElement('script');
-        rc.src = 'https://www.google.com/recaptcha/api.js?render=6Lc5ZG0mAAAAAGwClrZwtcyttcUMYDUPxg4MM4p3';
-        document.head.appendChild(rc);
-
         // Load GTM
         (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
         new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
         j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
         'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
         })(window,document,'script','dataLayer','GTM-P5NDQXGH');
-
-        // Swap Logos from Placeholder to Real
-        var realLogo = 'https://cdn.prod.website-files.com/63ede4a3da6dbd6b05c4612f/63ede4a3da6dbd515ec466c5_cleartax%20logo.svg';
-        document.querySelectorAll('.nav-logo img, .footer-brand img').forEach(function(img) {
-          img.src = realLogo;
-        });
-
-        // Load other lazy images if any
-        document.querySelectorAll('img[data-src]').forEach(function(img) {
-          img.src = img.getAttribute('data-src');
-          img.removeAttribute('data-src');
-        });
 
         // Cleanup
         ['mousedown', 'mousemove', 'keydown', 'scroll', 'touchstart'].forEach(function(e) {
@@ -81,8 +64,6 @@
 #ct-page2 .container { display: block !important; }
 #ct-page2 .urgency-banner { display: block !important; }
 #ct-page2 .cta-band { display: block !important; }
-#ct-page2 footer { display: block !important; }
-#ct-page2 .footer-inner { display: block !important; }
 #ct-page2 .faq-grid { display: block !important; }
 #ct-page2 .faq-item { display: block !important; }
 #ct-page2 .faq-a { display: block !important; }
@@ -119,134 +100,256 @@
 }
 
 /* ══════════════════════════════
-   NAVBAR
+   NAVBAR — PILL SHAPE (matches cleartax.com/ae)
 ══════════════════════════════ */
-#ct-page2 .nav-wrap {
-  position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
-  display: flex !important; align-items: center; justify-content: center;
-  padding: 16px 24px 0; pointer-events: none;
+#ct-nav {
+  position: sticky;
+  top: 0; left: 0; right: 0;
+  z-index: 1000;
+  background: transparent !important;
+  background-color: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  padding: 14px 24px;
+  display: block !important;
+  font-family: 'Manrope', sans-serif;
 }
-#ct-page2 nav {
-  pointer-events: all;
-  width: 100%; max-width: 1200px;
-  background: rgba(23,30,40,0.88);
-  backdrop-filter: blur(20px) saturate(180%);
-  -webkit-backdrop-filter: blur(20px) saturate(180%);
-  border: 1px solid rgba(255,255,255,0.12);
+#ct-nav-inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 24px;
+  height: 56px;
+  display: flex !important;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0;
+  background: #FFFFFF;
   border-radius: 100px;
-  padding: 10px 20px 10px 28px;
-  display: flex !important; align-items: center; justify-content: space-between;
-  gap: 16px; transition: background 0.3s;
+  border: 1px solid rgba(0,0,0,0.10);
+  box-shadow: 0 2px 16px rgba(0,0,0,0.10);
+  transition: box-shadow 0.3s;
 }
-#ct-page2 nav.scrolled {
-  background: rgba(23,30,40,0.97);
-  box-shadow: 0 8px 32px rgba(0,0,0,0.32);
+#ct-nav.scrolled #ct-nav-inner {
+  box-shadow: 0 4px 28px rgba(0,0,0,0.18);
 }
-#ct-page2 .nav-logo {
-  display: flex !important; align-items: center; gap: 6px;
-  text-decoration: none; flex-shrink: 0;
-}
-#ct-page2 .nav-logo img { height: 28px; width: auto; filter: brightness(0) invert(1); }
-#ct-page2 .nav-links {
-  display: flex !important; align-items: center; gap: 4px;
-  list-style: none; flex: 1; justify-content: center;
-}
-#ct-page2 .nav-links > li { position: relative; }
-#ct-page2 .nav-links > li > a,
-#ct-page2 .nav-links > li > button {
-  color: rgba(255,255,255,0.72); text-decoration: none;
-  font-size: 13.5px; font-weight: 500;
-  padding: 8px 14px; border-radius: 100px;
-  transition: all 0.2s; background: none; border: none;
-  cursor: pointer; display: flex !important; align-items: center; gap: 5px;
-  white-space: nowrap; font-family: 'Manrope', sans-serif;
-}
-#ct-page2 .nav-links > li > a:hover,
-#ct-page2 .nav-links > li > button:hover {
-  color: #FFFFFF; background: rgba(255,255,255,0.07);
-}
-#ct-page2 .nav-links .chevron {
-  width: 14px; height: 14px; opacity: 0.6;
-  transition: transform 0.25s;
-}
-#ct-page2 .nav-links > li.open > button .chevron { transform: rotate(180deg); }
 
-#ct-page2 .mega-menu {
+/* Logo */
+#ct-nav .ct-nav-logo {
+  display: flex !important;
+  align-items: center;
+  text-decoration: none;
+  flex-shrink: 0;
+  margin-right: 28px;
+}
+#ct-nav .ct-nav-logo img {
+  height: 26px;
+  width: auto;
+  display: block !important;
+}
+
+/* Nav links */
+#ct-nav .ct-nav-links {
+  display: flex !important;
+  align-items: center;
+  gap: 2px;
+  list-style: none;
+  flex: 1;
+}
+#ct-nav .ct-nav-links > li { position: relative; }
+#ct-nav .ct-nav-links > li > a,
+#ct-nav .ct-nav-links > li > button {
+  display: flex !important;
+  align-items: center;
+  gap: 4px;
+  padding: 8px 14px;
+  font-size: 14px;
+  font-weight: 500;
+  color: #1A1A2E;
+  text-decoration: none;
+  background: none;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-family: 'Manrope', sans-serif;
+  white-space: nowrap;
+  transition: background 0.18s, color 0.18s;
+  line-height: 1.4;
+}
+#ct-nav .ct-nav-links > li > a:hover,
+#ct-nav .ct-nav-links > li > button:hover {
+  background: #F4F5F7;
+  color: #0050FF;
+}
+#ct-nav .ct-nav-links .ct-chevron {
+  width: 14px; height: 14px;
+  flex-shrink: 0;
+  opacity: 0.45;
+  transition: transform 0.22s;
+}
+#ct-nav .ct-nav-links > li.open > button .ct-chevron {
+  transform: rotate(180deg);
+  opacity: 0.8;
+}
+
+/* Dropdown */
+#ct-nav .ct-dropdown {
   display: none;
-  position: absolute; top: calc(100% + 12px); left: 50%;
-  transform: translateX(-50%);
-  background: #1E2738;
-  border: 1px solid rgba(255,255,255,0.1);
-  border-radius: 20px; padding: 24px;
-  min-width: 280px;
-  box-shadow: 0 24px 64px rgba(0,0,0,0.4);
-  z-index: 100;
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  min-width: 220px;
+  background: #FFFFFF;
+  border: 1px solid rgba(0,0,0,0.09);
+  border-radius: 14px;
+  box-shadow: 0 12px 40px rgba(0,0,0,0.12);
+  padding: 8px;
+  z-index: 200;
 }
-#ct-page2 .mega-menu.wide { min-width: 440px; }
-#ct-page2 .nav-links > li.open .mega-menu { display: block; }
-#ct-page2 .mega-menu-grid { display: grid !important; grid-template-columns: 1fr 1fr; gap: 8px; }
-#ct-page2 .mega-menu-item {
-  display: flex !important; align-items: flex-start; gap: 12px;
-  padding: 12px; border-radius: 12px;
-  text-decoration: none; transition: background 0.2s;
+#ct-nav .ct-nav-links > li.open .ct-dropdown { display: block; }
+#ct-nav .ct-dropdown a {
+  display: flex !important;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  border-radius: 9px;
+  font-size: 14px;
+  color: #1A1A2E;
+  text-decoration: none;
+  font-weight: 500;
+  transition: background 0.15s;
 }
-#ct-page2 .mega-menu-item:hover { background: rgba(255,255,255,0.06); }
-#ct-page2 .mega-menu-icon {
-  width: 36px; height: 36px; border-radius: 9px;
-  background: rgba(99,85,216,0.2);
-  display: flex !important; align-items: center; justify-content: center;
-  font-size: 16px; flex-shrink: 0;
+#ct-nav .ct-dropdown a:hover { background: #F4F5F7; color: #0050FF; }
+#ct-nav .ct-dropdown-divider {
+  height: 1px;
+  background: rgba(0,0,0,0.07);
+  margin: 6px 0;
 }
-#ct-page2 .mega-menu-item h5 { color: #FFFFFF; font-size: 13px; font-weight: 600; margin-bottom: 2px; }
-#ct-page2 .mega-menu-item p { color: rgba(255,255,255,0.45); font-size: 11.5px; line-height: 1.5; }
 
-#ct-page2 .nav-cta-area { display: flex !important; align-items: center; gap: 10px; flex-shrink: 0; }
-#ct-page2 .nav-country {
-  display: flex !important; align-items: center; gap: 6px;
-  color: rgba(255,255,255,0.6); font-size: 12.5px; font-weight: 500;
-  padding: 7px 12px; border-radius: 100px;
-  border: 1px solid rgba(255,255,255,0.12);
-  cursor: pointer; background: none; font-family: 'Manrope', sans-serif;
+/* Right area */
+#ct-nav .ct-nav-right {
+  display: flex !important;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+/* Region pill — static, no dropdown */
+#ct-nav .ct-region-pill {
+  display: flex !important;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 13px;
+  border: 1px solid rgba(0,0,0,0.13);
+  border-radius: 100px;
+  background: none;
+  font-family: 'Manrope', sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  color: #1A1A2E;
+  cursor: default;
+  pointer-events: none;
+  user-select: none;
+}
+#ct-nav .ct-region-pill img {
+  width: 18px; height: 13px;
+  object-fit: cover;
+  border-radius: 2px;
+  display: block !important;
+}
+
+/* Book a demo CTA */
+#ct-nav .ct-btn-demo {
+  display: inline-flex !important;
+  align-items: center;
+  gap: 6px;
+  padding: 9px 20px;
+  background: linear-gradient(135deg, #110072, #7A5698);
+  color: #FFFFFF;
+  font-family: 'Manrope', sans-serif;
+  font-size: 13.5px;
+  font-weight: 600;
+  border-radius: 10px;
+  text-decoration: none;
+  border: none;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.2s, transform 0.2s, box-shadow 0.2s;
+}
+#ct-nav .ct-btn-demo:hover {
+  opacity: 0.88;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 14px rgba(17,0,114,0.35);
+}
+
+/* Hamburger */
+#ct-nav .ct-hamburger {
+  display: none !important;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 8px;
+  flex-direction: column;
+  gap: 0;
+}
+#ct-nav .ct-hamburger span {
+  display: block;
+  width: 22px; height: 2px;
+  background: #1A1A2E;
+  margin: 4px 0;
+  border-radius: 2px;
   transition: all 0.2s;
 }
-#ct-page2 .nav-country:hover { color: #FFFFFF; border-color: rgba(255,255,255,0.3); }
-#ct-page2 .nav-login {
-  color: rgba(255,255,255,0.72); text-decoration: none;
-  font-size: 13px; font-weight: 500; padding: 8px 14px;
-  border-radius: 100px; transition: all 0.2s;
+
+/* Mobile panel */
+#ct-nav .ct-mobile-panel {
+  display: none;
+  flex-direction: column;
+  background: #FFFFFF;
+  margin: 0 24px 14px;
+  border-radius: 20px;
+  border: 1px solid rgba(0,0,0,0.08);
+  padding: 16px 20px 20px;
+  gap: 4px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.10);
 }
-#ct-page2 .nav-login:hover { color: #FFFFFF; background: rgba(255,255,255,0.07); }
-#ct-page2 .btn-nav-demo {
-  padding: 9px 20px; background: linear-gradient(135deg, #6355D8 0%, #3025A0 100%);
-  border-radius: 100px; color: #fff;
-  font-size: 13px; font-weight: 700;
-  text-decoration: none; border: none; cursor: pointer;
-  font-family: 'Manrope', sans-serif;
-  display: flex !important; align-items: center; gap: 6px;
-  transition: all 0.2s; white-space: nowrap;
+#ct-nav .ct-mobile-panel.open { display: flex !important; }
+#ct-nav .ct-mobile-panel a {
+  display: block;
+  padding: 11px 12px;
+  font-size: 14.5px;
+  font-weight: 500;
+  color: #1A1A2E;
+  text-decoration: none;
+  border-radius: 8px;
+  transition: background 0.15s;
 }
-#ct-page2 .btn-nav-demo:hover {
-  background: linear-gradient(135deg, #7468E8 0%, #4035B8 100%);
-  box-shadow: 0 4px 16px rgba(99,85,216,0.4);
-  transform: translateY(-1px);
+#ct-nav .ct-mobile-panel a:hover { background: #F4F5F7; }
+#ct-nav .ct-mobile-panel .mob-divider {
+  height: 1px;
+  background: rgba(0,0,0,0.07);
+  margin: 8px 0;
 }
-#ct-page2 .nav-mobile-toggle {
-  display: none; background: none; border: none; cursor: pointer; padding: 8px;
-}
-#ct-page2 .nav-mobile-toggle span {
-  display: block; width: 20px; height: 2px;
-  background: rgba(255,255,255,0.7); margin: 4px 0;
-  border-radius: 2px;
+#ct-nav .ct-mobile-panel .mob-cta {
+  margin-top: 8px;
+  display: block;
+  padding: 12px 20px;
+  background: linear-gradient(135deg, #110072, #7A5698);
+  color: #FFFFFF !important;
+  border-radius: 10px;
+  text-align: center;
+  font-weight: 600;
+  font-size: 14.5px;
+  text-decoration: none;
 }
 
 /* ══════════════════════════════
    HERO
 ══════════════════════════════ */
 #ct-page2 #hero2 {
-  position: relative; min-height: 100vh;
+  position: relative; min-height: 90vh;
   display: grid !important; grid-template-columns: 1fr 460px;
   gap: 60px; align-items: center;
-  padding: 140px 0 80px;
+  padding: 40px 0 80px;
 }
 #ct-page2 #hero2::before {
   content: ''; position: absolute; inset: 0; z-index: 0;
@@ -339,10 +442,9 @@
 #ct-page2 .form-group input::placeholder { color: rgba(255,255,255,0.3); }
 #ct-page2 .form-group input:focus,
 #ct-page2 .form-group select:focus {
-  border-color: #6355D8;
-  box-shadow: 0 0 0 3px rgba(99,85,216,0.15);
+  border-color: #7A5698;
+  box-shadow: 0 0 0 3px rgba(122,86,152,0.15);
 }
-
 #ct-page2 .form-group select {
   appearance: none;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='rgba(255,255,255,0.5)' viewBox='0 0 16 16'%3E%3Cpath d='M8 11L3 6h10z'/%3E%3C/svg%3E");
@@ -353,16 +455,16 @@
 #ct-page2 .form-row { display: grid !important; grid-template-columns: 1fr 1fr; gap: 12px; }
 #ct-page2 .form-submit {
   width: 100%; padding: 14px 24px;
-  background: linear-gradient(135deg, #6355D8 0%, #3025A0 100%); color: #FFFFFF;
+  background: linear-gradient(135deg, #110072 0%, #7A5698 100%); color: #FFFFFF;
   font-family: 'Manrope', sans-serif; font-size: 15px; font-weight: 700;
   border: none; border-radius: 12px; cursor: pointer;
   transition: all 0.25s; margin-top: 8px; letter-spacing: 0.2px;
   display: block !important;
 }
 #ct-page2 .form-submit:hover {
-  background: linear-gradient(135deg, #7468E8 0%, #4035B8 100%);
+  opacity: 0.88;
   transform: translateY(-2px);
-  box-shadow: 0 8px 30px rgba(99,85,216,0.45);
+  box-shadow: 0 8px 30px rgba(17,0,114,0.4);
 }
 #ct-page2 .form-disclaimer {
   font-size: 11.5px; color: rgba(255,255,255,0.35);
@@ -413,7 +515,7 @@
 }
 #ct-page2 .pain-icon.red { background: rgba(239,68,68,0.15); }
 #ct-page2 .pain-icon.amber { background: rgba(245,184,64,0.14); }
-#ct-page2 .pain-icon.purple { background: rgba(99,85,216,0.15); }
+#ct-page2 .pain-icon.purple { background: rgba(122,86,152,0.15); }
 #ct-page2 .pain-card h3 { font-size: 17px; font-weight: 700; color: #FFFFFF; margin-bottom: 10px; display: block !important; }
 #ct-page2 .pain-card p { font-size: 14px; color: rgba(232,234,240,0.6); line-height: 1.7; display: block !important; }
 
@@ -460,12 +562,12 @@
   display: flex !important; gap: 20px; transition: all 0.3s;
 }
 #ct-page2 .adv-card:hover {
-  border-color: rgba(99,85,216,0.3);
+  border-color: rgba(122,86,152,0.3);
   box-shadow: 0 8px 32px rgba(0,0,0,0.25);
 }
 #ct-page2 .adv-num {
   width: 40px; height: 40px; border-radius: 10px;
-  background: rgba(99,85,216,0.15); color: #8B7EE8;
+  background: rgba(122,86,152,0.15); color: #7A5698;
   font-size: 16px; font-weight: 800;
   display: flex !important; align-items: center; justify-content: center;
   flex-shrink: 0;
@@ -477,14 +579,14 @@
    CTA BAND
 ══════════════════════════════ */
 #ct-page2 .cta-band {
-  background: linear-gradient(135deg, #3025A0, #6355D8);
+  background: linear-gradient(135deg, #110072, #7A5698);
   padding: 60px 0; text-align: center; position: relative; overflow: hidden;
 }
 #ct-page2 .cta-band::before {
   content: ''; position: absolute; inset: 0;
   background:
     radial-gradient(circle at 20% 50%, rgba(255,255,255,0.06) 0%, transparent 50%),
-    radial-gradient(circle at 80% 50%, rgba(0,196,176,0.08) 0%, transparent 50%);
+    radial-gradient(circle at 80% 50%, rgba(255,255,255,0.04) 0%, transparent 50%);
 }
 #ct-page2 .cta-band .container { position: relative; z-index: 1; }
 #ct-page2 .cta-band h2 { font-size: clamp(24px, 3.5vw, 36px); font-weight: 800; color: #FFFFFF; margin-bottom: 14px; display: block !important; }
@@ -495,7 +597,7 @@
 #ct-page2 .cta-band-btn {
   display: inline-flex !important; align-items: center; gap: 10px;
   padding: 16px 40px; background: #FFFFFF;
-  color: #3025A0; font-family: 'Manrope', sans-serif;
+  color: #110072; font-family: 'Manrope', sans-serif;
   font-size: 16px; font-weight: 700; border: none;
   border-radius: 12px; cursor: pointer; transition: all 0.25s; text-decoration: none;
 }
@@ -528,7 +630,7 @@
 /* ══════════════════════════════
    FAQs
 ══════════════════════════════ */
-#ct-page2 .faq-grid { margin-top: 48px; max-width: 800px; }
+#ct-page2 .faq-grid { margin-top: 48px; max-width: 100%; }
 #ct-page2 .faq-item { border-bottom: 1px solid rgba(255,255,255,0.08); }
 #ct-page2 .faq-q {
   width: 100%; padding: 22px 0; display: flex !important;
@@ -556,89 +658,105 @@
 /* ══════════════════════════════
    FOOTER
 ══════════════════════════════ */
-#ct-page2 footer {
+#ct-footer {
   background: #0D1117;
   border-top: 1px solid rgba(255,255,255,0.06);
-  padding: 72px 0 0;
+  font-family: 'Manrope', sans-serif;
+  display: block !important;
 }
-#ct-page2 .footer-inner { max-width: 1200px; margin: 0 auto; padding: 0 40px; }
-#ct-page2 .footer-top {
+#ct-footer-inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 40px;
+}
+#ct-footer-top {
   display: grid !important;
-  grid-template-columns: 1.8fr 1fr 1fr 1fr 1fr;
-  gap: 48px; margin-bottom: 56px;
+  grid-template-columns: 1.8fr 1fr 1fr 1fr 0.9fr;
+  gap: 48px;
+  padding: 64px 0 56px;
 }
-#ct-page2 .footer-brand img { height: 28px; width: auto; margin-bottom: 16px; filter: brightness(0) invert(1); }
-#ct-page2 .footer-brand p {
-  font-size: 13.5px; color: rgba(255,255,255,0.38);
-  line-height: 1.75; max-width: 260px; margin-bottom: 24px; display: block !important;
+#ct-footer .ft-logo {
+  height: 26px; width: auto;
+  filter: brightness(0) invert(1);
+  display: block !important;
+  margin-bottom: 16px;
 }
-#ct-page2 .footer-social { display: flex !important; gap: 10px; }
-#ct-page2 .social-icon {
-  width: 36px; height: 36px; border-radius: 9px;
-  background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.08);
+#ct-footer .ft-tagline {
+  font-size: 13px; color: rgba(255,255,255,0.35);
+  line-height: 1.75; max-width: 260px;
+  margin-bottom: 22px; display: block !important;
+}
+#ct-footer .ft-social { display: flex !important; gap: 10px; }
+#ct-footer .ft-social-btn {
+  width: 34px; height: 34px; border-radius: 8px;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.08);
   display: flex !important; align-items: center; justify-content: center;
-  color: rgba(255,255,255,0.4); font-size: 14px;
+  color: rgba(255,255,255,0.45); font-size: 13px; font-weight: 700;
   text-decoration: none; transition: all 0.2s;
 }
-#ct-page2 .social-icon:hover {
-  background: rgba(99,85,216,0.2); border-color: rgba(99,85,216,0.4); color: #8B7EE8;
+#ct-footer .ft-social-btn:hover {
+  background: rgba(122,86,152,0.2);
+  border-color: rgba(122,86,152,0.4);
+  color: #7A5698;
 }
-#ct-page2 .footer-col h5 {
-  font-size: 11.5px; font-weight: 700; color: rgba(255,255,255,0.35);
-  text-transform: uppercase; letter-spacing: 1.2px; margin-bottom: 18px; display: block !important;
+#ct-footer .ft-col h5 {
+  font-size: 11px; font-weight: 700;
+  color: rgba(255,255,255,0.32);
+  text-transform: uppercase; letter-spacing: 1.4px;
+  margin-bottom: 18px; display: block !important;
 }
-#ct-page2 .footer-col ul { list-style: none; display: flex !important; flex-direction: column; gap: 10px; }
-#ct-page2 .footer-col ul li a {
+#ct-footer .ft-col ul {
+  list-style: none;
+  display: flex !important; flex-direction: column; gap: 9px;
+}
+#ct-footer .ft-col ul li a {
   font-size: 13.5px; color: rgba(255,255,255,0.5);
-  text-decoration: none; transition: color 0.2s;
+  text-decoration: none; transition: color 0.18s;
 }
-#ct-page2 .footer-col ul li a:hover { color: rgba(255,255,255,0.9); }
-#ct-page2 .footer-bottom {
+#ct-footer .ft-col ul li a:hover { color: rgba(255,255,255,0.9); }
+#ct-footer .ft-col .ft-col-gap { height: 24px; display: block !important; }
+
+#ct-footer-bottom {
   border-top: 1px solid rgba(255,255,255,0.06);
-  padding: 24px 0; margin-top: 0;
-  display: flex !important; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px;
+  padding: 24px 0;
+  display: flex !important; align-items: center;
+  justify-content: space-between; flex-wrap: wrap; gap: 16px;
 }
-#ct-page2 .footer-bottom p { font-size: 12.5px; color: rgba(255,255,255,0.25); display: block !important; }
-#ct-page2 .footer-bottom-links { display: flex !important; gap: 20px; }
-#ct-page2 .footer-bottom-links a {
+#ct-footer-bottom-left {
+  display: flex !important; flex-direction: column; gap: 5px;
+}
+#ct-footer-bottom-links {
+  display: flex !important; gap: 18px; flex-wrap: wrap;
+}
+#ct-footer-bottom-links a {
   font-size: 12.5px; color: rgba(255,255,255,0.3);
-  text-decoration: none; transition: color 0.2s;
+  text-decoration: none; transition: color 0.18s;
 }
-#ct-page2 .footer-bottom-links a:hover { color: rgba(255,255,255,0.7); }
+#ct-footer-bottom-links a:hover { color: rgba(255,255,255,0.7); }
+#ct-footer-address {
+  font-size: 12px; color: rgba(255,255,255,0.22);
+  display: block !important;
+}
+#ct-footer-copy {
+  font-size: 12px; color: rgba(255,255,255,0.22);
+  display: block !important;
+}
+#ct-footer-trust-wrap {
+  display: flex !important; align-items: center; gap: 14px;
+}
+#ct-footer-trust-wrap img {
+  height: 34px; width: auto; opacity: 0.75;
+  display: block !important;
+}
+#ct-footer-trust-text {
+  font-size: 11.5px; color: rgba(255,255,255,0.28);
+  line-height: 1.5; display: block !important;
+}
 
 /* ══════════════════════════════
-   RESPONSIVE
+   THANK YOU MODAL
 ══════════════════════════════ */
-@media (max-width: 991px) {
-  #ct-page2 #hero2 { grid-template-columns: 1fr; gap: 40px; padding-top: 120px; }
-  #ct-page2 .hero-form-wrap { max-width: 500px; }
-  #ct-page2 .pain-grid { grid-template-columns: 1fr 1fr; }
-  #ct-page2 .adv-grid { grid-template-columns: 1fr; }
-  #ct-page2 .trust-grid { grid-template-columns: 1fr 1fr; }
-  #ct-page2 .footer-top { grid-template-columns: 1fr 1fr 1fr; }
-}
-@media (max-width: 767px) {
-  #ct-page2 .nav-links, #ct-page2 .nav-country, #ct-page2 .nav-login { display: none !important; }
-  #ct-page2 .nav-mobile-toggle { display: block !important; }
-  #ct-page2 .nav-wrap { padding: 12px 16px 0; }
-  #ct-page2 nav { padding: 10px 16px; border-radius: 20px; }
-  #ct-page2 #hero2 { padding: 110px 0 60px; }
-  #ct-page2 .hero-stats { gap: 24px; flex-wrap: wrap; }
-  #ct-page2 .pain-grid { grid-template-columns: 1fr; }
-  #ct-page2 .trust-grid { grid-template-columns: 1fr; }
-  #ct-page2 .form-row { grid-template-columns: 1fr; }
-  #ct-page2 .comp-table { font-size: 13px; }
-  #ct-page2 .comp-table thead th, #ct-page2 .comp-table tbody td { padding: 14px 16px; }
-  #ct-page2 .section { padding: 64px 0; }
-  #ct-page2 .footer-top { grid-template-columns: 1fr 1fr; gap: 32px; }
-}
-@media (max-width: 479px) {
-  #ct-page2 .hero-title { font-size: 28px; }
-  #ct-page2 .hero-stat-num { font-size: 28px; }
-  #ct-page2 .form-card { padding: 28px 20px; }
-}
-
-/* ── Thank You Modal Styles ── */
 #ct2-modal-wrap {
   position: fixed;
   top: 0; left: 0; right: 0; bottom: 0;
@@ -652,71 +770,325 @@
   -webkit-backdrop-filter: blur(10px);
 }
 #ct2-modal-wrap .ty-card {
-  text-align: center;
-  max-width: 440px;
-  width: 100%;
-  background: #FFFFFF;
-  padding: 48px 32px;
-  border-radius: 24px;
-  box-shadow: 0 20px 50px rgba(0,0,0,0.3);
+  text-align: center; max-width: 440px; width: 100%;
+  background: #FFFFFF; padding: 48px 32px;
+  border-radius: 24px; box-shadow: 0 20px 50px rgba(0,0,0,0.3);
   position: relative;
 }
 #ct2-modal-wrap .ty-icon {
-  width: 80px;
-  height: 80px;
-  margin: 0 auto 24px;
-  background: rgba(0, 196, 176, 0.1);
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  width: 80px; height: 80px; margin: 0 auto 24px;
+  background: rgba(17,0,114,0.08); border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
 }
 #ct2-modal-wrap .ty-check {
-  width: 40px;
-  height: 40px;
-  stroke: #00C4B0;
-  stroke-width: 3;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-  fill: none;
-  stroke-dasharray: 50;
-  stroke-dashoffset: 50;
+  width: 40px; height: 40px; stroke: #110072; stroke-width: 3;
+  stroke-linecap: round; stroke-linejoin: round; fill: none;
+  stroke-dasharray: 50; stroke-dashoffset: 50;
 }
-#ct2-modal-wrap.open .ty-check {
-  animation: ct2-draw 0.6s 0.2s ease-out forwards;
-}
+#ct2-modal-wrap.open .ty-check { animation: ct2-draw 0.6s 0.2s ease-out forwards; }
 #ct2-modal-wrap .ty-title {
-  font-family: 'Manrope', sans-serif;
-  font-size: 26px;
-  font-weight: 800;
-  color: #070A19;
-  margin-bottom: 12px;
+  font-family: 'Manrope', sans-serif; font-size: 26px; font-weight: 800;
+  color: #070A19; margin-bottom: 12px;
 }
-#ct2-modal-wrap .ty-sub {
-  font-size: 16px;
-  color: #64748B;
-  line-height: 1.6;
-  margin-bottom: 32px;
-}
+#ct2-modal-wrap .ty-sub { font-size: 16px; color: #64748B; line-height: 1.6; margin-bottom: 32px; }
 #ct2-modal-wrap .ty-btn {
-  display: inline-block;
-  background: #00C4B0;
-  color: #FFFFFF;
-  padding: 14px 32px;
-  border-radius: 12px;
-  font-weight: 700;
-  text-decoration: none;
-  transition: all 0.2s;
-  border: none;
-  cursor: pointer;
-  width: 100%;
+  display: inline-block; background: linear-gradient(135deg, #110072, #7A5698); color: #FFFFFF;
+  padding: 14px 32px; border-radius: 12px; font-weight: 700;
+  text-decoration: none; transition: all 0.2s;
+  border: none; cursor: pointer; width: 100%;
 }
-#ct2-modal-wrap .ty-btn:hover {
-  background: #00A396;
-  transform: translateY(-2px);
+#ct2-modal-wrap .ty-btn:hover { opacity: 0.88; transform: translateY(-2px); }
+@keyframes ct2-draw { to { stroke-dashoffset: 0; } }
+
+/* ══════════════════════════════
+   RESPONSIVE
+══════════════════════════════ */
+@media (max-width: 991px) {
+  #ct-page2 #hero2 { grid-template-columns: 1fr; gap: 40px; padding-top: 80px; }
+  #ct-page2 .hero-form-wrap { max-width: 500px; }
+  #ct-page2 .pain-grid { grid-template-columns: 1fr 1fr; }
+  #ct-page2 .adv-grid { grid-template-columns: 1fr; }
+  #ct-page2 .trust-grid { grid-template-columns: 1fr 1fr; }
+  #ct-footer-top { grid-template-columns: 1fr 1fr 1fr; }
 }
-@keyframes ct2-draw {
-  to { stroke-dashoffset: 0; }
+@media (max-width: 900px) {
+  #ct-nav .ct-nav-links,
+  #ct-nav .ct-region-btn { display: none !important; }
+  #ct-nav .ct-hamburger { display: flex !important; }
+  #ct-nav-inner { padding: 0 20px; }
+}
+@media (max-width: 767px) {
+  #ct-page2 #hero2 { padding: 80px 0 60px; }
+  #ct-page2 .hero-stats { gap: 24px; flex-wrap: wrap; }
+  #ct-page2 .pain-grid { grid-template-columns: 1fr; }
+  #ct-page2 .trust-grid { grid-template-columns: 1fr; }
+  #ct-page2 .form-row { grid-template-columns: 1fr; }
+  #ct-page2 .comp-table { font-size: 13px; }
+  #ct-page2 .comp-table thead th, #ct-page2 .comp-table tbody td { padding: 14px 16px; }
+  #ct-page2 .section { padding: 64px 0; }
+  #ct-footer-top { grid-template-columns: 1fr 1fr; gap: 32px; padding: 48px 0 40px; }
+  #ct-footer-inner { padding: 0 20px; }
+  #ct-footer-bottom { flex-direction: column; align-items: flex-start; }
+}
+@media (max-width: 479px) {
+  #ct-page2 .hero-title { font-size: 28px; }
+  #ct-page2 .hero-stat-num { font-size: 28px; }
+  #ct-page2 .form-card { padding: 28px 20px; }
+  #ct-footer-top { grid-template-columns: 1fr; }
+}
+
+/* ══════════════════════════════
+   SECTION CENTRE ALIGNMENTS
+══════════════════════════════ */
+#ct-page2 #the-reality .section-tag,
+#ct-page2 #the-reality .section-title,
+#ct-page2 #the-reality .section-sub,
+#ct-page2 #wrong-comparisons .section-tag,
+#ct-page2 #wrong-comparisons .section-title,
+#ct-page2 #wrong-comparisons .section-sub,
+#ct-page2 #comparison .section-tag,
+#ct-page2 #comparison .section-title,
+#ct-page2 #comparison .section-sub,
+#ct-page2 #advantages .section-tag,
+#ct-page2 #advantages .section-title,
+#ct-page2 #advantages .section-sub {
+  text-align: center !important;
+  max-width: 100% !important;
+  display: block !important;
+}
+
+/* Remove extra top padding before comparison table section */
+#ct-page2 #comparison {
+  padding-top: 40px !important;
+}
+/* HubSpot Form Dark Theme Styles */
+.ct-hs-form-wrap-light {
+    width: 100%;
+    min-height: 300px;
+}
+.ct-hs-form-wrap-light .inputs-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+.ct-hs-form-wrap-light form {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 14px !important;
+}
+.ct-hs-form-wrap-light .hs-form-field {
+    margin-bottom: 0 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 4px !important;
+}
+.ct-hs-form-wrap-light .hs-form-field > label {
+    display: block !important;
+    font-size: 11px !important;
+    font-weight: 600 !important;
+    color: rgba(255, 255, 255, .55) !important;
+    letter-spacing: .3px !important;
+    font-family: 'Inter', system-ui, -apple-system, sans-serif !important;
+    margin-bottom: 0 !important;
+}
+.ct-hs-form-wrap-light .hs-form-field > label .hs-form-required {
+    color: var(--purple-mid) !important;
+    margin-left: 2px !important;
+}
+.ct-hs-form-wrap-light input[type="text"],
+.ct-hs-form-wrap-light input[type="email"],
+.ct-hs-form-wrap-light input[type="tel"],
+.ct-hs-form-wrap-light input[type="number"],
+.ct-hs-form-wrap-light select,
+.ct-hs-form-wrap-light textarea {
+    width: 100% !important;
+    padding: 10px 14px !important;
+    background: rgba(255,255,255,0.04) !important;
+    border: 1px solid rgba(255, 255, 255, 0.14) !important;
+    border-radius: 10px !important;
+    color: #fff !important;
+    font-size: 14px !important;
+    font-family: 'Manrope', system-ui, -apple-system, sans-serif !important;
+    outline: none !important;
+    transition: border-color 0.2s, background 0.2s, box-shadow 0.2s !important;
+    box-sizing: border-box !important;
+}
+.ct-hs-form-wrap-light input:focus,
+.ct-hs-form-wrap-light select:focus,
+.ct-hs-form-wrap-light textarea:focus {
+    border-color: #7A5698 !important;
+    box-shadow: 0 0 0 3px rgba(122, 86, 152, 0.15) !important;
+}
+.ct-hs-form-wrap-light textarea {
+    min-height: 80px !important;
+    resize: vertical !important;
+}
+.ct-hs-form-wrap-light .hs_phone .hs-fieldtype-intl-phone {
+    display: flex !important;
+    gap: 10px !important;
+    width: 100% !important;
+}
+.ct-hs-form-wrap-light select {
+    appearance: auto !important;
+}
+.ct-hs-form-wrap-light select option {
+    background: #121829 !important;
+    color: #fff !important;
+}
+.ct-hs-form-wrap-light fieldset {
+    max-width: none !important;
+    border: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    display: flex !important;
+    flex-direction: row !important;
+    gap: 12px !important;
+}
+@media (max-width: 640px) {
+    .ct-hs-form-wrap-light fieldset {
+        flex-direction: column !important;
+        gap: 14px !important;
+    }
+}
+.ct-hs-form-wrap-light fieldset .hs-form-field {
+    flex: 1 !important;
+}
+.ct-hs-form-wrap-light .input {
+    margin-right: 0 !important;
+}
+.ct-hs-form-wrap-light .hs-form-booleancheckbox label,
+.ct-hs-form-wrap-light .legal-consent-container label {
+    display: flex !important;
+    gap: 10px;
+    align-items: flex-start !important;
+    font-size: 11px !important;
+    color: rgba(255, 255, 255, 0.4) !important;
+    line-height: 1.5 !important;
+    font-weight: 500 !important;
+    cursor: pointer !important;
+}
+.ct-hs-form-wrap-light .hs-form-booleancheckbox label a,
+.ct-hs-form-wrap-light .legal-consent-container label a {
+    color: #00C4B0 !important;
+    font-weight: 600 !important;
+    text-decoration: underline !important;
+}
+.ct-hs-form-wrap-light input[type="checkbox"] {
+    margin-top: 3px !important;
+    flex-shrink: 0 !important;
+    accent-color: #00C4B0 !important;
+    width: 14px !important;
+    height: 14px !important;
+    cursor: pointer !important;
+}
+.ct-hs-form-wrap-light .hs-submit {
+    margin-top: 8px !important;
+}
+.ct-hs-form-wrap-light input[type="submit"],
+.ct-hs-form-wrap-light .hs-button {
+    width: 100% !important;
+    padding: 14px 24px !important;
+    background: linear-gradient(135deg, #110072 0%, #7A5698 100%) !important;
+    border-radius: 12px !important;
+    color: white !important;
+    font-size: 15px !important;
+    font-weight: 700 !important;
+    border: none !important;
+    cursor: pointer !important;
+    font-family: 'Manrope', system-ui, -apple-system, sans-serif !important;
+    transition: all 0.25s !important;
+}
+.ct-hs-form-wrap-light input[type="submit"]:hover,
+.ct-hs-form-wrap-light .hs-button:hover {
+    opacity: 0.88 !important;
+    transform: translateY(-2px) !important;
+    box-shadow: 0 8px 30px rgba(17,0,114,0.4) !important;
+}
+.ct-hs-form-wrap-light .hs-error-msgs {
+    list-style: none !important;
+    padding: 0 !important;
+    margin: 4px 0 0 !important;
+    font-size: 11.5px !important;
+    color: #ef4444 !important;
+}
+.ct-hs-form-wrap-light .hs-error-msg {
+    color: #ef4444 !important;
+}
+.ct-hs-form-wrap-light .submitted-message {
+    background: rgba(255, 255, 255, 0.05) !important;
+    color: #fff !important;
+    padding: 18px !important;
+    border-radius: 10px !important;
+}
+.ct-hs-form-wrap-light fieldset:has([class*="hs_utm_"]),
+.ct-hs-form-wrap-light .hs-form-field[style*="display: none"] {
+    display: none !important;
+}
+/* Skeleton loader for HubSpot form on cygnate LP */
+.ct-form-skeleton {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    width: 100%;
+    min-height: 300px;
+}
+.ct-skeleton-row-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+}
+@media (max-width: 640px) {
+    .ct-skeleton-row-2 {
+        grid-template-columns: 1fr;
+        gap: 14px;
+    }
+}
+.ct-skeleton-label {
+    height: 12px;
+    width: 60px;
+    background: rgba(255, 255, 255, 0.15);
+    border-radius: 4px;
+    margin-bottom: 7px;
+}
+.ct-skeleton-input {
+    height: 46px;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    border-radius: 10px;
+    width: 100%;
+}
+.ct-skeleton-button {
+    height: 50px;
+    background: linear-gradient(135deg, rgba(17,0,114,0.3) 0%, rgba(122,86,152,0.3) 100%);
+    border-radius: 12px;
+    width: 100%;
+    margin-top: 8px;
+}
+.ct-shimmer {
+    position: relative;
+    overflow: hidden;
+}
+.ct-shimmer::after {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    transform: translateX(-100%);
+    background-image: linear-gradient(
+        90deg,
+        rgba(255, 255, 255, 0) 0%,
+        rgba(255, 255, 255, 0.15) 20%,
+        rgba(255, 255, 255, 0.15) 60%,
+        rgba(255, 255, 255, 0) 100%
+    );
+    animation: ct-shimmer-anim 1.6s infinite;
+    content: '';
+}
+@keyframes ct-shimmer-anim {
+    100% {
+        transform: translateX(100%);
+    }
 }
 </style>
 </head>
@@ -725,115 +1097,133 @@
 <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-P5NDQXGH"
 height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 <!-- End Google Tag Manager (noscript) -->
-    <div id="ct-page2">
 
-<!-- ═══════════ NAVBAR ═══════════ -->
-<div class="nav-wrap">
-  <nav id="mainNav2">
-    <a href="https://www.cleartax.com/ae" class="nav-logo">
-      <img src="https://cdn.prod.website-files.com/6093bce33d9b4bae841b04e3/69f9c316ad6a9e6874073bf6_logo%201.png" alt="ClearTax" width="135" height="28" fetchpriority="high">
+<!-- ═══════════ PAGE CONTENT ═══════════ -->
+<div id="ct-page2">
+
+<!-- nav is inside ct-page2 so the dark background shows through behind the pill -->
+
+<!-- ═══════════ NAVBAR (WHITE PILL — on dark background) ═══════════ -->
+<div id="ct-nav">
+  <div id="ct-nav-inner">
+
+    <!-- Logo -->
+    <a href="https://www.cleartax.com/ae" class="ct-nav-logo" aria-label="ClearTax Home">
+      <img
+        src="https://assets1.cleartax-cdn.com/finfo/wg-utils/retool/d9f36ac3-77a9-40c6-94fc-20c2e3855457.svg"
+        alt="ClearTax" width="130" height="26" fetchpriority="high"
+      >
     </a>
 
-    <ul class="nav-links" id="navLinks2">
-      <li id="menu2-platform">
-        <button onclick="ct2ToggleMenu('menu2-platform')">
-          e-Invoicing Platform
-          <svg class="chevron" viewBox="0 0 16 16" fill="none"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
-        </button>
-        <div class="mega-menu wide">
-          <div class="mega-menu-grid">
-            <a href="https://www.cleartax.com/ae/e-invoicing-software" class="mega-menu-item">
-              <div class="mega-menu-icon">📄</div>
-              <div><h5>e-Invoice Generation</h5><p>Create FTA-compliant XML invoices instantly</p></div>
-            </a>
-            <a href="#" class="mega-menu-item">
-              <div class="mega-menu-icon">🔗</div>
-              <div><h5>ERP Integration</h5><p>SAP, Oracle, Microsoft &amp; more</p></div>
-            </a>
-            <a href="#" class="mega-menu-item">
-              <div class="mega-menu-icon">✅</div>
-              <div><h5>Validation Engine</h5><p>Real-time FTA schema validation</p></div>
-            </a>
-            <a href="#" class="mega-menu-item">
-              <div class="mega-menu-icon">📊</div>
-              <div><h5>Analytics Dashboard</h5><p>Compliance metrics &amp; audit trails</p></div>
-            </a>
-            <a href="#" class="mega-menu-item">
-              <div class="mega-menu-icon">⚡</div>
-              <div><h5>API Access</h5><p>RESTful APIs for custom integration</p></div>
-            </a>
-            <a href="#" class="mega-menu-item">
-              <div class="mega-menu-icon">🛡️</div>
-              <div><h5>Compliance Monitoring</h5><p>Automated alerts &amp; status tracking</p></div>
-            </a>
-          </div>
-        </div>
+    <!-- Desktop links -->
+    <ul class="ct-nav-links" id="ctNavLinks">
+
+      <li>
+        <a href="https://www.cleartax.com/ae/company">About us</a>
       </li>
 
-      <li id="menu2-resources">
-        <button onclick="ct2ToggleMenu('menu2-resources')">
+      <li id="ct-menu-resources">
+        <button onclick="ctNavToggle('ct-menu-resources')" aria-expanded="false">
           Resources
-          <svg class="chevron" viewBox="0 0 16 16" fill="none"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+          <svg class="ct-chevron" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+            <path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
         </button>
-        <div class="mega-menu">
-          <div class="mega-menu-grid">
-            <a href="https://www.cleartax.com/ae/e-invoicing-uae" class="mega-menu-item">
-              <div class="mega-menu-icon">📖</div>
-              <div><h5>UAE e-Invoicing Guide</h5><p>Mandate overview &amp; compliance steps</p></div>
-            </a>
-            <a href="https://www.cleartax.com/ae/e-invoicing-uae-faqs" class="mega-menu-item">
-              <div class="mega-menu-icon">🎓</div>
-              <div><h5>Knowledge Hub</h5><p>UAE e-invoicing FAQs &amp; guides</p></div>
-            </a>
-            <a href="https://www.cleartax.com/ae/resources" class="mega-menu-item">
-              <div class="mega-menu-icon">📰</div>
-              <div><h5>Blog</h5><p>Latest compliance updates</p></div>
-            </a>
-            <a href="#" class="mega-menu-item">
-              <div class="mega-menu-icon">🎥</div>
-              <div><h5>Webinars</h5><p>Live &amp; on-demand sessions</p></div>
-            </a>
-          </div>
+        <div class="ct-dropdown" role="menu">
+          <a href="https://www.cleartax.com/ae/e-invoicing-uae" role="menuitem">📖 &nbsp;UAE e-Invoicing Guide</a>
+          <a href="https://www.cleartax.com/ae/e-invoicing-uae-faqs" role="menuitem">❓ &nbsp;FAQs</a>
+          <a href="https://www.cleartax.com/ae/resources" role="menuitem">📰 &nbsp;Blog</a>
+          <a href="https://www.cleartax.com/ae/case-studies" role="menuitem">📋 &nbsp;Case Studies</a>
+          <a href="https://www.cleartax.com/ae/whitepapers" role="menuitem">📄 &nbsp;Whitepapers</a>
+          <div class="ct-dropdown-divider"></div>
+          <a href="https://www.cleartax.com/ae/vat-calculator" role="menuitem">🧮 &nbsp;VAT Calculator</a>
         </div>
       </li>
 
-      <li id="menu2-company">
-        <button onclick="ct2ToggleMenu('menu2-company')">
-          Company
-          <svg class="chevron" viewBox="0 0 16 16" fill="none"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
-        </button>
-        <div class="mega-menu">
-          <div class="mega-menu-grid">
-            <a href="https://www.cleartax.com/ae/company" class="mega-menu-item">
-              <div class="mega-menu-icon">🏢</div>
-              <div><h5>About ClearTax</h5><p>Our story &amp; mission</p></div>
-            </a>
-            <a href="https://www.cleartax.com/ae/partners" class="mega-menu-item">
-              <div class="mega-menu-icon">🤝</div>
-              <div><h5>Partners</h5><p>Join our partner network</p></div>
-            </a>
-            <a href="https://www.cleartax.com/ae/contact-us" class="mega-menu-item">
-              <div class="mega-menu-icon">📞</div>
-              <div><h5>Contact Us</h5><p>Talk to our UAE team</p></div>
-            </a>
-          </div>
-        </div>
+      <li>
+        <a href="https://www.cleartax.com/ae/partners">Partners</a>
       </li>
+
+      <li>
+        <a href="https://www.cleartax.com/ae/contact-us">Contact</a>
+      </li>
+
     </ul>
 
-    <div class="nav-cta-area">
-      <button class="nav-country" title="UAE Region">🇦🇪 UAE</button>
-      <a href="#" class="nav-login">Login</a>
-      <a href="#ct2-hero-form" class="btn-nav-demo">
-        Book a Demo
-        <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 6h8M6 2l4 4-4 4" stroke="white" stroke-width="1.5" stroke-linecap="round"/></svg>
+    <!-- Right side -->
+    <div class="ct-nav-right">
+
+      <!-- Region pill — static, UAE only -->
+      <span class="ct-region-pill">
+        <img src="https://assets.clear.in/cleartax/images/1770972385_twemoji_flagunitedarabemirates.svg" alt="UAE" width="18" height="13">
+        UAE
+      </span>
+
+      <!-- CTA -->
+      <a href="#ct2-hero-form" class="ct-btn-demo">
+        Book a demo
+        <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+          <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
       </a>
-      <button class="nav-mobile-toggle" onclick="ct2ToggleMobileMenu()" aria-label="Toggle menu">
+
+      <!-- Hamburger -->
+      <button class="ct-hamburger" id="ctHamburger" onclick="ctMobileToggle()" aria-label="Toggle menu" aria-expanded="false">
         <span></span><span></span><span></span>
       </button>
+
     </div>
-  </nav>
+  </div>
+
+  <!-- Mobile panel -->
+  <div class="ct-mobile-panel" id="ctMobilePanel" role="navigation">
+    <a href="https://www.cleartax.com/ae/company">About us</a>
+    <a href="https://www.cleartax.com/ae/e-invoicing-uae">UAE e-Invoicing Guide</a>
+    <a href="https://www.cleartax.com/ae/e-invoicing-uae-faqs">FAQs</a>
+    <a href="https://www.cleartax.com/ae/resources">Blog</a>
+    <a href="https://www.cleartax.com/ae/case-studies">Case Studies</a>
+    <a href="https://www.cleartax.com/ae/whitepapers">Whitepapers</a>
+    <a href="https://www.cleartax.com/ae/vat-calculator">VAT Calculator</a>
+    <div class="mob-divider"></div>
+    <a href="https://www.cleartax.com/ae/partners">Partners</a>
+    <a href="https://www.cleartax.com/ae/contact-us">Contact</a>
+    <div class="mob-divider"></div>
+    <a href="#ct2-hero-form" class="mob-cta">Book a demo →</a>
+  </div>
 </div>
+
+<script>
+(function(){
+  window.addEventListener('scroll', function(){
+    var nav = document.getElementById('ct-nav');
+    if (nav) nav.classList.toggle('scrolled', window.scrollY > 10);
+  }, { passive: true });
+
+  window.ctNavToggle = function(id) {
+    var li = document.getElementById(id);
+    if (!li) return;
+    var wasOpen = li.classList.contains('open');
+    document.querySelectorAll('#ctNavLinks > li.open').forEach(function(el){ el.classList.remove('open'); });
+    if (!wasOpen) { li.classList.add('open'); }
+    var btn = li.querySelector('button');
+    if (btn) btn.setAttribute('aria-expanded', String(!wasOpen));
+  };
+
+  document.addEventListener('click', function(e){
+    if (!e.target.closest('#ctNavLinks')) {
+      document.querySelectorAll('#ctNavLinks > li.open').forEach(function(el){ el.classList.remove('open'); });
+    }
+  });
+
+  window.ctMobileToggle = function(){
+    var panel = document.getElementById('ctMobilePanel');
+    var btn = document.getElementById('ctHamburger');
+    if (!panel) return;
+    var isOpen = panel.classList.toggle('open');
+    if (btn) btn.setAttribute('aria-expanded', String(isOpen));
+  };
+})();
+</script>
 
 <!-- ═══════════ HERO ═══════════ -->
 <section id="hero2" class="container">
@@ -850,16 +1240,16 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     </p>
     <div class="hero-stats">
       <div>
-        <div class="hero-stat-num">400<span>+</span></div>
-        <div class="hero-stat-label">ERP Integrations</div>
+        <div class="hero-stat-num">1600<span>+</span></div>
+        <div class="hero-stat-label">ERP Integrations Completed</div>
       </div>
       <div>
         <div class="hero-stat-num">50<span>+</span></div>
         <div class="hero-stat-label">Countries Supported</div>
       </div>
       <div>
-        <div class="hero-stat-num">0<span>%</span></div>
-        <div class="hero-stat-label">Middleware Required</div>
+        <div class="hero-stat-num">$500<span>B+</span></div>
+        <div class="hero-stat-label">Worth e-invoices generated</div>
       </div>
     </div>
     <div class="hero-trust">
@@ -877,45 +1267,30 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     <div class="form-card">
       <div class="form-card-title">Book a Free Demo</div>
       <div class="form-card-sub">See how ClearTax handles your specific compliance needs</div>
-      <form id="ct2LeadForm" onsubmit="ct2HandleSubmit(event)">
-        <div class="form-group">
-          <label>Full Name *</label>
-          <input type="text" id="ct2-name" placeholder="John Smith" required>
-        </div>
-        <div class="form-group">
-          <label>Work Email *</label>
-          <input type="email" id="ct2-email" placeholder="john@company.com" required>
-        </div>
-        <div class="form-group">
-          <label>Phone Number *</label>
-          <div style="display: flex; gap: 10px;">
-            <select id="ct2-isd" style="width: 100px; flex-shrink: 0;" required>
-              <option value="+971" selected>🇦🇪 +971</option>
-              <option value="+966">🇸🇦 +966</option>
-              <option value="+91">🇮🇳 +91</option>
-              <option value="+1">🇺🇸 +1</option>
-              <option value="+44">🇬🇧 +44</option>
-              <option value="+973">🇧🇭 +973</option>
-              <option value="+968">🇴🇲 +968</option>
-              <option value="+974">🇶🇦 +974</option>
-              <option value="+965">🇰🇼 +965</option>
-            </select>
-            <input type="tel" id="ct2-phone" placeholder="50 XXX XXXX" required>
+      <div id="cygnate-hero-form" class="ct-hs-form-wrap-light">
+          <!-- Skeleton Loader -->
+          <div class="ct-form-skeleton ct-shimmer" id="cygnate-skeleton">
+              <div class="ct-skeleton-row-2">
+                  <div>
+                      <div class="ct-skeleton-label"></div>
+                      <div class="ct-skeleton-input"></div>
+                  </div>
+                  <div>
+                      <div class="ct-skeleton-label"></div>
+                      <div class="ct-skeleton-input"></div>
+                  </div>
+              </div>
+              <div>
+                  <div class="ct-skeleton-label"></div>
+                  <div class="ct-skeleton-input"></div>
+              </div>
+              <div>
+                  <div class="ct-skeleton-label"></div>
+                  <div class="ct-skeleton-input" style="height: 80px;"></div>
+              </div>
+              <div class="ct-skeleton-button"></div>
           </div>
-        </div>
-        <div class="form-group">
-          <label>Company Name *</label>
-          <input type="text" id="ct2-company" placeholder="Your company" required>
-        </div>
-        <div class="form-group">
-          <label>Designation *</label>
-          <input type="text" id="ct2-designation" placeholder="e.g. Tax Manager" required>
-        </div>
-        <button type="submit" class="form-submit">Book a Free Demo →</button>
-        <div class="form-disclaimer">
-          By submitting, you agree to ClearTax's privacy policy. No spam — just a one-on-one consultation with a compliance expert.
-        </div>
-      </form>
+      </div>
     </div>
   </div>
 </section>
@@ -1273,125 +1648,108 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
   </div>
 </div>
 
-<!-- ═══════════ FOOTER ═══════════ -->
-<footer>
-  <div class="footer-inner">
-    <div class="footer-top">
-      <div class="footer-brand">
-        <img src="https://cdn.prod.website-files.com/6093bce33d9b4bae841b04e3/69f9c316ad6a9e6874073bf6_logo%201.png" alt="ClearTax" width="135" height="28" loading="lazy">
-        <p>The leading e-invoicing compliance platform for UAE businesses — trusted by enterprises to automate FTA mandate compliance.</p>
-        <div class="footer-social">
-          <a href="https://www.linkedin.com/company/cleartax-me" target="_blank" class="social-icon" title="LinkedIn">in</a>
-          <a href="#" class="social-icon" title="Twitter">𝕏</a>
-          <a href="#" class="social-icon" title="YouTube">▶</a>
-          <a href="#" class="social-icon" title="Email">@</a>
-        </div>
-      </div>
-      <div class="footer-col">
-        <h5>Platform</h5>
-        <ul>
-          <li><a href="https://www.cleartax.com/ae/e-invoicing-software">e-Invoice Generation</a></li>
-          <li><a href="#">ERP Integration</a></li>
-          <li><a href="#">Validation Engine</a></li>
-          <li><a href="#">Compliance Dashboard</a></li>
-          <li><a href="#">API &amp; Developer Hub</a></li>
-          <li><a href="#">Archival &amp; Audit</a></li>
-        </ul>
-      </div>
-      <div class="footer-col">
-        <h5>Company</h5>
-        <ul>
-          <li><a href="https://www.cleartax.com/ae/company">About ClearTax</a></li>
-          <li><a href="#">Careers</a></li>
-          <li><a href="https://www.cleartax.com/ae/press">Press</a></li>
-          <li><a href="https://www.cleartax.com/ae/partners">Partners</a></li>
-          <li><a href="https://www.cleartax.com/ae/contact-us">Contact Us</a></li>
-        </ul>
-      </div>
-      <div class="footer-col">
-        <h5>Resources</h5>
-        <ul>
-          <li><a href="https://www.cleartax.com/ae/e-invoicing-uae">UAE e-Invoicing Guide</a></li>
-          <li><a href="https://www.cleartax.com/ae/e-invoicing-uae-faqs">FAQs</a></li>
-          <li><a href="https://www.cleartax.com/ae/resources">Blog</a></li>
-          <li><a href="#">Webinars</a></li>
-          <li><a href="#">Case Studies</a></li>
-          <li><a href="#">Knowledge Base</a></li>
-        </ul>
-      </div>
-      <div class="footer-col">
-        <h5>Legal</h5>
-        <ul>
-          <li><a href="#">Privacy Policy</a></li>
-          <li><a href="#">Terms of Service</a></li>
-          <li><a href="#">Cookie Policy</a></li>
-          <li><a href="#">Data Processing</a></li>
-          <li><a href="#">Security</a></li>
-        </ul>
-      </div>
-    </div>
-    <div class="footer-bottom">
-      <p>&copy; 2026 ClearTax International. All rights reserved. UAE FTA Approved e-Invoicing Solution.</p>
-      <div class="footer-bottom-links">
-        <a href="#">Privacy</a>
-        <a href="#">Terms</a>
-        <a href="#">Cookies</a>
-        <a href="#">Sitemap</a>
-      </div>
-    </div>
-  </div>
-</footer>
-
 </div><!-- end #ct-page2 -->
 
+<!-- ═══════════ FOOTER ═══════════ -->
+<footer id="ct-footer">
+  <div id="ct-footer-inner">
+    <div id="ct-footer-top">
 
-<!-- ═══════════ THANK YOU MODAL ═══════════ -->
-<div id="ct2-modal-wrap">
-  <div class="ty-card">
-    <div class="ty-icon">
-      <svg class="ty-check" viewBox="0 0 24 24">
-        <path d="M20 6L9 17l-5-5"/>
-      </svg>
+      <!-- Brand -->
+      <div class="ft-col">
+        <img
+          src="https://cdn.prod.website-files.com/6093bce33d9b4bae841b04e3/69dfcff6071b983201f5f097_logo-cleartax.svg"
+          alt="ClearTax" width="130" height="26" loading="lazy" class="ft-logo"
+        >
+        <span class="ft-tagline">The leading e-invoicing compliance platform for UAE businesses — trusted by enterprises to automate FTA mandate compliance.</span>
+        <div class="ft-social">
+          <a href="https://www.linkedin.com/company/cleartaxindia/" target="_blank" rel="noopener noreferrer" class="ft-social-btn" aria-label="LinkedIn">in</a>
+        </div>
+      </div>
+
+      <!-- Company -->
+      <div class="ft-col">
+        <h5>Company</h5>
+        <ul>
+          <li><a href="https://www.cleartax.com/ae/company" target="_blank">About us</a></li>
+          <li><a href="https://www.cleartax.com/ae/contact-us" target="_blank">Contact us</a></li>
+          <li><a href="https://www.cleartax.com/ae/partners" target="_blank">Partners</a></li>
+          <li><a href="https://www.cleartax.com/ae/press" target="_blank">Media &amp; Press</a></li>
+          <li><a href="https://www.cleartax.com/ae/customers" target="_blank">Customers</a></li>
+          <li><a href="https://www.cleartax.com/ae/why-cleartax" target="_blank">Why ClearTax for UAE</a></li>
+        </ul>
+      </div>
+
+      <!-- Products -->
+      <div class="ft-col">
+        <h5>Products &amp; Solutions</h5>
+        <ul>
+          <li><a href="https://www.cleartax.com/be" target="_blank">E-Invoicing Software (Belgium)</a></li>
+          <li><a href="https://www.cleartax.com/fr/en" target="_blank">E-Invoicing Software (France)</a></li>
+          <li><a href="https://www.cleartax.com/de/en" target="_blank">E-Invoicing Software (Germany)</a></li>
+          <li><a href="https://www.cleartax.com/sa/e-invoicing-software" target="_blank">E-Invoicing Software (Saudi Arabia)</a></li>
+          <li><a href="https://www.cleartax.com/ae/e-invoicing-software" target="_blank">E-Invoicing Software (UAE)</a></li>
+          <li><a href="https://www.cleartax.com/my/en" target="_blank">E-Invoicing Software (Malaysia)</a></li>
+          <li><a href="https://www.cleartax.com/sg/e-invoicing-software" target="_blank">E-Invoicing Software (Singapore)</a></li>
+          <li><a href="https://www.cleartax.com/om/e-invoicing-software" target="_blank">E-Invoicing Software (Oman)</a></li>
+          <li><a href="https://cleartax.in/s/e-invoicing-enterprise-software" target="_blank">E-Invoicing Software (India)</a></li>
+        </ul>
+      </div>
+
+      <!-- Resources -->
+      <div class="ft-col">
+        <h5>Resources</h5>
+        <ul>
+          <li><a href="https://www.cleartax.com/ae/e-invoicing-integration" target="_blank">E-Invoicing Integration</a></li>
+          <li><a href="https://www.cleartax.com/ae/resources" target="_blank">Blog</a></li>
+          <li><a href="https://www.cleartax.com/ae/vat-calculator" target="_blank">VAT Calculator</a></li>
+          <li><a href="https://www.cleartax.com/ae/case-studies" target="_blank">Case Studies</a></li>
+          <li><a href="https://www.cleartax.com/ae/whitepapers" target="_blank">Whitepapers</a></li>
+        </ul>
+        <span class="ft-col-gap"></span>
+        <h5>Resources (Arabic)</h5>
+        <ul>
+          <li><a href="https://www.cleartax.com/ae/ar/e-invoicing-uae" target="_blank">الفواتير الإلكترونية في الإمارات العربية المتحدة</a></li>
+          <li><a href="https://www.cleartax.com/ae/ar/vat-in-uae" target="_blank">ضريبة القيمة المضافة في الإمارات العربية المتحدة</a></li>
+          <li><a href="https://www.cleartax.com/ae/ar/trn-verification-uae" target="_blank">التحقق من رقم المعاملة في الإمارات العربية المتحدة</a></li>
+          <li><a href="https://www.cleartax.com/ae/vat-calculator" target="_blank">حاسبة ضريبة القيمة المضافة</a></li>
+          <li><a href="https://www.cleartax.com/ae/ar/corporate-tax-in-uae" target="_blank">ضريبة الشركات في الإمارات العربية المتحدة</a></li>
+        </ul>
+      </div>
+
+      <!-- Legal -->
+      <div class="ft-col">
+        <h5>Legal</h5>
+        <ul>
+          <li><a href="https://www.clear.in/s/legal" target="_blank">Legal</a></li>
+          <li><a href="https://www.cleartax.com/meta/privacy" target="_blank">Privacy Policy</a></li>
+        </ul>
+      </div>
+
+    </div><!-- /footer-top -->
+
+    <div id="ct-footer-bottom">
+      <div id="ct-footer-bottom-left">
+        <div id="ct-footer-bottom-links">
+          <a href="https://www.clear.in/s/legal" target="_blank">Legal</a>
+          <a href="https://www.cleartax.com/meta/privacy" target="_blank">Privacy Policy</a>
+        </div>
+        <span id="ct-footer-address">Plot No: JLT-PH2-RET-R6, Jumeirah Lakes Towers, Dubai, United Arab Emirates</span>
+        <span id="ct-footer-copy">&copy; 2026 ClearTax International. All rights reserved.</span>
+      </div>
+      <div id="ct-footer-trust-wrap">
+        <img src="https://cdn.prod.website-files.com/6093bce33d9b4bae841b04e3/69fb0ff41b9a63ce3e1f50d9_iso.png" alt="ISO 27001 Certified" loading="lazy" height="34">
+        <img src="https://cdn.prod.website-files.com/6093bce33d9b4bae841b04e3/69fad934822abf67d7c25954_soc.png" alt="AICPA SOC 2" loading="lazy" height="34">
+        <img src="https://cdn.prod.website-files.com/6093bce33d9b4bae841b04e3/69fad934c8e84c8da3641329_ssl.png" alt="SSL Secured" loading="lazy" height="34">
+        <span id="ct-footer-trust-text">Your data security and<br>privacy matter most to us.</span>
+      </div>
     </div>
-    <h3 class="ty-title">Request Received!</h3>
-    <p class="ty-sub">Thank you for your interest. One of our UAE e-invoicing experts will contact you shortly to schedule your demo.</p>
-    <button class="ty-btn" onclick="document.getElementById('ct2-modal-wrap').style.display='none';document.getElementById('ct2-modal-wrap').classList.remove('open');">Close</button>
-  </div>
-</div>
 
+  </div><!-- /footer-inner -->
+</footer>
 
 <script>
-// All functions namespaced with ct2 prefix to avoid conflicts
-
-
-
-var ct2Nav = document.getElementById('mainNav2');
-if (ct2Nav) {
-  window.addEventListener('scroll', function() {
-    ct2Nav.classList.toggle('scrolled', window.scrollY > 40);
-  });
-}
-
-function ct2ToggleMenu(menuId) {
-  var item = document.getElementById(menuId);
-  if (!item) return;
-  var wasOpen = item.classList.contains('open');
-  document.querySelectorAll('#ct-page2 .nav-links > li.open').forEach(function(li) { li.classList.remove('open'); });
-  if (!wasOpen) item.classList.add('open');
-}
-
-document.addEventListener('click', function(e) {
-  if (!e.target.closest('#ct-page2 .nav-links')) {
-    document.querySelectorAll('#ct-page2 .nav-links > li.open').forEach(function(li) { li.classList.remove('open'); });
-  }
-});
-
-function ct2ToggleMobileMenu() {
-  var navLinks = document.getElementById('navLinks2');
-  if (!navLinks) return;
-  navLinks.style.display = navLinks.style.display === 'flex' ? 'none' : 'flex';
-}
-
+/* ── FAQ toggle ── */
 function ct2ToggleFaq(btn) {
   var item = btn.parentElement;
   var wasOpen = item.classList.contains('open');
@@ -1399,131 +1757,117 @@ function ct2ToggleFaq(btn) {
   if (!wasOpen) item.classList.add('open');
 }
 
-function ct2HandleSubmit(e) {
-  e.preventDefault();
-  
-  var form = e.target;
-  var btn = form.querySelector('.form-submit');
-  var originalBtnText = btn.textContent;
-  
-  // Gathering form data
-  var fullName = document.getElementById('ct2-name').value;
-  var email = document.getElementById('ct2-email').value;
-  var company = document.getElementById('ct2-company').value;
-  var designation = document.getElementById('ct2-designation').value;
-  var phoneNumber = document.getElementById('ct2-phone').value.trim().replace(/\s+/g, '');
-  var isdCode = document.getElementById('ct2-isd').value;
-  
-  // Prepare payload
-  var urlParams = new URLSearchParams(window.location.search);
-  var payload = {
-    lead_platforms: { 
-      google_sheet: { sheet_name: "uaeRAD" }, 
-      pardot: true, 
-      salesforce: true 
-    },
-    extra_payload: { 
-      origin_country: "UAE",
-      designation: designation,
-      utm_source: urlParams.get('utm_source') || "",
-      utm_medium: urlParams.get('utm_medium') || "",
-      utm_campaign: urlParams.get('utm_campaign') || "",
-      utm_term: urlParams.get('utm_term') || "",
-      utm_content: urlParams.get('utm_content') || ""
-    },
-    lead_data: {
-      name: fullName,
-      phone_number: phoneNumber,
-      email: email,
-      company_name: company,
-      ISD: isdCode,
-      form_type: "GCC-contact-sales-form",
-      lead_type: "GCC",
-      lead_source_url: window.location.href
-    }
-  };
+/* ── HubSpot Form Init ── */
+(function() {
+    var initialized = false;
+    
+    function initForm() {
+        if (initialized) return;
+        if (window.hbspt && window.hbspt.forms) {
+            initialized = true;
+            window.hbspt.forms.create({
+                portalId: "245744706",
+                formId: "51af6b81-aa59-4bd2-b499-ff081e27324d",
+                region: "na2",
+                target: "#cygnate-hero-form",
+                onFormReady: function($form) {
+                    // Remove the skeleton loader
+                    var skeleton = document.getElementById("cygnate-skeleton");
+                    if (skeleton) {
+                        skeleton.remove();
+                    }
 
-  // Loading state
-  btn.textContent = 'Submitting...';
-  btn.disabled = true;
-
-  if (typeof grecaptcha === 'undefined') {
-    console.error("reCAPTCHA script not loaded");
-    btn.textContent = 'Error! Try Again';
-    setTimeout(function() { btn.textContent = originalBtnText; btn.disabled = false; }, 3000);
-    return;
-  }
-
-  grecaptcha.ready(function() {
-    grecaptcha.execute('6Lc5ZG0mAAAAAGwClrZwtcyttcUMYDUPxg4MM4p3', { action: 'submit' }).then(function(token) {
-      fetch('https://www.cleartax.com/f/common-lead/lead/?captcha_token=' + token, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
-      })
-      .then(function(response) {
-        if (response.ok || response.status === 201) {
-          // Success
-          form.reset();
-          document.getElementById('ct2-isd').value = '+971';
-          btn.textContent = originalBtnText;
-          btn.disabled = false;
-          
-          // Show Thank You Modal
-          var modal = document.getElementById('ct2-modal-wrap');
-          modal.style.display = 'flex';
-          setTimeout(function() { modal.classList.add('open'); }, 10);
-        } else {
-          throw new Error('Server responded with ' + response.status);
+                    var formEl = ($form && $form[0]) ? $form[0] : $form;
+                    if (formEl && formEl.querySelector) {
+                        var urlParams = new URLSearchParams(window.location.search);
+                        var utms = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 'utm_content'];
+                        utms.forEach(function(utm) {
+                            var value = urlParams.get(utm);
+                            if (value) {
+                                var input = formEl.querySelector('input[name="' + utm + '"]');
+                                if (input) {
+                                    input.value = value;
+                                }
+                            }
+                        });
+                    }
+                }
+            });
         }
-      })
-      .catch(function(error) {
-        console.error('Submission Error:', error);
-        btn.textContent = 'Error! Try Again';
-        btn.style.background = '#EF4444';
-        setTimeout(function() { 
-          btn.textContent = originalBtnText; 
-          btn.disabled = false; 
-          btn.style.background = '';
-        }, 3000);
-      });
-    });
-  });
-}
+    }
 
-document.querySelectorAll('#ct-page2 a[href^="#"]').forEach(function(a) {
+    function checkAndInit() {
+        if (window.hbspt && window.hbspt.forms) {
+            initForm();
+        } else {
+            // Look for HubSpot script and attach load listener
+            var script = document.querySelector('script[src*="hsforms.net"]');
+            if (script) {
+                script.addEventListener('load', initForm);
+            } else {
+                var hsScript = document.createElement('script');
+                hsScript.src = 'https://js-na2.hsforms.net/forms/embed/v2.js';
+                hsScript.charset = 'utf-8';
+                hsScript.type = 'text/javascript';
+                hsScript.addEventListener('load', initForm);
+                document.body.appendChild(hsScript);
+            }
+            // Also poll as a robust fallback
+            var pollCount = 0;
+            var interval = setInterval(function() {
+                pollCount++;
+                if (window.hbspt && window.hbspt.forms) {
+                    clearInterval(interval);
+                    initForm();
+                } else if (pollCount > 100) { // Stop polling after 10 seconds
+                    clearInterval(interval);
+                }
+            }, 100);
+        }
+    }
+
+    if (document.readyState === "loading") {
+        document.addEventListener("DOMContentLoaded", checkAndInit);
+    } else {
+        checkAndInit();
+    }
+})();
+
+/* ── Smooth scroll for all anchor links ── */
+document.querySelectorAll('a[href^="#"]').forEach(function(a) {
   a.addEventListener('click', function(e) {
-    e.preventDefault();
     var target = document.querySelector(a.getAttribute('href'));
-    if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    if (target) { e.preventDefault(); target.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
   });
 });
 
+/* ── Hero badge pulse ── */
 (function() {
   var dot = document.querySelector('#ct-page2 .hero-badge-dot');
-  if (dot) {
-    var grow = true;
-    setInterval(function() {
-      dot.style.boxShadow = grow ? '0 0 0 6px rgba(0,196,176,0)' : '0 0 0 0 rgba(0,196,176,0.4)';
-      grow = !grow;
-    }, 1000);
-  }
+  if (!dot) return;
+  var grow = true;
+  setInterval(function() {
+    dot.style.boxShadow = grow ? '0 0 0 6px rgba(0,196,176,0)' : '0 0 0 0 rgba(0,196,176,0.4)';
+    grow = !grow;
+  }, 1000);
 })();
 
+/* ── Scroll-in animations ── */
 (function() {
+  if (!('IntersectionObserver' in window)) return;
   var observer = new IntersectionObserver(function(entries) {
     entries.forEach(function(entry) {
       if (entry.isIntersecting) {
         entry.target.style.opacity = '1';
         entry.target.style.transform = 'translateY(0)';
+        observer.unobserve(entry.target);
       }
     });
-  }, { threshold: 0.1 });
-
+  }, { threshold: 0.08 });
   document.querySelectorAll('#ct-page2 .pain-card, #ct-page2 .adv-card, #ct-page2 .faq-item, #ct-page2 .trust-card').forEach(function(el) {
     el.style.opacity = '0';
     el.style.transform = 'translateY(20px)';
-    el.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+    el.style.transition = 'opacity 0.45s ease, transform 0.45s ease';
     observer.observe(el);
   });
 })();
