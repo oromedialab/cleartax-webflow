@@ -7,10 +7,9 @@ import HeroUAE from "../sections/uae/HeroUAE.astro";
 import LogosStrip from "../sections/uae/LogosStrip.astro";
 import WhyCleartax from "../sections/uae/WhyCleartax.astro";
 import CaseStudies from "../sections/uae/CaseStudies.astro";
-import ContactForm from "../sections/_shared/ContactForm.astro";
+import ContactForm from "../sections/_shared/ContactFormLead.astro";
 import Scale from "../sections/uae/Scale.astro";
 import FAQ from "../sections/uae/FAQ.astro";
-import FooterUAE from "../sections/_shared/FooterUAE.astro";
 ---
 
 <!doctype html>
@@ -26,14 +25,8 @@ import FooterUAE from "../sections/_shared/FooterUAE.astro";
     <meta content="noindex, nofollow" name="robots"/>
     <meta name="referrer" content="strict-origin-when-cross-origin" />
     <link rel="preload" as="image" href="https://cdn.prod.website-files.com/63ede4a3da6dbd6b05c4612f/69fb0e1e59fcac212140457b_hero-v2.png" fetchpriority="high" />
-    <link rel="preconnect" href="https://js-na2.hsforms.net" crossorigin />
-    <link rel="preconnect" href="https://forms.hsforms.com" crossorigin />
-    <link rel="preconnect" href="https://forms-na2.hsforms.com" crossorigin />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-
-    <!-- Eagerly download the HubSpot embed script asynchronously without blocking parsing -->
-    <script charset="utf-8" type="text/javascript" src="https://js-na2.hsforms.net/forms/embed/v2.js" is:inline async></script>
     <link
       href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800;900&display=swap"
       rel="stylesheet"
@@ -93,28 +86,6 @@ import FooterUAE from "../sections/_shared/FooterUAE.astro";
             }, { threshold: 0.1 });
             elements.forEach(el => revealObserver.observe(el));
           } catch (e) { console.error('Observer init failed', e); }
-
-          // Clean URL hash on anchor link clicks & initial landing
-          try {
-            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-              anchor.addEventListener('click', function(e) {
-                const targetId = this.getAttribute('href');
-                if (targetId === '#') return;
-                const targetElement = document.querySelector(targetId);
-                if (targetElement) {
-                  e.preventDefault();
-                  targetElement.scrollIntoView({ behavior: 'smooth' });
-                  history.pushState(null, document.title, window.location.pathname + window.location.search);
-                }
-              });
-            });
-
-            if (window.location.hash) {
-              setTimeout(() => {
-                history.replaceState(null, document.title, window.location.pathname + window.location.search);
-              }, 1000);
-            }
-          } catch (e) { console.error('Anchor hash handler failed', e); }
         };
 
         // 2. Deferred Non-Critical JS & Tracking (Load on interaction/idle)
@@ -184,8 +155,11 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     <WhyCleartax />
     <CaseStudies />
     <Scale />
-    <ContactForm />
+    <ContactForm
+      sheetName="uaeRAD"
+      originCountry="UAE"
+      thankYouUrl="https://www.cleartax.com/thank-you"
+    />
     <FAQ />
-    <FooterUAE />
   </body>
 </html>
