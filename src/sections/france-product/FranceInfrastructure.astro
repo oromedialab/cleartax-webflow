@@ -107,17 +107,17 @@ const tabs = [
     </div>
 
     <!-- Tab Bar Desktop Only -->
-    <div class="!hidden lg:!flex justify-center mb-7 overflow-x-auto pb-2 [scrollbar-width:_none] [-ms-overflow-style:_none] [&::-webkit-scrollbar]:hidden">
-      <div class="inline-flex border w-full justify-evenly items-center border-[#000000]/12 rounded-full p-2">
+    <div class="!hidden lg:!flex justify-start xl:justify-center mb-7 overflow-x-auto pb-2 [scrollbar-width:_none] [-ms-overflow-style:_none] [&::-webkit-scrollbar]:hidden">
+      <div class="inline-flex border min-w-max xl:w-full justify-start xl:justify-evenly items-center border-[#000000]/12 rounded-full p-2 px-0">
         {tabs.map((tab, index) => (
           <button
-            class={`flex items-center w-full justify-center gap-2 px-6 py-3 rounded-full text-sm font-medium transition-all duration-300 infra-tab-btn cursor-pointer border-none bg-transparent outline-none ${index === 0 ? 'active-tab shadow-[0_4px_12px_rgba(0,0,0,0.05)]' : 'text-black/40'}`}
+            class={`flex items-center shrink-0 justify-center gap-2 px-6 py-3.5 rounded-full text-sm font-medium transition-all duration-300 infra-tab-btn cursor-pointer border-none bg-transparent outline-none ${index === 0 ? 'active-tab shadow-[0_4px_12px_rgba(0,0,0,0.05)]' : 'text-black/40'}`}
             style={index === 0 ? 'background-color: rgba(229, 171, 130, 0.2); color: #BA6F3B;' : ''}
             data-index={index}
             data-tab={tab.id}
           >
             <img class="icon-wrapper opacity-60 transition-all duration-300 w-5 h-[17px] object-contain" src={tab.icon} />
-           <span class="leading-none text-sm">
+           <span class="leading-none text-base whitespace-nowrap">
                 {tab.label}
            </span>
           
@@ -140,7 +140,7 @@ const tabs = [
                 <h3 class="text-[24px] md:text[32px] xl:text-[36px] font-semibold max-w-120 text-black leading-[1.2] mb-6">
                   {tab.title}
                 </h3>
-                <p class="text-base lg:text-lg text-black/80 font-normal leading-relaxed mb-10">
+                <p class="text-base lg:text-base xl:text-lg text-black/80 font-normal leading-relaxed mb-10">
                   {tab.description}
                 </p>
                 
@@ -155,7 +155,7 @@ const tabs = [
                          />
                       </div>
 
-                        <span class="text-base md:text-lg font-normal text-black leading-none mt-auto ">
+                        <span class="text-base md:text-base xl:text-lg font-normal text-black leading-none mt-auto ">
                              {point.label}
                         </span>
                 </div>
@@ -272,13 +272,12 @@ const tabs = [
 
         const btns = section.querySelectorAll('.infra-tab-btn');
         const swiper = new Swiper('.infra-swiper', {
-          effect: 'fade',
-          fadeEffect: { crossFade: true },
           speed: 500,
           allowTouchMove: true,
           autoplay: {
             delay: 5000,
             disableOnInteraction: false,
+            pauseOnMouseEnter: true,
           },
           autoHeight: true,
           on: {
@@ -288,6 +287,7 @@ const tabs = [
           }
         });
 
+        let isInitial = true;
         function updateTabs(index) {
           btns.forEach((btn, i) => {
             const iconWrapper = btn.querySelector('.icon-wrapper');
@@ -300,6 +300,19 @@ const tabs = [
                 iconWrapper.style.filter = 'grayscale(0)';
                 iconWrapper.style.opacity = '1';
               }
+              if (!isInitial) {
+                const container = section.querySelector('.overflow-x-auto');
+                if (container) {
+                  const btnLeft = btn.offsetLeft;
+                  const btnWidth = btn.offsetWidth;
+                  const containerWidth = container.offsetWidth;
+                  const targetScrollLeft = btnLeft - (containerWidth / 2) + (btnWidth / 2);
+                  container.scrollTo({
+                    left: targetScrollLeft,
+                    behavior: 'smooth'
+                  });
+                }
+              }
             } else {
               btn.classList.remove('active-tab', 'shadow-[0_4px_12px_rgba(0,0,0,0.05)]');
               btn.classList.add('text-black/40');
@@ -311,6 +324,7 @@ const tabs = [
               }
             }
           });
+          isInitial = false;
         }
 
         btns.forEach((btn, index) => {
