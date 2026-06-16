@@ -1,0 +1,998 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Oman Fawtara E-Invoicing Readiness Assessment 2026 | ClearTax</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --purple:#301B5E;
+    --purple-dark:#1A0B3B;
+    --magenta:#E0249B;
+    --violet:#8B2FD6;
+    --white:#FFFFFF;
+    --black:#0A0612;
+    --lav:#EDEBFA;
+    --peach:#FDF2ED;
+    --p-orange:#F6E0C5;
+    --teal:#D8EFF2;
+    --mint:#ECF7ED;
+    --sky:#EAF4FF;
+    --tag-purple:#9879AF;
+    --tag-orange:#C77A3A;
+    --tag-cyan:#13839D;
+    --tag-forest:#338878;
+    --body:#37304E;
+    --label:#5B5474;
+    --placeholder:#AAA4BE;
+    --border:#E5E1F0;
+    --line-faint:rgba(48,27,94,.10);
+    --display:"Nohemi","Poppins","Manrope",system-ui,sans-serif;
+    --text:"Gilroy","Manrope","Poppins",system-ui,sans-serif;
+    --grad:linear-gradient(96deg,var(--magenta) 0%,var(--violet) 48%,var(--purple) 100%);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{font-family:var(--text);font-weight:500;color:var(--body);background:var(--white);line-height:1.55;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+  .wrap{max-width:1140px;margin:0 auto;padding:0 28px}
+  h1,h2,h3{font-family:var(--display);font-weight:500;letter-spacing:-.02em;line-height:1.02}
+  .eyebrow{font-family:var(--display);font-weight:600;font-size:.72rem;letter-spacing:.18em;text-transform:uppercase}
+  b,strong{font-weight:700}
+
+  #topline{position:fixed;top:0;left:0;height:3px;width:0;z-index:201;background:var(--grad);transition:width .5s cubic-bezier(.4,0,.2,1)}
+
+  /* ============================================================
+     CLEARTAX GLOBAL NAVBAR — matches cleartax.com exactly
+  ============================================================ */
+  .ct-nav-wrap{position:fixed;top:0;left:0;right:0;z-index:200;background:#fff;border-bottom:1px solid #EBEBEB;font-family:"Inter","Poppins",system-ui,sans-serif}
+  .ct-nav{max-width:1280px;margin:0 auto;padding:0 28px;height:64px;display:flex;align-items:center;gap:0}
+  .ct-logo{display:flex;align-items:center;flex:none;margin-right:32px;text-decoration:none}
+  .ct-logo img{height:28px;display:block}
+
+  /* Nav items */
+  .ct-nav-items{display:flex;align-items:center;gap:4px;flex:1}
+  .ct-nav-item{position:relative}
+  .ct-nav-item > a,
+  .ct-nav-item > button{display:flex;align-items:center;gap:5px;font-size:.875rem;font-weight:500;color:#1A1A2E;background:none;border:none;cursor:pointer;padding:8px 12px;border-radius:8px;text-decoration:none;white-space:nowrap;transition:background .15s,color .15s;font-family:inherit}
+  .ct-nav-item > a:hover,
+  .ct-nav-item > button:hover{background:#F5F4FF;color:var(--purple)}
+  .ct-nav-item > a.active,
+  .ct-nav-item > button.active{color:var(--purple)}
+  .ct-chevron{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;flex:none;transition:transform .2s}
+  .ct-nav-item.open > button .ct-chevron{transform:rotate(180deg)}
+
+  /* Dropdown panel */
+  .ct-dropdown{position:absolute;top:calc(100% + 10px);left:0;min-width:220px;background:#fff;border:1px solid #E8E6F0;border-radius:14px;box-shadow:0 16px 48px -12px rgba(26,11,59,.18);padding:8px;opacity:0;transform:translateY(-6px);pointer-events:none;transition:opacity .18s,transform .18s;z-index:300}
+  .ct-nav-item.open .ct-dropdown{opacity:1;transform:none;pointer-events:auto}
+  .ct-dropdown a{display:block;font-size:.875rem;font-weight:500;color:#2D2447;text-decoration:none;padding:9px 14px;border-radius:8px;transition:background .14s,color .14s;white-space:nowrap}
+  .ct-dropdown a:hover{background:#F5F4FF;color:var(--purple)}
+
+  /* Country selector dropdown — wider, 2-col */
+  .ct-country-btn{display:flex;align-items:center;gap:7px;font-size:.875rem;font-weight:500;color:#1A1A2E;background:none;border:1px solid #E8E6F0;cursor:pointer;padding:7px 13px;border-radius:8px;text-decoration:none;white-space:nowrap;transition:background .15s,border-color .15s;font-family:inherit}
+  .ct-country-btn:hover{background:#F5F4FF;border-color:#C9BEE6}
+  .ct-country-btn img{width:22px;height:15px;object-fit:cover;border-radius:2px;flex:none}
+  .ct-country-btn .ct-chevron{stroke:#666}
+  .ct-country-item.open .ct-country-btn{background:#F5F4FF;border-color:#C9BEE6}
+  .ct-country-item.open .ct-country-btn .ct-chevron{transform:rotate(180deg)}
+
+  .ct-country-dropdown{position:absolute;top:calc(100% + 10px);right:0;width:520px;background:#fff;border:1px solid #E8E6F0;border-radius:16px;box-shadow:0 20px 56px -14px rgba(26,11,59,.22);padding:16px;opacity:0;transform:translateY(-6px);pointer-events:none;transition:opacity .18s,transform .18s;z-index:300}
+  .ct-country-item.open .ct-country-dropdown{opacity:1;transform:none;pointer-events:auto}
+  .ct-country-dropdown-title{font-size:.7rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#AAA4BE;padding:4px 8px 12px;display:block}
+  .ct-country-grid{display:grid;grid-template-columns:1fr 1fr;gap:2px}
+  .ct-country-grid a{display:flex;align-items:center;gap:10px;font-size:.875rem;font-weight:500;color:#2D2447;text-decoration:none;padding:9px 12px;border-radius:10px;transition:background .14s;white-space:nowrap}
+  .ct-country-grid a:hover{background:#F5F4FF;color:var(--purple)}
+  .ct-country-grid a img{width:24px;height:16px;object-fit:cover;border-radius:3px;flex:none;box-shadow:0 0 0 1px rgba(0,0,0,.08)}
+  .ct-country-grid a .ct-country-langs{font-size:.72rem;color:#AAA4BE;margin-left:auto;padding-left:6px}
+
+  /* Right side */
+  .ct-nav-right{display:flex;align-items:center;gap:10px;margin-left:auto;flex:none}
+  .ct-demo-btn{display:inline-flex;align-items:center;gap:8px;background:var(--purple);color:#fff;border:none;cursor:pointer;
+    font-family:inherit;font-weight:600;font-size:.875rem;border-radius:8px;padding:9px 18px;text-decoration:none;
+    transition:background .2s,box-shadow .2s;white-space:nowrap}
+  .ct-demo-btn:hover{background:#3c2475;box-shadow:0 8px 20px -8px rgba(48,27,94,.6)}
+
+  /* Mobile hamburger */
+  .ct-hamburger{display:none;flex-direction:column;gap:5px;background:none;border:none;cursor:pointer;padding:8px;border-radius:8px}
+  .ct-hamburger span{display:block;width:22px;height:2px;background:#1A1A2E;border-radius:2px;transition:transform .2s}
+
+  /* Progress counter badge */
+  .ct-progress-badge{font-size:.78rem;font-weight:600;color:var(--violet);white-space:nowrap;background:#F5F4FF;border-radius:50px;padding:5px 12px;border:1px solid #E8E6F0}
+  .ct-progress-badge b{color:var(--purple)}
+
+  @media(max-width:980px){.ct-nav-items .ct-nav-item:not(.ct-country-item){display:none}}
+  @media(max-width:680px){
+    .ct-progress-badge{display:none}
+    .ct-nav{padding:0 16px;height:58px}
+    .ct-logo img{height:24px}
+  }
+  /* ============================================================ */
+
+  /* keep pill-btn for modal only */
+  .pill-btn{display:inline-flex;align-items:center;gap:9px;background:var(--purple);color:#fff;border:none;cursor:pointer;
+    font-family:var(--display);font-weight:600;font-size:.9rem;border-radius:50px;padding:11px 20px;text-decoration:none;
+    transition:transform .2s ease,box-shadow .2s ease,background .2s ease}
+  .pill-btn:hover{transform:translateY(-1px);box-shadow:0 12px 26px -12px rgba(48,27,94,.7);background:#3c2475}
+  .pill-btn svg{width:15px;height:15px}
+
+  .hero{position:relative;padding:128px 0 48px;overflow:hidden;
+    background:linear-gradient(180deg,#F4EFFC 0%,#EFE8FA 24%,#F6E9F0 46%,#FCEFDC 66%,#F3E2CB 84%,#3A235F 97%,var(--purple-dark) 100%)}
+  .hero::before{content:"";position:absolute;inset:0;pointer-events:none;
+    background:
+      radial-gradient(420px 220px at 62% 78%,rgba(255,210,140,.65),transparent 66%),
+      radial-gradient(620px 360px at 78% 60%,rgba(255,196,128,.55),transparent 62%),
+      radial-gradient(560px 420px at 98% 34%,rgba(86,158,232,.40),transparent 60%),
+      radial-gradient(520px 460px at 2% 78%,rgba(224,36,155,.24),transparent 60%)}
+  .orb{position:absolute;right:7%;top:120px;width:230px;height:230px;border-radius:50%;pointer-events:none;
+    background:conic-gradient(from 200deg at 50% 50%,#9be7ff,#c6a8ff,#ff9ed6,#ffd59e,#a8f0d0,#9be7ff);
+    filter:blur(.3px);box-shadow:0 0 0 1px rgba(255,255,255,.5) inset,0 30px 70px -20px rgba(124,47,214,.55),0 0 90px rgba(199,160,255,.6);
+    opacity:.92;animation:float 7s ease-in-out infinite}
+  .orb::after{content:"";position:absolute;inset:14%;border-radius:50%;background:radial-gradient(circle at 34% 30%,rgba(255,255,255,.85),rgba(255,255,255,0) 55%)}
+  @keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-16px)}}
+  .oman-pattern{position:absolute;inset:0;pointer-events:none;opacity:.08;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='64' height='64' viewBox='0 0 60 60'%3E%3Cpath fill='none' stroke='%23301B5E' stroke-width='1.1' d='M10 10H50V50H10Z M30 6L54 30L30 54L6 30Z'/%3E%3C/svg%3E");
+    background-size:64px 64px}
+  .skyline{position:absolute;left:0;right:0;bottom:46px;width:100%;height:270px;opacity:.82;pointer-events:none}
+  .skyline svg{width:100%;height:100%;display:block}
+
+  .hero-inner{position:relative;z-index:3;max-width:760px;margin-left:0;margin-right:auto;text-align:left}
+  .hero-inner::before{content:"";position:absolute;z-index:-1;top:-30px;bottom:-30px;left:-44px;right:-8%;
+    background:radial-gradient(135% 125% at 4% 44%,rgba(26,11,59,.82),rgba(26,11,59,.46) 46%,rgba(26,11,59,0) 74%)}
+  .pills{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:16px}
+  .pill-tag{font-family:var(--display);font-weight:600;font-size:.7rem;letter-spacing:.14em;text-transform:uppercase;
+    background:rgba(255,255,255,.6);border:1px solid rgba(255,255,255,.8);backdrop-filter:blur(8px);
+    color:var(--purple);padding:7px 13px;border-radius:50px}
+  .pill-tag.solid{background:var(--purple);color:#fff;border-color:transparent}
+  h1.hero-h1{font-size:clamp(2rem,4.8vw,3.5rem);max-width:22ch;
+    background:linear-gradient(96deg,#FF7AD0 0%,#D9BFFF 52%,#FFFFFF 100%);-webkit-background-clip:text;background-clip:text;color:transparent;
+    filter:drop-shadow(0 2px 12px rgba(26,11,59,.4));margin-bottom:14px}
+  .hero-sub{font-size:clamp(1.05rem,1.7vw,1.28rem);color:#fff;max-width:56ch;margin-bottom:18px;font-weight:500}
+  .hero-meta{font-family:var(--display);font-weight:600;font-size:.84rem;color:#fff;display:inline-flex;align-items:center;gap:9px}
+  .hero-meta svg{width:16px;height:16px}
+
+  .trust{position:relative;z-index:3;display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:48px;max-width:920px}
+  .tcard{background:rgba(255,255,255,.5);border:1px solid rgba(255,255,255,.75);backdrop-filter:blur(14px) saturate(140%);
+    -webkit-backdrop-filter:blur(14px) saturate(140%);border-radius:18px;padding:20px 22px;box-shadow:0 16px 40px -26px rgba(48,27,94,.4)}
+  .tcard .k{font-family:var(--display);font-weight:600;font-size:.66rem;letter-spacing:.16em;text-transform:uppercase;color:var(--magenta);margin-bottom:8px}
+  .tcard .t{font-family:var(--display);font-weight:600;font-size:1.06rem;color:var(--purple);margin-bottom:5px;letter-spacing:-.01em}
+  .tcard .d{font-size:.86rem;color:#5a4f74;line-height:1.45}
+  @media(max-width:760px){.trust{grid-template-columns:1fr}.orb{width:150px;height:150px;right:-10px;top:140px;opacity:.8}}
+
+  .phaseband{background:var(--purple-dark);color:#fff;padding:34px 0 50px}
+  .phaseband .cap{font-family:var(--display);font-weight:600;font-size:.7rem;letter-spacing:.18em;text-transform:uppercase;color:#C6A8FF;margin-bottom:26px}
+  .phase-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:22px;position:relative}
+  .phase{position:relative;padding-left:26px}
+  .phase .node{position:absolute;left:0;top:4px;width:13px;height:13px;border-radius:50%;background:#fff;box-shadow:0 0 0 4px rgba(255,255,255,.12)}
+  .phase:first-child .node{background:var(--magenta);box-shadow:0 0 0 4px rgba(224,36,155,.22)}
+  .phase .pn{font-family:var(--display);font-weight:600;font-size:.72rem;letter-spacing:.12em;color:#C6A8FF;margin-bottom:3px}
+  .phase .pd{font-family:var(--display);font-weight:500;font-size:1.2rem;margin-bottom:6px;letter-spacing:-.01em}
+  .phase .px{font-size:.86rem;color:rgba(255,255,255,.72);line-height:1.45}
+  @media(max-width:680px){.phase-grid{grid-template-columns:1fr;gap:20px}}
+
+  main{padding:64px 0 30px}
+  .section{border-radius:28px;padding:clamp(26px,4vw,52px);margin-bottom:30px}
+  .section.s1{background:var(--lav)}
+  .section.s2{background:var(--sky)}
+  .section.s3{background:var(--mint)}
+  .section.s4{background:var(--peach)}
+  .sec-head{display:flex;align-items:center;gap:18px;margin-bottom:26px}
+  .sec-ico{flex:none;width:54px;height:54px;border-radius:16px;background:#fff;display:grid;place-items:center;box-shadow:0 10px 26px -16px rgba(48,27,94,.4)}
+  .sec-ico svg{width:26px;height:26px;stroke:var(--purple);fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+  .sec-eyebrow{display:block;margin-bottom:2px}
+  .s1 .sec-eyebrow{color:var(--tag-purple)}
+  .s2 .sec-eyebrow{color:var(--tag-cyan)}
+  .s3 .sec-eyebrow{color:var(--tag-forest)}
+  .s4 .sec-eyebrow{color:var(--tag-orange)}
+  .sec-head h2{font-size:clamp(1.5rem,3vw,2.1rem);color:var(--purple)}
+
+  .qcard{background:#fff;border-radius:22px;padding:clamp(20px,3vw,30px);margin-bottom:20px;box-shadow:0 18px 44px -32px rgba(48,27,94,.4);
+    opacity:0;transform:translateY(14px)}
+  .qcard:last-child{margin-bottom:0}
+  .qcard.in{opacity:1;transform:none;transition:opacity .55s ease,transform .55s ease}
+  .qtop{display:flex;gap:14px;margin-bottom:20px}
+  .qnum{font-family:var(--display);font-weight:600;font-size:.95rem;color:var(--magenta);flex:none;padding-top:2px}
+  .qtext{font-family:var(--display);font-weight:500;font-size:1.16rem;color:var(--purple);line-height:1.32;letter-spacing:-.01em}
+  .opts{display:flex;flex-direction:column;gap:10px}
+  .opt{position:relative;display:flex;gap:14px;align-items:flex-start;border:1px solid var(--border);border-radius:14px;
+    padding:14px 16px;cursor:pointer;background:#fff;transition:border-color .18s,background .18s}
+  .opt:hover{border-color:#C9BEE6;background:#FAF8FF}
+  .opt input{position:absolute;opacity:0;width:0;height:0}
+  .opt .dot{flex:none;width:22px;height:22px;border-radius:50%;border:2px solid var(--border);margin-top:1px;display:grid;place-items:center;transition:border-color .18s}
+  .opt .dot::after{content:"";width:10px;height:10px;border-radius:50%;background:var(--purple);transform:scale(0);transition:transform .18s cubic-bezier(.4,0,.2,1)}
+  .opt .lvl{font-family:var(--display);font-weight:600;font-size:.62rem;letter-spacing:.12em;color:var(--label);display:block;margin-bottom:3px}
+  .opt .ot{font-size:.96rem;line-height:1.45;color:var(--body);font-weight:500}
+  .opt:has(input:checked){border-color:var(--purple);background:var(--lav)}
+  .opt:has(input:checked) .dot{border-color:var(--purple)}
+  .opt:has(input:checked) .dot::after{transform:scale(1)}
+  .opt:has(input:checked) .lvl{color:var(--purple)}
+  .opt input:focus-visible + .dot{outline:2px solid var(--violet);outline-offset:3px}
+
+  .legend{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin:6px 0 36px}
+  .lg{border-radius:16px;padding:16px 18px;background:#fff;border:1px solid var(--border)}
+  .lg .k{font-family:var(--display);font-weight:600;font-size:.72rem;letter-spacing:.06em}
+  .lg .v{font-size:.84rem;color:var(--label);margin-top:3px}
+  .lg.l1 .k{color:var(--tag-orange)}.lg.l2 .k{color:var(--tag-purple)}.lg.l3 .k{color:var(--tag-cyan)}.lg.l4 .k{color:var(--tag-forest)}
+  @media(max-width:620px){.legend{grid-template-columns:1fr 1fr}}
+
+  .details{background:var(--lav);border-radius:28px;padding:clamp(28px,5vw,56px);margin-bottom:40px}
+  .details-card{background:#fff;border-radius:22px;padding:clamp(26px,4vw,44px);max-width:760px;margin:0 auto;box-shadow:0 24px 60px -40px rgba(48,27,94,.5)}
+  .details-card h2{font-size:clamp(1.6rem,3vw,2.1rem);color:var(--purple);margin-bottom:8px;text-align:center}
+  .details-card .sub{color:var(--label);font-size:.96rem;text-align:center;max-width:48ch;margin:0 auto 30px}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+  @media(max-width:600px){.grid2{grid-template-columns:1fr}}
+  .field{display:flex;flex-direction:column;gap:7px}
+  .field.full{grid-column:1/-1}
+  .field label{font-size:.82rem;font-weight:600;color:var(--label)}
+  .field label .req{color:#E0476A}
+  .field input,.field select{font-family:var(--text);font-weight:500;font-size:.95rem;color:var(--purple);background:#fff;
+    border:1px solid var(--border);border-radius:8px;padding:13px 14px;width:100%;transition:border-color .18s,box-shadow .18s}
+  .field select{appearance:none;cursor:pointer;background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%23301B5E' stroke-width='2.4'><path d='M6 9l6 6 6-6'/></svg>");background-repeat:no-repeat;background-position:right 14px center}
+  .field input::placeholder{color:var(--placeholder)}
+  .field input:focus,.field select:focus{outline:none;border-color:var(--violet);box-shadow:0 0 0 3px rgba(139,47,214,.12)}
+  .field .err{font-size:.76rem;color:#E0476A;opacity:0;transform:translateY(-3px);transition:.2s;min-height:0}
+  .field.invalid input,.field.invalid select{border-color:#E0476A}
+  .field.invalid .err{opacity:1;transform:none}
+  .consent{grid-column:1/-1;display:flex;gap:12px;align-items:flex-start;margin-top:4px}
+  .consent input{flex:none;width:18px;height:18px;margin-top:3px;accent-color:var(--purple)}
+  .consent p{font-size:.8rem;color:var(--label);line-height:1.5}
+  .consent.invalid p{color:#E0476A}
+  .submit-row{grid-column:1/-1;margin-top:22px}
+  .submit{width:100%;justify-content:center;font-size:1rem;padding:15px 28px}
+  .submit .spin{width:16px;height:16px;border:2px solid rgba(255,255,255,.4);border-top-color:#fff;border-radius:50%;display:none;animation:spin .7s linear infinite}
+  .submit.loading .spin{display:block}.submit.loading .lbl{display:none}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  .encrypt{display:flex;align-items:center;justify-content:center;gap:8px;font-size:.78rem;color:var(--label);margin-top:14px}
+  .encrypt svg{width:14px;height:14px;flex-shrink:0}
+
+  #hs-report-form .hs-loading{color:var(--label);font-size:.9rem;text-align:center;padding:18px 0}
+  #hs-report-form form{margin:0}
+  #hs-report-form fieldset{max-width:none!important;margin-bottom:0}
+  #hs-report-form .hs-form-field{width:100%!important;float:none!important;margin-bottom:16px}
+  #hs-report-form .input,#hs-report-form .hs-input{margin:0!important}
+  #hs-report-form label{display:block;font-size:.82rem;font-weight:600;color:var(--label);margin-bottom:7px}
+  #hs-report-form .hs-form-required{color:#E0476A;margin-left:2px}
+  #hs-report-form .hs-input{width:100%!important;font-family:var(--text);font-weight:500;font-size:.95rem;color:var(--purple);
+    background:#fff;border:1px solid var(--border);border-radius:8px;padding:13px 14px;transition:border-color .18s,box-shadow .18s}
+  #hs-report-form select.hs-input{appearance:none;cursor:pointer}
+  #hs-report-form textarea.hs-input{min-height:96px;resize:vertical}
+  #hs-report-form .hs-input:focus{outline:none;border-color:var(--violet);box-shadow:0 0 0 3px rgba(139,47,214,.12)}
+  #hs-report-form .hs-input::placeholder{color:var(--placeholder)}
+  #hs-report-form .hs-error-msgs{list-style:none;margin:6px 0 0;padding:0}
+  #hs-report-form .hs-error-msgs label,#hs-report-form .hs-error-msg{color:#E0476A;font-size:.76rem;font-weight:500}
+  #hs-report-form .hs-input.invalid,#hs-report-form .hs-input.error{border-color:#E0476A}
+  #hs-report-form .hs-form-booleancheckbox label,#hs-report-form .hs-form-checkbox-display{display:flex;gap:10px;align-items:flex-start;font-size:.8rem;font-weight:500;color:var(--label)}
+  #hs-report-form .hs-form-booleancheckbox input,#hs-report-form .inputs-list input[type=checkbox]{width:18px;height:18px;margin-top:2px;accent-color:var(--purple)}
+  #hs-report-form .legal-consent-container{font-size:.8rem;color:var(--label);line-height:1.5;margin-top:6px}
+  #hs-report-form .hs-button{display:inline-flex;align-items:center;justify-content:center;width:100%;margin-top:8px;cursor:pointer;
+    background:var(--purple);color:#fff;border:none;font-family:var(--display);font-weight:600;font-size:1rem;border-radius:50px;padding:15px 28px;
+    transition:background .2s,transform .2s,box-shadow .2s}
+  #hs-report-form .hs-button:hover{background:#3c2475;transform:translateY(-1px);box-shadow:0 12px 26px -12px rgba(48,27,94,.7)}
+  #hs-report-form .submitted-message{text-align:center;color:var(--purple);font-weight:600}
+
+  .thanks{display:none;text-align:center;padding:110px 0 90px;position:relative}
+  .thanks.show{display:block;animation:rise .6s cubic-bezier(.2,.7,.2,1)}
+  @keyframes rise{from{opacity:0;transform:translateY(22px)}to{opacity:1;transform:none}}
+  .check{width:92px;height:92px;border-radius:50%;margin:0 auto 26px;display:grid;place-items:center;
+    background:radial-gradient(circle at 32% 28%,#7B2FD6,var(--purple));box-shadow:0 20px 46px -18px rgba(123,47,214,.7)}
+  .check svg{width:44px;height:44px;stroke:#fff;fill:none;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}
+  .thanks h2{font-size:clamp(1.9rem,4vw,2.6rem);color:var(--purple);margin-bottom:14px}
+  .thanks p{max-width:50ch;margin:0 auto;color:var(--label);font-size:1.02rem}
+
+  .confetti{position:absolute;inset:0;overflow:visible;pointer-events:none}
+  .confetti i{position:absolute;top:38%;left:50%;width:9px;height:9px;border-radius:2px;opacity:0}
+  .confetti.go i{animation:burst 1100ms ease-out forwards}
+  @keyframes burst{0%{opacity:1;transform:translate(0,0) rotate(0)}100%{opacity:0;transform:translate(var(--tx),var(--ty)) rotate(var(--rot))}}
+
+  /* ===================== FULL FOOTER ===================== */
+  .site-footer{background:#0D0628;color:rgba(255,255,255,.65);font-size:.88rem;line-height:1.6;padding:0}
+  .footer-top{padding:56px 0 48px;border-bottom:1px solid rgba(255,255,255,.08)}
+  .footer-top-inner{display:grid;grid-template-columns:240px 1fr;gap:52px;align-items:start}
+  .footer-brand{display:flex;flex-direction:column;gap:24px}
+  .footer-logo img{width:140px;display:block}
+  .footer-social-label{font-size:.74rem;color:rgba(255,255,255,.4);text-transform:uppercase;letter-spacing:.1em;font-weight:600;margin-bottom:10px}
+  .footer-social{display:flex;gap:10px;flex-wrap:wrap}
+  .footer-social a{display:grid;place-items:center;width:36px;height:36px;border-radius:50%;border:1px solid rgba(255,255,255,.18);color:rgba(255,255,255,.65);transition:border-color .18s,color .18s;text-decoration:none}
+  .footer-social a:hover{border-color:rgba(255,255,255,.55);color:#fff}
+  .footer-social svg{width:16px;height:16px;fill:currentColor}
+  .footer-support-label{font-size:.76rem;color:rgba(255,255,255,.4);text-transform:uppercase;letter-spacing:.1em;font-weight:600;display:block;margin-bottom:6px}
+  .footer-support-link{color:rgba(255,255,255,.75);text-decoration:none;font-weight:600;font-size:.9rem}
+  .footer-support-link:hover{color:#fff}
+
+  .footer-cols{display:grid;grid-template-columns:repeat(4,1fr);gap:32px}
+  .footer-col h4{font-family:var(--display);font-weight:600;font-size:.76rem;letter-spacing:.12em;text-transform:uppercase;color:#fff;margin-bottom:16px}
+  .footer-col ul{list-style:none;display:flex;flex-direction:column;gap:10px}
+  .footer-col ul li a{color:rgba(255,255,255,.6);text-decoration:none;font-size:.86rem;transition:color .15s}
+  .footer-col ul li a:hover{color:#fff}
+
+  .footer-bottom{padding:22px 0}
+  .footer-bottom-inner{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:18px}
+  .footer-legal{display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+  .footer-legal a{color:rgba(255,255,255,.5);text-decoration:none;font-size:.82rem;transition:color .15s}
+  .footer-legal a:hover{color:#fff}
+  .footer-legal-sep{color:rgba(255,255,255,.2)}
+  .footer-copyright{font-size:.82rem;color:rgba(255,255,255,.38)}
+  .footer-certs{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+  .footer-certs img{height:30px;opacity:.9}
+
+  @media(max-width:960px){
+    .footer-top-inner{grid-template-columns:1fr}
+    .footer-cols{grid-template-columns:repeat(2,1fr)}
+  }
+  @media(max-width:560px){
+    .footer-cols{grid-template-columns:1fr}
+    .footer-bottom-inner{flex-direction:column;align-items:flex-start;gap:14px}
+  }
+  /* ====================================================== */
+
+  .overlay{position:fixed;inset:0;z-index:200;background:rgba(20,9,46,.55);backdrop-filter:blur(3px);
+    display:none;align-items:center;justify-content:center;padding:24px}
+  .overlay.open{display:flex;animation:fade .25s ease}
+  @keyframes fade{from{opacity:0}to{opacity:1}}
+  .modal{background:#fff;border-radius:24px;width:min(480px,100%);padding:34px;position:relative;box-shadow:0 40px 90px -30px rgba(20,9,46,.7);
+    animation:pop .3s cubic-bezier(.2,.7,.2,1)}
+  @keyframes pop{from{opacity:0;transform:translateY(20px) scale(.97)}to{opacity:1;transform:none}}
+  .modal h3{font-size:1.5rem;color:var(--purple);margin-bottom:22px;text-align:center}
+  .modal .close{position:absolute;top:16px;right:16px;width:34px;height:34px;border-radius:50%;border:1px solid var(--border);
+    background:#fff;cursor:pointer;font-size:1.1rem;color:var(--label);line-height:1;display:grid;place-items:center}
+  .modal .close:hover{background:var(--lav)}
+  .modal .grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  .modal .field.full{grid-column:1/-1}
+  .modal-success{display:none;text-align:center;position:relative;padding:14px 0 6px}
+  .modal-success.show{display:block}
+  .modal-success .check{width:76px;height:76px;margin-bottom:18px}
+  .modal-success h3{margin-bottom:10px}
+  .modal-success p{color:var(--label);font-size:.92rem;max-width:34ch;margin:0 auto}
+  @media(max-width:560px){
+    .overlay{align-items:flex-end;padding:0}
+    .modal{width:100%;border-radius:24px 24px 0 0;animation:sheet .32s cubic-bezier(.2,.7,.2,1)}
+    .modal .grid{grid-template-columns:1fr}
+  }
+  @keyframes sheet{from{transform:translateY(100%)}to{transform:translateY(0)}}
+
+  @media(prefers-reduced-motion:reduce){
+    *{animation:none!important;transition:none!important}
+    .qcard{opacity:1;transform:none}
+    html{scroll-behavior:auto}
+  }
+</style>
+</head>
+<body>
+    <div id="topline"></div>
+
+<!-- ============================================================
+     CLEARTAX GLOBAL NAVBAR
+============================================================ -->
+<div class="ct-nav-wrap">
+  <nav class="ct-nav" aria-label="Primary navigation">
+
+    <!-- Logo -->
+    <a href="https://www.cleartax.com/" class="ct-logo">
+      <img src="https://cdn.prod.website-files.com/6093bce33d9b4bae841b04e3/69dfcff6071b983201f5f097_logo-cleartax.svg" alt="ClearTax" />
+    </a>
+
+    <!-- Nav items -->
+    <ul class="ct-nav-items" role="list" style="list-style:none;padding:0;margin:0;display:flex;align-items:center;gap:2px">
+
+      <!-- Products -->
+      <li class="ct-nav-item" id="navProducts">
+        <button type="button" aria-haspopup="true" aria-expanded="false">
+          Products
+          <svg class="ct-chevron" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg>
+        </button>
+        <div class="ct-dropdown" role="menu">
+          <a href="https://cleartax.com/global/recon-ai" role="menuitem">AI Reconciliation</a>
+          <a href="https://cleartax.com/global/compliance" role="menuitem">Compliance</a>
+          <a href="https://www.cleartax.com/global/e-invoicing-solution" role="menuitem">Global E-Invoicing</a>
+          <a href="https://cleartax.com/global/erp-integration" role="menuitem">Integration</a>
+          <a href="https://cleartax.com/global/scale-security" role="menuitem">Scale &amp; Security</a>
+        </div>
+      </li>
+
+      <!-- Resources -->
+      <li class="ct-nav-item" id="navResources">
+        <button type="button" aria-haspopup="true" aria-expanded="false">
+          Resources
+          <svg class="ct-chevron" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg>
+        </button>
+        <div class="ct-dropdown" role="menu">
+          <a href="https://www.cleartax.com/electronic-invoicing#country-select" role="menuitem">Blogs</a>
+          <a href="https://www.cleartax.com/case-studies" role="menuitem">Case Studies</a>
+          <a href="https://www.cleartax.com/ae/press" role="menuitem">Press Releases</a>
+        </div>
+      </li>
+
+      <!-- Contact Us -->
+      <li class="ct-nav-item">
+        <a href="https://www.cleartax.com/contact-us">Contact Us</a>
+      </li>
+
+      <!-- Partners -->
+      <li class="ct-nav-item">
+        <a href="https://www.cleartax.com/global/partner-program">Partners</a>
+      </li>
+
+    </ul><!-- /ct-nav-items -->
+
+    <!-- Right side -->
+    <div class="ct-nav-right">
+
+      <!-- Progress badge -->
+      <span class="ct-progress-badge" aria-live="polite"><b id="navCount">0</b>/8 answered</span>
+
+      <!-- Country selector -->
+      <div class="ct-nav-item ct-country-item" id="navCountry" style="position:relative">
+        <button class="ct-country-btn" type="button" style="cursor:default">
+          <img src="https://cdn.prod.website-files.com/6141e3720a248d2024615d96/63e29d499e782b5935404547_Group%201000003291.svg" alt="Oman flag" />
+          OMAN
+        </button>
+      </div><!-- /ct-country-item -->
+
+      <!-- Request a demo CTA -->
+      <a href="#details" class="ct-demo-btn">Request a demo</a>
+
+    </div><!-- /ct-nav-right -->
+
+  </nav>
+</div>
+
+<div id="app">
+
+  <header class="hero">
+    <div class="oman-pattern" aria-hidden="true"></div>
+    <div class="orb" aria-hidden="true"></div>
+    <div class="skyline" aria-hidden="true">
+      <svg viewBox="0 0 1200 220" preserveAspectRatio="xMidYMax slice">
+        <path fill="#E3D2B6" d="M0 118 L90 70 L170 104 L260 58 L360 108 L470 70 L560 110 L660 64 L770 106 L880 72 L980 110 L1080 68 L1160 102 L1200 84 L1200 220 L0 220Z"/>
+        <g fill="#CBAE80">
+          <rect x="120" y="150" width="140" height="40"/>
+          <rect x="124" y="142" width="14" height="10"/><rect x="150" y="142" width="14" height="10"/><rect x="176" y="142" width="14" height="10"/><rect x="202" y="142" width="14" height="10"/><rect x="228" y="142" width="14" height="10"/>
+          <path d="M102 190 V134 a19 19 0 0 1 38 0 V190Z"/>
+          <rect x="106" y="124" width="6" height="12"/><rect x="130" y="124" width="6" height="12"/>
+          <path d="M280 190 V150 a18 18 0 0 1 36 0 V190Z"/>
+          <path d="M330 190 V158 a14 14 0 0 1 28 0 V190Z"/>
+          <rect x="498" y="78" width="14" height="112"/>
+          <path d="M498 78 a7 9 0 0 1 14 0Z"/><rect x="503" y="60" width="4" height="18"/><circle cx="505" cy="58" r="3"/>
+          <rect x="545" y="120" width="110" height="70"/>
+          <path d="M545 122 A55 50 0 0 1 655 122Z"/>
+          <rect x="597" y="82" width="6" height="16"/><circle cx="600" cy="78" r="5"/>
+          <rect x="688" y="78" width="14" height="112"/>
+          <path d="M688 78 a7 9 0 0 1 14 0Z"/><rect x="693" y="60" width="4" height="18"/><circle cx="695" cy="58" r="3"/>
+          <path d="M740 190 V156 a16 16 0 0 1 32 0 V190Z"/>
+          <path d="M788 190 V150 a18 18 0 0 1 36 0 V190Z"/>
+          <rect x="860" y="150" width="120" height="40"/>
+          <rect x="864" y="142" width="14" height="10"/><rect x="890" y="142" width="14" height="10"/><rect x="916" y="142" width="14" height="10"/><rect x="942" y="142" width="14" height="10"/><rect x="966" y="142" width="14" height="10"/>
+          <path d="M952 190 V132 a16 16 0 0 1 32 0 V190Z"/>
+          <rect x="1030" y="150" width="6" height="40"/>
+          <path d="M1033 150 q-26 -6 -40 6 q22 -2 40 4Z"/><path d="M1033 150 q26 -6 40 6 q-22 -2 -40 4Z"/><path d="M1033 150 q-18 -20 -34 -20 q14 8 34 14Z"/><path d="M1033 150 q18 -20 34 -20 q-14 8 -34 14Z"/><path d="M1033 150 q0 -22 0 -30 q6 18 0 30Z"/>
+          <rect x="1086" y="158" width="5" height="32"/>
+          <path d="M1088 158 q-20 -5 -32 5 q18 -2 32 3Z"/><path d="M1088 158 q20 -5 32 5 q-18 -2 -32 3Z"/><path d="M1088 158 q-14 -16 -26 -16 q11 6 26 11Z"/><path d="M1088 158 q14 -16 26 -16 q-11 6 -26 11Z"/>
+          <path d="M1110 186 q44 16 100 0 q-22 13 -50 13 q-28 0 -50 -13Z"/>
+          <rect x="1150" y="116" width="4" height="70"/>
+          <path d="M1152 118 L1116 184 L1152 178Z"/>
+        </g>
+      </svg>
+    </div>
+    <div class="wrap hero-inner">
+      <div class="pills">
+        <span class="pill-tag solid">Oman Finance Leadership</span>
+        <span class="pill-tag">CFO Survey · 2026</span>
+        <span class="pill-tag">Confidential Assessment</span>
+      </div>
+      <h1 class="hero-h1">Oman Fawtara e-invoicing<br>readiness assessment</h1>
+      <p class="hero-sub">See how prepared your finance function is for Oman's Fawtara mandate.</p>
+      <span class="hero-meta">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
+        ~6 minutes · 8 questions across 4 dimensions
+      </span>
+    </div>
+  </header>
+
+  <section class="phaseband">
+    <div class="wrap">
+      <div class="phase-grid">
+        <div class="phase"><span class="node"></span><div class="pn">Phase 1</div><div class="pd">Aug 2026</div><div class="px">The ~150 largest VAT-registered companies. No slack left in the window.</div></div>
+        <div class="phase"><span class="node"></span><div class="pn">Phase 2</div><div class="pd">Feb 2027</div><div class="px">All remaining large taxpayers. The implementation window is narrow.</div></div>
+        <div class="phase"><span class="node"></span><div class="pn">Phase 3</div><div class="pd">Aug 2027</div><div class="px">All remaining VAT-registered businesses across Oman.</div></div>
+      </div>
+    </div>
+  </section>
+
+  <main class="wrap" id="sections">
+
+    <div class="section s1">
+      <div class="sec-head">
+        <span class="sec-ico"><svg viewBox="0 0 24 24"><path d="M12 3v18"/><path d="M5 7l-3 6a4 4 0 0 0 6 0L5 7zM19 7l-3 6a4 4 0 0 0 6 0L19 7z"/><path d="M7 20h10M5 7h14"/></svg></span>
+        <div><span class="eyebrow sec-eyebrow">Section 1 of 4</span><h2>Regulatory Awareness &amp; Phase Readiness</h2></div>
+      </div>
+      <div class="qcard" data-q="q1"><div class="qtop"><span class="qnum">Q1</span><span class="qtext">Has your organisation been formally notified by the Oman Tax Authority (OTA) of your Fawtara phase and go-live deadline?</span></div><div class="opts"></div></div>
+      <div class="qcard" data-q="q2"><div class="qtop"><span class="qnum">Q2</span><span class="qtext">How well does your finance and IT leadership understand Fawtara's technical requirements — the Peppol PINT-OM format, the OTA-accredited ASP obligation, and the 10-year structured archiving mandate?</span></div><div class="opts"></div></div>
+    </div>
+
+    <div class="section s2">
+      <div class="sec-head">
+        <span class="sec-ico"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="12" rx="1.5"/><path d="M8 20h8M12 16v4"/></svg></span>
+        <div><span class="eyebrow sec-eyebrow">Section 2 of 4</span><h2>Technical Infrastructure</h2></div>
+      </div>
+      <div class="qcard" data-q="q3"><div class="qtop"><span class="qnum">Q3</span><span class="qtext">Can your ERP or billing system generate e-invoices in the OTA-required Peppol PINT-OM (structured XML) format automatically — or does it need significant development or third-party integration?</span></div><div class="opts"></div></div>
+      <div class="qcard" data-q="q4"><div class="qtop"><span class="qnum">Q4</span><span class="qtext">Have you selected or contracted with an OTA-accredited Fawtara Application Service Provider (ASP) to handle transmission, validation, and OTA response management?</span></div><div class="opts"></div></div>
+    </div>
+
+    <div class="section s3">
+      <div class="sec-head">
+        <span class="sec-ico"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M5 5l2 2M17 17l2 2M19 5l-2 2M7 17l-2 2"/></svg></span>
+        <div><span class="eyebrow sec-eyebrow">Section 3 of 4</span><h2>Process Maturity</h2></div>
+      </div>
+      <div class="qcard" data-q="q5"><div class="qtop"><span class="qnum">Q5</span><span class="qtext">Have you mapped and tested e-invoicing workflows for complex transaction types — credit notes, self-billing, intercompany invoices, FX-denominated transactions, and future B2G flows?</span></div><div class="opts"></div></div>
+      <div class="qcard" data-q="q6"><div class="qtop"><span class="qnum">Q6</span><span class="qtext">Do you have a documented plan for ongoing Fawtara compliance operations post go-live — OTA response handling, rejection resolution, reconciliation, data-integrity checks, and staff capacity?</span></div><div class="opts"></div></div>
+    </div>
+
+    <div class="section s4">
+      <div class="sec-head">
+        <span class="sec-ico"><svg viewBox="0 0 24 24"><path d="M3 21h18M5 21V8l7-5 7 5v13M9 21v-6h6v6"/></svg></span>
+        <div><span class="eyebrow sec-eyebrow">Section 4 of 4</span><h2>Organisational &amp; Strategic Readiness</h2></div>
+      </div>
+      <div class="qcard" data-q="q7"><div class="qtop"><span class="qnum">Q7</span><span class="qtext">Has your organisation secured a formally approved, fully scoped budget for Fawtara — covering ERP changes, ASP fees, internal IT time, testing, training, and post-go-live support?</span></div><div class="opts"></div></div>
+      <div class="qcard" data-q="q8"><div class="qtop"><span class="qnum">Q8</span><span class="qtext">How is your organisation approaching the strategic value of Fawtara beyond compliance — real-time invoice data for working-capital optimisation, continuous audit readiness, or finance automation?</span></div><div class="opts"></div></div>
+    </div>
+
+    <div class="legend">
+      <div class="lg l1"><div class="k">L1 · Early Stage</div><div class="v">Not yet engaged</div></div>
+      <div class="lg l2"><div class="k">L2 · Developing</div><div class="v">Aware, not actioned</div></div>
+      <div class="lg l3"><div class="k">L3 · Progressing</div><div class="v">Underway with gaps</div></div>
+      <div class="lg l4"><div class="k">L4 · Advanced</div><div class="v">Owned and on track</div></div>
+    </div>
+
+    <section class="details" id="details">
+      <div class="details-card">
+        <h2>Get your readiness report</h2>
+        <p class="sub">Responses are kept strictly confidential and used only for benchmarking. We'll send your personalised report to the email below.</p>
+        <div id="hs-report-form"><p class="hs-loading">Loading form…</p></div>
+        <div class="encrypt"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="10" width="16" height="10" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>Your data is encrypted. Submitting confirms you'd like your personalised report.</div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<section class="thanks wrap" id="thanks" aria-hidden="true">
+  <div class="confetti" id="confetti1"></div>
+  <div class="check"><svg viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg></div>
+  <h2>Thank you — your response is recorded</h2>
+  <p>Your perspective goes directly into shaping Oman's E-Invoicing Readiness Report 2026. You'll be among the first to receive it when it's released — keep an eye on your inbox.</p>
+</section>
+
+<!-- ===================== FULL CLEARTAX FOOTER ===================== -->
+<footer class="site-footer">
+  <div class="footer-top">
+    <div class="wrap footer-top-inner">
+
+      <!-- Brand + social + support -->
+      <div class="footer-brand">
+        <a href="https://www.cleartax.com/" style="display:block">
+          <img src="https://cdn.prod.website-files.com/6093bce33d9b4bae841b04e3/69dfa05ecb34c38b5b8b5f54_cleartax-logo-light.png" alt="ClearTax" style="width:140px;display:block" />
+        </a>
+        <div>
+          <div class="footer-social-label">Follow us on</div>
+          <div class="footer-social">
+            <a href="https://www.linkedin.com/company/cleartaxmiddleeast" target="_blank" rel="noopener" aria-label="LinkedIn">
+              <svg viewBox="0 0 24 24"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 0 1-2.063-2.065 2.064 2.064 0 1 1 2.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+            </a>
+            <a href="https://www.facebook.com/ClearTaxMiddleEast" target="_blank" rel="noopener" aria-label="Facebook">
+              <svg viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+            </a>
+            <a href="https://x.com/ClearTax_ME" target="_blank" rel="noopener" aria-label="X (Twitter)">
+              <svg viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.748l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+            </a>
+            <a href="https://www.instagram.com/cleartax_middleeast/" target="_blank" rel="noopener" aria-label="Instagram">
+              <svg viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 1 0 0 12.324 6.162 6.162 0 0 0 0-12.324zM12 16a4 4 0 1 1 0-8 4 4 0 0 1 0 8zm6.406-11.845a1.44 1.44 0 1 0 0 2.881 1.44 1.44 0 0 0 0-2.881z"/></svg>
+            </a>
+          </div>
+        </div>
+        <div>
+          <span class="footer-support-label">Have a query?</span>
+          <a href="https://www.cleartax.com/contact-us" class="footer-support-link">Support</a>
+        </div>
+      </div>
+
+      <!-- Link columns -->
+      <div class="footer-cols">
+        <div class="footer-col">
+          <h4>Company</h4>
+          <ul>
+            <li><a href="https://www.cleartax.com/about-us">About us</a></li>
+            <li><a href="https://www.cleartax.com/contact-us">Contact us</a></li>
+            <li><a href="https://www.cleartax.com/ae/press">Media &amp; Press</a></li>
+            <li><a href="https://cleartax.in/s/trust">Trust &amp; Safety</a></li>
+            <li><a href="https://www.cleartax.com/global/partner-program">Partners</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>Products &amp; Solutions</h4>
+          <ul>
+            <li><a href="https://www.cleartax.com/global/e-invoicing-solution">Global E-Invoicing Platform</a></li>
+            <li><a href="https://www.cleartax.com/fr/en">E-Invoicing Software (France)</a></li>
+            <li><a href="https://www.cleartax.com/be">E-Invoicing Software (Belgium)</a></li>
+            <li><a href="https://www.cleartax.com/ae">E-Invoicing Software (UAE)</a></li>
+            <li><a href="https://www.cleartax.com/sg/e-invoicing-software">E-Invoicing Software (Singapore)</a></li>
+            <li><a href="https://www.cleartax.com/in">E-Invoicing Software (India)</a></li>
+            <li><a href="https://www.cleartax.com/my/en">E-Invoicing Software (Malaysia)</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>Resources &amp; Guides</h4>
+          <ul>
+            <li><a href="https://www.cleartax.com/sa/ksa-einvoicing">E-Invoicing in Saudi Arabia</a></li>
+            <li><a href="https://www.cleartax.com/ae/e-invoicing-uae">E-Invoicing in UAE</a></li>
+            <li><a href="https://www.cleartax.com/om/e-invoicing-oman">E-Invoicing in Oman</a></li>
+            <li><a href="https://www.cleartax.com/fr/en/e-invoicing-france">E-Invoicing in France</a></li>
+            <li><a href="https://www.cleartax.com/be/e-invoicing-belgium">E-Invoicing in Belgium</a></li>
+            <li><a href="https://www.cleartax.com/de/en/e-invoicing-germany">E-Invoicing in Germany</a></li>
+            <li><a href="https://www.cleartax.com/my/en/e-invoicing-malaysia">E-Invoicing in Malaysia</a></li>
+            <li><a href="https://www.cleartax.com/sg/en/e-invoicing-singapore">E-Invoicing in Singapore</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>Tools</h4>
+          <ul>
+            <li><a href="https://www.cleartax.com/sa/vat-calculator">VAT Calculator Saudi Arabia</a></li>
+            <li><a href="https://www.cleartax.com/ae/vat-calculator">VAT Calculator UAE</a></li>
+            <li><a href="https://www.cleartax.com/fr/en/vat-calculator">VAT Calculator France</a></li>
+            <li><a href="https://www.cleartax.com/be/vat-calculator">VAT Calculator Belgium</a></li>
+            <li><a href="https://www.cleartax.com/my/en/sst-calculator">SST Calculator</a></li>
+          </ul>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="footer-bottom">
+    <div class="wrap footer-bottom-inner">
+      <div class="footer-legal">
+        <a href="https://www.cleartax.com/s/legal">Legal</a>
+        <span class="footer-legal-sep">|</span>
+        <a href="https://www.cleartax.com/meta/privacy">Privacy Policy</a>
+        <span class="footer-copyright">© 2026 ClearTax Pvt. Ltd. All rights reserved.</span>
+      </div>
+      <div class="footer-certs">
+        <img src="https://cdn.prod.website-files.com/6093bce33d9b4bae841b04e3/69fb0ff41b9a63ce3e1f50d9_iso.png" alt="ISO Certified" />
+        <img src="https://cdn.prod.website-files.com/6093bce33d9b4bae841b04e3/69fad934822abf67d7c25954_soc.png" alt="SOC 2 Certified" />
+        <img src="https://cdn.prod.website-files.com/6093bce33d9b4bae841b04e3/6a154210439a661bb4313f68_ssll.png" alt="SSL Secured" />
+        <img src="https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6a153c9e423a6b967412239c_gdpr.png" alt="GDPR Compliant" />
+      </div>
+    </div>
+  </div>
+</footer>
+
+<div class="overlay" id="demoOverlay" aria-hidden="true">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="demoTitle">
+    <button class="close" id="closeDemo" aria-label="Close">&#x2715;</button>
+    <div id="demoFormWrap">
+      <h3 id="demoTitle">Book a live demo</h3>
+      <form id="demoForm" novalidate>
+        <div class="grid">
+          <div class="field"><label>Name <span class="req">*</span></label><input type="text" name="dname" placeholder="Your name"><span class="err">Name is required.</span></div>
+          <div class="field"><label>Phone number <span class="req">*</span></label><input type="tel" name="dphone" placeholder="Phone number"><span class="err">Phone is required.</span></div>
+          <div class="field full"><label>Company <span class="req">*</span></label><input type="text" name="dcompany" placeholder="Company name"><span class="err">Company is required.</span></div>
+          <div class="field full"><label>Official email ID <span class="req">*</span></label><input type="email" name="demail" placeholder="name@company.com"><span class="err">Enter a valid email.</span></div>
+          <div class="field full" style="margin-top:6px"><button class="pill-btn submit" type="submit">Book a demo
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+          </button></div>
+        </div>
+      </form>
+    </div>
+    <div class="modal-success" id="demoSuccess">
+      <div class="confetti" id="confetti2"></div>
+      <div class="check"><svg viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg></div>
+      <h3>Thank you</h3>
+      <p>Our representative will get in touch with you shortly. You can also let us know a preferred time to reach out.</p>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  "use strict";
+  var OPTIONS={
+    q1:["No — we have not received any OTA notification and are unaware of our phase or go-live deadline.",
+        "We received a notification but have not yet assessed what it means for our compliance timeline.",
+        "We know our phase and deadline, but formal planning and budget allocation have not started.",
+        "Yes — our phase is confirmed, our deadline is documented, and we have an active implementation plan with ownership."],
+    q2:["We are aware of the mandate at a high level only — no detailed understanding of the technical requirements.",
+        "We understand the broad obligations but have not mapped them to our current ERP and archiving systems.",
+        "We have a working understanding and have begun assessing gaps in our systems, data fields, and archiving.",
+        "Fully mapped — format, ASP obligations, data-dictionary fields, and archiving rules are documented and owned."],
+    q3:["No — our ERP cannot produce structured XML. Significant IT development or system replacement would be required.",
+        "Not natively — we can produce the output only through workarounds, manual steps, or interim tools.",
+        "Partially — standard invoices are handled, but gaps remain for credit notes, intercompany, FX, and B2G.",
+        "Fully capable — our ERP generates compliant Peppol PINT-OM XML automatically, with no manual intervention."],
+    q4:["No — we have not yet identified or evaluated any ASP candidates.",
+        "We're aware of the ASP requirement and have begun researching providers, but no formal evaluation yet.",
+        "We have shortlisted an accredited ASP and are in active evaluation or commercial discussions.",
+        "We have contracted an OTA-accredited ASP; integration, testing, and onboarding are underway or complete."],
+    q5:["No — our focus has been standard B2B invoice flows only. Complex transaction types are not assessed.",
+        "We're aware of the complexity but have not yet formalised workflows for high-risk transaction types.",
+        "Most standard scenarios are documented; credit notes and intercompany flows have partial coverage.",
+        "All types — credit notes, self-billing, intercompany, FX, and B2G — are fully mapped, tested, and owned."],
+    q6:["Not planned — we are focused solely on meeting go-live. Post-go-live operations are not assessed.",
+        "We plan to absorb the ongoing workload within existing team capacity, with no structural changes.",
+        "We are building dedicated processes and assessing headcount for post-go-live compliance monitoring.",
+        "Fully planned — automated reconciliation and response tools are in scope, with trained staff and escalation paths."],
+    q7:["No budget allocated — Fawtara is not yet on the financial or IT investment plan.",
+        "Budget discussions are underway, but formal approval and full cost scoping are not complete.",
+        "A budget is approved, though scoping across all cost categories may not yet be complete.",
+        "Fully scoped, approved budget with active C-level sponsorship and a clear implementation roadmap."],
+    q8:["Purely a compliance exercise — meet the mandate, minimise disruption, and move on.",
+        "Open to additional value, but no concrete plans beyond achieving baseline compliance.",
+        "Actively exploring how Fawtara data can improve AP/AR visibility, cash-flow forecasting, and reconciliation.",
+        "Treating it as a finance-transformation catalyst — automation, real-time reconciliation, and audit readiness in scope."]
+  };
+  var LEVELS=["L1","L2","L3","L4"], answers = window.answers = {}, TOTAL = window.TOTAL = 8;
+
+  Object.keys(OPTIONS).forEach(function(q){
+    var card=document.querySelector('.qcard[data-q="'+q+'"]'); if(!card) return;
+    var box=card.querySelector('.opts');
+    OPTIONS[q].forEach(function(text,i){
+      var id=q+'_'+i, l=document.createElement('label');
+      l.className='opt'; l.setAttribute('for',id);
+      l.innerHTML='<input type="radio" id="'+id+'" name="'+q+'" value="'+LEVELS[i]+'"><span class="dot"></span>'+
+                  '<span><span class="lvl">'+LEVELS[i]+'</span><span class="ot">'+text+'</span></span>';
+      box.appendChild(l);
+    });
+    box.addEventListener('change',function(e){answers[q]=e.target.value;updateProgress();});
+  });
+
+  var topline=document.getElementById('topline'), navCount=document.getElementById('navCount');
+  function updateProgress(){var n=Object.keys(answers).length,p=Math.round(n/TOTAL*100);topline.style.width=p+'%';navCount.textContent=n;}
+
+  if('IntersectionObserver' in window){
+    var io=new IntersectionObserver(function(es){es.forEach(function(en){if(en.isIntersecting){en.target.classList.add('in');io.unobserve(en.target);}});},{threshold:.12});
+    document.querySelectorAll('.qcard').forEach(function(c){io.observe(c);});
+  } else { document.querySelectorAll('.qcard').forEach(function(c){c.classList.add('in');}); }
+
+  function fireConfetti(el){
+    if(!el) return;
+    var colors=['#7B2FD6','#E0249B','#338878','#7BD8A6','#9879AF'];
+    el.innerHTML='';
+    for(var i=0;i<22;i++){
+      var p=document.createElement('i');
+      var ang=Math.random()*Math.PI*2, dist=80+Math.random()*150;
+      p.style.background=colors[i%colors.length];
+      p.style.setProperty('--tx',(Math.cos(ang)*dist).toFixed(0)+'px');
+      p.style.setProperty('--ty',(Math.sin(ang)*dist - 40).toFixed(0)+'px');
+      p.style.setProperty('--rot',(Math.random()*720-360).toFixed(0)+'deg');
+      p.style.animationDelay=(Math.random()*120)+'ms';
+      if(i%2){p.style.borderRadius='50%';}
+      el.appendChild(p);
+    }
+    void el.offsetWidth; el.classList.add('go');
+  }
+
+  var SHEET_WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbwc6cWhJYD8KW7_ARNL8Za2ayfUrJi19jqd1zH6m36hO5Lhjq3h8Hcwb_SA6flb76Rq/exec';
+  var urlParams = window.urlParams = new URLSearchParams(window.location.search);
+
+  window.sendToGoogleSheet = function(payload) {
+    // Add the region query parameter so the Apps Script routes to the right tab
+    payload.region = 'oman';
+    return fetch(SHEET_WEB_APP_URL, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded'
+      },
+      body: new URLSearchParams(payload).toString()
+    });
+  }
+
+  var EMAIL=/^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  function setInvalid(input,bad){var f=input.closest('.field'); if(f) f.classList.toggle('invalid',bad);}
+
+  window.__showThanks=function(){
+    var appEl=document.getElementById('app'); if(appEl) appEl.style.display='none';
+    var t=document.getElementById('thanks'); if(t){t.classList.add('show');t.setAttribute('aria-hidden','false');}
+    window.scrollTo({top:0,behavior:'smooth'});
+    fireConfetti(document.getElementById('confetti1'));
+  };
+
+
+
+  var overlay=document.getElementById('demoOverlay'),demoForm=document.getElementById('demoForm');
+  function openModal(){overlay.classList.add('open');overlay.setAttribute('aria-hidden','false');document.body.style.overflow='hidden';}
+  function closeModal(){overlay.classList.remove('open');overlay.setAttribute('aria-hidden','true');document.body.style.overflow='';}
+  document.getElementById('closeDemo').addEventListener('click',closeModal);
+  overlay.addEventListener('click',function(e){if(e.target===overlay)closeModal();});
+  document.addEventListener('keydown',function(e){if(e.key==='Escape'&&overlay.classList.contains('open'))closeModal();});
+  demoForm.addEventListener('input',function(e){if(e.target.closest('.field'))setInvalid(e.target,false);});
+  demoForm.addEventListener('submit',function(e){
+    e.preventDefault();var ok=true;
+    ['dname','dphone','dcompany'].forEach(function(k){var el=demoForm.elements[k],bad=!el.value.trim();setInvalid(el,bad);if(bad)ok=false;});
+    var em=demoForm.elements['demail'],badE=!EMAIL.test(em.value.trim());setInvalid(em,badE);if(badE)ok=false;
+    if(!ok){var fb=demoForm.querySelector('.field.invalid input');if(fb)fb.focus();return;}
+
+    var btn = demoForm.querySelector('button[type="submit"]');
+    btn.classList.add('loading');
+    btn.disabled = true;
+
+    var payload = {
+      submitted_at: new Date().toLocaleString(),
+      full_name: demoForm.elements['dname'].value.trim(),
+      company: demoForm.elements['dcompany'].value.trim(),
+      work_email: demoForm.elements['demail'].value.trim(),
+      phone: demoForm.elements['dphone'].value.trim(),
+      region: 'oman',
+      page_url: window.location.href,
+      utm_source: urlParams.get('utm_source') || '',
+      utm_medium: urlParams.get('utm_medium') || '',
+      utm_campaign: urlParams.get('utm_campaign') || '',
+      utm_term: urlParams.get('utm_term') || '',
+      utm_content: urlParams.get('utm_content') || '',
+      utm_adgroup: urlParams.get('utm_adgroup') || '',
+      form_type: 'Oman CFO Survey - Demo Booking'
+    };
+
+    sendToGoogleSheet(payload).then(function() {
+      btn.classList.remove('loading');
+      btn.disabled = false;
+      document.getElementById('demoFormWrap').style.display='none';
+      var s=document.getElementById('demoSuccess');s.classList.add('show');
+      fireConfetti(document.getElementById('confetti2'));
+    }).catch(function(err) {
+      console.error(err);
+      btn.classList.remove('loading');
+      btn.disabled = false;
+      document.getElementById('demoFormWrap').style.display='none';
+      var s=document.getElementById('demoSuccess');s.classList.add('show');
+      fireConfetti(document.getElementById('confetti2'));
+    });
+  });
+})();
+</script>
+
+<script>
+/* ---- ClearTax navbar dropdowns ---- */
+(function(){
+  var items = document.querySelectorAll('.ct-nav-item');
+  function closeAll(){
+    items.forEach(function(it){
+      it.classList.remove('open');
+      var btn=it.querySelector('button[aria-expanded]');
+      if(btn) btn.setAttribute('aria-expanded','false');
+    });
+  }
+  items.forEach(function(item){
+    var btn = item.querySelector('button[aria-expanded]');
+    if(!btn) return;
+    btn.addEventListener('click',function(e){
+      e.stopPropagation();
+      var isOpen = item.classList.contains('open');
+      closeAll();
+      if(!isOpen){ item.classList.add('open'); btn.setAttribute('aria-expanded','true'); }
+    });
+  });
+  document.addEventListener('click', closeAll);
+  document.addEventListener('keydown',function(e){ if(e.key==='Escape') closeAll(); });
+})();
+</script>
+<script charset="utf-8" type="text/javascript" src="//js-na2.hsforms.net/forms/embed/v2.js"></script>
+<script type="text/javascript">
+  function initHubspotForm() {
+    if (window.hbspt && window.hbspt.forms) {
+      hbspt.forms.create({
+        portalId: "245744706",
+        formId: "33abb1cd-08f0-4761-a2d4-8bd23f9fd370",
+        region: "na2",
+        target: "#hs-report-form",
+        css: "",
+        onFormReady: function($form) {
+          // Prefill UTM parameters in HubSpot form fields
+          var formEl = ($form && $form[0]) ? $form[0] : $form;
+          if (formEl && formEl.querySelector) {
+            var utms = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 'utm_content', 'utm_adgroup'];
+            utms.forEach(function(utm) {
+              var value = window.urlParams ? window.urlParams.get(utm) : '';
+              if (value) {
+                var input = formEl.querySelector('input[name="' + utm + '"]');
+                if (input) {
+                  input.value = value;
+                }
+              }
+            });
+          }
+
+          // Intercept submit button for survey answers validation
+          $form.submit(function(event) {
+            var requiredQs = ['q1', 'q2', 'q3', 'q4', 'q5', 'q6', 'q7', 'q8'];
+            var missingQs = [];
+            requiredQs.forEach(function(q) {
+              if (!window.answers || !window.answers[q]) {
+                missingQs.push(q);
+              }
+            });
+
+            if (missingQs.length > 0) {
+              event.preventDefault();
+              event.stopPropagation();
+              var totalQs = window.TOTAL || 8;
+              alert('Please answer all ' + totalQs + ' questions before submitting.');
+              var firstMissing = document.querySelector('.qcard[data-q="' + missingQs[0] + '"]');
+              if (firstMissing) {
+                firstMissing.scrollIntoView({ behavior: 'smooth', block: 'center' });
+              }
+              return false;
+            }
+
+            // Extract contact values from HubSpot form
+            var email = $form.find('input[name="email"]').val() || '';
+            var firstname = $form.find('input[name="firstname"]').val() || '';
+            var lastname = $form.find('input[name="lastname"]').val() || '';
+            var name = (firstname + ' ' + lastname).trim() || $form.find('input[name="fullname"]').val() || '';
+            var company = $form.find('input[name="company"]').val() || '';
+            var jobtitle = $form.find('input[name="jobtitle"]').val() || '';
+            var phone = $form.find('input[name="phone"]').val() || $form.find('input[name="mobilephone"]').val() || '';
+            var industry = $form.find('select[name="industry"]').val() || '';
+            var revenue = $form.find('select[name="annual_revenue"]').val() || $form.find('select[name="revenue"]').val() || '';
+
+            window.submittedSurveyData = {
+              name: name,
+              title: jobtitle,
+              company: company,
+              email: email,
+              phone: phone,
+              industry: industry,
+              revenue: revenue
+            };
+          });
+        },
+        onFormSubmitted: function () {
+          if (window.__showThanks) window.__showThanks();
+          
+          var data = window.submittedSurveyData;
+          if (!data) return;
+
+          var payload = {
+            submitted_at: new Date().toLocaleString(),
+            full_name: data.name,
+            job_title: data.title,
+            company: data.company,
+            work_email: data.email,
+            phone: data.phone,
+            region: 'oman',
+            industry_sector: data.industry,
+            annual_revenue: data.revenue,
+            page_url: window.location.href,
+            utm_source: (window.urlParams && window.urlParams.get('utm_source')) || '',
+            utm_medium: (window.urlParams && window.urlParams.get('utm_medium')) || '',
+            utm_campaign: (window.urlParams && window.urlParams.get('utm_campaign')) || '',
+            utm_term: (window.urlParams && window.urlParams.get('utm_term')) || '',
+            utm_adgroup: (window.urlParams && window.urlParams.get('utm_adgroup')) || '',
+            form_type: 'Oman-CFO-Assessment-2026'
+          };
+          
+          var requiredQs = ['q1', 'q2', 'q3', 'q4', 'q5', 'q6', 'q7', 'q8'];
+          requiredQs.forEach(function(q) {
+            payload[q] = (window.answers && window.answers[q]) || '';
+          });
+
+          if (window.sendToGoogleSheet) {
+            window.sendToGoogleSheet(payload);
+          }
+        }
+      });
+    }
+  }
+
+  // Poll for hbspt availability
+  var pollCount = 0;
+  var interval = setInterval(function() {
+    pollCount++;
+    if (window.hbspt && window.hbspt.forms) {
+      clearInterval(interval);
+      initHubspotForm();
+    } else if (pollCount > 100) {
+      clearInterval(interval);
+    }
+  }, 100);
+</script>
+</body>
+</html>
