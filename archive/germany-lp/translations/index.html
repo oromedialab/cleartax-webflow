@@ -16,7 +16,6 @@
 <link rel="icon" type="image/png" sizes="32x32" href="https://cdn.prod.website-files.com/63ede4a3da6dbd6b05c4612f/63ede4a3da6dbd7162c46439_32by32.png" />
 <link rel="icon" type="image/png" sizes="256x256" href="https://cdn.prod.website-files.com/63ede4a3da6dbd6b05c4612f/63ede4a3da6dbd8997c46450_256by256.png" />
 <link rel="apple-touch-icon" href="https://cdn.prod.website-files.com/63ede4a3da6dbd6b05c4612f/63ede4a3da6dbd8997c46450_256by256.png" />
-<script src="https://www.google.com/recaptcha/api.js?render=6Lc5ZG0mAAAAAGwClrZwtcyttcUMYDUPxg4MM4p3"></script>
 <script charset="utf-8" type="text/javascript" src="https://js-na2.hsforms.net/forms/embed/v2.js"></script>
 <script>
 (function(){
@@ -415,13 +414,7 @@ body{font-family:'Manrope',sans-serif!important;color:var(--text)!important;back
   </nav>
 </div>
 
-<section class="ct-hero" id="ct-hero"
-  data-recaptcha-key="6Lc5ZG0mAAAAAGwClrZwtcyttcUMYDUPxg4MM4p3"
-  data-sheet-name="germanyRAD"
-  data-origin-country="Germany"
-  data-thankyou-url="https://www.cleartax.com/de/german/thank-you"
-  data-form-type="GCC-contact-sales-form"
-  data-lead-type="GCC">
+<section class="ct-hero" id="ct-hero">
   <div class="ct-hero-inner">
     <div>
       <div class="ct-hero-eyebrow">
@@ -760,72 +753,6 @@ function ctVtab(sec,el){
   }
   track.innerHTML=html;
 })();
-  (function () {
-    const section = document.getElementById('ct-hero');
-    const form = section.querySelector('[data-lead-form]');
-    if (!form) return;
-    form.addEventListener('submit', function (e) {
-      e.preventDefault();
-      const btn = form.querySelector('[data-submit]');
-      const originalText = btn.textContent;
-      
-      // Visual feedback
-      btn.textContent = 'Verbinden...';
-      btn.disabled = true;
-      const recaptchaKey = section.getAttribute('data-recaptcha-key');
-      const sheetName = section.getAttribute('data-sheet-name');
-      const originCountry = section.getAttribute('data-origin-country');
-      const thankYouUrl = section.getAttribute('data-thankyou-url');
-      const formType = section.getAttribute('data-form-type');
-      const leadType = section.getAttribute('data-lead-type');
-      function readField(name) {
-        const el = form.querySelector('[data-field="' + name + '"]');
-        return el ? el.value : '';
-      }
-
-      function submitWithToken(token) {
-        const payload = {
-          lead_platforms: { 
-            google_sheet: { sheet_name: sheetName }, 
-            pardot: true, 
-            salesforce: true 
-          },
-          extra_payload: { origin_country: originCountry },
-          lead_data: {
-            name: readField('name'),
-            phone_number: readField('phone'),
-            email: readField('email'),
-            company_name: readField('company'),
-            ISD: readField('isd'),
-            form_type: formType,
-            lead_type: leadType,
-            lead_source_url: window.location.href,
-          },
-        };
-        fetch('https://www.cleartax.com/f/common-lead/lead/?captcha_token=' + token, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(payload),
-        })
-        .then(function(response) {
-          if (response.status === 201 || response.ok) {
-            window.location.href = thankYouUrl;
-          } else {
-            throw new Error('Submission Error');
-          }
-        })
-        .catch(function() {
-          btn.textContent = '✕ Fehler beim Senden';
-          btn.disabled = false;
-          setTimeout(function() { btn.textContent = originalText; }, 4000);
-        });
-      }
-      // Execute reCAPTCHA before API call
-      grecaptcha.ready(function () {
-        grecaptcha.execute(recaptchaKey, { action: 'submit' }).then(submitWithToken);
-      });
-    });
-  })();
 
           if (typeof hbspt !== 'undefined') {
             hbspt.forms.create({
