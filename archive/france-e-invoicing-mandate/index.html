@@ -11,6 +11,15 @@
 <!-- Guideline: "Do not try to fit any new typefaces" — no third typeface (no serif, no mono) -->
 <link href="https://fonts.cdnfonts.com/css/nohemi" rel="stylesheet">
 <link href="https://fonts.cdnfonts.com/css/gilroy-bold" rel="stylesheet">
+<!-- Google Tag Manager -->
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','GTM-P5NDQXGH');</script>
+<!-- End Google Tag Manager -->
+<script src="https://web.cmp.usercentrics.eu/modules/autoblocker.js" defer></script> 
+<script id="usercentrics-cmp" src="https://web.cmp.usercentrics.eu/ui/loader.js" data-settings-id="utqqyaEbvbzrTk" async></script>
 <style>
   :root {
     --ct-purple: #301B5E;
@@ -1284,6 +1293,8 @@
     flex-shrink: 0;
     border: 3px solid white;
     box-shadow: 0 8px 24px rgba(91,44,140,0.25);
+    object-fit: cover;
+    object-position: top;
   }
   .speaker-card.moderator .speaker-avatar {
     background: linear-gradient(135deg, #B98DDB, var(--ct-purple));
@@ -2001,7 +2012,10 @@
 </style>
 </head>
 <body>
-
+<!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-P5NDQXGH"
+height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<!-- End Google Tag Manager (noscript) -->
 <!-- ===== NAV (floating pill, matching screenshot) ===== -->
 <!-- ===== NAV (NavbarGlobalV2, matching france product page) ===== -->
 <div data-nav-root>
@@ -2157,7 +2171,7 @@
             </div>
           </div>
         </div>
-        <a href="#register" class="glass-nav-btn-demo">
+        <a href="javascript:void(0)" onclick="scrollToRegister(event)" class="glass-nav-btn-demo">
           Request a demo
           <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true">
             <path d="M2 6h8M6 2l4 4-4 4" stroke="white" stroke-width="1.5" stroke-linecap="round"></path>
@@ -2228,7 +2242,7 @@
       </li>
     </ul>
     <div class="glass-nav-mobile-footer">
-      <a href="#register" class="glass-nav-mobile-btn-demo">
+      <a href="javascript:void(0)" onclick="scrollToRegister(event)" class="glass-nav-mobile-btn-demo">
         Request a demo
         <svg width="14" height="14" viewBox="0 0 12 12" fill="none" aria-hidden="true">
           <path d="M2 6h8M6 2l4 4-4 4" stroke="white" stroke-width="1.5" stroke-linecap="round"></path>
@@ -2605,7 +2619,7 @@
       <div class="speaker-card single">
         <span class="speaker-role-tag">▸ Featured Speaker</span>
         <div class="speaker-head">
-          <div class="speaker-avatar">JG</div>
+          <img class="speaker-avatar" src="https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6a38ddc75224b51b6ff53e9d_jean%20pierre.png" alt="Jean-Pierre Gardille" />
           <div>
             <div class="speaker-name">Jean-Pierre Gardille</div>
             <div class="speaker-title">Senior E-invoicing Consultant<br><span class="speaker-company">ClearTax</span></div>
@@ -2625,7 +2639,7 @@
   </div>
   <h2>Reserve your spot for <span class="italic">2 July</span>.</h2>
   <p>Register now to secure your spot and receive the session recording and materials after the event.</p>
-  <a href="#register" class="btn-primary">
+  <a href="javascript:void(0)" onclick="scrollToRegister(event)" class="btn-primary">
     Register Now
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
   </a>
@@ -2748,6 +2762,14 @@ Your data security and privacy matter most to us.
     const unlockScroll = () => {
       scrollLockCount = Math.max(0, scrollLockCount - 1);
       if (scrollLockCount === 0) document.body.style.overflow = "";
+    };
+
+    window.scrollToRegister = (e) => {
+      if (e) e.preventDefault();
+      const registerEl = document.getElementById('register');
+      if (registerEl) {
+        registerEl.scrollIntoView({ behavior: 'smooth' });
+      }
     };
 
     const setMenuOpen = (open) => {
@@ -2952,36 +2974,6 @@ Your data security and privacy matter most to us.
       observer.observe(document.body, { childList: true, subtree: true, attributes: true });
     }
     handleTicker();
-
-    // Clean URL hash on anchor link clicks & initial landing
-    const setupHashCleaner = () => {
-      try {
-        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-          anchor.addEventListener('click', function(e) {
-            const targetId = this.getAttribute('href');
-            if (targetId === '#') return;
-            const targetElement = document.querySelector(targetId);
-            if (targetElement) {
-              e.preventDefault();
-              targetElement.scrollIntoView({ behavior: 'smooth' });
-              history.pushState(null, document.title, window.location.pathname + window.location.search);
-            }
-          });
-        });
-
-        if (window.location.hash) {
-          setTimeout(() => {
-            history.replaceState(null, document.title, window.location.pathname + window.location.search);
-          }, 1000);
-        }
-      } catch (e) { console.error('Anchor hash handler failed', e); }
-    };
-
-    if (document.readyState === "loading") {
-      document.addEventListener("DOMContentLoaded", setupHashCleaner);
-    } else {
-      setupHashCleaner();
-    }
   })();
 </script>
 
