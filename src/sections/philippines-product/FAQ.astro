@@ -1,0 +1,252 @@
+---
+/**
+ * Germany FAQ accordion — adapted from UAE standard page styling and structure.
+ * Features 6 Germany B2B & ViDA enterprise questions with support for paragraph, list,
+ * and mixed content blocks. Uses native javascript height transition animations that remain resize-safe.
+ */
+interface FaqItem {
+  q: string;
+  /** Plain string OR array of paragraphs / lists. */
+  a:
+    | string
+    | Array<
+        { kind: "p"; html: string } | { kind: "ul" | "ol"; items: string[] }
+      >;
+}
+
+const items: FaqItem[] = [
+  {
+    q: "What is the current status of e‑invoicing in the Philippines?",
+    a: "E‑invoicing is not yet fully in place. Beginning 31st December 2026, the BIR will require large taxpayers, e‑commerce companies, and ERP users to issue structured digital invoices through accredited software.",
+  },
+  {
+    q: "Which businesses are required to implement e‑invoicing in the Philippines?",
+    a: "RR 11‑2025 and RR 26‑2025 make e‑invoicing mandatory for large taxpayers, e‑commerce businesses, CAS users, and exporters. Micro‑taxpayers are exempt unless they already issue electronic invoices. B2C transactions are also not covered.",
+  },
+  {
+    q: "How does the Philippines E‑Invoicing System (EIS) work?",
+    a: "Designated businesses must create invoices and receipts as JSON files using BIR‑approved software. Each file is signed with a JWS digital signature and sent to the BIR's EIS through an API. Submissions are expected within three calendar days. The BIR validates your document and accepts it, or may ask for corrections.",
+  },
+  {
+    q: "What are the benefits of e‑invoicing for Philippine businesses?",
+    a: "E‑invoicing cuts down manual errors and allows for reporting tax data faster. It also ensures audit-ready records and improves data transparency with the BIR.",
+  },
+  {
+    q: "What is the e‑invoicing timeline for the Philippines?",
+    a: "The Philippines e-Invoicing timeline begins with the pilot phase in 2022. In February 2025, RR 11‑2025 came up with the mandatory framework. Later on, RR 26‑2025 extended the first wave to 31st December 2026. In the future, exporters and incentive‑based businesses will also be added, although the implementation date is not yet known."
+  },
+  {
+    q: "How should businesses choose the right e‑invoicing solution for the Philippines?",
+    a: "The right Philippines e-invoicing solution must be BIR‑certified. It has to be capable of generating JSON files, applying JWS signatures, and sending data directly to the EIS. It should also integrate with ERP or billing systems and support onboarding, certification, audit requirements, and future regulatory updates.",
+  },
+  {
+    q: "What documents are covered under the Philippines e‑invoicing mandate?",
+    a: "Documents include sales invoices, official receipts, service billings, and debit or credit notes, in the BIR-notified structured JSON format."
+  },
+  {
+    q: "What are the penalties for non‑compliance with e‑invoicing in the Philippines?",
+    a: "Currently, failure to comply with e-invoicing can result in invoices being invalidated and the loss of input tax deductions."
+  },
+  {
+    q: "How can ClearTax help businesses comply with the Philippines e‑invoicing mandate?",
+    a: [
+      {
+        kind: "p",
+        html: "The mandate requires covered taxpayers to issue invoices and receipts as signed JSON files and transmit them to the BIR within three days. ClearTax offers a complete solution that removes the need for in‑house development by finance and IT teams."
+      },
+      {
+        kind: "p",
+        html: "With ClearTax, businesses can:"
+      },
+      {
+        kind: "ul",
+        items: [
+          "Easily connect with more than 60 ERPs and billing solutions such as SAP, Oracle, and Microsoft Dynamics.",
+          "Convert invoice data into the required JSON format, apply the JWS signature, and validate each file before submission.",
+          "Submit invoices directly to the EIS via API, with built‑in confirmation, error handling, and resubmission features.",
+          "Store documents securely for 10 years in line with BIR requirements, with reconciliation and audit support included.",
+          "Access CAS registration support, Permit to Transmit, and BIR testing with guidance from experts in both regulation and technology.",
+          "Stay always compliant as ClearTax updates its platform near real-time to reflect changes in EIS rules and timelines. We have been a global e-invoicing platform across more than 50 countries since 2017. You can use a single platform to go live for e-invoicing across many countries."
+        ]
+      }
+    ]
+  },
+  
+];
+---
+
+<section
+  class="faq-section box-border bg-[#FFFFFF] py-12 font-['Manrope'] text-[#0F1020] sm:py-20"
+  id="faq"
+>
+  <div class="faq-container mx-auto max-w-[1200px] px-4 sm:px-6">
+    <div class="faq-header mb-8 max-w-[720px] mx-auto text-center sm:mb-12">
+      <h2
+        class="faq-heading mb-4 lg:text-[44px] sm:text-[32px] text-[26px] font-semibold leading-[1.18] tracking-[-1.2px] text-black"
+      >
+        Frequently Asked <em class="not-italic text-[#655DFF]">Questions</em>
+      </h2>
+      <p
+        class="faq-sub max-w-147 mx-auto lg:text-lg text-base leading-[1.44] text-black/80"
+      >
+        Everything you need to know about Philippine e-invoicing and ClearTax.
+      </p>
+    </div>
+
+    <div class="faq-list flex flex-col gap-5" data-faq-root>
+      {
+        items.map((it, i) => (
+          <div
+            class={`faq-item group overflow-hidden rounded-[8px] border border-[rgba(15,16,32,0.08)] bg-white transition-[border-color,box-shadow] duration-300 ease-in-out [box-sizing:border-box] ${i === 0 ? "faq-open" : ""} ${i >= 5 ? "hidden hidden-faq" : ""}`}
+            style={`transition-delay: ${200 + (i * 50)}ms`}
+          >
+            <button
+              class="faq-trigger flex w-full appearance-none items-center justify-between gap-4 border-0 bg-transparent px-[18px] py-[18px] text-left text-[15.5px] leading-[1.4] text-[#0F1020] [box-sizing:border-box] cursor-pointer focus-visible:rounded-[14px] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-[#0057FF] sm:px-6 sm:py-[22px] sm:text-[17px]"
+              type="button"
+              aria-expanded={i === 0 ? "true" : "false"}
+            >
+              <h4 class="faq-question min-w-0 flex-1 font-medium text-[18px] sm:text-[20px] leading-[1.32] break-words text-[#0F172A] text-left">
+                {it.q}
+              </h4>
+              <span
+                class="faq-icon flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-[rgba(0,87,255,0.1)] text-[#0057FF] transition-[transform,background,color] duration-300 ease-in-out group-[.faq-open]:rotate-45 group-[.faq-open]:bg-[#0057FF1A] group-[.faq-open]:text-white"
+                aria-hidden="true"
+              >
+                <svg
+                  width="14"
+                  height="14"
+                  viewBox="0 0 14 14"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    d="M6.69995 0.700195V12.7002M0.699951 6.7002H12.7"
+                    stroke="#6355D8"
+                    stroke-width="1.4"
+                    stroke-linecap="round"
+                  />
+                </svg>
+              </span>
+            </button>
+            <div 
+              class={`faq-panel overflow-hidden transition-[height] duration-[320ms] [transition-timing-function:cubic-bezier(.4,0,.2,1)] ${i === 0 ? "" : "h-0"}`}
+              style={i === 0 ? "height: auto;" : undefined}
+            >
+              <div class="faq-answer px-[18px] pb-[18px leading-[1.7] text-[#5A6070] sm:px-6 sm:pb-[22px] text-[16px] [&_li]:mb-1.5 [&_ol]:m-0 [&_ol]:pl-5 [&_p:last-child]:mb-0 [&_p]:mb-2.5 [&_p]:mt-0 [&_strong]:text-[#0F1020] [&_ul]:m-0 [&_ul]:pl-5">
+                {typeof it.a === "string" ? (
+                  <p set:html={it.a} />
+                ) : (
+                  it.a.map((block) =>
+                    block.kind === "p" ? (
+                      <p set:html={block.html} />
+                    ) : block.kind === "ul" ? (
+                      <ul>
+                        {block.items.map((li) => (
+                          <li set:html={li} />
+                        ))}
+                      </ul>
+                    ) : (
+                      <ol>
+                        {block.items.map((li) => (
+                          <li set:html={li} />
+                        ))}
+                      </ol>
+                    ),
+                  )
+                )}
+              </div>
+            </div>
+          </div>
+        ))
+      }
+    </div>
+
+    {
+      items.length > 5 && (
+        <div
+          class="mt-12 mx-auto flex items-center justify-center"
+          id="faq-load-more-container"
+        >
+          <button
+            id="faq-load-more-btn"
+            class="inline-flex items-center gap-2 justify-center rounded-full border border-[#110072] bg-white px-10 py-4 text-base font-medium font-['gilroy'] leading-[1.4] text-[#1C0976] outline-offset-[-2px] transition-all duration-300 ease-in-out hover:scale-105 active:scale-95 cursor-pointer"
+          >
+            Load More
+            <span class="flex items-center justify-center">
+              <svg
+                width="10"
+                height="11"
+                viewBox="0 0 10 11"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M4.79999 0.799805V9.7998M0.799988 5.7998L4.79999 9.7998L8.79999 5.7998"
+                  stroke="#1C0976"
+                  stroke-width="1.6"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
+              </svg>
+            </span>
+          </button>
+        </div>
+      )
+    }
+  </div>
+</section>
+
+<script is:inline>
+  (function () {
+    const root = document.querySelector("[data-faq-root]");
+    if (!root) return;
+    const items = root.querySelectorAll(".faq-item");
+
+    const loadMoreBtn = document.getElementById("faq-load-more-btn");
+    const loadMoreContainer = document.getElementById(
+      "faq-load-more-container",
+    );
+    if (loadMoreBtn) {
+      loadMoreBtn.addEventListener("click", function () {
+        const hiddenItems = root.querySelectorAll(".hidden-faq");
+        hiddenItems.forEach(function (item) {
+          item.classList.remove("hidden", "hidden-faq");
+        });
+        if (loadMoreContainer) {
+          loadMoreContainer.style.display = "none";
+        }
+      });
+    }
+    items.forEach(function (item) {
+      const trigger = item.querySelector(".faq-trigger");
+      const panel = item.querySelector(".faq-panel");
+      if (!trigger || !panel) return;
+
+      trigger.addEventListener("click", function () {
+        const isOpen = item.classList.contains("faq-open");
+        if (isOpen) {
+          panel.style.height = panel.scrollHeight + "px";
+          requestAnimationFrame(function () {
+            panel.style.height = "0px";
+          });
+          item.classList.remove("faq-open");
+          trigger.setAttribute("aria-expanded", "false");
+        } else {
+          panel.style.height = panel.scrollHeight + "px";
+          item.classList.add("faq-open");
+          trigger.setAttribute("aria-expanded", "true");
+          panel.addEventListener("transitionend", function handler(e) {
+            if (e.propertyName !== "height") return;
+            panel.removeEventListener("transitionend", handler);
+            if (item.classList.contains("faq-open"))
+              panel.style.height = "auto";
+          });
+        }
+      });
+
+      window.addEventListener("resize", function () {
+        if (item.classList.contains("faq-open")) panel.style.height = "auto";
+      });
+    });
+  })();
+</script>
