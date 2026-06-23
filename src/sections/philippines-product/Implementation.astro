@@ -1,0 +1,133 @@
+---
+export interface Props {
+    //
+}
+
+const steps = [
+    {
+        dateLine1: "FEB",
+        dateLine2: "2025",
+        phase: "ISSUED",
+        phaseColor: "text-[#4D3BE2]",
+        descColor: "text-[#000000]/80",
+        desc: "RR No. 011-2025 mandates e-invoicing for large taxpayers, e-commerce, exporters.",
+        active: true,
+        lineSolid: true
+    },
+    {
+        dateLine1: "SEP",
+        dateLine2: "2025",
+        phase: "EXTENDED",
+        phaseColor: "text-[#4D3BE2]",
+        descColor: "text-[#000000]/80",
+        desc: "RR No. 026-2025 extends Phase 1 to 31 December 2026.",
+        active: true,
+        lineSolid: true
+    },
+    {
+        dateLine1: "31 Dec",
+        dateLine2: "2026",
+        phase: "PHASE 1 — MANDATORY",
+        phaseColor: "text-[#4D3BE2]",
+        descColor: "text-[#000000]/80",
+        desc: "LTS, e-commerce, and ERP users issue structured e-invoices to BIR’s EIS.",
+        highlight: true,
+        active: true,
+        lineSolid: false
+    },
+    {
+        dateLine1: "2027",
+        dateLine2: "ONWARDS",
+        phase: "PHASE 2 - EXPANDING SCOPE",
+        phaseColor: "text-[#4D3BE2]/80",
+        descColor: "text-[#000000]/40",
+        desc: "RBEs & additional taxpayer groups enter scope through future BIR regulations.",
+        active: false,
+        lineSolid: false
+    }
+];
+---
+
+<section class="py-20 lg:py-25 lg:pb-0 bg-gradient-to-b from-[#FFFFFF] to-[#F3F1F9] overflow-hidden">
+    <div class="max-w-[1280px] mx-auto px-4 lg:px-6">
+        <div class="text-center premium-reveal">
+            <h2 class="text-3xl md:text-[40px] lg:text-[44px] font-semibold text-[#030203]">
+               Philippines EIS Implementation<span class="text-[#655DFF]">Timeline</span>
+            </h2>
+        </div>
+
+        <div class="flex flex-col gap-12 lg:grid lg:grid-cols-4 lg:gap-10 sm:gap-16 mt-12 lg:mt-24 relative z-10 max-w-[400px] lg:max-w-none mx-auto premium-reveal [transition-delay:200ms]">
+            {steps.map((step, index) => (
+                <div class={`relative flex flex-row lg:flex-col w-[370px] lg:w-auto items-start lg:items-center group ${index === 1 || index === 2 ? 'lg:translate-x-7' : ''}`}>
+                    <div class="relative shrink-0 flex justify-center w-[96px]">
+                        <div class={`w-[96px] h-[96px] rounded-full flex flex-col items-center font-semibold justify-center text-white transition-all duration-300 group-hover:-translate-y-1 ${
+                            step.highlight 
+                                ? 'bg-[#6B5CE7] ring-[6px] ring-[#6B5CE7]/20 glow-pulse scale-105' 
+                                : step.active 
+                                    ? 'bg-[#6B5CE7] shadow-[0_0_20px_rgba(101,93,255,0.2)]' 
+                                    : 'bg-[#A198EE] text-white/80'
+                        }`}>
+                            <span>{step.dateLine1}</span>
+                            <span>{step.dateLine2}</span>
+                        </div>
+                    </div>
+                    
+                    <div class="ml-6 lg:ml-0 lg:mt-7 flex-1 lg:text-center pt-2 lg:pt-0">
+                        <div class={`text-[16px] tracking-[1.5px] uppercase font-normal ${step.phaseColor}`}>
+                            {step.phase}
+                        </div>
+                        <div class={`text-lg font-normal mt-3 leading-[1.4] text-wrap lg:mx-auto ${step.descColor} ${index === 1 ? 'max-w-[240px]' : 'max-w-[258px]'}`}>
+                            {step.desc}
+                        </div>
+                    </div>
+ 
+                    {index < steps.length - 1 && (
+                        <>
+                            <!-- Desktop Line -->
+                            <div 
+                                class={`hidden lg:block absolute top-[48px] left-[120px] w-75 -z-10 ${step.lineSolid ? 'h-[2px] bg-[#655DFF]' : 'dashed-line-horizontal'}`}
+                                style={
+                                    index === 0 
+                                        ? "width: calc(75% + 160px);" 
+                                        : index === 2 
+                                            ? "width: calc(100% - -40px);" 
+                                            : undefined
+                                }
+                            ></div>
+                            
+                            <!-- Mobile Line -->
+                            <div class={`lg:hidden absolute top-[96px] h-17 left-[48px] -translate-x-1/2 -bottom-12 -z-10 ${step.lineSolid ? 'w-[2px] bg-[#655DFF]' : 'dashed-line-vertical'}`}></div>
+                        </>
+                    )}
+                </div>
+            ))}
+        </div>
+    </div>
+</section>
+
+<style is:global>
+    .dashed-line-horizontal {
+        height: 2px;
+        --clr-border: #A198EE;
+        background-image: repeating-linear-gradient(90deg, var(--clr-border), var(--clr-border) 10px, transparent 10px, transparent 20px);
+    }
+    .dashed-line-vertical {
+        width: 2px;
+        --clr-border: #A198EE;
+        background-image: repeating-linear-gradient(0deg, var(--clr-border), var(--clr-border) 10px, transparent 10px, transparent 20px);
+    }
+    .glow-pulse {
+        animation: pulse-glow 2s infinite ease-in-out;
+    }
+    @keyframes pulse-glow {
+        0% {
+            box-shadow: 0 0 0 0 rgba(107, 92, 231, 0.6);
+        }
+        70% {
+            box-shadow: 0 0 0 12px rgba(107, 92, 231, 0);
+        }
+        100% {
+            box-shadow: 0 0 0 0 rgba(107, 92, 231, 0);
+        }
+    }
+</style>

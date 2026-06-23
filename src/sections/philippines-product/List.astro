@@ -1,0 +1,68 @@
+---
+/**
+ * ListComp - A horizontal statistics/list section.
+ * Ported from image showing 4 key metrics with dividers.
+ */
+const stats = [
+    { value: "$500B+", label: "Invoices processed" },
+    { value: "50+", label: "Countries covered" },
+    { value: "1B+", label: "E-Invoices processed" },
+    { value: "5000+", label: "Enterprise clients" },
+];
+---
+
+<section class="list-comp pb-25 bg-[#F3F1F9]!">
+    <div
+        class="mx-auto max-w-[var(--container-max)] px-4 lg:px-6 pt-12"
+    >
+        <div class="flex items-center gap-4 mb-12 select-none">
+            <span class="text-[14px] font-normal tracking-widest leading-1.5 text-[#000000]/68 uppercase shrink-0">
+                Built for enterprise scale
+            </span>
+            <div class="h-[1px] flex-grow bg-black/28"></div>
+        </div>
+        <div class="relative w-full">
+            <div
+                class="grid grid-cols-2 gap-y-8 gap-x-4 md:flex md:flex-row md:flex-nowrap md:justify-between md:items-center md:gap-12"
+            >
+                {
+                    stats.map((stat, index) => (
+                        <>
+                            <div
+                                class={`flex-1 min-w-[140px] md:min-w-0 px-2 sm:px-0 premium-reveal ${index < 2 ? 'pb-4 md:pb-0' : 'pt-4 md:pt-0'}`}
+                                style={`transition-delay: ${index * 100}ms`}
+                            >
+                                <h3 class="text-[22px] font-medium text-black/80 text-center mb-3 leading-tight tracking-tight">
+                                    {stat.value}
+                                </h3>
+                                <p class="text-sm lg:text-base font-normal text-[#000000]/68 text-center text-balance leading-relaxed">
+                                    {stat.label}
+                                </p>
+                            </div>
+                            {index < stats.length - 1 && (
+                                <div class="hidden md:block w-[1px] h-16 bg-[#000000]/28 shrink-0" />
+                            )}
+                        </>
+                    ))
+                }
+            </div>
+
+            <!-- Mobile Segmented Plus Dividers -->
+            <!-- Top Vertical Divider Line -->
+            <div class="absolute md:hidden left-1/2 -translate-x-1/2 bottom-[calc(50%+16px)] h-16 w-[1px] bg-black/28"></div>
+            <!-- Bottom Vertical Divider Line -->
+            <div class="absolute md:hidden left-1/2 -translate-x-1/2 top-[calc(50%+16px)] h-16 w-[1px] bg-black/28"></div>
+            <!-- Left Horizontal Divider Line -->
+            <div class="absolute md:hidden top-1/2 -translate-y-1/2 left-1/4 -translate-x-1/2 w-16 h-[1px] bg-black/28"></div>
+            <!-- Right Horizontal Divider Line -->
+            <div class="absolute md:hidden top-1/2 -translate-y-1/2 left-3/4 -translate-x-1/2 w-16 h-[1px] bg-black/28"></div>
+        </div>
+    </div>
+</section>
+
+<style is:global>
+    .list-comp {
+        /* Subtle inner shadow for depth */
+        box-shadow: inset 0 2px 40px rgba(0, 0, 0, 0.02);
+    }
+</style>
