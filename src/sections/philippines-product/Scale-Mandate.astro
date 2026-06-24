@@ -94,7 +94,8 @@ const tabs = [
       <div class="inline-flex border w-full justify-evenly items-center border-[#000000]/12 rounded-full p-2">
         {tabs.map((tab, index) => (
           <button
-            class={`flex items-center w-full justify-center gap-2 px-6 py-3 rounded-full text-sm font-medium transition-all duration-300 infra-tab-btn cursor-pointer border-none bg-transparent outline-none ${index === 0 ? 'active-tab text-black shadow-[0_4px_12px_rgba(0,0,0,0.05)]' : 'text-black/40'}`}
+            class={`flex items-center w-full justify-center gap-2 px-6 py-3 rounded-full text-base font-medium transition-all duration-300 infra-tab-btn cursor-pointer border-none bg-transparent outline-none ${index === 0 ? 'active-tab shadow-[0_4px_12px_rgba(0,0,0,0.05)]' : 'text-black/40'}`}
+            style={index === 0 ? `color: ${['#BA6F3B', '#338878', '#13859f', '#8059ba', '#655DFF'][index]};` : ''}
             data-index={index}
             data-tab={tab.id}
           >
@@ -181,7 +182,7 @@ const tabs = [
           >
             <div class="flex items-center gap-3 pointer-events-none">
               <img src={tab.icon} class={`icon-wrapper transition-all duration-300 w-5 h-[17px] object-contain ${index === 0 ? 'opacity-100' : 'opacity-40 grayscale'}`} alt="" loading="lazy" decoding="async" />
-              <span class={`text-base font-semibold transition-colors duration-300 ${index === 0 ? 'text-black' : 'text-black/60'}`}>{tab.label}</span>
+              <span class={`text-base font-semibold transition-colors duration-300 ${index === 0 ? '' : 'text-black/60'}`} style={index === 0 ? `color: ${['#BA6F3B', '#338878', '#13859f', '#8059ba', '#655DFF'][index]};` : ''}>{tab.label}</span>
             </div>
             <svg class={`acc-chevron w-5 h-5 transition-transform duration-500 pointer-events-none ${index === 0 ? 'rotate-180' : ''}`} viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
               <polyline points="6 9 12 15 18 9"></polyline>
@@ -232,6 +233,7 @@ const tabs = [
         'rgba(152, 120, 175, 0.1)', 
         'rgba(101, 93, 255, 0.1)'
       ];
+      const textColors = ['#BA6F3B', '#338878', '#13859f', '#8059ba', '#655DFF'];
 
       // --- Desktop Swiper Logic ---
       const initSwiper = () => {
@@ -266,6 +268,7 @@ const tabs = [
             if (i === index) {
               btn.classList.add('active-tab', 'shadow-[0_4px_12px_rgba(0,0,0,0.05)]');
               btn.classList.remove('text-black/40');
+              btn.style.color = textColors[i];
               btn.style.backgroundColor = colors[i].replace('0.1', '0.2');
               if (iconWrapper) {
                 iconWrapper.style.filter = 'grayscale(0)';
@@ -274,6 +277,7 @@ const tabs = [
             } else {
               btn.classList.remove('active-tab', 'shadow-[0_4px_12px_rgba(0,0,0,0.05)]');
               btn.classList.add('text-black/40');
+              btn.style.color = '';
               btn.style.backgroundColor = 'transparent';
               if (iconWrapper) {
                 iconWrapper.style.filter = 'grayscale(1)';
@@ -313,7 +317,10 @@ const tabs = [
               content.style.maxHeight = '0px';
               content.style.opacity = '0';
               if (icon) icon.classList.add('opacity-40', 'grayscale');
-              if (label) label.classList.add('text-black/60');
+              if (label) {
+                label.classList.add('text-black/60');
+                label.style.color = '';
+              }
               if (chevron) chevron.classList.remove('rotate-180');
               return;
             }
@@ -328,7 +335,10 @@ const tabs = [
               const otherIcon = otherItem.querySelector('.icon-wrapper');
               if (otherIcon) otherIcon.classList.add('opacity-40', 'grayscale');
               const otherLabel = otherItem.querySelector('.text-base');
-              if (otherLabel) otherLabel.classList.add('text-black/60');
+              if (otherLabel) {
+                otherLabel.classList.add('text-black/60');
+                otherLabel.style.color = '';
+              }
               const otherChevron = otherItem.querySelector('.acc-chevron');
               if (otherChevron) otherChevron.classList.remove('rotate-180');
             });
@@ -338,7 +348,10 @@ const tabs = [
             content.style.maxHeight = '2000px';
             content.style.opacity = '1';
             if (icon) icon.classList.remove('opacity-40', 'grayscale');
-            if (label) label.classList.remove('text-black/60');
+            if (label) {
+              label.classList.remove('text-black/60');
+              label.style.color = textColors[index];
+            }
             if (chevron) chevron.classList.add('rotate-180');
           });
         });
