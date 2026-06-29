@@ -2487,40 +2487,59 @@
                                 const faqStyle = document.createElement('style');
                                 faqStyle.textContent = `
                                     .faq01-comment-3 {
-                                        max-height: 0px !important;
-                                        overflow: hidden !important;
-                                        transition: max-height 0.3s ease-out, opacity 0.3s ease-out !important;
+                                        max-height: 0px;
+                                        overflow: hidden;
+                                        transition: max-height 0.3s ease-out, opacity 0.3s ease-out;
                                         display: block !important;
-                                        opacity: 0 !important;
-                                    }
-                                    .faq01_click_wrap.active .faq01-comment-3 {
-                                        max-height: 1000px !important;
-                                        opacity: 1 !important;
+                                        opacity: 0;
                                     }
                                     .faq01_click_wrap .faq01_icon-2.minus {
                                         display: none !important;
                                     }
                                     .faq01_click_wrap .faq01_icon-2.cfive {
                                         display: block !important;
-                                    }
-                                    .faq01_click_wrap.active .faq01_icon-2.minus {
-                                        display: block !important;
+                                        transition: transform 0.3s ease-out !important;
+                                        transform: rotate(90deg) !important;
                                     }
                                     .faq01_click_wrap.active .faq01_icon-2.cfive {
-                                        display: none !important;
+                                        transform: rotate(270deg) !important;
                                     }
                                 `;
                                 document.head.appendChild(faqStyle);
 
-                                document.querySelectorAll('.faq01_click_wrap').forEach(wrap => {
+                                document.querySelectorAll('.faq01_click_wrap').forEach((wrap, index) => {
+                                    const comment = wrap.querySelector('.faq01-comment-3');
+                                    if (comment) {
+                                        if (index === 0) {
+                                            wrap.classList.add('active');
+                                            comment.style.maxHeight = comment.scrollHeight + 'px';
+                                            comment.style.opacity = '1';
+                                        } else {
+                                            comment.style.maxHeight = '0px';
+                                            comment.style.opacity = '0';
+                                        }
+                                    }
                                     wrap.addEventListener('click', (e) => {
+                                        e.stopPropagation();
+                                        e.stopImmediatePropagation();
                                         if (e.target.closest('.faq01-comment-3')) {
                                             return;
                                         }
                                         const isActive = wrap.classList.contains('active');
-                                        document.querySelectorAll('.faq01_click_wrap').forEach(w => w.classList.remove('active'));
+                                        document.querySelectorAll('.faq01_click_wrap').forEach(w => {
+                                            w.classList.remove('active');
+                                            const c = w.querySelector('.faq01-comment-3');
+                                            if (c) {
+                                                c.style.maxHeight = '0px';
+                                                c.style.opacity = '0';
+                                            }
+                                        });
                                         if (!isActive) {
                                             wrap.classList.add('active');
+                                            if (comment) {
+                                                comment.style.maxHeight = comment.scrollHeight + 'px';
+                                                comment.style.opacity = '1';
+                                            }
                                         }
                                     });
                                 });
