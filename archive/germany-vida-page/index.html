@@ -50,33 +50,650 @@ h1,h2,h3,h4{font-weight:500;letter-spacing:-.02em;line-height:1.08;color:var(--i
 .btn-outline:hover{background:rgba(255,255,255,.1);transform:translateY(-2px)}
 
 /* ── HEADER ── */
-.site-header{position:fixed;top:14px;left:50%;transform:translateX(-50%);z-index:400;
-  width:calc(100% - 28px);max-width:1200px;display:flex;align-items:center;justify-content:space-between;gap:16px;
-  background:rgba(255,255,255,.55);backdrop-filter:blur(22px);-webkit-backdrop-filter:blur(22px);
-  border:1px solid rgba(255,255,255,.72);border-radius:50px;padding:8px 8px 8px 22px;
-  box-shadow:0 16px 44px -20px rgba(26,11,59,.45);transition:background .3s}
-.site-header.scrolled{background:rgba(255,255,255,.9)}
-.hbrand{display:flex;align-items:center;text-decoration:none;flex:none}
-.hbrand img{height:24px;width:auto}
-.hbrand .fw{font-weight:600;font-size:1.4rem;color:var(--purple);letter-spacing:-.04em;display:none}
-.hnav{display:flex;align-items:center;gap:4px}
-.ni{position:relative}
-.ni>a,.ni>button{display:inline-flex;align-items:center;gap:5px;background:none;border:none;cursor:pointer;
-  font-family:inherit;font-size:.88rem;font-weight:500;color:var(--ink);opacity:.82;text-decoration:none;
-  padding:9px 13px;border-radius:50px;transition:.18s;white-space:nowrap}
-.ni>a:hover,.ni>button:hover{opacity:1;background:rgba(48,27,94,.07);color:var(--purple)}
-.caret{font-size:.6rem;opacity:.65;transition:transform .2s}
-.ni:hover .caret{transform:rotate(180deg)}
-.drop{position:absolute;top:calc(100% + 10px);left:0;min-width:220px;background:#fff;border-radius:16px;
-  border:1px solid var(--line);box-shadow:0 20px 50px -20px rgba(48,27,94,.45);padding:7px;
-  opacity:0;visibility:hidden;transform:translateY(7px);transition:.2s}
-.ni:hover .drop{opacity:1;visibility:visible;transform:none}
-.drop a{display:block;padding:10px 13px;border-radius:10px;color:var(--ink);text-decoration:none;font-size:.88rem;font-weight:500;transition:.15s}
-.drop a:hover{background:var(--lav);color:var(--purple)}
-.hright{display:flex;align-items:center;gap:8px;flex:none}
-.region-drop{left:auto;right:0;max-height:320px;overflow-y:auto}
-.hcta{padding:10px 22px;font-size:.92rem}
-@media(max-width:960px){.hnav,.hright .ni{display:none}}
+.glass-nav-outer { position: fixed;top: 16px;left: 50%;transform: translateX(-50%);z-index: 1000; padding: 6px; border-radius: 63px; width: calc(100% - 32px); height: 56px; max-width: 1200px; box-sizing: border-box; background: linear-gradient(135deg,rgba(255, 255, 255, 0.4) 0%,rgba(255, 255, 255, 0.1) 50%,rgba(255, 255, 255, 0.25) 100%) !important; backdrop-filter: blur(24px) saturate(210%) !important; -webkit-backdrop-filter: blur(24px) saturate(210%) !important; box-shadow: 0 12px 40px rgba(0, 0, 0, 0.12),inset 0 1.5px 1.5px rgba(255, 255, 255, 0.85),inset 0 -1.5px 1.5px rgba(0, 0, 0, 0.05),inset 1.5px 0 1.5px rgba(255, 255, 255, 0.4),inset -1.5px 0 1.5px rgba(255, 255, 255, 0.4) !important; border: 1px solid rgba(255, 255, 255, 0.38) !important; transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1) !important;}
+
+[data-nav-root].scrolled .glass-nav-outer { backdrop-filter: blur(28px) saturate(220%) !important;-webkit-backdrop-filter: blur(28px) saturate(220%) !important; background: linear-gradient(135deg,rgba(255, 255, 255, 0.45) 0%,rgba(255, 255, 255, 0.15) 50%,rgba(255, 255, 255, 0.3) 100%) !important; box-shadow: 0 16px 48px rgba(0, 0, 0, 0.16),inset 0 1.5px 1.5px rgba(255, 255, 255, 0.95),inset 0 -1.5px 1.5px rgba(0, 0, 0, 0.08) !important;}
+
+@media (min-width: 1025px) { .glass-nav-outer { width: calc(100% - 48px); height: 74px; }}
+
+.glass-nav-inner { width: 100%; height: 100%; background-color: rgba(255, 255, 255, 0.95); border-radius: 59px; display: flex !important; align-items: center; justify-content: space-between; padding-left: 0; padding-right: 8px; padding-top: 6px; padding-bottom: 6px; font-size: 14px; font-weight: 500; border: 1px solid rgba(255, 255, 255, 0.15) !important; box-shadow: inset 0 1px 0px rgba(255, 255, 255, 0.6), 0 4px 12px rgba(0, 0, 0, 0.04) !important; box-sizing: border-box;}
+
+@media (min-width: 1025px) { .glass-nav-inner { padding-right: 16px; padding-top: 10px; padding-bottom: 10px; }}
+
+.nav-logo-link { display: flex; align-items: center; flex-shrink: 0; padding-left: 12px; padding-right: 12px;  padding-top: 6px; padding-bottom: 6px; box-sizing: border-box;}
+
+@media (min-width: 1025px) { .nav-logo-link { padding-left: 40px; padding-right: 40px; padding-top: 12px; padding-bottom: 12px; }}
+
+.nav-logo-link img { height: 20px; width: auto; display: block;
+}
+
+@media (min-width: 1025px) {
+  .nav-logo-link img {
+    height: 28px;
+  }
+}
+
+.nav-menu {
+  display: none;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+@media (min-width: 1025px) {
+  .nav-menu {
+    display: flex;
+    align-items: center;
+    flex: 1;
+    justify-content: flex-end;
+    padding-left: 16px;
+    padding-right: 10px;
+  }
+}
+
+.nav-item {
+  position: relative;
+  list-style: none;
+}
+
+.nav-link, .nav-trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: #1a1a1a;
+  font-size: 14px;
+  font-weight: 500;
+  padding: 16px 14px;
+  white-space: nowrap;
+  text-decoration: none;
+  transition: color 0.2s ease;
+  background: transparent;
+  border: 0;
+  cursor: pointer;
+  font-family: inherit;
+  box-sizing: border-box;
+}
+
+.nav-link:hover, .nav-trigger:hover,
+.nav-item.active .nav-trigger,
+.nav-item:hover .nav-trigger {
+  color: #483c71;
+}
+
+.chevron-icon {
+  flex-shrink: 0;
+  transition: transform 0.2s ease;
+}
+
+.nav-item:hover .chevron-icon,
+.nav-item.active .chevron-icon {
+  transform: rotate(180deg);
+}
+
+.nav-dropdown {
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translate(-50%, 10px);
+  margin-top: 10px;
+  background-color: #fff;
+  border-radius: 12px;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.12);
+  padding: 8px 0;
+  min-width: 200px;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  z-index: 1001;
+  box-sizing: border-box;
+}
+
+.nav-item:hover .nav-dropdown,
+.nav-item.active .nav-dropdown {
+  opacity: 1;
+  visibility: visible;
+  transform: translate(-50%, 0);
+}
+
+.dropdown-link {
+  display: block;
+  padding: 10px 20px;
+  font-size: 14px;
+  font-weight: 500;
+  color: #171e28;
+  text-decoration: none;
+  transition: background-color 0.2s ease, color 0.2s ease;
+  box-sizing: border-box;
+}
+
+.dropdown-link:hover {
+  background-color: #f4f6f9;
+  color: #5e46e5;
+}
+
+.nav-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+  box-sizing: border-box;
+}
+
+.country-selector {
+  position: relative;
+}
+
+.country-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 8px;
+  border-radius: 9999px;
+  border: 1.5px solid #e5e7eb;
+  background-color: #fff;
+  color: #1a1a1a;
+  font-size: 14px;
+  font-weight: 500;
+  transition: background-color 0.2s ease;
+  cursor: pointer;
+  box-sizing: border-box;
+}
+
+@media (min-width: 1025px) {
+  .country-btn {
+    gap: 8px;
+    padding-left: 10px;
+    padding-right: 14px;
+    padding-top: 6px;
+    padding-bottom: 6px;
+  }
+}
+
+.country-btn:hover {
+  background-color: #f9fafb;
+}
+
+.country-current {
+  display: none;
+}
+
+@media (min-width: 1025px) {
+  .country-current {
+    display: inline;
+  }
+}
+
+.global-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  color: #5e46e5;
+}
+
+@media (min-width: 1025px) {
+  .global-icon {
+    width: 22px;
+    height: 22px;
+  }
+}
+
+.country-flag {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  flex-shrink: 0;
+  width: 24px;
+  text-align: center;
+}
+
+.country-flag img {
+  display: inline-block;
+  width: 100%;
+  height: auto;
+  vertical-align: middle;
+  max-height: 16px;
+  object-fit: contain;
+}
+
+.country-selector .chevron-icon {
+  flex-shrink: 0;
+  transition: transform 0.2s ease;
+}
+
+.country-selector:hover .chevron-icon,
+.country-selector.active .chevron-icon {
+  transform: rotate(180deg);
+}
+
+.country-dropdown {
+  display: none;
+}
+
+@media (min-width: 1025px) {
+  .country-dropdown {
+    display: block;
+    position: absolute;
+    top: 100%;
+    right: 0;
+    width: 380px;
+    background-color: transparent;
+    padding-top: 10px;
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transition: all 0.3s ease;
+    z-index: 1001;
+    box-sizing: border-box;
+  }
+  .country-selector:hover .country-dropdown,
+  .country-selector.active .country-dropdown {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+  }
+}
+
+.country-dropdown-inner {
+  background-color: #fff;
+  border-radius: 16px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.12), 0 0 0 1px rgba(0, 0, 0, 0.04);
+  padding: 20px 24px;
+  box-sizing: border-box;
+}
+
+.country-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 4px;
+  box-sizing: border-box;
+}
+
+.country-option {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  transition: background-color 0.2s ease;
+  text-decoration: none;
+  color: inherit;
+  box-sizing: border-box;
+}
+
+.country-option:hover {
+  background-color: #f9fafb;
+}
+
+.country-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.country-name {
+  display: block;
+  font-size: 14px;
+  font-weight: 600;
+  color: #1a1a1a;
+  text-transform: uppercase;
+  letter-spacing: 0.2px;
+}
+
+.country-lang {
+  display: block;
+  font-size: 11px;
+  color: #9ca3af;
+  margin-top: 1px;
+}
+
+.v2-nav-btn {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  padding: 12px 20px !important;
+  font-size: 14px !important;
+  font-weight: 700 !important;
+  color: #ffffff !important;
+  background: linear-gradient(90deg, #110072 0%, #7a5698 100%) !important;
+  border-radius: 9999px !important;
+  text-decoration: none !important;
+  transition: opacity 0.2s ease !important;
+}
+
+.v2-nav-btn:hover {
+  opacity: 0.9 !important;
+}
+
+.desktop-cta {
+  display: none !important;
+}
+
+@media (min-width: 1025px) {
+  .desktop-cta {
+    display: inline-flex !important;
+  }
+}
+
+.mobile-toggle {
+  display: block;
+  position: relative;
+  width: 40px;
+  height: 40px;
+  margin-right: 6px;
+  background: transparent;
+  border: 0;
+  cursor: pointer;
+  padding: 8px;
+  box-sizing: border-box;
+}
+
+@media (min-width: 1025px) {
+  .mobile-toggle {
+    display: none;
+  }
+}
+
+.toggle-line {
+  display: block;
+  position: absolute;
+  left: 9px;
+  width: 22px;
+  height: 2px;
+  background-color: #1a1a1a;
+  border-radius: 4px;
+  transition: all 0.3s ease;
+}
+
+.line-top {
+  top: 13px;
+}
+
+.line-middle {
+  top: 19px;
+  transition: opacity 0.2s ease;
+}
+
+.line-bottom {
+  top: 25px;
+}
+
+.mobile-toggle.open .line-top {
+  top: 19px;
+  transform: rotate(45deg);
+}
+
+.mobile-toggle.open .line-middle {
+  opacity: 0;
+}
+
+.mobile-toggle.open .line-bottom {
+  top: 19px;
+  transform: rotate(-45deg);
+}
+
+.mobile-menu-drawer {
+  display: flex;
+  flex-direction: column;
+  position: fixed;
+  inset: 0;
+  z-index: 1100;
+  background-color: #fff;
+  transform: translateX(100%);
+  pointer-events: none;
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  box-sizing: border-box;
+}
+
+.mobile-menu-drawer.open {
+  transform: translateX(0);
+  pointer-events: auto;
+}
+
+@media (min-width: 1025px) {
+  .mobile-menu-drawer {
+    display: none;
+  }
+}
+
+.mobile-menu-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  border-bottom: 1px solid #f3f4f6;
+  box-sizing: border-box;
+}
+
+.mobile-menu-close {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 9999px;
+  background: transparent;
+  border: 0;
+  cursor: pointer;
+  color: #1a1a1a;
+  transition: background-color 0.2s ease;
+  box-sizing: border-box;
+}
+
+.mobile-menu-close:hover {
+  background-color: #f4f6f9;
+}
+
+.mobile-menu-list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  list-style: none;
+  margin: 0;
+  padding: 16px;
+  flex: 1;
+  overflow-y: auto;
+  box-sizing: border-box;
+}
+
+.mobile-menu-item {
+  position: relative;
+  list-style: none;
+}
+
+.mobile-menu-link, .mobile-menu-trigger {
+  display: block;
+  width: 100%;
+  padding: 14px 16px;
+  font-size: 16px;
+  font-weight: 500;
+  color: #171e28;
+  text-decoration: none;
+  border-radius: 12px;
+  transition: background-color 0.2s ease;
+  box-sizing: border-box;
+}
+
+.mobile-menu-trigger {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: transparent;
+  border: 0;
+  cursor: pointer;
+  text-align: left;
+  font-family: inherit;
+}
+
+.mobile-menu-link:hover, .mobile-menu-trigger:hover {
+  background-color: #f4f6f9;
+}
+
+.mobile-menu-item .chevron-icon {
+  flex-shrink: 0;
+  transition: transform 0.3s ease;
+}
+
+.mobile-menu-item.active .chevron-icon {
+  transform: rotate(180deg);
+}
+
+.mobile-menu-dropdown-grid {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  box-sizing: border-box;
+}
+
+.mobile-menu-item.active .mobile-menu-dropdown-grid {
+  grid-template-rows: 1fr;
+}
+
+.mobile-menu-dropdown-inner {
+  overflow: hidden;
+}
+
+.mobile-menu-dropdown-links {
+  padding-left: 12px;
+  padding-top: 4px;
+  padding-bottom: 8px;
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+}
+
+.mobile-dropdown-link {
+  display: block;
+  padding: 10px 16px;
+  font-size: 14px;
+  font-weight: 500;
+  color: #171e28;
+  border-radius: 8px;
+  text-decoration: none;
+  transition: background-color 0.2s ease, color 0.2s ease;
+  box-sizing: border-box;
+}
+
+.mobile-dropdown-link:hover {
+  background-color: #f4f6f9;
+  color: #5e46e5;
+}
+
+.mobile-menu-footer {
+  padding: 16px 20px;
+  border-top: 1px solid #f3f4f6;
+  box-sizing: border-box;
+}
+
+.mobile-cta {
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+}
+
+.mobile-country-backdrop {
+  display: block;
+  position: fixed;
+  inset: 0;
+  z-index: 1199;
+  background-color: rgba(0, 0, 0, 0.4);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+
+.mobile-country-backdrop.open {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.mobile-country-sheet {
+  display: flex;
+  flex-direction: column;
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 1200;
+  transform: translateY(100%);
+  transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+  background-color: #fff;
+  border-top-left-radius: 24px;
+  border-top-right-radius: 24px;
+  box-shadow: 0 -12px 40px rgba(0, 0, 0, 0.18);
+  max-height: 85vh;
+  box-sizing: border-box;
+}
+
+.mobile-country-sheet.open {
+  transform: translateY(0);
+}
+
+@media (min-width: 1025px) {
+  .mobile-country-backdrop, .mobile-country-sheet {
+    display: none !important;
+  }
+}
+
+.sheet-handle-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-top: 12px;
+  padding-bottom: 4px;
+}
+
+.sheet-handle {
+  display: block;
+  width: 36px;
+  height: 4px;
+  border-radius: 9999px;
+  background-color: #e5e7eb;
+}
+
+.sheet-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 20px;
+  border-bottom: 1px solid #f3f4f6;
+  box-sizing: border-box;
+}
+
+.sheet-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: #1a1a1a;
+}
+
+.sheet-close {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 9999px;
+  background: transparent;
+  border: 0;
+  cursor: pointer;
+  color: #1a1a1a;
+  transition: background-color 0.2s ease;
+  box-sizing: border-box;
+}
+
+.sheet-close:hover {
+  background-color: #f4f6f9;
+}
+
+.sheet-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 12px 16px;
+  box-sizing: border-box;
+}
 
 /* ── HERO ── */
 .hero{position:relative;overflow:hidden;padding:148px 0 90px;
@@ -318,7 +935,7 @@ h1,h2,h3,h4{font-weight:500;letter-spacing:-.02em;line-height:1.08;color:var(--i
 
 /* ── FOOTER ── */
 footer{background:var(--purple-dark);color:rgba(255,255,255,.66);padding:60px 0 28px}
-.foot-wrap{display:grid;grid-template-columns:1.4fr 1fr 1fr 1fr 1fr;gap:32px;padding-bottom:34px;border-bottom:1px solid var(--line-dark)}
+.foot-wrap{display:grid;grid-template-columns:1.4fr 1fr 1fr 1fr 1fr;gap:32px;padding-bottom:34px}
 .fbrand img{height:28px;margin-bottom:16px}
 .fbrand .fw{font-weight:600;font-size:1.5rem;color:#fff;letter-spacing:-.04em;display:none}
 .fbrand .fdesc{font-size:.84rem;margin-bottom:14px;line-height:1.5}
@@ -327,8 +944,28 @@ footer{background:var(--purple-dark);color:rgba(255,255,255,.66);padding:60px 0 
 .fcol a:hover{color:#fff}
 .foot-certs{display:flex;gap:14px;align-items:center;margin-top:16px}
 .foot-certs img{height:32px;width:auto;opacity:.85}
-.fbot{padding-top:20px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px;font-size:.82rem}
 @media(max-width:860px){.foot-wrap{grid-template-columns:1fr 1fr}.fbrand{grid-column:1/-1}}
+
+.footer-bottom { margin-top: 56px; padding: 32px 0 0; border-top: 1px solid rgba(255, 255, 255, 0.08); }
+.footer-bottom-content { display: flex; justify-content: space-between; align-items: flex-start; gap: 40px;flex-wrap: wrap;}
+.footer-bottom-left { display: flex; flex-direction: column; gap: 16px;}
+.footer-legal-links { display: flex; gap: 24px;}
+.footer-legal-link {font-size: 14px;color: rgba(255, 255, 255, 0.6);text-decoration: none;transition: color 0.18s ease;}
+.footer-legal-link:hover { color: #fff;}
+.footer-address {font-size: 13px;color: rgba(255, 255, 255, 0.4);line-height: 1.6;}
+.footer-address p { margin: 0;}
+.footer-address .mt-1 { margin-top: 4px;}
+.footer-bottom-right { display: flex; flex-direction: column; align-items: flex-end; flex-shrink: 0; text-align: right;}
+.footer-trust-logos { display: flex !important; align-items: center !important; gap: 10px;}
+.footer-trust-logos img { height: 40px; width: auto;}
+.footer-badges-text { font-size: 14px; color: rgba(255, 255, 255, 0.6); margin: 16px 0 0;}
+@media (max-width: 768px) {.footer-bottom-content { flex-direction: column; align-items: flex-start; gap: 32px;}.footer-bottom-right {align-items: flex-start;text-align: left;margin-top: 16px;}
+}
+.footer-social { display: flex; flex-direction: column; gap: 12px; }
+.footer-social-label { font-size: 14px;font-weight: 600;color: var(--color-white);margin: 0; }
+.footer-social-icons { display: flex; gap: 12px;}
+.footer-social-icon { width: 36px;height: 36px; display: flex;align-items: center;justify-content: center;background: rgba(255, 255, 255, 0.1);border-radius: 8px;color: var(--color-white);transition: background var(--transition-fast);}
+.footer-social-icon:hover { background: rgba(255, 255, 255, 0.2);}
 
 .reveal{opacity:0;transform:translateY(22px);transition:opacity .65s ease,transform .65s ease}
 .reveal.in{opacity:1;transform:none}
@@ -340,44 +977,354 @@ footer{background:var(--purple-dark);color:rgba(255,255,255,.66);padding:60px 0 
 height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 <!-- End Google Tag Manager (noscript) -->
 <!-- ══ HEADER ══ -->
-<header class="site-header" id="site-header">
-  <a href="https://www.cleartax.com/de/en" class="hbrand">
-    <img src="https://cdn.prod.website-files.com/6093bce33d9b4bae841b04e3/69dfcff6071b983201f5f097_logo-cleartax.svg"
-         alt="ClearTax" onerror="this.style.display='none';this.nextElementSibling.style.display='block'">
-    <span class="fw">cleartax</span>
-  </a>
-  <nav class="hnav">
-    <div class="ni"><a href="https://www.cleartax.com/de/en/about-us">About us</a></div>
-    <div class="ni">
-      <button>Resources <span class="caret">▾</span></button>
-      <div class="drop">
-        <a href="https://www.cleartax.com/de/en/e-invoicing-germany">Blog</a>
-        <a href="https://www.cleartax.com/case-studies">Case Studies</a>
+<div data-nav-root>
+  <header class="glass-nav-outer" aria-label="Primary">
+    <div class="glass-nav-inner">
+      <a href="https://www.cleartax.com/de/en" class="nav-logo-link">
+        <img
+          src="https://cdn.prod.website-files.com/6093bce33d9b4bae841b04e3/69dfcff6071b983201f5f097_logo-cleartax.svg"
+          alt="ClearTax"
+          width="120"
+          height="27"
+          loading="eager"
+        />
+      </a>
+
+      <ul class="nav-menu" data-nav-menu>
+        <li class="nav-item"><a href="https://www.cleartax.com/de/en/about-us" class="nav-link">About us</a></li>
+        <li class="nav-item has-dropdown">
+          <button type="button" data-nav-trigger class="nav-trigger">
+            Solutions
+            <svg class="chevron-icon" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+              <path d="m6 9 6 6 6-6" />
+            </svg>
+          </button>
+          <div class="nav-dropdown">
+            <a href="https://www.cleartax.com/de/en/e-invoicing-software" class="dropdown-link">E-Invoicing Software</a>
+            <a href="https://www.cleartax.com/global/e-invoicing-solution" class="dropdown-link">Global E-Invoicing</a>
+          </div>
+        </li>
+        <li class="nav-item has-dropdown">
+          <button type="button" data-nav-trigger class="nav-trigger">
+            Resources
+            <svg class="chevron-icon" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+              <path d="m6 9 6 6 6-6" />
+            </svg>
+          </button>
+          <div class="nav-dropdown">
+            <a href="https://www.cleartax.com/de/en/e-invoicing-germany" class="dropdown-link">Blog</a>
+          </div>
+        </li>
+        <li class="nav-item"><a href="https://www.cleartax.com/partners" class="nav-link">Partners</a></li>
+        <li class="nav-item"><a href="https://www.cleartax.com/de/en/contact-us" class="nav-link">Contact</a></li>
+      </ul>
+
+      <div class="nav-right">
+        <div class="country-selector" data-country-selector>
+          <button type="button" data-country-btn class="country-btn">
+            <span class="global-icon">
+              <span class="country-flag">
+                <img src="https://assets.clear.in/cleartax/images/1771829770_flagforflaggermanysvgrepocom1.svg" alt="GERMANY flag" />
+              </span>
+            </span>
+            <span data-country-current class="country-current">Germany</span>
+            <svg class="chevron-icon" width="10" height="6" viewBox="0 0 10 6" fill="none">
+              <path d="M1 1L5 5L9 1" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path>
+            </svg>
+          </button>
+          <div class="country-dropdown">
+            <div class="country-dropdown-inner">
+              <div class="country-grid">
+                <a href="https://www.clear.in/" data-country="INDIA" data-flag="https://cdn.prod.website-files.com/6141e3720a248d2024615d96/649999dbc3faf054134a1e01_India_flag.png" target="_blank" rel="noopener noreferrer" class="country-option">
+                  <span class="country-flag"><img src="https://cdn.prod.website-files.com/6141e3720a248d2024615d96/649999dbc3faf054134a1e01_India_flag.png" alt="INDIA flag" /></span>
+                  <div class="country-info">
+                    <span class="country-name">INDIA</span>
+                  </div>
+                </a>
+                <a href="https://www.cleartax.com/my/en" data-country="MALAYSIA" data-flag="https://cdn.prod.website-files.com/6141e3720a248d2024615d96/649a7b4653733f5dbda826ea_malaysia%20v1.png" target="_blank" rel="noopener noreferrer" class="country-option">
+                  <span class="country-flag"><img src="https://cdn.prod.website-files.com/6141e3720a248d2024615d96/649a7b4653733f5dbda826ea_malaysia%20v1.png" alt="MALAYSIA flag" /></span>
+                  <div class="country-info">
+                    <span class="country-name">MALAYSIA</span>
+                  </div>
+                </a>
+                <a href="https://www.clear.tech/" data-country="USA" data-flag="https://cdn.prod.website-files.com/6141e3720a248d2024615d96/64999a14db4af851a9f7ce5b_usa%20flag.png" target="_blank" rel="noopener noreferrer" class="country-option">
+                  <span class="country-flag"><img src="https://cdn.prod.website-files.com/6141e3720a248d2024615d96/64999a14db4af851a9f7ce5b_usa%20flag.png" alt="USA flag" /></span>
+                  <div class="country-info">
+                    <span class="country-name">USA</span>
+                  </div>
+                </a>
+                <a href="https://www.cleartax.com/pl/en" data-country="POLAND" data-flag="https://cdn.prod.website-files.com/6141e3720a248d2024615d96/64999b053b3f5248132a620d_poland%20flag.png" target="_blank" rel="noopener noreferrer" class="country-option">
+                  <span class="country-flag"><img src="https://cdn.prod.website-files.com/6141e3720a248d2024615d96/64999b053b3f5248132a620d_poland%20flag.png" alt="POLAND flag" /></span>
+                  <div class="country-info">
+                    <span class="country-name">POLAND</span>
+                    <span class="country-lang">English | Polish</span>
+                  </div>
+                </a>
+                <a href="https://www.cleartax.com/sa" data-country="SAUDI ARABIA" data-flag="https://cdn.prod.website-files.com/6141e3720a248d2024615d96/63e28756aeabe12df79ff5d5_Rectangle%202515530.svg" target="_blank" rel="noopener noreferrer" class="country-option">
+                  <span class="country-flag"><img src="https://cdn.prod.website-files.com/6141e3720a248d2024615d96/63e28756aeabe12df79ff5d5_Rectangle%202515530.svg" alt="SAUDI ARABIA flag" /></span>
+                  <div class="country-info">
+                    <span class="country-name">SAUDI ARABIA</span>
+                    <span class="country-lang">English | العربية</span>
+                  </div>
+                </a>
+                <a href="https://www.cleartax.com/om" data-country="OMAN" data-flag="https://cdn.prod.website-files.com/6141e3720a248d2024615d96/63e29d499e782b5935404547_Group%201000003291.svg" target="_blank" rel="noopener noreferrer" class="country-option">
+                  <span class="country-flag"><img src="https://cdn.prod.website-files.com/6141e3720a248d2024615d96/63e29d499e782b5935404547_Group%201000003291.svg" alt="OMAN flag" /></span>
+                  <div class="country-info">
+                    <span class="country-name">OMAN</span>
+                  </div>
+                </a>
+                <a href="https://www.cleartax.com/fr/en" data-country="FRANCE" data-flag="https://cdn.prod.website-files.com/6141e3720a248d2024615d96/64999768870655432964457d_france_flag.png" target="_blank" rel="noopener noreferrer" class="country-option">
+                  <span class="country-flag"><img src="https://cdn.prod.website-files.com/6141e3720a248d2024615d96/64999768870655432964457d_france_flag.png" alt="FRANCE flag" /></span>
+                  <div class="country-info">
+                    <span class="country-name">FRANCE</span>
+                    <span class="country-lang">English | French</span>
+                  </div>
+                </a>
+                <a href="https://www.cleartax.com/bh" data-country="BAHRAIN" data-flag="https://cdn.prod.website-files.com/6141e3720a248d2024615d96/63e29d6c2e1ddc75a632d00f_Group%201000003292.svg" target="_blank" rel="noopener noreferrer" class="country-option">
+                  <span class="country-flag"><img src="https://cdn.prod.website-files.com/6141e3720a248d2024615d96/63e29d6c2e1ddc75a632d00f_Group%201000003292.svg" alt="BAHRAIN flag" /></span>
+                  <div class="country-info">
+                    <span class="country-name">BAHRAIN</span>
+                  </div>
+                </a>
+                <a href="https://www.cleartax.com/es/en" data-country="SPAIN" data-flag="https://cdn.prod.website-files.com/6141e3720a248d2024615d96/64999a546cfce1e0515f0f60_spain%20flag.png" target="_blank" rel="noopener noreferrer" class="country-option">
+                  <span class="country-flag"><img src="https://cdn.prod.website-files.com/6141e3720a248d2024615d96/64999a546cfce1e0515f0f60_spain%20flag.png" alt="SPAIN flag" /></span>
+                  <div class="country-info">
+                    <span class="country-name">SPAIN</span>
+                  </div>
+                </a>
+                <a href="https://www.cleartax.com/ae" data-country="UAE" data-flag="https://cdn.prod.website-files.com/6141e3720a248d2024615d96/63e29d24f310792735ab4bba_Mask%20group%20(3).svg" target="_blank" rel="noopener noreferrer" class="country-option">
+                  <span class="country-flag"><img src="https://cdn.prod.website-files.com/6141e3720a248d2024615d96/63e29d24f310792735ab4bba_Mask%20group%20(3).svg" alt="UAE flag" /></span>
+                  <div class="country-info">
+                    <span class="country-name">UAE</span>
+                  </div>
+                </a>
+                <a href="https://www.cleartax.com/sg/e-invoicing-software" data-country="SINGAPORE" data-flag="https://cdn.prod.website-files.com/6141e3720a248d2024615d96/66716d4c6753fb52078bec02_singapore%20flag%203.png" target="_blank" rel="noopener noreferrer" class="country-option">
+                  <span class="country-flag"><img src="https://cdn.prod.website-files.com/6141e3720a248d2024615d96/66716d4c6753fb52078bec02_singapore%20flag%203.png" alt="SINGAPORE flag" /></span>
+                  <div class="country-info">
+                    <span class="country-name">SINGAPORE</span>
+                  </div>
+                </a>
+                <a href="https://www.cleartax.com/global/e-invoicing-solution" data-country="GLOBAL" data-flag="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%235E46E5' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><circle cx='12' cy='12' r='10'></circle><line x1='2' y1='12' x2='22' y2='12'></line><path d='M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z'></path></svg>" target="_blank" rel="noopener noreferrer" class="country-option">
+                  <span class="country-flag"><img src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%235E46E5' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><circle cx='12' cy='12' r='10'></circle><line x1='2' y1='12' x2='22' y2='12'></line><path d='M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z'></path></svg>" alt="GLOBAL flag" /></span>
+                  <div class="country-info">
+                    <span class="country-name">GLOBAL</span>
+                  </div>
+                </a>
+                <a href="https://www.cleartax.com/be/en" data-country="BELGIUM" data-flag="https://cdn.prod.website-files.com/6141e3720a248d2024615d96/67e3e6ae1e19488131f26dfd_belgium_flag.png" target="_blank" rel="noopener noreferrer" class="country-option">
+                  <span class="country-flag"><img src="https://cdn.prod.website-files.com/6141e3720a248d2024615d96/67e3e6ae1e19488131f26dfd_belgium_flag.png" alt="BELGIUM flag" /></span>
+                  <div class="country-info">
+                    <span class="country-name">BELGIUM</span>
+                  </div>
+                </a>
+                <a href="https://www.cleartax.com/jo/e-invoicing-software" data-country="JORDAN" data-flag="https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6a27ad811aee7102520dd245_Flag-Jordan.webp" target="_blank" rel="noopener noreferrer" class="country-option">
+                  <span class="country-flag"><img src="https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6a27ad811aee7102520dd245_Flag-Jordan.webp" alt="JORDAN flag" /></span>
+                  <div class="country-info">
+                    <span class="country-name">JORDAN</span>
+                  </div>
+                </a>
+                <a href="https://www.cleartax.com/ph" data-country="PHILIPPINES" data-flag="https://cdn.prod.website-files.com/6141e3720a248d2024615d96/6a2935c197e9e718191d8d34_Flag_of_the_Philippines.svg" target="_blank" rel="noopener noreferrer" class="country-option">
+                  <span class="country-flag"><img src="https://cdn.prod.website-files.com/6141e3720a248d2024615d96/6a2935c197e9e718191d8d34_Flag_of_the_Philippines.svg" alt="PHILIPPINES flag" /></span>
+                  <div class="country-info">
+                    <span class="country-name">PHILIPPINES</span>
+                  </div>
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <a href="javascript:void(0)" onclick="scrollToRegister(event)" class="v2-nav-btn desktop-cta">
+          Book a demo
+          <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true">
+            <path d="M2 6h8M6 2l4 4-4 4" stroke="white" stroke-width="1.5" stroke-linecap="round"></path>
+          </svg>
+        </a>
+
+        <button type="button" data-mobile-toggle aria-label="Toggle menu" aria-expanded="false" class="mobile-toggle">
+          <span class="toggle-line line-top"></span>
+          <span class="toggle-line line-middle"></span>
+          <span class="toggle-line line-bottom"></span>
+        </button>
       </div>
     </div>
-    <div class="ni"><a href="https://www.cleartax.com/global/partner-program">Partners</a></div>
-    <div class="ni"><a href="https://www.cleartax.com/de/en/contact-us">Contact</a></div>
-    <div class="ni">
-      <button>🇩🇪 GERMANY <span class="caret">▾</span></button>
-      <div class="drop region-drop">
-        <a href="https://www.clear.in/">🇮🇳 INDIA</a>
-        <a href="https://www.cleartax.com/my/en">🇲🇾 MALAYSIA</a>
-        <a href="https://www.clear.tech/">🇺🇸 USA</a>
-        <a href="https://www.cleartax.com/pl/en">🇵🇱 POLAND</a>
-        <a href="https://www.cleartax.com/sa">🇸🇦 SAUDI ARABIA</a>
-        <a href="https://www.cleartax.com/fr/en">🇫🇷 FRANCE</a>
-        <a href="https://www.cleartax.com/be/en">🇧🇪 BELGIUM</a>
-        <a href="https://www.cleartax.com/ae">🇦🇪 UAE</a>
-        <a href="https://www.cleartax.com/de/en">🇩🇪 GERMANY</a>
-        <a href="https://www.cleartax.com/es/en">🇪🇸 SPAIN</a>
-        <a href="https://www.cleartax.com/sg/e-invoicing-software">🇸🇬 SINGAPORE</a>
-      </div>
+  </header>
+
+  <!-- Mobile Menu Drawer -->
+  <div class="mobile-menu-drawer" data-mobile-menu aria-hidden="true">
+    <div class="mobile-menu-header">
+      <a href="https://www.cleartax.com/de/en" class="nav-logo-link">
+        <img src="https://cdn.prod.website-files.com/6093bce33d9b4bae841b04e3/69dfcff6071b983201f5f097_logo-cleartax.svg" alt="ClearTax" width="120" height="27" loading="eager" />
+      </a>
+      <button type="button" data-mobile-close aria-label="Close menu" class="mobile-menu-close">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M18 6 6 18"></path>
+          <path d="m6 6 12 12"></path>
+        </svg>
+      </button>
     </div>
-  </nav>
-  <div class="hright">
-    <a href="javascript:void(0)" onclick="scrollToRegister(event)" class="btn btn-purple hcta">Book a demo <span class="arr">→</span></a>
+
+    <ul class="mobile-menu-list">
+      <li class="mobile-menu-item">
+        <a href="https://www.cleartax.com/de/en/about-us" class="mobile-menu-link">About us</a>
+      </li>
+      <li class="mobile-menu-item has-dropdown-m">
+        <button type="button" data-m-trigger class="mobile-menu-trigger">
+          <span>Solutions</span>
+          <svg class="chevron-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+            <path d="m6 9 6 6 6-6" />
+          </svg>
+        </button>
+        <div class="mobile-menu-dropdown-grid">
+          <div class="mobile-menu-dropdown-inner">
+            <div class="mobile-menu-dropdown-links">
+              <a href="https://www.cleartax.com/de/en/e-invoicing-software" class="mobile-dropdown-link">E-Invoicing Software</a>
+              <a href="https://www.cleartax.com/global/e-invoicing-solution" class="mobile-dropdown-link">Global E-Invoicing</a>
+            </div>
+          </div>
+        </div>
+      </li>
+      <li class="mobile-menu-item has-dropdown-m">
+        <button type="button" data-m-trigger class="mobile-menu-trigger">
+          <span>Resources</span>
+          <svg class="chevron-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+            <path d="m6 9 6 6 6-6" />
+          </svg>
+        </button>
+        <div class="mobile-menu-dropdown-grid">
+          <div class="mobile-menu-dropdown-inner">
+            <div class="mobile-menu-dropdown-links">
+              <a href="https://www.cleartax.com/de/en/e-invoicing-germany" class="mobile-dropdown-link">Blog</a>
+            </div>
+          </div>
+        </div>
+      </li>
+      <li class="mobile-menu-item">
+        <a href="https://www.cleartax.com/partners" class="mobile-menu-link">Partners</a>
+      </li>
+      <li class="mobile-menu-item">
+        <a href="https://www.cleartax.com/de/en/contact-us" class="mobile-menu-link">Contact</a>
+      </li>
+    </ul>
+
+    <div class="mobile-menu-footer">
+      <a href="javascript:void(0)" onclick="scrollToRegister(event)" class="v2-nav-btn mobile-cta">
+        Book a demo
+        <svg width="14" height="14" viewBox="0 0 12 12" fill="none" aria-hidden="true">
+          <path d="M2 6h8M6 2l4 4-4 4" stroke="white" stroke-width="1.5" stroke-linecap="round"></path>
+        </svg>
+      </a>
+    </div>
   </div>
-</header>
+
+  <!-- Mobile Country Sheet & Backdrop -->
+  <div class="mobile-country-backdrop" data-country-backdrop aria-hidden="true"></div>
+
+  <div class="mobile-country-sheet" data-country-sheet role="dialog" aria-modal="true" aria-label="Select country" aria-hidden="true">
+    <div class="sheet-handle-container">
+      <span class="sheet-handle" aria-hidden="true"></span>
+    </div>
+    <div class="sheet-header">
+      <span class="sheet-title">Select country</span>
+      <button type="button" data-country-close aria-label="Close country selector" class="sheet-close">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M18 6 6 18"></path>
+          <path d="m6 6 12 12"></path>
+        </svg>
+      </button>
+    </div>
+    <div class="sheet-body">
+      <div class="country-grid">
+        <a href="https://www.clear.in/" data-country-sheet-option data-country="INDIA" data-flag="https://cdn.prod.website-files.com/6141e3720a248d2024615d96/649999dbc3faf054134a1e01_India_flag.png" target="_blank" rel="noopener noreferrer" class="country-option">
+          <span class="country-flag"><img src="https://cdn.prod.website-files.com/6141e3720a248d2024615d96/649999dbc3faf054134a1e01_India_flag.png" alt="INDIA flag" /></span>
+          <div class="country-info">
+            <span class="country-name">INDIA</span>
+          </div>
+        </a>
+        <a href="https://www.cleartax.com/my/en" data-country-sheet-option data-country="MALAYSIA" data-flag="https://cdn.prod.website-files.com/6141e3720a248d2024615d96/649a7b4653733f5dbda826ea_malaysia%20v1.png" target="_blank" rel="noopener noreferrer" class="country-option">
+          <span class="country-flag"><img src="https://cdn.prod.website-files.com/6141e3720a248d2024615d96/649a7b4653733f5dbda826ea_malaysia%20v1.png" alt="MALAYSIA flag" /></span>
+          <div class="country-info">
+            <span class="country-name">MALAYSIA</span>
+          </div>
+        </a>
+        <a href="https://www.clear.tech/" data-country-sheet-option data-country="USA" data-flag="https://cdn.prod.website-files.com/6141e3720a248d2024615d96/64999a14db4af851a9f7ce5b_usa%20flag.png" target="_blank" rel="noopener noreferrer" class="country-option">
+          <span class="country-flag"><img src="https://cdn.prod.website-files.com/6141e3720a248d2024615d96/64999a14db4af851a9f7ce5b_usa%20flag.png" alt="USA flag" /></span>
+          <div class="country-info">
+            <span class="country-name">USA</span>
+          </div>
+        </a>
+        <a href="https://www.cleartax.com/pl/en" data-country-sheet-option data-country="POLAND" data-flag="https://cdn.prod.website-files.com/6141e3720a248d2024615d96/64999b053b3f5248132a620d_poland%20flag.png" target="_blank" rel="noopener noreferrer" class="country-option">
+          <span class="country-flag"><img src="https://cdn.prod.website-files.com/6141e3720a248d2024615d96/64999b053b3f5248132a620d_poland%20flag.png" alt="POLAND flag" /></span>
+          <div class="country-info">
+            <span class="country-name">POLAND</span>
+            <span class="country-lang">English | Polish</span>
+          </div>
+        </a>
+        <a href="https://www.cleartax.com/sa" data-country-sheet-option data-country="SAUDI ARABIA" data-flag="https://cdn.prod.website-files.com/6141e3720a248d2024615d96/63e28756aeabe12df79ff5d5_Rectangle%202515530.svg" target="_blank" rel="noopener noreferrer" class="country-option">
+          <span class="country-flag"><img src="https://cdn.prod.website-files.com/6141e3720a248d2024615d96/63e28756aeabe12df79ff5d5_Rectangle%202515530.svg" alt="SAUDI ARABIA flag" /></span>
+          <div class="country-info">
+            <span class="country-name">SAUDI ARABIA</span>
+            <span class="country-lang">English | العربية</span>
+          </div>
+        </a>
+        <a href="https://www.cleartax.com/om" data-country-sheet-option data-country="OMAN" data-flag="https://cdn.prod.website-files.com/6141e3720a248d2024615d96/63e29d499e782b5935404547_Group%201000003291.svg" target="_blank" rel="noopener noreferrer" class="country-option">
+          <span class="country-flag"><img src="https://cdn.prod.website-files.com/6141e3720a248d2024615d96/63e29d499e782b5935404547_Group%201000003291.svg" alt="OMAN flag" /></span>
+          <div class="country-info">
+            <span class="country-name">OMAN</span>
+          </div>
+        </a>
+        <a href="https://www.cleartax.com/fr/en" data-country-sheet-option data-country="FRANCE" data-flag="https://cdn.prod.website-files.com/6141e3720a248d2024615d96/64999768870655432964457d_france_flag.png" target="_blank" rel="noopener noreferrer" class="country-option">
+          <span class="country-flag"><img src="https://cdn.prod.website-files.com/6141e3720a248d2024615d96/64999768870655432964457d_france_flag.png" alt="FRANCE flag" /></span>
+          <div class="country-info">
+            <span class="country-name">FRANCE</span>
+            <span class="country-lang">English | French</span>
+          </div>
+        </a>
+        <a href="https://www.cleartax.com/bh" data-country-sheet-option data-country="BAHRAIN" data-flag="https://cdn.prod.website-files.com/6141e3720a248d2024615d96/63e29d6c2e1ddc75a632d00f_Group%201000003292.svg" target="_blank" rel="noopener noreferrer" class="country-option">
+          <span class="country-flag"><img src="https://cdn.prod.website-files.com/6141e3720a248d2024615d96/63e29d6c2e1ddc75a632d00f_Group%201000003292.svg" alt="BAHRAIN flag" /></span>
+          <div class="country-info">
+            <span class="country-name">BAHRAIN</span>
+          </div>
+        </a>
+        <a href="https://www.cleartax.com/es/en" data-country-sheet-option data-country="SPAIN" data-flag="https://cdn.prod.website-files.com/6141e3720a248d2024615d96/64999a546cfce1e0515f0f60_spain%20flag.png" target="_blank" rel="noopener noreferrer" class="country-option">
+          <span class="country-flag"><img src="https://cdn.prod.website-files.com/6141e3720a248d2024615d96/64999a546cfce1e0515f0f60_spain%20flag.png" alt="SPAIN flag" /></span>
+          <div class="country-info">
+            <span class="country-name">SPAIN</span>
+          </div>
+        </a>
+        <a href="https://www.cleartax.com/ae" data-country-sheet-option data-country="UAE" data-flag="https://cdn.prod.website-files.com/6141e3720a248d2024615d96/63e29d24f310792735ab4bba_Mask%20group%20(3).svg" target="_blank" rel="noopener noreferrer" class="country-option">
+          <span class="country-flag"><img src="https://cdn.prod.website-files.com/6141e3720a248d2024615d96/63e29d24f310792735ab4bba_Mask%20group%20(3).svg" alt="UAE flag" /></span>
+          <div class="country-info">
+            <span class="country-name">UAE</span>
+          </div>
+        </a>
+        <a href="https://www.cleartax.com/sg/e-invoicing-software" data-country-sheet-option data-country="SINGAPORE" data-flag="https://cdn.prod.website-files.com/6141e3720a248d2024615d96/66716d4c6753fb52078bec02_singapore%20flag%203.png" target="_blank" rel="noopener noreferrer" class="country-option">
+          <span class="country-flag"><img src="https://cdn.prod.website-files.com/6141e3720a248d2024615d96/66716d4c6753fb52078bec02_singapore%20flag%203.png" alt="SINGAPORE flag" /></span>
+          <div class="country-info">
+            <span class="country-name">SINGAPORE</span>
+          </div>
+        </a>
+        <a href="https://www.cleartax.com/global/e-invoicing-solution" data-country-sheet-option data-country="GLOBAL" data-flag="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%235E46E5' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><circle cx='12' cy='12' r='10'></circle><line x1='2' y1='12' x2='22' y2='12'></line><path d='M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z'></path></svg>" target="_blank" rel="noopener noreferrer" class="country-option">
+          <span class="country-flag"><img src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%235E46E5' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><circle cx='12' cy='12' r='10'></circle><line x1='2' y1='12' x2='22' y2='12'></line><path d='M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z'></path></svg>" alt="GLOBAL flag" /></span>
+          <div class="country-info">
+            <span class="country-name">GLOBAL</span>
+          </div>
+        </a>
+        <a href="https://www.cleartax.com/be/en" data-country-sheet-option data-country="BELGIUM" data-flag="https://cdn.prod.website-files.com/6141e3720a248d2024615d96/67e3e6ae1e19488131f26dfd_belgium_flag.png" target="_blank" rel="noopener noreferrer" class="country-option">
+          <span class="country-flag"><img src="https://cdn.prod.website-files.com/6141e3720a248d2024615d96/67e3e6ae1e19488131f26dfd_belgium_flag.png" alt="BELGIUM flag" /></span>
+          <div class="country-info">
+            <span class="country-name">BELGIUM</span>
+          </div>
+        </a>
+        <a href="https://www.cleartax.com/jo/e-invoicing-software" data-country-sheet-option data-country="JORDAN" data-flag="https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6a27ad811aee7102520dd245_Flag-Jordan.webp" target="_blank" rel="noopener noreferrer" class="country-option">
+          <span class="country-flag"><img src="https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6a27ad811aee7102520dd245_Flag-Jordan.webp" alt="JORDAN flag" /></span>
+          <div class="country-info">
+            <span class="country-name">JORDAN</span>
+          </div>
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
 
 <!-- ══ HERO ══ -->
 <section class="hero" id="top">
@@ -845,10 +1792,24 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
              alt="ClearTax" onerror="this.style.display='none';this.nextElementSibling.style.display='block'">
         <span class="fw">cleartax</span>
         <p class="fdesc">Germany's ViDA-ready e-invoicing and digital compliance platform.</p>
-        <div class="foot-certs">
-          <img src="https://cdn.prod.website-files.com/6093bce33d9b4bae841b04e3/69fb0ff41b9a63ce3e1f50d9_iso.png" alt="ISO 27001">
-          <img src="https://cdn.prod.website-files.com/6093bce33d9b4bae841b04e3/69fad934822abf67d7c25954_soc.png" alt="SOC 2">
-          <img src="https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6a153c9e423a6b967412239c_gdpr.png" alt="GDPR">
+        <div class="footer-social">
+          <p class="footer-social-label">Follow us on</p>
+          <div class="footer-social-icons">
+                <a
+                  href="https://www.linkedin.com/company/cleartax/"
+                  class="footer-social-icon"
+                  aria-label="LinkedIn"
+                >
+                  <svg
+                    width="20"
+                    height="20"
+                    viewBox="0 0 24 24"
+                    fill="currentColor"
+                  >
+                    <path d="M20.5 2h-17A1.5 1.5 0 002 3.5v17A1.5 1.5 0 003.5 22h17a1.5 1.5 0 001.5-1.5v-17A1.5 1.5 0 0020.5 2zM8 19H5v-9h3zM6.5 8.25A1.75 1.75 0 118.3 6.5a1.78 1.78 0 01-1.8 1.75zM19 19h-3v-4.74c0-1.42-.6-1.93-1.38-1.93A1.74 1.74 0 0013 14.19V19h-3v-9h2.9v1.3a3.11 3.11 0 012.7-1.4c1.55 0 3.36.86 3.36 3.66z" />
+                  </svg>
+                </a>
+          </div>
         </div>
       </div>
       <div class="fcol">
@@ -877,28 +1838,47 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         <a href="https://www.cleartax.com/de/en/peppol-in-germany">PEPPOL in Germany: Explained</a>
         <a href="https://www.cleartax.com/de/en/vat-id-number-in-germany">Germany VAT ID Number</a>
         <a href="https://www.cleartax.com/de/en/mandatory-data-fields-germany-e-invoicing">Mandatory Data Fields for Germany E-Invoicing</a>
-        <a href="https://www.cleartax.com/de/en/e-invoicing-faqs-germany">XRechnung Format</a>
+        <a href="https://www.cleartax.com/de/en/xrechnung-e-invoicing">XRechnung Format</a>
         <a href="https://www.cleartax.com/de/en/e-invoicing-faqs-germany">Germany E-Invoicing FAQs</a>
         <a href="https://www.cleartax.com/de/en/zugferd-vs-xrechnung">ZUGFeRD or XRechnung</a>
         <a href="https://www.cleartax.com/de/en/vat-calculator">VAT Calculator Germany</a>
       </div>
       <div class="fcol">
         <h4>Resources (Deutsch)</h4>
-        <a href="https://www.cleartax.com/de/en/e-invoicing-germany">E-Rechnungspflicht ab 2027</a>
-        <a href="https://www.cleartax.com/de/en/top-e-invoicing-solution-provider-germany">Umsatzsteuer ID Nummer 2026</a>
-        <a href="https://www.cleartax.com/de/en/en-16931-standard-germany">EN 16931 Norm für e-Rechnung</a>
-        <a href="https://www.cleartax.com/de/en/peppol-in-germany">Das OZG-RE-Portal</a>
-        <a href="https://www.cleartax.com/de/en/vat-id-number-in-germany">PEPPOL in Deutschland</a>
-        <a href="https://www.cleartax.com/de/en/mandatory-data-fields-germany-e-invoicing">E-Rechnung Empfangen</a>
-        <a href="https://www.cleartax.com/de/en/e-invoicing-faqs-germany">E-Rechnungspflicht für Kleinunternehmer</a>
-        <a href="https://www.cleartax.com/de/en/e-invoicing-faqs-germany">Mehrwertsteuer im digitalen Zeitalter (ViDA)</a>
-        <a href="https://www.cleartax.com/de/en/zugferd-vs-xrechnung">Was ist eine Leitweg-ID</a>
-        <a href="https://www.cleartax.com/de/en/vat-calculator">MwSt Rechner Deutschland</a>
+        <a href="https://www.cleartax.com/de/e-rechnung">E-Rechnungspflicht ab 2027</a>
+        <a href="https://www.cleartax.com/de/umsatzsteuer-id-nummer">Umsatzsteuer ID Nummer 2026</a>
+        <a href="https://www.cleartax.com/de/en-16931-norm-fur-e-rechnung">EN 16931 Norm für e-Rechnung</a>
+        <a href="https://www.cleartax.com/de/ozg-re-portal">Das OZG-RE-Portal</a>
+        <a href="https://www.cleartax.com/de/peppol-in-deutschland">PEPPOL in Deutschland</a>
+        <a href="https://www.cleartax.com/de/e-rechnung-empfangen">E-Rechnung Empfangen</a>
+        <a href="https://www.cleartax.com/de/e-rechnungpflicht-fur-kleinunternehmer">E-Rechnungspflicht für Kleinunternehmer</a>
+        <a href="https://www.cleartax.com/de/mehrwertsteuer-im-digitalen-zeitalter-vida">Mehrwertsteuer im digitalen Zeitalter (ViDA)</a>
+        <a href="https://www.cleartax.com/de/was-ist-eine-leitweg-id">Was ist eine Leitweg-ID</a>
+        <a href="https://www.cleartax.com/de/mwst-rechner">MwSt Rechner Deutschland</a>
       </div>
     </div>
-    <div class="fbot">
-      <span>© 2026 ClearTax Pvt. Ltd. All rights reserved.</span>
-      <span><a href="https://www.clear.in/s/legal" style="color:inherit">Legal</a> · <a href="https://www.cleartax.com/meta/privacy" style="color:inherit">Privacy Policy</a></span>
+    <div class="footer-bottom">
+      <div class="footer-bottom-content">
+        <div class="footer-bottom-left">
+          <div class="footer-legal-links">
+            <a href="https://www.clear.in/s/legal" class="footer-legal-link">Legal</a>
+            <a href="https://www.cleartax.com/meta/privacy" class="footer-legal-link">Privacy Policy</a>
+          </div>
+          <div class="footer-address">
+            <p>House A, 1st floor, Edisonstraße 63, Berlin 12459 Germany</p>
+            <p class="mt-1">Cleartax is a product by Defmacro Software Pvt. Ltd.</p>
+          </div>
+        </div>
+        <div class="footer-bottom-right">
+          <div class="footer-trust-logos">
+            <img alt="ISO Certified" decoding="async" loading="lazy" src="https://cdn.prod.website-files.com/6093bce33d9b4bae841b04e3/69fb0ff41b9a63ce3e1f50d9_iso.png" />
+            <img alt="SOC Certified" decoding="async" loading="lazy" src="https://cdn.prod.website-files.com/6093bce33d9b4bae841b04e3/69fad934822abf67d7c25954_soc.png" />
+            <img alt="SSL Secured" decoding="async" loading="lazy" src="https://cdn.prod.website-files.com/6093bce33d9b4bae841b04e3/6a154210439a661bb4313f68_ssll.png" />
+            <img alt="GDPR Compliant" decoding="async" loading="lazy" src="https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6a153c9e423a6b967412239c_gdpr.png" />
+          </div>
+          <p class="footer-badges-text">Your data security and privacy matter most to us.</p>
+        </div>
+      </div>
     </div>
   </div>
 </footer>
@@ -963,9 +1943,250 @@ function updateCountdown(){
 }
 updateCountdown();setInterval(updateCountdown,1000);
 
-// Header scroll
-const sh=document.getElementById('site-header');
-addEventListener('scroll',()=>sh.classList.toggle('scrolled',scrollY>20),{passive:true});
+// Navigation & Mobile interactions
+(function () {
+  const navbar = document.querySelector("[data-nav-root]");
+  if (!navbar) return;
+  const mobileToggle = navbar.querySelector("[data-mobile-toggle]");
+  const mobileMenu = navbar.querySelector("[data-mobile-menu]");
+  const mobileClose = navbar.querySelector("[data-mobile-close]");
+  const dropdownItems = navbar.querySelectorAll(".has-dropdown");
+  const mDropdownItems = navbar.querySelectorAll(".has-dropdown-m");
+  const countrySelector = navbar.querySelector("[data-country-selector]");
+  const countrySheet = navbar.querySelector("[data-country-sheet]");
+  const countryBackdrop = navbar.querySelector("[data-country-backdrop]");
+  const countrySheetClose = navbar.querySelector("[data-country-close]");
+
+  let scrollLockCount = 0;
+  const lockScroll = () => {
+    scrollLockCount += 1;
+    if (scrollLockCount === 1) document.body.style.overflow = "hidden";
+  };
+  const unlockScroll = () => {
+    scrollLockCount = Math.max(0, scrollLockCount - 1);
+    if (scrollLockCount === 0) document.body.style.overflow = "";
+  };
+
+  const setMenuOpen = (open) => {
+    if (!mobileMenu) return;
+    const wasOpen = mobileMenu.classList.contains("open");
+    if (open === wasOpen) return;
+    mobileMenu.classList.toggle("open", open);
+    mobileMenu.setAttribute("aria-hidden", open ? "false" : "true");
+    mobileToggle?.classList.toggle("open", open);
+    mobileToggle?.setAttribute("aria-expanded", open ? "true" : "false");
+    if (open) lockScroll();
+    else unlockScroll();
+  };
+
+  window.scrollToRegister = (e) => {
+    if (e) e.preventDefault();
+    setMenuOpen(false);
+    const registerEl = document.getElementById('demo') || document.getElementById('hs-demo-form') || document.getElementById('heroForm') || document.getElementById('hero-hubspot-form');
+    if (registerEl) {
+      registerEl.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
+  window.scrollToRoadmap = (e) => {
+    if (e) e.preventDefault();
+    const roadmapEl = document.getElementById('roadmap');
+    if (roadmapEl) {
+      roadmapEl.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
+  const setSheetOpen = (open) => {
+    if (!countrySheet || !countryBackdrop) return;
+    const wasOpen = countrySheet.classList.contains("open");
+    if (open === wasOpen) return;
+    countrySheet.classList.toggle("open", open);
+    countryBackdrop.classList.toggle("open", open);
+    countrySheet.setAttribute("aria-hidden", open ? "false" : "true");
+    if (open) lockScroll();
+    else unlockScroll();
+  };
+
+  window.addEventListener("scroll", () => {
+    navbar.classList.toggle("scrolled", window.scrollY > 10);
+  });
+
+  dropdownItems.forEach((item) => {
+    const btn = item.querySelector("[data-nav-trigger]");
+    if (!btn) return;
+    btn.addEventListener("click", (e) => {
+      if (window.innerWidth <= 1024) return;
+      e.preventDefault();
+      const isActive = item.classList.contains("active");
+      dropdownItems.forEach((i) => i.classList.remove("active"));
+      item.classList.toggle("active", !isActive);
+    });
+  });
+
+  mDropdownItems.forEach((item) => {
+    const btn = item.querySelector("[data-m-trigger]");
+    if (!btn) return;
+    btn.addEventListener("click", (e) => {
+      e.preventDefault();
+      item.classList.toggle("active");
+    });
+  });
+
+  if (countrySelector) {
+    const countryBtn = countrySelector.querySelector("[data-country-btn]");
+    const currentLabel = countrySelector.querySelector(
+      "[data-country-current]"
+    );
+    const globeIcon = countryBtn?.querySelector(".global-icon");
+    const options = countrySelector.querySelectorAll("[data-country]");
+
+    countryBtn?.addEventListener("click", (e) => {
+      e.stopPropagation();
+      if (window.innerWidth <= 1024) {
+        setSheetOpen(!countrySheet?.classList.contains("open"));
+        return;
+      }
+      countrySelector.classList.toggle("active");
+    });
+
+    options.forEach((option) => {
+      option.addEventListener("click", (e) => {
+        e.preventDefault();
+        const flag = option.getAttribute("data-flag");
+        const name = option.getAttribute("data-country");
+        if (globeIcon)
+          globeIcon.innerHTML = `<span class="country-flag"><img src="${flag}" alt="${name} flag" /></span>`;
+        if (currentLabel) currentLabel.textContent = name;
+        countrySelector.classList.remove("active");
+        const href = option.getAttribute("href");
+        const target = option.getAttribute("target");
+        if (href) {
+          if (target === "_blank") {
+            window.open(href, "_blank");
+          } else {
+            window.location.href = href;
+          }
+        }
+      });
+    });
+  }
+
+  if (countrySheet) {
+    const sheetOptions = countrySheet.querySelectorAll(
+      "[data-country-sheet-option]"
+    );
+    sheetOptions.forEach((option) => {
+      option.addEventListener("click", (e) => {
+        e.preventDefault();
+        setSheetOpen(false);
+        const href = option.getAttribute("href");
+        const target = option.getAttribute("target");
+        if (href) {
+          if (target === "_blank") {
+            window.open(href, "_blank");
+          } else {
+            window.location.href = href;
+          }
+        }
+      });
+    });
+  }
+
+  countrySheetClose?.addEventListener("click", () => setSheetOpen(false));
+  countryBackdrop?.addEventListener("click", () => setSheetOpen(false));
+
+  document.addEventListener("click", (e) => {
+    if (!e.target.closest(".has-dropdown")) {
+      dropdownItems.forEach((item) => item.classList.remove("active"));
+    }
+    if (countrySelector && !e.target.closest("[data-country-selector]")) {
+      countrySelector.classList.remove("active");
+    }
+  });
+
+  mobileToggle?.addEventListener("click", () => {
+    setMenuOpen(!mobileMenu?.classList.contains("open"));
+  });
+  mobileClose?.addEventListener("click", () => setMenuOpen(false));
+
+  mobileMenu?.addEventListener("click", (e) => {
+    const link = e.target.closest("a[href]");
+    if (!link) return;
+    setMenuOpen(false);
+  });
+
+  document.addEventListener("keydown", (e) => {
+    if (e.key !== "Escape") return;
+    dropdownItems.forEach((item) => item.classList.remove("active"));
+    countrySelector?.classList.remove("active");
+    setSheetOpen(false);
+    setMenuOpen(false);
+  });
+
+  function handleTicker() {
+    const ticker = document.getElementById("ct-announcement-ticker-inner");
+    const main = document.getElementById("main");
+    const hero = document.getElementById("hero");
+    const navContainer = navbar.querySelector(".glass-nav-outer");
+    if (!ticker) return;
+
+    const isVisible = !!(ticker.offsetWidth || ticker.offsetHeight || ticker.getClientRects().length);
+    if (isVisible) {
+      const tickerHeight = ticker.offsetHeight;
+      const isInsideHero = hero && hero.contains(ticker);
+
+      if (isInsideHero) {
+        if (ticker.style.marginTop !== "76px") {
+          ticker.style.marginTop = "76px";
+        }
+        if (navContainer) {
+          navContainer.style.top = "";
+        }
+        if (main) {
+          main.style.marginTop = "";
+        }
+      } else {
+        if (ticker.style.marginTop !== "") {
+          ticker.style.marginTop = "";
+        }
+        if (main) {
+          main.style.marginTop = tickerHeight + "px";
+        }
+        if (navContainer) {
+          const tickerRect = ticker.getBoundingClientRect();
+          const isStickyOrFixed = window.scrollY > 5 && tickerRect.top > -10;
+          if (isStickyOrFixed) {
+            navContainer.style.top = (tickerHeight + 16) + "px";
+          } else {
+            if (window.scrollY < tickerHeight) {
+              navContainer.style.top = (tickerHeight + 16 - window.scrollY) + "px";
+            } else {
+              navContainer.style.top = "16px";
+            }
+          }
+        }
+      }
+    } else {
+      if (ticker) {
+        ticker.style.marginTop = "";
+      }
+      if (main) {
+        main.style.marginTop = "";
+      }
+      if (navContainer) {
+        navContainer.style.top = "";
+      }
+    }
+  }
+
+  window.addEventListener("scroll", handleTicker);
+  window.addEventListener("resize", handleTicker);
+  if (typeof MutationObserver !== "undefined") {
+    const observer = new MutationObserver(handleTicker);
+    observer.observe(document.body, { childList: true, subtree: true, attributes: true });
+  }
+  handleTicker();
+})();
 
 // Reveal
 const rv=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');rv.unobserve(e.target);}}),{threshold:.08});
