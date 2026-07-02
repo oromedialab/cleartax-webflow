@@ -43,6 +43,8 @@ body { background:var(--bg); color:var(--text); font-family:'Inter Tight',sans-s
 .ct-navbar-inner { max-width:1200px; margin:0 auto; padding:0 24px; display:flex; align-items:center; height:64px; gap:6px; }
 .ct-logo { display:flex; align-items:center; text-decoration:none; margin-right:16px; }
 .ct-logo-wordmark { font-family:'Inter Tight',sans-serif; font-size:1.35rem; font-weight:700; color:#111827; letter-spacing:-0.03em; line-height:1; }
+.ct-nav-menu { display:flex; align-items:center; flex:1; }
+.ct-mobile-toggle { display:none; }
 .ct-nav-items { display:flex; align-items:center; gap:2px; flex:1; }
 .ct-nav-item { position:relative; }
 .ct-nav-link { display:flex; align-items:center; gap:5px; padding:8px 14px; font-size:0.875rem; font-weight:500; color:#374151; text-decoration:none; border-radius:6px; transition:background .15s,color .15s; cursor:pointer; white-space:nowrap; border:none; background:none; font-family:'Inter Tight',sans-serif; }
@@ -50,13 +52,33 @@ body { background:var(--bg); color:var(--text); font-family:'Inter Tight',sans-s
 .ct-nav-link svg { flex-shrink:0; transition:transform .2s; }
 .ct-nav-item:hover .ct-nav-link svg,.ct-nav-item.open .ct-nav-link svg { transform:rotate(180deg); }
 .ct-dropdown { position:absolute; top:calc(100% + 8px); left:0; min-width:240px; background:#fff; border:1px solid #e5e7eb; border-radius:10px; box-shadow:0 10px 40px rgba(0,0,0,0.12); padding:6px; opacity:0; visibility:hidden; transform:translateY(-6px); transition:opacity .18s,transform .18s,visibility .18s; z-index:400; }
-.ct-nav-item:hover .ct-dropdown,.ct-nav-item.open .ct-dropdown { opacity:1; visibility:visible; transform:translateY(0); }
+@media (min-width: 769px) {
+  .ct-nav-item:hover .ct-dropdown,.ct-nav-item.open .ct-dropdown { opacity:1; visibility:visible; transform:translateY(0); }
+}
 .ct-dropdown a { display:flex; align-items:center; gap:10px; padding:10px 14px; font-size:0.855rem; font-weight:500; color:#374151; text-decoration:none; border-radius:7px; transition:background .14s,color .14s; }
 .ct-dropdown a:hover { background:#eff6ff; color:#1a56db; }
 .ct-dropdown a .dd-icon { width:30px; height:30px; border-radius:7px; background:#eff6ff; display:flex; align-items:center; justify-content:center; font-size:0.9rem; flex-shrink:0; }
 .ct-nav-right { display:flex; align-items:center; gap:10px; margin-left:auto; }
 .ct-nav-btn { display:inline-flex; align-items:center; gap:7px; background:linear-gradient(135deg,#110072,#7A5698); color:#fff; font-family:'Inter Tight',sans-serif; font-size:0.8rem; font-weight:700; border:none; border-radius:50px; padding:9px 20px; cursor:pointer; text-decoration:none; white-space:nowrap; transition:opacity .2s; }
 .ct-nav-btn:hover { opacity:.88; }
+
+@media (max-width: 768px) {
+  .ct-navbar-inner { height: 56px; padding: 0 16px; }
+  .progress-bar { top: 56px; }
+  .ct-mobile-toggle { display: flex; align-items: center; justify-content: center; background: none; border: none; color: #374151; cursor: pointer; padding: 8px; margin-left: auto; }
+  .ct-mobile-toggle svg { width: 24px; height: 24px; }
+  .ct-nav-menu { display: none; position: absolute; top: 56px; left: 0; right: 0; background: #fff; border-top: 1px solid #f3f4f6; border-bottom: 1px solid #e5e7eb; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); padding: 16px 24px; flex-direction: column; align-items: stretch; gap: 16px; z-index: 299; max-height: calc(100vh - 56px); overflow-y: auto; }
+  .ct-nav-menu.open { display: flex; }
+  .ct-nav-items { flex-direction: column; align-items: stretch; gap: 8px; width: 100%; }
+  .ct-nav-link { width: 100%; padding: 12px 16px; justify-content: space-between; border-radius: 8px; background: #f9fafb; }
+  .ct-nav-link:hover { background: #f3f4f6; }
+  .ct-dropdown { position: static; opacity: 1; visibility: visible; transform: none; box-shadow: none; border: none; padding: 0 0 0 12px; margin-top: 4px; display: none; transition: none; }
+  .ct-nav-item.open .ct-dropdown { display: block; }
+  .ct-dropdown a { padding: 10px 12px; background: transparent; }
+  .ct-dropdown a:hover { background: #eff6ff; }
+  .ct-nav-right { margin-left: 0; width: 100%; padding-top: 8px; border-top: 1px solid #f3f4f6; }
+  .ct-nav-btn { width: 100%; justify-content: center; padding: 12px 20px; font-size: 0.9rem; }
+}
 .ct-subheader { background:#fff; border-bottom:1px solid #e5e7eb; padding:0 24px; }
 .ct-subheader-inner { max-width:1200px; margin:0 auto; height:52px; display:flex; align-items:center; justify-content:space-between; }
 .ct-subheader-left { display:flex; align-items:center; gap:14px; }
@@ -64,22 +86,22 @@ body { background:var(--bg); color:var(--text); font-family:'Inter Tight',sans-s
 .ct-subheader-title { font-size:0.88rem; font-weight:700; color:#111827; letter-spacing:-0.01em; line-height:1.2; }
 .ct-subheader-subtitle { font-size:0.68rem; font-weight:500; color:#6b7280; letter-spacing:0.06em; text-transform:uppercase; margin-top:1px; }
 .ct-subheader-badge { display:inline-flex; align-items:center; padding:6px 16px; border:1.5px solid #d8b4fe; border-radius:100px; font-size:0.68rem; font-weight:700; letter-spacing:0.1em; text-transform:uppercase; color:#7c3aed; background:#faf5ff; }
-.progress-bar { position:sticky; top:64px; z-index:190; background:#fff; border-bottom:1px solid var(--border); padding:0 2rem; }
-.progress-inner { max-width:900px; margin:0 auto; padding:12px 0 10px; }
-.prog-sections { display:flex; gap:5px; margin-bottom:9px; }
-.prog-seg { flex:1; height:3px; border-radius:2px; background:var(--bg-alt); transition:background .35s; }
-.prog-seg.done { background:#1a56db; }
-.prog-seg.active { background:linear-gradient(90deg,#1a56db,#3b82f6); }
-.prog-meta { display:flex; justify-content:space-between; align-items:center; }
-.prog-label { font-size:0.73rem; color:var(--text-muted); }
-.prog-label strong { color:#1a56db; font-weight:600; }
-.prog-pct { font-size:0.73rem; color:var(--text-dim); }
+.progress-bar { position:sticky; top:55px; z-index:190; background:#fff; border-bottom:1px solid var(--border); padding:0 2rem; }
+.progress-inner { max-width:900px; margin:0 auto; padding:12px 0; display:flex; justify-content:center; align-items:center; }
+.prog-label { font-size:0.82rem; font-weight:700; color:#1a56db; letter-spacing:0.04em; display:flex; align-items:center; gap:8px; text-transform:uppercase; }
+.prog-dot { width:6px; height:6px; border-radius:50%; background:#1a56db; display:inline-block; animation:progPulse 2s infinite; }
+@keyframes progPulse {
+  0% { transform:scale(0.95); box-shadow:0 0 0 0 rgba(26,86,219,0.7); }
+  70% { transform:scale(1); box-shadow:0 0 0 5px rgba(26,86,219,0); }
+  100% { transform:scale(0.95); box-shadow:0 0 0 0 rgba(26,86,219,0); }
+}
 .hero { background:linear-gradient(180deg,#eff6ff 0%,#fff 100%); border-bottom:1px solid var(--border); padding:72px 2rem 56px; text-align:center; position:relative; overflow:hidden; }
 .hero::before { content:''; position:absolute; inset:0; background:radial-gradient(ellipse 70% 60% at 50% 0%,rgba(26,86,219,0.06) 0%,transparent 70%); pointer-events:none; }
 .hero-content { position:relative; z-index:1; max-width:800px; margin:0 auto; }
 .hero h1 { font-family:'DM Serif Display',serif; font-size:clamp(2rem,5vw,3rem); color:var(--navy); line-height:1.2; margin-bottom:18px; }
 .hero-sub { font-size:1rem; color:var(--text-muted); max-width:580px; margin:0 auto 28px; line-height:1.75; }
 .hero-time-box { display:inline-flex; align-items:center; gap:9px; background:#fff; border:1px solid var(--blue-border); border-radius:50px; padding:12px 28px; font-size:0.88rem; font-weight:600; color:#1a56db; box-shadow:var(--shadow); margin-top:4px; }
+.hero-time-box svg { flex-shrink:0; }
 .mandate-banner { background:#f0f7ff; border:1px solid #bfdbfe; border-radius:var(--radius); padding:18px 22px; margin-bottom:36px; display:flex; flex-wrap:wrap; gap:16px; }
 .mandate-item { display:flex; align-items:flex-start; gap:10px; flex:1; min-width:220px; }
 .mandate-dot { width:8px; height:8px; border-radius:50%; background:#1a56db; flex-shrink:0; margin-top:6px; }
@@ -103,7 +125,7 @@ body { background:var(--bg); color:var(--text); font-family:'Inter Tight',sans-s
 .section-emoji { width:46px; height:46px; border-radius:12px; border:1px solid var(--border); background:#fafbfc; display:flex; align-items:center; justify-content:center; font-size:1.4rem; flex-shrink:0; }
 .section-tag { font-size:0.65rem; font-weight:600; letter-spacing:0.1em; text-transform:uppercase; color:#1a56db; margin-bottom:2px; }
 .section-title { font-family:'DM Serif Display',serif; font-size:1.1rem; color:var(--navy); }
-.q-card { background:var(--bg-card); border:1px solid var(--border); border-radius:var(--radius); padding:26px 26px 22px; margin-bottom:14px; transition:border-color .25s,box-shadow .25s; }
+.q-card { background:var(--bg-card); border:1px solid #bbb; border-radius:var(--radius); padding:26px 26px 22px; margin-bottom:14px; transition:border-color .25s,box-shadow .25s; }
 .q-card:hover { border-color:var(--border-hover); }
 .q-card.answered { border-color:rgba(26,86,219,0.3); box-shadow:0 0 0 3px rgba(26,86,219,0.04); }
 .q-card.error { border-color:rgba(220,53,69,0.4); box-shadow:0 0 0 3px rgba(220,53,69,0.06); }
@@ -121,6 +143,8 @@ body { background:var(--bg); color:var(--text); font-family:'Inter Tight',sans-s
 .opt-radio:checked::after { transform:translate(-50%,-50%) scale(1); }
 .opt-text { font-size:0.82rem; color:var(--text-muted); line-height:1.5; }
 .opt-label:has(input:checked) .opt-text { color:var(--text); }
+.opt-level-tag { display:inline-block; font-size:0.65rem; font-weight:700; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.05em; margin-bottom:4px; transition:color 0.2s; }
+.opt-label:has(input:checked) .opt-level-tag { color:#1a56db; }
 .scale-legend { display:flex; flex-wrap:wrap; gap:8px; margin:32px 0; padding:14px 18px; background:var(--bg-alt); border-radius:var(--radius-sm); border:1px solid var(--border); }
 .scale-item { display:flex; align-items:center; gap:6px; font-size:0.74rem; color:var(--text-muted); }
 .scale-dot { width:8px; height:8px; border-radius:50%; background:#1a56db; flex-shrink:0; }
@@ -163,9 +187,8 @@ body { background:var(--bg); color:var(--text); font-family:'Inter Tight',sans-s
 .ct-footer-legal a:hover { color:#9ca3af; }
 @media(max-width:640px){
   .hero h1{font-size:1.75rem}
-  .q-card{padding:18px 14px} .info-card{padding:20px} .ct-navbar-inner{padding:0 16px}
+  .q-card{padding:18px 14px} .info-card{padding:20px}
   .ct-footer-bottom-wrap{padding:0 20px} .ct-footer-bottom{flex-direction:column;align-items:flex-start;gap:10px}
-  .progress-bar{top:56px}
 }
 
 /* ============ HUBSPOT FORM STYLING OVERRIDES ============ */
@@ -279,34 +302,40 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     <a class="ct-logo" href="https://www.cleartax.com/electronic-invoicing" target="_blank">
       <span class="ct-logo-wordmark"><span>clear</span><span>tax</span></span>
     </a>
-    <div class="ct-nav-items">
-      <div class="ct-nav-item" id="nav-products">
-        <button class="ct-nav-link" onclick="toggleNav('nav-products')">Products
-          <svg fill="none" height="14" viewBox="0 0 14 14" width="14"><path d="M3 5l4 4 4-4" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"></path></svg>
-        </button>
-        <div class="ct-dropdown">
-          <a href="https://www.cleartax.com/electronic-invoicing" rel="noopener" target="_blank"><div class="dd-icon">🌐</div>Global E-Invoicing</a>
-          <a href="https://www.cleartax.com/ae/e-invoicing-software" rel="noopener" target="_blank"><div class="dd-icon">🇦🇪</div>UAE E-Invoicing</a>
-          <a href="https://www.cleartax.com/sa/e-invoicing-software" rel="noopener" target="_blank"><div class="dd-icon">🇸🇦</div>Saudi Arabia</a>
-          <a href="https://www.cleartax.com/fr/en" rel="noopener" target="_blank"><div class="dd-icon">🇫🇷</div>France</a>
+    <button class="ct-mobile-toggle" onclick="toggleMobileMenu()" aria-label="Toggle Menu">
+      <svg class="icon-menu" fill="none" height="24" viewBox="0 0 24 24" width="24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"></path></svg>
+      <svg class="icon-close" fill="none" height="24" viewBox="0 0 24 24" width="24" stroke="currentColor" stroke-width="2" style="display:none;"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path></svg>
+    </button>
+    <div class="ct-nav-menu" id="ctNavMenu">
+      <div class="ct-nav-items">
+        <div class="ct-nav-item" id="nav-products">
+          <button class="ct-nav-link" onclick="toggleNav('nav-products')">Products
+            <svg fill="none" height="14" viewBox="0 0 14 14" width="14"><path d="M3 5l4 4 4-4" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"></path></svg>
+          </button>
+          <div class="ct-dropdown">
+            <a href="https://www.cleartax.com/electronic-invoicing" rel="noopener" target="_blank"><div class="dd-icon">🌐</div>Global E-Invoicing</a>
+            <a href="https://www.cleartax.com/ae/e-invoicing-software" rel="noopener" target="_blank"><div class="dd-icon">🇦🇪</div>UAE E-Invoicing</a>
+            <a href="https://www.cleartax.com/sa/e-invoicing-software" rel="noopener" target="_blank"><div class="dd-icon">🇸🇦</div>Saudi Arabia</a>
+            <a href="https://www.cleartax.com/fr/en" rel="noopener" target="_blank"><div class="dd-icon">🇫🇷</div>France</a>
+          </div>
         </div>
-      </div>
-      <div class="ct-nav-item" id="nav-resources">
-        <button class="ct-nav-link" onclick="toggleNav('nav-resources')">Resources
-          <svg fill="none" height="14" viewBox="0 0 14 14" width="14"><path d="M3 5l4 4 4-4" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"></path></svg>
-        </button>
-        <div class="ct-dropdown">
-          <a href="https://www.cleartax.com/electronic-invoicing" rel="noopener" target="_blank"><div class="dd-icon">📝</div>Blogs</a>
-          <a href="https://www.cleartax.com/case-studies" rel="noopener" target="_blank"><div class="dd-icon">📊</div>Case Studies</a>
-          <a href="https://www.cleartax.com/partners" rel="noopener" target="_blank"><div class="dd-icon">🤝</div>Partners</a>
+        <div class="ct-nav-item" id="nav-resources">
+          <button class="ct-nav-link" onclick="toggleNav('nav-resources')">Resources
+            <svg fill="none" height="14" viewBox="0 0 14 14" width="14"><path d="M3 5l4 4 4-4" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"></path></svg>
+          </button>
+          <div class="ct-dropdown">
+            <a href="https://www.cleartax.com/electronic-invoicing" rel="noopener" target="_blank"><div class="dd-icon">📝</div>Blogs</a>
+            <a href="https://www.cleartax.com/case-studies" rel="noopener" target="_blank"><div class="dd-icon">📊</div>Case Studies</a>
+            <a href="https://www.cleartax.com/partners" rel="noopener" target="_blank"><div class="dd-icon">🤝</div>Partners</a>
+          </div>
         </div>
+        <a class="ct-nav-link" href="https://www.cleartax.com/electronic-invoicing" rel="noopener" target="_blank">Contact Us</a>
       </div>
-      <a class="ct-nav-link" href="https://www.cleartax.com/electronic-invoicing" rel="noopener" target="_blank">Contact Us</a>
-    </div>
-    <div class="ct-nav-right">
-      <a class="ct-nav-btn" href="#" id="navBookDemo">Book a Demo
-        <svg fill="none" height="14" viewBox="0 0 16 16" width="14"><path d="M3 8h10m0 0L9 4m4 4L9 12" stroke="white" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"></path></svg>
-      </a>
+      <div class="ct-nav-right">
+        <a class="ct-nav-btn" href="#" id="navBookDemo">Book a Demo
+          <svg fill="none" height="14" viewBox="0 0 16 16" width="14"><path d="M3 8h10m0 0L9 4m4 4L9 12" stroke="white" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"></path></svg>
+        </a>
+      </div>
     </div>
   </div>
 </nav>
@@ -333,16 +362,9 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 <!-- PROGRESS BAR -->
 <div class="progress-bar">
   <div class="progress-inner">
-    <div class="prog-sections" id="progSections">
-      <div class="prog-seg" data-s="0"></div>
-      <div class="prog-seg" data-s="1"></div>
-      <div class="prog-seg" data-s="2"></div>
-      <div class="prog-seg" data-s="3"></div>
-      <div class="prog-seg" data-s="4"></div>
-    </div>
-    <div class="prog-meta">
-      <div class="prog-label"><strong id="answeredCount">0</strong> of 5 questions answered</div>
-      <div class="prog-pct" id="progPct">0%</div>
+    <div class="prog-label">
+      <span class="prog-dot"></span>
+      <span id="activeQuestionText">Question 1 of 5</span>
     </div>
   </div>
 </div>
@@ -358,7 +380,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         <circle cx="12" cy="12" r="9" stroke="#1a56db" stroke-width="1.7"/>
         <path d="M12 7v5l3 3" stroke="#1a56db" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.7"/>
       </svg>
-      Take the ~8 minute survey to unlock early access to the full report.
+      Take the survey in less than a minute to unlock early access to the full report.
     </div>
   </div>
 </section>
@@ -406,13 +428,13 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         </div>
         <div class="options-grid">
           <label class="opt-label"><input class="opt-radio" name="q1" type="radio" value="L1"/>
-            <div><div class="opt-text">Not started — our AR and AP workflows are unchanged; we are treating e-invoicing as a format change, not a process change.</div></div></label>
+            <div><div class="opt-level-tag">L1 — Early Stage</div><div class="opt-text">Not started — our AR and AP workflows are unchanged; we are treating e-invoicing as a format change, not a process change.</div></div></label>
           <label class="opt-label"><input class="opt-radio" name="q1" type="radio" value="L2"/>
-            <div><div class="opt-text">We have identified that workflows need to change but redesign has not started; current plan is to manually handle structured invoices within existing processes.</div></div></label>
+            <div><div class="opt-level-tag">L2 — Developing</div><div class="opt-text">We have identified that workflows need to change but redesign has not started; current plan is to manually handle structured invoices within existing processes.</div></div></label>
           <label class="opt-label"><input class="opt-radio" name="q1" type="radio" value="L3"/>
-            <div><div class="opt-text">AR and AP workflows are being redesigned — automated posting rules, validation triggers, and exception queues are defined but not fully tested.</div></div></label>
+            <div><div class="opt-level-tag">L3 — Progressing</div><div class="opt-text">AR and AP workflows are being redesigned — automated posting rules, validation triggers, and exception queues are defined but not fully tested.</div></div></label>
           <label class="opt-label"><input class="opt-radio" name="q1" type="radio" value="L4"/>
-            <div><div class="opt-text">Fully redesigned and tested — structured invoice data drives automated three-way matching, real-time posting, and exception routing in both AR and AP with minimal manual intervention.</div></div></label>
+            <div><div class="opt-level-tag">L4 — Advanced</div><div class="opt-text">Fully redesigned and tested — structured invoice data drives automated three-way matching, real-time posting, and exception routing in both AR and AP with minimal manual intervention.</div></div></label>
         </div>
       </div>
 
@@ -426,13 +448,13 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         </div>
         <div class="options-grid">
           <label class="opt-label"><input class="opt-radio" name="q2" type="radio" value="L1"/>
-            <div><div class="opt-text">No — we archive PDFs or ERP exports; original XRechnung or ZUGFeRD XML files are not preserved separately.</div></div></label>
+            <div><div class="opt-level-tag">L1 — Early Stage</div><div class="opt-text">No — we archive PDFs or ERP exports; original XRechnung or ZUGFeRD XML files are not preserved separately.</div></div></label>
           <label class="opt-label"><input class="opt-radio" name="q2" type="radio" value="L2"/>
-            <div><div class="opt-text">Digital archiving exists but we have not validated that original structured formats are preserved unaltered or that GoBD integrity requirements are met.</div></div></label>
+            <div><div class="opt-level-tag">L2 — Developing</div><div class="opt-text">Digital archiving exists but we have not validated that original structured formats are preserved unaltered or that GoBD integrity requirements are met.</div></div></label>
           <label class="opt-label"><input class="opt-radio" name="q2" type="radio" value="L3"/>
-            <div><div class="opt-text">GoBD-compliant archiving covers most flows; gaps remain for some legacy EDI formats and email-delivered invoices where XML attachments are not always captured.</div></div></label>
+            <div><div class="opt-level-tag">L3 — Progressing</div><div class="opt-text">GoBD-compliant archiving covers most flows; gaps remain for some legacy EDI formats and email-delivered invoices where XML attachments are not always captured.</div></div></label>
           <label class="opt-label"><input class="opt-radio" name="q2" type="radio" value="L4"/>
-            <div><div class="opt-text">Fully compliant — original structured formats preserved unaltered and tamper-proof across all channels, retrievable within hours for any period in the 10-year window.</div></div></label>
+            <div><div class="opt-level-tag">L4 — Advanced</div><div class="opt-text">Fully compliant — original structured formats preserved unaltered and tamper-proof across all channels, retrievable within hours for any period in the 10-year window.</div></div></label>
         </div>
       </div>
 
@@ -444,13 +466,13 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         </div>
         <div class="options-grid">
           <label class="opt-label"><input class="opt-radio" name="q3" type="radio" value="L1"/>
-            <div><div class="opt-text">Not addressed — compliance work has focused on standard invoice flows; complex types have not been scoped.</div></div></label>
+            <div><div class="opt-level-tag">L1 — Early Stage</div><div class="opt-text">Not addressed — compliance work has focused on standard invoice flows; complex types have not been scoped.</div></div></label>
           <label class="opt-label"><input class="opt-radio" name="q3" type="radio" value="L2"/>
-            <div><div class="opt-text">We know these have specific requirements but workflows are undocumented and testing has not been planned.</div></div></label>
+            <div><div class="opt-level-tag">L2 — Developing</div><div class="opt-text">We know these have specific requirements but workflows are undocumented and testing has not been planned.</div></div></label>
           <label class="opt-label"><input class="opt-radio" name="q3" type="radio" value="L3"/>
-            <div><div class="opt-text">Most types are documented and tested; a few edge cases (self-billing in specific business units, multi-currency flows) remain open.</div></div></label>
+            <div><div class="opt-level-tag">L3 — Progressing</div><div class="opt-text">Most types are documented and tested; a few edge cases (self-billing in specific business units, multi-currency flows) remain open.</div></div></label>
           <label class="opt-label"><input class="opt-radio" name="q3" type="radio" value="L4"/>
-            <div><div class="opt-text">All types fully documented, tested against EN 16931, and owned — including structured credit notes, self-billing, FX invoices, and intercompany corrections.</div></div></label>
+            <div><div class="opt-level-tag">L4 — Advanced</div><div class="opt-text">All types fully documented, tested against EN 16931, and owned — including structured credit notes, self-billing, FX invoices, and intercompany corrections.</div></div></label>
         </div>
       </div>
 
@@ -462,13 +484,13 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         </div>
         <div class="options-grid">
           <label class="opt-label"><input class="opt-radio" name="q4" type="radio" value="L1"/>
-            <div><div class="opt-text">No — each format and country is handled in isolation; there is no consolidated view.</div></div></label>
+            <div><div class="opt-level-tag">L1 — Early Stage</div><div class="opt-text">No — each format and country is handled in isolation; there is no consolidated view.</div></div></label>
           <label class="opt-label"><input class="opt-radio" name="q4" type="radio" value="L2"/>
-            <div><div class="opt-text">We have visibility within Germany but no unified view across other markets or formats.</div></div></label>
+            <div><div class="opt-level-tag">L2 — Developing</div><div class="opt-text">We have visibility within Germany but no unified view across other markets or formats.</div></div></label>
           <label class="opt-label"><input class="opt-radio" name="q4" type="radio" value="L3"/>
-            <div><div class="opt-text">A centralised view is being built; Germany and one or two other markets are connected but coverage is incomplete.</div></div></label>
+            <div><div class="opt-level-tag">L3 — Progressing</div><div class="opt-text">A centralised view is being built; Germany and one or two other markets are connected but coverage is incomplete.</div></div></label>
           <label class="opt-label"><input class="opt-radio" name="q4" type="radio" value="L4"/>
-            <div><div class="opt-text">Full consolidated view in place — all formats and markets flow into a single platform with unified tracking, exception management, and compliance monitoring.</div></div></label>
+            <div><div class="opt-level-tag">L4 — Advanced</div><div class="opt-text">Full consolidated view in place — all formats and markets flow into a single platform with unified tracking, exception management, and compliance monitoring.</div></div></label>
         </div>
       </div>
 
@@ -480,13 +502,13 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         </div>
         <div class="options-grid">
           <label class="opt-label"><input class="opt-radio" name="q5" type="radio" value="L1"/>
-            <div><div class="opt-text">Not on our radar — we are focused solely on meeting the January 2027 issuance deadline.</div></div></label>
+            <div><div class="opt-level-tag">L1 — Early Stage</div><div class="opt-text">Not on our radar — we are focused solely on meeting the January 2027 issuance deadline.</div></div></label>
           <label class="opt-label"><input class="opt-radio" name="q5" type="radio" value="L2"/>
-            <div><div class="opt-text">We are aware of ViDA but have not built any architectural flexibility for future reporting into our current implementation.</div></div></label>
+            <div><div class="opt-level-tag">L2 — Developing</div><div class="opt-text">We are aware of ViDA but have not built any architectural flexibility for future reporting into our current implementation.</div></div></label>
           <label class="opt-label"><input class="opt-radio" name="q5" type="radio" value="L3"/>
-            <div><div class="opt-text">Our architecture is ViDA-aware — our ERP and format strategy can extend to a reporting layer without a full rebuild.</div></div></label>
+            <div><div class="opt-level-tag">L3 — Progressing</div><div class="opt-text">Our architecture is ViDA-aware — our ERP and format strategy can extend to a reporting layer without a full rebuild.</div></div></label>
           <label class="opt-label"><input class="opt-radio" name="q5" type="radio" value="L4"/>
-            <div><div class="opt-text">ViDA-aligned roadmap in place — structured data, master data governance, and vendor strategy are all designed to absorb digital reporting obligations as they are confirmed.</div></div></label>
+            <div><div class="opt-level-tag">L4 — Advanced</div><div class="opt-text">ViDA-aligned roadmap in place — structured data, master data governance, and vendor strategy are all designed to absorb digital reporting obligations as they are confirmed.</div></div></label>
         </div>
       </div>
 
@@ -646,20 +668,53 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     questions.forEach(function(q) {
       var checked = !!document.querySelector('input[name="'+q+'"]:checked');
       var card = document.getElementById('qc-'+q);
-      if (checked) { done++; card.classList.add('answered'); }
-      else { card.classList.remove('answered'); }
+      if (card) {
+        if (checked) { done++; card.classList.add('answered'); }
+        else { card.classList.remove('answered'); }
+      }
     });
-    document.getElementById('answeredCount').textContent = done;
-    document.getElementById('progPct').textContent = Math.round((done / questions.length) * 100) + '%';
-    for (var s = 0; s < 5; s++) {
-      var keys = sectionMap[s];
-      var d = keys.filter(function(i){ return !!document.querySelector('input[name="'+questions[i]+'"]:checked'); }).length;
-      var el = document.querySelector('.prog-seg[data-s="'+s+'"]');
-      el.className = 'prog-seg' + (d === keys.length ? ' done' : d > 0 ? ' active' : '');
+  }
+
+  function updateActiveQuestionOnScroll() {
+    var bestQ = 1;
+    var minDiff = Infinity;
+    
+    questions.forEach(function(q, index) {
+      var card = document.getElementById('qc-' + q);
+      if (card) {
+        var rect = card.getBoundingClientRect();
+        var score = Math.abs(rect.top - 140);
+        if (score < minDiff) {
+          minDiff = score;
+          bestQ = index + 1;
+        }
+      }
+    });
+
+    var infoCard = document.querySelector('.info-card');
+    if (infoCard) {
+      var rect = infoCard.getBoundingClientRect();
+      if (rect.top < window.innerHeight * 0.5) {
+        var activeText = document.getElementById('activeQuestionText');
+        if (activeText) {
+          activeText.textContent = 'Almost Done — Your Details';
+        }
+        return;
+      }
+    }
+
+    var activeText = document.getElementById('activeQuestionText');
+    if (activeText) {
+      activeText.textContent = 'Question ' + bestQ + ' of 5';
     }
   }
+
   document.querySelectorAll('input[type=radio]').forEach(function(r){ r.addEventListener('change', updateProgress); });
   updateProgress();
+
+  window.addEventListener('scroll', updateActiveQuestionOnScroll);
+  window.addEventListener('resize', updateActiveQuestionOnScroll);
+  updateActiveQuestionOnScroll();
 
   function toggleNav(id) {
     var item = document.getElementById(id);
@@ -667,15 +722,64 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     document.querySelectorAll('.ct-nav-item.open').forEach(function(el){ el.classList.remove('open'); });
     if (!isOpen) item.classList.add('open');
   }
+  function toggleMobileMenu() {
+    var menu = document.getElementById('ctNavMenu');
+    var btn = document.querySelector('.ct-mobile-toggle');
+    if (!menu) return;
+    var isOpen = menu.classList.contains('open');
+    if (isOpen) {
+      menu.classList.remove('open');
+      if (btn) {
+        btn.classList.remove('open');
+        var iconMenu = btn.querySelector('.icon-menu');
+        var iconClose = btn.querySelector('.icon-close');
+        if (iconMenu) iconMenu.style.display = 'block';
+        if (iconClose) iconClose.style.display = 'none';
+      }
+    } else {
+      menu.classList.add('open');
+      if (btn) {
+        btn.classList.add('open');
+        var iconMenu = btn.querySelector('.icon-menu');
+        var iconClose = btn.querySelector('.icon-close');
+        if (iconMenu) iconMenu.style.display = 'none';
+        if (iconClose) iconClose.style.display = 'block';
+      }
+    }
+  }
   document.addEventListener('click', function(e) {
     if (!e.target.closest('.ct-nav-item')) {
       document.querySelectorAll('.ct-nav-item.open').forEach(function(el){ el.classList.remove('open'); });
     }
+    var nav = document.querySelector('.ct-navbar');
+    var menu = document.getElementById('ctNavMenu');
+    var btn = document.querySelector('.ct-mobile-toggle');
+    if (menu && menu.classList.contains('open')) {
+      if (!nav || !nav.contains(e.target) || 
+          e.target.closest('.ct-nav-link:not([onclick])') || 
+          e.target.closest('.ct-nav-btn') || 
+          e.target.closest('.ct-dropdown a')) {
+        menu.classList.remove('open');
+        if (btn) {
+          btn.classList.remove('open');
+          var iconMenu = btn.querySelector('.icon-menu');
+          var iconClose = btn.querySelector('.icon-close');
+          if (iconMenu) iconMenu.style.display = 'block';
+          if (iconClose) iconClose.style.display = 'none';
+        }
+      }
+    }
   });
-  document.getElementById('navBookDemo').addEventListener('click', function(e) {
-    e.preventDefault();
-    document.querySelector('.info-card').scrollIntoView({ behavior:'smooth', block:'start' });
-  });
+  var bookDemoBtn = document.getElementById('navBookDemo');
+  if (bookDemoBtn) {
+    bookDemoBtn.addEventListener('click', function(e) {
+      e.preventDefault();
+      var infoCard = document.querySelector('.info-card');
+      if (infoCard) {
+        infoCard.scrollIntoView({ behavior:'smooth', block:'start' });
+      }
+    });
+  }
 
   function showToast(msg, isErr) {
     if (isErr === undefined) isErr = true;
