@@ -4694,10 +4694,13 @@ Save taxes with Clear by investing in tax saving mutual funds (ELSS) online. Our
 </div>
 
 
-<link href="https://assets1.cleartax-cdn.com/cleartax-frontend/slick/1604995700_slick.css" rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.8.1/slick.min.css" rel="stylesheet">
 
-<script type="text/javascript" src="https://assets1.cleartax-cdn.com/content-prod/3rdparty/jquery/jquery-2.2.1.min.js"></script>
-<script type="text/javascript" src="https://assets1.cleartax-cdn.com/cleartax-frontend/slick/1603112319_slick.min.js"></script>
+<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.8.1/slick.min.js"></script>
+<script>
+    window.slick_jQuery = jQuery;
+</script>
 
 <script>
 	
@@ -4991,38 +4994,54 @@ var hideAndShowCTA = function () {
 window.addEventListener("scroll", hideAndShowCTA);
 </script>
 
-<script>
-const settingsTestimonial = {
-        infinite: false,
-        slidesToShow: 1,
-        slidesToScroll: 1,
-        nextArrow: "#testimonialRightButton",
-        prevArrow: "#testimonialLeftButton",
-        responsive: [
-        {
-            breakpoint: 768,
-            settings: {
-            slidesToShow: 1,
-            slidesToScroll: 1,
-            arrows: false,
-            dots: true,
-            dotsClass: "custom-dots", //slick generates this <ul.custom-dots> within the appendDots container
-            customPaging: function (slider, i) {
-                //is required to use our custom dots
-                return '<a class="dot" role="button"></a>';
-            },
-            },
-        },
-        {
-            breakpoint: 1024,
-            settings: {
-            slidesToShow: 1,
-            slidesToScroll: 1,
-            },
-        },
-        ],
+<style>
+    #testimonialCards.slick-initialized {
+        display: block !important;
     }
-    $("#testimonialCards").slick(settingsTestimonial);
+</style>
+<script>
+    (function ($) {
+        $(document).ready(function () {
+            if (typeof $.fn.slick === 'undefined') {
+                console.warn('Slick Slider is not loaded on local jQuery context');
+                return;
+            }
+            const settingsTestimonial = {
+                infinite: false,
+                slidesToShow: 1,
+                slidesToScroll: 1,
+                nextArrow: "#testimonialRightButton",
+                prevArrow: "#testimonialLeftButton",
+                responsive: [
+                {
+                    breakpoint: 768,
+                    settings: {
+                    slidesToShow: 1,
+                    slidesToScroll: 1,
+                    arrows: false,
+                    dots: true,
+                    dotsClass: "custom-dots", //slick generates this <ul.custom-dots> within the appendDots container
+                    customPaging: function (slider, i) {
+                        //is required to use our custom dots
+                        return '<a class="dot" role="button"></a>';
+                    },
+                    },
+                },
+                {
+                    breakpoint: 1024,
+                    settings: {
+                    slidesToShow: 1,
+                    slidesToScroll: 1,
+                    },
+                },
+                ],
+            };
+
+            if ($("#testimonialCards").length) {
+                $("#testimonialCards").slick(settingsTestimonial);
+            }
+        });
+    })(window.slick_jQuery || jQuery);
 </script>
 	<script>
  var LOGOUT_API = '/f/auth/logout';
