@@ -27,6 +27,7 @@ export const PAGE_TARGETS = [
   { name: 'test',                   input: 'src/styles/test.css',                   page: 'src/pages/test.astro' },
   { name: 'france-product',          input: 'src/styles/france-product.css',          page: 'src/pages/france-product.astro' },
   { name: 'philippines-product',     input: 'src/styles/philippines-product.css',     page: 'src/pages/philippines-product.astro' },
+  { name: 'oman-product',            input: 'src/styles/oman-product.css',            page: 'src/pages/oman-product.astro' },
 ];
 
 const SHARED_IMPORT_RE = /import\s+[A-Z][A-Za-z0-9]*\s+from\s+['"]\.\.\/sections\/_shared\/([A-Za-z0-9_-]+)\.astro['"]/g;
