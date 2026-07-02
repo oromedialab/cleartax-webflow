@@ -43,6 +43,8 @@ body { background:var(--bg); color:var(--text); font-family:'Inter Tight',sans-s
 .ct-navbar-inner { max-width:1200px; margin:0 auto; padding:0 24px; display:flex; align-items:center; height:64px; gap:6px; }
 .ct-logo { display:flex; align-items:center; text-decoration:none; margin-right:16px; }
 .ct-logo-wordmark { font-family:'Inter Tight',sans-serif; font-size:1.35rem; font-weight:700; color:#111827; letter-spacing:-0.03em; line-height:1; }
+.ct-nav-menu { display:flex; align-items:center; flex:1; }
+.ct-mobile-toggle { display:none; }
 .ct-nav-items { display:flex; align-items:center; gap:2px; flex:1; }
 .ct-nav-item { position:relative; }
 .ct-nav-link { display:flex; align-items:center; gap:5px; padding:8px 14px; font-size:0.875rem; font-weight:500; color:#374151; text-decoration:none; border-radius:6px; transition:background .15s,color .15s; cursor:pointer; white-space:nowrap; border:none; background:none; font-family:'Inter Tight',sans-serif; }
@@ -50,13 +52,33 @@ body { background:var(--bg); color:var(--text); font-family:'Inter Tight',sans-s
 .ct-nav-link svg { flex-shrink:0; transition:transform .2s; }
 .ct-nav-item:hover .ct-nav-link svg,.ct-nav-item.open .ct-nav-link svg { transform:rotate(180deg); }
 .ct-dropdown { position:absolute; top:calc(100% + 8px); left:0; min-width:240px; background:#fff; border:1px solid #e5e7eb; border-radius:10px; box-shadow:0 10px 40px rgba(0,0,0,0.12); padding:6px; opacity:0; visibility:hidden; transform:translateY(-6px); transition:opacity .18s,transform .18s,visibility .18s; z-index:400; }
-.ct-nav-item:hover .ct-dropdown,.ct-nav-item.open .ct-dropdown { opacity:1; visibility:visible; transform:translateY(0); }
+@media (min-width: 769px) {
+  .ct-nav-item:hover .ct-dropdown,.ct-nav-item.open .ct-dropdown { opacity:1; visibility:visible; transform:translateY(0); }
+}
 .ct-dropdown a { display:flex; align-items:center; gap:10px; padding:10px 14px; font-size:0.855rem; font-weight:500; color:#374151; text-decoration:none; border-radius:7px; transition:background .14s,color .14s; }
 .ct-dropdown a:hover { background:#eff6ff; color:#1a56db; }
 .ct-dropdown a .dd-icon { width:30px; height:30px; border-radius:7px; background:#eff6ff; display:flex; align-items:center; justify-content:center; font-size:0.9rem; flex-shrink:0; }
 .ct-nav-right { display:flex; align-items:center; gap:10px; margin-left:auto; }
 .ct-nav-btn { display:inline-flex; align-items:center; gap:7px; background:linear-gradient(135deg,#110072,#7A5698); color:#fff; font-family:'Inter Tight',sans-serif; font-size:0.8rem; font-weight:700; border:none; border-radius:50px; padding:9px 20px; cursor:pointer; text-decoration:none; white-space:nowrap; transition:opacity .2s; }
 .ct-nav-btn:hover { opacity:.88; }
+
+@media (max-width: 768px) {
+  .ct-navbar-inner { height: 56px; padding: 0 16px; }
+  .progress-bar { top: 56px; }
+  .ct-mobile-toggle { display: flex; align-items: center; justify-content: center; background: none; border: none; color: #374151; cursor: pointer; padding: 8px; margin-left: auto; }
+  .ct-mobile-toggle svg { width: 24px; height: 24px; }
+  .ct-nav-menu { display: none; position: absolute; top: 56px; left: 0; right: 0; background: #fff; border-top: 1px solid #f3f4f6; border-bottom: 1px solid #e5e7eb; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); padding: 16px 24px; flex-direction: column; align-items: stretch; gap: 16px; z-index: 299; max-height: calc(100vh - 56px); overflow-y: auto; }
+  .ct-nav-menu.open { display: flex; }
+  .ct-nav-items { flex-direction: column; align-items: stretch; gap: 8px; width: 100%; }
+  .ct-nav-link { width: 100%; padding: 12px 16px; justify-content: space-between; border-radius: 8px; background: #f9fafb; }
+  .ct-nav-link:hover { background: #f3f4f6; }
+  .ct-dropdown { position: static; opacity: 1; visibility: visible; transform: none; box-shadow: none; border: none; padding: 0 0 0 12px; margin-top: 4px; display: none; transition: none; }
+  .ct-nav-item.open .ct-dropdown { display: block; }
+  .ct-dropdown a { padding: 10px 12px; background: transparent; }
+  .ct-dropdown a:hover { background: #eff6ff; }
+  .ct-nav-right { margin-left: 0; width: 100%; padding-top: 8px; border-top: 1px solid #f3f4f6; }
+  .ct-nav-btn { width: 100%; justify-content: center; padding: 12px 20px; font-size: 0.9rem; }
+}
 .ct-subheader { background:#fff; border-bottom:1px solid #e5e7eb; padding:0 24px; }
 .ct-subheader-inner { max-width:1200px; margin:0 auto; height:52px; display:flex; align-items:center; justify-content:space-between; }
 .ct-subheader-left { display:flex; align-items:center; gap:14px; }
@@ -64,22 +86,22 @@ body { background:var(--bg); color:var(--text); font-family:'Inter Tight',sans-s
 .ct-subheader-title { font-size:0.88rem; font-weight:700; color:#111827; letter-spacing:-0.01em; line-height:1.2; }
 .ct-subheader-subtitle { font-size:0.68rem; font-weight:500; color:#6b7280; letter-spacing:0.06em; text-transform:uppercase; margin-top:1px; }
 .ct-subheader-badge { display:inline-flex; align-items:center; padding:6px 16px; border:1.5px solid #d8b4fe; border-radius:100px; font-size:0.68rem; font-weight:700; letter-spacing:0.1em; text-transform:uppercase; color:#7c3aed; background:#faf5ff; }
-.progress-bar { position:sticky; top:64px; z-index:190; background:#fff; border-bottom:1px solid var(--border); padding:0 2rem; }
-.progress-inner { max-width:900px; margin:0 auto; padding:12px 0 10px; }
-.prog-sections { display:flex; gap:5px; margin-bottom:9px; }
-.prog-seg { flex:1; height:3px; border-radius:2px; background:var(--bg-alt); transition:background .35s; }
-.prog-seg.done { background:#1a56db; }
-.prog-seg.active { background:linear-gradient(90deg,#1a56db,#3b82f6); }
-.prog-meta { display:flex; justify-content:space-between; align-items:center; }
-.prog-label { font-size:0.73rem; color:var(--text-muted); }
-.prog-label strong { color:#1a56db; font-weight:600; }
-.prog-pct { font-size:0.73rem; color:var(--text-dim); }
+.progress-bar { position:sticky; top:55px; z-index:190; background:#fff; border-bottom:1px solid var(--border); padding:0 2rem; }
+.progress-inner { max-width:900px; margin:0 auto; padding:12px 0; display:flex; justify-content:center; align-items:center; }
+.prog-label { font-size:0.82rem; font-weight:700; color:#1a56db; letter-spacing:0.04em; display:flex; align-items:center; gap:8px; text-transform:uppercase; }
+.prog-dot { width:6px; height:6px; border-radius:50%; background:#1a56db; display:inline-block; animation:progPulse 2s infinite; }
+@keyframes progPulse {
+  0% { transform:scale(0.95); box-shadow:0 0 0 0 rgba(26,86,219,0.7); }
+  70% { transform:scale(1); box-shadow:0 0 0 5px rgba(26,86,219,0); }
+  100% { transform:scale(0.95); box-shadow:0 0 0 0 rgba(26,86,219,0); }
+}
 .hero { background:linear-gradient(180deg,#eff6ff 0%,#fff 100%); border-bottom:1px solid var(--border); padding:72px 2rem 56px; text-align:center; position:relative; overflow:hidden; }
 .hero::before { content:''; position:absolute; inset:0; background:radial-gradient(ellipse 70% 60% at 50% 0%,rgba(26,86,219,0.06) 0%,transparent 70%); pointer-events:none; }
 .hero-content { position:relative; z-index:1; max-width:800px; margin:0 auto; }
 .hero h1 { font-family:'DM Serif Display',serif; font-size:clamp(2rem,5vw,3rem); color:var(--navy); line-height:1.2; margin-bottom:18px; }
 .hero-sub { font-size:1rem; color:var(--text-muted); max-width:580px; margin:0 auto 28px; line-height:1.75; }
 .hero-time-box { display:inline-flex; align-items:center; gap:9px; background:#fff; border:1px solid var(--blue-border); border-radius:50px; padding:12px 28px; font-size:0.88rem; font-weight:600; color:#1a56db; box-shadow:var(--shadow); margin-top:4px; }
+.hero-time-box svg { flex-shrink:0; }
 .mandate-banner { background:#f0f7ff; border:1px solid #bfdbfe; border-radius:var(--radius); padding:18px 22px; margin-bottom:36px; display:flex; flex-wrap:wrap; gap:16px; }
 .mandate-item { display:flex; align-items:flex-start; gap:10px; flex:1; min-width:220px; }
 .mandate-dot { width:8px; height:8px; border-radius:50%; background:#1a56db; flex-shrink:0; margin-top:6px; }
@@ -100,11 +122,10 @@ body { background:var(--bg); color:var(--text); font-family:'Inter Tight',sans-s
 .section-block { margin-bottom:48px; animation:fadeUp .45s ease both; opacity:0; transform:translateY(18px); }
 .section-block:nth-child(1){animation-delay:.04s}.section-block:nth-child(2){animation-delay:.1s}.section-block:nth-child(3){animation-delay:.16s}.section-block:nth-child(4){animation-delay:.22s}.section-block:nth-child(5){animation-delay:.28s}
 @keyframes fadeUp { to{opacity:1;transform:translateY(0)} }
-.section-hdr { display:flex; align-items:center; gap:14px; margin-bottom:20px; padding-bottom:18px; border-bottom:1px solid var(--border); }
 .section-emoji { width:46px; height:46px; border-radius:12px; border:1px solid var(--border); background:#fafbfc; display:flex; align-items:center; justify-content:center; font-size:1.4rem; flex-shrink:0; }
 .section-tag { font-size:0.65rem; font-weight:600; letter-spacing:0.1em; text-transform:uppercase; color:#1a56db; margin-bottom:2px; }
 .section-title { font-family:'DM Serif Display',serif; font-size:1.1rem; color:var(--navy); }
-.q-card { background:var(--bg-card); border:1px solid var(--border); border-radius:var(--radius); padding:26px 26px 22px; margin-bottom:14px; transition:border-color .25s,box-shadow .25s; }
+.q-card { background:var(--bg-card); border:1px solid #bbb; border-radius:var(--radius); padding:26px 26px 22px; margin-bottom:14px; transition:border-color .25s,box-shadow .25s; }
 .q-card:hover { border-color:var(--border-hover); }
 .q-card.answered { border-color:rgba(26,86,219,0.3); box-shadow:0 0 0 3px rgba(26,86,219,0.04); }
 .q-card.error { border-color:rgba(220,53,69,0.4); box-shadow:0 0 0 3px rgba(220,53,69,0.06); }
@@ -122,7 +143,9 @@ body { background:var(--bg); color:var(--text); font-family:'Inter Tight',sans-s
 .opt-radio:checked::after { transform:translate(-50%,-50%) scale(1); }
 .opt-text { font-size:0.82rem; color:var(--text-muted); line-height:1.5; }
 .opt-label:has(input:checked) .opt-text { color:var(--text); }
-.scale-legend { display:flex; flex-wrap:wrap; gap:8px; margin-top:32px; padding:14px 18px; background:var(--bg-alt); border-radius:var(--radius-sm); border:1px solid var(--border); }
+.opt-level-tag { display:inline-block; font-size:0.65rem; font-weight:700; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.05em; margin-bottom:4px; transition:color 0.2s; }
+.opt-label:has(input:checked) .opt-level-tag { color:#1a56db; }
+.scale-legend { display:flex; flex-wrap:wrap; gap:8px; margin:32px 0; padding:14px 18px; background:var(--bg-alt); border-radius:var(--radius-sm); border:1px solid var(--border); }
 .scale-item { display:flex; align-items:center; gap:6px; font-size:0.74rem; color:var(--text-muted); }
 .scale-dot { width:8px; height:8px; border-radius:50%; background:#1a56db; flex-shrink:0; }
 .submit-wrap { text-align:center; padding-top:16px; }
@@ -164,9 +187,8 @@ body { background:var(--bg); color:var(--text); font-family:'Inter Tight',sans-s
 .ct-footer-legal a:hover { color:#9ca3af; }
 @media(max-width:640px){
   .hero h1{font-size:1.75rem}
-  .q-card{padding:18px 14px} .info-card{padding:20px} .ct-navbar-inner{padding:0 16px}
+  .q-card{padding:18px 14px} .info-card{padding:20px}
   .ct-footer-bottom-wrap{padding:0 20px} .ct-footer-bottom{flex-direction:column;align-items:flex-start;gap:10px}
-  .progress-bar{top:56px}
 }
 
 /* ============ HUBSPOT FORM STYLING OVERRIDES ============ */
@@ -213,7 +235,7 @@ body { background:var(--bg); color:var(--text); font-family:'Inter Tight',sans-s
   background: #fff !important;
 }
 .hs-form-wrap input::placeholder { color: var(--text-dim) !important; }
-.hs-form-wrap fieldset { max-width: none !important; border: none !important; padding: 0 !important; margin: 0 0 16px 0 !important; display: flex !important; flex-direction: row !important; gap: 16px !important; }
+.hs-form-wrap fieldset { max-width: none !important; border: none !important; padding: 0 !important; margin: 0 !important; display: flex !important; flex-direction: row !important; gap: 16px !important; }
 @media (max-width: 620px) {
   .hs-form-wrap fieldset { flex-direction: column !important; }
 }
@@ -280,34 +302,40 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     <a class="ct-logo" href="https://www.cleartax.com/electronic-invoicing" target="_blank">
       <span class="ct-logo-wordmark"><span>clear</span><span>tax</span></span>
     </a>
-    <div class="ct-nav-items">
-      <div class="ct-nav-item" id="nav-products">
-        <button class="ct-nav-link" onclick="toggleNav('nav-products')">Products
-          <svg fill="none" height="14" viewBox="0 0 14 14" width="14"><path d="M3 5l4 4 4-4" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"></path></svg>
-        </button>
-        <div class="ct-dropdown">
-          <a href="https://www.cleartax.com/electronic-invoicing" rel="noopener" target="_blank"><div class="dd-icon">🌐</div>Global E-Invoicing</a>
-          <a href="https://www.cleartax.com/ae/e-invoicing-software" rel="noopener" target="_blank"><div class="dd-icon">🇦🇪</div>UAE E-Invoicing</a>
-          <a href="https://www.cleartax.com/sa/e-invoicing-software" rel="noopener" target="_blank"><div class="dd-icon">🇸🇦</div>Saudi Arabia</a>
-          <a href="https://www.cleartax.com/fr/en" rel="noopener" target="_blank"><div class="dd-icon">🇫🇷</div>France</a>
+    <button class="ct-mobile-toggle" onclick="toggleMobileMenu()" aria-label="Toggle Menu">
+      <svg class="icon-menu" fill="none" height="24" viewBox="0 0 24 24" width="24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"></path></svg>
+      <svg class="icon-close" fill="none" height="24" viewBox="0 0 24 24" width="24" stroke="currentColor" stroke-width="2" style="display:none;"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path></svg>
+    </button>
+    <div class="ct-nav-menu" id="ctNavMenu">
+      <div class="ct-nav-items">
+        <div class="ct-nav-item" id="nav-products">
+          <button class="ct-nav-link" onclick="toggleNav('nav-products')">Products
+            <svg fill="none" height="14" viewBox="0 0 14 14" width="14"><path d="M3 5l4 4 4-4" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"></path></svg>
+          </button>
+          <div class="ct-dropdown">
+            <a href="https://www.cleartax.com/electronic-invoicing" rel="noopener" target="_blank"><div class="dd-icon">🌐</div>Global E-Invoicing</a>
+            <a href="https://www.cleartax.com/ae/e-invoicing-software" rel="noopener" target="_blank"><div class="dd-icon">🇦🇪</div>UAE E-Invoicing</a>
+            <a href="https://www.cleartax.com/sa/e-invoicing-software" rel="noopener" target="_blank"><div class="dd-icon">🇸🇦</div>Saudi Arabia</a>
+            <a href="https://www.cleartax.com/fr/en" rel="noopener" target="_blank"><div class="dd-icon">🇫🇷</div>France</a>
+          </div>
         </div>
-      </div>
-      <div class="ct-nav-item" id="nav-resources">
-        <button class="ct-nav-link" onclick="toggleNav('nav-resources')">Resources
-          <svg fill="none" height="14" viewBox="0 0 14 14" width="14"><path d="M3 5l4 4 4-4" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"></path></svg>
-        </button>
-        <div class="ct-dropdown">
-          <a href="https://www.cleartax.com/electronic-invoicing" rel="noopener" target="_blank"><div class="dd-icon">📝</div>Blogs</a>
-          <a href="https://www.cleartax.com/case-studies" rel="noopener" target="_blank"><div class="dd-icon">📊</div>Case Studies</a>
-          <a href="https://www.cleartax.com/partners" rel="noopener" target="_blank"><div class="dd-icon">🤝</div>Partners</a>
+        <div class="ct-nav-item" id="nav-resources">
+          <button class="ct-nav-link" onclick="toggleNav('nav-resources')">Resources
+            <svg fill="none" height="14" viewBox="0 0 14 14" width="14"><path d="M3 5l4 4 4-4" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"></path></svg>
+          </button>
+          <div class="ct-dropdown">
+            <a href="https://www.cleartax.com/electronic-invoicing" rel="noopener" target="_blank"><div class="dd-icon">📝</div>Blogs</a>
+            <a href="https://www.cleartax.com/case-studies" rel="noopener" target="_blank"><div class="dd-icon">📊</div>Case Studies</a>
+            <a href="https://www.cleartax.com/partners" rel="noopener" target="_blank"><div class="dd-icon">🤝</div>Partners</a>
+          </div>
         </div>
+        <a class="ct-nav-link" href="https://www.cleartax.com/electronic-invoicing" rel="noopener" target="_blank">Contact Us</a>
       </div>
-      <a class="ct-nav-link" href="https://www.cleartax.com/electronic-invoicing" rel="noopener" target="_blank">Contact Us</a>
-    </div>
-    <div class="ct-nav-right">
-      <a class="ct-nav-btn" href="#" id="navBookDemo">Book a Demo
-        <svg fill="none" height="14" viewBox="0 0 16 16" width="14"><path d="M3 8h10m0 0L9 4m4 4L9 12" stroke="white" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"></path></svg>
-      </a>
+      <div class="ct-nav-right">
+        <a class="ct-nav-btn" href="#" id="navBookDemo">Book a Demo
+          <svg fill="none" height="14" viewBox="0 0 16 16" width="14"><path d="M3 8h10m0 0L9 4m4 4L9 12" stroke="white" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"></path></svg>
+        </a>
+      </div>
     </div>
   </div>
 </nav>
@@ -334,16 +362,9 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 <!-- PROGRESS BAR -->
 <div class="progress-bar">
   <div class="progress-inner">
-    <div class="prog-sections" id="progSections">
-      <div class="prog-seg" data-s="0"></div>
-      <div class="prog-seg" data-s="1"></div>
-      <div class="prog-seg" data-s="2"></div>
-      <div class="prog-seg" data-s="3"></div>
-      <div class="prog-seg" data-s="4"></div>
-    </div>
-    <div class="prog-meta">
-      <div class="prog-label"><strong id="answeredCount">0</strong> of 14 questions answered</div>
-      <div class="prog-pct" id="progPct">0%</div>
+    <div class="prog-label">
+      <span class="prog-dot"></span>
+      <span id="activeQuestionText">Question 1 of 5</span>
     </div>
   </div>
 </div>
@@ -359,7 +380,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         <circle cx="12" cy="12" r="9" stroke="#1a56db" stroke-width="1.7"/>
         <path d="M12 7v5l3 3" stroke="#1a56db" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.7"/>
       </svg>
-      Take the ~8 minute survey to unlock early access to the full report.
+      Take the survey in less than a minute to unlock early access to the full report.
     </div>
   </div>
 </section>
@@ -399,309 +420,95 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
   <form id="surveyForm" novalidate="">
 
-    <!-- SECTION 1: Regulatory Awareness -->
-    <div class="section-block" data-section="0">
-      <div class="section-hdr">
-        <div class="section-emoji">⚖️</div>
-        <div>
-          <div class="section-tag">Section 1 of 5</div>
-          <div class="section-title">Regulatory Awareness</div>
-        </div>
-      </div>
-
-      <!-- Q1 -->
+      <!-- Q4 — NEW -->
       <div class="q-card" id="qc-q1">
         <div class="q-top">
           <div class="q-badge">Q1</div>
-          <div class="q-text">Since January 2025, all businesses must be able to receive structured e-invoices (XRechnung, ZUGFeRD). How far has your organisation progressed on both reception and the 2027 issuance obligation?</div>
-        </div>
-        <div class="options-grid">
-          <label class="opt-label"><input class="opt-radio" name="q1" type="radio" value="L1"/>
-            <div><div class="opt-text">Minimal progress — inbound processing is not automated and 2027 issuance preparation has not started.</div></div></label>
-          <label class="opt-label"><input class="opt-radio" name="q1" type="radio" value="L2"/>
-            <div><div class="opt-text">We can receive structured invoices but rely on manual processing; issuance has not been formally scoped.</div></div></label>
-          <label class="opt-label"><input class="opt-radio" name="q1" type="radio" value="L3"/>
-            <div><div class="opt-text">Inbound processing is being automated; our 2027 issuance programme is underway with format, ERP, and supplier plans in development.</div></div></label>
-          <label class="opt-label"><input class="opt-radio" name="q1" type="radio" value="L4"/>
-            <div><div class="opt-text">Inbound is automated and tested; 2027 issuance is in pilot with key customers, and a supplier readiness programme is running in parallel.</div></div></label>
-        </div>
-      </div>
-
-      <!-- Q2 -->
-      <div class="q-card" id="qc-q2">
-        <div class="q-top">
-          <div class="q-badge">Q2</div>
-          <div class="q-text">Germany's mandate applies only to domestic B2B transactions between German-established entities. Have you formally defined what is in scope — including EDI arrangements, foreign subsidiaries, and low-value invoice exemptions?</div>
-        </div>
-        <div class="options-grid">
-          <label class="opt-label"><input class="opt-radio" name="q2" type="radio" value="L1"/>
-            <div><div class="opt-text">Not scoped — we have assumed all invoices are in scope without reviewing entity structure or exemption conditions.</div></div></label>
-          <label class="opt-label"><input class="opt-radio" name="q2" type="radio" value="L2"/>
-            <div><div class="opt-text">We have a general understanding but have not reviewed establishment status for each entity or assessed EDI and low-value exemptions.</div></div></label>
-          <label class="opt-label"><input class="opt-radio" name="q2" type="radio" value="L3"/>
-            <div><div class="opt-text">Scope defined for main entities; some edge cases (foreign-established group companies, specific EDI flows) are still under legal review.</div></div></label>
-          <label class="opt-label"><input class="opt-radio" name="q2" type="radio" value="L4"/>
-            <div><div class="opt-text">Fully documented — establishment status confirmed per entity, EDI arrangements assessed, exemptions flagged, and B2C and intra-EU exclusions validated across all entities.</div></div></label>
-        </div>
-      </div>
-    </div>
-
-    <!-- SECTION 2: Technical Infrastructure -->
-    <div class="section-block" data-section="1">
-      <div class="section-hdr">
-        <div class="section-emoji">🖥️</div>
-        <div>
-          <div class="section-tag">Section 2 of 5</div>
-          <div class="section-title">Technical Infrastructure</div>
-        </div>
-      </div>
-
-      <!-- Q3 -->
-      <div class="q-card" id="qc-q3">
-        <div class="q-top">
-          <div class="q-badge">Q3</div>
-          <div class="q-text">Have you finalised your format strategy (XRechnung vs ZUGFeRD) and transmission channel (Peppol, EDI, or other) for different customer segments?</div>
-        </div>
-        <div class="options-grid">
-          <label class="opt-label"><input class="opt-radio" name="q3" type="radio" value="L1"/>
-            <div><div class="opt-text">Not decided — we have not evaluated format trade-offs or assessed which transmission channel fits each customer segment.</div></div></label>
-          <label class="opt-label"><input class="opt-radio" name="q3" type="radio" value="L2"/>
-            <div><div class="opt-text">We have a provisional format preference but have not validated it against customer reception capabilities at scale.</div></div></label>
-          <label class="opt-label"><input class="opt-radio" name="q3" type="radio" value="L3"/>
-            <div><div class="opt-text">Format strategy defined — XRechnung for structured flows, ZUGFeRD where a human-readable layer is needed; Peppol connectivity is being assessed.</div></div></label>
-          <label class="opt-label"><input class="opt-radio" name="q3" type="radio" value="L4"/>
-            <div><div class="opt-text">Finalised and operational — format selection is automated by customer segment, Peppol with GEBA addressing is configured as the primary channel, and fallback protocols are tested.</div></div></label>
-        </div>
-      </div>
-
-      <!-- Q4 — NEW -->
-      <div class="q-card" id="qc-q4">
-        <div class="q-top">
-          <div class="q-badge">Q4</div>
           <div class="q-text">How are your AR and AP workflows being adapted to handle the transition from PDF exchange to mandatory structured e-invoicing data?</div>
         </div>
         <div class="options-grid">
-          <label class="opt-label"><input class="opt-radio" name="q4" type="radio" value="L1"/>
-            <div><div class="opt-text">Not started — our AR and AP workflows are unchanged; we are treating e-invoicing as a format change, not a process change.</div></div></label>
-          <label class="opt-label"><input class="opt-radio" name="q4" type="radio" value="L2"/>
-            <div><div class="opt-text">We have identified that workflows need to change but redesign has not started; current plan is to manually handle structured invoices within existing processes.</div></div></label>
-          <label class="opt-label"><input class="opt-radio" name="q4" type="radio" value="L3"/>
-            <div><div class="opt-text">AR and AP workflows are being redesigned — automated posting rules, validation triggers, and exception queues are defined but not fully tested.</div></div></label>
-          <label class="opt-label"><input class="opt-radio" name="q4" type="radio" value="L4"/>
-            <div><div class="opt-text">Fully redesigned and tested — structured invoice data drives automated three-way matching, real-time posting, and exception routing in both AR and AP with minimal manual intervention.</div></div></label>
+          <label class="opt-label"><input class="opt-radio" name="q1" type="radio" value="L1"/>
+            <div><div class="opt-level-tag">L1 — Early Stage</div><div class="opt-text">Not started — our AR and AP workflows are unchanged; we are treating e-invoicing as a format change, not a process change.</div></div></label>
+          <label class="opt-label"><input class="opt-radio" name="q1" type="radio" value="L2"/>
+            <div><div class="opt-level-tag">L2 — Developing</div><div class="opt-text">We have identified that workflows need to change but redesign has not started; current plan is to manually handle structured invoices within existing processes.</div></div></label>
+          <label class="opt-label"><input class="opt-radio" name="q1" type="radio" value="L3"/>
+            <div><div class="opt-level-tag">L3 — Progressing</div><div class="opt-text">AR and AP workflows are being redesigned — automated posting rules, validation triggers, and exception queues are defined but not fully tested.</div></div></label>
+          <label class="opt-label"><input class="opt-radio" name="q1" type="radio" value="L4"/>
+            <div><div class="opt-level-tag">L4 — Advanced</div><div class="opt-text">Fully redesigned and tested — structured invoice data drives automated three-way matching, real-time posting, and exception routing in both AR and AP with minimal manual intervention.</div></div></label>
         </div>
       </div>
 
       <!-- Q5 -->
-      <div class="q-card" id="qc-q5">
-        <div class="q-top">
-          <div class="q-badge">Q5</div>
-          <div class="q-text">From January 2027, issuing non-compliant invoices (including PDFs) will invalidate your customers' right to deduct VAT. Have you quantified this risk and built controls to prevent non-compliant issuance?</div>
-        </div>
-        <div class="options-grid">
-          <label class="opt-label"><input class="opt-radio" name="q5" type="radio" value="L1"/>
-            <div><div class="opt-text">Not assessed — we have not modelled the VAT deduction impact on customers from non-compliant invoices after 2027.</div></div></label>
-          <label class="opt-label"><input class="opt-radio" name="q5" type="radio" value="L2"/>
-            <div><div class="opt-text">We are aware of the risk but have no controls or quantified exposure analysis in place.</div></div></label>
-          <label class="opt-label"><input class="opt-radio" name="q5" type="radio" value="L3"/>
-            <div><div class="opt-text">Risk quantified; pre-submission validation is being implemented to flag non-compliant invoices; customer communication is planned.</div></div></label>
-          <label class="opt-label"><input class="opt-radio" name="q5" type="radio" value="L4"/>
-            <div><div class="opt-text">Fully mitigated — automated validation blocks non-compliant issuance; customers notified of transition timeline; dispute resolution process documented and tested.</div></div></label>
-        </div>
-      </div>
 
       <!-- Q6 -->
-      <div class="q-card" id="qc-q6">
+      <div class="q-card" id="qc-q2">
         <div class="q-top">
-          <div class="q-badge">Q6</div>
+          <div class="q-badge">Q2</div>
           <div class="q-text">Germany's GoBD rules require e-invoices to be archived in their original structured format — unaltered — for 10 years. Does your archiving infrastructure meet this for all inbound and outbound flows?</div>
         </div>
         <div class="options-grid">
-          <label class="opt-label"><input class="opt-radio" name="q6" type="radio" value="L1"/>
-            <div><div class="opt-text">No — we archive PDFs or ERP exports; original XRechnung or ZUGFeRD XML files are not preserved separately.</div></div></label>
-          <label class="opt-label"><input class="opt-radio" name="q6" type="radio" value="L2"/>
-            <div><div class="opt-text">Digital archiving exists but we have not validated that original structured formats are preserved unaltered or that GoBD integrity requirements are met.</div></div></label>
-          <label class="opt-label"><input class="opt-radio" name="q6" type="radio" value="L3"/>
-            <div><div class="opt-text">GoBD-compliant archiving covers most flows; gaps remain for some legacy EDI formats and email-delivered invoices where XML attachments are not always captured.</div></div></label>
-          <label class="opt-label"><input class="opt-radio" name="q6" type="radio" value="L4"/>
-            <div><div class="opt-text">Fully compliant — original structured formats preserved unaltered and tamper-proof across all channels, retrievable within hours for any period in the 10-year window.</div></div></label>
-        </div>
-      </div>
-    </div>
-
-    <!-- SECTION 3: Process Maturity -->
-    <div class="section-block" data-section="2">
-      <div class="section-hdr">
-        <div class="section-emoji">⚙️</div>
-        <div>
-          <div class="section-tag">Section 3 of 5</div>
-          <div class="section-title">Process Maturity</div>
+          <label class="opt-label"><input class="opt-radio" name="q2" type="radio" value="L1"/>
+            <div><div class="opt-level-tag">L1 — Early Stage</div><div class="opt-text">No — we archive PDFs or ERP exports; original XRechnung or ZUGFeRD XML files are not preserved separately.</div></div></label>
+          <label class="opt-label"><input class="opt-radio" name="q2" type="radio" value="L2"/>
+            <div><div class="opt-level-tag">L2 — Developing</div><div class="opt-text">Digital archiving exists but we have not validated that original structured formats are preserved unaltered or that GoBD integrity requirements are met.</div></div></label>
+          <label class="opt-label"><input class="opt-radio" name="q2" type="radio" value="L3"/>
+            <div><div class="opt-level-tag">L3 — Progressing</div><div class="opt-text">GoBD-compliant archiving covers most flows; gaps remain for some legacy EDI formats and email-delivered invoices where XML attachments are not always captured.</div></div></label>
+          <label class="opt-label"><input class="opt-radio" name="q2" type="radio" value="L4"/>
+            <div><div class="opt-level-tag">L4 — Advanced</div><div class="opt-text">Fully compliant — original structured formats preserved unaltered and tamper-proof across all channels, retrievable within hours for any period in the 10-year window.</div></div></label>
         </div>
       </div>
 
       <!-- Q7 -->
-      <div class="q-card" id="qc-q7">
+      <div class="q-card" id="qc-q3">
         <div class="q-top">
-          <div class="q-badge">Q7</div>
+          <div class="q-badge">Q3</div>
           <div class="q-text">Have you documented and tested compliant workflows for complex transaction types — structured credit notes, intercompany invoices, self-billing, and FX invoices?</div>
         </div>
         <div class="options-grid">
-          <label class="opt-label"><input class="opt-radio" name="q7" type="radio" value="L1"/>
-            <div><div class="opt-text">Not addressed — compliance work has focused on standard invoice flows; complex types have not been scoped.</div></div></label>
-          <label class="opt-label"><input class="opt-radio" name="q7" type="radio" value="L2"/>
-            <div><div class="opt-text">We know these have specific requirements but workflows are undocumented and testing has not been planned.</div></div></label>
-          <label class="opt-label"><input class="opt-radio" name="q7" type="radio" value="L3"/>
-            <div><div class="opt-text">Most types are documented and tested; a few edge cases (self-billing in specific business units, multi-currency flows) remain open.</div></div></label>
-          <label class="opt-label"><input class="opt-radio" name="q7" type="radio" value="L4"/>
-            <div><div class="opt-text">All types fully documented, tested against EN 16931, and owned — including structured credit notes, self-billing, FX invoices, and intercompany corrections.</div></div></label>
+          <label class="opt-label"><input class="opt-radio" name="q3" type="radio" value="L1"/>
+            <div><div class="opt-level-tag">L1 — Early Stage</div><div class="opt-text">Not addressed — compliance work has focused on standard invoice flows; complex types have not been scoped.</div></div></label>
+          <label class="opt-label"><input class="opt-radio" name="q3" type="radio" value="L2"/>
+            <div><div class="opt-level-tag">L2 — Developing</div><div class="opt-text">We know these have specific requirements but workflows are undocumented and testing has not been planned.</div></div></label>
+          <label class="opt-label"><input class="opt-radio" name="q3" type="radio" value="L3"/>
+            <div><div class="opt-level-tag">L3 — Progressing</div><div class="opt-text">Most types are documented and tested; a few edge cases (self-billing in specific business units, multi-currency flows) remain open.</div></div></label>
+          <label class="opt-label"><input class="opt-radio" name="q3" type="radio" value="L4"/>
+            <div><div class="opt-level-tag">L4 — Advanced</div><div class="opt-text">All types fully documented, tested against EN 16931, and owned — including structured credit notes, self-billing, FX invoices, and intercompany corrections.</div></div></label>
         </div>
       </div>
 
       <!-- Q8 -->
-      <div class="q-card" id="qc-q8">
+      <div class="q-card" id="qc-q4">
         <div class="q-top">
-          <div class="q-badge">Q8</div>
+          <div class="q-badge">Q4</div>
           <div class="q-text">Your suppliers and customers across Europe will send e-invoices in different formats — XRechnung, ZUGFeRD, Factur-X, Peppol UBL, and others. Do you have a single, consolidated view of all inbound and outbound e-invoice flows across formats and markets?</div>
         </div>
         <div class="options-grid">
-          <label class="opt-label"><input class="opt-radio" name="q8" type="radio" value="L1"/>
-            <div><div class="opt-text">No — each format and country is handled in isolation; there is no consolidated view.</div></div></label>
-          <label class="opt-label"><input class="opt-radio" name="q8" type="radio" value="L2"/>
-            <div><div class="opt-text">We have visibility within Germany but no unified view across other markets or formats.</div></div></label>
-          <label class="opt-label"><input class="opt-radio" name="q8" type="radio" value="L3"/>
-            <div><div class="opt-text">A centralised view is being built; Germany and one or two other markets are connected but coverage is incomplete.</div></div></label>
-          <label class="opt-label"><input class="opt-radio" name="q8" type="radio" value="L4"/>
-            <div><div class="opt-text">Full consolidated view in place — all formats and markets flow into a single platform with unified tracking, exception management, and compliance monitoring.</div></div></label>
-        </div>
-      </div>
-
-      <!-- Q9 -->
-      <div class="q-card" id="qc-q9">
-        <div class="q-top">
-          <div class="q-badge">Q9</div>
-          <div class="q-text">Have you assessed which of your suppliers will be unable to issue compliant e-invoices by January 2027 — and do you have a plan to manage AP disruption during the transition?</div>
-        </div>
-        <div class="options-grid">
-          <label class="opt-label"><input class="opt-radio" name="q9" type="radio" value="L1"/>
-            <div><div class="opt-text">Not started — we have not identified non-compliant suppliers or assessed the AP impact.</div></div></label>
-          <label class="opt-label"><input class="opt-radio" name="q9" type="radio" value="L2"/>
-            <div><div class="opt-text">We are aware of the supplier risk but have not contacted suppliers, assessed readiness, or planned contingency AP handling.</div></div></label>
-          <label class="opt-label"><input class="opt-radio" name="q9" type="radio" value="L3"/>
-            <div><div class="opt-text">Supplier risk segmentation done; high-volume suppliers are being supported with format guidance; a small-supplier strategy is in development.</div></div></label>
-          <label class="opt-label"><input class="opt-radio" name="q9" type="radio" value="L4"/>
-            <div><div class="opt-text">Proactive programme underway — all material suppliers assessed, compliance support in place, and AP can handle a defined residual volume of non-compliant flows post-2027.</div></div></label>
-        </div>
-      </div>
-    </div>
-
-    <!-- SECTION 4: Organisational Readiness -->
-    <div class="section-block" data-section="3">
-      <div class="section-hdr">
-        <div class="section-emoji">🏢</div>
-        <div>
-          <div class="section-tag">Section 4 of 5</div>
-          <div class="section-title">Organisational Readiness</div>
-        </div>
-      </div>
-
-      <!-- Q10 -->
-      <div class="q-card" id="qc-q10">
-        <div class="q-top">
-          <div class="q-badge">Q10</div>
-          <div class="q-text">Has a fully scoped budget been approved — covering ERP development, format testing, Peppol connectivity, GoBD-compliant archiving, supplier communication, and post-go-live support?</div>
-        </div>
-        <div class="options-grid">
-          <label class="opt-label"><input class="opt-radio" name="q10" type="radio" value="L1"/>
-            <div><div class="opt-text">No budget — e-invoicing is being absorbed within existing IT and finance capacity; no formal cost assessment has been done.</div></div></label>
-          <label class="opt-label"><input class="opt-radio" name="q10" type="radio" value="L2"/>
-            <div><div class="opt-text">Budget is under discussion but not approved; the full scope and true costs of ERP changes, archiving, and supplier management have not been assessed.</div></div></label>
-          <label class="opt-label"><input class="opt-radio" name="q10" type="radio" value="L3"/>
-            <div><div class="opt-text">Fully scoped budget approved for both the 2025 reception and 2027 issuance phases, with a named programme owner.</div></div></label>
-          <label class="opt-label"><input class="opt-radio" name="q10" type="radio" value="L4"/>
-            <div><div class="opt-text">Fully funded with C-level sponsorship — implementation underway with clear milestones, post-go-live support budgeted, and a quantified automation ROI agreed.</div></div></label>
-        </div>
-      </div>
-
-      <!-- Q11 -->
-      <div class="q-card" id="qc-q11">
-        <div class="q-top">
-          <div class="q-badge">Q11</div>
-          <div class="q-text">How confident are you that your ERP vendor and e-invoicing platform will keep pace with ongoing BMF clarifications and technical updates to the mandate?</div>
-        </div>
-        <div class="options-grid">
-          <label class="opt-label"><input class="opt-radio" name="q11" type="radio" value="L1"/>
-            <div><div class="opt-text">Not confident — our vendor has not demonstrated a track record on German mandate updates; we are considering alternatives.</div></div></label>
-          <label class="opt-label"><input class="opt-radio" name="q11" type="radio" value="L2"/>
-            <div><div class="opt-text">Uncertain — we have not assessed our vendor's responsiveness to mandate changes or established contractual compliance update obligations.</div></div></label>
-          <label class="opt-label"><input class="opt-radio" name="q11" type="radio" value="L3"/>
-            <div><div class="opt-text">Cautiously confident — our vendor has responded to BMF updates to date and is committed to ongoing compliance; SLAs are being negotiated.</div></div></label>
-          <label class="opt-label"><input class="opt-radio" name="q11" type="radio" value="L4"/>
-            <div><div class="opt-text">Fully confident — vendor contractually committed to continuous compliance updates with defined SLAs and a validated response track record on prior BMF clarifications.</div></div></label>
-        </div>
-      </div>
-    </div>
-
-    <!-- SECTION 5: Future Readiness -->
-    <div class="section-block" data-section="4">
-      <div class="section-hdr">
-        <div class="section-emoji">🔭</div>
-        <div>
-          <div class="section-tag">Section 5 of 5</div>
-          <div class="section-title">Future Readiness</div>
+          <label class="opt-label"><input class="opt-radio" name="q4" type="radio" value="L1"/>
+            <div><div class="opt-level-tag">L1 — Early Stage</div><div class="opt-text">No — each format and country is handled in isolation; there is no consolidated view.</div></div></label>
+          <label class="opt-label"><input class="opt-radio" name="q4" type="radio" value="L2"/>
+            <div><div class="opt-level-tag">L2 — Developing</div><div class="opt-text">We have visibility within Germany but no unified view across other markets or formats.</div></div></label>
+          <label class="opt-label"><input class="opt-radio" name="q4" type="radio" value="L3"/>
+            <div><div class="opt-level-tag">L3 — Progressing</div><div class="opt-text">A centralised view is being built; Germany and one or two other markets are connected but coverage is incomplete.</div></div></label>
+          <label class="opt-label"><input class="opt-radio" name="q4" type="radio" value="L4"/>
+            <div><div class="opt-level-tag">L4 — Advanced</div><div class="opt-text">Full consolidated view in place — all formats and markets flow into a single platform with unified tracking, exception management, and compliance monitoring.</div></div></label>
         </div>
       </div>
 
       <!-- Q12 — moved from original Q1 Regulatory Awareness -->
-      <div class="q-card" id="qc-q12">
+      <div class="q-card" id="qc-q5">
         <div class="q-top">
-          <div class="q-badge">Q12</div>
+          <div class="q-badge">Q5</div>
           <div class="q-text">Germany currently has no real-time government clearance or e-reporting requirement. How is your organization preparing for the upcoming EU "VAT in the Digital Age” ViDA reporting mandates?</div>
         </div>
         <div class="options-grid">
-          <label class="opt-label"><input class="opt-radio" name="q12" type="radio" value="L1"/>
-            <div><div class="opt-text">Not on our radar — we are focused solely on meeting the January 2027 issuance deadline.</div></div></label>
-          <label class="opt-label"><input class="opt-radio" name="q12" type="radio" value="L2"/>
-            <div><div class="opt-text">We are aware of ViDA but have not built any architectural flexibility for future reporting into our current implementation.</div></div></label>
-          <label class="opt-label"><input class="opt-radio" name="q12" type="radio" value="L3"/>
-            <div><div class="opt-text">Our architecture is ViDA-aware — our ERP and format strategy can extend to a reporting layer without a full rebuild.</div></div></label>
-          <label class="opt-label"><input class="opt-radio" name="q12" type="radio" value="L4"/>
-            <div><div class="opt-text">ViDA-aligned roadmap in place — structured data, master data governance, and vendor strategy are all designed to absorb digital reporting obligations as they are confirmed.</div></div></label>
-        </div>
-      </div>
-
-      <!-- Q13 -->
-      <div class="q-card" id="qc-q13">
-        <div class="q-top">
-          <div class="q-badge">Q13</div>
-          <div class="q-text">Post-2027 tax audits are expected to incorporate structured invoice data — checking format integrity, GoBD archiving, and VAT consistency. How prepared is your organisation for this more data-driven audit environment?</div>
-        </div>
-        <div class="options-grid">
-          <label class="opt-label"><input class="opt-radio" name="q13" type="radio" value="L1"/>
-            <div><div class="opt-text">Not prepared — we have focused on go-live compliance; the audit implications of structured invoice data have not been assessed.</div></div></label>
-          <label class="opt-label"><input class="opt-radio" name="q13" type="radio" value="L2"/>
-            <div><div class="opt-text">We know audits will be more data-driven after 2027 but have not reviewed our controls, VAT positions, or archiving integrity against this.</div></div></label>
-          <label class="opt-label"><input class="opt-radio" name="q13" type="radio" value="L3"/>
-            <div><div class="opt-text">Initial audit readiness review done — data quality issues and GoBD gaps are being addressed; a VAT consistency check is planned before the 2027 deadline.</div></div></label>
-          <label class="opt-label"><input class="opt-radio" name="q13" type="radio" value="L4"/>
-            <div><div class="opt-text">AI-powered audit readiness in place — continuous automated checks across format integrity, GoBD archiving, and VAT consistency flag anomalies before they become audit findings.</div></div></label>
-        </div>
-      </div>
-
-      <!-- Q14 -->
-      <div class="q-card" id="qc-q14">
-        <div class="q-top">
-          <div class="q-badge">Q14</div>
-          <div class="q-text">Has your organisation planned to capture the operational gains from structured e-invoicing — touchless AP processing, automated three-way matching, and reduced manual reconciliation?</div>
-        </div>
-        <div class="options-grid">
-          <label class="opt-label"><input class="opt-radio" name="q14" type="radio" value="L1"/>
-            <div><div class="opt-text">No — our programme is compliance-only; operational efficiency benefits have not been assessed.</div></div></label>
-          <label class="opt-label"><input class="opt-radio" name="q14" type="radio" value="L2"/>
-            <div><div class="opt-text">We recognise efficiency gains are possible but have not quantified them or built them into our programme objectives.</div></div></label>
-          <label class="opt-label"><input class="opt-radio" name="q14" type="radio" value="L3"/>
-            <div><div class="opt-text">Benefits quantified — reduced AP workload, faster processing, and lower exception rates are targeted; tooling is being evaluated.</div></div></label>
-          <label class="opt-label"><input class="opt-radio" name="q14" type="radio" value="L4"/>
-            <div><div class="opt-text">Operational transformation is a core objective — quantified business case for touchless AP, AI-assisted exception management, and automated reconciliation, tracked against post-go-live metrics.</div></div></label>
+          <label class="opt-label"><input class="opt-radio" name="q5" type="radio" value="L1"/>
+            <div><div class="opt-level-tag">L1 — Early Stage</div><div class="opt-text">Not on our radar — we are focused solely on meeting the January 2027 issuance deadline.</div></div></label>
+          <label class="opt-label"><input class="opt-radio" name="q5" type="radio" value="L2"/>
+            <div><div class="opt-level-tag">L2 — Developing</div><div class="opt-text">We are aware of ViDA but have not built any architectural flexibility for future reporting into our current implementation.</div></div></label>
+          <label class="opt-label"><input class="opt-radio" name="q5" type="radio" value="L3"/>
+            <div><div class="opt-level-tag">L3 — Progressing</div><div class="opt-text">Our architecture is ViDA-aware — our ERP and format strategy can extend to a reporting layer without a full rebuild.</div></div></label>
+          <label class="opt-label"><input class="opt-radio" name="q5" type="radio" value="L4"/>
+            <div><div class="opt-level-tag">L4 — Advanced</div><div class="opt-text">ViDA-aligned roadmap in place — structured data, master data governance, and vendor strategy are all designed to absorb digital reporting obligations as they are confirmed.</div></div></label>
         </div>
       </div>
 
@@ -712,7 +519,6 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         <span class="scale-item"><span class="scale-dot"></span>L3 = Progressing</span>
         <span class="scale-item"><span class="scale-dot"></span>L4 = Advanced</span>
       </div>
-    </div>
 
     <!-- CONSENT -->
     <div id="nativeConsentWrap" style="background:#f8f9ff;border:1px solid #e2e5ed;border-radius:12px;padding:20px 24px;margin-bottom:24px;display:flex;align-items:flex-start;gap:12px;box-sizing:border-box;width:100%;font-family:'Inter Tight', sans-serif !important;">
@@ -854,28 +660,61 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
 <script>
   var SHEET_WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbwc6cWhJYD8KW7_ARNL8Za2ayfUrJi19jqd1zH6m36hO5Lhjq3h8Hcwb_SA6flb76Rq/exec';
-  var questions = ['q1','q2','q3','q4','q5','q6','q7','q8','q9','q10','q11','q12','q13','q14'];
-  var sectionMap = { 0:[0,1], 1:[2,3,4,5], 2:[6,7,8], 3:[9,10], 4:[11,12,13] };
+  var questions = ['q1','q2','q3','q4','q5'];
+  var sectionMap = { 0:[0], 1:[1], 2:[2], 3:[3], 4:[4] };
 
   function updateProgress() {
     var done = 0;
     questions.forEach(function(q) {
       var checked = !!document.querySelector('input[name="'+q+'"]:checked');
       var card = document.getElementById('qc-'+q);
-      if (checked) { done++; card.classList.add('answered'); }
-      else { card.classList.remove('answered'); }
+      if (card) {
+        if (checked) { done++; card.classList.add('answered'); }
+        else { card.classList.remove('answered'); }
+      }
     });
-    document.getElementById('answeredCount').textContent = done;
-    document.getElementById('progPct').textContent = Math.round((done / questions.length) * 100) + '%';
-    for (var s = 0; s < 5; s++) {
-      var keys = sectionMap[s];
-      var d = keys.filter(function(i){ return !!document.querySelector('input[name="'+questions[i]+'"]:checked'); }).length;
-      var el = document.querySelector('.prog-seg[data-s="'+s+'"]');
-      el.className = 'prog-seg' + (d === keys.length ? ' done' : d > 0 ? ' active' : '');
+  }
+
+  function updateActiveQuestionOnScroll() {
+    var bestQ = 1;
+    var minDiff = Infinity;
+    
+    questions.forEach(function(q, index) {
+      var card = document.getElementById('qc-' + q);
+      if (card) {
+        var rect = card.getBoundingClientRect();
+        var score = Math.abs(rect.top - 140);
+        if (score < minDiff) {
+          minDiff = score;
+          bestQ = index + 1;
+        }
+      }
+    });
+
+    var infoCard = document.querySelector('.info-card');
+    if (infoCard) {
+      var rect = infoCard.getBoundingClientRect();
+      if (rect.top < window.innerHeight * 0.5) {
+        var activeText = document.getElementById('activeQuestionText');
+        if (activeText) {
+          activeText.textContent = 'Almost Done — Your Details';
+        }
+        return;
+      }
+    }
+
+    var activeText = document.getElementById('activeQuestionText');
+    if (activeText) {
+      activeText.textContent = 'Question ' + bestQ + ' of 5';
     }
   }
+
   document.querySelectorAll('input[type=radio]').forEach(function(r){ r.addEventListener('change', updateProgress); });
   updateProgress();
+
+  window.addEventListener('scroll', updateActiveQuestionOnScroll);
+  window.addEventListener('resize', updateActiveQuestionOnScroll);
+  updateActiveQuestionOnScroll();
 
   function toggleNav(id) {
     var item = document.getElementById(id);
@@ -883,15 +722,64 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     document.querySelectorAll('.ct-nav-item.open').forEach(function(el){ el.classList.remove('open'); });
     if (!isOpen) item.classList.add('open');
   }
+  function toggleMobileMenu() {
+    var menu = document.getElementById('ctNavMenu');
+    var btn = document.querySelector('.ct-mobile-toggle');
+    if (!menu) return;
+    var isOpen = menu.classList.contains('open');
+    if (isOpen) {
+      menu.classList.remove('open');
+      if (btn) {
+        btn.classList.remove('open');
+        var iconMenu = btn.querySelector('.icon-menu');
+        var iconClose = btn.querySelector('.icon-close');
+        if (iconMenu) iconMenu.style.display = 'block';
+        if (iconClose) iconClose.style.display = 'none';
+      }
+    } else {
+      menu.classList.add('open');
+      if (btn) {
+        btn.classList.add('open');
+        var iconMenu = btn.querySelector('.icon-menu');
+        var iconClose = btn.querySelector('.icon-close');
+        if (iconMenu) iconMenu.style.display = 'none';
+        if (iconClose) iconClose.style.display = 'block';
+      }
+    }
+  }
   document.addEventListener('click', function(e) {
     if (!e.target.closest('.ct-nav-item')) {
       document.querySelectorAll('.ct-nav-item.open').forEach(function(el){ el.classList.remove('open'); });
     }
+    var nav = document.querySelector('.ct-navbar');
+    var menu = document.getElementById('ctNavMenu');
+    var btn = document.querySelector('.ct-mobile-toggle');
+    if (menu && menu.classList.contains('open')) {
+      if (!nav || !nav.contains(e.target) || 
+          e.target.closest('.ct-nav-link:not([onclick])') || 
+          e.target.closest('.ct-nav-btn') || 
+          e.target.closest('.ct-dropdown a')) {
+        menu.classList.remove('open');
+        if (btn) {
+          btn.classList.remove('open');
+          var iconMenu = btn.querySelector('.icon-menu');
+          var iconClose = btn.querySelector('.icon-close');
+          if (iconMenu) iconMenu.style.display = 'block';
+          if (iconClose) iconClose.style.display = 'none';
+        }
+      }
+    }
   });
-  document.getElementById('navBookDemo').addEventListener('click', function(e) {
-    e.preventDefault();
-    document.querySelector('.info-card').scrollIntoView({ behavior:'smooth', block:'start' });
-  });
+  var bookDemoBtn = document.getElementById('navBookDemo');
+  if (bookDemoBtn) {
+    bookDemoBtn.addEventListener('click', function(e) {
+      e.preventDefault();
+      var infoCard = document.querySelector('.info-card');
+      if (infoCard) {
+        infoCard.scrollIntoView({ behavior:'smooth', block:'start' });
+      }
+    });
+  }
 
   function showToast(msg, isErr) {
     if (isErr === undefined) isErr = true;
@@ -943,7 +831,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
           // Bind form submit event
           $form.submit(function(event) {
-            // Validate all 14 questions
+            // Validate all 5 questions
             var missing = [];
             var answers = {};
             questions.forEach(function (q) {
@@ -963,7 +851,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             if (missing.length > 0) {
               event.preventDefault();
               event.stopPropagation();
-              showToast('Please answer all 14 questions');
+              showToast('Please answer all 5 questions');
               var firstMissing = document.getElementById('qc-' + missing[0]);
               if (firstMissing) {
                 firstMissing.scrollIntoView({ behavior: 'smooth', block: 'center' });
