@@ -346,7 +346,6 @@
     font-weight: 600 !important;
     border: none !important;
     cursor: pointer !important;
-    margin-top: 24px !important; /* Nudged button down per request */
     transition: all 0.25s ease !important;
     font-family: 'Gilroy', sans-serif !important;
   }
@@ -354,7 +353,7 @@
   .form-card .hs-form .hs_submit,
   .form-card .hs-form .hs-submit,
   .form-card .hs-form .actions {
-    margin-top: 20px !important;
+    margin-top: 14px !important;
     padding-top: 4px !important;
   }
   .form-card .hs-form .hs-button:hover,
@@ -369,10 +368,70 @@
     font-family: 'Gilroy', sans-serif !important;
     margin-top: 4px;
   }
-  .form-card .hs-form .hs-richtext, .form-card .hs-form .legal-consent-container {
-    font-size: 12px;
-    color: var(--ct-text-muted);
-    margin-top: 12px;
+  .form-card .hs-error-msgs {
+    list-style: none;
+  }
+  /* Skeleton Loader Styles */
+  .ct-form-skeleton {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    width: 100%;
+    min-height: 340px;
+    padding-top: 10px;
+  }
+  .ct-skeleton-row-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+  @media (max-width: 640px) {
+    .ct-skeleton-row-2 {
+      grid-template-columns: 1fr;
+      gap: 14px;
+    }
+  }
+  .ct-skeleton-label {
+    height: 11px;
+    width: 65px;
+    background: rgba(91,44,140,0.1);
+    border-radius: 4px;
+    margin-bottom: 6px;
+  }
+  .ct-skeleton-input {
+    height: 42px;
+    background: #FAF8FC;
+    border: 1.5px solid var(--ct-border);
+    border-radius: 9px;
+    width: 100%;
+  }
+  .ct-skeleton-button {
+    height: 48px;
+    background: linear-gradient(135deg, rgba(91,44,140,0.2) 0%, rgba(48,27,94,0.2) 100%);
+    border-radius: 100px;
+    width: 100%;
+    margin-top: 16px;
+  }
+  .ct-shimmer {
+    position: relative;
+    overflow: hidden;
+  }
+  .ct-shimmer::after {
+    position: absolute;
+    top: 0; right: 0; bottom: 0; left: 0;
+    transform: translateX(-100%);
+    background-image: linear-gradient(
+      90deg,
+      rgba(91,44,140,0) 0%,
+      rgba(91,44,140,0.05) 20%,
+      rgba(91,44,140,0.05) 60%,
+      rgba(91,44,140,0) 100%
+    );
+    animation: ct-shimmer-anim 1.6s infinite;
+    content: '';
+  }
+  @keyframes ct-shimmer-anim {
+    100% { transform: translateX(100%); }
   }
 
   /* ===== BUTTONS ===== */
@@ -549,6 +608,7 @@
     flex-shrink: 0;
     border: 3px solid white;
     box-shadow: 0 8px 24px rgba(91,44,140,0.25);
+    object-fit: cover;
   }
   .speaker-card.moderator .speaker-avatar {
     background: linear-gradient(135deg, #B98DDB, var(--ct-purple));
@@ -848,6 +908,7 @@
   .final-meta {
     display: flex;
     justify-content: center;
+    align-items: center;
     gap: 30px;
     margin-top: 32px;
     flex-wrap: wrap;
@@ -1540,7 +1601,7 @@
     display: flex;
     flex-wrap: wrap;
     gap: 14px;
-    margin-top: 4px;
+    margin-top: 32px;
   }
 
   /* ===== BIG STAT CALLOUT (57.5% survey benchmark) ===== */
@@ -1978,19 +2039,21 @@
 <!-- ===== NAV (floating pill) ===== -->
 <nav class="nav">
   <div class="nav-inner">
-    <div class="logo">cleartax</div>
+    <a href="#" class="logo" style="text-decoration: none;">
+      <img src="https://cdn.prod.website-files.com/6093bce33d9b4bae841b04e3/69dfcff6071b983201f5f097_logo-cleartax.svg" alt="ClearTax" style="height: 24px; display: block;">
+    </a>
     <div class="nav-links">
-      <a href="#premise">The premise</a>
-      <a href="#workshop">How it works</a>
-      <a href="#stakes">The stakes</a>
-      <a href="#speaker">Speaker</a>
+      <a href="javascript:void(0)" onclick="scrollToId('premise')">The premise</a>
+      <a href="javascript:void(0)" onclick="scrollToId('workshop')">How it works</a>
+      <a href="javascript:void(0)" onclick="scrollToId('stakes')">The stakes</a>
+      <a href="javascript:void(0)" onclick="scrollToId('speaker')">Speaker</a>
     </div>
     <div style="display:flex; align-items:center; gap:10px;">
       <span class="nav-locale">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+        <img src="https://cdn.prod.website-files.com/6093bce33d9b4bae841b04e3/69eb6c5dc761d4d31839b3d0_tax-live-uae.png" alt="UAE" style="width: 20px;">
         UAE
       </span>
-      <a href="#register" class="nav-cta">
+      <a href="javascript:void(0)" onclick="scrollToId('register-form')" class="nav-cta">
         Reserve seat
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
       </a>
@@ -2044,11 +2107,11 @@
         </li>
       </ul>
       <div class="hero-cta-row">
-        <a href="#register-form" class="btn-primary">
+        <a href="javascript:void(0)" onclick="scrollToId('register-form')" class="btn-primary">
           Reserve my seat
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
         </a>
-        <a href="#premise" class="btn-secondary">
+        <a ref="javascript:void(0)" onclick="scrollToId('premise')" class="btn-secondary">
           Read the survey report first
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12l7 7 7-7"/></svg>
         </a>
@@ -2059,77 +2122,60 @@
       Wiring note: replace the JS handler below with a real backend call (HubSpot Forms API, your CRM, etc.). -->
     <div class="form-card" id="register-form">
       <span class="seats-badge"><span class="dot-warn"></span>Free to attend · Limited seats</span>
+      <div class="form-title" style="margin-bottom: 16px;">Save your seat</div>
 
-      <div class="form-step active" id="step-1">
-        <div class="form-title">Save your seat</div>
-        <div class="form-sub">21 Jul 2026 · 11:00 AM GST · Live online</div>
-
-        <form id="uae-register" novalidate>
-          <div class="field-group">
-            <label class="field-label" for="w-name">Full name</label>
-            <input class="field-input" type="text" id="w-name" name="fullName" required placeholder="Sarah Al Mansouri">
-          </div>
-          <div class="field-group">
-            <label class="field-label" for="w-email">Work email</label>
-            <input class="field-input" type="email" id="w-email" name="email" required placeholder="sarah.almansouri@company.ae">
-          </div>
-          <div class="field-group">
-            <label class="field-label" for="w-company">Company</label>
-            <input class="field-input" type="text" id="w-company" name="company" required placeholder="Your company">
-          </div>
-          <div class="field-group">
-            <label class="field-label" for="w-title">Job title</label>
-            <input class="field-input" type="text" id="w-title" name="jobTitle" required placeholder="Chief Financial Officer">
-          </div>
-          <div class="field-group">
-            <label class="field-label" for="w-revenue">Company revenue band <span class="opt">(optional — helps us benchmark your cohort)</span></label>
-            <select class="field-input" id="w-revenue" name="revenue">
-              <option value="" disabled selected>Select a range</option>
-              <option>Under AED 50M</option>
-              <option>AED 50M – 200M</option>
-              <option>AED 200M – 1B</option>
-              <option>AED 1B – 5B</option>
-              <option>Over AED 5B</option>
-              <option>Prefer not to say</option>
-            </select>
-          </div>
-          <div class="field-group-tight">
-            <label class="field-label" for="w-sector">Industry sector <span class="opt">(optional)</span></label>
-            <select class="field-input" id="w-sector" name="sector">
-              <option value="" disabled selected>Select a sector</option>
-              <option>Retail &amp; e-commerce</option>
-              <option>Hospitality &amp; travel</option>
-              <option>Financial services</option>
-              <option>Real estate &amp; construction</option>
-              <option>Manufacturing &amp; industrial</option>
-              <option>Logistics &amp; transport</option>
-              <option>Energy &amp; utilities</option>
-              <option>Healthcare</option>
-              <option>Technology</option>
-              <option>Professional services</option>
-              <option>Other</option>
-            </select>
-          </div>
-
-          <button type="submit" class="form-submit-btn">
-            Confirm my registration
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-          </button>
-          <div class="form-foot">By registering you agree to ClearTax's Privacy Policy. Your data is encrypted and never sold. A calendar invite and joining link will be sent to your email.</div>
-        </form>
-      </div>
-
-      <!-- Post-submit confirmation -->
-      <div class="form-step" id="step-final">
-        <div class="form-final">
-          <div class="check-circle">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-          </div>
-          <h4>You're in.</h4>
-          <p>Your seat for the Live CFO Benchmarking Workshop on 21 July at 11:00 AM GST is confirmed. Check your inbox for the joining link and calendar invite.</p>
-          <a href="#premise" class="form-final-link">Want a head start? Read the report →</a>
+      <!-- HubSpot Form Container -->
+      <div id="uae-hubspot-form" style="min-height: 340px;">
+        <div id="uae-form-skeleton" class="ct-form-skeleton">
+          <div class="ct-skeleton-row-2"><div><div class="ct-skeleton-label ct-shimmer"></div><div class="ct-skeleton-input ct-shimmer"></div></div><div><div class="ct-skeleton-label ct-shimmer"></div><div class="ct-skeleton-input ct-shimmer"></div></div></div>
+          <div><div class="ct-skeleton-label ct-shimmer" style="width:100px;"></div><div class="ct-skeleton-input ct-shimmer"></div></div>
+          <div class="ct-skeleton-row-2"><div><div class="ct-skeleton-label ct-shimmer"></div><div class="ct-skeleton-input ct-shimmer"></div></div><div><div class="ct-skeleton-label ct-shimmer"></div><div class="ct-skeleton-input ct-shimmer"></div></div></div>
+          <div class="ct-skeleton-button ct-shimmer"></div>
         </div>
       </div>
+
+      <script>
+        (function() {
+          function initForm() {
+            window.hbspt.forms.create({
+              portalId: "245744706",
+              formId: "20d256a7-83bf-468e-8a6d-70e209cebe98",
+              region: "na2",
+              target: "#uae-hubspot-form",
+              onFormReady: function ($form) {
+                // Remove skeleton loader
+                var skel = document.getElementById('uae-form-skeleton');
+                if (skel) skel.remove();
+                
+                // Populate UTM tracking inputs
+                var formEl = ($form && $form[0]) ? $form[0] : $form;
+                if (formEl && formEl.querySelector) {
+                  var params = new URLSearchParams(window.location.search);
+                  ['utm_source','utm_medium','utm_campaign','utm_term','utm_content'].forEach(function (k) {
+                    var v = params.get(k);
+                    if (v) {
+                      var inp = formEl.querySelector('input[name="' + k + '"]');
+                      if (inp) inp.value = v;
+                    }
+                  });
+                }
+              }
+            });
+          }
+
+          if (window.hbspt && window.hbspt.forms) {
+            initForm();
+          } else {
+            var s = document.createElement('script');
+            s.src = 'https://js-na2.hsforms.net/forms/embed/v2.js';
+            s.charset = 'utf-8';
+            s.type = 'text/javascript';
+            s.defer = true;
+            s.onload = initForm;
+            document.head.appendChild(s);
+          }
+        })();
+      </script>
     </div>
   </div>
 </header>
@@ -2293,7 +2339,7 @@
       <div class="inline-cta-copy">
         Benchmark your function on <strong>21 July</strong>.
       </div>
-      <a href="#register-form" class="btn-primary">
+      <a href="javascript:void(0)" onclick="scrollToId('register-form')" class="btn-primary">
         Reserve my seat
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
       </a>
@@ -2329,7 +2375,7 @@
       <div class="speaker-card single">
         <span class="speaker-role-tag">▸ Featured Speaker</span>
         <div class="speaker-head">
-          <div class="speaker-avatar">RK</div>
+          <img class="speaker-avatar" src="https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6a4e27f232069766e622d29c_Rami.png" alt="Rami Khairallah">
           <div>
             <div class="speaker-name">Rami Khairallah</div>
             <div class="speaker-title">Senior Manager — Enterprise Business<br><span class="speaker-company">ClearTax</span></div>
@@ -2364,7 +2410,7 @@
   </div>
   <h2>Know your number before the mandate <span class="italic">assigns you one</span>.</h2>
   <p>500+ finance leaders have been benchmarked. On 21 July, it's your turn.</p>
-  <a href="#register-form" class="btn-primary">
+  <a href="javascript:void(0)" onclick="scrollToId('register-form')" class="btn-primary">
     Reserve my seat
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
   </a>
@@ -2388,13 +2434,12 @@
       Read the survey report
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M7 17L17 7M7 7h10v10"/></svg>
     </a>
-    <span class="not-ready-meta">cleartax.com/ae</span>
   </div>
 </section>
 
 <!-- ===== FOOTER ===== -->
 <footer>
-  © 2026 ClearTax · <a href="https://cleartax.com/ae">cleartax.com/ae</a> · <a href="#">Privacy Policy</a> · <a href="#">Contact</a>
+  © 2026 ClearTax · <a href="https://cleartax.com/ae">cleartax.com/ae</a> · <a href="https://www.cleartax.com/meta/privacy">Privacy Policy</a> · <a href="https://www.cleartax.com/contact-us">Contact</a>
 </footer>
 
 <!-- ===== WORKSHOP REGISTRATION HANDLER =====
@@ -2402,42 +2447,10 @@
   call (HubSpot Forms API, your CRM, a server endpoint, etc.). -->
 <script>
   (function () {
-    const stepForm = document.getElementById('step-1');
-    const stepFinal = document.getElementById('step-final');
-    const form = document.getElementById('uae-register');
-    const card = document.getElementById('register-form');
-
-    function showStep(el) {
-      [stepForm, stepFinal].forEach(s => s.classList.remove('active'));
-      el.classList.add('active');
-      if (card) card.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }
-
-    function persistData(payload) {
-      // TODO: replace with real backend call.
-      console.log('[ClearTax UAE Workshop] registration:', payload);
-      return Promise.resolve();
-    }
-
-    if (form) {
-      form.addEventListener('submit', function (e) {
-        e.preventDefault();
-        const payload = {
-          fullName: form.fullName.value.trim(),
-          email: form.email.value.trim(),
-          company: form.company.value.trim(),
-          jobTitle: form.jobTitle.value.trim(),
-          revenue: form.revenue.value || null,   // optional
-          sector: form.sector.value || null       // optional
-        };
-        // Only the first four fields are required
-        if (!payload.fullName || !payload.email || !payload.company || !payload.jobTitle) {
-          alert('Please complete all required fields (Full name, Work email, Company, Job title).');
-          return;
-        }
-        persistData(payload).then(() => showStep(stepFinal));
-      });
-    }
+    window.scrollToId = function (id) {
+      const el = document.getElementById(id);
+      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    };
   })();
 </script>
 
