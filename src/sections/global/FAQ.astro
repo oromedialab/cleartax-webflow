@@ -1,0 +1,427 @@
+---
+/**
+ * Global E-Invoicing FAQ accordion.
+ * Features 11 global e-invoicing compliance questions with paragraph and list content support.
+ * Uses native Javascript height transition animations that remain resize-safe and feel premium.
+ */
+interface FaqItem {
+  q: string;
+  a:
+    | string
+    | Array<
+        { kind: "p"; html: string } | { kind: "ul" | "ol"; items: string[] }
+      >;
+}
+
+const items: FaqItem[] = [
+  {
+    q: "What is global e-invoicing and how does it work?",
+    a: [
+      {
+        kind: "p",
+        html: "Global e-invoicing exchanges invoices in structured, machine-readable formats (XML, UBL) through government-designated systems or regulated networks like Peppol - replacing paper and PDF invoices with a fully digital, auditable process.",
+      },
+      {
+        kind: "p",
+        html: "Countries enforce one of three models:",
+      },
+      {
+        kind: "ul",
+        items: [
+          "<strong>Clearance</strong>: Tax authority approves the invoice before it reaches the buyer (e.g., Saudi Arabia, India, Mexico).",
+          "<strong>Post-audit / Reporting</strong>: Invoices are submitted to the authority after issuance (e.g., Germany, France).",
+          "<strong>Exchange</strong>: Structured invoices are transmitted through a regulated network like Peppol (e.g., Belgium, Croatia).",
+        ],
+      },
+    ],
+  },
+  {
+    q: "Why do multinational businesses need a global e-invoicing solution?",
+    a: [
+      {
+        kind: "p",
+        html: "Over 100 countries have active or upcoming mandates, each with different formats, timelines, and penalties. Country-by-country management creates compliance gaps and duplicated costs.",
+      },
+      {
+        kind: "p",
+        html: "A global solution provides: one integration for all mandates, centralised visibility across entities, and auto-updates that adapt without ERP rework.",
+      },
+    ],
+  },
+  {
+    q: "What is a global e-invoicing network, and how do businesses connect to it?",
+    a: [
+      {
+        kind: "p",
+        html: "A global e-invoicing network routes structured invoices between businesses and tax authorities. The most widely adopted is Peppol. National portals include India's IRP, Saudi Arabia's Fatoora, and Malaysia's MyInvois.",
+      },
+      {
+        kind: "p",
+        html: "Businesses connect through a certified Access Point (like ClearTax), which handles formatting, validation, signing, and transmission to the correct authority or buyer.",
+      },
+    ],
+  },
+  {
+    q: "What is the Peppol e-invoicing network and which countries use it?",
+    a: [
+      {
+        kind: "p",
+        html: "Peppol (Pan-European Public Procurement OnLine) is a not-for-profit international network for exchanging structured business documents. Governed by OpenPeppol, it uses a four-corner model where sender and receiver each connect through their own certified Access Point.",
+      },
+      {
+        kind: "p",
+        html: "As of 2026, 46+ countries are OpenPeppol members with 1.4 million registered participants, including:",
+      },
+      {
+        kind: "ul",
+        items: [
+          "<strong>Mandatory B2B/B2G</strong>: Belgium, Norway, Australia, Singapore, Japan, Croatia.",
+          "<strong>Phased mandates</strong>: Germany, France, Netherlands, Denmark, UAE, New Zealand.",
+          "<strong>Voluntary/pilot</strong>: UK, US, Canada, India, South Africa.",
+        ],
+      },
+    ],
+  },
+  {
+    q: "What are the biggest challenges businesses face with global e-invoicing regulations?",
+    a: [
+      {
+        kind: "ul",
+        items: [
+          "<strong>Fragmented regulations</strong>: 100+ countries with different formats, models, and deadlines.",
+          "<strong>Frequent changes</strong>: Mandates update regularly; grace periods expire with short notice.",
+          "<strong>Complex integrations</strong>: Connecting legacy systems to multiple portals is costly without pre-built connectors.",
+          "<strong>Data precision</strong>: Structured formats require exact data; errors cause immediate rejection.",
+          "<strong>Multi-entity compliance</strong>: Subsidiaries face different rules and staggered go-live dates.",
+          "<strong>Data residency</strong>: Local laws often prevent invoice data crossing borders.",
+        ],
+      },
+    ],
+  },
+  {
+    q: "What are the penalties for non-compliance with global e-invoicing mandates?",
+    a: [
+      {
+        kind: "p",
+        html: "<strong>Financial fines</strong>",
+      },
+      {
+        kind: "ul",
+        items: [
+          "<strong>Italy</strong>: EUR 250 to EUR 2,000 per invoice; up to 180% of VAT for format violations.",
+          "<strong>France</strong>: EUR 50 per invoice, capped at EUR 15,000/year.",
+          "<strong>Germany</strong>: Up to EUR 5,000 per offence from 2027.",
+          "<strong>Poland</strong>: Up to 100% of the invoice VAT amount from January 2027.",
+          "<strong>Belgium</strong>: EUR 1,500 to EUR 5,000 for repeated non-compliance.",
+          "<strong>UAE</strong>: AED 5,000/month for non-implementation; AED 100 per invoice.",
+        ],
+      },
+      {
+        kind: "p",
+        html: "<strong>Denied tax deductions</strong>",
+      },
+      {
+        kind: "ul",
+        items: [
+          "<strong>India</strong>: No GST input tax credit without a valid IRN.",
+          "<strong>Saudi Arabia</strong>: ZATCA can deny VAT credit on non-integrated invoices.",
+        ],
+      },
+      {
+        kind: "p",
+        html: "<strong>Operational blocks</strong>",
+      },
+      {
+        kind: "ul",
+        items: [
+          "<strong>Brazil and Mexico</strong>: Uncleared invoices have no legal standing; revenue cannot be recognised.",
+          "<strong>Egypt</strong>: Non-compliance can lead to criminal liability for executives.",
+        ],
+      },
+    ],
+  },
+  {
+    q: "Does ClearTax support global e-invoicing compliance across multiple countries?",
+    a: [
+      {
+        kind: "p",
+        html: "Yes. ClearTax covers 50+ countries on a single API. Mandates are configured, not coded. When a new mandate launches, activate it instantly without integration changes.",
+      },
+      {
+        kind: "p",
+        html: "Government-accredited in every country, with local data residency and auto-updates for regulatory changes. Trusted by 5,000+ enterprises.",
+      },
+    ],
+  },
+  {
+    q: "Which countries does ClearTax support for e-invoicing?",
+    a: [
+      {
+        kind: "p",
+        html: "ClearTax covers 50+ countries across EMEA and APAC:",
+      },
+      {
+        kind: "ul",
+        items: [
+          "<strong>Middle East</strong>: Saudi Arabia (ZATCA/Fatoora), UAE (FTA/PINT AE), Oman (OTA/Fawtara), Bahrain, Kuwait, Qatar.",
+          "<strong>Asia</strong>: India (NIC/IRP), Malaysia (LHDN/MyInvois), Philippines, Vietnam.",
+          "<strong>Europe</strong>: Belgium, France, Germany, Poland (KSeF), Croatia, Spain, Netherlands, and more.",
+        ],
+      },
+    ],
+  },
+  {
+    q: "Does ClearTax support Peppol and other global e-invoicing standards?",
+    a: [
+      {
+        kind: "p",
+        html: "Yes. As a registered Open Peppol Access Point, ClearTax supports:",
+      },
+      {
+        kind: "ul",
+        items: [
+          "<strong>Peppol profiles</strong>: BIS Billing 3.0, PINT AE (UAE), PINT A-NZ (Australia/New Zealand), BE CIUS (Belgium).",
+          "<strong>European formats</strong>: XRechnung, ZUGFeRD 2.x, EN 16931, UBL 2.1.",
+          "<strong>National formats</strong>: ZATCA XML (KSA), GST JSON (India), MyInvois XML (Malaysia), KSeF XML (Poland), OTA Fawtara (Oman).",
+        ],
+      },
+      {
+        kind: "p",
+        html: "ClearTax is also built for EU ViDA (VAT in the Digital Age) from 2030, requiring no additional setup when that transition arrives.",
+      },
+    ],
+  },
+  {
+    q: "Can ClearTax integrate with SAP, Oracle, Microsoft Dynamics, NetSuite, and other ERP systems?",
+    a: [
+      {
+        kind: "p",
+        html: "Yes. ClearTax has completed 2,000+ ERP integrations with pre-built certified connectors for:",
+      },
+      {
+        kind: "ul",
+        items: [
+          "<strong>SAP</strong>: ECC and S/4HANA via a certified lightweight add-on.",
+          "<strong>Oracle</strong>: Fusion Cloud and EBS.",
+          "<strong>Microsoft Dynamics</strong>: 365 F&O and Business Central.",
+          "<strong>Others</strong>: NetSuite, Tally, Zoho, JDE, custom ERPs, POS, and OMS platforms.",
+        ],
+      },
+      {
+        kind: "p",
+        html: "AI-powered field mapping cuts setup from weeks to hours. Post go-live regulatory changes are handled cloud-side - no ERP rework.",
+      },
+    ],
+  },
+  {
+    q: "How does global e-invoicing work for accounts receivable teams?",
+    a: [
+      {
+        kind: "p",
+        html: "ClearTax automates the full invoice lifecycle: generation, validation, transmission, and acknowledgement.",
+      },
+      {
+        kind: "ul",
+        items: [
+          "<strong>Auto-retry</strong>: Failed invoices are detected, diagnosed, and resubmitted automatically, with no manual intervention required.",
+          "<strong>Live status dashboard</strong>: Track every invoice across all countries in one view: submitted, cleared, rejected, or pending.",
+          "<strong>AI VAT Recon Agent</strong>: Runs daily, flags discrepancies with recommended actions, and alerts your team only when action is needed.",
+          "<strong>Zero downtime</strong>: Invoices clear continuously even during cloud outages, protecting cash flow and DSO targets.",
+        ],
+      },
+    ],
+  },
+];
+
+// Generate JSON-LD Schema
+const schemaData = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": items.map(item => {
+    let answerText = "";
+    if (typeof item.a === "string") {
+      answerText = item.a;
+    } else {
+      answerText = item.a.map(block => {
+        if (block.kind === "p") {
+          return block.html;
+        } else {
+          return block.items.map(li => `- ${li}`).join("\n");
+        }
+      }).join("\n\n");
+    }
+    // Clean html tags for json text to make it compliant
+    const plainText = answerText.replace(/<\/?[^>]+(>|$)/g, "");
+    return {
+      "@type": "Question",
+      "name": item.q,
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": plainText
+      }
+    };
+  })
+};
+---
+
+<section
+  class="faq-section box-border bg-white py-16 font-['Inter'] text-[#0F1020] sm:py-24"
+  id="faq"
+>
+  <div class="faq-container mx-auto max-w-[1200px] px-4 sm:px-6">
+    <div class="faq-header mb-12 max-w-[800px] mx-auto text-center">
+      <h2
+        class="faq-heading mb-4 text-[32px] sm:text-[44px] font-semibold leading-[1.2] tracking-[-1.2px] text-black"
+      >
+        Frequently Asked <em class="not-italic text-[#655DFF]">Questions</em>
+      </h2>
+      <p
+        class="faq-sub max-w-[600px] mx-auto text-base sm:text-lg leading-[1.5] text-black/70"
+      >
+        Everything you need to know about global e-invoicing mandates, compliance, and the ClearTax platform.
+      </p>
+    </div>
+
+    <div class="faq-list flex flex-col gap-4" data-faq-root>
+      {
+        items.map((it, i) => (
+          <div
+            class={`faq-item group overflow-hidden rounded-xl border border-[rgba(15,16,32,0.08)] bg-white transition-all duration-300 ease-in-out [box-sizing:border-box] ${i === 0 ? "faq-open" : ""} ${i >= 5 ? "hidden hidden-faq" : ""}`}
+            style={`transition-delay: ${50 + (i * 25)}ms`}
+          >
+            <button
+              class="faq-trigger flex w-full appearance-none items-center justify-between gap-4 border-0 bg-transparent px-5 py-5 text-left cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-[#655DFF] sm:px-6 sm:py-6"
+              type="button"
+              aria-expanded={i === 0 ? "true" : "false"}
+            >
+              <h4 class="faq-question min-w-0 flex-1 text-xl sm:text-[22px] font-semibold leading-[1.4] text-[#0F172A] text-left transition-colors duration-200">
+                {it.q}
+              </h4>
+              <span
+                class="faq-icon flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[rgba(101,93,255,0.08)] text-[#655DFF] transition-all duration-300 ease-in-out group-hover:scale-105 group-[.faq-open]:rotate-45 group-[.faq-open]:bg-[#655DFF] group-[.faq-open]:text-white"
+                aria-hidden="true"
+              >
+                <svg
+                  width="12"
+                  height="12"
+                  viewBox="0 0 12 12"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    d="M6 1V11M1 6H11"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                  />
+                </svg>
+              </span>
+            </button>
+            <div 
+              class={`faq-panel overflow-hidden transition-[height] duration-[320ms] [transition-timing-function:cubic-bezier(.4,0,.2,1)] ${i === 0 ? "" : "h-0"}`}
+              style={i === 0 ? "height: auto;" : undefined}
+            >
+              <div class="faq-answer px-5 pb-5 text-base leading-[1.7] text-[#5A6070] sm:px-6 sm:pb-6 [&_li]:mb-2 [&_ol]:m-0 [&_ol]:pl-5 [&_p:last-child]:mb-0 [&_p]:mb-3 [&_p]:mt-0 [&_strong]:text-[#0F1020] [&_ul]:m-0 [&_ul]:pl-5">
+                {typeof it.a === "string" ? (
+                  <p set:html={it.a} />
+                ) : (
+                  it.a.map((block) =>
+                    block.kind === "p" ? (
+                      <p set:html={block.html} />
+                    ) : block.kind === "ul" ? (
+                      <ul class="list-disc pl-5">
+                        {block.items.map((li) => (
+                          <li set:html={li} />
+                        ))}
+                      </ul>
+                    ) : (
+                      <ol class="list-decimal pl-5">
+                        {block.items.map((li) => (
+                          <li set:html={li} />
+                        ))}
+                      </ol>
+                    ),
+                  )
+                )}
+              </div>
+            </div>
+          </div>
+        ))
+      }
+    </div>
+
+    {
+      items.length > 5 && (
+        <div
+          class="mt-12 mx-auto flex items-center justify-center"
+          id="faq-load-more-container"
+        >
+          <button
+            id="faq-load-more-btn"
+            class="inline-flex items-center gap-2 justify-center rounded-full border-2 border-[#655DFF] bg-white px-8 py-3.5 text-base font-semibold leading-[1.4] text-[#655DFF] outline-none transition-all duration-300 ease-in-out hover:shadow-[0_4px_15px_rgba(101,93,255,0.25)] active:scale-95 cursor-pointer"
+          >
+            Load More
+          </button>
+        </div>
+      )
+    }
+  </div>
+</section>
+
+<!-- Inject FAQ Schema -->
+<script type="application/ld+json" set:html={JSON.stringify(schemaData)} />
+
+<script is:inline>
+  (function () {
+    const root = document.querySelector("[data-faq-root]");
+    if (!root) return;
+    const items = root.querySelectorAll(".faq-item");
+
+    const loadMoreBtn = document.getElementById("faq-load-more-btn");
+    const loadMoreContainer = document.getElementById(
+      "faq-load-more-container",
+    );
+    if (loadMoreBtn) {
+      loadMoreBtn.addEventListener("click", function () {
+        const hiddenItems = root.querySelectorAll(".hidden-faq");
+        hiddenItems.forEach(function (item) {
+          item.classList.remove("hidden", "hidden-faq");
+        });
+        if (loadMoreContainer) {
+          loadMoreContainer.style.display = "none";
+        }
+      });
+    }
+    items.forEach(function (item) {
+      const trigger = item.querySelector(".faq-trigger");
+      const panel = item.querySelector(".faq-panel");
+      if (!trigger || !panel) return;
+
+      trigger.addEventListener("click", function () {
+        const isOpen = item.classList.contains("faq-open");
+        if (isOpen) {
+          panel.style.height = panel.scrollHeight + "px";
+          requestAnimationFrame(function () {
+            panel.style.height = "0px";
+          });
+          item.classList.remove("faq-open");
+          trigger.setAttribute("aria-expanded", "false");
+        } else {
+          panel.style.height = panel.scrollHeight + "px";
+          item.classList.add("faq-open");
+          trigger.setAttribute("aria-expanded", "true");
+          panel.addEventListener("transitionend", function handler(e) {
+            if (e.propertyName !== "height") return;
+            panel.removeEventListener("transitionend", handler);
+            if (item.classList.contains("faq-open"))
+              panel.style.height = "auto";
+          });
+        }
+      });
+
+      window.addEventListener("resize", function () {
+        if (item.classList.contains("faq-open")) panel.style.height = "auto";
+      });
+    });
+  })();
+</script>
