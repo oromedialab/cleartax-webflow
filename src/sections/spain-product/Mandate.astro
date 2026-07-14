@@ -1,0 +1,454 @@
+---
+/**
+ * Spain Mandate At A Glance section — modern Astro component
+ * Matches reference layout and screenshot with interactive timeline cards,
+ * dynamic progress bar, hover/click state animations, and responsiveness.
+ */
+
+const steps = [
+    {
+        title: "CREA Y CRECE STARTS -",
+        desc: "Draft Ministerial Order expected to enter force, starting the business phase in timeline.",
+        date: "1 JUL 2027",
+        icon: "success",
+    },
+    {
+        title: "VERIFACTU FOR COMPANIES",
+        desc: "Mandatory for all corporate income tax taxpayers under Spain's billing integrity rules.",
+        date: "AUG 2027",
+        icon: "hourglass",
+    },
+    {
+        title: "VERIFACTU EXPANDS",
+        desc: "Self-employed professionals and IRPF taxpayers come into scope.",
+        date: "1 JUL 2027",
+        icon: "users",
+    },
+    {
+        title: "AEAT PLATFORM GOES LIVE",
+        desc: "AEAT public e-invoicing platform expected before Phase 1 begins.",
+        date: "AUG 2027",
+        icon: "go-live",
+    },
+];
+---
+
+<section class="py-20 lg:py-28 bg-[#F6F5FB] overflow-hidden" id="spain-mandate">
+    <div class="max-w-[1280px] mx-auto px-4 lg:px-8">
+        <!-- Top header row -->
+        <div class="flex flex-col lg:flex-row lg:items-end justify-between gap-6 mb-16 lg:mb-20">
+            <div class="max-w-xl premium-reveal">
+                <h2 class="text-4xl lg:text-[44px] font-semibold text-[000000] leading-tight m-0 font-gilroy">
+                    Spain Mandate At <span class="block bg-[#655DFF] bg-clip-text text-transparent">A Glance</span>
+                </h2>
+            </div>
+            <p class="max-w-xs text-lg text-[#000000]/70 font-normal pl-5 premium-reveal [transition-delay:150ms]">
+                Dates per draft Ministerial Order (17 Apr 2026); subject to final BOE publication.
+            </p>
+        </div>
+
+        <!-- Desktop Layout -->
+        <div class="hidden lg:block relative premium-reveal [transition-delay:300ms]">
+            <!-- Cards Grid (aligned to bottom so cards sit on the same bottom level) -->
+            <div class="grid grid-cols-4 gap-6 xl:gap-8 items-end mb-16 relative z-10 min-h-[280px]">
+                {
+                    steps.map((step, idx) => (
+                        <div
+                            class="timeline-card group relative p-6 rounded-2xl cursor-pointer select-none flex flex-col justify-between overflow-hidden"
+                            data-index={idx}
+                        >
+                            <!-- Icon wrapper (collapses when inactive, expands when active) -->
+                            <div class="icon-wrapper transition-all duration-500 ease-out overflow-hidden">
+                                <div class="icon-box w-12 h-12 rounded-xl flex items-center justify-center border transition-all duration-500">
+                                    {step.icon === "success" && (
+                                        <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
+                                            <polyline points="22 4 12 14.01 9 11.01" />
+                                        </svg>
+                                    )}
+                                    {step.icon === "hourglass" && (
+                                        <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                            <path d="M5 2h14" />
+                                            <path d="M5 22h14" />
+                                            <path d="M19 2v4c0 3.87-3.13 7-7 7s-7-3.13-7-7V2" />
+                                            <path d="M5 22v-4c0-3.87 3.13-7 7-7s7 3.13 7 7v4" />
+                                        </svg>
+                                    )}
+                                    {step.icon === "users" && (
+                                        <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+                                            <circle cx="9" cy="7" r="4" />
+                                            <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+                                            <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+                                        </svg>
+                                    )}
+                                    {step.icon === "go-live" && (
+                                        <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                            <path d="M5 12h14M12 5l7 7-7 7" />
+                                        </svg>
+                                    )}
+                                </div>
+                            </div>
+
+                            <!-- Text block -->
+                            <div class="text-block flex flex-col justify-end">
+                                <!-- Card Title -->
+                                <h3 class="card-title text-sm font-semibold tracking-wider uppercase mb-2.5 transition-colors duration-500">
+                                    {step.title}
+                                </h3>
+
+                                <!-- Card Description -->
+                                <p class="card-desc text-[14px] font-normal leading-relaxed transition-colors duration-500 m-0">
+                                    {step.desc}
+                                </p>
+                            </div>
+                        </div>
+                    ))
+                }
+            </div>
+
+            <!-- Timeline Tracker Line & Pills -->
+            <div class="relative mt-8">
+                <!-- Line Background -->
+                <div class="absolute top-1/2 left-0 right-0 h-[3px] bg-[#E1DFEC] -translate-y-1/2 z-0 rounded-full"></div>
+                
+                <!-- Active Progress Line -->
+                <div 
+                    id="desktop-progress-line" 
+                    class="absolute top-1/2 left-0 h-[3px] bg-gradient-to-r from-[#6366F1] to-[#4F46E5] -translate-y-1/2 transition-all duration-500 ease-out z-0 rounded-full" 
+                    style="width: 37.5%;"
+                ></div>
+                
+                <!-- Pills Row -->
+                <div class="grid grid-cols-4 gap-6 xl:gap-8 relative z-10">
+                    {
+                        steps.map((step, idx) => (
+                            <div class="flex justify-center">
+                                <div
+                                    class="timeline-pill px-6 py-2 rounded-full text-xs font-bold tracking-wider uppercase transition-all duration-500 cursor-pointer shadow-sm select-none"
+                                    data-index={idx}
+                                >
+                                    {step.date}
+                                </div>
+                            </div>
+                        ))
+                    }
+                </div>
+            </div>
+        </div>
+
+        <!-- Mobile Layout -->
+        <div class="block lg:hidden relative pl-8 border-l-2 border-[#E1DFEC] flex flex-col gap-10 premium-reveal [transition-delay:300ms]">
+            <!-- Vertical Active Progress Line -->
+            <div 
+                id="mobile-progress-line" 
+                class="absolute left-[-2px] top-0 w-[2px] bg-gradient-to-b from-[#6366F1] to-[#4F46E5] transition-all duration-500 ease-out" 
+                style="height: 35%;"
+            ></div>
+
+            {
+                steps.map((step, idx) => (
+                    <div 
+                        class="mobile-step-group relative flex flex-col gap-4 cursor-pointer select-none"
+                        data-index={idx}
+                    >
+                        <!-- Mobile Dot Indicator -->
+                        <div class="mobile-dot absolute -left-[42px] top-1.5 w-[20px] h-[20px] rounded-full border-4 border-[#F6F5FB] bg-[#E1DFEC] transition-all duration-500 z-10"></div>
+                        
+                        <!-- Mobile Date Pill -->
+                        <div class="inline-flex">
+                            <span class="mobile-pill px-5 py-1.5 rounded-full text-xs font-bold tracking-wider transition-all duration-500 border border-transparent shadow-sm">
+                                {step.date}
+                            </span>
+                        </div>
+
+                        <!-- Mobile Card Content -->
+                        <div class="mobile-card p-6 rounded-2xl border transition-all duration-500 ease-out flex flex-col justify-between overflow-hidden">
+                            <!-- Mobile Icon wrapper -->
+                            <div class="mobile-icon-wrapper transition-all duration-500 ease-out overflow-hidden">
+                                <div class="mobile-icon-box w-10 h-10 rounded-lg flex items-center justify-center border transition-all duration-500 shrink-0">
+                                    {step.icon === "success" && (
+                                        <svg class="w-4.5 h-4.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
+                                            <polyline points="22 4 12 14.01 9 11.01" />
+                                        </svg>
+                                    )}
+                                    {step.icon === "hourglass" && (
+                                        <svg class="w-4.5 h-4.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                            <path d="M5 2h14" />
+                                            <path d="M5 22h14" />
+                                            <path d="M19 2v4c0 3.87-3.13 7-7 7s-7-3.13-7-7V2" />
+                                            <path d="M5 22v-4c0-3.87 3.13-7 7-7s7 3.13 7 7v4" />
+                                        </svg>
+                                    )}
+                                    {step.icon === "users" && (
+                                        <svg class="w-4.5 h-4.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+                                            <circle cx="9" cy="7" r="4" />
+                                            <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+                                            <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+                                        </svg>
+                                    )}
+                                    {step.icon === "go-live" && (
+                                        <svg class="w-4.5 h-4.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                            <path d="M5 12h14M12 5l7 7-7 7" />
+                                        </svg>
+                                    )}
+                                </div>
+                            </div>
+
+                            <!-- Mobile Card text -->
+                            <div class="mobile-text-block">
+                                <h3 class="mobile-card-title text-sm font-semibold tracking-wider uppercase mb-2 transition-colors duration-500">
+                                    {step.title}
+                                </h3>
+                                <p class="mobile-card-desc text-[14px] font-normal leading-relaxed transition-colors duration-500 m-0">
+                                    {step.desc}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                ))
+            }
+        </div>
+    </div>
+</section>
+
+<style is:global>
+    /* Styling for Inactive Desktop Cards */
+    .timeline-card {
+        height: 140px; /* Short state height shown in 1st image */
+        background-color: rgba(235, 233, 245, 0.6);
+        border: 1px solid #E1DFEC;
+        transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .timeline-card .card-title {
+        color: #432984;
+    }
+    .timeline-card .card-desc {
+        color: rgba(17, 8, 19, 0.7);
+    }
+    .timeline-card .icon-wrapper {
+        height: 0px;
+        opacity: 0;
+        margin-bottom: 0px;
+    }
+    .timeline-card .icon-box {
+        border-color: #CFCBDD;
+        background-color: rgba(255, 255, 255, 0.4);
+        color: #6366F1;
+    }
+
+    /* Hover effect for Inactive Cards */
+    .timeline-card:not(.active):hover {
+        background-color: rgba(229, 226, 242, 0.85);
+        border-color: #CBC8DC;
+        transform: translateY(-4px);
+        box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.04);
+    }
+
+    /* Styling for Active Desktop Card */
+    .timeline-card.active {
+        height: 260px; /* Tall active state height shown in 2nd image */
+        background: linear-gradient(135deg, #6366F1 0%, #4F46E5 100%);
+        border-color: transparent;
+        transform: translateY(0px) scale(1.01); /* Elevate slightly but align to bottom */
+        box-shadow: 0 25px 50px -12px rgba(99, 102, 241, 0.45);
+        z-index: 10;
+    }
+    .timeline-card.active .card-title {
+        color: rgba(255, 255, 255, 0.8);
+    }
+    .timeline-card.active .card-desc {
+        color: #FFFFFF;
+    }
+    .timeline-card.active .icon-wrapper {
+        height: 48px;
+        opacity: 1;
+        margin-bottom: 24px;
+    }
+    .timeline-card.active .icon-box {
+        border-color: rgba(255, 255, 255, 0.25);
+        background-color: rgba(255, 255, 255, 0.15);
+        color: #FFFFFF;
+        box-shadow: 0 0 15px rgba(255, 255, 255, 0.1);
+    }
+
+    /* Styling for Desktop Inactive Pills */
+    .timeline-pill {
+        background-color: #E1DFEC;
+        color: rgba(17, 8, 19, 0.55);
+        border: 2px solid #F6F5FB;
+    }
+    .timeline-pill:hover {
+        background-color: #D6D3E4;
+        color: rgba(17, 8, 19, 0.8);
+    }
+
+    /* Styling for Desktop Active Pill */
+    .timeline-pill.active {
+        background-color: #6366F1;
+        color: #FFFFFF;
+        transform: scale(1.08);
+        box-shadow: 0 8px 20px -4px rgba(99, 102, 241, 0.4);
+    }
+
+    /* MOBILE TIMELINE STYLING */
+    /* Mobile Inactive Pill */
+    .mobile-pill {
+        background-color: #E1DFEC;
+        color: rgba(17, 8, 19, 0.6);
+    }
+    /* Mobile Active Pill */
+    .mobile-pill.active {
+        background-color: #6366F1;
+        color: #FFFFFF;
+        box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+    }
+
+    /* Mobile Inactive Dot */
+    .mobile-dot {
+        background-color: #E1DFEC;
+    }
+    /* Mobile Active Dot */
+    .mobile-dot.active {
+        background-color: #6366F1;
+        box-shadow: 0 0 0 5px rgba(99, 102, 241, 0.2);
+    }
+
+    /* Mobile Inactive Card */
+    .mobile-card {
+        height: 110px;
+        background-color: rgba(235, 233, 245, 0.6);
+        border-color: #E1DFEC;
+        transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .mobile-card .mobile-icon-wrapper {
+        height: 0px;
+        opacity: 0;
+        margin-bottom: 0px;
+    }
+    .mobile-card-title {
+        color: #432984;
+    }
+    .mobile-card-desc {
+        color: rgba(17, 8, 19, 0.7);
+    }
+    .mobile-icon-box {
+        border-color: #CFCBDD;
+        background-color: rgba(255, 255, 255, 0.4);
+        color: #6366F1;
+    }
+
+    /* Mobile Active Card */
+    .mobile-step-group.active .mobile-card {
+        height: 220px;
+        background: linear-gradient(135deg, #6366F1 0%, #4F46E5 100%);
+        border-color: transparent;
+        box-shadow: 0 16px 32px rgba(99, 102, 241, 0.3);
+    }
+    .mobile-step-group.active .mobile-card .mobile-icon-wrapper {
+        height: 40px;
+        opacity: 1;
+        margin-bottom: 16px;
+    }
+    .mobile-step-group.active .mobile-card-title {
+        color: rgba(255, 255, 255, 0.8);
+    }
+    .mobile-step-group.active .mobile-card-desc {
+        color: #FFFFFF;
+    }
+    .mobile-step-group.active .mobile-icon-box {
+        border-color: rgba(255, 255, 255, 0.25);
+        background-color: rgba(255, 255, 255, 0.15);
+        color: #FFFFFF;
+    }
+</style>
+
+<script is:inline>
+    (() => {
+        // Timeline interactive functionality
+        const desktopCards = document.querySelectorAll('#spain-mandate .timeline-card');
+        const desktopPills = document.querySelectorAll('#spain-mandate .timeline-pill');
+        const desktopProgressLine = document.getElementById('desktop-progress-line');
+
+        const mobileSteps = document.querySelectorAll('#spain-mandate .mobile-step-group');
+        const mobileProgressLine = document.getElementById('mobile-progress-line');
+
+        let activeIndex = 1; // Default active step is VERIFACTU FOR COMPANIES (index 1)
+
+        const updateTimeline = (index) => {
+            activeIndex = index;
+
+            // Update Desktop elements
+            if (desktopCards.length > 0) {
+                desktopCards.forEach((card, idx) => {
+                    if (idx === index) {
+                        card.classList.add('active');
+                    } else {
+                        card.classList.remove('active');
+                    }
+                });
+
+                desktopPills.forEach((pill, idx) => {
+                    if (idx === index) {
+                        pill.classList.add('active');
+                    } else {
+                        pill.classList.remove('active');
+                    }
+                });
+
+                // Calculate progress line percentage based on selected card index
+                // Center positions of columns: index * 25% + 12.5%
+                const progressWidth = index * 25 + 12.5;
+                if (desktopProgressLine) {
+                    desktopProgressLine.style.width = `${progressWidth}%`;
+                }
+            }
+
+            // Update Mobile elements
+            if (mobileSteps.length > 0) {
+                mobileSteps.forEach((step, idx) => {
+                    const pill = step.querySelector('.mobile-pill');
+                    const dot = step.querySelector('.mobile-dot');
+
+                    if (idx === index) {
+                        step.classList.add('active');
+                        if (pill) pill.classList.add('active');
+                        if (dot) dot.classList.add('active');
+                    } else {
+                        step.classList.remove('active');
+                        if (pill) pill.classList.remove('active');
+                        if (dot) dot.classList.remove('active');
+                    }
+                });
+
+                // Calculate vertical progress height
+                const totalSteps = mobileSteps.length;
+                const progressHeight = (index / (totalSteps - 1)) * 100;
+                if (mobileProgressLine) {
+                    mobileProgressLine.style.height = `${progressHeight}%`;
+                }
+            }
+        };
+
+        // Add event listeners for desktop hover/click
+        desktopCards.forEach((card, idx) => {
+            card.addEventListener('mouseenter', () => updateTimeline(idx));
+            card.addEventListener('click', () => updateTimeline(idx));
+        });
+
+        desktopPills.forEach((pill, idx) => {
+            pill.addEventListener('mouseenter', () => updateTimeline(idx));
+            pill.addEventListener('click', () => updateTimeline(idx));
+        });
+
+        // Add event listeners for mobile click
+        mobileSteps.forEach((step, idx) => {
+            step.addEventListener('click', () => updateTimeline(idx));
+        });
+
+        // Initialize with default active index (1)
+        updateTimeline(activeIndex);
+    })();
+</script>
