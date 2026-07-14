@@ -14,21 +14,22 @@ import { resolve } from 'node:path';
  * gets its `_shared` @sources auto-injected from the page's frontmatter.
  */
 export const PAGE_TARGETS = [
-  { name: 'uae',                    input: 'src/styles/uae.css',                    page: 'src/pages/uae.astro' },
-  { name: 'uaev2',                  input: 'src/styles/uaev2.css',                  page: 'src/pages/uaev2.astro' },
-  { name: 'oman-e-invoicing',       input: 'src/styles/oman-e-invoicing.css',       page: 'src/pages/oman-e-invoicing.astro' },
-  { name: 'global-mandate',         input: 'src/styles/global-mandate.css',         page: 'src/pages/global-mandate.astro' },
-  { name: 'global-mandate-v2',      input: 'src/styles/global-mandate-v2.css',      page: 'src/pages/global-mandate-v2.astro' },
-  { name: 'scale-and-security',     input: 'src/styles/scale-and-security.css',     page: 'src/pages/scale-and-security.astro' },
-  { name: 'erp-connectivity',       input: 'src/styles/erp-connectivity.css',       page: 'src/pages/erp-connectivity.astro' },
+  { name: 'uae', input: 'src/styles/uae.css', page: 'src/pages/uae.astro' },
+  { name: 'uaev2', input: 'src/styles/uaev2.css', page: 'src/pages/uaev2.astro' },
+  { name: 'oman-e-invoicing', input: 'src/styles/oman-e-invoicing.css', page: 'src/pages/oman-e-invoicing.astro' },
+  { name: 'global-mandate', input: 'src/styles/global-mandate.css', page: 'src/pages/global-mandate.astro' },
+  { name: 'global-mandate-v2', input: 'src/styles/global-mandate-v2.css', page: 'src/pages/global-mandate-v2.astro' },
+  { name: 'scale-and-security', input: 'src/styles/scale-and-security.css', page: 'src/pages/scale-and-security.astro' },
+  { name: 'erp-connectivity', input: 'src/styles/erp-connectivity.css', page: 'src/pages/erp-connectivity.astro' },
   { name: 'clear-compliance-cloud', input: 'src/styles/clear-compliance-cloud.css', page: 'src/pages/clear-compliance-cloud.astro' },
-  { name: 'recon-ai-agent',         input: 'src/styles/recon-ai-agent.css',         page: 'src/pages/recon-ai-agent.astro' },
-  { name: 'germany-product',         input: 'src/styles/germany-product.css',         page: 'src/pages/germany-product.astro' },
-  { name: 'test',                   input: 'src/styles/test.css',                   page: 'src/pages/test.astro' },
-  { name: 'france-product',          input: 'src/styles/france-product.css',          page: 'src/pages/france-product.astro' },
-  { name: 'philippines-product',     input: 'src/styles/philippines-product.css',     page: 'src/pages/philippines-product.astro' },
-  { name: 'oman-product',            input: 'src/styles/oman-product.css',            page: 'src/pages/oman-product.astro' },
-  { name: 'blog',                    input: 'src/styles/blog.css',                    page: 'src/pages/blog.astro' },
+  { name: 'recon-ai-agent', input: 'src/styles/recon-ai-agent.css', page: 'src/pages/recon-ai-agent.astro' },
+  { name: 'germany-product', input: 'src/styles/germany-product.css', page: 'src/pages/germany-product.astro' },
+  { name: 'test', input: 'src/styles/test.css', page: 'src/pages/test.astro' },
+  { name: 'france-product', input: 'src/styles/france-product.css', page: 'src/pages/france-product.astro' },
+  { name: 'philippines-product', input: 'src/styles/philippines-product.css', page: 'src/pages/philippines-product.astro' },
+  { name: 'oman-product', input: 'src/styles/oman-product.css', page: 'src/pages/oman-product.astro' },
+  { name: 'spain-product', input: 'src/styles/spain-product.css', page: 'src/pages/spain-product.astro' },
+  { name: 'blog', input: 'src/styles/blog.css', page: 'src/pages/blog.astro' },
 ];
 
 const SHARED_IMPORT_RE = /import\s+[A-Z][A-Za-z0-9]*\s+from\s+['"]\.\.\/sections\/_shared\/([A-Za-z0-9_-]+)\.astro['"]/g;
