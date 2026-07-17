@@ -894,6 +894,98 @@
                         </div>
                     </section>
                 </div>
+                <style>
+                /* 1. Force elements into their hidden starting positions instantly (Stops the glitch!) */
+                .\-translate-x-20 { opacity: 1 !important; transform: translateX(-80px) !important; }
+                .translate-y-10 { opacity: 1 !important; transform: translateY(40px) !important; }
+                .translate-x-\[100px\] { opacity: 1 !important; transform: translateX(100px) !important; }
+
+                /* 2. The final visible state that JS will trigger */
+                .force-show {
+                    opacity: 1 !important;
+                    transform: translate(0, 0) !important;
+                }
+                </style>
+
+                <script>
+                window.addEventListener('load', () => {
+                    // Wait just a tiny fraction of a second for the page to settle
+                    setTimeout(() => {
+                    // Find the hidden elements
+                    const leftCol = document.querySelector('.\\-translate-x-20');
+                    const rightCol = document.querySelector('.translate-y-10');
+                    const logos = document.querySelectorAll('.translate-x-\\[100px\\]');
+                    
+                    // Add the class that triggers the sliding animation!
+                    if(leftCol) leftCol.classList.add('force-show');
+                    if(rightCol) rightCol.classList.add('force-show');
+                    if(logos) logos.forEach(el => el.classList.add('force-show'));
+                    }, 150);
+                });
+                </script>
+                <style>
+                :root {
+                    --lp-heading: #483C71;
+                    --lp-heading-dark: #352762;
+                    --lp-gradient-from: #110072;
+                    --lp-gradient-to: #7A5698;
+                    --lp-hero-gradient-accent: #AA50C8;
+                    --lp-section-bg: #EDEBFA;
+                    --lp-section-bg-alt: #FDF2ED;
+                    --lp-section-gradient-end: #EDEAF6;
+                    --lp-dark-bg: #2D0A4E;
+                    --lp-dark-text: #1A0533;
+                    --lp-dot-active: #483C71;
+                    --lp-dot-inactive: #D4D0DE;
+                    --lp-step-line: #D4B8F0;
+                    --lp-font: 'Nohemi';
+                    --lp-mobile-heading-gradient: linear-gradient(96deg, #FFF 0%, #FFF 100%);
+                    --lp-mobile-eyebrow-bg: linear-gradient(90deg, rgba(129,89,186,0.30) 32.72%, rgba(38,1,89,0.10) 93.49%);
+                    --lp-mobile-eyebrow-text: #FFFFFF;
+                }
+                </style>
+
+                <!-- Local Animation Activator Script -->
+                <script>
+                document.addEventListener('DOMContentLoaded', () => {
+                    // 1. Slide up the loader screen
+                    const loader = document.querySelector('div[class*="z-[100]"]');
+                    if (loader) {
+                    setTimeout(() => {
+                        loader.classList.remove('translate-y-0');
+                        loader.classList.add('-translate-y-full');
+                        setTimeout(() => loader.style.display = 'none', 700);
+                    }, 300);
+                    }
+
+                    // 2. Fade/slide in the left hero text/content
+                    const heroContent = document.querySelector('div[class*="-translate-x-20"]');
+                    if (heroContent) {
+                    setTimeout(() => {
+                        heroContent.classList.remove('opacity-0', '-translate-x-20');
+                        heroContent.classList.add('opacity-100', 'translate-x-0');
+                    }, 500);
+                    }
+
+                    // 3. Fade/slide in the hero image circle
+                    const heroImage = document.querySelector('[data-testid="lp-hero-image-layer"]');
+                    if (heroImage) {
+                    setTimeout(() => {
+                        heroImage.classList.remove('opacity-0', 'translate-x-[120px]');
+                        heroImage.classList.add('opacity-100', 'translate-x-0');
+                    }, 700);
+                    }
+
+                    // 4. Fade/slide in the logo marquee and trusted text
+                    const trustElements = document.querySelectorAll('*[class*="translate-x-[100px]"]');
+                    trustElements.forEach((el, idx) => {
+                    setTimeout(() => {
+                        el.classList.remove('opacity-0', 'translate-x-[100px]');
+                        el.classList.add('opacity-100', 'translate-x-0');
+                    }, 900 + (idx * 150));
+                    });
+                });
+                </script>
                 <!-- Hero -->
                 <!-- Glance -->
                 <section>
@@ -2087,9 +2179,9 @@
             .hs-form-wrap-light textarea { min-height: 80px !important; resize: vertical !important; }
             .hs-form-wrap-light .hs_phone .hs-fieldtype-intl-phone{ display: flex !important; gap: 12px !important; width: 102% !important; }
             .hs-form-wrap-light select { appearance: auto !important; }
-            .hs-form-wrap-light fieldset { max-width: none !important; border: none !important; padding: 0 !important; margin: 0 !important; display: flex !important; flex-direction: row !important; gap: 12px !important; }
-            @media (max-width: 640px) { .hs-form-wrap-light fieldset { flex-direction: column !important; gap: 16px !important; } }
-            .hs-form-wrap-light fieldset .hs-form-field { flex: 1 !important; }
+            .hs-form-wrap-light fieldset, .hs-form-wrap-light .form-columns-2, .hs-form-wrap-light .form-columns-3 { max-width: none !important; border: none !important; padding: 0 !important; margin: 0 !important; display: flex !important; flex-direction: row !important; gap: 12px !important; }
+            @media (max-width: 640px) { .hs-form-wrap-light fieldset, .hs-form-wrap-light .form-columns-2, .hs-form-wrap-light .form-columns-3 { flex-direction: column !important; gap: 16px !important; } }
+            .hs-form-wrap-light fieldset .hs-form-field, .hs-form-wrap-light .form-columns-2 .hs-form-field, .hs-form-wrap-light .form-columns-3 .hs-form-field { flex: 1 !important; width: 100% !important; float: none !important; padding: 0 !important; }
             .hs-form-wrap-light .input { margin-right: 0 !important; }
             .hs-form-wrap-light .hs-form-booleancheckbox label, .hs-form-wrap-light .legal-consent-container label { display: flex !important; align-items: flex-start !important; font-size: 14px !important; color: rgba(0, 0, 0, 0.8) !important; line-height: 1.5 !important; font-weight: 400 !important; cursor: pointer !important; }
             .hs-form-wrap-light .hs-form-booleancheckbox label a, .hs-form-wrap-light .legal-consent-container label a { color: #4F46E5 !important; font-weight: 600 !important; text-decoration: underline !important; }
@@ -2101,6 +2193,60 @@
             .hs-form-wrap-light .hs-error-msg { color: #ef4444 !important; }
             .hs-form-wrap-light .submitted-message { background: #EEF2F6 !important; color: #1E1B4B !important; padding: 18px !important; border-radius: 8px !important; font-size: 14.5px !important; font-weight: 600 !important; text-align: center !important; border: 1px solid rgba(79, 70, 229, 0.15) !important; }
             .hs-form-wrap-light fieldset:has([class*="hs_utm_"]), .hs-form-wrap-light .hs-form-field[style*="display: none"] { display: none !important; }
+
+            /* Hero Flex Layout Overrides */
+            @media (min-width: 1024px) {
+                div[data-hero-root="true"] .wg-container,
+                .wg-container:has(#hero-form-card) {
+                    display: flex !important;
+                    flex-direction: row !important;
+                    flex-wrap: nowrap !important;
+                    justify-content: space-between !important;
+                    align-items: flex-start !important;
+                    gap: 2.5rem !important;
+                }
+                div[data-hero-root="true"] .wg-container > div:first-child,
+                .wg-container:has(#hero-form-card) > div:first-child {
+                    flex: 1 1 auto !important;
+                    max-width: 620px !important;
+                    width: auto !important;
+                }
+                #hero-form-card {
+                    flex: 0 0 440px !important;
+                    width: 440px !important;
+                    max-width: 440px !important;
+                    position: relative !important;
+                    margin: 0 !important;
+                    z-index: 20 !important;
+                }
+            }
+            @media (max-width: 1023px) {
+                div[data-hero-root="true"] .wg-container,
+                .wg-container:has(#hero-form-card) {
+                    display: flex !important;
+                    flex-direction: column !important;
+                    gap: 2rem !important;
+                    padding-bottom: 2rem !important;
+                }
+                div[data-hero-root="true"] .wg-container > div:first-child,
+                .wg-container:has(#hero-form-card) > div:first-child {
+                    width: 100% !important;
+                    max-width: 100% !important;
+                    min-height: 0 !important;
+                }
+                div[data-hero-root="true"] [data-testid="lp-hero-cards"],
+                .wg-container:has(#hero-form-card) [data-testid="lp-hero-cards"] {
+                    margin-top: 1.5rem !important;
+                }
+                #hero-form-card {
+                    width: 100% !important;
+                    max-width: 440px !important;
+                    position: relative !important;
+                    margin: 0 auto !important;
+                    z-index: 20 !important;
+                }
+            }
+
             .form-skeleton { display: flex; flex-direction: column; gap: 16px; width: 100%; min-height: 300px; }
             .skeleton-row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
             @media (max-width: 640px) { .skeleton-row-2 { grid-template-columns: 1fr; gap: 16px; } }
@@ -2212,7 +2358,7 @@
                 } else {
                     hubspotLoading = true;
                     const script = document.createElement('script');
-                    script.src = 'https://js.hsforms.net/forms/v2.js';
+                    script.src = 'https://js-na2.hsforms.net/forms/v2.js';
                     script.onload = () => {
                         hubspotLoading = false;
                         callback();
@@ -2299,13 +2445,18 @@
                         formCard = wrapper.firstElementChild;
                         wgContainer.appendChild(formCard);
                         heroFormInjected = false;
-                        loadHubspot(initHeroForm);
                     } else {
                         // Ensure it's inside the wg-container if hydration moved/deleted it
                         if (formCard.parentNode !== wgContainer) {
                             wgContainer.appendChild(formCard);
                         }
                     }
+                }
+
+                // 3. Initialize form if target element is present
+                const target = document.getElementById('hero-hs-form-target');
+                if (target && !heroFormInjected) {
+                    loadHubspot(initHeroForm);
                 }
             };
 
