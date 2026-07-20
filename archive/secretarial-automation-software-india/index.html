@@ -1427,7 +1427,7 @@
     <div class="section-four">
         <div class="container-4 w-container">
             <h2 class="heading-cards">Trusted by over <span class="text-span-blue">2000+</span> users</h2>
-            <div class="div-cards flex" data-w-id="77bdf580-e25b-9fae-93f3-0301805cfdd0" style="opacity:0">
+            <div class="div-cards flex reveal-popup" data-w-id="77bdf580-e25b-9fae-93f3-0301805cfdd0">
                 <div class="cta06_column fixed-width">
                     <h3 class="cta06_h3 black">11000<span class="text-span-2 green">+</span><br /></h3>
                     <div class="cta06_text grey">Meetings facilitated<br /></div>
@@ -2401,7 +2401,64 @@ iv. Group MIS Report Generation module for around a dozen frequency used informa
         .w-webflow-badge {
             display: none !important;
         }
+
+        /* Reveal Animation for Stats Cards - Simultaneous Scale & Opacity */
+        .div-cards.flex {
+            opacity: 0;
+            transform: scale(0.9) translateY(20px);
+            transition: opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1), transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+            will-change: opacity, transform;
+        }
+
+        .div-cards.flex.is-visible, .div-cards.flex.w--visible {
+            opacity: 1 !important;
+            transform: scale(1) translateY(0) !important;
+        }
+
+        .div-cards.flex .cta06_column {
+            opacity: 0;
+            transform: scale(0.9) translateY(15px);
+            transition: opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1), transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+            will-change: opacity, transform;
+        }
+
+        .div-cards.flex.is-visible .cta06_column {
+            opacity: 1 !important;
+            transform: scale(1) translateY(0) !important;
+        }
     </style>
+    <script crossorigin="anonymous" integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0="
+        src="https://d3e54v103j8qbb.cloudfront.net/js/jquery-3.5.1.min.dc5e7f18c8.js?site=61d6f0a7f216225f9f10b3a6"
+        type="text/javascript"></script>
+    <script src="https://assets-global.website-files.com/61d6f0a7f216225f9f10b3a6/js/clearid-staging.cade62710.js"
+        type="text/javascript"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const opacityElements = document.querySelectorAll('.div-cards.flex, [data-w-id="77bdf580-e25b-9fae-93f3-0301805cfdd0"]');
+            
+            function triggerReveal(el) {
+                if (el) {
+                    el.classList.add('is-visible');
+                    el.style.opacity = '1';
+                }
+            }
+
+            if ('IntersectionObserver' in window) {
+                const observer = new IntersectionObserver((entries, obs) => {
+                    entries.forEach(entry => {
+                        if (entry.isIntersecting) {
+                            triggerReveal(entry.target);
+                            obs.unobserve(entry.target);
+                        }
+                    });
+                }, { threshold: 0.1 });
+
+                opacityElements.forEach(el => observer.observe(el));
+            } else {
+                opacityElements.forEach(el => triggerReveal(el));
+            }
+        });
+    </script>
 </body>
 
 </html>
