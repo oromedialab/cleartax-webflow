@@ -2398,9 +2398,6 @@ iv. Group MIS Report Generation module for around a dozen frequency used informa
 }
 </script>
     <style>
-        .w-webflow-badge {
-            display: none !important;
-        }
 
         /* Reveal Animation for Stats Cards - Simultaneous Scale & Opacity */
         .div-cards.flex {
@@ -2434,6 +2431,117 @@ iv. Group MIS Report Generation module for around a dozen frequency used informa
         type="text/javascript"></script>
     <script>
         document.addEventListener("DOMContentLoaded", function () {
+            // FAQ Accordion Styles & Logic
+            const faqStyle = document.createElement('style');
+            faqStyle.textContent = `
+                .faq01-comment-2 {
+                    max-height: 0px;
+                    overflow: hidden;
+                    transition: max-height 0.35s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.25s ease-out !important;
+                    display: block !important;
+                    opacity: 0;
+                    height: auto !important;
+                }
+                .faq01_click_wrap.active .faq01-comment-2 {
+                    opacity: 1;
+                }
+                .faq01_click_wrap .faq01_icon-2.minus {
+                    display: none !important;
+                }
+                .faq01_click_wrap .faq01_icon-2.cfive {
+                    display: block !important;
+                }
+                .faq01_click_wrap.active .faq01_icon-2.minus {
+                    display: block !important;
+                }
+                .faq01_click_wrap.active .faq01_icon-2.cfive {
+                    display: none !important;
+                }
+                .faq01_click_wrap {
+                    cursor: pointer;
+                }
+                .faq01_title_wrap,
+                .faq01_h3-2,
+                .faq01_block-2,
+                .faq-header {
+                    border: none !important;
+                    border-bottom: none !important;
+                    box-shadow: none !important;
+                }
+                .faq01_title_wrap::after,
+                .faq01_title_wrap::before,
+                .faq01_h3-2::after,
+                .faq01_h3-2::before {
+                    display: none !important;
+                    content: none !important;
+                }
+            `;
+            document.head.appendChild(faqStyle);
+
+            const wraps = document.querySelectorAll('.faq01_click_wrap');
+
+            function closeItem(wrap) {
+                wrap.classList.remove('active');
+                const comment = wrap.querySelector('.faq01-comment-2');
+                if (comment) {
+                    comment.style.maxHeight = comment.scrollHeight + 'px';
+                    comment.offsetHeight; // Force reflow
+                    comment.style.maxHeight = '0px';
+                    comment.style.opacity = '0';
+                }
+            }
+
+            function openItem(wrap) {
+                wrap.classList.add('active');
+                const comment = wrap.querySelector('.faq01-comment-2');
+                if (comment) {
+                    comment.style.maxHeight = comment.scrollHeight + 'px';
+                    comment.style.opacity = '1';
+                }
+            }
+
+            wraps.forEach((wrap, index) => {
+                const comment = wrap.querySelector('.faq01-comment-2');
+                if (comment) {
+                    if (index === 0) {
+                        wrap.classList.add('active');
+                        comment.style.maxHeight = comment.scrollHeight + 'px';
+                        comment.style.opacity = '1';
+                    } else {
+                        comment.style.maxHeight = '0px';
+                        comment.style.opacity = '0';
+                    }
+                }
+
+                wrap.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    e.stopImmediatePropagation();
+                    if (e.target.closest('.faq01-comment-2')) return;
+
+                    const isActive = wrap.classList.contains('active');
+
+                    wraps.forEach(w => {
+                        if (w.classList.contains('active')) {
+                            closeItem(w);
+                        }
+                    });
+
+                    if (!isActive) {
+                        openItem(wrap);
+                    }
+                });
+            });
+
+            window.addEventListener('resize', () => {
+                const activeWrap = document.querySelector('.faq01_click_wrap.active');
+                if (activeWrap) {
+                    const comment = activeWrap.querySelector('.faq01-comment-2');
+                    if (comment) {
+                        comment.style.maxHeight = comment.scrollHeight + 'px';
+                    }
+                }
+            });
+
             const opacityElements = document.querySelectorAll('.div-cards.flex, [data-w-id="77bdf580-e25b-9fae-93f3-0301805cfdd0"]');
             
             function triggerReveal(el) {
