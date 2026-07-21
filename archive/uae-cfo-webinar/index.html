@@ -13,6 +13,46 @@
 <link href="https://fonts.cdnfonts.com/css/nohemi" rel="stylesheet">
 <link href="https://fonts.cdnfonts.com/css/gilroy-bold" rel="stylesheet">
 <link rel="canonical" href="https://www.cleartax.com/ae/uae-cfo-webinar"> 
+<script>
+(function() {
+    var interactionEvents = ['mouseover', 'keydown', 'touchmove', 'touchstart', 'wheel'];
+    var blockedScripts = [];
+    var observer = new MutationObserver(function(mutations) {
+        mutations.forEach(function(mutation) {
+            mutation.addedNodes.forEach(function(node) {
+                if (node.tagName === 'SCRIPT') {
+                    var src = node.src || '';
+                    if (src && /webflow|jquery|webfont|fonts\.googleapis|usercentrics|linkedin|smartlook|gtm/.test(src)) {
+                        blockedScripts.push({
+                            src: src,
+                            attrs: Array.from(node.attributes).reduce(function(a, b) { a[b.name] = b.value; return a; }, {})
+                        });
+                        node.parentNode.removeChild(node);
+                    }
+                }
+            });
+        });
+    });
+    observer.observe(document.documentElement, { childList: true, subtree: true });
+    function loadJS() {
+        if (window.__JS_LOADED) return;
+        window.__JS_LOADED = true;
+        observer.disconnect();
+        interactionEvents.forEach(function(e) { window.removeEventListener(e, loadJS); });
+        (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','GTM-MKPDH9');
+        blockedScripts.forEach(function(s) {
+            var script = document.createElement('script');
+            Object.keys(s.attrs).forEach(function(k) { script.setAttribute(k, s.attrs[k]); });
+            script.async = true;
+            document.head.appendChild(script);
+        });
+        var f = document.createElement('link'); f.rel = 'stylesheet'; f.href = 'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@600;700;800&family=Playfair+Display:wght@700;800;900&display=swap'; document.head.appendChild(f);
+        var uc = document.createElement('script'); uc.src = "https://web.cmp.usercentrics.eu/ui/loader.js"; uc.setAttribute('data-settings-id', 'utqqyaEbvbzrTk'); uc.async = true; document.head.appendChild(uc);
+        document.querySelectorAll('img[data-src]').forEach(function(img) { img.src = img.dataset.src; });
+    }
+    interactionEvents.forEach(function(e) { window.addEventListener(e, loadJS, { once: true, passive: true }); });
+})();
+</script>
 <style>
   :root {
     --ct-purple: #301B5E;
@@ -2037,7 +2077,10 @@
 </style>
 </head>
 <body>
-
+<!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-P5NDQXGH"
+height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<!-- End Google Tag Manager (noscript) -->
 <!-- ===== NAV (floating pill) ===== -->
 <nav class="nav">
   <div class="nav-inner">

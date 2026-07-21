@@ -1,4 +1,5 @@
 import { defineConfig } from 'astro/config';
+import react from '@astrojs/react';
 import { fileURLToPath } from 'node:url';
 import { resolve, dirname } from 'node:path';
 import tailwindcss from '@tailwindcss/vite';
@@ -48,6 +49,7 @@ function autoSharedEntries() {
 }
 
 export default defineConfig({
+  integrations: [react()],
   output: 'static',
   i18n: {
     defaultLocale: 'en',
