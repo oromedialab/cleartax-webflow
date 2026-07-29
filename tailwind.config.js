@@ -13,9 +13,15 @@ export default {
   // but prefer @theme in tokens.css for new tokens.
   theme: {
     extend: {
+      // Custom breakpoint above xl (1280) — enables `xl2:` variants on all pages.
+      screens: {
+        xl2: "1400px",
+      },
       container: {
         screens: {
           xl: "1328px",
+          // Keep the container locked to 1328px from the new 1400px breakpoint up.
+          xl2: "1328px",
         },
       },
     },
