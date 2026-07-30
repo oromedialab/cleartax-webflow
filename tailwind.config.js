@@ -19,7 +19,7 @@ export default {
       },
       container: {
         screens: {
-          xl: "1328px",
+          xl: "1280px",
           // Keep the container locked to 1328px from the new 1400px breakpoint up.
           xl2: "1328px",
         },
