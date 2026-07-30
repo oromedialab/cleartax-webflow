@@ -2637,6 +2637,70 @@
                 transform: translateX(100%);
             }
         }
+
+        /* Placeholder cards shown while the sheet data is loading */
+        .cc-skeleton {
+            background: var(--white);
+            border: 1px solid var(--ink-100);
+            border-radius: var(--r-lg);
+            padding: 1.4rem 1.5rem 1.6rem;
+            box-shadow: var(--shadow-1);
+            pointer-events: none;
+        }
+
+        .ct-sk {
+            background: var(--ink-100);
+            border-radius: 5px;
+        }
+
+        .cc-skeleton .sk-top {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .cc-skeleton .sk-flag {
+            width: 30px;
+            height: 22px;
+            border-radius: 3px;
+            flex-shrink: 0;
+        }
+
+        .cc-skeleton .sk-name {
+            height: 13px;
+            width: 55%;
+            margin-bottom: 7px;
+        }
+
+        .cc-skeleton .sk-region {
+            height: 10px;
+            width: 35%;
+        }
+
+        .cc-skeleton .sk-badge {
+            width: 52px;
+            height: 20px;
+            border-radius: 999px;
+            margin-left: auto;
+        }
+
+        .cc-skeleton .sk-row {
+            height: 11px;
+            margin-top: 14px;
+        }
+
+        .cc-skeleton .sk-row.w70 {
+            width: 70%;
+        }
+
+        .cc-skeleton .sk-row.w90 {
+            width: 90%;
+        }
+
+        .cc-skeleton .sk-row.w50 {
+            width: 50%;
+        }
     </style>
 </head>
 
@@ -3349,7 +3413,16 @@
   const APPS_SCRIPT_URL =
     "https://script.google.com/macros/s/AKfycbyy2IWZIzk14Rap3AciRetLktaCta3awdghumYQQg6KhKFHzCYIKJiKRYVAKzbmynGN/exec";
 
+  // Paint shimmering placeholder cards so the grid isn't blank while the
+  // sheet data is fetched. render() overwrites #cgrid once data arrives.
+  function renderSkeletons(n) {
+    const card =
+      '<div class="cc-skeleton"><div class="sk-top"><div class="ct-sk sk-flag ct-shimmer"></div><div style="flex:1"><div class="ct-sk sk-name ct-shimmer"></div><div class="ct-sk sk-region ct-shimmer"></div></div><div class="ct-sk sk-badge ct-shimmer"></div></div><div class="ct-sk sk-row w70 ct-shimmer"></div><div class="ct-sk sk-row w90 ct-shimmer"></div><div class="ct-sk sk-row w50 ct-shimmer"></div></div>';
+    document.getElementById("cgrid").innerHTML = card.repeat(n || 9);
+  }
+
   async function loadFromSheet() {
+    renderSkeletons(9);
     try {
       const res = await fetch(APPS_SCRIPT_URL);
       const data = await res.json();
