@@ -30,16 +30,52 @@ var REGION = {
   GB: "Europe", US: "North America", OM: "Middle East"
 };
 
-function doGet() {
-  var payload;
-  try {
-    payload = buildData();
-  } catch (err) {
-    payload = { error: String(err) };
+// Opening the Spreadsheet and reading the data range costs ~2s per request,
+// and every visitor was paying it. Serve the shaped JSON from the script cache
+// instead so only the first request after an edit touches the Sheet.
+// Bust it with ?refresh=1, by running clearTrackerCache(), or automatically via
+// the onSheetChange trigger below.
+var CACHE_KEY = "einv-tracker-payload-v1";
+var CACHE_SECONDS = 21600;    // 6h — the Apps Script maximum
+var CACHE_MAX_BYTES = 100000; // CacheService rejects values above ~100KB
+
+function doGet(e) {
+  var cache = CacheService.getScriptCache();
+  var wantsFresh = !!(e && e.parameter && e.parameter.refresh);
+  var json = wantsFresh ? null : cache.get(CACHE_KEY);
+
+  if (!json) {
+    try {
+      json = JSON.stringify(buildData());
+    } catch (err) {
+      json = JSON.stringify({ error: String(err) });
+    }
+    if (json.length < CACHE_MAX_BYTES) {
+      try {
+        cache.put(CACHE_KEY, json, CACHE_SECONDS);
+      } catch (err) {
+        // cache write failed — serving the fresh payload is still correct
+      }
+    }
   }
+
   return ContentService
-    .createTextOutput(JSON.stringify(payload))
+    .createTextOutput(json)
     .setMimeType(ContentService.MimeType.JSON);
+}
+
+// Run manually from the editor after editing the Sheet to publish immediately.
+function clearTrackerCache() {
+  CacheService.getScriptCache().remove(CACHE_KEY);
+}
+
+// Wire this up so sheet edits go live at once instead of waiting out the TTL:
+//   Apps Script editor → Triggers → Add trigger
+//     Function: onSheetChange
+//     Event source: From spreadsheet
+//     Event type: On change
+function onSheetChange() {
+  clearTrackerCache();
 }
 
 function buildData() {
