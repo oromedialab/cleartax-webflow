@@ -4,6 +4,20 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="preconnect" href="https://script.google.com" crossorigin />
+    <link rel="preconnect" href="https://script.googleusercontent.com" crossorigin />
+    <script>
+        // Fire the sheet request here, in <head>, rather than at the bottom of
+        // <body>: the round-trip then overlaps parsing the ~120KB below and the
+        // font/CSS fetches instead of queuing behind them. loadFromSheet()
+        // awaits this promise. /exec 302-redirects to script.googleusercontent,
+        // so both hosts are preconnected above.
+        window.__SHEET_URL =
+            "https://script.google.com/macros/s/AKfycbyy2IWZIzk14Rap3AciRetLktaCta3awdghumYQQg6KhKFHzCYIKJiKRYVAKzbmynGN/exec";
+        window.__sheetReq = fetch(window.__SHEET_URL)
+            .then(function (r) { return r.json(); })
+            .catch(function () { return null; });
+    </script>
     <script>
         (function (w, d, s, l, i) {
             w[l] = w[l] || [];
@@ -1482,14 +1496,6 @@
             font-size: 28px;
             line-height: 1;
             flex-shrink: 0;
-        }
-
-        .flag-img {
-            display: inline-block;
-            height: auto;
-            border-radius: 3px;
-            vertical-align: middle;
-            box-shadow: 0 0 0 1px rgba(29, 42, 82, 0.12);
         }
 
         .card-name {
@@ -3234,19 +3240,15 @@
     cQ = "",
     cSort = "name",
     cView = "grid";
-  // Flag emoji don't render on Windows, so render flags as images (with the
-  // emoji as a fallback if the country has no ISO code).
-  function flagHTML(e, w) {
-    return e.code
-      ? `<img class="flag-img" src="https://flagcdn.com/${e.code}.svg" alt="${esc(e.name)} flag" loading="lazy" style="width:${w}px">`
-      : e.flag || "🏳️";
+  function flagHTML(e) {
+    return e.flag || "🏳️";
   }
   function buildUrgency() {
     const e = D.filter((e) => "2025" === e.status || "2026" === e.status);
     document.getElementById("urgstrip").innerHTML = e
       .map(
         (e) =>
-          `<div class="urgency-card" onclick="openM('${esc(e.name)}')"><div class="uc-flag">${flagHTML(e, 26)}</div><div class="uc-name">${escHTML(e.name)}</div><div class="uc-date" style="color:${UC[e.status]};">${escHTML(e.deadline.split("·")[0].trim())}</div><div class="uc-arrow">View details →</div></div>`,
+          `<div class="urgency-card" onclick="openM('${esc(e.name)}')"><div class="uc-flag">${flagHTML(e)}</div><div class="uc-name">${escHTML(e.name)}</div><div class="uc-date" style="color:${UC[e.status]};">${escHTML(e.deadline.split("·")[0].trim())}</div><div class="uc-arrow">View details →</div></div>`,
       )
       .join("");
   }
@@ -3290,7 +3292,7 @@
       ? (t.innerHTML = e
           .map(
             (e) =>
-              `<div class="cc" onclick="openM('${esc(e.name)}')" tabindex="0" onkeydown="if(event.key==='Enter')openM('${esc(e.name)}')"><div class="card-top"><div class="card-id"><div class="card-flag">${flagHTML(e, 30)}</div><div><div class="card-name">${escHTML(e.name)}</div><div class="card-region">${escHTML(e.region)}</div></div></div><span class="${BC[e.status]}">${BL[e.status]}</span></div><div class="lv-meta"><div class="lv-meta-item"><span>Deadline</span>${escHTML(e.deadline.split("·")[0].trim())}</div><div class="lv-meta-item"><span>Format</span>${escHTML(e.format.split(" via")[0])}</div></div><div class="card-hr"></div><div class="card-row"><span class="card-key">Deadline</span><span class="card-val">${escHTML(e.deadline.split("·")[0].trim())}</span></div><div class="card-row"><span class="card-key">Format</span><span class="card-val">${escHTML(e.format.split(" via")[0])}</span></div><p class="card-scope">${escHTML(e.scope.split(".")[0])}.</p><div class="card-caret">›</div></div>`,
+              `<div class="cc" onclick="openM('${esc(e.name)}')" tabindex="0" onkeydown="if(event.key==='Enter')openM('${esc(e.name)}')"><div class="card-top"><div class="card-id"><div class="card-flag">${flagHTML(e)}</div><div><div class="card-name">${escHTML(e.name)}</div><div class="card-region">${escHTML(e.region)}</div></div></div><span class="${BC[e.status]}">${BL[e.status]}</span></div><div class="lv-meta"><div class="lv-meta-item"><span>Deadline</span>${escHTML(e.deadline.split("·")[0].trim())}</div><div class="lv-meta-item"><span>Format</span>${escHTML(e.format.split(" via")[0])}</div></div><div class="card-hr"></div><div class="card-row"><span class="card-key">Deadline</span><span class="card-val">${escHTML(e.deadline.split("·")[0].trim())}</span></div><div class="card-row"><span class="card-key">Format</span><span class="card-val">${escHTML(e.format.split(" via")[0])}</span></div><p class="card-scope">${escHTML(e.scope.split(".")[0])}.</p><div class="card-caret">›</div></div>`,
           )
           .join(""))
       : (t.innerHTML =
@@ -3312,7 +3314,7 @@
   function openM(t) {
     var e = D.find((e) => e.name === t);
     if (e) {
-      ((document.getElementById("mflag").innerHTML = flagHTML(e, 40)),
+      ((document.getElementById("mflag").innerHTML = flagHTML(e)),
         (document.getElementById("mcountry").textContent = e.name),
         (document.getElementById("mreg").textContent = e.region));
       const n = document.getElementById("mbadge");
@@ -3411,7 +3413,37 @@
   // The script reads the source Sheet server-side and returns ready-to-render
   // JSON, so nothing about the data lives in this page. See Code.gs.
   const APPS_SCRIPT_URL =
+    window.__SHEET_URL ||
     "https://script.google.com/macros/s/AKfycbyy2IWZIzk14Rap3AciRetLktaCta3awdghumYQQg6KhKFHzCYIKJiKRYVAKzbmynGN/exec";
+
+  // Stale-while-revalidate: a returning visitor gets the grid painted from
+  // localStorage with no network on the critical path, then we quietly swap in
+  // the fresh sheet data once it lands (only if it actually changed, so the
+  // page doesn't flicker or lose the user's scroll position).
+  const CACHE_KEY = "einv-tracker-rows-v1";
+
+  function readCache() {
+    try {
+      const c = JSON.parse(localStorage.getItem(CACHE_KEY) || "null");
+      return c && Array.isArray(c.rows) && c.rows.length ? c.rows : null;
+    } catch (e) {
+      return null;
+    }
+  }
+
+  function writeCache(rows) {
+    try {
+      localStorage.setItem(CACHE_KEY, JSON.stringify({ t: Date.now(), rows }));
+    } catch (e) {
+      /* private mode / quota — cache is an optimisation, never a requirement */
+    }
+  }
+
+  function paint(rows) {
+    D = rows;
+    buildUrgency();
+    render();
+  }
 
   // Paint shimmering placeholder cards so the grid isn't blank while the
   // sheet data is fetched. render() overwrites #cgrid once data arrives.
@@ -3422,17 +3454,38 @@
   }
 
   async function loadFromSheet() {
-    renderSkeletons(9);
+    const cached = readCache();
+    if (cached) paint(cached);
+    else renderSkeletons(9);
+
+    // Pick up the request started in <head>; retry once if it never resolved.
+    let data = null;
     try {
-      const res = await fetch(APPS_SCRIPT_URL);
-      const data = await res.json();
-      const rows = Array.isArray(data) ? data : data.rows || [];
-      D = rows.filter((x) => x && x.name);
-    } catch (err) {
-      console.error("Sheet load failed:", err);
+      data = await (window.__sheetReq || Promise.resolve(null));
+    } catch (e) {
+      /* handled by the retry below */
     }
-    buildUrgency();
-    render();
+    if (!data) {
+      try {
+        data = await fetch(APPS_SCRIPT_URL).then((r) => r.json());
+      } catch (err) {
+        console.error("Sheet load failed:", err);
+      }
+    }
+
+    const rows = (
+      Array.isArray(data) ? data : (data && data.rows) || []
+    ).filter((x) => x && x.name);
+
+    // Nothing usable came back — keep whatever the cache painted, or fall
+    // through to the empty state on a cold first visit.
+    if (!rows.length) {
+      if (!cached) paint([]);
+      return;
+    }
+
+    writeCache(rows);
+    if (!cached || JSON.stringify(rows) !== JSON.stringify(cached)) paint(rows);
   }
 
   loadFromSheet();
