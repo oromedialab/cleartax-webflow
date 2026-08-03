@@ -1,0 +1,1005 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Global E-Invoicing Solution &amp; Compliance Platform — ClearTax</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* ==========================================================================
+   cleartax.com/global/e-invoicing-solution — re-skinned in Design System V1.3
+   Same sections, same order, same copy as production.
+   Type: Neue Montreal (display) / Gilroy (body); Archivo / Poppins as web
+   fallbacks — drop in the licensed faces and the stacks resolve.
+   ========================================================================== */
+:root{
+  --midnight:#05022A; --grey-white:#F0F0F0; --lime:#C8F006; --indigo:#5446FF;
+  --white:#FFFFFF; --black:#000000;
+  --ink-60:rgba(5,2,42,.62); --ink-40:rgba(5,2,42,.40);
+  --ink-12:rgba(5,2,42,.12); --ink-08:rgba(5,2,42,.08);
+  --paper-20:rgba(240,240,240,.20); --paper-60:rgba(240,240,240,.60);
+  --font-display:'Neue Montreal','Archivo','Helvetica Neue',Arial,sans-serif;
+  --font-body:'Gilroy','Poppins','Helvetica Neue',Arial,sans-serif;
+  --r-btn:10px; --r-card:16px; --r-pill:999px;
+  --pad:clamp(20px,5vw,72px); --max:1280px;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}
+  *,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important}}
+body{margin:0;background:var(--grey-white);color:var(--midnight);font-family:var(--font-body);
+  font-size:16px;line-height:1.55;-webkit-font-smoothing:antialiased}
+img{max-width:100%;display:block}
+a{color:inherit;text-decoration:none}
+button{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--indigo);outline-offset:3px;border-radius:4px}
+
+h1,h2,h3,h4{font-family:var(--font-display);font-weight:700;margin:0;letter-spacing:-.02em;line-height:1.08}
+h1{font-size:clamp(34px,4.9vw,64px)}
+h2{font-size:clamp(27px,3.5vw,44px);line-height:1.12}
+h3{font-size:clamp(18px,1.5vw,22px);line-height:1.26;letter-spacing:-.01em}
+h4{font-size:16.5px;letter-spacing:-.01em}
+p{margin:0}
+.eyebrow{font-family:var(--font-body);font-weight:600;font-size:11px;text-transform:uppercase;letter-spacing:.34em;color:var(--ink-60)}
+.eyebrow--light{color:var(--paper-60)}
+.lede{font-size:clamp(16px,1.3vw,18.5px);line-height:1.55;color:var(--ink-60);max-width:60ch}
+.small{font-size:13px;line-height:1.5;color:var(--ink-60)}
+.on-dark{background:var(--midnight);color:var(--grey-white)}
+.on-dark .lede,.on-dark .small{color:var(--paper-60)}
+.mark{background:var(--lime);color:var(--midnight);padding:0 .12em;border-radius:3px;
+  box-decoration-break:clone;-webkit-box-decoration-break:clone}
+.wrap{max-width:var(--max);margin:0 auto;padding-inline:var(--pad)}
+section{padding-block:clamp(54px,7vw,100px)}
+.sec-head{display:flex;flex-direction:column;gap:14px;margin-bottom:clamp(30px,4vw,52px);max-width:74ch}
+.dotted{background-image:radial-gradient(var(--ink-12) 1.4px,transparent 1.4px);background-size:22px 22px}
+.dotted-dark{background-image:radial-gradient(rgba(240,240,240,.13) 1.4px,transparent 1.4px);background-size:22px 22px}
+
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:10px;border-radius:var(--r-btn);
+  border:1.5px solid transparent;cursor:pointer;font-family:var(--font-body);font-weight:600;padding:15px 26px;font-size:15px;
+  transition:transform .18s ease,background .18s ease,color .18s ease,border-color .18s ease}
+.btn:hover{transform:translateY(-1px)}
+.btn--primary{background:var(--indigo);color:var(--white)}
+.btn--primary:hover{background:#4536f5}
+.btn--secondary{background:transparent;color:var(--midnight);border-color:var(--midnight)}
+.btn--secondary:hover{background:var(--midnight);color:var(--grey-white)}
+.on-dark .btn--secondary{color:var(--grey-white);border-color:var(--paper-60)}
+.on-dark .btn--secondary:hover{background:var(--grey-white);color:var(--midnight)}
+.btn--lime{background:var(--lime);color:var(--midnight)}
+.btn--sm{padding:11px 18px;font-size:14px}
+.link{display:inline-flex;align-items:center;gap:8px;font-weight:600;font-size:14px;border-bottom:1.5px solid currentColor;padding-bottom:2px}
+.link:hover{gap:12px}
+.arw{transition:transform .18s ease}
+.link:hover .arw{transform:translateX(3px)}
+.tick{width:15px;height:15px;flex:0 0 auto}
+
+/* ---------- nav ---------- */
+.nav{position:sticky;top:0;z-index:80;background:rgba(240,240,240,.93);backdrop-filter:blur(14px);border-bottom:1px solid var(--ink-08)}
+.nav__in{max-width:var(--max);margin:0 auto;padding:12px var(--pad);display:flex;align-items:center;gap:6px}
+.logo{font-family:var(--font-display);font-weight:700;font-size:23px;letter-spacing:-.04em}
+.nav__menu{display:flex;align-items:center;gap:2px;margin-left:24px}
+.nav__item{position:relative}
+.nav__trigger{background:transparent;border:0;cursor:pointer;border-radius:var(--r-btn);padding:10px 13px;
+  font-family:var(--font-body);font-size:14.5px;font-weight:500;color:var(--ink-60);display:inline-flex;align-items:center;gap:7px}
+.nav__trigger:hover{color:var(--midnight);background:var(--ink-08)}
+.nav__item[data-open="true"] .nav__trigger{color:var(--midnight);background:var(--ink-08)}
+.nav__trigger[aria-current="page"]{color:var(--midnight);font-weight:600}
+.caret{width:10px;height:10px;transition:transform .18s ease}
+.nav__item[data-open="true"] .caret{transform:rotate(180deg)}
+.dd{position:absolute;top:calc(100% + 8px);left:0;min-width:256px;z-index:90;background:var(--white);
+  border:1px solid var(--ink-12);border-radius:var(--r-card);padding:10px;
+  box-shadow:0 26px 52px -26px rgba(5,2,42,.4);display:none;flex-direction:column;gap:1px}
+.nav__item[data-open="true"] .dd{display:flex}
+.dd a{padding:11px 12px;border-radius:10px;font-size:14.5px;font-weight:600;display:block}
+.dd a small{display:block;font-size:12px;font-weight:400;color:var(--ink-40);margin-top:2px}
+.dd a:hover{background:var(--grey-white)}
+.dd a[aria-current="page"]{background:var(--grey-white)}
+.nav__right{margin-left:auto;display:flex;align-items:center;gap:10px}
+.geo{position:relative}
+.geo__btn{display:inline-flex;align-items:center;gap:8px;cursor:pointer;background:transparent;font-family:var(--font-body);
+  font-size:13.5px;font-weight:600;border:1.5px solid var(--ink-12);border-radius:var(--r-btn);padding:11px 14px;color:var(--midnight)}
+.geo__btn:hover{border-color:var(--midnight)}
+.geo__panel{position:absolute;right:0;top:calc(100% + 8px);width:min(600px,88vw);z-index:90;background:var(--white);
+  border:1px solid var(--ink-12);border-radius:var(--r-card);padding:16px;box-shadow:0 26px 52px -26px rgba(5,2,42,.4);display:none}
+.geo[data-open="true"] .geo__panel{display:block}
+.geo__panel .eyebrow{margin:2px 4px 12px}
+.geo__grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1px}
+@media(max-width:640px){.geo__grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.geo__grid a{display:flex;align-items:center;gap:9px;padding:9px 10px;border-radius:10px;font-size:13.5px;font-weight:600}
+.geo__grid a:hover{background:var(--grey-white)}
+.geo__grid em{font-style:normal;font-weight:400;font-size:11.5px;color:var(--ink-40)}
+.flag{font-size:15px;line-height:1}
+.burger{display:none;background:transparent;border:1.5px solid var(--ink-12);border-radius:var(--r-btn);padding:11px 12px;cursor:pointer}
+.burger svg{width:18px;height:18px;display:block}
+.drawer{display:none;border-top:1px solid var(--ink-08);background:var(--grey-white);max-height:72vh;overflow:auto}
+.drawer[data-open="true"]{display:block}
+.drawer__in{padding:14px var(--pad) 26px}
+.dgroup{border-bottom:1px solid var(--ink-12)}
+.dgroup > button{width:100%;text-align:left;background:transparent;border:0;padding:16px 0;font-family:var(--font-body);
+  font-size:16px;font-weight:600;display:flex;align-items:center;justify-content:space-between;cursor:pointer}
+.dgroup__body{display:none;padding-bottom:14px;flex-direction:column;gap:12px}
+.dgroup[data-open="true"] .dgroup__body{display:flex}
+.dgroup__body a{font-size:14.5px;color:var(--ink-60);font-weight:500}
+.drawer__flat{display:flex;flex-direction:column}
+.drawer__flat a{padding:16px 0;border-bottom:1px solid var(--ink-12);font-size:16px;font-weight:600}
+.drawer .btn{width:100%;margin-top:20px}
+#geoGridMobile{display:none;flex-direction:column}
+.dgroup[data-open="true"] #geoGridMobile{display:flex}
+#geoGridMobile a{display:flex;align-items:center;gap:10px;padding:10px 0;font-size:14.5px;font-weight:500;color:var(--ink-60)}
+#geoGridMobile em{font-style:normal;font-size:11.5px;color:var(--ink-40)}
+@media(max-width:1080px){.nav__menu{display:none}.burger{display:inline-flex}}
+@media(max-width:760px){.geo__btn span{display:none}}
+@media(max-width:560px){.btn{padding:13px 18px}}
+
+/* ---------- 1. hero ---------- */
+.hero{position:relative;overflow:hidden;padding-block:clamp(44px,6vw,80px) clamp(32px,4vw,52px)}
+.hero__grid{position:relative;z-index:2;display:grid;grid-template-columns:1.04fr .96fr;gap:clamp(26px,4vw,52px);align-items:center}
+@media(max-width:960px){.hero__grid{grid-template-columns:1fr}}
+.hero__sub{margin-top:20px}
+.hero__actions{display:flex;flex-wrap:wrap;gap:12px;margin-top:28px}
+.hero__accred{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin-top:34px;padding-top:24px;border-top:1px solid var(--ink-12)}
+.hero__accred p{font-size:11px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--ink-40);width:100%}
+.reg{border:1.5px solid var(--ink-12);background:var(--white);border-radius:var(--r-btn);padding:10px 15px;
+  font-family:var(--font-display);font-weight:700;font-size:13px;letter-spacing:.02em}
+
+/* video card */
+.vid{position:relative;background:var(--midnight);border-radius:var(--r-card);overflow:hidden;
+  aspect-ratio:16/11;display:grid;place-items:center;box-shadow:0 26px 60px -30px rgba(5,2,42,.5)}
+.vid .dotted-dark{position:absolute;inset:0}
+.vid__play{position:relative;z-index:2;width:74px;height:74px;border-radius:50%;background:var(--lime);
+  display:grid;place-items:center;cursor:pointer;border:0;transition:transform .2s ease}
+.vid__play:hover{transform:scale(1.06)}
+.vid__play svg{width:22px;height:22px;fill:var(--midnight);margin-left:4px}
+.vid__label{position:absolute;z-index:2;bottom:18px;left:20px;right:20px;color:var(--paper-60);font-size:12.5px}
+
+/* ---------- 2. logos ---------- */
+.logos{padding-block:clamp(30px,4vw,46px);background:var(--white);border-top:1px solid var(--ink-08);border-bottom:1px solid var(--ink-08)}
+.logos .eyebrow{text-align:center;margin-bottom:22px}
+.marquee{overflow:hidden}
+.marquee__track{display:flex;gap:52px;align-items:center;width:max-content;animation:slide 44s linear infinite}
+.marquee:hover .marquee__track{animation-play-state:paused}
+@keyframes slide{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+.marquee__track span{font-family:var(--font-display);font-weight:600;font-size:18px;color:var(--ink-40);white-space:nowrap}
+
+/* ---------- 3. platform cards ---------- */
+.plat{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+@media(max-width:1000px){.plat{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:600px){.plat{grid-template-columns:1fr}}
+.pcard{border:1px solid var(--paper-20);border-radius:var(--r-card);padding:24px;background:rgba(240,240,240,.05);
+  display:flex;flex-direction:column;gap:12px;min-height:230px}
+.pcard--lime{background:var(--lime);border-color:var(--lime);color:var(--midnight)}
+.pcard--indigo{background:var(--indigo);border-color:var(--indigo);color:#fff}
+.pcard__ico{width:40px;height:40px;border-radius:11px;background:rgba(240,240,240,.12);display:grid;place-items:center;margin-bottom:auto}
+.pcard--lime .pcard__ico{background:rgba(5,2,42,.1)}
+.pcard--indigo .pcard__ico{background:rgba(255,255,255,.16)}
+.pcard__ico svg{width:19px;height:19px;fill:none;stroke:currentColor;stroke-width:1.9}
+.pcard p{font-size:14px;color:var(--paper-60);line-height:1.5}
+.pcard--lime p{color:rgba(5,2,42,.72)}
+.pcard--indigo p{color:rgba(255,255,255,.8)}
+.pcard b.metric{font-family:var(--font-display);font-size:clamp(26px,2.8vw,34px);letter-spacing:-.03em;display:block}
+.syschips{display:flex;flex-wrap:wrap;gap:7px;margin-top:4px}
+.syschip{font-size:11.5px;font-weight:600;border:1px solid var(--paper-20);border-radius:var(--r-pill);padding:5px 11px;color:var(--paper-60)}
+
+/* ---------- 4. one API diagram (signature) ---------- */
+.api{display:grid;grid-template-columns:.85fr 1fr 1.3fr;gap:clamp(16px,2.4vw,30px);align-items:center}
+@media(max-width:1000px){.api{grid-template-columns:1fr}}
+.apicol > .eyebrow{margin-bottom:14px;display:block}
+.stack{display:flex;flex-direction:column;gap:8px}
+.stackitem{border:1.5px solid var(--ink-12);background:var(--white);border-radius:var(--r-btn);padding:14px 16px;
+  font-family:var(--font-display);font-weight:600;font-size:14.5px}
+.hub{background:var(--midnight);color:var(--grey-white);border-radius:var(--r-card);padding:26px 22px;text-align:center;position:relative}
+.hub b{font-family:var(--font-display);font-size:19px;display:block;line-height:1.25}
+.hub span{display:block;font-size:13px;color:var(--paper-60);margin-top:10px}
+.hub__flag{display:inline-block;background:var(--lime);color:var(--midnight);font-size:11px;font-weight:700;
+  letter-spacing:.1em;text-transform:uppercase;padding:5px 11px;border-radius:var(--r-pill);margin-bottom:14px}
+.hub::before,.hub::after{content:"";position:absolute;top:50%;width:clamp(16px,2.4vw,30px);height:0;
+  border-top:2px dotted var(--ink-12)}
+.hub::before{right:100%}
+.hub::after{left:100%}
+@media(max-width:1000px){.hub::before,.hub::after{display:none}}
+.auth{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+@media(max-width:520px){.auth{grid-template-columns:1fr}}
+.authitem{display:flex;align-items:center;justify-content:space-between;gap:10px;background:var(--white);
+  border:1.5px solid var(--ink-12);border-radius:var(--r-btn);padding:13px 15px}
+.authitem b{font-family:var(--font-display);font-weight:600;font-size:14.5px}
+.st{font-size:10.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding:5px 9px;border-radius:var(--r-pill);white-space:nowrap}
+.st--live{background:var(--lime);color:var(--midnight)}
+.st--soon{background:rgba(84,70,255,.12);color:var(--indigo)}
+.api__note{margin-top:24px;display:flex;flex-wrap:wrap;align-items:center;gap:12px 20px}
+
+/* ---------- 5. capability tabs ---------- */
+.tabs{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:26px}
+.tab{background:transparent;border:1.5px solid var(--ink-12);border-radius:var(--r-pill);padding:11px 20px;
+  font-size:14.5px;font-weight:600;cursor:pointer;transition:.16s}
+.tab:hover{border-color:var(--midnight)}
+.tab[aria-selected="true"]{background:var(--indigo);border-color:var(--indigo);color:#fff}
+.panel{display:none}
+.panel[data-active="true"]{display:block}
+.panel > h3{margin-bottom:6px}
+.grid3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-top:24px}
+@media(max-width:900px){.grid3{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:520px){.grid3{grid-template-columns:1fr}}
+.item{background:var(--white);border:1px solid var(--ink-08);border-radius:var(--r-card);padding:20px}
+.item b{font-family:var(--font-display);font-size:15.5px;display:block}
+.item span{display:block;font-size:13.5px;color:var(--ink-60);margin-top:6px}
+.metrics{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-top:24px}
+@media(max-width:700px){.metrics{grid-template-columns:1fr}}
+.metric-card{border-radius:var(--r-card);padding:24px;background:var(--midnight);color:var(--grey-white)}
+.metric-card:nth-child(2){background:var(--indigo)}
+.metric-card:nth-child(3){background:var(--lime);color:var(--midnight)}
+.metric-card b{font-family:var(--font-display);font-size:clamp(28px,3vw,38px);letter-spacing:-.03em;display:block}
+.metric-card span{display:block;font-size:13.5px;opacity:.8;margin-top:8px}
+
+/* ---------- 6. testimonials ---------- */
+.quotes{display:grid;grid-auto-flow:column;grid-auto-columns:minmax(320px,1fr);gap:16px;overflow-x:auto;scroll-snap-type:x mandatory;padding-bottom:10px}
+.quotes::-webkit-scrollbar{height:6px}
+.quotes::-webkit-scrollbar-thumb{background:var(--ink-12);border-radius:99px}
+.quote{scroll-snap-align:start;background:var(--white);border:1px solid var(--ink-08);border-radius:var(--r-card);
+  padding:26px;display:flex;flex-direction:column;gap:16px}
+.qm{font-family:var(--font-display);font-size:34px;line-height:.6;color:var(--indigo)}
+.quote p{font-size:15.5px;line-height:1.5}
+.quote footer{margin-top:auto;display:flex;align-items:center;gap:12px}
+.av{width:42px;height:42px;border-radius:50%;background:var(--midnight);color:var(--grey-white);display:grid;place-items:center;
+  font-family:var(--font-display);font-weight:700;font-size:15px;flex:0 0 auto}
+.quote b{font-family:var(--font-display);font-size:15px;display:block}
+.quote small{font-size:12.5px;color:var(--ink-60)}
+.qnav{display:flex;gap:8px;margin-top:18px}
+.qnav button{width:42px;height:42px;border-radius:var(--r-pill);border:1.5px solid var(--ink-12);background:transparent;cursor:pointer;display:grid;place-items:center}
+.qnav button:hover{border-color:var(--midnight);background:var(--white)}
+.qnav svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2}
+
+/* ---------- 7. closing + form ---------- */
+.close__grid{display:grid;grid-template-columns:1fr 1fr;gap:clamp(28px,4vw,60px);align-items:start}
+@media(max-width:880px){.close__grid{grid-template-columns:1fr}}
+.assure{list-style:none;margin:26px 0 0;padding:0}
+.assure li{padding:18px 0;border-top:1px solid var(--paper-20)}
+.assure li:last-child{border-bottom:1px solid var(--paper-20)}
+.assure b{font-family:var(--font-display);font-size:16px;display:block}
+.assure span{display:block;font-size:14px;color:var(--paper-60);margin-top:5px}
+.formcard{background:var(--grey-white);color:var(--midnight);border-radius:var(--r-card);padding:clamp(22px,3vw,32px)}
+.form{display:grid;gap:14px;margin-top:18px}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media(max-width:520px){.two{grid-template-columns:1fr}}
+.field{display:flex;flex-direction:column;gap:7px}
+.field label{font-size:12.5px;font-weight:600}
+.field input,.field select{font:inherit;font-size:15px;padding:13px 14px;border:1.5px solid var(--ink-12);
+  border-radius:var(--r-btn);background:var(--white);color:var(--midnight)}
+.field input:focus,.field select:focus{border-color:var(--indigo);outline:none}
+.form__note{font-size:12.5px;color:var(--ink-60)}
+.note-flag{background:var(--lime);color:var(--midnight);font-size:12.5px;font-weight:600;padding:10px 16px;border-radius:var(--r-btn);display:inline-block}
+
+/* ---------- 8. FAQ ---------- */
+.faq{max-width:900px;margin:0 auto}
+.q{border-bottom:1px solid var(--ink-12)}
+.q > button{width:100%;background:transparent;border:0;cursor:pointer;text-align:left;padding:22px 0;
+  display:flex;align-items:flex-start;justify-content:space-between;gap:20px;
+  font-family:var(--font-display);font-weight:600;font-size:clamp(16px,1.4vw,19px);line-height:1.35;letter-spacing:-.01em}
+.q__sign{flex:0 0 auto;width:26px;height:26px;border-radius:50%;border:1.5px solid var(--ink-12);display:grid;place-items:center;margin-top:2px}
+.q__sign svg{width:11px;height:11px;stroke:currentColor;fill:none;stroke-width:2.4;transition:transform .2s ease}
+.q[data-open="true"] .q__sign{background:var(--lime);border-color:var(--lime)}
+.q[data-open="true"] .q__sign svg{transform:rotate(45deg)}
+.q__body{display:none;padding:0 0 24px;max-width:74ch}
+.q[data-open="true"] .q__body{display:block}
+.q__body p{font-size:15px;color:var(--ink-60);line-height:1.6}
+.q__body p + p{margin-top:12px}
+.q__body ul{margin:12px 0 0;padding-left:20px;display:flex;flex-direction:column;gap:8px}
+.q__body li{font-size:15px;color:var(--ink-60);line-height:1.55}
+.q__body strong{color:var(--midnight);font-weight:600}
+.faq__more{display:flex;justify-content:center;margin-top:32px}
+
+/* ---------- footer ---------- */
+footer.site{background:var(--midnight);color:var(--grey-white);padding-block:clamp(48px,5vw,76px) 26px}
+.fgrid{display:grid;grid-template-columns:1.25fr repeat(4,minmax(0,1fr));gap:36px 28px}
+@media(max-width:1080px){.fgrid{grid-template-columns:1fr 1fr 1fr}}
+@media(max-width:720px){.fgrid{grid-template-columns:1fr 1fr}}
+@media(max-width:520px){.fgrid{grid-template-columns:1fr}}
+.fbrand .logo{color:var(--grey-white);display:inline-block}
+.fbrand p{margin-top:14px}
+.fsocial{margin-top:26px}
+.fsocial p{font-size:12px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--paper-60)}
+.fsocial div{display:flex;gap:10px;margin-top:12px}
+.fsocial a{width:36px;height:36px;border-radius:var(--r-pill);border:1px solid var(--paper-20);display:grid;place-items:center;transition:.18s}
+.fsocial a svg{width:16px;height:16px;fill:currentColor}
+.fsocial a:hover{background:var(--lime);color:var(--midnight);border-color:var(--lime)}
+.fquery{margin-top:26px;font-size:13.5px;color:var(--paper-60)}
+.fquery a{display:inline-block;margin-top:8px;color:var(--grey-white);font-weight:600;border-bottom:1.5px solid var(--lime);padding-bottom:2px}
+.fcol h5{font-family:var(--font-body);font-size:11.5px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--paper-60);margin:0 0 16px}
+.fcol ul{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:11px}
+.fcol a{font-size:13.5px;color:var(--grey-white);opacity:.8;line-height:1.4}
+.fcol a:hover{opacity:1;color:var(--lime)}
+.fbottom{margin-top:48px;padding-top:22px;border-top:1px solid var(--paper-20);display:flex;flex-wrap:wrap;
+  align-items:center;gap:14px 26px;font-size:12.5px;color:var(--paper-60)}
+.fbottom a{color:var(--grey-white);opacity:.8}
+.fbottom a:hover{opacity:1;color:var(--lime)}
+.fcerts{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-left:auto}
+.fcert{font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;border:1px solid var(--paper-20);
+  border-radius:var(--r-pill);padding:7px 12px;color:var(--grey-white)}
+.fsecure{width:100%;font-size:12.5px;color:var(--paper-60);margin-top:4px}
+.skip{position:absolute;left:-9999px}
+.skip:focus{left:12px;top:12px;z-index:99;background:var(--lime);color:var(--midnight);padding:10px 14px;border-radius:var(--r-btn)}
+</style>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<!-- ================= NAV ================= -->
+<nav class="nav" id="nav">
+  <div class="nav__in">
+    <a href="/" class="logo" aria-label="ClearTax home">cleartax</a>
+    <div class="nav__menu">
+      <div class="nav__item" data-dropdown>
+        <button class="nav__trigger" type="button" aria-expanded="false" aria-controls="dd-products">Products
+          <svg class="caret" viewBox="0 0 12 8" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M1 1.5 6 6.5l5-5"/></svg>
+        </button>
+        <div class="dd" id="dd-products">
+          <a href="/global/recon-ai">AI Reconciliation<small>VAT recon that runs daily on its own</small></a>
+          <a href="/global/compliance">Compliance<small>Returns, filings and notice exposure</small></a>
+          <a href="/global/e-invoicing-solution" aria-current="page">Global E-Invoicing<small>One API, every mandate</small></a>
+          <a href="/global/erp-integration">Integration<small>SAP, Oracle, Dynamics, POS and more</small></a>
+          <a href="/global/scale-security">Scale &amp; Security<small>10k invoices/second, SOC 2, ISO</small></a>
+        </div>
+      </div>
+      <div class="nav__item" data-dropdown>
+        <button class="nav__trigger" type="button" aria-expanded="false" aria-controls="dd-res">Resources
+          <svg class="caret" viewBox="0 0 12 8" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M1 1.5 6 6.5l5-5"/></svg>
+        </button>
+        <div class="dd" id="dd-res">
+          <a href="/electronic-invoicing#country-select">Blogs<small>Country-by-country mandate updates</small></a>
+          <a href="/case-studies">Case Studies<small>Landmark, AirAsia, Zamil and more</small></a>
+          <a href="/ae/press">Press Releases</a>
+        </div>
+      </div>
+      <div class="nav__item"><a class="nav__trigger" href="/contact-us">Contact Us</a></div>
+      <div class="nav__item"><a class="nav__trigger" href="/global/partner-program">Partners</a></div>
+    </div>
+    <div class="nav__right">
+      <div class="geo" data-dropdown>
+        <button class="geo__btn" type="button" aria-expanded="false" aria-controls="geo-panel">
+          <svg class="tick" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 3 2.5 15 0 18M12 3c-2.5 3-2.5 15 0 18"/></svg>
+          <span>Global</span>
+          <svg class="caret" viewBox="0 0 12 8" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M1 1.5 6 6.5l5-5"/></svg>
+        </button>
+        <div class="geo__panel" id="geo-panel">
+          <p class="eyebrow">Select country</p>
+          <div class="geo__grid" id="geoGrid"></div>
+        </div>
+      </div>
+      <a href="#demo" class="btn btn--primary btn--sm">Book a demo</a>
+      <button class="burger" type="button" id="burger" aria-expanded="false" aria-controls="drawer" aria-label="Open menu">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+      </button>
+    </div>
+  </div>
+  <div class="drawer" id="drawer">
+    <div class="drawer__in">
+      <div class="dgroup" data-acc>
+        <button type="button">Products <svg class="caret" viewBox="0 0 12 8" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 1.5 6 6.5l5-5"/></svg></button>
+        <div class="dgroup__body">
+          <a href="/global/recon-ai">AI Reconciliation</a><a href="/global/compliance">Compliance</a>
+          <a href="/global/e-invoicing-solution">Global E-Invoicing</a><a href="/global/erp-integration">Integration</a>
+          <a href="/global/scale-security">Scale &amp; Security</a>
+        </div>
+      </div>
+      <div class="dgroup" data-acc>
+        <button type="button">Resources <svg class="caret" viewBox="0 0 12 8" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 1.5 6 6.5l5-5"/></svg></button>
+        <div class="dgroup__body">
+          <a href="/electronic-invoicing#country-select">Blogs</a><a href="/case-studies">Case Studies</a><a href="/ae/press">Press Releases</a>
+        </div>
+      </div>
+      <div class="dgroup" data-acc>
+        <button type="button">Select country <svg class="caret" viewBox="0 0 12 8" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 1.5 6 6.5l5-5"/></svg></button>
+        <div class="dgroup__body" id="geoGridMobile"></div>
+      </div>
+      <div class="drawer__flat"><a href="/contact-us">Contact Us</a><a href="/global/partner-program">Partners</a></div>
+      <a href="#demo" class="btn btn--primary">Book a demo</a>
+    </div>
+  </div>
+</nav>
+
+<main id="main">
+
+<!-- ================= 1. HERO ================= -->
+<header class="hero dotted">
+  <div class="wrap hero__grid">
+    <div>
+      <p class="eyebrow">Global e-invoicing</p>
+      <h1 style="margin-top:18px">E-Invoicing compliance today. <span class="mark">Tax assurance tomorrow.</span></h1>
+      <p class="lede hero__sub">ClearTax helps you do more than meet the e-invoicing deadline. We prepare you for a future of automated tax scrutiny and always-on global compliance.</p>
+      <div class="hero__actions">
+        <a href="#demo" class="btn btn--primary">Book a demo</a>
+        <a href="#api" class="btn btn--secondary">See how one API works</a>
+      </div>
+      <div class="hero__accred">
+        <p>Working alongside regulators</p>
+        <span class="reg">ZATCA</span><span class="reg">FTA</span><span class="reg">NIC</span><span class="reg">Peppol</span>
+      </div>
+    </div>
+    <div>
+      <div class="vid">
+        <div class="dotted-dark" aria-hidden="true"></div>
+        <button class="vid__play" type="button" aria-label="Play platform video">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>
+        </button>
+        <p class="vid__label">Platform video &mdash; drop in the existing hero recording</p>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- ================= 2. LOGOS ================= -->
+<div class="logos">
+  <div class="wrap">
+    <p class="eyebrow">Trusted by 5,000+ businesses worldwide</p>
+    <div class="marquee"><div class="marquee__track" id="logoTrack" aria-hidden="true"></div></div>
+  </div>
+</div>
+
+<!-- ================= 3. CONTINUOUS COMPLIANCE PLATFORM ================= -->
+<section class="on-dark">
+  <div class="wrap">
+    <div class="sec-head">
+      <p class="eyebrow eyebrow--light">The platform</p>
+      <h2>ClearTax is a <span class="mark">continuous compliance</span> platform</h2>
+      <p class="lede">Enterprise-grade infrastructure trusted by the world's largest organisations.</p>
+    </div>
+    <div class="plat">
+      <article class="pcard pcard--lime">
+        <span class="pcard__ico"><svg viewBox="0 0 24 24"><path d="M13 2 3 14h7l-1 8 10-12h-7z"/></svg></span>
+        <b class="metric">10,000/sec</b>
+        <h4>Built for your busiest day</h4>
+        <p>Infrastructure auto-scales as transactions grow. Month-end peaks and POS surges handled without slowdown.</p>
+      </article>
+
+      <article class="pcard">
+        <span class="pcard__ico"><svg viewBox="0 0 24 24"><path d="M10 13a5 5 0 0 0 7 0l3-3a5 5 0 0 0-7-7l-1 1"/><path d="M14 11a5 5 0 0 0-7 0l-3 3a5 5 0 0 0 7 7l1-1"/></svg></span>
+        <h4>Connects to everything you run on</h4>
+        <p>Pre-built certified connectors, so your daily workflow stays where it is.</p>
+        <div class="syschips">
+          <span class="syschip">SAP</span><span class="syschip">Oracle</span><span class="syschip">MS Dynamics</span>
+          <span class="syschip">OMS</span><span class="syschip">POS</span><span class="syschip">Billing systems</span>
+        </div>
+      </article>
+
+      <article class="pcard pcard--indigo">
+        <span class="pcard__ico"><svg viewBox="0 0 24 24"><path d="M21 12a9 9 0 1 1-3-6.7"/><path d="M21 4v5h-5"/></svg></span>
+        <h4>Always-on e-invoicing</h4>
+        <p>Detects, diagnoses and resubmits failed invoices automatically. No manual intervention, no AR disruption &mdash; invoices clear every time.</p>
+      </article>
+
+      <article class="pcard">
+        <span class="pcard__ico"><svg viewBox="0 0 24 24"><path d="M12 3l8 4v6c0 5-3.5 7.5-8 8-4.5-.5-8-3-8-8V7z"/></svg></span>
+        <h4>Zero downtime. By design.</h4>
+        <p>A cloud outage never becomes a compliance gap, and your data stays in-country wherever you operate.</p>
+      </article>
+
+      <article class="pcard">
+        <span class="pcard__ico"><svg viewBox="0 0 24 24"><path d="M4 7h11l-3-3M20 17H9l3 3"/></svg></span>
+        <h4>VAT assurance: Recon AI agent</h4>
+        <p>Runs every day on its own. Discrepancies surface with AI-recommended actions, and you're notified only when something needs attention.</p>
+      </article>
+
+      <article class="pcard">
+        <span class="pcard__ico"><svg viewBox="0 0 24 24"><rect x="4" y="10" width="16" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg></span>
+        <h4>Enterprise AI security</h4>
+        <p>SOC 2 Type II. ISO 27001:2022. AES 256-bit at rest. Local data residency in every country you operate. Your data never leaves your environment and is never used to train models.</p>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- ================= 4. ONE API. EVERY MANDATE. ================= -->
+<section id="api">
+  <div class="wrap">
+    <div class="sec-head">
+      <p class="eyebrow">Architecture</p>
+      <h2>One API. <span class="mark">Every mandate.</span></h2>
+      <p class="lede">Country mandates sit on top of it as configuration, not separate builds. When a new country goes live, you switch it on — your integration doesn't change.</p>
+    </div>
+
+    <div class="api">
+      <div class="apicol">
+        <span class="eyebrow">Your system</span>
+        <div class="stack">
+          <div class="stackitem">SAP</div>
+          <div class="stackitem">Oracle</div>
+          <div class="stackitem">MS Dynamics</div>
+          <div class="stackitem">POS / OMS / billing</div>
+        </div>
+      </div>
+
+      <div class="apicol">
+        <div class="hub">
+          <span class="hub__flag">One integration</span>
+          <b>ClearTax Global<br>Unified API</b>
+          <span>Format, validate, sign, transmit, retry, reconcile.</span>
+        </div>
+      </div>
+
+      <div class="apicol">
+        <span class="eyebrow">Tax authorities</span>
+        <div class="auth">
+          <div class="authitem"><b>KSA</b><span class="st st--live">Live</span></div>
+          <div class="authitem"><b>Malaysia</b><span class="st st--live">Live</span></div>
+          <div class="authitem"><b>Croatia</b><span class="st st--live">Live</span></div>
+          <div class="authitem"><b>France</b><span class="st st--soon">Live 2026</span></div>
+          <div class="authitem"><b>Oman</b><span class="st st--soon">Live 2026</span></div>
+          <div class="authitem"><b>Poland</b><span class="st st--soon">Live 2026</span></div>
+          <div class="authitem"><b>UAE</b><span class="st st--soon">Live 2027</span></div>
+          <div class="authitem"><b>Germany</b><span class="st st--soon">Live 2027</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="api__note">
+      <span class="reg">50+ countries &amp; growing</span>
+      <a href="/electronic-invoicing#country-select" class="link">See every country and date <span class="arw">&rarr;</span></a>
+    </div>
+  </div>
+</section>
+
+<!-- ================= 5. CAPABILITY TABS ================= -->
+<section style="background:var(--white)">
+  <div class="wrap">
+    <div class="sec-head">
+      <p class="eyebrow">What sits behind it</p>
+      <h2>Seamless integrations, compliance &amp; <span class="mark">dependable support</span></h2>
+    </div>
+
+    <div class="tabs" role="tablist" aria-label="Capabilities">
+      <button class="tab" role="tab" aria-selected="true" aria-controls="c1" id="ct1">Compliance</button>
+      <button class="tab" role="tab" aria-selected="false" aria-controls="c2" id="ct2">Integrations</button>
+      <button class="tab" role="tab" aria-selected="false" aria-controls="c3" id="ct3">Security</button>
+      <button class="tab" role="tab" aria-selected="false" aria-controls="c4" id="ct4">Service and support</button>
+    </div>
+
+    <div class="panel" id="c1" role="tabpanel" aria-labelledby="ct1" data-active="true">
+      <h3>Powering global e-invoicing alongside regulators</h3>
+      <p class="lede">Accredited and connected where it counts, so your invoices reach the right authority in the right format.</p>
+      <div class="grid3">
+        <div class="item"><b>Peppol</b><span>Pan-European e-invoicing &amp; procurement network</span></div>
+        <div class="item"><b>FTA</b><span>UAE Federal Tax Authority compliance</span></div>
+        <div class="item"><b>ZATCA</b><span>Saudi e-invoicing mandate (Fatoorah)</span></div>
+        <div class="item"><b>DGFiP</b><span>French tax administration</span></div>
+        <div class="item"><b>FPS Finance</b><span>Belgian fiscal services</span></div>
+        <div class="item"><b>NIC</b><span>National Informatics Centre</span></div>
+        <div class="item"><b>LHDN</b><span>Malaysian tax authority</span></div>
+      </div>
+    </div>
+
+    <div class="panel" id="c2" role="tabpanel" aria-labelledby="ct2">
+      <h3>Deep integrations mean minimal to no change in your daily workflow</h3>
+      <p class="lede">Connectors already built and already in production, supported by engineers who do only this.</p>
+      <div class="metrics">
+        <div class="metric-card"><b>2,000+</b><span>Successful integrations</span></div>
+        <div class="metric-card"><b>100+</b><span>Integration engineers</span></div>
+        <div class="metric-card"><b>Multiple systems</b><span>ERPs, POS and handheld systems</span></div>
+      </div>
+    </div>
+
+    <div class="panel" id="c3" role="tabpanel" aria-labelledby="ct3">
+      <h3>Audited, encrypted, access-controlled</h3>
+      <p class="lede">Every claim below is independently verified rather than self-asserted.</p>
+      <div class="grid3">
+        <div class="item"><b>SOC 2 Type II</b><span>Annual audit compliance for data security</span></div>
+        <div class="item"><b>ISO 27001 / 22301</b><span>Information security &amp; business continuity</span></div>
+        <div class="item"><b>VAPT</b><span>Vulnerability assessment &amp; penetration testing</span></div>
+        <div class="item"><b>SSL transit</b><span>Encrypted data in transit with TLS 1.3</span></div>
+        <div class="item"><b>AES 256-bit</b><span>Encryption at rest</span></div>
+        <div class="item"><b>RBAC</b><span>Role-based access control</span></div>
+        <div class="item"><b>Auth tokens</b><span>Secure token-based authentication</span></div>
+        <div class="item"><b>Multi-cloud hosting</b><span>OCI local residency with AWS backup</span></div>
+        <div class="item"><b>Privacy</b><span>Regulatory-compliant data privacy</span></div>
+      </div>
+    </div>
+
+    <div class="panel" id="c4" role="tabpanel" aria-labelledby="ct4">
+      <h3>360&deg; support</h3>
+      <p class="lede">End-to-end assistance from onboarding to ongoing optimisation for your business.</p>
+      <div class="grid3">
+        <div class="item"><b>Onboarding</b><span>Implementation support to get your teams live faster</span></div>
+        <div class="item"><b>Go-live</b><span>Joint testing with authorities where mandates require it</span></div>
+        <div class="item"><b>Ongoing</b><span>Regulatory changes shipped as platform updates, not projects</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= 6. TESTIMONIALS ================= -->
+<section>
+  <div class="wrap">
+    <div class="sec-head">
+      <p class="eyebrow">Customers</p>
+      <h2>Trusted by industry leaders across the <span class="mark">world</span></h2>
+    </div>
+    <div class="quotes" id="quotes">
+      <figure class="quote">
+        <span class="qm" aria-hidden="true">&ldquo;</span>
+        <p>ClearTax has transformed the way we handle GST compliance. Real-time creation of e-Invoices and e-Way bills plays a significant role in providing us with critical insight into our business.</p>
+        <footer><span class="av" aria-hidden="true">PK</span><span><b>Pratush Kumar</b><small>DGM-IT, JK Tyre (India)</small></span></footer>
+      </figure>
+      <figure class="quote">
+        <span class="qm" aria-hidden="true">&ldquo;</span>
+        <p>ClearTax is simplifying e-Invoicing. They enabled us to implement the e-Invoicing system in time and handled all our business complexities with ease.</p>
+        <footer><span class="av" aria-hidden="true">RK</span><span><b>Raj Kiran</b><small>Head, Taxation &amp; Retail Finance, Puma (India)</small></span></footer>
+      </figure>
+      <figure class="quote">
+        <span class="qm" aria-hidden="true">&ldquo;</span>
+        <p>We appreciate ClearTax for successfully completing the complex ZATCA e-Invoicing Phase II integration. Their platform enabled seamless management of multiple business units.</p>
+        <footer><span class="av" aria-hidden="true">AA</span><span><b>Abdulbary Atassi</b><small>Director of IT, Zamil Industrial (KSA)</small></span></footer>
+      </figure>
+      <figure class="quote">
+        <span class="qm" aria-hidden="true">&ldquo;</span>
+        <p>Collaborating with ClearTax was an exceptional experience. They streamlined the entire process, even under tight deadlines, for our diverse ERP systems.</p>
+        <footer><span class="av" aria-hidden="true">VB</span><span><b>V Bharathy</b><small>Manager, Finance Applications, Gamuda Land</small></span></footer>
+      </figure>
+      <figure class="quote">
+        <span class="qm" aria-hidden="true">&ldquo;</span>
+        <p>Salam's search for a reliable partner ended with ClearTax. Their tailored solutions ensured a smooth transition for all 8 of our systems in just 3 months.</p>
+        <footer><span class="av" aria-hidden="true">AC</span><span><b>Arslan Choudhary</b><small>Director of Enterprise Enablement, Salam Telco</small></span></footer>
+      </figure>
+    </div>
+    <div class="qnav">
+      <button type="button" id="qPrev" aria-label="Previous testimonials"><svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg></button>
+      <button type="button" id="qNext" aria-label="More testimonials"><svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg></button>
+    </div>
+  </div>
+</section>
+
+<!-- ================= 7. CLOSING + BOOK A DEMO ================= -->
+<section class="on-dark" id="demo">
+  <div class="wrap close__grid">
+    <div>
+      <p class="eyebrow eyebrow--light">Get started</p>
+      <h2 style="margin-top:14px">Ready to run compliance <span class="mark">without limits?</span></h2>
+      <p class="lede" style="margin-top:18px">Join 5,000+ global enterprises that trust ClearTax for uninterrupted, multi-jurisdiction e-invoicing compliance.</p>
+      <ul class="assure">
+        <li><b>Enterprise onboarding</b><span>Dedicated implementation support to help your teams go live faster.</span></li>
+        <li><b>Security-led setup</b><span>Built around zero-trust access, encryption and role-based controls.</span></li>
+        <li><b>Global integration</b><span>Custom-fit to your ERP, subsidiaries and compliance workflows.</span></li>
+      </ul>
+    </div>
+    <div class="formcard">
+      <h3>Book a demo</h3>
+      <p class="small" style="margin-top:8px">Our enterprise specialists will walk you through the platform and help map your scale, security and compliance requirements.</p>
+      <form class="form" id="demoForm" novalidate>
+        <div class="two">
+          <div class="field"><label for="name">Name</label><input id="name" autocomplete="name" required></div>
+          <div class="field"><label for="email">Work email</label><input id="email" type="email" autocomplete="email" required></div>
+        </div>
+        <div class="two">
+          <div class="field"><label for="company">Company</label><input id="company" autocomplete="organization" required></div>
+          <div class="field"><label for="country">Country</label>
+            <select id="country" required>
+              <option value="">Select</option><option>United Arab Emirates</option><option>Saudi Arabia</option>
+              <option>Malaysia</option><option>Germany</option><option>France</option><option>Belgium</option>
+              <option>Poland</option><option>Croatia</option><option>Oman</option><option>Philippines</option>
+              <option>Singapore</option><option>India</option><option>Multiple / other</option>
+            </select>
+          </div>
+        </div>
+        <div class="field"><label for="erp">Your ERP</label>
+          <select id="erp">
+            <option value="">Select</option><option>SAP</option><option>Oracle</option><option>MS Dynamics</option>
+            <option>NetSuite</option><option>More than one</option><option>Other</option>
+          </select>
+        </div>
+        <button type="submit" class="btn btn--primary" style="width:100%">Book a demo</button>
+        <p class="form__note" id="formNote">No spam. Just a 30-minute call with our specialists.</p>
+      </form>
+    </div>
+  </div>
+</section>
+
+<!-- ================= 8. FAQ ================= -->
+<section style="background:var(--white)">
+  <div class="wrap">
+    <div class="sec-head" style="max-width:none;text-align:center;align-items:center">
+      <p class="eyebrow">FAQ</p>
+      <h2>Frequently asked <span class="mark">questions</span></h2>
+      <p class="lede" style="text-align:center">Everything you need to know about global e-invoicing mandates, compliance and the ClearTax platform.</p>
+    </div>
+
+    <div class="faq" id="faq">
+      <div class="q" data-q>
+        <button type="button" aria-expanded="false">
+          What is global e-invoicing and how does it work?
+          <span class="q__sign" aria-hidden="true"><svg viewBox="0 0 12 12"><path d="M6 1v10M1 6h10"/></svg></span>
+        </button>
+        <div class="q__body">
+          <p>Global e-invoicing exchanges invoices in structured, machine-readable formats such as XML or UBL, through government-designated systems or regulated networks like Peppol — replacing paper and PDF invoices with a fully digital, auditable process.</p>
+          <p>Countries enforce one of three models:</p>
+          <ul>
+            <li><strong>Clearance</strong> — the tax authority approves the invoice before it reaches the buyer (Saudi Arabia, India, Mexico).</li>
+            <li><strong>Post-audit / reporting</strong> — invoices are submitted to the authority after issuance (Germany, France).</li>
+            <li><strong>Exchange</strong> — structured invoices travel through a regulated network like Peppol (Belgium, Croatia).</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="q" data-q>
+        <button type="button" aria-expanded="false">
+          Why do multinational businesses need a global e-invoicing solution?
+          <span class="q__sign" aria-hidden="true"><svg viewBox="0 0 12 12"><path d="M6 1v10M1 6h10"/></svg></span>
+        </button>
+        <div class="q__body">
+          <p>Over 100 countries have active or upcoming mandates, each with different formats, timelines and penalties. Managing them country by country creates compliance gaps and duplicated cost.</p>
+          <p>A global solution gives you one integration for all mandates, centralised visibility across entities, and auto-updates that adapt without ERP rework.</p>
+        </div>
+      </div>
+
+      <div class="q" data-q>
+        <button type="button" aria-expanded="false">
+          What is a global e-invoicing network, and how do businesses connect to it?
+          <span class="q__sign" aria-hidden="true"><svg viewBox="0 0 12 12"><path d="M6 1v10M1 6h10"/></svg></span>
+        </button>
+        <div class="q__body">
+          <p>A global e-invoicing network routes structured invoices between businesses and tax authorities. The most widely adopted is Peppol. National portals include India's IRP, Saudi Arabia's Fatoora and Malaysia's MyInvois.</p>
+          <p>Businesses connect through a certified Access Point such as ClearTax, which handles formatting, validation, signing and transmission to the correct authority or buyer.</p>
+        </div>
+      </div>
+
+      <div class="q" data-q>
+        <button type="button" aria-expanded="false">
+          What is the Peppol e-invoicing network and which countries use it?
+          <span class="q__sign" aria-hidden="true"><svg viewBox="0 0 12 12"><path d="M6 1v10M1 6h10"/></svg></span>
+        </button>
+        <div class="q__body">
+          <p>Peppol (Pan-European Public Procurement OnLine) is a not-for-profit international network for exchanging structured business documents. Governed by OpenPeppol, it uses a four-corner model in which sender and receiver each connect through their own certified Access Point.</p>
+          <p>As of 2026, 46+ countries are OpenPeppol members with 1.4 million registered participants:</p>
+          <ul>
+            <li><strong>Mandatory B2B/B2G</strong> — Belgium, Norway, Australia, Singapore, Japan, Croatia.</li>
+            <li><strong>Phased mandates</strong> — Germany, France, Netherlands, Denmark, UAE, New Zealand.</li>
+            <li><strong>Voluntary or pilot</strong> — UK, US, Canada, India, South Africa.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="q" data-q>
+        <button type="button" aria-expanded="false">
+          What are the biggest challenges businesses face with global e-invoicing regulations?
+          <span class="q__sign" aria-hidden="true"><svg viewBox="0 0 12 12"><path d="M6 1v10M1 6h10"/></svg></span>
+        </button>
+        <div class="q__body">
+          <ul>
+            <li><strong>Fragmented regulations</strong> — 100+ countries with different formats, models and deadlines.</li>
+            <li><strong>Frequent changes</strong> — mandates update regularly and grace periods expire at short notice.</li>
+            <li><strong>Complex integrations</strong> — connecting legacy systems to multiple portals is costly without pre-built connectors.</li>
+            <li><strong>Data precision</strong> — structured formats demand exact data; errors cause immediate rejection.</li>
+            <li><strong>Multi-entity compliance</strong> — subsidiaries face different rules and staggered go-live dates.</li>
+            <li><strong>Data residency</strong> — local law often prevents invoice data crossing borders.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="faq__more"><button type="button" class="btn btn--secondary" id="faqMore">Load more</button></div>
+  </div>
+</section>
+
+</main>
+
+<!-- ================= FOOTER ================= -->
+<footer class="site">
+  <div class="wrap">
+    <div class="fgrid">
+      <div class="fcol fbrand">
+        <a href="/" class="logo">cleartax</a>
+        <p class="small" style="max-width:30ch">e-Invoicing and tax compliance infrastructure for enterprises in 50+ countries.</p>
+        <div class="fsocial">
+          <p>Follow us on</p>
+          <div>
+            <a href="https://www.linkedin.com/company/cleartaxmiddleeast" aria-label="LinkedIn"><svg viewBox="0 0 24 24"><path d="M4.98 3.5a2.5 2.5 0 1 1 0 5 2.5 2.5 0 0 1 0-5zM3 9h4v12H3zM9 9h3.8v1.7h.05c.53-1 1.83-2.05 3.77-2.05C20.3 8.65 21 11 21 14.1V21h-4v-6.1c0-1.45-.03-3.32-2.02-3.32-2.02 0-2.33 1.58-2.33 3.21V21H9z"/></svg></a>
+            <a href="https://www.facebook.com/ClearTaxMiddleEast" aria-label="Facebook"><svg viewBox="0 0 24 24"><path d="M13.5 21v-8h2.7l.4-3.1h-3.1V8c0-.9.25-1.5 1.55-1.5H16.7V3.7c-.3-.04-1.3-.14-2.45-.14-2.42 0-4.05 1.48-4.05 4.18V9.9H7.5V13h2.7v8z"/></svg></a>
+            <a href="https://x.com/ClearTax_ME" aria-label="X"><svg viewBox="0 0 24 24"><path d="M17.3 3h3.2l-7 8 7.5 10h-5.3l-4.2-5.6L6.6 21H3.4l7.3-8.3L3.5 3h5.4l3.9 5.2zm-1.1 16h1.5L7.7 4.5H6.1z"/></svg></a>
+            <a href="https://www.instagram.com/cleartax_middleeast/" aria-label="Instagram"><svg viewBox="0 0 24 24"><path d="M12 2.2c3.2 0 3.6 0 4.85.07 1.17.05 1.97.24 2.67.51.72.28 1.33.66 1.93 1.26.6.6.98 1.21 1.26 1.93.27.7.46 1.5.51 2.67.07 1.25.07 1.65.07 3.36s0 2.1-.07 3.35c-.05 1.17-.24 1.97-.51 2.67-.28.72-.66 1.33-1.26 1.93-.6.6-1.21.98-1.93 1.26-.7.27-1.5.46-2.67.51-1.25.07-1.65.07-4.85.07s-3.6 0-4.85-.07c-1.17-.05-1.97-.24-2.67-.51a5.3 5.3 0 0 1-1.93-1.26 5.3 5.3 0 0 1-1.26-1.93c-.27-.7-.46-1.5-.51-2.67C.79 14.1.79 13.7.79 12s0-2.1.07-3.35c.05-1.17.24-1.97.51-2.67.28-.72.66-1.33 1.26-1.93A5.3 5.3 0 0 1 4.56 2.8c.7-.27 1.5-.46 2.67-.51C8.48 2.2 8.88 2.2 12 2.2zm0 2.6c-3.14 0-3.5.01-4.73.07-.94.04-1.45.2-1.79.33-.45.17-.77.38-1.11.72-.34.34-.55.66-.72 1.11-.13.34-.29.85-.33 1.79-.06 1.23-.07 1.58-.07 3.18s.01 1.95.07 3.18c.04.94.2 1.45.33 1.79.17.45.38.77.72 1.11.34.34.66.55 1.11.72.34.13.85.29 1.79.33 1.23.06 1.59.07 4.73.07s3.5-.01 4.73-.07c.94-.04 1.45-.2 1.79-.33.45-.17.77-.38 1.11-.72.34-.34.55-.66.72-1.11.13-.34.29-.85.33-1.79.06-1.23.07-1.58.07-3.18s-.01-1.95-.07-3.18c-.04-.94-.2-1.45-.33-1.79a2.98 2.98 0 0 0-.72-1.11 2.98 2.98 0 0 0-1.11-.72c-.34-.13-.85-.29-1.79-.33-1.23-.06-1.59-.07-4.73-.07zm0 3.4a5.8 5.8 0 1 1 0 11.6 5.8 5.8 0 0 1 0-11.6zm0 2.6a3.2 3.2 0 1 0 0 6.4 3.2 3.2 0 0 0 0-6.4zm6.1-2.9a1.36 1.36 0 1 1-2.72 0 1.36 1.36 0 0 1 2.72 0z"/></svg></a>
+          </div>
+        </div>
+        <div class="fquery">Have a query?<br><a href="/contact-us">Support</a></div>
+      </div>
+
+      <div class="fcol"><h5>Company</h5><ul>
+        <li><a href="/about-us">About us</a></li><li><a href="/contact-us">Contact us</a></li>
+        <li><a href="/ae/press">Media &amp; Press</a></li><li><a href="https://cleartax.in/s/trust">Trust &amp; Safety</a></li>
+        <li><a href="/global/partner-program">Partners</a></li>
+      </ul></div>
+
+      <div class="fcol"><h5>Products &amp; Solutions</h5><ul>
+        <li><a href="/global/e-invoicing-solution">Global E-invoicing Platform</a></li>
+        <li><a href="/fr/en">E-Invoicing Software (France)</a></li>
+        <li><a href="/be">E-Invoicing Software (Belgium)</a></li>
+        <li><a href="/ae">E-Invoicing Software (UAE)</a></li>
+        <li><a href="/sg/e-invoicing-software">E-invoicing Software (Singapore)</a></li>
+        <li><a href="/in">E-invoicing Software (India)</a></li>
+        <li><a href="/my/en">E-Invoicing Software (Malaysia)</a></li>
+      </ul></div>
+
+      <div class="fcol"><h5>Resources &amp; Guides</h5><ul>
+        <li><a href="/sa/ksa-einvoicing">E-Invoicing in Saudi Arabia</a></li>
+        <li><a href="/ae/e-invoicing-uae">E-Invoicing in UAE</a></li>
+        <li><a href="/om/e-invoicing-oman">E-Invoicing in Oman</a></li>
+        <li><a href="/fr/en/e-invoicing-france">E-Invoicing in France</a></li>
+        <li><a href="/be/e-invoicing-belgium">E-Invoicing in Belgium</a></li>
+        <li><a href="/de/en/e-invoicing-germany">E-Invoicing in Germany</a></li>
+        <li><a href="/my/en/e-invoicing-malaysia">E-Invoicing in Malaysia</a></li>
+        <li><a href="/sg/en/e-invoicing-singapore">E-Invoicing in Singapore</a></li>
+      </ul></div>
+
+      <div class="fcol"><h5>Tools</h5><ul>
+        <li><a href="/sa/vat-calculator">VAT Calculator Saudi Arabia</a></li>
+        <li><a href="/ae/vat-calculator">VAT Calculator UAE</a></li>
+        <li><a href="/fr/en/vat-calculator">VAT Calculator France</a></li>
+        <li><a href="/be/vat-calculator">VAT Calculator Belgium</a></li>
+        <li><a href="/my/en/sst-calculator">SST Calculator</a></li>
+      </ul></div>
+    </div>
+
+    <div class="fbottom">
+      <a href="https://www.clear.in/s/legal">Legal</a>
+      <a href="/meta/privacy">Privacy Policy</a>
+      <span>&copy; 2026 ClearTax Pvt. Ltd. All rights reserved.</span>
+      <div class="fcerts">
+        <span class="fcert">ISO 27001</span><span class="fcert">SOC 2 Type II</span>
+        <span class="fcert">SSL / TLS 1.3</span><span class="fcert">GDPR</span>
+      </div>
+      <p class="fsecure">Your data security and privacy matter most to us. Customer data is never used to train models.</p>
+    </div>
+  </div>
+</footer>
+
+<script>
+(function(){
+  "use strict";
+  var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  /* ---------- country selector ---------- */
+  var GEO = [
+    ['🇮🇳','INDIA','https://www.clear.in/',''],['🇲🇾','MALAYSIA','/my/en',''],
+    ['🇺🇸','USA','https://www.clear.tech/',''],['🇵🇱','POLAND','/pl/en','English | Polish'],
+    ['🇸🇦','SAUDI ARABIA','/sa','English | العربية'],['🇴🇲','OMAN','/om',''],
+    ['🇫🇷','FRANCE','/fr/en','English | French'],['🇧🇭','BAHRAIN','/bh',''],
+    ['🇪🇸','SPAIN','/es/en',''],['🇦🇪','UAE','/ae',''],
+    ['🇸🇬','SINGAPORE','/sg/e-invoicing-software',''],['🇩🇪','GERMANY','/de/en',''],
+    ['🇧🇪','BELGIUM','/be/en',''],['🇯🇴','JORDAN','/jo/e-invoicing-software',''],
+    ['🇵🇭','PHILIPPINES','/ph','']
+  ];
+  var geoHTML = GEO.map(function(g){
+    return '<a href="'+g[2]+'"><span class="flag" aria-hidden="true">'+g[0]+'</span><span>'+g[1]+
+           (g[3] ? '<br><em>'+g[3]+'</em>' : '')+'</span></a>';
+  }).join('');
+  ['geoGrid','geoGridMobile'].forEach(function(id){
+    var el = document.getElementById(id); if (el) el.innerHTML = geoHTML;
+  });
+
+  /* ---------- header dropdowns ---------- */
+  var dropdowns = Array.prototype.slice.call(document.querySelectorAll('[data-dropdown]'));
+  function closeAll(except){
+    dropdowns.forEach(function(d){
+      if (d === except) return;
+      d.dataset.open='false';
+      var t = d.querySelector('button'); if (t) t.setAttribute('aria-expanded','false');
+    });
+  }
+  dropdowns.forEach(function(d){
+    var trigger = d.querySelector('button'); if (!trigger) return;
+    trigger.addEventListener('click', function(e){
+      e.stopPropagation();
+      var open = d.dataset.open === 'true';
+      closeAll(d);
+      d.dataset.open = open ? 'false' : 'true';
+      trigger.setAttribute('aria-expanded', open ? 'false' : 'true');
+    });
+    if (window.matchMedia('(hover:hover) and (min-width:1081px)').matches){
+      d.addEventListener('mouseenter', function(){ closeAll(d); d.dataset.open='true'; trigger.setAttribute('aria-expanded','true'); });
+      d.addEventListener('mouseleave', function(){ d.dataset.open='false'; trigger.setAttribute('aria-expanded','false'); });
+    }
+  });
+  document.addEventListener('click', function(){ closeAll(null); });
+  document.addEventListener('keydown', function(e){ if (e.key === 'Escape'){ closeAll(null); shutDrawer(); } });
+
+  /* ---------- mobile drawer ---------- */
+  var burger = document.getElementById('burger');
+  var drawer = document.getElementById('drawer');
+  function shutDrawer(){ if (drawer){ drawer.dataset.open='false'; burger.setAttribute('aria-expanded','false'); } }
+  if (burger && drawer){
+    burger.addEventListener('click', function(e){
+      e.stopPropagation();
+      var open = drawer.dataset.open === 'true';
+      drawer.dataset.open = open ? 'false' : 'true';
+      burger.setAttribute('aria-expanded', open ? 'false' : 'true');
+      burger.setAttribute('aria-label', open ? 'Open menu' : 'Close menu');
+    });
+    drawer.addEventListener('click', function(e){ e.stopPropagation(); });
+    Array.prototype.forEach.call(drawer.querySelectorAll('[data-acc] > button'), function(b){
+      b.addEventListener('click', function(){
+        var g = b.parentNode;
+        g.dataset.open = g.dataset.open === 'true' ? 'false' : 'true';
+      });
+    });
+    Array.prototype.forEach.call(drawer.querySelectorAll('a'), function(a){ a.addEventListener('click', shutDrawer); });
+  }
+
+  /* ---------- logo marquee ---------- */
+  var names = ['Majid Al Futtaim','Landmark Group','AirAsia','Puma','JK Tyre','Zamil Industrial','Gamuda Land',
+    'Salam Telco','Al Naboodah','Marriott','Etihad','KraftHeinz','Vistajet','Serco','Vallourec','Huawei'];
+  var track = document.getElementById('logoTrack');
+  if (track){
+    var h = names.map(function(n){ return '<span>'+n+'</span>'; }).join('');
+    track.innerHTML = h + h;
+    if (reduce) track.style.animation='none';
+  }
+
+  /* ---------- capability tabs ---------- */
+  var tabs = Array.prototype.slice.call(document.querySelectorAll('.tab'));
+  function select(t){
+    tabs.forEach(function(x){
+      x.setAttribute('aria-selected','false');
+      document.getElementById(x.getAttribute('aria-controls')).dataset.active='false';
+    });
+    t.setAttribute('aria-selected','true');
+    document.getElementById(t.getAttribute('aria-controls')).dataset.active='true';
+  }
+  tabs.forEach(function(t){
+    t.addEventListener('click', function(){ select(t); });
+    t.addEventListener('keydown', function(e){
+      var i = tabs.indexOf(t);
+      if (e.key === 'ArrowRight'){ var n = tabs[(i+1)%tabs.length]; n.focus(); select(n); }
+      if (e.key === 'ArrowLeft'){ var p = tabs[(i-1+tabs.length)%tabs.length]; p.focus(); select(p); }
+    });
+  });
+
+  /* ---------- testimonial scroller ---------- */
+  var q = document.getElementById('quotes');
+  function step(dir){
+    if (!q) return;
+    var card = q.querySelector('.quote');
+    var by = card ? card.getBoundingClientRect().width + 16 : 340;
+    q.scrollBy({left: dir*by, behavior: reduce ? 'auto' : 'smooth'});
+  }
+  var pv = document.getElementById('qPrev'), nx = document.getElementById('qNext');
+  if (pv) pv.addEventListener('click', function(){ step(-1); });
+  if (nx) nx.addEventListener('click', function(){ step(1); });
+
+  /* ---------- FAQ accordion ---------- */
+  Array.prototype.forEach.call(document.querySelectorAll('[data-q]'), function(item){
+    var b = item.querySelector('button');
+    b.addEventListener('click', function(){
+      var open = item.dataset.open === 'true';
+      item.dataset.open = open ? 'false' : 'true';
+      b.setAttribute('aria-expanded', open ? 'false' : 'true');
+    });
+  });
+  var more = document.getElementById('faqMore');
+  if (more) more.addEventListener('click', function(){
+    more.textContent = 'Remaining questions load here';
+    more.disabled = true;
+    more.style.opacity = '.6';
+  });
+
+  /* ---------- form (prototype only) ---------- */
+  var form = document.getElementById('demoForm');
+  var note = document.getElementById('formNote');
+  if (form) form.addEventListener('submit', function(e){
+    e.preventDefault();
+    if (!form.checkValidity()){
+      note.textContent = 'A few fields are still empty — fill them and we can prepare properly.';
+      note.style.color = 'var(--indigo)';
+      var first = form.querySelector(':invalid'); if (first) first.focus();
+      return;
+    }
+    var email = document.getElementById('email');
+    if (/@(gmail|yahoo|outlook|hotmail|icloud)\./i.test(email.value)){
+      note.textContent = 'Use your work email so the specialist can look up your setup.';
+      note.style.color = 'var(--indigo)';
+      email.focus();
+      return;
+    }
+    form.innerHTML = '<div style="border:1.5px solid var(--ink-12);border-radius:var(--r-card);padding:26px">'+
+      '<span class="note-flag">Prototype — nothing was sent</span>'+
+      '<h3 style="margin-top:16px">Booked.</h3>'+
+      '<p class="small" style="margin-top:10px">In production: one confirmation email with a calendar link. No sequence.</p></div>';
+  });
+})();
+</script>
+</body>
+</html>
