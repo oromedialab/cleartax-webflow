@@ -1,12 +1,25 @@
+---
+export interface Props {
+  hubspotPortalId?: string;
+  hubspotFormId?: string;
+  hubspotRegion?: string;
+}
+
+const {
+  hubspotPortalId = "245744706",
+  hubspotFormId = "51af6b81-aa59-4bd2-b499-ff081e27324d",
+  hubspotRegion = "na2",
+} = Astro.props as Props;
+---
 <section
     class="relative overflow-hidden bg-[#1B1140] bg-cover bg-center bg-no-repeat max-md:py-12 md:max-lg:py-16 lg:py-16"
     style="background-image: url('https://cdn.prod.website-files.com/63ede4a3da6dbd6b05c4612f/6a06c1ff977549be3339fd66_closing-cta-bg.png');"
 >
     <div
-        class="relative z-10 mx-auto max-w-[var(--container-max)] w-full px-4 md:px-6"
+        class="relative z-10 mx-auto lg:container w-full px-4 md:px-6"
     >
-        <div class="flex justify-between items-center gap-4">
-            <div class="flex-1 flex-col gap-6 max-w-[750px]">
+        <div class="flex flex-col lg:flex-row justify-between lg:items-start gap-10 lg:gap-12">
+            <div class="flex-1 flex-col gap-6 mt-3 lg:mt-6 max-w-[750px]">
                 <h2
                     class="font-nohemi max-md:text-[26px]! md:max-lg:text-4xl! lg:text-[32px]! leading-[1.14]! font-semibold text-left max-w-116 w-full m-0 shimmer-text"
                 >
@@ -15,7 +28,7 @@
                     >
                 </h2>
                 <p
-                    class="mt-4 font-normal text-white/80 max-md:text-[16px]! leading-normal max-w-118 font-gilroy text-left"
+                    class="mt-6 font-normal text-white/80 max-md:text-[16px]! leading-normal max-w-118 font-gilroy text-left"
                 >
                     Crea y Crece is expected from Oct 2026, with business
                     phase-in deadlines to follow. Verifactu is already active
@@ -23,31 +36,367 @@
                     Country & Navarre.
                 </p>
                 <p
-                    class="mt-4 font-normal text-white/80 max-md:text-[16px]! leading-normal max-w-118 font-gilroy text-left"
+                    class="mt-6 font-normal text-white/80 max-md:text-[16px]! leading-normal max-w-118 font-gilroy text-left"
                 >
                     ClearTax implementation takes 6-10 weeks. Start before the
                     deadline gets too close.
                 </p>
             </div>
-            <div
-                class="w-full flex-1 rounded-xl border border-[rgba(255,255,255,0.1)] bg-white px-10 py-6"
-            >
-                <h2
-                    class="text-black font-nohemi max-md:text-[26px]! md:max-lg:text-4xl! lg:text-[32px]! leading-[1.14]! font-semibold text-left"
-                >
-                    Book a Demo
-                </h2>
-                <p
-                    class="mt-2 text-black text-base font-normal max-md:text-[16px]! leading-normal max-w-118 font-gilroy text-left"
-                >
-                    Our Spain specialists will walk you through the platform and
-                    build your compliance roadmap.
-                </p>
+            <div id="contact-form"
+        class="scroll-mt-32 rounded-xl w-full flex-1 border border-[rgba(255,255,255,0.1)] bg-white lg:px-10 lg:py-[30px] px-6 py-6 shadow-[0_40px_80px_rgba(0,0,0,0.3)] lg:px-9 lg:py-10 premium-reveal [transition-delay:500ms] overflow-clip!"
+      >
+        <h3 class="mb-2 text-[22px] font-semibold leading-[1.36] text-black">
+          Book a Demo
+        </h3>
+        <p class="mb-7 text-base leading-[1.5] text-black/80">
+          Our Spain specialists will walk you through the platform and build your
+          compliance roadmap.
+        </p>
+
+        <!-- HubSpot Form Mount Container -->
+        <div id="contact" class="uae-hs-form-wrap" data-portal-id={hubspotPortalId} data-form-id={hubspotFormId} data-region={hubspotRegion}>
+          <!-- Form Skeleton Loader -->
+          <div id="form-skeleton" class="form-skeleton">
+            <div class="skeleton-row-2">
+              <div>
+                <div class="skeleton-label shimmer"></div>
+                <div class="skeleton-input shimmer"></div>
+              </div>
+              <div>
+                <div class="skeleton-label shimmer"></div>
+                <div class="skeleton-input shimmer"></div>
+              </div>
             </div>
+            <div>
+              <div class="skeleton-label shimmer" style="width: 100px;"></div>
+              <div class="skeleton-input shimmer"></div>
+            </div>
+            <div class="skeleton-row-2">
+              <div>
+                <div class="skeleton-label shimmer"></div>
+                <div class="skeleton-input shimmer"></div>
+              </div>
+              <div>
+                <div class="skeleton-label shimmer"></div>
+                <div class="skeleton-input shimmer"></div>
+              </div>
+            </div>
+            <div class="skeleton-button shimmer"></div>
+          </div>
+        </div>
+
+        <p class="mt-4 text-center text-sm text-black/80">
+          No spam. Just a 30-min call with our Spain specialists.
+        </p>
+      </div>
         </div>
     </div>
 </section>
 
+<script is:inline>
+  // HubSpot form embed with URL parameters auto-prefill
+  (() => {
+    let initialized = false;
+    
+    const initForm = () => {
+      if (initialized) return;
+      const container = document.getElementById("contact");
+      if (!container) return;
+      const portalId = container.getAttribute("data-portal-id");
+      const formId = container.getAttribute("data-form-id");
+      const region = container.getAttribute("data-region") || "na2";
+
+      if (window.hbspt && window.hbspt.forms) {
+        initialized = true;
+        window.hbspt.forms.create({
+          portalId: portalId,
+          formId: formId,
+          region: region,
+          target: "#contact",
+          onFormReady: function($form) {
+            // Remove the skeleton loader
+            const skeleton = document.getElementById("form-skeleton");
+            if (skeleton) {
+              skeleton.remove();
+            }
+
+            const formEl = ($form && $form[0]) ? $form[0] : $form;
+            if (formEl && formEl.querySelector) {
+              const urlParams = new URLSearchParams(window.location.search);
+              const utms = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 'utm_content'];
+              utms.forEach(utm => {
+                const value = urlParams.get(utm);
+                if (value) {
+                  const input = formEl.querySelector('input[name="' + utm + '"]');
+                  if (input) {
+                    input.value = value;
+                  }
+                }
+              });
+            }
+          }
+        });
+      }
+    };
+
+    const checkAndInit = () => {
+      if (window.hbspt && window.hbspt.forms) {
+        initForm();
+      } else {
+        const script = document.querySelector('script[src*="hsforms.net"]');
+        if (script) {
+          script.addEventListener('load', initForm);
+        }
+        let pollCount = 0;
+        const interval = setInterval(() => {
+          pollCount++;
+          if (window.hbspt && window.hbspt.forms) {
+            clearInterval(interval);
+            initForm();
+          } else if (pollCount > 100) {
+            clearInterval(interval);
+          }
+        }, 100);
+      }
+    };
+
+    if (document.readyState === "loading") {
+      document.addEventListener("DOMContentLoaded", checkAndInit);
+    } else {
+      checkAndInit();
+    }
+  })();
+</script>
+
+<style is:global>
+  /* Pixel-perfect styles for light glassmorphism HubSpot Form to match layout */
+  .uae-hs-form-wrap {
+    width: 100%;
+    min-height: 300px;
+  }
+  .uae-hs-form-wrap .inputs-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  .uae-hs-form-wrap form {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 16px !important;
+  }
+  .uae-hs-form-wrap .hs-form-field {
+    margin-bottom: 0 !important;
+  }
+  .uae-hs-form-wrap .hs-form-field > label {
+    display: block !important;
+    font-size: 13px !important;
+    font-weight: 600 !important;
+    color: rgba(0, 0, 0, 0.8) !important;
+    margin-bottom: 5px !important;
+  }
+  .uae-hs-form-wrap .hs-form-field > label .hs-form-required {
+    color: #ef4444 !important;
+    margin-left: 2px !important;
+  }
+  .uae-hs-form-wrap input[type="text"],
+  .uae-hs-form-wrap input[type="email"],
+  .uae-hs-form-wrap input[type="tel"],
+  .uae-hs-form-wrap input[type="number"],
+  .uae-hs-form-wrap select,
+  .uae-hs-form-wrap textarea {
+    width: 100% !important;
+    border-radius: 8px !important;
+    border: 1px solid #e2e8f0 !important;
+    background-color: #ffffff !important;
+    padding: 11px 14px !important;
+    font-size: 14.5px !important;
+    color: #1e1b4b !important;
+    outline: none !important;
+    transition: all 0.25s ease !important;
+    box-sizing: border-box !important;
+    box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.02) !important;
+  }
+  .uae-hs-form-wrap input:focus,
+  .uae-hs-form-wrap select:focus,
+  .uae-hs-form-wrap textarea:focus {
+    border-color: #110072 !important;
+    box-shadow: 0 0 0 3px rgba(17, 0, 114, 0.12) !important;
+  }
+  .uae-hs-form-wrap textarea {
+    min-height: 80px !important;
+    resize: vertical !important;
+  }
+  .uae-hs-form-wrap .hs_phone .hs-fieldtype-intl-phone {
+    display: flex !important;
+    gap: 12px !important;
+    width: 102% !important;
+  }
+  .uae-hs-form-wrap select {
+    appearance: auto !important;
+  }
+  .uae-hs-form-wrap fieldset {
+    max-width: none !important;
+    border: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    display: flex !important;
+    flex-direction: row !important;
+    gap: 12px !important;
+  }
+  @media (max-width: 640px) {
+    .uae-hs-form-wrap fieldset {
+      flex-direction: column !important;
+      gap: 16px !important;
+    }
+  }
+  .uae-hs-form-wrap fieldset .hs-form-field {
+    flex: 1 !important;
+  }
+  .uae-hs-form-wrap .input {
+    margin-right: 0 !important;
+  }
+  .uae-hs-form-wrap .hs-form-booleancheckbox label,
+  .uae-hs-form-wrap .legal-consent-container label {
+    display: flex !important;
+    align-items: flex-start !important;
+    font-size: 14px !important;
+    color: rgba(0, 0, 0, 0.8) !important;
+    line-height: 1.5 !important;
+    font-weight: 400 !important;
+    cursor: pointer !important;
+  }
+  .uae-hs-form-wrap .hs-form-booleancheckbox label a,
+  .uae-hs-form-wrap .legal-consent-container label a {
+    color: #110072 !important;
+    font-weight: 600 !important;
+    text-decoration: underline !important;
+  }
+  .uae-hs-form-wrap input[type="checkbox"] {
+    margin-top: 3px !important;
+    flex-shrink: 0 !important;
+    accent-color: #110072 !important;
+    width: 15px !important;
+    height: 15px !important;
+    cursor: pointer !important;
+  }
+  .uae-hs-form-wrap .hs-submit {
+    margin-top: 8px !important;
+  }
+  .uae-hs-form-wrap input[type="submit"],
+  .uae-hs-form-wrap .hs-button {
+    width: 100% !important;
+    background: linear-gradient(135deg, #110072 0%, #7a5698 100%) !important;
+    color: white !important;
+    padding: 13px !important;
+    border-radius: 30px !important;
+    font-weight: 700 !important;
+    font-size: 15px !important;
+    border: none !important;
+    cursor: pointer !important;
+    font-family: inherit !important;
+    transition: all 0.25s ease !important;
+    box-shadow: 0 4px 14px rgba(17, 0, 114, 0.25) !important;
+  }
+  .uae-hs-form-wrap input[type="submit"]:hover,
+  .uae-hs-form-wrap .hs-button:hover {
+    transform: translateY(-1px) !important;
+    box-shadow: 0 6px 18px rgba(17, 0, 114, 0.35) !important;
+    opacity: 0.95 !important;
+  }
+  .uae-hs-form-wrap .hs-error-msgs {
+    list-style: none !important;
+    padding: 0 !important;
+    margin: 4px 0 0 !important;
+    font-size: 11.5px !important;
+    color: #ef4444 !important;
+  }
+  .uae-hs-form-wrap .hs-error-msg {
+    color: #ef4444 !important;
+  }
+  .uae-hs-form-wrap .submitted-message {
+    background: #eef2f6 !important;
+    color: #1e1b4b !important;
+    padding: 18px !important;
+    border-radius: 8px !important;
+    font-size: 14.5px !important;
+    font-weight: 600 !important;
+    text-align: center !important;
+    border: 1px solid rgba(17, 0, 114, 0.15) !important;
+  }
+  .uae-hs-form-wrap fieldset:has([class*="hs_utm_"]),
+  .uae-hs-form-wrap .hs-form-field[style*="display: none"] {
+    display: none !important;
+  }
+
+  /* ==================== FORM SKELETON SHIMMER STYLES ==================== */
+  .form-skeleton {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    width: 100%;
+    min-height: 300px;
+  }
+  .skeleton-row-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+  @media (max-width: 640px) {
+    .skeleton-row-2 {
+      grid-template-columns: 1fr;
+      gap: 16px;
+    }
+  }
+  .skeleton-label {
+    height: 14px;
+    width: 80px;
+    background: rgba(0, 0, 0, 0.08);
+    border-radius: 4px;
+    margin-bottom: 6px;
+  }
+  .skeleton-input {
+    height: 44px;
+    background: rgba(0, 0, 0, 0.03);
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    border-radius: 8px;
+    width: 100%;
+  }
+  .skeleton-button {
+    height: 46px;
+    background: linear-gradient(135deg, rgba(17, 0, 114, 0.25) 0%, rgba(122, 86, 152, 0.25) 100%);
+    border-radius: 30px;
+    width: 100%;
+    margin-top: 8px;
+  }
+
+  /* Shimmer Animation */
+  .shimmer {
+    position: relative;
+    overflow: hidden;
+  }
+  .shimmer::after {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    transform: translateX(-100%);
+    background-image: linear-gradient(
+      90deg,
+      rgba(255, 255, 255, 0) 0%,
+      rgba(255, 255, 255, 0.6) 20%,
+      rgba(255, 255, 255, 0.6) 60%,
+      rgba(255, 255, 255, 0) 100%
+    );
+    animation: shimmer-anim 1.6s infinite;
+    content: "";
+  }
+  @keyframes shimmer-anim {
+    100% {
+      transform: translateX(100%);
+    }
+  }
+</style>
 <style>
     .shimmer-text {
         background: linear-gradient(

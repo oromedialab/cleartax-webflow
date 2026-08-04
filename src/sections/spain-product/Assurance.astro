@@ -99,28 +99,28 @@ const assuranceCards = [
         </div>
 
     <!-- Bottom Accordion Section -->
-    <div class="flex flex-row gap-3 lg:gap-4 w-full h-[360px] lg:h-[320px]" id="assurance-accordion">
+    <div class="grid grid-cols-1 gap-4 lg:flex lg:flex-row lg:gap-4 w-full lg:h-[320px]" id="assurance-accordion">
       {assuranceCards.map((card, idx) => (
         <div 
           data-id={card.id}
-          class={`assurance-card group relative flex flex-col justify-between overflow-hidden transition-all duration-500 ease-[cubic-bezier(0.4,0,0.2,1)] rounded-[20px] ${card.bg} cursor-pointer 
-            ${idx === 0 ? 'flex-1 p-6 lg:p-7 cursor-default' : 'w-[80px] shrink-0 p-3 hover:brightness-95'}`}
+          class={`assurance-card group relative flex flex-col justify-between overflow-hidden transition-all duration-500 ease-[cubic-bezier(0.4,0,0.2,1)] rounded-[20px] ${card.bg} max-lg:w-full max-lg:p-6
+            ${idx === 0 ? 'flex-1 p-6 lg:p-7 cursor-default' : 'w-[80px] shrink-0 p-3 hover:brightness-95 cursor-pointer lg:cursor-pointer'}`}
         >
           <!-- Top Row (Icon + Link) -->
-          <div class="flex flex-row items-start justify-between w-full">
+          <div class="flex flex-row items-center md:items-start justify-between w-full">
             <div class="shrink-0 flex items-center border-white border shadow-sm rounded-[14px] justify-center transition-all duration-500" set:html={card.iconCode}>
             </div>
             
-            <div class={`link-wrapper overflow-hidden transition-all duration-500 flex justify-end shrink-0
+            <div class={`link-wrapper overflow-hidden transition-all duration-500 flex justify-end shrink-0 max-lg:w-32 max-lg:opacity-100
                 ${idx === 0 ? 'opacity-100 w-32' : 'opacity-0 w-0'}`}>
-              <a href="#" class={`${card.text} font-semibold text-sm lg:text-base flex items-center hover:opacity-80`}>
+              <a href="#contact-form" class={`contact-trigger ${card.text} font-semibold text-sm lg:text-base flex items-center hover:opacity-80`}>
                 <span class="underline decoration-current decoration-1 underline-offset-4">Book A Demo <span class="text-base inline-block ml-1">↗</span></span>
               </a>
             </div>
           </div>
 
           <!-- Bottom Content -->
-          <div class={`text-wrapper transition-all duration-500 flex flex-col justify-end
+          <div class={`text-wrapper transition-all duration-500 flex flex-col justify-end max-lg:opacity-100 max-lg:pointer-events-auto max-lg:mt-6
               ${idx === 0 ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>
             <div class=" w-full">
               <h3 class={`${card.text} text-xl lg:text-[22px] font-medium mb-2 lg:mb-3`}>{card.title}</h3>
@@ -140,6 +140,7 @@ const assuranceCards = [
     
     cards.forEach(card => {
       card.addEventListener('click', () => {
+        if (window.innerWidth < 1024) return; // Disable accordion logic on mobile
         if (card.classList.contains('flex-1')) return;
 
         cards.forEach(c => {
@@ -167,7 +168,23 @@ const assuranceCards = [
         text?.classList.add('opacity-100');
       });
     });
+
+    const contactTriggers = document.querySelectorAll(".contact-trigger");
+    contactTriggers.forEach((trigger) => {
+      trigger.addEventListener("click", (e) => {
+        e.preventDefault();
+        const targetId = trigger.getAttribute("href")?.replace("#", "");
+        if (targetId) {
+          const contactSection = document.getElementById(targetId);
+          if (contactSection) {
+            contactSection.scrollIntoView({ behavior: "smooth" });
+          }
+        }
+      });
+    });
   });
+
+
 </script>
 
 <style is:global>
