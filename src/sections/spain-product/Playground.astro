@@ -2574,31 +2574,17 @@
         }
 
         if (section) {
-            section.addEventListener("mouseenter", initTiltedCards, {
-                once: true,
-            });
-            section.addEventListener("touchstart", initTiltedCards, {
-                once: true,
-            });
-            if ("IntersectionObserver" in window) {
-                const obs = new IntersectionObserver(
-                    (entries) => {
-                        entries.forEach((entry) => {
-                            if (entry.isIntersecting) {
-                                initTiltedCards();
-                                section.classList.add("animate-start");
-                            } else {
-                                section.classList.remove("animate-start");
-                            }
-                        });
-                    },
-                    { rootMargin: "100px" },
-                );
-                obs.observe(section);
-            } else {
+            // Animations only trigger on user interaction (hover/touch), not on page scroll.
+            // This prevents heavy GSAP timelines from running as soon as the section enters viewport.
+            section.addEventListener("mouseenter", () => {
                 initTiltedCards();
                 section.classList.add("animate-start");
-            }
+            }, { once: true });
+
+            section.addEventListener("touchstart", () => {
+                initTiltedCards();
+                section.classList.add("animate-start");
+            }, { once: true, passive: true });
         }
     })();
 </script>
