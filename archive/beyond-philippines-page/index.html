@@ -1,6 +1,47 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+<script>
+(function() {
+    var interactionEvents = ['mouseover', 'keydown', 'touchmove', 'touchstart', 'wheel'];
+    var blockedScripts = [];
+    var observer = new MutationObserver(function(mutations) {
+        mutations.forEach(function(mutation) {
+            mutation.addedNodes.forEach(function(node) {
+                if (node.tagName === 'SCRIPT') {
+                    var src = node.src || '';
+                    if (src && /webflow|jquery|webfont|fonts\.googleapis|usercentrics|linkedin|smartlook|gtm/.test(src)) {
+                        blockedScripts.push({
+                            src: src,
+                            attrs: Array.from(node.attributes).reduce(function(a, b) { a[b.name] = b.value; return a; }, {})
+                        });
+                        node.parentNode.removeChild(node);
+                    }
+                }
+            });
+        });
+    });
+    observer.observe(document.documentElement, { childList: true, subtree: true });
+    function loadJS() {
+        if (window.__JS_LOADED) return;
+        window.__JS_LOADED = true;
+        observer.disconnect();
+        interactionEvents.forEach(function(e) { window.removeEventListener(e, loadJS); });
+        (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','GTM-MKPDH9');
+        blockedScripts.forEach(function(s) {
+            var script = document.createElement('script');
+            Object.keys(s.attrs).forEach(function(k) { script.setAttribute(k, s.attrs[k]); });
+            script.async = true;
+            document.head.appendChild(script);
+        });
+        var f = document.createElement('link'); f.rel = 'stylesheet'; f.href = 'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@600;700;800&family=Playfair+Display:wght@700;800;900&display=swap'; document.head.appendChild(f);
+        var uc = document.createElement('script'); uc.src = "https://web.cmp.usercentrics.eu/ui/loader.js"; uc.setAttribute('data-settings-id', 'utqqyaEbvbzrTk'); uc.async = true; document.head.appendChild(uc);
+        document.querySelectorAll('img[data-src]').forEach(function(img) { img.src = img.dataset.src; });
+    }
+    interactionEvents.forEach(function(e) { window.addEventListener(e, loadJS, { once: true, passive: true }); });
+})();
+</script>
+
 <meta content="noindex, nofollow" name="robots"/>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -218,39 +259,50 @@ footer.ctf{background:#171e28;color:#8983A6;padding:56px 0 28px;font-family:'Int
   .bw .arow{grid-template-columns:140px 130px 1fr!important;min-width:750px;gap:16px!important}
 }
 
-/* ── SPEAKERS (3-card roster) ─────────────────────────────── */
+/* ── SPEAKERS ─────────────────────────────────────────────── */
 .spk-main{background:linear-gradient(160deg,#07111F 0%,#0C1E38 50%,#0E2345 100%);padding:72px 0;position:relative;overflow:hidden}
 .spk-main::before{content:'';position:absolute;inset:0;background:radial-gradient(600px 400px at 80% 20%,rgba(201,169,97,.1),transparent 60%),radial-gradient(500px 400px at 10% 80%,rgba(60,100,200,.1),transparent 60%);pointer-events:none}
 .spk-main .wrap{position:relative}
 .spk-eyb{display:inline-block;font-size:12.5px;font-weight:700;color:#C9A961;letter-spacing:.18em;text-transform:uppercase;padding:6px 14px;border-radius:999px;background:rgba(201,169,97,.1);border:1px solid rgba(201,169,97,.3)}
 .spk-h2{font-size:clamp(26px,3vw,38px);color:#fff;margin:20px 0 0;letter-spacing:-.02em;font-weight:800;line-height:1.1}
 .spk-sub{color:#7a8fa8;font-size:16px;margin:16px 0 0;max-width:720px;line-height:1.6}
-.spk3-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:22px;margin-top:44px}
-.spk3-card{background:rgba(255,255,255,.04);border:1px solid rgba(201,169,97,.18);border-radius:18px;padding:32px 28px;transition:transform .2s,border-color .2s,background .2s}
-.spk3-card:hover{transform:translateY(-4px);border-color:rgba(201,169,97,.42);background:rgba(201,169,97,.06)}
-.spk3-tag{display:inline-block;font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:6px 14px;border-radius:999px;background:rgba(201,169,97,.14);color:#C9A961;margin-bottom:26px}
-.spk3-tag.lead{background:rgba(107,33,200,.3);color:#d9c2ff}
-.spk3-head{display:flex;align-items:center;gap:18px;margin-bottom:18px}
-.spk3-av{width:72px;height:72px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#0A1A33;font-size:24px;font-weight:800;flex-shrink:0;font-family:'Inter',sans-serif}
-.spk3-av.gold{background:linear-gradient(135deg,#C9A961,#0A1A33);color:#fff}
-.spk3-av.purple{background:linear-gradient(135deg,#8b5cf6,#6B21C8);color:#fff}
-.spk3-name{font-size:20px;font-weight:800;color:#fff;line-height:1.2;margin-bottom:5px;letter-spacing:-.01em}
-.spk3-role{font-size:13.5px;color:#8a94a8;line-height:1.4}
-.spk3-role .co{color:#C9A961;font-weight:700}
-.spk3-bio{font-size:13.5px;color:#9aa5ba;line-height:1.6;padding-top:16px;border-top:1px solid rgba(255,255,255,.1)}
-.spk3-tbd{background:rgba(255,255,255,.03);border:1.5px dashed rgba(201,169,97,.3);display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center}
-.spk3-tbd-ic{width:64px;height:64px;border-radius:50%;background:rgba(201,169,97,.1);border:1.5px dashed rgba(201,169,97,.4);display:flex;align-items:center;justify-content:center;color:#C9A961;margin-bottom:18px}
-.spk3-tbd-ic svg{width:26px;height:26px}
-.spk3-tbd h4{font-size:18px;font-weight:800;color:#fff;margin:0 0 10px;letter-spacing:-.01em}
-.spk3-tbd p{font-size:13.5px;color:#9aa5ba;line-height:1.6;margin:0}
-@media(max-width:900px){.spk3-grid{grid-template-columns:1fr}}
+.spk-main-inner{display:grid;grid-template-columns:1.3fr 0.7fr;gap:48px;align-items:flex-start;margin-top:36px}
+.spk-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+.spk-card{background:rgba(255,255,255,.04);border:1px solid rgba(201,169,97,.18);border-radius:16px;padding:20px 16px;text-align:center;transition:transform .2s,border-color .2s,background .2s}
+.spk-card:hover{transform:translateY(-4px);border-color:rgba(201,169,97,.42);background:rgba(201,169,97,.06)}
+.spk-card .spk-img-wrap{width:64px;height:64px;border-radius:50%;margin:0 auto 12px;overflow:hidden;border:2px solid rgba(201,169,97,.35);box-shadow:0 8px 24px rgba(0,0,0,.35);display:flex;align-items:center;justify-content:center;background:rgba(255, 255, 255, 0.8);color:#fff;font-weight:800;font-size:18px;font-family:'Inter',sans-serif}
+.spk-card .spk-img-wrap img{width:100%;height:100%;object-fit:cover;object-position:top}
+.spk-card .spk-name{font-family:'Inter',sans-serif;font-weight:700;font-size:14px;color:#fff;margin:0 0 4px;line-height:1.3}
+.spk-card .spk-role{font-size:12px;color:#C9A961;font-weight:600;margin:0 0 3px;line-height:1.3}
+.spk-card .spk-company{font-size:11.5px;color:#8a94a8;line-height:1.3}
+.spk-right-head{font-family:'Inter',sans-serif;font-size:26px;font-weight:800;color:#fff;line-height:1.2;margin-bottom:6px}
+.spk-right-head em{color:#C9A961;font-style:normal}
+.spk-right-sub{font-size:14px;color:#7a8fa8;margin-bottom:24px;margin-top:4px}
+.spk-right-divider{width:40px;height:3px;background:#C9A961;border-radius:2px;margin-bottom:24px}
+.spk-logo-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.spk-logo-card{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:10px 14px;display:flex;flex-direction: column;justify-content: center; align-items:center;gap:14px;transition:border-color .2s,background .2s}
+.spk-logo-card:hover{border-color:rgba(201,169,97,.3);background:rgba(201,169,97,.05)}
+.spk-logo-card .logo-chip{background:#fff;border-radius:6px;padding:6px 10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:0 2px 10px rgba(0,0,0,.2)}
+.spk-logo-card img{height:44px;width:auto;max-width:120px;object-fit:contain;display:block}
+.spk-logo-card span{font-size:13px;font-weight:600;color:#c2ccde;text-align:left;line-height:1.3}
+.spk-more{margin-top:14px;font-size:12.5px;color:#C9A961;font-weight:600;letter-spacing:.08em;display:flex;align-items:center;gap:6px}
+.spk-more::before{content:'——';letter-spacing:-2px;opacity:.6}
+@media(max-width:900px){
+  .spk-main-inner{grid-template-columns:1fr}
+  .spk-grid{grid-template-columns:repeat(2,1fr)}
+  .spk-logo-grid{grid-template-columns:repeat(3,1fr)}
+}
+@media(max-width:560px){
+  .spk-grid{grid-template-columns:repeat(2,1fr)}
+  .spk-logo-grid{grid-template-columns:repeat(2,1fr)}
+}
 
 @keyframes pulse-dot{0%,100%{box-shadow:0 0 0 3px rgba(201,169,97,.22)}50%{box-shadow:0 0 0 6px rgba(201,169,97,.08)}}
 .w-webflow-badge{display:none!important}
 </style>
 </head>
 <body>
-    <!-- Google Tag Manager (noscript) -->
+<!-- Google Tag Manager (noscript) -->
 <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-P5NDQXGH"
 height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 <!-- End Google Tag Manager (noscript) -->
@@ -259,7 +311,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 <div class="ct-nav-wrap">
   <nav class="ct-nav">
     <div class="nav-logo">
-      <img src="https://cdn.prod.website-files.com/6093bce33d9b4bae841b04e3/69dfcff6071b983201f5f097_logo-cleartax.svg" alt="ClearTax" width="120" height="24" fetchpriority="high"
+      <img src="https://cdn.prod.website-files.com/6093bce33d9b4bae841b04e3/69dfcff6071b983201f5f097_logo-cleartax.svg" alt="ClearTax" width="120" height="24" loading="lazy" decoding="async"
            onerror="this.style.display='none';this.nextSibling.style.display='inline'">
       <span class="nav-logo-text" style="display:none">cleartax</span>
     </div>
@@ -282,7 +334,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
   <div class="wrap">
     <div class="hero-logo-block">
       <div class="beyond-logo" aria-label="Beyond Global by ClearTax">
-        <img src="https://cdn.prod.website-files.com/6093bce33d9b4bae841b04e3/69e8784a9d2efaae7a88bb96_beyond-global.png" alt="Beyond Global by ClearTax" width="240" height="52" fetchpriority="high" />
+        <img src="https://cdn.prod.website-files.com/6093bce33d9b4bae841b04e3/69e8784a9d2efaae7a88bb96_beyond-global.png" alt="Beyond Global by ClearTax" loading="lazy" decoding="async" />
       </div>
       <span class="hero-badge"><span class="dot"></span>Philippines · Manila Chapter · 2026</span>
     </div>
@@ -291,7 +343,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     <div class="meta">
       <div class="mc"><div class="ml">Date</div><div class="mv">August 12, 2026</div></div>
       <div class="mc"><div class="ml">Time</div><div class="mv">8:30 AM – 1:30 PM PHT</div></div>
-      <div class="mc"><div class="ml">Location</div><div class="mv">Manila</div></div>
+      <div class="mc"><div class="ml">Location</div><div class="mv">Shangri-La The Fort, Manila</div></div>
       <div class="mc"><div class="ml">Format</div><div class="mv">In-person · Invite-only</div></div>
     </div>
     <div class="cta-row">
@@ -335,41 +387,101 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
   <div class="wrap">
     <span class="spk-eyb">▸ Speakers</span>
     <h2 class="spk-h2">Philippines &amp; global tax-tech leaders.</h2>
-    <p class="spk-sub">On stage at Manila · 12 August 2026. Full roster being finalised. Expect a mix of Large Taxpayer CFOs, Group CTOs, Heads of Tax, and ClearTax leadership.</p>
-    <div class="spk3-grid">
-
-      <div class="spk3-card">
-        <span class="spk3-tag">▸ Keynote</span>
-        <div class="spk3-head">
-          <div class="spk3-av gold">AG</div>
-          <div>
-            <div class="spk3-name">Archit Gupta</div>
-            <div class="spk3-role">Founder &amp; CEO<br><span class="co">ClearTax</span></div>
+    <p class="spk-sub">On stage at Shangri-La The Fort, Manila · 12 August 2026.</p>
+    <div class="spk-main-inner">
+      <!-- Left: Speaker cards -->
+      <div>
+        <div class="spk-grid">
+          <div class="spk-card">
+            <div class="spk-img-wrap"><img src="https://cdn.prod.website-files.com/6093bce33d9b4bae841b04e3/6a26901c552736c94e5ce279_archit-gupta.png" alt="Archit Gupta" width="80" height="80" loading="lazy" decoding="async"></div>
+            <div class="spk-name">Archit Gupta</div>
+            <div class="spk-role">Founder &amp; CEO</div>
+            <div class="spk-company">ClearTax</div>
+          </div>
+          <div class="spk-card">
+            <div class="spk-img-wrap"><img src="https://cdn.prod.website-files.com/6093bce33d9b4bae841b04e3/6a7331b004dfc9b3d5c6be24_mohammed-farhan-k.png" alt="Mohammed Farhan K." width="64" height="64" loading="lazy" decoding="async"></div>
+            <div class="spk-name">Mohammed Farhan K.</div>
+            <div class="spk-role">Business Head – SEA &amp; KSA</div>
+            <div class="spk-company">ClearTax</div>
+          </div>
+          <div class="spk-card">
+            <div class="spk-img-wrap"><img src="https://cdn.prod.website-files.com/6093bce33d9b4bae841b04e3/6a7331b1c6241cc3929de1e7_rakshit-jain.png" alt="Rakshit Jain" width="64" height="64" loading="lazy" decoding="async"></div>
+            <div class="spk-name">Rakshit Jain</div>
+            <div class="spk-role">Head of GTM Strategy &amp; Operations</div>
+            <div class="spk-company">ClearTax</div>
+          </div>
+          <div class="spk-card">
+            <div class="spk-img-wrap"><img src="https://cdn.prod.website-files.com/6093bce33d9b4bae841b04e3/6a7331b0fb39a5e33feac162_mike-san-diego.png" alt="Mike San Diego" width="64" height="64" loading="lazy" decoding="async"></div>
+            <div class="spk-name">Mike San Diego</div>
+            <div class="spk-role">Chief Financial Officer, Sr Vice President</div>
+            <div class="spk-company">EON Group</div>
+          </div>
+          <div class="spk-card">
+            <div class="spk-img-wrap"><img src="https://cdn.prod.website-files.com/6093bce33d9b4bae841b04e3/6a7331af4097fdaa805bccfe_eugene-eligio-velasquez.png" alt="Eugene Eligio Velasquez" width="64" height="64" loading="lazy" decoding="async"></div>
+            <div class="spk-name">Eugene Eligio Velasquez</div>
+            <div class="spk-role">Vice President, Chief Financial Officer</div>
+            <div class="spk-company">Trans World Trading Co., Inc.</div>
+          </div>
+          <div class="spk-card">
+            <div class="spk-img-wrap"><img src="https://cdn.prod.website-files.com/6093bce33d9b4bae841b04e3/6a7331b004dfc9b3d5c6be17_mary-grace-sebastian-aguinaldo.png" alt="Mary Grace Sebastian-Aguinaldo" width="64" height="64" loading="lazy" decoding="async"></div>
+            <div class="spk-name">Mary Grace Sebastian-Aguinaldo</div>
+            <div class="spk-role">Chief Financial Officer</div>
+            <div class="spk-company">M-Commerce Corporation</div>
+          </div>
+          <div class="spk-card">
+            <div class="spk-img-wrap"><img src="https://cdn.prod.website-files.com/6093bce33d9b4bae841b04e3/6a7331b0714947d91fa8879f_naconiel-dela-torre.png" alt="Naconiel Dela Torre" width="64" height="64" loading="lazy" decoding="async"></div>
+            <div class="spk-name">Naconiel Dela Torre</div>
+            <div class="spk-role">Finance Shared Services Head</div>
+            <div class="spk-company">Filinvest Business Services Corporation</div>
+          </div>
+          <div class="spk-card">
+            <div class="spk-img-wrap"><img src="https://cdn.prod.website-files.com/6093bce33d9b4bae841b04e3/6a7331af4a903f2dc3b7856d_fortune-ernest-jose.png" alt="Fortune Ernest Jose" width="64" height="64" loading="lazy" decoding="async"></div>
+            <div class="spk-name">Fortune Ernest Jose</div>
+            <div class="spk-role">VP for Finance</div>
+            <div class="spk-company">Enderun Colleges</div>
+          </div>
+          <div class="spk-card">
+            <div class="spk-img-wrap"><img src="https://cdn.prod.website-files.com/6093bce33d9b4bae841b04e3/6a7331b17bb536ad265fc122_olivia-samantha-agustin.png" alt="Olivia Samantha Agustin" width="64" height="64" loading="lazy" decoding="async"></div>
+            <div class="spk-name">Olivia Samantha Agustin</div>
+            <div class="spk-role">REPH Decision Support Head &amp; Financial Accounting Hub Transition Lead</div>
+            <div class="spk-company">Reed Elsevier Philippines</div>
+          </div>
+          <div class="spk-card">
+            <div class="spk-img-wrap"><img src="https://cdn.prod.website-files.com/6093bce33d9b4bae841b04e3/6a7331affb39a5e33feac11c_aldrin-dennis-dulig.png" alt="Aldrin Dennis Dulig" width="64" height="64" loading="lazy" decoding="async"></div>
+            <div class="spk-name">Aldrin Dennis Dulig</div>
+            <div class="spk-role">VP Finance</div>
+            <div class="spk-company">Concentrix</div>
+          </div>
+          <div class="spk-card">
+            <div class="spk-img-wrap"><img src="https://cdn.prod.website-files.com/6093bce33d9b4bae841b04e3/6a7331b063aa42d5d669f079_geoffrey-ogang.png" alt="Geoffrey Ogang" width="64" height="64" loading="lazy" decoding="async"></div>
+            <div class="spk-name">Geoffrey Ogang</div>
+            <div class="spk-role">VP Finance</div>
+            <div class="spk-company">Sprout Solutions</div>
+          </div>
+          <div class="spk-card">
+            <div class="spk-img-wrap"><img src="https://cdn.prod.website-files.com/6093bce33d9b4bae841b04e3/6a7331b00ec924f35e27690c_giselle-arellano.png" alt="Giselle Arellano" width="64" height="64" loading="lazy" decoding="async"></div>
+            <div class="spk-name">Giselle Arellano</div>
+            <div class="spk-role">Head of Finance, VP Finance Accounting &amp; Procurement</div>
+            <div class="spk-company">Shearwater CPO</div>
           </div>
         </div>
-        <p class="spk3-bio">Delivers the vision keynote on the Philippines' digital tax future: CTCs, real-time reporting evolution, AI-driven audits, and ASEAN interoperability.</p>
       </div>
-
-      <div class="spk3-card">
-        <span class="spk3-tag lead">▸ Session Lead</span>
-        <div class="spk3-head">
-          <div class="spk3-av purple">MF</div>
-          <div>
-            <div class="spk3-name">Mohammed Farhan</div>
-            <div class="spk3-role">Business Head, Southeast Asia<br><span class="co">ClearTax</span></div>
-          </div>
+      <!-- Right: Company roster -->
+      <div class="spk-right">
+        <div class="spk-right-head">Finance leaders<br>from the <em>Philippines'</em><br>most dynamic<br>industries.</div>
+        <div class="spk-right-divider"></div>
+        <div class="spk-logo-grid">
+          <div class="spk-logo-card"><img src="https://cdn.prod.website-files.com/6093bce33d9b4bae841b04e3/6a7335b34229f2272a9ee772_logo-eon-group.png" alt="EON Group" loading="lazy" decoding="async"><span>EON Group</span></div>
+          <div class="spk-logo-card"><img src="https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6a744b18eb481309db1cec97_image%20(1).png" alt="Trans World Trading Co., Inc." loading="lazy" decoding="async"><span>Trans World Trading Co.</span></div>
+          <div class="spk-logo-card"><img src="https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6a744b17638fdaa619809b77_image%20(6).png" alt="Filinvest Business Services Corporation" loading="lazy" decoding="async"><span>Filinvest Business Services</span></div>
+          <div class="spk-logo-card"><img src="https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6a744b17e7b264502745ed39_image%20(5).png" alt="Concentrix" loading="lazy" decoding="async"><span>Concentrix</span></div>
+          <div class="spk-logo-card"><img src="https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6a744b18da2a57168a859089_image.png" alt="Enderun Colleges" loading="lazy" decoding="async"><span>Enderun Colleges</span></div>
+          <div class="spk-logo-card"><img src="https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6a744b1793d8443261dc42d8_image%20(3).png" alt="Sprout Solutions" loading="lazy" decoding="async"><span>Sprout Solutions</span></div>
+          <div class="spk-logo-card"><img src="https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6a744b17bd250eb2d2b5fbba_image%20(2).png" alt="Reed Elsevier Philippines" loading="lazy" decoding="async"><span>Reed Elsevier Philippines</span></div>
+          <div class="spk-logo-card"><img src="https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6a744b18a39fcd4ef15ca50f_image%20(4).png" alt="Shearwater CPO" loading="lazy" decoding="async"><span>Shearwater CPO</span></div>
         </div>
-        <p class="spk3-bio">Leads the BIR Compliance Playbook session: CAS re-registration, EIS Certification, Permit to Transmit, and the questions CFOs should be asking their teams before Q4 2026.</p>
+        <div class="spk-more">+ MORE LEADERS JOINING</div>
       </div>
-
-      <div class="spk3-card spk3-tbd">
-        <div class="spk3-tbd-ic">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-        </div>
-        <h4>8-10 panellists to be announced</h4>
-        <p>Group CFOs, CTOs and Heads of Tax from Large Taxpayers across the Philippines. Check back for updates or request your invite to receive the confirmed roster.</p>
-      </div>
-
     </div>
   </div>
 </section>
@@ -394,95 +506,107 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     <div class="agenda-scroll-container">
       <div class="aw">
         <div class="arow">
-          <div class="atime">8:30 – 9:20 AM</div>
+          <div class="atime">8:30 AM</div>
           <div><span class="pil net">Networking</span></div>
           <div><div class="atitle">Registration, Breakfast &amp; Peer Networking</div><p class="adesc">Arrivals, registration, and networking with fellow peers.</p></div>
         </div>
         <div class="arow">
-          <div class="atime">9:20 – 9:30 AM</div>
+          <div class="atime">9:25 AM</div>
           <div><span class="pil">Opening</span></div>
+          <div><div class="atitle">Opening Welcome Remarks</div><p class="adesc">Setting the stage for the Philippines E-Invoicing Executive Exchange.</p></div>
+        </div>
+        <div class="arow">
+          <div class="atime">9:30 AM</div>
+          <div><span class="pil key">Context setting</span></div>
           <div>
-            <div class="atitle">Opening Welcome Remarks</div>
-            <p class="adesc">Setting the stage for the Philippines E-Invoicing Executive Exchange.</p>
+            <div class="atitle">The Mandate Context</div>
+            <p class="adesc">A grounded look at where the mandate stands today: what has been finalized, what is still evolving (CEI, Wave 2), and what taxpayers must have in motion before Q4 2026. Includes discussion prompts on EIS-readiness, transformation upside, and peer benchmarking.</p>
             <ul class="aspk">
-              <li><strong>Speaker:</strong> [Emcee / Portfolio Director]</li>
+              <li><strong>Compliance:</strong> what does EIS-ready actually mean, and what have we not yet done?</li>
+              <li><strong>Transformation:</strong> how do we turn compliance cost into data and control upside?</li>
+              <li><strong>Peer benchmark:</strong> where does our readiness stand vs peers in our sector?</li>
             </ul>
           </div>
         </div>
         <div class="arow">
-          <div class="atime">9:30 – 9:50 AM</div>
-          <div><span class="pil key">Vision Keynote</span></div>
+          <div class="atime">10:10 AM</div>
+          <div><span class="pil key">BIR Keynote</span></div>
           <div>
-            <div class="atitle">Vision Keynote | The Philippines' Digital Tax Future: What Comes After E-Invoicing?</div>
-            <p class="adesc">Continuous Transaction Controls, real-time reporting evolution, AI-driven audits, digital VAT administration, and ASEAN interoperability possibilities.</p>
+            <div class="atitle">What Every Large Taxpayer Should Have Done by This Time Next Year</div>
+            <p class="adesc">A view from the tax authority on expectations, enforcement direction, and the readiness milestones every Large Taxpayer should have reached over the coming year.</p>
             <ul class="aspk">
-              <li><strong>Speaker:</strong> Archit Gupta, CEO, ClearTax</li>
+              <li><strong>Speaker:</strong> TBC, BIR</li>
             </ul>
           </div>
         </div>
         <div class="arow">
-          <div class="atime">9:50 – 10:10 AM</div>
-          <div><span class="pil prt">Session</span></div>
+          <div class="atime">10:35 AM</div>
+          <div><span class="pil prt">ClearTax Keynote</span></div>
           <div>
-            <div class="atitle">The BIR Compliance Playbook: What Enterprises Should Solve Before Go-Live</div>
-            <p class="adesc">CAS re-registration, EIS Certification and Permit to Transmit, JSON schema and JWS signing, 3-day transmission window, ERP fitment, and the questions CFOs should be asking their teams before Q4 2026.</p>
+            <div class="atitle">ClearTax Keynote | E-Invoicing Beyond Borders: Navigating the Philippines Mandate, ASEAN Readiness, and Global Compliance Trends</div>
+            <p class="adesc">Discussion topics:</p>
             <ul class="aspk">
-              <li><strong>Speaker:</strong> Mohammed Farhan, Associate Director, SEA Region, ClearTax</li>
+              <li><strong>Philippines E-Invoicing Readiness:</strong> latest BIR developments, compliance timelines, and what businesses must do now.</li>
+              <li><strong>ASEAN E-Invoicing Landscape:</strong> key developments across Malaysia, Singapore, Vietnam, Indonesia.</li>
+              <li><strong>Global Trends Shaping Compliance:</strong> insights from Europe, GCC, and other mature e-invoicing markets.</li>
+              <li><strong>India as the world's largest live mandate:</strong> what 8 years of enforcement teaches us.</li>
+              <li><strong>Building for the Future:</strong> how enterprises can create a scalable e-invoicing strategy for multi-country operations and evolving tax regulations.</li>
             </ul>
           </div>
         </div>
         <div class="arow">
-          <div class="atime">10:10 – 11:00 AM</div>
+          <div class="atime">11:30 AM</div>
           <div><span class="pil pan">Panel Discussion 1</span></div>
           <div>
-            <div class="atitle">Compliance to Competence Preparing the Enterprise for Continuous Compliance</div>
-            <p class="adesc">Why master data is becoming more strategic than ever, how finance, tax, IT, and procurement must collaborate, centralized vs decentralized operating models, and what leaders will be prioritizing in the next 12 months.</p>
+            <div class="atitle">Panel 1 | From RR 11-2025 to Go-Live</div>
+            <p class="adesc">Discussion topics:</p>
             <ul class="aspk">
-              <li><strong>Panelists:</strong> Group CFOs, Tax Heads &amp; CIOs</li>
+              <li>EIS Certification and PTT process; CAS re-registration pre-work</li>
+              <li>eSRS onboarding + Cross-Border E-Invoicing (CEI) readiness (both November 2025 developments)</li>
+              <li>JSON schema, JWS signing, 3-day window</li>
+              <li>Inter-company and export scenarios</li>
+              <li>Penalty exposure vs cost of compliance</li>
+              <li>Supplier readiness across the ecosystem</li>
+              <li>A 90-day action list to start Monday</li>
             </ul>
           </div>
         </div>
         <div class="arow">
-          <div class="atime">11:00 – 11:30 AM</div>
+          <div class="atime">12:10 PM</div>
           <div><span class="pil brk">Break</span></div>
           <div><div class="atitle">Networking Coffee Break</div><p class="adesc">Networking, coffee, and informal discussion.</p></div>
         </div>
         <div class="arow">
-          <div class="atime">11:30 AM – 12:20 PM</div>
+          <div class="atime">12:30 PM</div>
           <div><span class="pil pan">Panel Discussion 2</span></div>
           <div>
-            <div class="atitle">Integration, Scalability, and Compliance Considerations for E-Invoicing</div>
-            <p class="adesc">Middleware strategies, multi-ERP complexity (SAP, Oracle, Dynamics, and custom Philippine CAS environments), shared service centre models, custom invoice flows, integration timelines, and internal IT bandwidth issues.</p>
+            <div class="atitle">Panel 2 | E-Invoicing as a Finance Transformation Lever</div>
+            <p class="adesc">Discussion topics:</p>
             <ul class="aspk">
-              <li><strong>Panelists:</strong> Group CFOs, Tax Heads &amp; CIOs</li>
+              <li>The finance stack of 2027</li>
+              <li>ERP readiness (SAP, Oracle, Dynamics) without expensive customisation</li>
+              <li>Separation of layers (e-invoicing, ERP, AI)</li>
+              <li>Real-time visibility into revenue and VAT</li>
+              <li>Master-data cleanup as the hidden project</li>
+              <li>Multi-country ambition across ASEAN + GCC</li>
+              <li>Where AI helps vs where it distracts</li>
             </ul>
           </div>
         </div>
         <div class="arow">
-          <div class="atime">12:20 – 1:10 PM</div>
-          <div><span class="pil pan">Leadership Panel</span></div>
-          <div>
-            <div class="atitle">Can E-Invoicing Deliver Business Value Beyond Compliance? | The conversation beyond regulation</div>
-            <p class="adesc">AP/AR automation, faster reconciliation, working capital visibility, fraud reduction, audit efficiency, data intelligence, supplier collaboration, and finance transformation.</p>
-            <ul class="aspk">
-              <li><strong>Panelists:</strong> Group CFOs, Tax Heads &amp; CIOs</li>
-            </ul>
-          </div>
-        </div>
-        <div class="arow">
-          <div class="atime">1:10 – 1:15 PM</div>
+          <div class="atime">1:10 PM</div>
           <div><span class="pil">Live Polling</span></div>
           <div><div class="atitle">Live Polling Segment</div><p class="adesc">Real-time audience polling on biggest implementation concerns, ERP systems, and readiness gaps.</p></div>
         </div>
         <div class="arow">
-          <div class="atime">1:15 – 1:20 PM</div>
-          <div><span class="pil">Closing</span></div>
-          <div><div class="atitle">Closing Remarks, Raffle Draw &amp; Group Photo</div><p class="adesc">Event summary, raffle draw, and group photograph.</p></div>
+          <div class="atime">1:15 PM</div>
+          <div><span class="pil">Raffle Draw</span></div>
+          <div><div class="atitle">Raffle Draw</div><p class="adesc">Prize raffle draw for attendees.</p></div>
         </div>
         <div class="arow">
           <div class="atime">1:20 PM</div>
           <div><span class="pil net">Networking</span></div>
-          <div><div class="atitle">Lunch &amp; Curated Networking</div><p class="adesc">Continued peer-to-peer discussions and networking over lunch.</p></div>
+          <div><div class="atitle">VIP Networking Lunch</div><p class="adesc">Continued peer-to-peer discussions and networking over lunch.</p></div>
         </div>
       </div>
     </div>
@@ -494,13 +618,13 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
   <div class="wrap ci">
     <div>
       <span class="eyb"><span class="dt"></span> Limited seats · Invite-only</span>
-      <h2 style="margin-top:16px">Reserve your seat at Beyond Philippines · Manila</h2>
+      <h2 style="margin-top:16px">Reserve your seat at Beyond Philippines · Shangri-La The Fort, Manila</h2>
       <p>Join a focused room of CFOs, Tax Heads, and finance leaders shaping the Philippines' e-invoicing future. Breakfast, sessions, and lunch included.</p>
       <div style="display:flex;gap:10px;margin-top:18px;flex-wrap:wrap">
-        <div class="tg">📅 August 12, 2026</div><div class="tg">📍[Venue TBC], Manila, Philippines</div><div class="tg">⏱ 8:30 AM – 1:30 PM PHT</div>
+        <div class="tg">📅 August 12, 2026</div><div class="tg">📍Shangri-La The Fort, Manila, Philippines</div><div class="tg">⏱ 8:30 AM – 1:30 PM PHT</div>
       </div>
     </div>
-    <form class="frm" onsubmit="event.preventDefault(); submitForm(this);">
+    <form class="frm" onsubmit="event.preventDefault();submitForm(this)">
       <div class="fr">
         <div class="fd"><label>First name</label><input type="text" required placeholder="First name" id="f-firstname"/></div>
         <div class="fd"><label>Last name</label><input type="text" required placeholder="Last name" id="f-lastname"/></div>
@@ -610,38 +734,31 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
   ['mouseover','keydown','touchstart','scroll'].forEach(function(e){window.addEventListener(e,loadGTM,{once:true,passive:true})});
 })();
 
-async function submitForm(form) {
-  const btn = form.querySelector('button[type="submit"]');
-  const originalText = btn.textContent;
-  btn.textContent = 'Submitting...';
-  btn.disabled = true;
-  const urlParams = new URLSearchParams(window.location.search);
-  const data = {
-    sheetName: 'Manila',
-    firstName: document.getElementById('f-firstname').value,
-    lastName:  document.getElementById('f-lastname').value,
-    jobTitle:  document.getElementById('f-jobtitle').value,
-    company:   document.getElementById('f-company').value,
-    email:     document.getElementById('f-email').value,
-    mobile:    "'" + document.getElementById('f-countrycode').value + ' ' + document.getElementById('f-mobile').value,
-    utm_source:   urlParams.get('utm_source') || '',
-    utm_medium:   urlParams.get('utm_medium') || '',
-    utm_campaign: urlParams.get('utm_campaign') || '',
-    utm_term:     urlParams.get('utm_term') || '',
-    utm_content:  urlParams.get('utm_content') || ''
+async function submitForm(form){
+  var btn=form.querySelector('button[type="submit"]');
+  btn.textContent='Submitting...';btn.disabled=true;
+  var urlParams=new URLSearchParams(window.location.search);
+  var data={
+    sheetName:'manila',
+    firstName:document.getElementById('f-firstname').value,
+    lastName:document.getElementById('f-lastname').value,
+    jobTitle:document.getElementById('f-jobtitle').value,
+    company:document.getElementById('f-company').value,
+    email:document.getElementById('f-email').value,
+    mobile:"'"+document.getElementById('f-countrycode').value+' '+document.getElementById('f-mobile').value,
+    utm_source:urlParams.get('utm_source')||'',
+    utm_medium:urlParams.get('utm_medium')||'',
+    utm_campaign:urlParams.get('utm_campaign')||''
   };
-  try {
-    await fetch('https://script.google.com/macros/s/AKfycbyagzKYbBU92AjTD-nvsQmspcLVs5yDpYLYicL1gn40NnITPaBADqDlSshMfWXnv1Rf/exec', {
-      method: 'POST', mode: 'no-cors',
-      headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify(data)
+  try{
+    await fetch('https://script.google.com/macros/s/AKfycbyagzKYbBU92AjTD-nvsQmspcLVs5yDpYLYicL1gn40NnITPaBADqDlSshMfWXnv1Rf/exec',{
+      method:'POST',mode:'no-cors',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify(data)
     });
-    window.location.href = 'https://www.cleartax.com/beyond/thank-you';
-  } catch(err) {
-    console.error('Submission error:', err);
-    btn.textContent = originalText;
-    btn.disabled = false;
-  }
+    window.location.href='https://www.cleartax.com/beyond/thank-you';
+  }catch(err){console.error('Submission error:',err);}
+  finally{btn.textContent='Request invite →';btn.disabled=false;}
 }
 
 // Intersection Observer for below-fold images
