@@ -210,19 +210,6 @@ const assuranceCards = [
 
         startAutoplay();
 
-        const contactTriggers = document.querySelectorAll(".contact-trigger");
-        contactTriggers.forEach((trigger) => {
-          trigger.addEventListener("click", (e) => {
-            e.preventDefault();
-            const targetId = trigger.getAttribute("href")?.replace("#", "");
-            if (targetId) {
-              const contactSection = document.getElementById(targetId);
-              if (contactSection) {
-                contactSection.scrollIntoView({ behavior: "smooth" });
-              }
-            }
-          });
-        });
       };
 
       if (document.readyState === "loading") {
@@ -238,3 +225,25 @@ const assuranceCards = [
     });
   })();
 </script>
+
+<!-- Eager: contact-trigger scroll is lightweight and must be ready before first click -->
+<script is:inline>
+  (function () {
+    const setup = () => {
+      document.addEventListener("click", (e) => {
+        const trigger = e.target.closest(".contact-trigger");
+        if (!trigger) return;
+        e.preventDefault();
+        const targetId = trigger.getAttribute("href")?.replace("#", "");
+        if (targetId) {
+          const el = document.getElementById(targetId);
+          if (el) el.scrollIntoView({ behavior: "smooth" });
+        }
+      });
+    };
+    if (document.readyState === "loading") {
+      document.addEventListener("DOMContentLoaded", setup);
+    } else {
+      setup();
+    }
+  })();
