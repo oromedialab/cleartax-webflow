@@ -112,14 +112,47 @@ const checklistItems = [
             <!-- Empty column placeholder on desktop to reserve space in grid layout so text does not overlap -->
             <div class="hidden lg:block pointer-events-none"></div>
         </div>
-
     </div>
 </section>
 
 <script is:inline>
-    window.scrollToPlayground = (e) => {
-        if (e) e.preventDefault();
-        const el = document.getElementById("playground");
-        if (el) el.scrollIntoView({ behavior: "smooth" });
-    };
+    (function () {
+        let heroInitialized = false;
+
+        function initHero() {
+            if (heroInitialized) return;
+            heroInitialized = true;
+
+            // Cleanup listeners
+            heroEvents.forEach(function (event) {
+                window.removeEventListener(event, initHero, { passive: true });
+            });
+
+            const run = () => {
+                window.scrollToPlayground = (e) => {
+                    if (e) e.preventDefault();
+                    const el = document.getElementById("playground");
+                    if (el) el.scrollIntoView({ behavior: "smooth" });
+                };
+            };
+
+            if (document.readyState === "loading") {
+                document.addEventListener("DOMContentLoaded", run);
+            } else {
+                run();
+            }
+        }
+
+        const heroEvents = [
+            "mousemove",
+            "mouseenter",
+            "mouseover",
+            "touchstart",
+            "scroll",
+            "keydown",
+        ];
+        heroEvents.forEach(function (event) {
+            window.addEventListener(event, initHero, { passive: true });
+        });
+    })();
 </script>

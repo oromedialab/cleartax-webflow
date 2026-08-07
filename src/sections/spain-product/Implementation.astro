@@ -1126,7 +1126,27 @@ const tabs = [
 
 
 <script is:inline>
-  (function() {
+  (function () {
+    let implInitialized = false;
+
+    function initImplementation() {
+      if (implInitialized) return;
+      implInitialized = true;
+
+      // Cleanup listeners
+      implEvents.forEach(function (event) {
+        window.removeEventListener(event, initImplementation, { passive: true });
+      });
+
+      const run = () => { initInfrastructure(); };
+
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', run);
+      } else {
+        run();
+      }
+    }
+
     function initInfrastructure() {
       const section = document.querySelector('.infrastructure-section');
       if (!section) return;
@@ -2188,11 +2208,10 @@ const tabs = [
       }
     }
 
-    if (document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', initInfrastructure);
-    } else {
-      initInfrastructure();
-    }
+    const implEvents = ['mousemove', 'mouseenter', 'mouseover', 'touchstart', 'scroll', 'keydown'];
+    implEvents.forEach(function (event) {
+      window.addEventListener(event, initImplementation, { passive: true });
+    });
   })();
 </script>
 

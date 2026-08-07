@@ -135,83 +135,106 @@ const assuranceCards = [
 </section>
 
 <script is:inline>
-  document.addEventListener('DOMContentLoaded', () => {
-    const cardsArray = Array.from(document.querySelectorAll('.assurance-card'));
-    let autoplayTimer;
-    let currentIndex = 0;
+  (function () {
+    let assuranceInitialized = false;
 
-    function activateCard(card) {
-        if (window.innerWidth < 1024) return; // Disable accordion logic on mobile
-        if (card.classList.contains('flex-1')) return;
+    function initAssurance() {
+      if (assuranceInitialized) return;
+      assuranceInitialized = true;
 
-        cardsArray.forEach(c => {
-          c.classList.remove('flex-1', 'p-6', 'lg:p-7', 'cursor-default');
-          c.classList.add('w-[80px]', 'shrink-0', 'p-3', 'hover:brightness-95', 'cursor-pointer');
-          
-          const link = c.querySelector('.link-wrapper');
-          link?.classList.remove('opacity-100', 'w-32');
-          link?.classList.add('opacity-0', 'w-0');
+      // Cleanup listeners
+      assuranceEvents.forEach(function (event) {
+        window.removeEventListener(event, initAssurance, { passive: true });
+      });
 
-          const text = c.querySelector('.text-wrapper');
-          text?.classList.remove('opacity-100', 'translate-y-0', 'duration-500', 'delay-[400ms]', 'ease-out', 'duration-300', 'delay-500', 'delay-100');
-          text?.classList.add('opacity-0', 'translate-y-4', 'duration-0', 'pointer-events-none');
+      const run = () => {
+        const cardsArray = Array.from(document.querySelectorAll('.assurance-card'));
+        let autoplayTimer;
+        let currentIndex = 0;
+
+        function activateCard(card) {
+          if (window.innerWidth < 1024) return;
+          if (card.classList.contains('flex-1')) return;
+
+          cardsArray.forEach(c => {
+            c.classList.remove('flex-1', 'p-6', 'lg:p-7', 'cursor-default');
+            c.classList.add('w-[80px]', 'shrink-0', 'p-3', 'hover:brightness-95', 'cursor-pointer');
+
+            const link = c.querySelector('.link-wrapper');
+            link?.classList.remove('opacity-100', 'w-32');
+            link?.classList.add('opacity-0', 'w-0');
+
+            const text = c.querySelector('.text-wrapper');
+            text?.classList.remove('opacity-100', 'translate-y-0', 'duration-500', 'delay-[400ms]', 'ease-out', 'duration-300', 'delay-500', 'delay-100');
+            text?.classList.add('opacity-0', 'translate-y-4', 'duration-0', 'pointer-events-none');
+          });
+
+          card.classList.remove('w-[80px]', 'shrink-0', 'p-3', 'hover:brightness-95', 'cursor-pointer');
+          card.classList.add('flex-1', 'p-6', 'lg:p-7', 'cursor-default');
+
+          const link = card.querySelector('.link-wrapper');
+          link?.classList.remove('opacity-0', 'w-0');
+          link?.classList.add('opacity-100', 'w-32');
+
+          const text = card.querySelector('.text-wrapper');
+          text?.classList.remove('opacity-0', 'translate-y-4', 'duration-0', 'pointer-events-none');
+          text?.classList.add('opacity-100', 'translate-y-0', 'duration-500', 'delay-[400ms]', 'ease-out');
+        }
+
+        cardsArray.forEach((card, idx) => {
+          card.addEventListener('click', () => {
+            currentIndex = idx;
+            activateCard(card);
+          });
         });
 
-        card.classList.remove('w-[80px]', 'shrink-0', 'p-3', 'hover:brightness-95', 'cursor-pointer');
-        card.classList.add('flex-1', 'p-6', 'lg:p-7', 'cursor-default');
-        
-        const link = card.querySelector('.link-wrapper');
-        link?.classList.remove('opacity-0', 'w-0');
-        link?.classList.add('opacity-100', 'w-32');
+        const startAutoplay = () => {
+          if (autoplayTimer) clearInterval(autoplayTimer);
+          autoplayTimer = setInterval(() => {
+            if (window.innerWidth < 1024) return;
+            currentIndex = (currentIndex + 1) % cardsArray.length;
+            activateCard(cardsArray[currentIndex]);
+          }, 5000);
+        };
 
-        const text = card.querySelector('.text-wrapper');
-        text?.classList.remove('opacity-0', 'translate-y-4', 'duration-0', 'pointer-events-none');
-        text?.classList.add('opacity-100', 'translate-y-0', 'duration-500', 'delay-[400ms]', 'ease-out');
-    }
-    
-    cardsArray.forEach((card, idx) => {
-      card.addEventListener('click', () => {
-        currentIndex = idx;
-        activateCard(card);
-      });
-    });
+        const stopAutoplay = () => {
+          if (autoplayTimer) clearInterval(autoplayTimer);
+        };
 
-    const startAutoplay = () => {
-      if (autoplayTimer) clearInterval(autoplayTimer);
-      autoplayTimer = setInterval(() => {
-        if (window.innerWidth < 1024) return;
-        currentIndex = (currentIndex + 1) % cardsArray.length;
-        activateCard(cardsArray[currentIndex]);
-      }, 5000);
-    };
-
-    const stopAutoplay = () => {
-      if (autoplayTimer) clearInterval(autoplayTimer);
-    };
-
-    const accordion = document.getElementById('assurance-accordion');
-    if (accordion) {
-      accordion.addEventListener('mouseenter', stopAutoplay);
-      accordion.addEventListener('mouseleave', startAutoplay);
-      accordion.addEventListener('touchstart', stopAutoplay, {passive: true});
-    }
-
-    startAutoplay();
-
-    const contactTriggers = document.querySelectorAll(".contact-trigger");
-    contactTriggers.forEach((trigger) => {
-      trigger.addEventListener("click", (e) => {
-        e.preventDefault();
-        const targetId = trigger.getAttribute("href")?.replace("#", "");
-        if (targetId) {
-          const contactSection = document.getElementById(targetId);
-          if (contactSection) {
-            contactSection.scrollIntoView({ behavior: "smooth" });
-          }
+        const accordion = document.getElementById('assurance-accordion');
+        if (accordion) {
+          accordion.addEventListener('mouseenter', stopAutoplay);
+          accordion.addEventListener('mouseleave', startAutoplay);
+          accordion.addEventListener('touchstart', stopAutoplay, { passive: true });
         }
-      });
+
+        startAutoplay();
+
+        const contactTriggers = document.querySelectorAll(".contact-trigger");
+        contactTriggers.forEach((trigger) => {
+          trigger.addEventListener("click", (e) => {
+            e.preventDefault();
+            const targetId = trigger.getAttribute("href")?.replace("#", "");
+            if (targetId) {
+              const contactSection = document.getElementById(targetId);
+              if (contactSection) {
+                contactSection.scrollIntoView({ behavior: "smooth" });
+              }
+            }
+          });
+        });
+      };
+
+      if (document.readyState === "loading") {
+        document.addEventListener("DOMContentLoaded", run);
+      } else {
+        run();
+      }
+    }
+
+    const assuranceEvents = ["mousemove", "mouseenter", "mouseover", "touchstart", "scroll", "keydown"];
+    assuranceEvents.forEach(function (event) {
+      window.addEventListener(event, initAssurance, { passive: true });
     });
-  });
-
-
+  })();
 </script>
