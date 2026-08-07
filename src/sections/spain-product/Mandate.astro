@@ -285,8 +285,8 @@ const allSteps = [...row1, ...row2];
     }
 </style>
 
-<script>
-    document.addEventListener("DOMContentLoaded", () => {
+<script is:inline>
+    function initMandateObserver() {
         const observer = new IntersectionObserver((entries) => {
             entries.forEach(entry => {
                 if (entry.isIntersecting) {
@@ -298,5 +298,11 @@ const allSteps = [...row1, ...row2];
         
         const mandateSection = document.getElementById('spain-mandate');
         if (mandateSection) observer.observe(mandateSection);
-    });
+    }
+
+    if (document.readyState === "loading") {
+        document.addEventListener("DOMContentLoaded", initMandateObserver);
+    } else {
+        initMandateObserver();
+    }
 </script>
