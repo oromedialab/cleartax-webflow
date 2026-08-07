@@ -286,23 +286,42 @@ const allSteps = [...row1, ...row2];
 </style>
 
 <script is:inline>
-    function initMandateObserver() {
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    entry.target.classList.add('is-visible');
-                    observer.unobserve(entry.target);
-                }
-            });
-        }, { threshold: 0.2 });
-        
-        const mandateSection = document.getElementById('spain-mandate');
-        if (mandateSection) observer.observe(mandateSection);
-    }
+    (function () {
+        let mandateInitialized = false;
 
-    if (document.readyState === "loading") {
-        document.addEventListener("DOMContentLoaded", initMandateObserver);
-    } else {
-        initMandateObserver();
-    }
+        function initMandate() {
+            if (mandateInitialized) return;
+            mandateInitialized = true;
+
+            mandateEvents.forEach(function (event) {
+                window.removeEventListener(event, initMandate, { passive: true });
+            });
+
+            const run = () => {
+                const observer = new IntersectionObserver((entries) => {
+                    entries.forEach(entry => {
+                        if (entry.isIntersecting) {
+                            entry.target.classList.add('is-visible');
+                            observer.unobserve(entry.target);
+                        }
+                    });
+                }, { threshold: 0.2 });
+
+                const mandateSection = document.getElementById('spain-mandate');
+                if (mandateSection) observer.observe(mandateSection);
+            };
+
+            if (document.readyState === "loading") {
+                document.addEventListener("DOMContentLoaded", run);
+            } else {
+                run();
+            }
+        }
+
+        const mandateEvents = ['mousemove', 'mouseenter', 'mouseover', 'touchstart', 'scroll', 'keydown'];
+        mandateEvents.forEach(function (event) {
+            window.addEventListener(event, initMandate, { passive: true });
+        });
+    })();
 </script>
+

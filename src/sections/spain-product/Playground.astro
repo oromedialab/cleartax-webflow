@@ -679,12 +679,42 @@
                                             fill="none"></path>
 
                                         <!-- Connection Dots -->
-                                        <circle cx="866.202" cy="249.817" r="2.667" fill="#7C75FF" fill-opacity="0.8"></circle>
-                                        <circle cx="851.401" cy="-6.195" r="2.667" fill="#7C75FF" fill-opacity="0.8"></circle>
-                                        <circle cx="2.667" cy="202.5" r="2.667" fill="#7C75FF" fill-opacity="0.8"></circle>
-                                        <circle cx="141.66" cy="139.805" r="2.667" fill="#7C75FF" fill-opacity="0.8"></circle>
-                                        <circle cx="128.347" cy="297.726" r="2.667" fill="#7C75FF" fill-opacity="0.8"></circle>
-                                        <circle cx="323.226" cy="238.477" r="2.667" fill="#7C75FF" fill-opacity="0.8"></circle>
+                                        <circle
+                                            cx="866.202"
+                                            cy="249.817"
+                                            r="2.667"
+                                            fill="#7C75FF"
+                                            fill-opacity="0.8"></circle>
+                                        <circle
+                                            cx="851.401"
+                                            cy="-6.195"
+                                            r="2.667"
+                                            fill="#7C75FF"
+                                            fill-opacity="0.8"></circle>
+                                        <circle
+                                            cx="2.667"
+                                            cy="202.5"
+                                            r="2.667"
+                                            fill="#7C75FF"
+                                            fill-opacity="0.8"></circle>
+                                        <circle
+                                            cx="141.66"
+                                            cy="139.805"
+                                            r="2.667"
+                                            fill="#7C75FF"
+                                            fill-opacity="0.8"></circle>
+                                        <circle
+                                            cx="128.347"
+                                            cy="297.726"
+                                            r="2.667"
+                                            fill="#7C75FF"
+                                            fill-opacity="0.8"></circle>
+                                        <circle
+                                            cx="323.226"
+                                            cy="238.477"
+                                            r="2.667"
+                                            fill="#7C75FF"
+                                            fill-opacity="0.8"></circle>
                                     </g>
 
                                     <!-- Sliding Arrowheads -->
@@ -1445,1146 +1475,1262 @@
     }
 </style>
 
-<script
-    src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"
-    is:inline></script>
-
 <script is:inline>
     (function () {
-        let initialized = false;
-        const section = document.getElementById("playground-section");
+        let playgroundInitialized = false;
 
-        let card1Timeline = null;
-        let card2Timeline = null;
+        function initPlayground() {
+            if (playgroundInitialized) return;
+            playgroundInitialized = true;
 
-        function initCard1Animation() {
-            const cardEl = document.getElementById("card-verifactu");
-            if (!cardEl) return;
-
-            const step1 = cardEl.querySelector(".pg-step-1");
-            const step2 = cardEl.querySelector(".pg-step-2");
-            const step3 = cardEl.querySelector(".pg-step-3");
-            const step4_1 = cardEl.querySelector(".pg-step-4-1");
-            const step4_2 = cardEl.querySelector(".pg-step-4-2");
-            const step4_3 = cardEl.querySelector(".pg-step-4-3");
-            const step4_4 = cardEl.querySelector(".pg-step-4-4");
-
-            if (
-                !step1 ||
-                !step2 ||
-                !step3 ||
-                !step4_1 ||
-                !step4_2 ||
-                !step4_3 ||
-                !step4_4
-            )
-                return;
-
-            // Initial load state: Show full Final State
-            gsap.set([step1, step2, step3], { opacity: 0, scale: 1 });
-            gsap.set([step4_1, step4_2], { opacity: 1, scale: 1 });
-            gsap.set([step4_3, step4_4], {
-                opacity: 1,
-                xPercent: 0,
-                yPercent: 0,
-                scale: 1,
+            playgroundEvents.forEach(function (event) {
+                window.removeEventListener(event, initPlayground, {
+                    passive: true,
+                });
             });
 
-            cardEl.addEventListener("mouseenter", () => {
-                runAnim();
-            });
-
-            function runAnim() {
-                if (card1Timeline) {
-                    card1Timeline.kill();
-                }
-
-                // Initial setup for central Cleartax circle badge (step4_2) to pop in with back.out
-                gsap.set(step4_2, {
-                    opacity: 0,
-                    scale: 0,
-                    zIndex: 30,
-                    transformOrigin: "center center",
-                });
-                gsap.set(step1, {
-                    opacity: 0,
-                    scale: 1,
-                    transformOrigin: "center center",
-                });
-                gsap.set([step2, step3, step4_1], {
-                    opacity: 0,
-                    scale: 1,
-                });
-
-                // Tucked position for side cards (opposite rotational tilt for arc swing)
-                gsap.set(step4_3, {
-                    xPercent: 35,
-                    yPercent: 15,
-                    rotation: 35,
-                    scale: 0.7,
-                    opacity: 0,
-                    transformOrigin: "right center",
-                });
-                gsap.set(step4_4, {
-                    xPercent: -35,
-                    yPercent: 15,
-                    rotation: -35,
-                    scale: 0.7,
-                    opacity: 0,
-                    transformOrigin: "left center",
-                });
-
-                card1Timeline = gsap.timeline();
-
-                card1Timeline
-                    // Pop in central Cleartax circle badge with back.out ease, then it stays static
-                    .to(
-                        step4_2,
-                        {
-                            opacity: 1,
-                            scale: 1,
-                            duration: 0.45,
-                            ease: "back.out(1.7)",
-                        },
-                        0.0,
-                    )
-                    // Fade in 1st base frame (Mask group (1).png) under central circle
-                    .to(
-                        step1,
-                        {
-                            opacity: 1,
-                            scale: 1,
-                            duration: 0.35,
-                            ease: "power1.inOut",
-                        },
-                        0.0,
-                    )
-                    // Direct transition from Step 1 to Step 3 (Ripples State)
-                    .to(
-                        step1,
-                        {
-                            opacity: 0,
-                            duration: 0.35,
-                            ease: "power1.inOut",
-                        },
-                        0.6,
-                    )
-                    .to(
-                        step3,
-                        {
-                            opacity: 1,
-                            scale: 1,
-                            duration: 0.35,
-                            ease: "power2.inOut",
-                        },
-                        0.6,
-                    )
-
-                    // Step 3 to Step 4 (Final State background)
-                    .to(
-                        step3,
-                        {
-                            opacity: 0,
-                            duration: 0.35,
-                            ease: "power2.inOut",
-                        },
-                        1.25,
-                    )
-                    .to(
-                        step4_1,
-                        {
-                            opacity: 1,
-                            scale: 1,
-                            duration: 0.35,
-                            ease: "power2.inOut",
-                        },
-                        1.25,
-                    )
-
-                    // Rotational arc swing out from behind static circle into final position
-                    .to(
-                        step4_3,
-                        {
-                            xPercent: 0,
-                            yPercent: 0,
-                            rotation: 0,
-                            scale: 1,
-                            opacity: 1,
-                            duration: 0.65,
-                            ease: "back.out(1.4)",
-                        },
-                        1.6,
-                    )
-                    .to(
-                        step4_4,
-                        {
-                            xPercent: 0,
-                            yPercent: 0,
-                            rotation: 0,
-                            scale: 1,
-                            opacity: 1,
-                            duration: 0.65,
-                            ease: "back.out(1.4)",
-                        },
-                        1.6,
-                    );
+            // Load GSAP dynamically then boot the playground logic
+            if (typeof gsap === "undefined") {
+                var gsapScript = document.createElement("script");
+                gsapScript.src =
+                    "https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js";
+                gsapScript.onload = runPlayground;
+                document.head.appendChild(gsapScript);
+            } else {
+                runPlayground();
             }
-
-            window.playCard1GSAP = runAnim;
         }
 
-        function initCard2Animation() {
-            const cardEl = document.getElementById("card-lifecycle");
-            if (!cardEl) return;
+        function runPlayground() {
+            let initialized = false;
+            const section = document.getElementById("playground-section");
 
-            const itemLeft = cardEl.querySelector(".card2-item-left");
-            const itemCenter = cardEl.querySelector(".card2-item-center");
-            const itemRight = cardEl.querySelector(".card2-item-right");
+            let card1Timeline = null;
+            let card2Timeline = null;
 
-            if (!itemLeft || !itemCenter || !itemRight) return;
+            function initCard1Animation() {
+                const cardEl = document.getElementById("card-verifactu");
+                if (!cardEl) return;
 
-            const bgLeft = itemLeft.querySelectorAll("img")[0];
-            const bgCenter = itemCenter.querySelectorAll("img")[0];
-            const bgRight = itemRight.querySelectorAll("img")[0];
+                const step1 = cardEl.querySelector(".pg-step-1");
+                const step2 = cardEl.querySelector(".pg-step-2");
+                const step3 = cardEl.querySelector(".pg-step-3");
+                const step4_1 = cardEl.querySelector(".pg-step-4-1");
+                const step4_2 = cardEl.querySelector(".pg-step-4-2");
+                const step4_3 = cardEl.querySelector(".pg-step-4-3");
+                const step4_4 = cardEl.querySelector(".pg-step-4-4");
 
-            if (!bgLeft || !bgCenter || !bgRight) return;
+                if (
+                    !step1 ||
+                    !step2 ||
+                    !step3 ||
+                    !step4_1 ||
+                    !step4_2 ||
+                    !step4_3 ||
+                    !step4_4
+                )
+                    return;
 
-            const pillContent1 = cardEl.querySelector(".card2-pill-content-1");
-            const pillContent2 = cardEl.querySelector(".card2-pill-content-2");
-            const pillContent3 = cardEl.querySelector(".card2-pill-content-3");
-
-            // Entrance animation
-            gsap.fromTo(
-                itemLeft,
-                { opacity: 0, xPercent: 10, scale: 0.8, rotation: 0 },
-                {
-                    opacity: 0.15,
-                    xPercent: -10,
-                    scale: 0.8,
-                    rotation: 0,
-                    duration: 0.6,
-                    ease: "power2.out",
-                },
-            );
-            gsap.fromTo(
-                bgLeft,
-                { rotation: 15 },
-                { rotation: 15, duration: 0.6 },
-            );
-
-            gsap.fromTo(
-                itemCenter,
-                { opacity: 0, xPercent: 10, scale: 0.8, rotation: 0 },
-                {
+                // Initial load state: Show full Final State
+                gsap.set([step1, step2, step3], { opacity: 0, scale: 1 });
+                gsap.set([step4_1, step4_2], { opacity: 1, scale: 1 });
+                gsap.set([step4_3, step4_4], {
                     opacity: 1,
                     xPercent: 0,
+                    yPercent: 0,
                     scale: 1,
-                    rotation: 0,
-                    duration: 0.6,
-                    ease: "power2.out",
-                    delay: 0.2,
-                },
-            );
-            gsap.fromTo(
-                bgCenter,
-                { rotation: 0 },
-                { rotation: 0, duration: 0.6, delay: 0.2 },
-            );
-
-            gsap.fromTo(
-                itemRight,
-                { opacity: 0, xPercent: 20, scale: 0.8, rotation: 0 },
-                {
-                    opacity: 0.15,
-                    xPercent: 10,
-                    scale: 0.8,
-                    rotation: 0,
-                    duration: 0.6,
-                    ease: "power2.out",
-                    delay: 0.4,
-                },
-            );
-            gsap.fromTo(
-                bgRight,
-                { rotation: -15 },
-                { rotation: -15, duration: 0.6, delay: 0.4 },
-            );
-
-            // Hover trigger loop
-            cardEl.addEventListener("mouseenter", () => {
-                runLifecycleLoop();
-            });
-
-            function runLifecycleLoop() {
-                if (card2Timeline) {
-                    card2Timeline.kill();
-                }
-
-                // Reset to initial State 1 (Center active)
-                gsap.set(itemLeft, {
-                    xPercent: -10,
-                    scale: 0.8,
-                    rotation: 0,
-                    opacity: 0.15,
-                    zIndex: 10,
                 });
-                gsap.set(bgLeft, { rotation: 15 });
 
-                gsap.set(itemCenter, {
-                    xPercent: 0,
-                    scale: 1,
-                    rotation: 0,
-                    opacity: 1,
-                    zIndex: 20,
+                cardEl.addEventListener("mouseenter", () => {
+                    runAnim();
                 });
-                gsap.set(bgCenter, { rotation: 0 });
 
-                gsap.set(itemRight, {
-                    xPercent: 10,
-                    scale: 0.8,
-                    rotation: 0,
-                    opacity: 0.15,
-                    zIndex: 10,
-                });
-                gsap.set(bgRight, { rotation: -15 });
+                function runAnim() {
+                    if (card1Timeline) {
+                        card1Timeline.kill();
+                    }
 
-                if (pillContent1 && pillContent2 && pillContent3) {
-                    gsap.set(pillContent2, { opacity: 1 });
-                    gsap.set([pillContent1, pillContent3], { opacity: 0 });
-                }
-
-                card2Timeline = gsap.timeline();
-
-                card2Timeline
-                    // Transition 1: Right card to center (Step 1 active)
-                    .to(
-                        itemLeft,
-                        {
-                            opacity: 0,
-                            scale: 0.5,
-                            rotation: 0,
-                            duration: 0.3,
-                            ease: "power2.in",
-                        },
-                        1.2,
-                    )
-                    .set(itemLeft, { xPercent: 221.8, zIndex: 5 }, 1.5)
-                    .to(
-                        itemLeft,
-                        {
-                            opacity: 0.15,
-                            scale: 0.8,
-                            rotation: 0,
-                            duration: 0.4,
-                            ease: "power2.out",
-                        },
-                        1.6,
-                    )
-                    .to(
-                        bgLeft,
-                        { rotation: -15, duration: 0.4, ease: "power2.out" },
-                        1.6,
-                    )
-
-                    // Center card moves Center -> Left
-                    .to(
-                        itemCenter,
-                        {
-                            xPercent: -99.5,
-                            scale: 0.8,
-                            rotation: 0,
-                            opacity: 0.15,
-                            duration: 0.8,
-                            ease: "power2.inOut",
-                        },
-                        1.2,
-                    )
-                    .to(
-                        bgCenter,
-                        { rotation: 15, duration: 0.8, ease: "power2.inOut" },
-                        1.2,
-                    )
-                    .set(itemCenter, { zIndex: 10 }, 1.2)
-
-                    // Right card moves Right -> Center
-                    .set(itemRight, { zIndex: 20 }, 1.2)
-                    .to(
-                        itemRight,
-                        {
-                            xPercent: -105.9,
-                            scale: 1,
-                            rotation: 0,
-                            opacity: 1,
-                            duration: 0.8,
-                            ease: "power2.inOut",
-                        },
-                        1.2,
-                    )
-                    .to(
-                        bgRight,
-                        { rotation: 0, duration: 0.8, ease: "power2.inOut" },
-                        1.2,
-                    );
-
-                if (pillContent1 && pillContent2 && pillContent3) {
-                    card2Timeline
-                        .to(pillContent2, { opacity: 0, duration: 0.4 }, 1.2)
-                        .to(pillContent1, { opacity: 1, duration: 0.4 }, 1.2);
-                }
-
-                card2Timeline
-                    // Transition 2: Left card to center (Step 3 active)
-                    .to(
-                        itemCenter,
-                        {
-                            opacity: 0,
-                            scale: 0.5,
-                            rotation: 0,
-                            duration: 0.3,
-                            ease: "power2.in",
-                        },
-                        3.2,
-                    )
-                    .set(itemCenter, { xPercent: 99.5, zIndex: 5 }, 3.5)
-                    .to(
-                        itemCenter,
-                        {
-                            opacity: 0.15,
-                            scale: 0.8,
-                            rotation: 0,
-                            duration: 0.4,
-                            ease: "power2.out",
-                        },
-                        3.6,
-                    )
-                    .to(
-                        bgCenter,
-                        { rotation: -15, duration: 0.4, ease: "power2.out" },
-                        3.6,
-                    )
-
-                    // Right card moves Center -> Left
-                    .to(
-                        itemRight,
-                        {
-                            xPercent: -221.8,
-                            scale: 0.8,
-                            rotation: 0,
-                            opacity: 0.15,
-                            duration: 0.8,
-                            ease: "power2.inOut",
-                        },
-                        3.2,
-                    )
-                    .to(
-                        bgRight,
-                        { rotation: 15, duration: 0.8, ease: "power2.inOut" },
-                        3.2,
-                    )
-                    .set(itemRight, { zIndex: 10 }, 3.2)
-
-                    // Left card moves Right -> Center
-                    .set(itemLeft, { zIndex: 20 }, 3.2)
-                    .to(
-                        itemLeft,
-                        {
-                            xPercent: 105.9,
-                            scale: 1,
-                            rotation: 0,
-                            opacity: 1,
-                            duration: 0.8,
-                            ease: "power2.inOut",
-                        },
-                        3.2,
-                    )
-                    .to(
-                        bgLeft,
-                        { rotation: 0, duration: 0.8, ease: "power2.inOut" },
-                        3.2,
-                    );
-
-                if (pillContent1 && pillContent2 && pillContent3) {
-                    card2Timeline
-                        .to(pillContent1, { opacity: 0, duration: 0.4 }, 3.2)
-                        .to(pillContent3, { opacity: 1, duration: 0.4 }, 3.2);
-                }
-
-                card2Timeline
-                    // Transition 3: Reset back to Center card (Step 2 active)
-                    .to(
-                        itemRight,
-                        {
-                            opacity: 0,
-                            scale: 0.5,
-                            rotation: 0,
-                            duration: 0.3,
-                            ease: "power2.in",
-                        },
-                        5.2,
-                    )
-                    .set(itemRight, { xPercent: 10, zIndex: 5 }, 5.5)
-                    .to(
-                        itemRight,
-                        {
-                            opacity: 0.15,
-                            scale: 0.8,
-                            rotation: 0,
-                            duration: 0.4,
-                            ease: "power2.out",
-                        },
-                        5.6,
-                    )
-                    .to(
-                        bgRight,
-                        { rotation: -15, duration: 0.4, ease: "power2.out" },
-                        5.6,
-                    )
-
-                    // Left card moves Center -> Left
-                    .to(
-                        itemLeft,
-                        {
-                            xPercent: -10,
-                            scale: 0.8,
-                            rotation: 0,
-                            opacity: 0.15,
-                            duration: 0.8,
-                            ease: "power2.inOut",
-                        },
-                        5.2,
-                    )
-                    .to(
-                        bgLeft,
-                        { rotation: 15, duration: 0.8, ease: "power2.inOut" },
-                        5.2,
-                    )
-                    .set(itemLeft, { zIndex: 10 }, 5.2)
-
-                    // Center card moves Right -> Center
-                    .set(itemCenter, { zIndex: 20 }, 5.2)
-                    .to(
-                        itemCenter,
-                        {
-                            xPercent: 0,
-                            scale: 1,
-                            rotation: 0,
-                            opacity: 1,
-                            duration: 0.8,
-                            ease: "power2.inOut",
-                        },
-                        5.2,
-                    )
-                    .to(
-                        bgCenter,
-                        { rotation: 0, duration: 0.8, ease: "power2.inOut" },
-                        5.2,
-                    );
-
-                if (pillContent1 && pillContent2 && pillContent3) {
-                    card2Timeline
-                        .to(pillContent3, { opacity: 0, duration: 0.4 }, 5.2)
-                        .to(pillContent2, { opacity: 1, duration: 0.4 }, 5.2);
-                }
-            }
-        }
-
-        let card3Timeline = null;
-
-        function runCard3Animation() {
-            const cardEl = document.getElementById("card-interoperability");
-            if (!cardEl) return;
-
-            const gear = cardEl.querySelector(".card3-gear-wrapper");
-            const lineLeft = cardEl.querySelector(".card3-line-left");
-            const dot = cardEl.querySelector(".card3-dot");
-            const dotOutline = cardEl.querySelector(".card3-dot-outline");
-            const lineMid = cardEl.querySelector(".card3-line-mid");
-            const lineTop = cardEl.querySelector(".card3-line-top");
-            const lineBottom = cardEl.querySelector(".card3-line-bottom");
-            const pillTop = cardEl.querySelector(".card3-pill-top");
-            const pillMid = cardEl.querySelector(".card3-pill-mid");
-            const pillBottom = cardEl.querySelector(".card3-pill-bottom");
-
-            if (card3Timeline) {
-                card3Timeline.kill();
-            }
-
-            // Set initial states
-            gsap.set(gear, { opacity: 0, scale: 1, x: -60 });
-            gsap.set([dot, dotOutline], {
-                scale: 0,
-                opacity: 0,
-                transformOrigin: "center center",
-            });
-            gsap.set([pillTop, pillMid, pillBottom], { opacity: 0, x: 20 });
-
-            // Prepare SVG paths for stroke animation
-            const preparePath = (path) => {
-                if (!path) return;
-                const length = path.getTotalLength();
-                gsap.set(path, {
-                    strokeDasharray: length,
-                    strokeDashoffset: length,
-                    opacity: 1,
-                });
-            };
-
-            preparePath(lineLeft);
-            preparePath(lineMid);
-            preparePath(lineTop);
-            preparePath(lineBottom);
-
-            card3Timeline = gsap.timeline();
-
-            card3Timeline
-                // 1. Gear animates in
-                .to(gear, {
-                    opacity: 1,
-                    scale: 1,
-                    x: 0,
-                    duration: 0.6,
-                    ease: "back.out(1.7)",
-                })
-                // 2. Horizontal line starts drawing
-                .to(
-                    lineLeft,
-                    {
-                        strokeDashoffset: 0,
-                        duration: 0.8,
-                        ease: "power1.inOut",
-                    },
-                    "-=0.2",
-                )
-                // 3. Dot and outline scale up as the line passes through (around 65% mark)
-                .to(
-                    [dot, dotOutline],
-                    {
+                    // Initial setup for central Cleartax circle badge (step4_2) to pop in with back.out
+                    gsap.set(step4_2, {
+                        opacity: 0,
+                        scale: 0,
+                        zIndex: 30,
+                        transformOrigin: "center center",
+                    });
+                    gsap.set(step1, {
+                        opacity: 0,
                         scale: 1,
-                        opacity: 1,
-                        duration: 0.3,
-                        ease: "back.out(2)",
-                        stagger: 0.05,
-                    },
-                    "-=0.45",
-                )
-                // 4. Branching top, middle, and bottom curves start drawing as the dot scales up
-                .to(
-                    [lineTop, lineMid, lineBottom],
-                    {
-                        strokeDashoffset: 0,
-                        duration: 0.7,
-                        ease: "power1.inOut",
-                        stagger: 0.05,
-                    },
-                    "-=0.2",
-                )
-                // 5. Middle pill fades in when the horizontal line reaches it
-                .to(
-                    pillMid,
-                    {
-                        opacity: 1,
-                        x: 0,
-                        duration: 0.4,
-                        ease: "power2.out",
-                    },
-                    "-=0.5",
-                )
-                // 6. Top and bottom pills fade in when their curves reach them
-                .to(
-                    [pillTop, pillBottom],
-                    {
-                        opacity: 1,
-                        x: 0,
-                        duration: 0.4,
-                        ease: "power2.out",
-                        stagger: 0.1,
-                    },
-                    "-=0.3",
+                        transformOrigin: "center center",
+                    });
+                    gsap.set([step2, step3, step4_1], {
+                        opacity: 0,
+                        scale: 1,
+                    });
+
+                    // Tucked position for side cards (opposite rotational tilt for arc swing)
+                    gsap.set(step4_3, {
+                        xPercent: 35,
+                        yPercent: 15,
+                        rotation: 35,
+                        scale: 0.7,
+                        opacity: 0,
+                        transformOrigin: "right center",
+                    });
+                    gsap.set(step4_4, {
+                        xPercent: -35,
+                        yPercent: 15,
+                        rotation: -35,
+                        scale: 0.7,
+                        opacity: 0,
+                        transformOrigin: "left center",
+                    });
+
+                    card1Timeline = gsap.timeline();
+
+                    card1Timeline
+                        // Pop in central Cleartax circle badge with back.out ease, then it stays static
+                        .to(
+                            step4_2,
+                            {
+                                opacity: 1,
+                                scale: 1,
+                                duration: 0.45,
+                                ease: "back.out(1.7)",
+                            },
+                            0.0,
+                        )
+                        // Fade in 1st base frame (Mask group (1).png) under central circle
+                        .to(
+                            step1,
+                            {
+                                opacity: 1,
+                                scale: 1,
+                                duration: 0.35,
+                                ease: "power1.inOut",
+                            },
+                            0.0,
+                        )
+                        // Direct transition from Step 1 to Step 3 (Ripples State)
+                        .to(
+                            step1,
+                            {
+                                opacity: 0,
+                                duration: 0.35,
+                                ease: "power1.inOut",
+                            },
+                            0.6,
+                        )
+                        .to(
+                            step3,
+                            {
+                                opacity: 1,
+                                scale: 1,
+                                duration: 0.35,
+                                ease: "power2.inOut",
+                            },
+                            0.6,
+                        )
+
+                        // Step 3 to Step 4 (Final State background)
+                        .to(
+                            step3,
+                            {
+                                opacity: 0,
+                                duration: 0.35,
+                                ease: "power2.inOut",
+                            },
+                            1.25,
+                        )
+                        .to(
+                            step4_1,
+                            {
+                                opacity: 1,
+                                scale: 1,
+                                duration: 0.35,
+                                ease: "power2.inOut",
+                            },
+                            1.25,
+                        )
+
+                        // Rotational arc swing out from behind static circle into final position
+                        .to(
+                            step4_3,
+                            {
+                                xPercent: 0,
+                                yPercent: 0,
+                                rotation: 0,
+                                scale: 1,
+                                opacity: 1,
+                                duration: 0.65,
+                                ease: "back.out(1.4)",
+                            },
+                            1.6,
+                        )
+                        .to(
+                            step4_4,
+                            {
+                                xPercent: 0,
+                                yPercent: 0,
+                                rotation: 0,
+                                scale: 1,
+                                opacity: 1,
+                                duration: 0.65,
+                                ease: "back.out(1.4)",
+                            },
+                            1.6,
+                        );
+                }
+
+                window.playCard1GSAP = runAnim;
+            }
+
+            function initCard2Animation() {
+                const cardEl = document.getElementById("card-lifecycle");
+                if (!cardEl) return;
+
+                const itemLeft = cardEl.querySelector(".card2-item-left");
+                const itemCenter = cardEl.querySelector(".card2-item-center");
+                const itemRight = cardEl.querySelector(".card2-item-right");
+
+                if (!itemLeft || !itemCenter || !itemRight) return;
+
+                const bgLeft = itemLeft.querySelectorAll("img")[0];
+                const bgCenter = itemCenter.querySelectorAll("img")[0];
+                const bgRight = itemRight.querySelectorAll("img")[0];
+
+                if (!bgLeft || !bgCenter || !bgRight) return;
+
+                const pillContent1 = cardEl.querySelector(
+                    ".card2-pill-content-1",
                 );
-        }
-
-        function initCard3Animation() {
-            const cardEl = document.getElementById("card-interoperability");
-            if (!cardEl) return;
-
-            cardEl.addEventListener("mouseenter", () => {
-                runCard3Animation();
-            });
-        }
-
-        function showCard3FinalState() {
-            const cardEl = document.getElementById("card-interoperability");
-            if (!cardEl) return;
-
-            const gear = cardEl.querySelector(".card3-gear-wrapper");
-            const lineLeft = cardEl.querySelector(".card3-line-left");
-            const dot = cardEl.querySelector(".card3-dot");
-            const dotOutline = cardEl.querySelector(".card3-dot-outline");
-            const lineMid = cardEl.querySelector(".card3-line-mid");
-            const lineTop = cardEl.querySelector(".card3-line-top");
-            const lineBottom = cardEl.querySelector(".card3-line-bottom");
-            const pillTop = cardEl.querySelector(".card3-pill-top");
-            const pillMid = cardEl.querySelector(".card3-pill-mid");
-            const pillBottom = cardEl.querySelector(".card3-pill-bottom");
-
-            if (card3Timeline) {
-                card3Timeline.kill();
-            }
-
-            gsap.set(gear, { opacity: 1, scale: 1, x: 0 });
-            gsap.set([dot, dotOutline], { scale: 1, opacity: 1 });
-            gsap.set([pillTop, pillMid, pillBottom], { opacity: 1, x: 0 });
-            gsap.set([lineLeft, lineMid, lineTop, lineBottom], {
-                strokeDashoffset: 0,
-                opacity: 1,
-            });
-        }
-
-        let card4Timeline = null;
-
-        function runCard4Animation() {
-            const cardEl = document.getElementById("card-format");
-            if (!cardEl) return;
-
-            const stepLeft = cardEl.querySelector(".card4-step-1");
-            const stepCenter = cardEl.querySelector(".card4-step-2");
-            const stepRight = cardEl.querySelector(".card4-step-3");
-
-            if (card4Timeline) {
-                card4Timeline.kill();
-            }
-
-            // Set initial states: center hidden, left and right hidden and shifted behind it
-            gsap.set(stepCenter, {
-                opacity: 0,
-                scale: 0.8,
-                y: 20,
-                transformOrigin: "center center",
-            });
-            gsap.set(stepLeft, {
-                opacity: 0,
-                x: 50,
-                scale: 0.9,
-                transformOrigin: "center center",
-            });
-            gsap.set(stepRight, {
-                opacity: 0,
-                x: -50,
-                scale: 0.9,
-                transformOrigin: "center center",
-            });
-
-            card4Timeline = gsap.timeline();
-
-            card4Timeline
-                // 1. Center card fades in and slides/scales up
-                .to(stepCenter, {
-                    opacity: 1,
-                    scale: 1,
-                    y: 0,
-                    duration: 0.6,
-                    ease: "back.out(1.4)",
-                })
-                // 2. Left and right cards slide/fan out from behind the center card together
-                .to(
-                    [stepLeft, stepRight],
-                    {
-                        opacity: 1,
-                        x: 0,
-                        scale: 1,
-                        duration: 0.7,
-                        ease: "power2.out",
-                        stagger: 0.05,
-                    },
-                    "-=0.25",
+                const pillContent2 = cardEl.querySelector(
+                    ".card2-pill-content-2",
                 );
-        }
+                const pillContent3 = cardEl.querySelector(
+                    ".card2-pill-content-3",
+                );
 
-        function initCard4Animation() {
-            const cardEl = document.getElementById("card-format");
-            if (!cardEl) return;
-
-            cardEl.addEventListener("mouseenter", () => {
-                runCard4Animation();
-            });
-        }
-
-        function showCard4FinalState() {
-            const cardEl = document.getElementById("card-format");
-            if (!cardEl) return;
-
-            const stepLeft = cardEl.querySelector(".card4-step-1");
-            const stepCenter = cardEl.querySelector(".card4-step-2");
-            const stepRight = cardEl.querySelector(".card4-step-3");
-
-            if (card4Timeline) {
-                card4Timeline.kill();
-            }
-
-            gsap.set(stepCenter, {
-                opacity: 1,
-                scale: 1,
-                y: 0,
-            });
-            gsap.set(stepLeft, {
-                opacity: 1,
-                x: 0,
-                scale: 1,
-            });
-            gsap.set(stepRight, {
-                opacity: 1,
-                x: 0,
-                scale: 1,
-            });
-        }
-
-        let card5Timeline = null;
-
-        function runCard5Animation() {
-            const cardEl = document.getElementById("card-applicability");
-            if (!cardEl) return;
-
-            const bubbleB2B = cardEl.querySelector(".card5-step-1");
-            const bubbleB2G = cardEl.querySelector(".card5-step-2");
-            const bubbleB2C = cardEl.querySelector(".card5-step-3");
-            const bubbleCircle = cardEl.querySelector(".card5-step-4");
-            const svgContainer = cardEl.querySelector(".card5-svg-container");
-
-            const line1 = cardEl.querySelector(".card5-line-1");
-            const line2 = cardEl.querySelector(".card5-line-2");
-            const line3 = cardEl.querySelector(".card5-line-3");
-            const line4 = cardEl.querySelector(".card5-line-4");
-            const line5 = cardEl.querySelector(".card5-line-5");
-
-            if (card5Timeline) {
-                card5Timeline.kill();
-            }
-            svgContainer.classList.remove("animate-arrows");
-
-            // Set initial states for mask paths using precise hardcoded lengths
-            gsap.set(line1, {
-                strokeDasharray: 610,
-                strokeDashoffset: 610,
-                opacity: 1,
-            });
-            gsap.set(line2, {
-                strokeDasharray: 630,
-                strokeDashoffset: 630,
-                opacity: 1,
-            });
-            gsap.set(line3, {
-                strokeDasharray: 300,
-                strokeDashoffset: 300,
-                opacity: 1,
-            });
-            gsap.set(line4, {
-                strokeDasharray: 190,
-                strokeDashoffset: 190,
-                opacity: 1,
-            });
-            gsap.set(line5, {
-                strokeDasharray: 235,
-                strokeDashoffset: 235,
-                opacity: 1,
-            });
-
-            // Set initial states for bubbles and arrows
-            gsap.set([bubbleCircle, bubbleB2B, bubbleB2G, bubbleB2C], {
-                opacity: 0,
-                scale: 0,
-                transformOrigin: "center center",
-            });
-            const slidingArrows = cardEl.querySelectorAll(
-                ".card5-sliding-arrow",
-            );
-            gsap.set(slidingArrows, { opacity: 0 });
-
-            // Ensure clipPath doesn't clip our mask drawing lines
-            gsap.set(svgContainer, {
-                clipPath: "none",
-            });
-
-            card5Timeline = gsap.timeline();
-
-            card5Timeline
-                // 0. Scale up Cleartax Circle
-                .to(bubbleCircle, {
-                    opacity: 1,
-                    scale: 1,
-                    duration: 0.6,
-                    ease: "back.out(1.5)",
-                })
-                // 1. All lines start drawing at the same time
-                .to(
-                    [line1, line2, line3, line4, line5],
+                // Entrance animation
+                gsap.fromTo(
+                    itemLeft,
+                    { opacity: 0, xPercent: 10, scale: 0.8, rotation: 0 },
                     {
-                        strokeDashoffset: 0,
-                        duration: 1.2,
-                        ease: "power1.inOut",
-                    },
-                    "-=0.2",
-                )
-                // 2. B2G, B2B, and B2C bubbles scale up as the lines reach them
-                .to(
-                    [bubbleB2G, bubbleB2B, bubbleB2C],
-                    {
-                        opacity: 1,
-                        scale: 1,
-                        duration: 0.8,
-                        ease: "back.out(1.2)",
-                        stagger: 0.1,
-                    },
-                    "-=0.8",
-                )
-                .call(() => {
-                    svgContainer.classList.add("animate-arrows");
-                });
-        }
-
-        function initCard5Animation() {
-            const cardEl = document.getElementById("card-applicability");
-            if (!cardEl) return;
-
-            cardEl.addEventListener("mouseenter", () => {
-                runCard5Animation();
-            });
-        }
-
-        function showCard5FinalState() {
-            const cardEl = document.getElementById("card-applicability");
-            if (!cardEl) return;
-
-            const bubbleB2B = cardEl.querySelector(".card5-step-1");
-            const bubbleB2G = cardEl.querySelector(".card5-step-2");
-            const bubbleB2C = cardEl.querySelector(".card5-step-3");
-            const bubbleCircle = cardEl.querySelector(".card5-step-4");
-            const svgContainer = cardEl.querySelector(".card5-svg-container");
-
-            const line1 = cardEl.querySelector(".card5-line-1");
-            const line2 = cardEl.querySelector(".card5-line-2");
-            const line3 = cardEl.querySelector(".card5-line-3");
-            const line4 = cardEl.querySelector(".card5-line-4");
-            const line5 = cardEl.querySelector(".card5-line-5");
-
-            if (card5Timeline) {
-                card5Timeline.kill();
-            }
-
-            gsap.set([bubbleCircle, bubbleB2B, bubbleB2G, bubbleB2C], {
-                opacity: 1,
-                scale: 1,
-            });
-
-            gsap.set([line1, line2, line3, line4, line5], {
-                strokeDashoffset: 0,
-                opacity: 1,
-            });
-
-            gsap.set(cardEl.querySelectorAll(".card5-sliding-arrow"), {
-                clearProps: "opacity",
-            });
-
-            svgContainer.classList.remove("animate-arrows");
-        }
-
-        let card6Timeline = null;
-
-        function runCard6Animation() {
-            const cardEl = document.getElementById("card-copy");
-            if (!cardEl) return;
-
-            const card62Phase = cardEl.querySelector(".card6-2-phase");
-            const baseState = cardEl.querySelector(".card6-step-1");
-            const bubbleLeft = cardEl.querySelector(".card6-bubble-left");
-            const bubbleRight = cardEl.querySelector(".card6-bubble-right");
-            const svgContainer = cardEl.querySelector(".card6-svg-container");
-            const ublCopy = cardEl.querySelector(".card6-ubl-copy");
-            const step4Wrapper = cardEl.querySelector(".card6-step4-wrapper");
-            const statCard1 = cardEl.querySelector(".card6-stat-card-1");
-            const statCard2 = cardEl.querySelector(".card6-stat-card-2");
-
-            if (card6Timeline) {
-                card6Timeline.kill();
-            }
-
-            // Set initial states for animation targets
-            gsap.set(card62Phase, {
-                opacity: 0,
-                y: 0,
-                scale: 0.8,
-                transformOrigin: "center center",
-            });
-            gsap.set(baseState, {
-                opacity: 1,
-                y: 0,
-                scale: 1,
-                clipPath: "inset(0% 100% 0% 0%)",
-                transformOrigin: "left center",
-            });
-            gsap.set(bubbleLeft, {
-                opacity: 0,
-                x: 0,
-                y: 50,
-                scale: 0.8,
-            });
-            gsap.set(bubbleRight, {
-                opacity: 0,
-                x: 0,
-                y: 50,
-                scale: 0.8,
-            });
-            gsap.set(svgContainer, {
-                opacity: 0,
-                y: -30,
-                clipPath: "inset(0% 0% 100% 0%)",
-            });
-            gsap.set(ublCopy, {
-                opacity: 0,
-                y: 0,
-                scale: 0.8,
-            });
-            gsap.set(step4Wrapper, {
-                opacity: 0,
-                y: 240,
-            });
-            gsap.set(statCard1, {
-                opacity: 0,
-                y: 120,
-            });
-            gsap.set(statCard2, {
-                opacity: 0,
-                y: 120,
-            });
-
-            card6Timeline = gsap.timeline({ timeScale: 1.05 });
-
-            card6Timeline
-                // 1. First card-6-2-phase pops in at center
-                .to(card62Phase, {
-                    opacity: 1,
-                    scale: 1,
-                    duration: 0.35,
-                    ease: "back.out(1.5)",
-                })
-                // 2. Base state draws out horizontally to left and right simultaneously from behind 2nd phase badge
-                .to(
-                    baseState,
-                    {
-                        clipPath: "inset(0% 0% 0% 0%)",
-                        duration: 1.2,
-                        ease: "power2.inOut",
-                    },
-                    "-=0.15",
-                )
-                // 3. Then bubble comes in perspective (one time at left and right)
-                .to(
-                    [bubbleLeft, bubbleRight],
-                    {
-                        opacity: 1,
-                        y: 0,
-                        scale: 1,
-                        duration: 0.4,
-                        ease: "back.out(1.5)",
-                        stagger: 0.1,
-                    },
-                    "+=0.05",
-                )
-                // 4. Then SVG slides down
-                .to(
-                    svgContainer,
-                    {
-                        opacity: 1,
-                        y: 0,
-                        clipPath: "inset(0% 0% 0% 0%)",
-                        duration: 0.7,
-                        ease: "power1.out",
-                    },
-                    "+=0.05",
-                )
-                // 5. UBL Copy pill appears when SVG starts
-                .to(
-                    ublCopy,
-                    {
-                        opacity: 1,
-                        y: 0,
-                        scale: 1,
+                        opacity: 0.15,
+                        xPercent: -10,
+                        scale: 0.8,
+                        rotation: 0,
                         duration: 0.6,
                         ease: "power2.out",
                     },
-                    "<",
-                )
-                // 6. card6-step-4-wrapper slides directly to full height in one continuous smooth motion
-                .to(
-                    step4Wrapper,
-                    {
-                        opacity: 1,
-                        y: 0,
-                        duration: 0.95,
-                        ease: "power2.out",
-                    },
-                    "<",
-                )
-                // 8. Then from behind stat-card-1 slides up smoothly
-                .to(
-                    statCard1,
-                    {
-                        opacity: 1,
-                        y: 0,
-                        duration: 0.5,
-                        ease: "power2.out",
-                    },
-                    "+=0.08",
-                )
-                // 9. Then stat-card-2 slides up smoothly
-                .to(
-                    statCard2,
-                    {
-                        opacity: 1,
-                        y: 0,
-                        duration: 0.5,
-                        ease: "power2.out",
-                    },
-                    "+=0.1",
                 );
-        }
+                gsap.fromTo(
+                    bgLeft,
+                    { rotation: 15 },
+                    { rotation: 15, duration: 0.6 },
+                );
 
-        function initCard6Animation() {
-            const cardEl = document.getElementById("card-copy");
-            if (!cardEl) return;
+                gsap.fromTo(
+                    itemCenter,
+                    { opacity: 0, xPercent: 10, scale: 0.8, rotation: 0 },
+                    {
+                        opacity: 1,
+                        xPercent: 0,
+                        scale: 1,
+                        rotation: 0,
+                        duration: 0.6,
+                        ease: "power2.out",
+                        delay: 0.2,
+                    },
+                );
+                gsap.fromTo(
+                    bgCenter,
+                    { rotation: 0 },
+                    { rotation: 0, duration: 0.6, delay: 0.2 },
+                );
 
-            cardEl.addEventListener("mouseenter", () => {
-                runCard6Animation();
-            });
-        }
+                gsap.fromTo(
+                    itemRight,
+                    { opacity: 0, xPercent: 20, scale: 0.8, rotation: 0 },
+                    {
+                        opacity: 0.15,
+                        xPercent: 10,
+                        scale: 0.8,
+                        rotation: 0,
+                        duration: 0.6,
+                        ease: "power2.out",
+                        delay: 0.4,
+                    },
+                );
+                gsap.fromTo(
+                    bgRight,
+                    { rotation: -15 },
+                    { rotation: -15, duration: 0.6, delay: 0.4 },
+                );
 
-        function initTiltedCards() {
-            if (initialized) return;
-            initialized = true;
+                // Hover trigger loop
+                cardEl.addEventListener("mouseenter", () => {
+                    runLifecycleLoop();
+                });
 
-            // Initialize GSAP animations
-            initCard1Animation();
-            initCard2Animation();
-            initCard3Animation();
-            initCard4Animation();
-            initCard5Animation();
-            initCard6Animation();
-            showCard3FinalState();
-            showCard4FinalState();
-            showCard5FinalState();
-        }
+                function runLifecycleLoop() {
+                    if (card2Timeline) {
+                        card2Timeline.kill();
+                    }
 
-        if (section) {
-            // Animations only trigger on user interaction (hover/touch), not on page scroll.
-            // This prevents heavy GSAP timelines from running as soon as the section enters viewport.
-            section.addEventListener("mouseenter", () => {
-                initTiltedCards();
-                section.classList.add("animate-start");
-            }, { once: true });
+                    // Reset to initial State 1 (Center active)
+                    gsap.set(itemLeft, {
+                        xPercent: -10,
+                        scale: 0.8,
+                        rotation: 0,
+                        opacity: 0.15,
+                        zIndex: 10,
+                    });
+                    gsap.set(bgLeft, { rotation: 15 });
 
-            section.addEventListener("touchstart", () => {
-                initTiltedCards();
-                section.classList.add("animate-start");
-            }, { once: true, passive: true });
-        }
+                    gsap.set(itemCenter, {
+                        xPercent: 0,
+                        scale: 1,
+                        rotation: 0,
+                        opacity: 1,
+                        zIndex: 20,
+                    });
+                    gsap.set(bgCenter, { rotation: 0 });
+
+                    gsap.set(itemRight, {
+                        xPercent: 10,
+                        scale: 0.8,
+                        rotation: 0,
+                        opacity: 0.15,
+                        zIndex: 10,
+                    });
+                    gsap.set(bgRight, { rotation: -15 });
+
+                    if (pillContent1 && pillContent2 && pillContent3) {
+                        gsap.set(pillContent2, { opacity: 1 });
+                        gsap.set([pillContent1, pillContent3], { opacity: 0 });
+                    }
+
+                    card2Timeline = gsap.timeline();
+
+                    card2Timeline
+                        // Transition 1: Right card to center (Step 1 active)
+                        .to(
+                            itemLeft,
+                            {
+                                opacity: 0,
+                                scale: 0.5,
+                                rotation: 0,
+                                duration: 0.3,
+                                ease: "power2.in",
+                            },
+                            1.2,
+                        )
+                        .set(itemLeft, { xPercent: 221.8, zIndex: 5 }, 1.5)
+                        .to(
+                            itemLeft,
+                            {
+                                opacity: 0.15,
+                                scale: 0.8,
+                                rotation: 0,
+                                duration: 0.4,
+                                ease: "power2.out",
+                            },
+                            1.6,
+                        )
+                        .to(
+                            bgLeft,
+                            {
+                                rotation: -15,
+                                duration: 0.4,
+                                ease: "power2.out",
+                            },
+                            1.6,
+                        )
+
+                        // Center card moves Center -> Left
+                        .to(
+                            itemCenter,
+                            {
+                                xPercent: -99.5,
+                                scale: 0.8,
+                                rotation: 0,
+                                opacity: 0.15,
+                                duration: 0.8,
+                                ease: "power2.inOut",
+                            },
+                            1.2,
+                        )
+                        .to(
+                            bgCenter,
+                            {
+                                rotation: 15,
+                                duration: 0.8,
+                                ease: "power2.inOut",
+                            },
+                            1.2,
+                        )
+                        .set(itemCenter, { zIndex: 10 }, 1.2)
+
+                        // Right card moves Right -> Center
+                        .set(itemRight, { zIndex: 20 }, 1.2)
+                        .to(
+                            itemRight,
+                            {
+                                xPercent: -105.9,
+                                scale: 1,
+                                rotation: 0,
+                                opacity: 1,
+                                duration: 0.8,
+                                ease: "power2.inOut",
+                            },
+                            1.2,
+                        )
+                        .to(
+                            bgRight,
+                            {
+                                rotation: 0,
+                                duration: 0.8,
+                                ease: "power2.inOut",
+                            },
+                            1.2,
+                        );
+
+                    if (pillContent1 && pillContent2 && pillContent3) {
+                        card2Timeline
+                            .to(
+                                pillContent2,
+                                { opacity: 0, duration: 0.4 },
+                                1.2,
+                            )
+                            .to(
+                                pillContent1,
+                                { opacity: 1, duration: 0.4 },
+                                1.2,
+                            );
+                    }
+
+                    card2Timeline
+                        // Transition 2: Left card to center (Step 3 active)
+                        .to(
+                            itemCenter,
+                            {
+                                opacity: 0,
+                                scale: 0.5,
+                                rotation: 0,
+                                duration: 0.3,
+                                ease: "power2.in",
+                            },
+                            3.2,
+                        )
+                        .set(itemCenter, { xPercent: 99.5, zIndex: 5 }, 3.5)
+                        .to(
+                            itemCenter,
+                            {
+                                opacity: 0.15,
+                                scale: 0.8,
+                                rotation: 0,
+                                duration: 0.4,
+                                ease: "power2.out",
+                            },
+                            3.6,
+                        )
+                        .to(
+                            bgCenter,
+                            {
+                                rotation: -15,
+                                duration: 0.4,
+                                ease: "power2.out",
+                            },
+                            3.6,
+                        )
+
+                        // Right card moves Center -> Left
+                        .to(
+                            itemRight,
+                            {
+                                xPercent: -221.8,
+                                scale: 0.8,
+                                rotation: 0,
+                                opacity: 0.15,
+                                duration: 0.8,
+                                ease: "power2.inOut",
+                            },
+                            3.2,
+                        )
+                        .to(
+                            bgRight,
+                            {
+                                rotation: 15,
+                                duration: 0.8,
+                                ease: "power2.inOut",
+                            },
+                            3.2,
+                        )
+                        .set(itemRight, { zIndex: 10 }, 3.2)
+
+                        // Left card moves Right -> Center
+                        .set(itemLeft, { zIndex: 20 }, 3.2)
+                        .to(
+                            itemLeft,
+                            {
+                                xPercent: 105.9,
+                                scale: 1,
+                                rotation: 0,
+                                opacity: 1,
+                                duration: 0.8,
+                                ease: "power2.inOut",
+                            },
+                            3.2,
+                        )
+                        .to(
+                            bgLeft,
+                            {
+                                rotation: 0,
+                                duration: 0.8,
+                                ease: "power2.inOut",
+                            },
+                            3.2,
+                        );
+
+                    if (pillContent1 && pillContent2 && pillContent3) {
+                        card2Timeline
+                            .to(
+                                pillContent1,
+                                { opacity: 0, duration: 0.4 },
+                                3.2,
+                            )
+                            .to(
+                                pillContent3,
+                                { opacity: 1, duration: 0.4 },
+                                3.2,
+                            );
+                    }
+
+                    card2Timeline
+                        // Transition 3: Reset back to Center card (Step 2 active)
+                        .to(
+                            itemRight,
+                            {
+                                opacity: 0,
+                                scale: 0.5,
+                                rotation: 0,
+                                duration: 0.3,
+                                ease: "power2.in",
+                            },
+                            5.2,
+                        )
+                        .set(itemRight, { xPercent: 10, zIndex: 5 }, 5.5)
+                        .to(
+                            itemRight,
+                            {
+                                opacity: 0.15,
+                                scale: 0.8,
+                                rotation: 0,
+                                duration: 0.4,
+                                ease: "power2.out",
+                            },
+                            5.6,
+                        )
+                        .to(
+                            bgRight,
+                            {
+                                rotation: -15,
+                                duration: 0.4,
+                                ease: "power2.out",
+                            },
+                            5.6,
+                        )
+
+                        // Left card moves Center -> Left
+                        .to(
+                            itemLeft,
+                            {
+                                xPercent: -10,
+                                scale: 0.8,
+                                rotation: 0,
+                                opacity: 0.15,
+                                duration: 0.8,
+                                ease: "power2.inOut",
+                            },
+                            5.2,
+                        )
+                        .to(
+                            bgLeft,
+                            {
+                                rotation: 15,
+                                duration: 0.8,
+                                ease: "power2.inOut",
+                            },
+                            5.2,
+                        )
+                        .set(itemLeft, { zIndex: 10 }, 5.2)
+
+                        // Center card moves Right -> Center
+                        .set(itemCenter, { zIndex: 20 }, 5.2)
+                        .to(
+                            itemCenter,
+                            {
+                                xPercent: 0,
+                                scale: 1,
+                                rotation: 0,
+                                opacity: 1,
+                                duration: 0.8,
+                                ease: "power2.inOut",
+                            },
+                            5.2,
+                        )
+                        .to(
+                            bgCenter,
+                            {
+                                rotation: 0,
+                                duration: 0.8,
+                                ease: "power2.inOut",
+                            },
+                            5.2,
+                        );
+
+                    if (pillContent1 && pillContent2 && pillContent3) {
+                        card2Timeline
+                            .to(
+                                pillContent3,
+                                { opacity: 0, duration: 0.4 },
+                                5.2,
+                            )
+                            .to(
+                                pillContent2,
+                                { opacity: 1, duration: 0.4 },
+                                5.2,
+                            );
+                    }
+                }
+            }
+
+            let card3Timeline = null;
+
+            function runCard3Animation() {
+                const cardEl = document.getElementById("card-interoperability");
+                if (!cardEl) return;
+
+                const gear = cardEl.querySelector(".card3-gear-wrapper");
+                const lineLeft = cardEl.querySelector(".card3-line-left");
+                const dot = cardEl.querySelector(".card3-dot");
+                const dotOutline = cardEl.querySelector(".card3-dot-outline");
+                const lineMid = cardEl.querySelector(".card3-line-mid");
+                const lineTop = cardEl.querySelector(".card3-line-top");
+                const lineBottom = cardEl.querySelector(".card3-line-bottom");
+                const pillTop = cardEl.querySelector(".card3-pill-top");
+                const pillMid = cardEl.querySelector(".card3-pill-mid");
+                const pillBottom = cardEl.querySelector(".card3-pill-bottom");
+
+                if (card3Timeline) {
+                    card3Timeline.kill();
+                }
+
+                // Set initial states
+                gsap.set(gear, { opacity: 0, scale: 1, x: -60 });
+                gsap.set([dot, dotOutline], {
+                    scale: 0,
+                    opacity: 0,
+                    transformOrigin: "center center",
+                });
+                gsap.set([pillTop, pillMid, pillBottom], { opacity: 0, x: 20 });
+
+                // Prepare SVG paths for stroke animation
+                const preparePath = (path) => {
+                    if (!path) return;
+                    const length = path.getTotalLength();
+                    gsap.set(path, {
+                        strokeDasharray: length,
+                        strokeDashoffset: length,
+                        opacity: 1,
+                    });
+                };
+
+                preparePath(lineLeft);
+                preparePath(lineMid);
+                preparePath(lineTop);
+                preparePath(lineBottom);
+
+                card3Timeline = gsap.timeline();
+
+                card3Timeline
+                    // 1. Gear animates in
+                    .to(gear, {
+                        opacity: 1,
+                        scale: 1,
+                        x: 0,
+                        duration: 0.6,
+                        ease: "back.out(1.7)",
+                    })
+                    // 2. Horizontal line starts drawing
+                    .to(
+                        lineLeft,
+                        {
+                            strokeDashoffset: 0,
+                            duration: 0.8,
+                            ease: "power1.inOut",
+                        },
+                        "-=0.2",
+                    )
+                    // 3. Dot and outline scale up as the line passes through (around 65% mark)
+                    .to(
+                        [dot, dotOutline],
+                        {
+                            scale: 1,
+                            opacity: 1,
+                            duration: 0.3,
+                            ease: "back.out(2)",
+                            stagger: 0.05,
+                        },
+                        "-=0.45",
+                    )
+                    // 4. Branching top, middle, and bottom curves start drawing as the dot scales up
+                    .to(
+                        [lineTop, lineMid, lineBottom],
+                        {
+                            strokeDashoffset: 0,
+                            duration: 0.7,
+                            ease: "power1.inOut",
+                            stagger: 0.05,
+                        },
+                        "-=0.2",
+                    )
+                    // 5. Middle pill fades in when the horizontal line reaches it
+                    .to(
+                        pillMid,
+                        {
+                            opacity: 1,
+                            x: 0,
+                            duration: 0.4,
+                            ease: "power2.out",
+                        },
+                        "-=0.5",
+                    )
+                    // 6. Top and bottom pills fade in when their curves reach them
+                    .to(
+                        [pillTop, pillBottom],
+                        {
+                            opacity: 1,
+                            x: 0,
+                            duration: 0.4,
+                            ease: "power2.out",
+                            stagger: 0.1,
+                        },
+                        "-=0.3",
+                    );
+            }
+
+            function initCard3Animation() {
+                const cardEl = document.getElementById("card-interoperability");
+                if (!cardEl) return;
+
+                cardEl.addEventListener("mouseenter", () => {
+                    runCard3Animation();
+                });
+            }
+
+            function showCard3FinalState() {
+                const cardEl = document.getElementById("card-interoperability");
+                if (!cardEl) return;
+
+                const gear = cardEl.querySelector(".card3-gear-wrapper");
+                const lineLeft = cardEl.querySelector(".card3-line-left");
+                const dot = cardEl.querySelector(".card3-dot");
+                const dotOutline = cardEl.querySelector(".card3-dot-outline");
+                const lineMid = cardEl.querySelector(".card3-line-mid");
+                const lineTop = cardEl.querySelector(".card3-line-top");
+                const lineBottom = cardEl.querySelector(".card3-line-bottom");
+                const pillTop = cardEl.querySelector(".card3-pill-top");
+                const pillMid = cardEl.querySelector(".card3-pill-mid");
+                const pillBottom = cardEl.querySelector(".card3-pill-bottom");
+
+                if (card3Timeline) {
+                    card3Timeline.kill();
+                }
+
+                gsap.set(gear, { opacity: 1, scale: 1, x: 0 });
+                gsap.set([dot, dotOutline], { scale: 1, opacity: 1 });
+                gsap.set([pillTop, pillMid, pillBottom], { opacity: 1, x: 0 });
+                gsap.set([lineLeft, lineMid, lineTop, lineBottom], {
+                    strokeDashoffset: 0,
+                    opacity: 1,
+                });
+            }
+
+            let card4Timeline = null;
+
+            function runCard4Animation() {
+                const cardEl = document.getElementById("card-format");
+                if (!cardEl) return;
+
+                const stepLeft = cardEl.querySelector(".card4-step-1");
+                const stepCenter = cardEl.querySelector(".card4-step-2");
+                const stepRight = cardEl.querySelector(".card4-step-3");
+
+                if (card4Timeline) {
+                    card4Timeline.kill();
+                }
+
+                // Set initial states: center hidden, left and right hidden and shifted behind it
+                gsap.set(stepCenter, {
+                    opacity: 0,
+                    scale: 0.8,
+                    y: 20,
+                    transformOrigin: "center center",
+                });
+                gsap.set(stepLeft, {
+                    opacity: 0,
+                    x: 50,
+                    scale: 0.9,
+                    transformOrigin: "center center",
+                });
+                gsap.set(stepRight, {
+                    opacity: 0,
+                    x: -50,
+                    scale: 0.9,
+                    transformOrigin: "center center",
+                });
+
+                card4Timeline = gsap.timeline();
+
+                card4Timeline
+                    // 1. Center card fades in and slides/scales up
+                    .to(stepCenter, {
+                        opacity: 1,
+                        scale: 1,
+                        y: 0,
+                        duration: 0.6,
+                        ease: "back.out(1.4)",
+                    })
+                    // 2. Left and right cards slide/fan out from behind the center card together
+                    .to(
+                        [stepLeft, stepRight],
+                        {
+                            opacity: 1,
+                            x: 0,
+                            scale: 1,
+                            duration: 0.7,
+                            ease: "power2.out",
+                            stagger: 0.05,
+                        },
+                        "-=0.25",
+                    );
+            }
+
+            function initCard4Animation() {
+                const cardEl = document.getElementById("card-format");
+                if (!cardEl) return;
+
+                cardEl.addEventListener("mouseenter", () => {
+                    runCard4Animation();
+                });
+            }
+
+            function showCard4FinalState() {
+                const cardEl = document.getElementById("card-format");
+                if (!cardEl) return;
+
+                const stepLeft = cardEl.querySelector(".card4-step-1");
+                const stepCenter = cardEl.querySelector(".card4-step-2");
+                const stepRight = cardEl.querySelector(".card4-step-3");
+
+                if (card4Timeline) {
+                    card4Timeline.kill();
+                }
+
+                gsap.set(stepCenter, {
+                    opacity: 1,
+                    scale: 1,
+                    y: 0,
+                });
+                gsap.set(stepLeft, {
+                    opacity: 1,
+                    x: 0,
+                    scale: 1,
+                });
+                gsap.set(stepRight, {
+                    opacity: 1,
+                    x: 0,
+                    scale: 1,
+                });
+            }
+
+            let card5Timeline = null;
+
+            function runCard5Animation() {
+                const cardEl = document.getElementById("card-applicability");
+                if (!cardEl) return;
+
+                const bubbleB2B = cardEl.querySelector(".card5-step-1");
+                const bubbleB2G = cardEl.querySelector(".card5-step-2");
+                const bubbleB2C = cardEl.querySelector(".card5-step-3");
+                const bubbleCircle = cardEl.querySelector(".card5-step-4");
+                const svgContainer = cardEl.querySelector(
+                    ".card5-svg-container",
+                );
+
+                const line1 = cardEl.querySelector(".card5-line-1");
+                const line2 = cardEl.querySelector(".card5-line-2");
+                const line3 = cardEl.querySelector(".card5-line-3");
+                const line4 = cardEl.querySelector(".card5-line-4");
+                const line5 = cardEl.querySelector(".card5-line-5");
+
+                if (card5Timeline) {
+                    card5Timeline.kill();
+                }
+                svgContainer.classList.remove("animate-arrows");
+
+                // Set initial states for mask paths using precise hardcoded lengths
+                gsap.set(line1, {
+                    strokeDasharray: 610,
+                    strokeDashoffset: 610,
+                    opacity: 1,
+                });
+                gsap.set(line2, {
+                    strokeDasharray: 630,
+                    strokeDashoffset: 630,
+                    opacity: 1,
+                });
+                gsap.set(line3, {
+                    strokeDasharray: 300,
+                    strokeDashoffset: 300,
+                    opacity: 1,
+                });
+                gsap.set(line4, {
+                    strokeDasharray: 190,
+                    strokeDashoffset: 190,
+                    opacity: 1,
+                });
+                gsap.set(line5, {
+                    strokeDasharray: 235,
+                    strokeDashoffset: 235,
+                    opacity: 1,
+                });
+
+                // Set initial states for bubbles and arrows
+                gsap.set([bubbleCircle, bubbleB2B, bubbleB2G, bubbleB2C], {
+                    opacity: 0,
+                    scale: 0,
+                    transformOrigin: "center center",
+                });
+                const slidingArrows = cardEl.querySelectorAll(
+                    ".card5-sliding-arrow",
+                );
+                gsap.set(slidingArrows, { opacity: 0 });
+
+                // Ensure clipPath doesn't clip our mask drawing lines
+                gsap.set(svgContainer, {
+                    clipPath: "none",
+                });
+
+                card5Timeline = gsap.timeline();
+
+                card5Timeline
+                    // 0. Scale up Cleartax Circle
+                    .to(bubbleCircle, {
+                        opacity: 1,
+                        scale: 1,
+                        duration: 0.6,
+                        ease: "back.out(1.5)",
+                    })
+                    // 1. All lines start drawing at the same time
+                    .to(
+                        [line1, line2, line3, line4, line5],
+                        {
+                            strokeDashoffset: 0,
+                            duration: 1.2,
+                            ease: "power1.inOut",
+                        },
+                        "-=0.2",
+                    )
+                    // 2. B2G, B2B, and B2C bubbles scale up as the lines reach them
+                    .to(
+                        [bubbleB2G, bubbleB2B, bubbleB2C],
+                        {
+                            opacity: 1,
+                            scale: 1,
+                            duration: 0.8,
+                            ease: "back.out(1.2)",
+                            stagger: 0.1,
+                        },
+                        "-=0.8",
+                    )
+                    .call(() => {
+                        svgContainer.classList.add("animate-arrows");
+                    });
+            }
+
+            function initCard5Animation() {
+                const cardEl = document.getElementById("card-applicability");
+                if (!cardEl) return;
+
+                cardEl.addEventListener("mouseenter", () => {
+                    runCard5Animation();
+                });
+            }
+
+            function showCard5FinalState() {
+                const cardEl = document.getElementById("card-applicability");
+                if (!cardEl) return;
+
+                const bubbleB2B = cardEl.querySelector(".card5-step-1");
+                const bubbleB2G = cardEl.querySelector(".card5-step-2");
+                const bubbleB2C = cardEl.querySelector(".card5-step-3");
+                const bubbleCircle = cardEl.querySelector(".card5-step-4");
+                const svgContainer = cardEl.querySelector(
+                    ".card5-svg-container",
+                );
+
+                const line1 = cardEl.querySelector(".card5-line-1");
+                const line2 = cardEl.querySelector(".card5-line-2");
+                const line3 = cardEl.querySelector(".card5-line-3");
+                const line4 = cardEl.querySelector(".card5-line-4");
+                const line5 = cardEl.querySelector(".card5-line-5");
+
+                if (card5Timeline) {
+                    card5Timeline.kill();
+                }
+
+                gsap.set([bubbleCircle, bubbleB2B, bubbleB2G, bubbleB2C], {
+                    opacity: 1,
+                    scale: 1,
+                });
+
+                gsap.set([line1, line2, line3, line4, line5], {
+                    strokeDashoffset: 0,
+                    opacity: 1,
+                });
+
+                gsap.set(cardEl.querySelectorAll(".card5-sliding-arrow"), {
+                    clearProps: "opacity",
+                });
+
+                svgContainer.classList.remove("animate-arrows");
+            }
+
+            let card6Timeline = null;
+
+            function runCard6Animation() {
+                const cardEl = document.getElementById("card-copy");
+                if (!cardEl) return;
+
+                const card62Phase = cardEl.querySelector(".card6-2-phase");
+                const baseState = cardEl.querySelector(".card6-step-1");
+                const bubbleLeft = cardEl.querySelector(".card6-bubble-left");
+                const bubbleRight = cardEl.querySelector(".card6-bubble-right");
+                const svgContainer = cardEl.querySelector(
+                    ".card6-svg-container",
+                );
+                const ublCopy = cardEl.querySelector(".card6-ubl-copy");
+                const step4Wrapper = cardEl.querySelector(
+                    ".card6-step4-wrapper",
+                );
+                const statCard1 = cardEl.querySelector(".card6-stat-card-1");
+                const statCard2 = cardEl.querySelector(".card6-stat-card-2");
+
+                if (card6Timeline) {
+                    card6Timeline.kill();
+                }
+
+                // Set initial states for animation targets
+                gsap.set(card62Phase, {
+                    opacity: 0,
+                    y: 0,
+                    scale: 0.8,
+                    transformOrigin: "center center",
+                });
+                gsap.set(baseState, {
+                    opacity: 1,
+                    y: 0,
+                    scale: 1,
+                    clipPath: "inset(0% 100% 0% 0%)",
+                    transformOrigin: "left center",
+                });
+                gsap.set(bubbleLeft, {
+                    opacity: 0,
+                    x: 0,
+                    y: 50,
+                    scale: 0.8,
+                });
+                gsap.set(bubbleRight, {
+                    opacity: 0,
+                    x: 0,
+                    y: 50,
+                    scale: 0.8,
+                });
+                gsap.set(svgContainer, {
+                    opacity: 0,
+                    y: -30,
+                    clipPath: "inset(0% 0% 100% 0%)",
+                });
+                gsap.set(ublCopy, {
+                    opacity: 0,
+                    y: 0,
+                    scale: 0.8,
+                });
+                gsap.set(step4Wrapper, {
+                    opacity: 0,
+                    y: 240,
+                });
+                gsap.set(statCard1, {
+                    opacity: 0,
+                    y: 120,
+                });
+                gsap.set(statCard2, {
+                    opacity: 0,
+                    y: 120,
+                });
+
+                card6Timeline = gsap.timeline({ timeScale: 1.05 });
+
+                card6Timeline
+                    // 1. First card-6-2-phase pops in at center
+                    .to(card62Phase, {
+                        opacity: 1,
+                        scale: 1,
+                        duration: 0.35,
+                        ease: "back.out(1.5)",
+                    })
+                    // 2. Base state draws out horizontally to left and right simultaneously from behind 2nd phase badge
+                    .to(
+                        baseState,
+                        {
+                            clipPath: "inset(0% 0% 0% 0%)",
+                            duration: 1.2,
+                            ease: "power2.inOut",
+                        },
+                        "-=0.15",
+                    )
+                    // 3. Then bubble comes in perspective (one time at left and right)
+                    .to(
+                        [bubbleLeft, bubbleRight],
+                        {
+                            opacity: 1,
+                            y: 0,
+                            scale: 1,
+                            duration: 0.4,
+                            ease: "back.out(1.5)",
+                            stagger: 0.1,
+                        },
+                        "+=0.05",
+                    )
+                    // 4. Then SVG slides down
+                    .to(
+                        svgContainer,
+                        {
+                            opacity: 1,
+                            y: 0,
+                            clipPath: "inset(0% 0% 0% 0%)",
+                            duration: 0.7,
+                            ease: "power1.out",
+                        },
+                        "+=0.05",
+                    )
+                    // 5. UBL Copy pill appears when SVG starts
+                    .to(
+                        ublCopy,
+                        {
+                            opacity: 1,
+                            y: 0,
+                            scale: 1,
+                            duration: 0.6,
+                            ease: "power2.out",
+                        },
+                        "<",
+                    )
+                    // 6. card6-step-4-wrapper slides directly to full height in one continuous smooth motion
+                    .to(
+                        step4Wrapper,
+                        {
+                            opacity: 1,
+                            y: 0,
+                            duration: 0.95,
+                            ease: "power2.out",
+                        },
+                        "<",
+                    )
+                    // 8. Then from behind stat-card-1 slides up smoothly
+                    .to(
+                        statCard1,
+                        {
+                            opacity: 1,
+                            y: 0,
+                            duration: 0.5,
+                            ease: "power2.out",
+                        },
+                        "+=0.08",
+                    )
+                    // 9. Then stat-card-2 slides up smoothly
+                    .to(
+                        statCard2,
+                        {
+                            opacity: 1,
+                            y: 0,
+                            duration: 0.5,
+                            ease: "power2.out",
+                        },
+                        "+=0.1",
+                    );
+            }
+
+            function initCard6Animation() {
+                const cardEl = document.getElementById("card-copy");
+                if (!cardEl) return;
+
+                cardEl.addEventListener("mouseenter", () => {
+                    runCard6Animation();
+                });
+            }
+
+            function initTiltedCards() {
+                if (initialized) return;
+                initialized = true;
+
+                // Initialize GSAP animations
+                initCard1Animation();
+                initCard2Animation();
+                initCard3Animation();
+                initCard4Animation();
+                initCard5Animation();
+                initCard6Animation();
+                showCard3FinalState();
+                showCard4FinalState();
+                showCard5FinalState();
+            }
+
+            if (section) {
+                // Animations only trigger on user interaction (hover/touch), not on page scroll.
+                // This prevents heavy GSAP timelines from running as soon as the section enters viewport.
+                section.addEventListener(
+                    "mouseenter",
+                    () => {
+                        initTiltedCards();
+                        section.classList.add("animate-start");
+                    },
+                    { once: true },
+                );
+
+                section.addEventListener(
+                    "touchstart",
+                    () => {
+                        initTiltedCards();
+                        section.classList.add("animate-start");
+                    },
+                    { once: true, passive: true },
+                );
+            }
+        } // end runPlayground
+
+        const playgroundEvents = [
+            "mousemove",
+            "mouseenter",
+            "mouseover",
+            "touchstart",
+            "scroll",
+            "keydown",
+        ];
+        playgroundEvents.forEach(function (event) {
+            window.addEventListener(event, initPlayground, { passive: true });
+        });
     })();
 </script>

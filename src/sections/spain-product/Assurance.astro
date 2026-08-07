@@ -53,7 +53,7 @@ const assuranceCards = [
   }
 ];
 ---
-<section id="assusrance" class="bg-[#FFFFFF] py-12 lg:py-25 w-full">
+<section id="assusrance" class="bg-[#F6F4FA] py-12 lg:py-25 w-full">
     <div class="lg:container mx-auto px-4 lg:px-6">
         
         <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-6 mb-12">
@@ -113,7 +113,7 @@ const assuranceCards = [
             
             <div class={`link-wrapper overflow-hidden transition-all duration-500 flex justify-end shrink-0 max-lg:w-32 max-lg:opacity-100
                 ${idx === 0 ? 'opacity-100 w-32' : 'opacity-0 w-0'}`}>
-              <a href="#contact-form" class={`contact-trigger ${card.text} font-semibold text-sm lg:text-base flex items-center hover:opacity-80 whitespace-nowrap`}>
+              <a data-target="contact-form" class={`contact-trigger cursor-pointer ${card.text} font-semibold text-sm lg:text-base flex items-center hover:opacity-80 whitespace-nowrap`}>
                 <span class="underline decoration-current decoration-1 underline-offset-4">Book A Demo</span> <span class="text-base inline-block ml-1">↗</span>
               </a>
             </div>
@@ -135,83 +135,116 @@ const assuranceCards = [
 </section>
 
 <script is:inline>
-  document.addEventListener('DOMContentLoaded', () => {
-    const cardsArray = Array.from(document.querySelectorAll('.assurance-card'));
-    let autoplayTimer;
-    let currentIndex = 0;
+  (function () {
+    let assuranceInitialized = false;
 
-    function activateCard(card) {
-        if (window.innerWidth < 1024) return; // Disable accordion logic on mobile
-        if (card.classList.contains('flex-1')) return;
+    function initAssurance() {
+      if (assuranceInitialized) return;
+      assuranceInitialized = true;
 
-        cardsArray.forEach(c => {
-          c.classList.remove('flex-1', 'p-6', 'lg:p-7', 'cursor-default');
-          c.classList.add('w-[80px]', 'shrink-0', 'p-3', 'hover:brightness-95', 'cursor-pointer');
-          
-          const link = c.querySelector('.link-wrapper');
-          link?.classList.remove('opacity-100', 'w-32');
-          link?.classList.add('opacity-0', 'w-0');
+      // Cleanup listeners
+      assuranceEvents.forEach(function (event) {
+        window.removeEventListener(event, initAssurance, { passive: true });
+      });
 
-          const text = c.querySelector('.text-wrapper');
-          text?.classList.remove('opacity-100', 'translate-y-0', 'duration-500', 'delay-[400ms]', 'ease-out', 'duration-300', 'delay-500', 'delay-100');
-          text?.classList.add('opacity-0', 'translate-y-4', 'duration-0', 'pointer-events-none');
+      const run = () => {
+        const cardsArray = Array.from(document.querySelectorAll('.assurance-card'));
+        let autoplayTimer;
+        let currentIndex = 0;
+
+        function activateCard(card) {
+          if (window.innerWidth < 1024) return;
+          if (card.classList.contains('flex-1')) return;
+
+          cardsArray.forEach(c => {
+            c.classList.remove('flex-1', 'p-6', 'lg:p-7', 'cursor-default');
+            c.classList.add('w-[80px]', 'shrink-0', 'p-3', 'hover:brightness-95', 'cursor-pointer');
+
+            const link = c.querySelector('.link-wrapper');
+            link?.classList.remove('opacity-100', 'w-32');
+            link?.classList.add('opacity-0', 'w-0');
+
+            const text = c.querySelector('.text-wrapper');
+            text?.classList.remove('opacity-100', 'translate-y-0', 'duration-500', 'delay-[400ms]', 'ease-out', 'duration-300', 'delay-500', 'delay-100');
+            text?.classList.add('opacity-0', 'translate-y-4', 'duration-0', 'pointer-events-none');
+          });
+
+          card.classList.remove('w-[80px]', 'shrink-0', 'p-3', 'hover:brightness-95', 'cursor-pointer');
+          card.classList.add('flex-1', 'p-6', 'lg:p-7', 'cursor-default');
+
+          const link = card.querySelector('.link-wrapper');
+          link?.classList.remove('opacity-0', 'w-0');
+          link?.classList.add('opacity-100', 'w-32');
+
+          const text = card.querySelector('.text-wrapper');
+          text?.classList.remove('opacity-0', 'translate-y-4', 'duration-0', 'pointer-events-none');
+          text?.classList.add('opacity-100', 'translate-y-0', 'duration-500', 'delay-[400ms]', 'ease-out');
+        }
+
+        cardsArray.forEach((card, idx) => {
+          card.addEventListener('click', () => {
+            currentIndex = idx;
+            activateCard(card);
+          });
         });
 
-        card.classList.remove('w-[80px]', 'shrink-0', 'p-3', 'hover:brightness-95', 'cursor-pointer');
-        card.classList.add('flex-1', 'p-6', 'lg:p-7', 'cursor-default');
-        
-        const link = card.querySelector('.link-wrapper');
-        link?.classList.remove('opacity-0', 'w-0');
-        link?.classList.add('opacity-100', 'w-32');
+        const startAutoplay = () => {
+          if (autoplayTimer) clearInterval(autoplayTimer);
+          autoplayTimer = setInterval(() => {
+            if (window.innerWidth < 1024) return;
+            currentIndex = (currentIndex + 1) % cardsArray.length;
+            activateCard(cardsArray[currentIndex]);
+          }, 5000);
+        };
 
-        const text = card.querySelector('.text-wrapper');
-        text?.classList.remove('opacity-0', 'translate-y-4', 'duration-0', 'pointer-events-none');
-        text?.classList.add('opacity-100', 'translate-y-0', 'duration-500', 'delay-[400ms]', 'ease-out');
+        const stopAutoplay = () => {
+          if (autoplayTimer) clearInterval(autoplayTimer);
+        };
+
+        const accordion = document.getElementById('assurance-accordion');
+        if (accordion) {
+          accordion.addEventListener('mouseenter', stopAutoplay);
+          accordion.addEventListener('mouseleave', startAutoplay);
+          accordion.addEventListener('touchstart', stopAutoplay, { passive: true });
+        }
+
+        startAutoplay();
+
+      };
+
+      if (document.readyState === "loading") {
+        document.addEventListener("DOMContentLoaded", run);
+      } else {
+        run();
+      }
     }
-    
-    cardsArray.forEach((card, idx) => {
-      card.addEventListener('click', () => {
-        currentIndex = idx;
-        activateCard(card);
-      });
+
+    const assuranceEvents = ["mousemove", "mouseenter", "mouseover", "touchstart", "scroll", "keydown"];
+    assuranceEvents.forEach(function (event) {
+      window.addEventListener(event, initAssurance, { passive: true });
     });
+  })();
+</script>
 
-    const startAutoplay = () => {
-      if (autoplayTimer) clearInterval(autoplayTimer);
-      autoplayTimer = setInterval(() => {
-        if (window.innerWidth < 1024) return;
-        currentIndex = (currentIndex + 1) % cardsArray.length;
-        activateCard(cardsArray[currentIndex]);
-      }, 5000);
-    };
-
-    const stopAutoplay = () => {
-      if (autoplayTimer) clearInterval(autoplayTimer);
-    };
-
-    const accordion = document.getElementById('assurance-accordion');
-    if (accordion) {
-      accordion.addEventListener('mouseenter', stopAutoplay);
-      accordion.addEventListener('mouseleave', startAutoplay);
-      accordion.addEventListener('touchstart', stopAutoplay, {passive: true});
-    }
-
-    startAutoplay();
-
-    const contactTriggers = document.querySelectorAll(".contact-trigger");
-    contactTriggers.forEach((trigger) => {
-      trigger.addEventListener("click", (e) => {
+<!-- Eager: contact-trigger scroll is lightweight and must be ready before first click -->
+<script is:inline>
+  (function () {
+    const setup = () => {
+      document.addEventListener("click", (e) => {
+        const trigger = e.target.closest(".contact-trigger");
+        if (!trigger) return;
         e.preventDefault();
-        const targetId = trigger.getAttribute("href")?.replace("#", "");
+        const targetId = trigger.getAttribute("href")?.replace("#", "") || trigger.getAttribute("data-target");
         if (targetId) {
-          const contactSection = document.getElementById(targetId);
-          if (contactSection) {
-            contactSection.scrollIntoView({ behavior: "smooth" });
-          }
+          const el = document.getElementById(targetId);
+          if (el) el.scrollIntoView({ behavior: "smooth" });
         }
       });
-    });
-  });
-
-
+    };
+    if (document.readyState === "loading") {
+      document.addEventListener("DOMContentLoaded", setup);
+    } else {
+      setup();
+    }
+  })();
 </script>
