@@ -15,7 +15,7 @@
  * Fails if output contains page chrome (<html>, <head>, <!doctype>) or any
  * residual Astro scope markers.
  */
-import { readFileSync, writeFileSync, mkdirSync, readdirSync, statSync, existsSync, rmSync } from 'node:fs';
+import { readFileSync, writeFileSync, mkdirSync, readdirSync, statSync, existsSync, rmSync, unlinkSync } from 'node:fs';
 import { resolve, join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { parse as parseHtml } from 'node-html-parser';
@@ -27,6 +27,11 @@ const DIST = resolve(ROOT, 'dist');
 const SRC_DIR = resolve(DIST, 'embed-build');
 const OUT_DIR = resolve(DIST, '_embeds');
 const SECTIONS_DIR = resolve(ROOT, 'src/sections');
+
+// Webflow's Embed field caps a paste at ~50k chars. Mirrors SPLIT_LIMIT in
+// build-css.mjs. Sections over this are auto-split into <section>-1.html,
+// <section>-2.html, ... at safe boundaries (see splitHtml below).
+const SPLIT_LIMIT = 49000;
 
 if (!existsSync(SRC_DIR)) {
   console.error(`[extract-embeds] ${SRC_DIR} not found — run astro build first.`);
@@ -84,6 +89,109 @@ function minify(css) {
     console.warn(`[extract-embeds] css-tree parse failed, keeping raw: ${e.message}`);
     return css;
   }
+}
+
+/**
+ * Walks raw HTML and returns every offset that falls strictly between
+ * top-level constructs (tags, comments, <script>/<style> bodies) — i.e.
+ * points where slicing the string never cuts through a tag, an attribute
+ * value, a comment, or inline script/style content. Concatenating slices
+ * taken at these offsets reproduces the original text byte-for-byte, which
+ * is what lets a section be split across sibling Webflow Embed elements
+ * without corrupting the DOM they render.
+ */
+function findSafeBoundaries(html) {
+  const boundaries = [0];
+  const n = html.length;
+  let i = 0;
+  while (i < n) {
+    if (html[i] !== '<') { i++; continue; }
+    if (html.startsWith('<!--', i)) {
+      const end = html.indexOf('-->', i + 4);
+      i = end === -1 ? n : end + 3;
+      boundaries.push(i);
+      continue;
+    }
+    const tagMatch = /^<\/?([a-zA-Z][a-zA-Z0-9-]*)/.exec(html.slice(i));
+    const tagName = tagMatch ? tagMatch[1].toLowerCase() : null;
+    let j = i + 1;
+    let quote = null;
+    while (j < n) {
+      const c = html[j];
+      if (quote) {
+        if (c === quote) quote = null;
+      } else if (c === '"' || c === "'") {
+        quote = c;
+      } else if (c === '>') {
+        j++;
+        break;
+      }
+      j++;
+    }
+    if (tagName === 'script' || tagName === 'style') {
+      const selfClosing = html.slice(i, j).trimEnd().endsWith('/>');
+      if (!selfClosing) {
+        const closeTag = `</${tagName}>`;
+        const closeIdx = html.toLowerCase().indexOf(closeTag, j);
+        j = closeIdx === -1 ? n : closeIdx + closeTag.length;
+      }
+    }
+    i = j;
+    boundaries.push(i);
+  }
+  if (boundaries[boundaries.length - 1] !== n) boundaries.push(n);
+  return boundaries;
+}
+
+/** Greedily chunks html at safe boundaries, each chunk <= limit chars. */
+function splitHtml(html, limit) {
+  const boundaries = findSafeBoundaries(html);
+  const parts = [];
+  let start = 0;
+  let bi = 0;
+  while (start < html.length) {
+    while (bi < boundaries.length && boundaries[bi] <= start) bi++;
+    let chosen = -1;
+    let k = bi;
+    while (k < boundaries.length && boundaries[k] - start <= limit) {
+      chosen = boundaries[k];
+      k++;
+    }
+    if (chosen === -1) chosen = boundaries[bi] ?? html.length;
+    parts.push(html.slice(start, chosen));
+    start = chosen;
+    bi = k;
+  }
+  return parts;
+}
+
+/**
+ * Writes a section's combined HTML to outPath, splitting into
+ * <base>-1.html, <base>-2.html, ... if it exceeds SPLIT_LIMIT. Clears stale
+ * part files (or a stale single file) left over from a previous build shape.
+ */
+function writeSectionOutput(outPath, combined) {
+  const base = outPath.replace(/\.html$/, '');
+
+  let idx = 1;
+  while (existsSync(`${base}-${idx}.html`)) {
+    unlinkSync(`${base}-${idx}.html`);
+    idx++;
+  }
+
+  if (combined.length <= SPLIT_LIMIT) {
+    writeFileSync(outPath, combined + '\n', 'utf8');
+    return [{ path: outPath, size: combined.length + 1 }];
+  }
+
+  if (existsSync(outPath)) unlinkSync(outPath);
+  const parts = splitHtml(combined, SPLIT_LIMIT);
+  return parts.map((part, i) => {
+    const text = i === parts.length - 1 ? part + '\n' : part;
+    const p = `${base}-${i + 1}.html`;
+    writeFileSync(p, text, 'utf8');
+    return { path: p, size: text.length };
+  });
 }
 
 function readSectionStyles(sourcePath) {
@@ -145,9 +253,13 @@ for (const file of files) {
 
   const outPath = join(OUT_DIR, page, `${section}.html`);
   mkdirSync(dirname(outPath), { recursive: true });
-  writeFileSync(outPath, combined + '\n', 'utf8');
-  const sizeKb = (combined.length / 1024).toFixed(2);
-  console.log(`[extract-embeds] ${page}/${section}.html (${sizeKb} KB)`);
+  const written = writeSectionOutput(outPath, combined);
+  if (written.length > 1) {
+    const kbs = written.map((w) => (w.size / 1024).toFixed(2)).join(' KB + ');
+    console.log(`[extract-embeds] ${page}/${section} split into ${written.length} parts (${kbs} KB) — total ${(combined.length / 1024).toFixed(2)} KB`);
+  } else {
+    console.log(`[extract-embeds] ${page}/${section}.html (${(written[0].size / 1024).toFixed(2)} KB)`);
+  }
 }
 
 if (errorCount > 0) {

@@ -29,6 +29,25 @@ function kebab(s) {
 }
 
 /**
+ * Reads a section embed's content. If extract-embeds.mjs split the section
+ * into <base>-1.html, <base>-2.html, ... (over Webflow's paste limit), reads
+ * and concatenates the parts in order instead — this mirrors what the page
+ * looks like once all part-Embeds are pasted in sequence in Webflow.
+ * Returns null if neither the single file nor any parts exist.
+ */
+function readEmbedContent(basePath) {
+  if (existsSync(basePath)) return readFileSync(basePath, 'utf8');
+  const base = basePath.replace(/\.html$/, '');
+  const parts = [];
+  let idx = 1;
+  while (existsSync(`${base}-${idx}.html`)) {
+    parts.push(readFileSync(`${base}-${idx}.html`, 'utf8'));
+    idx++;
+  }
+  return parts.length ? parts.join('') : null;
+}
+
+/**
  * Inlines dist/css/<bundle>.css files as <style> blocks in preview head,
  * one per CSS import found in the page's Astro frontmatter.
  *
@@ -147,10 +166,11 @@ for (const pageFile of pages) {
 
     let found = false;
     for (const p of pathsToTry) {
-        if (existsSync(p)) {
+        const content = readEmbedContent(p);
+        if (content !== null) {
             console.log(`[assemble-preview] Adding ${componentName} to ${pageName} (from ${p})`);
             assembledHtml += `<!-- Section: ${componentName} -->\n`;
-            assembledHtml += readFileSync(p, 'utf8') + '\n';
+            assembledHtml += content + '\n';
             found = true;
             break;
         }
