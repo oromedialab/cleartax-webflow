@@ -12,45 +12,51 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <!-- Poppins is a geometric stand-in for the licensed brand faces Nohemi (display) + Gilroy (body); swap those in on the live site -->
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<script charset="utf-8" type="text/javascript" src="//js-na2.hsforms.net/forms/embed/v2.js"></script>
 <script>
-(function() {
-    var interactionEvents = ['mouseover', 'keydown', 'touchmove', 'touchstart', 'wheel'];
-    var blockedScripts = [];
-    var observer = new MutationObserver(function(mutations) {
-        mutations.forEach(function(mutation) {
-            mutation.addedNodes.forEach(function(node) {
-                if (node.tagName === 'SCRIPT') {
-                    var src = node.src || '';
-                    if (src && /webflow|jquery|webfont|fonts\.googleapis|usercentrics|linkedin|smartlook|gtm/.test(src)) {
-                        blockedScripts.push({
-                            src: src,
-                            attrs: Array.from(node.attributes).reduce(function(a, b) { a[b.name] = b.value; return a; }, {})
-                        });
-                        node.parentNode.removeChild(node);
-                    }
-                }
+    (function() {
+        var interactionTriggered = false;
+
+        function loadThirdPartyScripts() {
+            if (interactionTriggered) return;
+            interactionTriggered = true;
+
+            // Cleanup event listeners
+            interactionEvents.forEach(function(event) {
+                window.removeEventListener(event, loadThirdPartyScripts, { passive: true });
             });
+
+            // 1. Usercentrics AutoBlocker
+            var autoblocker = document.createElement('script');
+            autoblocker.src = 'https://web.cmp.usercentrics.eu/modules/autoblocker.js';
+            document.head.appendChild(autoblocker);
+
+            // 2. Usercentrics CMP Loader
+            var cmpLoader = document.createElement('script');
+            cmpLoader.id = 'usercentrics-cmp';
+            cmpLoader.src = 'https://web.cmp.usercentrics.eu/ui/loader.js';
+            cmpLoader.setAttribute('data-settings-id', 'utqqyaEbvbzrTk');
+            cmpLoader.async = true;
+            document.head.appendChild(cmpLoader);
+
+            // 3. Google Tag Manager
+            (function (w, d, s, l, i) {
+                w[l] = w[l] || []; w[l].push({
+                    'gtm.start': new Date().getTime(), event: 'gtm.js'
+                });
+                var f = d.getElementsByTagName(s)[0],
+                    j = d.createElement(s), dl = l != 'dataLayer' ? '&l=' + l : '';
+                j.async = true;
+                j.src = 'https://www.googletagmanager.com/gtm.js?id=' + i + dl;
+                f.parentNode.insertBefore(j, f);
+            })(window, document, 'script', 'dataLayer', 'GTM-P5NDQXGH');
+        }
+
+        var interactionEvents = ['mousemove', 'mouseenter', 'mouseover', 'touchstart', 'scroll', 'keydown'];
+        interactionEvents.forEach(function(event) {
+            window.addEventListener(event, loadThirdPartyScripts, { passive: true });
         });
-    });
-    observer.observe(document.documentElement, { childList: true, subtree: true });
-    function loadJS() {
-        if (window.__JS_LOADED) return;
-        window.__JS_LOADED = true;
-        observer.disconnect();
-        interactionEvents.forEach(function(e) { window.removeEventListener(e, loadJS); });
-        (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','GTM-MKPDH9');
-        blockedScripts.forEach(function(s) {
-            var script = document.createElement('script');
-            Object.keys(s.attrs).forEach(function(k) { script.setAttribute(k, s.attrs[k]); });
-            script.async = true;
-            document.head.appendChild(script);
-        });
-        var f = document.createElement('link'); f.rel = 'stylesheet'; f.href = 'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@600;700;800&family=Playfair+Display:wght@700;800;900&display=swap'; document.head.appendChild(f);
-        var uc = document.createElement('script'); uc.src = "https://web.cmp.usercentrics.eu/ui/loader.js"; uc.setAttribute('data-settings-id', 'utqqyaEbvbzrTk'); uc.async = true; document.head.appendChild(uc);
-        document.querySelectorAll('img[data-src]').forEach(function(img) { img.src = img.dataset.src; });
-    }
-    interactionEvents.forEach(function(e) { window.addEventListener(e, loadJS, { once: true, passive: true }); });
-})();
+    })();
 </script>
 <style>
 :root{
@@ -119,7 +125,6 @@ h1,h2,h3,h4{font-family:var(--font-display);font-weight:500;color:var(--ink);lin
 /* dropdown panels (Products / Resources / Country) */
 .ni .dropdown-panel,.region .dropdown-panel{display:none;position:absolute;top:calc(100% + 10px);left:0;background:#fff;border:1px solid var(--line);border-radius:16px;box-shadow:0 30px 60px -24px rgba(26,11,59,.35);padding:10px;min-width:220px;z-index:50}
 .ni:hover .dropdown-panel,.region:hover .dropdown-panel{display:block}
-.dropdown-panel::before{content:'';position:absolute;top:-12px;left:0;right:0;height:12px;background:transparent}
 .dropdown-panel a{display:flex;align-items:center;gap:9px;padding:9px 12px;border-radius:9px;font-size:.87rem;font-weight:500;color:var(--ink);text-decoration:none;white-space:nowrap;opacity:1}
 .dropdown-panel a:hover{background:var(--lav);color:var(--purple)}
 .country-panel{left:auto;right:0;min-width:380px;display:grid;grid-template-columns:1fr 1fr;grid-auto-flow:row;gap:16px 28px;padding:20px 22px}
@@ -205,7 +210,7 @@ h1,h2,h3,h4{font-family:var(--font-display);font-weight:500;color:var(--ink);lin
 
 /* ── HUBSPOT FORM STYLE OVERRIDE (matches .hero-form design) ── */
 #spain-hubspot-form fieldset{border:none;margin:0;padding:0;min-width:0}
-#spain-hubspot-form .hs-form{display:flex;flex-direction:column;gap:14px}
+#spain-hubspot-form .hs-form{display:flex;flex-direction:column;gap:12px}
 #spain-hubspot-form .hs-form-field{margin:0}
 #spain-hubspot-form .hs-form-field > label{display:block;font-size:.76rem;font-weight:500;color:#5A556E;margin-bottom:4px}
 #spain-hubspot-form .hs-form-required{color:#D9415B}
@@ -830,7 +835,6 @@ if(heroSubmit) heroSubmit.addEventListener('click',()=>{
 </script>
 
 <!-- HubSpot lead form: hero "Talk to a specialist" box -->
-<script src="//js.hsforms.net/forms/embed/v2.js"></script>
 <script>
 hbspt.forms.create({
   portalId: "245744706",
