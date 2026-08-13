@@ -31,6 +31,7 @@ export const PAGE_TARGETS = [
   { name: 'spain-product', input: 'src/styles/spain-product.css', page: 'src/pages/spain-product.astro' },
   { name: 'blog', input: 'src/styles/blog.css', page: 'src/pages/blog.astro' },
   { name: 'global-invoicing-delivery', input: 'src/styles/global-invoicing-delivery.css', page: 'src/pages/global-e-invoicing-delivery.astro' },
+  { name: 'resources-overview', input: 'src/styles/resources-overview.css', page: 'src/pages/resources-overview.astro' },
 ];
 
 const SHARED_IMPORT_RE = /import\s+[A-Z][A-Za-z0-9]*\s+from\s+['"]\.\.\/sections\/_shared\/([A-Za-z0-9_-]+)\.astro['"]/g;
