@@ -1,0 +1,61 @@
+---
+/**
+ * Choose section — horizontal list of filter options/tabs
+ */
+const filters = [
+    "Blogs",
+    "Webinars",
+    "Events",
+    "Reports",
+    "Whitepapers",
+    "Case Studies",
+    "Tools"
+];
+---
+
+<section class="w-full bg-white py-10">
+    <div class="lg:container mx-auto px-4 lg:px-6">
+        <div class="flex items-center justify-center gap-3 overflow-x-auto no-scrollbar" id="filter-container">
+            {filters.map((filter, index) => (
+                <button onclick={`handleFilterClick(this, '${filter}')`}
+                    type="button"
+                    class={`filter-btn flex-none px-6 py-2.5 rounded-full border text-[15px] font-medium transition-colors whitespace-nowrap ${index === 0 ? 'bg-[#8A5FD8] text-white border-[#8A5FD8]' : 'border-gray-200 bg-white text-gray-600 hover:border-gray-300 hover:text-gray-900'}`}
+                >
+                    {filter}
+                </button>
+            ))}
+        </div>
+    </div>
+</section>
+
+<style>
+    /* Hide scrollbar for Chrome, Safari and Opera */
+    .no-scrollbar::-webkit-scrollbar {
+        display: none;
+    }
+    /* Hide scrollbar for IE, Edge and Firefox */
+    .no-scrollbar {
+        -ms-overflow-style: none; /* IE and Edge */
+        scrollbar-width: none; /* Firefox */
+    }
+</style>
+
+<script is:inline>
+    function handleFilterClick(btnElement, filterName) {
+        // Find all filter buttons
+        const buttons = document.querySelectorAll('.filter-btn');
+        
+        // Remove active state from all buttons
+        buttons.forEach(btn => {
+            btn.classList.remove('bg-[#8A5FD8]', 'text-white', 'border-[#8A5FD8]');
+            btn.classList.add('border-gray-200', 'bg-white', 'text-gray-600', 'hover:border-gray-300', 'hover:text-gray-900');
+        });
+
+        // Add active state to the clicked button
+        btnElement.classList.remove('border-gray-200', 'bg-white', 'text-gray-600', 'hover:border-gray-300', 'hover:text-gray-900');
+        btnElement.classList.add('bg-[#8A5FD8]', 'text-white', 'border-[#8A5FD8]');
+        
+        // You can add your filter logic here using filterName
+        console.log('Selected filter:', filterName);
+    }
+</script>
