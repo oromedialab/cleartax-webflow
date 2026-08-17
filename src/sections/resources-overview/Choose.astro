@@ -3,26 +3,32 @@
  * Choose section — horizontal list of filter options/tabs
  */
 const filters = [
-    "Blogs",
-    "Webinars",
+    "Tools",
     "Events",
-    "Reports",
-    "Whitepapers",
+    "Webinars",
+    "Blogs",
+    "Reports & Guides",
     "Case Studies",
-    "Tools"
+    "Whitepapers"
 ];
 ---
 
-<section class="w-full bg-white py-10">
+<section id="choose-section" class="group w-full transition-colors duration-300 bg-white py-4 md:py-6 lg:py-8 border-b border-gray-100 sticky top-[68px] md:top-[78px] lg:top-[100px] z-40 data-[stuck=true]:bg-[#F9FAFB] data-[stuck=true]:py-4 data-[stuck=true]:border-[#E5E7EB]">
     <div class="lg:container mx-auto px-4 lg:px-6">
-        <div class="flex items-center justify-center gap-3 overflow-x-auto no-scrollbar" id="filter-container">
+        <div class="flex items-center justify-start lg:justify-center gap-3 group-data-[stuck=true]:gap-2 group-data-[stuck=true]:sm:gap-4 overflow-x-auto no-scrollbar w-full" id="filter-container">
             {filters.map((filter, index) => (
-                <button onclick={`handleFilterClick(this, '${filter}')`}
-                    type="button"
-                    class={`filter-btn flex-none px-6 py-2.5 rounded-full border text-[15px] font-medium transition-colors whitespace-nowrap ${index === 0 ? 'bg-[#8A5FD8] text-white border-[#8A5FD8]' : 'border-gray-200 bg-white text-gray-600 hover:border-gray-300 hover:text-gray-900'}`}
-                >
-                    {filter}
-                </button>
+                <>
+                    <button onclick={`handleFilterClick(this, '${filter}')`}
+                        type="button"
+                        data-active={index === 2 ? "true" : "false"}
+                        class="filter-btn flex-none px-6 py-2.5 rounded-full text-[15px] font-medium transition-colors whitespace-nowrap border border-gray-200 bg-white text-gray-600 hover:border-gray-300 hover:text-gray-900 group-data-[stuck=true]:border-transparent group-data-[stuck=true]:bg-transparent group-data-[stuck=true]:text-[#000000]/60 group-data-[stuck=true]:hover:text-[#000000] data-[active=true]:!bg-[#8A5FD8] data-[active=true]:!text-white data-[active=true]:!border-[#8A5FD8]"
+                    >
+                        {filter}
+                    </button>
+                    {index < filters.length - 1 && (
+                        <div class="hidden group-data-[stuck=true]:block w-[1px] h-5 bg-[#D1D5DB] flex-none"></div>
+                    )}
+                </>
             ))}
         </div>
     </div>
@@ -45,17 +51,38 @@ const filters = [
         // Find all filter buttons
         const buttons = document.querySelectorAll('.filter-btn');
         
-        // Remove active state from all buttons
+        // Update active state via data attribute
         buttons.forEach(btn => {
-            btn.classList.remove('bg-[#8A5FD8]', 'text-white', 'border-[#8A5FD8]');
-            btn.classList.add('border-gray-200', 'bg-white', 'text-gray-600', 'hover:border-gray-300', 'hover:text-gray-900');
+            btn.setAttribute('data-active', 'false');
         });
 
         // Add active state to the clicked button
-        btnElement.classList.remove('border-gray-200', 'bg-white', 'text-gray-600', 'hover:border-gray-300', 'hover:text-gray-900');
-        btnElement.classList.add('bg-[#8A5FD8]', 'text-white', 'border-[#8A5FD8]');
+        btnElement.setAttribute('data-active', 'true');
         
         // You can add your filter logic here using filterName
         console.log('Selected filter:', filterName);
     }
+
+    // Handle sticky state detection
+    document.addEventListener("DOMContentLoaded", () => {
+        const section = document.getElementById("choose-section");
+        if (!section) return;
+        
+        const checkSticky = () => {
+            const rect = section.getBoundingClientRect();
+            const computedStyle = window.getComputedStyle(section);
+            const topVal = parseInt(computedStyle.top, 10);
+            
+            // Add a 1px threshold for subpixel precision
+            if (rect.top <= topVal + 1) {
+                section.setAttribute("data-stuck", "true");
+            } else {
+                section.removeAttribute("data-stuck");
+            }
+        };
+
+        window.addEventListener("scroll", checkSticky, { passive: true });
+        window.addEventListener("resize", checkSticky, { passive: true });
+        checkSticky(); // Initial check
+    });
 </script>
