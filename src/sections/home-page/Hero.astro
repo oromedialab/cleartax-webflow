@@ -1,13 +1,16 @@
 <section
-    class="hero-section relative min-h-[700px] overflow-hidden flex items-center pt-28 pb-12 md:pt-30 md:pb-16 lg:pt-35 lg:pb-25"
+    class="hero-section relative min-h-[700px] bg-[linear-gradient(180deg,#FFFFFF_0%,#F2F1F0_25%,#F2F1F0_75%,#FFFFFF_100%)] overflow-hidden flex items-center pt-28 pb-12 md:pt-30 md:pb-16 lg:pt-35 lg:pb-25"
     id="hero"
 >
-    <!-- Sunset Skyline Background with dark to soft fade overlays -->
-    <div
-        class="absolute inset-0 z-0 bg-cover bg-center bg-no-repeat"
-        style="background-image: url('https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6a731820698401458f78185d_hero-bg.png');"
+    <!-- Interactive Dot Grid Background -->
+    <canvas id="hero-dots-canvas" class="absolute inset-0 z-0 w-full h-full pointer-events-none"></canvas>
+    
+    <!-- Radial Gradient Mask to hide dots in the center (behind text) -->
+    <div 
+        class="absolute inset-0 z-0 bg-[radial-gradient(circle_at_center,_rgba(255,255,255,1)_30%,_rgba(255,255,255,0.7)_40%,_rgba(255,255,255,0)_65%)] pointer-events-none"
     >
     </div>
+
     <div
         class="absolute inset-0 z-0 bg-gradient-to-b from-white/85 via-white/50 to-transparent hidden max-[630px]:block pointer-events-none"
     >
@@ -19,7 +22,7 @@
             <div class="hero-content flex flex-col items-center mx-auto text-center">
                 <!-- Headline -->
                 <h2
-                    class="text-[36px] lg:text-[44px] xl:text-[80px] max-w-250 text-black font-semibold font-inter-tight leading-[1] mb-4 m-0 text-center"
+                    class="text-[36px] lg:text-[44px] xl:text-[80px] max-w-250 text-black font-semibold font-inter-tight leading-[1.1] mb-4 m-0 text-center"
                 >
                     AI-powered  <span class="text-black bg-[#C8F006] px-1 rounded-lg">compliance</span>, built for assurance
                 </h2>
@@ -44,6 +47,7 @@
     </div>
 </section>
 <script is:inline>
+  // Smooth scroll logic
   window.scrollToContactForm = (e) => {
     e.preventDefault();
     const contactForm = document.getElementById('contact-form');
@@ -52,4 +56,90 @@
       history.replaceState(null, '', window.location.pathname + window.location.search);
     }
   };
+
+  // Interactive Dot Grid Canvas Animation
+  document.addEventListener('DOMContentLoaded', () => {
+    const canvas = document.getElementById('hero-dots-canvas');
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+
+    let width, height;
+    let dots = [];
+    const spacing = 30; // Space between dots
+    const radius = 2; // Size of dots
+    const mouse = { x: -1000, y: -1000 };
+    const hoverRadius = 100; // How far the mouse repels
+
+    function resize() {
+      width = canvas.parentElement.offsetWidth;
+      height = canvas.parentElement.offsetHeight;
+      canvas.width = width;
+      canvas.height = height;
+      initGrid();
+    }
+
+    function initGrid() {
+      dots = [];
+      const cols = Math.floor(width / spacing) + 2;
+      const rows = Math.floor(height / spacing) + 2;
+      
+      for (let i = -1; i < cols; i++) {
+        for (let j = -1; j < rows; j++) {
+          dots.push({
+            originX: i * spacing,
+            originY: j * spacing,
+            x: i * spacing,
+            y: j * spacing,
+          });
+        }
+      }
+    }
+
+    function animate() {
+      ctx.clearRect(0, 0, width, height);
+      // Use the #C8F006 color but slightly transparent for the dots
+      ctx.fillStyle = 'rgba(165, 210, 0, 0.8)'; 
+
+      dots.forEach(dot => {
+        const dx = mouse.x - dot.originX;
+        const dy = mouse.y - dot.originY;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+
+        if (dist < hoverRadius) {
+          const angle = Math.atan2(dy, dx);
+          const force = (hoverRadius - dist) / hoverRadius;
+          const push = force * 25; // max push distance
+          dot.x = dot.originX - Math.cos(angle) * push;
+          dot.y = dot.originY - Math.sin(angle) * push;
+        } else {
+          // Return to origin with smooth easing
+          dot.x += (dot.originX - dot.x) * 0.1;
+          dot.y += (dot.originY - dot.y) * 0.1;
+        }
+
+        ctx.beginPath();
+        ctx.arc(dot.x, dot.y, radius, 0, Math.PI * 2);
+        ctx.fill();
+      });
+
+      requestAnimationFrame(animate);
+    }
+
+    window.addEventListener('resize', resize);
+    
+    // Track mouse over the hero section
+    const heroSection = document.getElementById('hero');
+    heroSection.addEventListener('mousemove', (e) => {
+      const rect = canvas.getBoundingClientRect();
+      mouse.x = e.clientX - rect.left;
+      mouse.y = e.clientY - rect.top;
+    });
+    heroSection.addEventListener('mouseleave', () => {
+      mouse.x = -1000;
+      mouse.y = -1000;
+    });
+
+    resize();
+    animate();
+  });
 </script>
