@@ -1,9 +1,41 @@
+---
+interface Props {
+  dotSize?: number;
+  gap?: number;
+  baseColor?: string;
+  activeColor?: string;
+  proximity?: number;
+  speedTrigger?: number;
+  shockRadius?: number;
+  shockStrength?: number;
+  maxSpeed?: number;
+  resistance?: number;
+  returnDuration?: number;
+}
+
+const {
+  dotSize = 4,
+  gap = 22,
+  baseColor = "#A5D200",
+  activeColor = "#799124",
+  proximity = 120,
+  speedTrigger = 100,
+  shockRadius = 250,
+  shockStrength = 6,
+  maxSpeed = 5000,
+  resistance = 450,
+  returnDuration = 1.5,
+} = Astro.props;
+---
+
 <section
     class="hero-section relative min-h-[700px] bg-[linear-gradient(180deg,#FFFFFF_0%,#F2F1F0_25%,#F2F1F0_75%,#FFFFFF_100%)] overflow-hidden flex items-center pt-28 pb-12 md:pt-30 md:pb-16 lg:pt-35 lg:pb-25"
     id="hero"
 >
     <!-- Interactive Dot Grid Background -->
-    <canvas id="hero-dots-canvas" class="absolute inset-0 z-0 w-full h-full pointer-events-none"></canvas>
+    <div class="absolute inset-0 z-0 w-full h-full pointer-events-none">
+        <canvas id="hero-dots-canvas" class="absolute inset-0 w-full h-full"></canvas>
+    </div>
     
     <!-- Radial Gradient Mask to hide dots in the center (behind text) -->
     <div 
@@ -16,7 +48,7 @@
     >
     </div>
 
-    <div class="relative z-10 mx-auto lg:container w-full px-4 lg:px-8">
+    <div class="relative z-10 mx-auto lg:container w-full px-4 lg:px-8 pointer-events-auto">
         <div class="flex justify-center items-center w-full">
             <!-- Hero Content -->
             <div class="hero-content flex flex-col items-center mx-auto text-center">
@@ -46,6 +78,7 @@
         </div>
     </div>
 </section>
+
 <script is:inline>
   // Smooth scroll logic
   window.scrollToContactForm = (e) => {
@@ -62,17 +95,13 @@
     if (!canvas) return;
     const ctx = canvas.getContext('2d');
 
-    let width, height;
-    
-    // Exact configuration from your code snippet + physics props
+    // Configuration matched to your original code
     const config = {
       dotSize: 4,
       gap: 22,
       baseColor: "#A5D200",
       activeColor: "#799124",
       proximity: 120,
-      
-      // Physics additions
       speedTrigger: 100,
       shockRadius: 250,
       shockStrength: 6,
@@ -81,12 +110,10 @@
       returnDuration: 1.5
     };
 
+    let width, height;
     let dots = [];
-    let shockwaves = [];
-    
-    let mouse = { x: -9999, y: -9999 };
-    let lastMouse = { x: -9999, y: -9999 };
-    let lastShockwaveTime = 0;
+    let mouse = { x: -9999, y: -9999, vx: 0, vy: 0, speed: 0 };
+    let lastMouse = { x: -9999, y: -9999, time: 0 };
 
     function initGrid() {
       width = canvas.parentElement.offsetWidth;
@@ -100,22 +127,27 @@
       dots = [];
       const spacing = config.dotSize + config.gap;
       
-      for (let y = spacing; y < height + spacing; y += spacing) {
-        for (let x = spacing; x < width + spacing; x += spacing) {
-          dots.push({
-            originX: x,
-            originY: y,
-            x: x,
-            y: y,
-            vx: 0,
-            vy: 0,
-            colorIntensity: 0
+      // Calculate extra space to center the grid
+      const cols = Math.floor(width / spacing);
+      const rows = Math.floor(height / spacing);
+      const startX = (width - (cols * spacing)) / 2 + (config.dotSize / 2);
+      const startY = (height - (rows * spacing)) / 2 + (config.dotSize / 2);
+
+      for (let y = 0; y < rows; y++) {
+        for (let x = 0; x < cols; x++) {
+          const cx = startX + x * spacing;
+          const cy = startY + y * spacing;
+          dots.push({ 
+            x: cx, y: cy, 
+            originX: cx, originY: cy, 
+            vx: 0, vy: 0, 
+            colorIntensity: 0 
           });
         }
       }
     }
 
-    // Convert hex colors to RGB for smooth transitions
+    // Convert hex colors to RGB for easy color transitioning
     function hexToRgb(hex) {
       const bigint = parseInt(hex.replace('#', ''), 16);
       return [(bigint >> 16) & 255, (bigint >> 8) & 255, bigint & 255];
@@ -127,75 +159,43 @@
 
     function draw(time) {
       let dt = (time - lastTime) / 1000;
-      if (dt > 0.05) dt = 0.05; // Cap delta time
+      if (dt > 0.05) dt = 0.05; // Cap delta time to prevent huge physics jumps
       lastTime = time;
 
       ctx.clearRect(0, 0, width, height);
 
-      // Expand and filter shockwaves
-      shockwaves.forEach(sw => {
-        sw.radius += 800 * dt; 
-      });
-      shockwaves = shockwaves.filter(sw => sw.radius < config.shockRadius);
-
-      // Physics variables derived from your parameters
+      // Physics variables for spring-back effect
       const spring = 30 / config.returnDuration; 
       const damping = config.resistance / 100;
 
       dots.forEach((dot) => {
-        const dx = mouse.x - dot.originX;
-        const dy = mouse.y - dot.originY;
-        const distance = Math.sqrt(dx * dx + dy * dy);
-
-        // 1. Proximity Color Change (Just like your provided snippet)
-        let targetIntensity = distance < config.proximity ? 1 : 0;
-        
-        // 2. Proximity Magnetic Flow (Tuned based on your edits)
-        // If you don't want any movement on hover, you can delete this block!
-        if (distance < config.proximity) {
-          const force = Math.pow((config.proximity - distance) / config.proximity, 2);
-          const angle = Math.atan2(dy, dx);
-          dot.vx -= Math.cos(angle) * force * 350 * dt; // Outward push
-          dot.vy -= Math.sin(angle) * force * 350 * dt;
-          dot.vx -= Math.cos(angle + Math.PI/2) * force * 100 * dt; // Swirl
-          dot.vy -= Math.sin(angle + Math.PI/2) * force * 100 * dt;
-        }
-
-        // 3. Shockwave Push
-        shockwaves.forEach(sw => {
-          const swDx = dot.x - sw.x;
-          const swDy = dot.y - sw.y;
-          const swDist = Math.sqrt(swDx*swDx + swDy*swDy);
-          const distToFront = Math.abs(swDist - sw.radius);
-          
-          if (distToFront < 30) { 
-            const force = config.shockStrength * (1 - sw.radius/config.shockRadius) * (30 - distToFront)/30;
-            const angle = Math.atan2(swDy, swDx);
-            dot.vx += Math.cos(angle) * force * 2000 * dt;
-            dot.vy += Math.sin(angle) * force * 2000 * dt;
-          }
-        });
-
-        // 4. Spring physics returning to origin
+        // 1. Spring physics pulling dot back to its origin
         dot.vx -= spring * (dot.x - dot.originX) * dt;
         dot.vy -= spring * (dot.y - dot.originY) * dt;
         
+        // 2. Friction (damping) slowing it down
         dot.vx -= damping * dot.vx * dt;
         dot.vy -= damping * dot.vy * dt;
 
-        // Cap speed
-        const speed = Math.sqrt(dot.vx*dot.vx + dot.vy*dot.vy);
+        // 3. Cap max speed
+        const speed = Math.sqrt(dot.vx * dot.vx + dot.vy * dot.vy);
         if (speed > config.maxSpeed) {
           dot.vx = (dot.vx / speed) * config.maxSpeed;
           dot.vy = (dot.vy / speed) * config.maxSpeed;
         }
 
-        // Apply velocity
+        // Apply velocity to position
         dot.x += dot.vx * dt;
         dot.y += dot.vy * dt;
 
-        // Smoothly transition colors
+        // 4. Smooth color transitions based on mouse proximity
+        const dx = mouse.x - dot.originX;
+        const dy = mouse.y - dot.originY;
+        const distance = Math.sqrt(dx * dx + dy * dy);
+        
+        const targetIntensity = distance < config.proximity ? 1 : 0;
         dot.colorIntensity += (targetIntensity - dot.colorIntensity) * 10 * dt;
+
         const r = Math.round(baseRgb[0] + (activeRgb[0] - baseRgb[0]) * dot.colorIntensity);
         const g = Math.round(baseRgb[1] + (activeRgb[1] - baseRgb[1]) * dot.colorIntensity);
         const b = Math.round(baseRgb[2] + (activeRgb[2] - baseRgb[2]) * dot.colorIntensity);
@@ -211,28 +211,39 @@
 
     window.addEventListener('resize', initGrid);
     initGrid();
+    requestAnimationFrame(draw);
 
-    // Mouse Tracking & Shockwave Trigger
+    // --- User Interactions ---
     const heroSection = document.getElementById('hero');
+
     heroSection.addEventListener("mousemove", (e) => {
       const rect = canvas.getBoundingClientRect();
       const currentX = e.clientX - rect.left;
       const currentY = e.clientY - rect.top;
+      const now = performance.now();
 
-      if (lastMouse.x !== -9999) {
-        const dx = currentX - lastMouse.x;
-        const dy = currentY - lastMouse.y;
-        const dist = Math.sqrt(dx*dx + dy*dy);
+      // Calculate mouse speed and velocity
+      if (lastMouse.time > 0) {
+        const dtMove = (now - lastMouse.time) / 1000;
+        mouse.vx = (currentX - lastMouse.x) / dtMove;
+        mouse.vy = (currentY - lastMouse.y) / dtMove;
+        mouse.speed = Math.sqrt(mouse.vx * mouse.vx + mouse.vy * mouse.vy);
         
-        const now = performance.now();
-        if (dist > config.speedTrigger && now - lastShockwaveTime > 150) { 
-          shockwaves.push({ x: currentX, y: currentY, radius: 0 });
-          lastShockwaveTime = now;
+        // Push dots away on fast mouse movement
+        if (mouse.speed > config.speedTrigger) {
+          dots.forEach(dot => {
+            const dist = Math.sqrt(Math.pow(dot.originX - currentX, 2) + Math.pow(dot.originY - currentY, 2));
+            if (dist < config.proximity) {
+              dot.vx = (dot.originX - currentX) + mouse.vx * 0.005;
+              dot.vy = (dot.originY - currentY) + mouse.vy * 0.005;
+            }
+          });
         }
       }
 
       lastMouse.x = currentX;
       lastMouse.y = currentY;
+      lastMouse.time = now;
       mouse.x = currentX;
       mouse.y = currentY;
     });
@@ -240,10 +251,24 @@
     heroSection.addEventListener("mouseleave", () => {
       mouse.x = -9999;
       mouse.y = -9999;
-      lastMouse.x = -9999;
-      lastMouse.y = -9999;
+      lastMouse.time = 0;
     });
 
-    draw(performance.now());
+    // Shockwave click effect
+    heroSection.addEventListener("click", (e) => {
+      const rect = canvas.getBoundingClientRect();
+      const cx = e.clientX - rect.left;
+      const cy = e.clientY - rect.top;
+
+      dots.forEach(dot => {
+        const dist = Math.sqrt(Math.pow(dot.originX - cx, 2) + Math.pow(dot.originY - cy, 2));
+        if (dist < config.shockRadius) {
+          const falloff = Math.max(0, 1 - dist / config.shockRadius);
+          dot.vx = (dot.originX - cx) * config.shockStrength * falloff;
+          dot.vy = (dot.originY - cy) * config.shockStrength * falloff;
+        }
+      });
+    });
   });
 </script>
+
