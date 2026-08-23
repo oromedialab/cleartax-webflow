@@ -57,89 +57,193 @@
     }
   };
 
-  // Interactive Dot Grid Canvas Animation
   document.addEventListener('DOMContentLoaded', () => {
     const canvas = document.getElementById('hero-dots-canvas');
     if (!canvas) return;
     const ctx = canvas.getContext('2d');
 
     let width, height;
-    let dots = [];
-    const spacing = 30; // Space between dots
-    const radius = 2; // Size of dots
-    const mouse = { x: -1000, y: -1000 };
-    const hoverRadius = 100; // How far the mouse repels
+    
+    // Exact configuration from your code snippet + physics props
+    const config = {
+      dotSize: 4,
+      gap: 22,
+      baseColor: "#A5D200",
+      activeColor: "#799124",
+      proximity: 120,
+      
+      // Physics additions
+      speedTrigger: 100,
+      shockRadius: 250,
+      shockStrength: 6,
+      maxSpeed: 5000,
+      resistance: 450,
+      returnDuration: 1.5
+    };
 
-    function resize() {
-      width = canvas.parentElement.offsetWidth;
-      height = canvas.parentElement.offsetHeight;
-      canvas.width = width;
-      canvas.height = height;
-      initGrid();
-    }
+    let dots = [];
+    let shockwaves = [];
+    
+    let mouse = { x: -9999, y: -9999 };
+    let lastMouse = { x: -9999, y: -9999 };
+    let lastShockwaveTime = 0;
 
     function initGrid() {
-      dots = [];
-      const cols = Math.floor(width / spacing) + 2;
-      const rows = Math.floor(height / spacing) + 2;
+      width = canvas.parentElement.offsetWidth;
+      height = canvas.parentElement.offsetHeight;
       
-      for (let i = -1; i < cols; i++) {
-        for (let j = -1; j < rows; j++) {
+      const dpr = window.devicePixelRatio || 1;
+      canvas.width = width * dpr;
+      canvas.height = height * dpr;
+      ctx.scale(dpr, dpr);
+      
+      dots = [];
+      const spacing = config.dotSize + config.gap;
+      
+      for (let y = spacing; y < height + spacing; y += spacing) {
+        for (let x = spacing; x < width + spacing; x += spacing) {
           dots.push({
-            originX: i * spacing,
-            originY: j * spacing,
-            x: i * spacing,
-            y: j * spacing,
+            originX: x,
+            originY: y,
+            x: x,
+            y: y,
+            vx: 0,
+            vy: 0,
+            colorIntensity: 0
           });
         }
       }
     }
 
-    function animate() {
-      ctx.clearRect(0, 0, width, height);
-      // Use the #C8F006 color but slightly transparent for the dots
-      ctx.fillStyle = 'rgba(165, 210, 0, 0.8)'; 
+    // Convert hex colors to RGB for smooth transitions
+    function hexToRgb(hex) {
+      const bigint = parseInt(hex.replace('#', ''), 16);
+      return [(bigint >> 16) & 255, (bigint >> 8) & 255, bigint & 255];
+    }
+    const baseRgb = hexToRgb(config.baseColor);
+    const activeRgb = hexToRgb(config.activeColor);
 
-      dots.forEach(dot => {
+    let lastTime = performance.now();
+
+    function draw(time) {
+      let dt = (time - lastTime) / 1000;
+      if (dt > 0.05) dt = 0.05; // Cap delta time
+      lastTime = time;
+
+      ctx.clearRect(0, 0, width, height);
+
+      // Expand and filter shockwaves
+      shockwaves.forEach(sw => {
+        sw.radius += 800 * dt; 
+      });
+      shockwaves = shockwaves.filter(sw => sw.radius < config.shockRadius);
+
+      // Physics variables derived from your parameters
+      const spring = 30 / config.returnDuration; 
+      const damping = config.resistance / 100;
+
+      dots.forEach((dot) => {
         const dx = mouse.x - dot.originX;
         const dy = mouse.y - dot.originY;
-        const dist = Math.sqrt(dx * dx + dy * dy);
+        const distance = Math.sqrt(dx * dx + dy * dy);
 
-        if (dist < hoverRadius) {
+        // 1. Proximity Color Change (Just like your provided snippet)
+        let targetIntensity = distance < config.proximity ? 1 : 0;
+        
+        // 2. Proximity Magnetic Flow (Tuned based on your edits)
+        // If you don't want any movement on hover, you can delete this block!
+        if (distance < config.proximity) {
+          const force = Math.pow((config.proximity - distance) / config.proximity, 2);
           const angle = Math.atan2(dy, dx);
-          const force = (hoverRadius - dist) / hoverRadius;
-          const push = force * 25; // max push distance
-          dot.x = dot.originX - Math.cos(angle) * push;
-          dot.y = dot.originY - Math.sin(angle) * push;
-        } else {
-          // Return to origin with smooth easing
-          dot.x += (dot.originX - dot.x) * 0.1;
-          dot.y += (dot.originY - dot.y) * 0.1;
+          dot.vx -= Math.cos(angle) * force * 350 * dt; // Outward push
+          dot.vy -= Math.sin(angle) * force * 350 * dt;
+          dot.vx -= Math.cos(angle + Math.PI/2) * force * 100 * dt; // Swirl
+          dot.vy -= Math.sin(angle + Math.PI/2) * force * 100 * dt;
         }
 
+        // 3. Shockwave Push
+        shockwaves.forEach(sw => {
+          const swDx = dot.x - sw.x;
+          const swDy = dot.y - sw.y;
+          const swDist = Math.sqrt(swDx*swDx + swDy*swDy);
+          const distToFront = Math.abs(swDist - sw.radius);
+          
+          if (distToFront < 30) { 
+            const force = config.shockStrength * (1 - sw.radius/config.shockRadius) * (30 - distToFront)/30;
+            const angle = Math.atan2(swDy, swDx);
+            dot.vx += Math.cos(angle) * force * 2000 * dt;
+            dot.vy += Math.sin(angle) * force * 2000 * dt;
+          }
+        });
+
+        // 4. Spring physics returning to origin
+        dot.vx -= spring * (dot.x - dot.originX) * dt;
+        dot.vy -= spring * (dot.y - dot.originY) * dt;
+        
+        dot.vx -= damping * dot.vx * dt;
+        dot.vy -= damping * dot.vy * dt;
+
+        // Cap speed
+        const speed = Math.sqrt(dot.vx*dot.vx + dot.vy*dot.vy);
+        if (speed > config.maxSpeed) {
+          dot.vx = (dot.vx / speed) * config.maxSpeed;
+          dot.vy = (dot.vy / speed) * config.maxSpeed;
+        }
+
+        // Apply velocity
+        dot.x += dot.vx * dt;
+        dot.y += dot.vy * dt;
+
+        // Smoothly transition colors
+        dot.colorIntensity += (targetIntensity - dot.colorIntensity) * 10 * dt;
+        const r = Math.round(baseRgb[0] + (activeRgb[0] - baseRgb[0]) * dot.colorIntensity);
+        const g = Math.round(baseRgb[1] + (activeRgb[1] - baseRgb[1]) * dot.colorIntensity);
+        const b = Math.round(baseRgb[2] + (activeRgb[2] - baseRgb[2]) * dot.colorIntensity);
+
         ctx.beginPath();
-        ctx.arc(dot.x, dot.y, radius, 0, Math.PI * 2);
+        ctx.fillStyle = `rgb(${r}, ${g}, ${b})`;
+        ctx.arc(dot.x, dot.y, config.dotSize / 2, 0, Math.PI * 2);
         ctx.fill();
       });
 
-      requestAnimationFrame(animate);
+      requestAnimationFrame(draw);
     }
 
-    window.addEventListener('resize', resize);
-    
-    // Track mouse over the hero section
+    window.addEventListener('resize', initGrid);
+    initGrid();
+
+    // Mouse Tracking & Shockwave Trigger
     const heroSection = document.getElementById('hero');
-    heroSection.addEventListener('mousemove', (e) => {
+    heroSection.addEventListener("mousemove", (e) => {
       const rect = canvas.getBoundingClientRect();
-      mouse.x = e.clientX - rect.left;
-      mouse.y = e.clientY - rect.top;
-    });
-    heroSection.addEventListener('mouseleave', () => {
-      mouse.x = -1000;
-      mouse.y = -1000;
+      const currentX = e.clientX - rect.left;
+      const currentY = e.clientY - rect.top;
+
+      if (lastMouse.x !== -9999) {
+        const dx = currentX - lastMouse.x;
+        const dy = currentY - lastMouse.y;
+        const dist = Math.sqrt(dx*dx + dy*dy);
+        
+        const now = performance.now();
+        if (dist > config.speedTrigger && now - lastShockwaveTime > 150) { 
+          shockwaves.push({ x: currentX, y: currentY, radius: 0 });
+          lastShockwaveTime = now;
+        }
+      }
+
+      lastMouse.x = currentX;
+      lastMouse.y = currentY;
+      mouse.x = currentX;
+      mouse.y = currentY;
     });
 
-    resize();
-    animate();
+    heroSection.addEventListener("mouseleave", () => {
+      mouse.x = -9999;
+      mouse.y = -9999;
+      lastMouse.x = -9999;
+      lastMouse.y = -9999;
+    });
+
+    draw(performance.now());
   });
 </script>
