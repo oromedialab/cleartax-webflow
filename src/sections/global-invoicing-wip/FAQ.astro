@@ -265,7 +265,7 @@ const schemaData = {
 ---
 
 <section class="faq-section bg-white py-16 lg:py-20" id="faq">
-  <div class="wf-container mx-auto px-4">
+  <div class="max-w-[var(--container-max)] mx-auto px-4">
     <div class="max-w-155 mx-auto flex flex-col items-center gap-4 text-center mb-8">
       <h2 class="m-0 text-[28px] sm:text-[36px] lg:text-[40px] leading-[1.2] font-medium text-[#05022A]">
         Frequently Asked Questions
@@ -275,17 +275,17 @@ const schemaData = {
       </p>
     </div>
 
-    <div class="max-w-155 mx-auto">
+    <div class="">
       <div class="flex flex-col" data-faq-root>
         {
           items.map((it, i) => (
             <div
-              class={`faq-item group border-b border-[#e5e7eb] ${i >= 5 ? "hidden hidden-faq" : ""}`}
+              class={`faq-item group border p-3 mb-3 rounded-xl border-[#e5e7eb] ${i === 0 ? "faq-open" : ""} ${i >= 5 ? "hidden hidden-faq" : ""}`}
             >
               <button
                 class="faq-trigger flex w-full appearance-none items-center justify-between gap-3 border-0 bg-transparent py-4 text-left cursor-pointer"
                 type="button"
-                aria-expanded="false"
+                aria-expanded={i === 0 ? "true" : "false"}
               >
                 <h4 class="faq-question min-w-0 flex-1 text-base font-medium text-[#05022A]">
                   {it.q}
@@ -296,7 +296,7 @@ const schemaData = {
                   </svg>
                 </span>
               </button>
-              <div class="faq-panel overflow-hidden transition-[height] duration-[320ms] [transition-timing-function:cubic-bezier(.4,0,.2,1)] h-0">
+              <div class={`faq-panel overflow-hidden transition-[height] duration-[320ms] [transition-timing-function:cubic-bezier(.4,0,.2,1)] ${i === 0 ? "h-auto" : "h-0"}`}>
                 <div class="faq-answer pb-4 text-sm text-[#6B7280] leading-[1.6] [&_li]:mb-2 [&_ol]:m-0 [&_ol]:pl-5 [&_p:last-child]:mb-0 [&_p]:mb-3 [&_p]:mt-0 [&_strong]:text-[#05022A] [&_ul]:m-0 [&_ul]:pl-5">
                   {typeof it.a === "string" ? (
                     <p set:html={it.a} />
@@ -364,6 +364,27 @@ const schemaData = {
         }
       });
     }
+    function closeItem(item, panel, trigger) {
+      panel.style.height = panel.scrollHeight + "px";
+      requestAnimationFrame(function () {
+        panel.style.height = "0px";
+      });
+      item.classList.remove("faq-open");
+      trigger.setAttribute("aria-expanded", "false");
+    }
+
+    function openItem(item, panel, trigger) {
+      panel.style.height = panel.scrollHeight + "px";
+      item.classList.add("faq-open");
+      trigger.setAttribute("aria-expanded", "true");
+      panel.addEventListener("transitionend", function handler(e) {
+        if (e.propertyName !== "height") return;
+        panel.removeEventListener("transitionend", handler);
+        if (item.classList.contains("faq-open"))
+          panel.style.height = "auto";
+      });
+    }
+
     items.forEach(function (item) {
       const trigger = item.querySelector(".faq-trigger");
       const panel = item.querySelector(".faq-panel");
@@ -372,23 +393,18 @@ const schemaData = {
       trigger.addEventListener("click", function () {
         const isOpen = item.classList.contains("faq-open");
         if (isOpen) {
-          panel.style.height = panel.scrollHeight + "px";
-          requestAnimationFrame(function () {
-            panel.style.height = "0px";
-          });
-          item.classList.remove("faq-open");
-          trigger.setAttribute("aria-expanded", "false");
-        } else {
-          panel.style.height = panel.scrollHeight + "px";
-          item.classList.add("faq-open");
-          trigger.setAttribute("aria-expanded", "true");
-          panel.addEventListener("transitionend", function handler(e) {
-            if (e.propertyName !== "height") return;
-            panel.removeEventListener("transitionend", handler);
-            if (item.classList.contains("faq-open"))
-              panel.style.height = "auto";
-          });
+          closeItem(item, panel, trigger);
+          return;
         }
+
+        items.forEach(function (other) {
+          if (other === item || !other.classList.contains("faq-open")) return;
+          const otherPanel = other.querySelector(".faq-panel");
+          const otherTrigger = other.querySelector(".faq-trigger");
+          if (otherPanel && otherTrigger) closeItem(other, otherPanel, otherTrigger);
+        });
+
+        openItem(item, panel, trigger);
       });
 
       window.addEventListener("resize", function () {
