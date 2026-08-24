@@ -1,0 +1,360 @@
+---
+/**
+ * global-invoicing-wip navbar — flat bordered bar per Figma (node 12239:15725),
+ * distinct from the floating glass-pill _shared/NavbarGlobalV2.astro used elsewhere.
+ */
+export interface NavLink {
+  label: string;
+  href?: string;
+  dropdown?: { label: string; href: string }[];
+}
+
+const links: NavLink[] = [
+  { label: "AI Platform", href: "https://www.cleartax.com/global/recon-ai" },
+  {
+    label: "Enterprise Solutions",
+    dropdown: [
+      { label: "Compliance", href: "https://www.cleartax.com/global/compliance" },
+      {
+        label: "Global E-Invoicing",
+        href: "https://www.cleartax.com/global/e-invoicing-solution",
+      },
+      {
+        label: "Integration",
+        href: "https://www.cleartax.com/global/erp-integration",
+      },
+      {
+        label: "Scale & Security",
+        href: "https://www.cleartax.com/global/scale-security",
+      },
+    ],
+  },
+  {
+    label: "Resources",
+    dropdown: [
+      {
+        label: "Blogs",
+        href: "https://www.cleartax.com/electronic-invoicing#country-select",
+      },
+      { label: "Case Studies", href: "https://www.cleartax.com/case-studies" },
+      { label: "Press Releases", href: "https://www.cleartax.com/ae/press" },
+    ],
+  },
+  {
+    label: "Company",
+    dropdown: [
+      { label: "About us", href: "https://www.cleartax.com/about-us" },
+      { label: "Contact Us", href: "https://www.cleartax.com/contact-us" },
+      {
+        label: "Partners",
+        href: "https://www.cleartax.com/global/partner-program",
+      },
+    ],
+  },
+  {
+    label: "Country",
+    dropdown: [
+      { label: "India", href: "https://www.clear.in/" },
+      { label: "Malaysia", href: "https://www.cleartax.com/my/en" },
+      { label: "USA", href: "https://www.clear.tech/" },
+      { label: "Poland", href: "https://www.cleartax.com/pl/en" },
+      { label: "Saudi Arabia", href: "https://www.cleartax.com/sa" },
+      { label: "Oman", href: "https://www.cleartax.com/om" },
+      { label: "France", href: "https://www.cleartax.com/fr/en" },
+      { label: "Bahrain", href: "https://www.cleartax.com/bh" },
+      { label: "Spain", href: "https://www.cleartax.com/es/en" },
+      { label: "UAE", href: "https://www.cleartax.com/ae" },
+      { label: "Singapore", href: "https://www.cleartax.com/sg/e-invoicing-software" },
+      { label: "Germany", href: "https://www.cleartax.com/de/en" },
+      { label: "Belgium", href: "https://www.cleartax.com/be/en" },
+      { label: "Philippines", href: "https://www.cleartax.com/ph" },
+    ],
+  },
+];
+---
+
+<div data-giwip-nav-root>
+  <div class="fixed top-4 inset-x-0 z-[1000] pointer-events-none">
+    <div class="max-w-[var(--container-max)] mx-auto pointer-events-auto">
+      <div class="w-full max-w-[1280px] mx-auto bg-white border-2 border-[#ECECF4] rounded-xl shadow-[0px_2px_6px_rgba(16,24,40,0.06)] flex items-center justify-between p-2">
+        <a href="/" class="flex items-center shrink-0 pl-6 py-3">
+          <img
+            src="https://cdn.prod.website-files.com/6093bce33d9b4bae841b04e3/69dfcff6071b983201f5f097_logo-cleartax.svg"
+            alt="ClearTax"
+            class="h-6 w-auto"
+            width="112"
+            height="24"
+            loading="eager"
+            fetchpriority="high"
+            decoding="async"
+          />
+        </a>
+
+        <div class="hidden lg:flex items-center gap-6">
+          <ul class="flex items-center list-none m-0 p-0" data-nav-menu>
+            {
+              links.map((l) => (
+                <li class:list={["relative group/item", l.dropdown && "has-dropdown"]}>
+                  {l.dropdown ? (
+                    <>
+                      <button
+                        type="button"
+                        data-nav-trigger
+                        class="flex items-center gap-2 text-sm font-medium text-[#05022A] px-5 py-3.5 rounded-lg whitespace-nowrap bg-transparent border-0 cursor-pointer font-[inherit] transition-colors hover:bg-[#F4F6F9]"
+                      >
+                        {l.label}
+                        <svg
+                          class="shrink-0 transition-transform duration-200 group-[.active]/item:rotate-180"
+                          width="20"
+                          height="20"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          stroke-width="2"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                        >
+                          <path d="m6 9 6 6 6-6" />
+                        </svg>
+                      </button>
+                      <div
+                        class:list={[
+                          "absolute top-full left-0 translate-y-2.5 mt-2.5 bg-white rounded-xl shadow-[0_12px_40px_rgba(0,0,0,0.12)] py-2 opacity-0 invisible transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] z-[1001] group-[.active]/item:opacity-100 group-[.active]/item:visible",
+                          l.label === "Country" ? "grid grid-cols-2 w-90" : "min-w-50 max-w-70",
+                        ]}
+                      >
+                        {l.dropdown.map((d) => (
+                          <a
+                            href={d.href}
+                            target={l.label === "Country" ? "_blank" : undefined}
+                            rel={l.label === "Country" ? "noopener noreferrer" : undefined}
+                            class="block px-5 py-2.5 text-sm font-medium text-[#171E28] no-underline transition-colors hover:bg-[#F4F6F9] hover:text-[#5446FF]"
+                          >
+                            {d.label}
+                          </a>
+                        ))}
+                      </div>
+                    </>
+                  ) : (
+                    <a
+                      href={l.href}
+                      class="inline-flex items-center text-sm font-medium text-[#05022A] px-5 py-3.5 rounded-lg whitespace-nowrap no-underline transition-colors hover:bg-[#F4F6F9]"
+                    >
+                      {l.label}
+                    </a>
+                  )}
+                </li>
+              ))
+            }
+          </ul>
+
+          <a
+            href="javascript:void(0)"
+            onclick="scrollToGiwipRegister(event)"
+            class="inline-flex items-center gap-2 px-5 py-3.5 text-base font-medium text-[#ECEFFF] bg-[#5446FF] rounded-lg whitespace-nowrap no-underline shadow-[0px_2px_3px_rgba(16,24,40,0.06)] transition-opacity duration-200 hover:opacity-90"
+          >
+            Book a demo
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+              <path
+                d="M4 10h12M11 5l5 5-5 5"
+                stroke="#ECEFFF"
+                stroke-width="1.5"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+            </svg>
+          </a>
+        </div>
+
+        <button
+          type="button"
+          data-mobile-toggle
+          aria-label="Toggle menu"
+          aria-expanded="false"
+          class="group/toggle lg:hidden relative w-10 h-10 mr-1 bg-transparent border-0 cursor-pointer p-2"
+        >
+          <span class="block absolute left-[9px] top-[13px] w-[22px] h-0.5 bg-[#05022A] rounded-sm transition-all duration-300 group-[.open]/toggle:top-[19px] group-[.open]/toggle:rotate-45" />
+          <span class="block absolute left-[9px] top-[19px] w-[22px] h-0.5 bg-[#05022A] rounded-sm transition-opacity duration-200 group-[.open]/toggle:opacity-0" />
+          <span class="block absolute left-[9px] top-[25px] w-[22px] h-0.5 bg-[#05022A] rounded-sm transition-all duration-300 group-[.open]/toggle:top-[19px] group-[.open]/toggle:-rotate-45" />
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Mobile menu -->
+  <div
+    class="lg:hidden fixed inset-0 z-[1100] bg-white translate-x-full pointer-events-none transition-transform duration-400 ease-[cubic-bezier(0.16,1,0.3,1)] [&.open]:translate-x-0 [&.open]:pointer-events-auto flex flex-col"
+    data-mobile-menu
+    aria-hidden="true"
+  >
+    <div class="flex items-center justify-between px-5 py-4 border-b border-[#F3F4F6]">
+      <a href="/" class="flex items-center shrink-0">
+        <img
+          src="https://cdn.prod.website-files.com/6093bce33d9b4bae841b04e3/69dfcff6071b983201f5f097_logo-cleartax.svg"
+          alt="ClearTax"
+          class="h-6 w-auto"
+          width="112"
+          height="24"
+          loading="eager"
+          decoding="async"
+        />
+      </a>
+      <button
+        type="button"
+        data-mobile-close
+        aria-label="Close menu"
+        class="inline-flex items-center justify-center w-10 h-10 rounded-full bg-transparent border-0 cursor-pointer text-[#05022A] hover:bg-[#F4F6F9] transition-colors"
+      >
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M18 6 6 18" />
+          <path d="m6 6 12 12" />
+        </svg>
+      </button>
+    </div>
+
+    <ul class="flex-1 overflow-y-auto flex flex-col gap-1 list-none m-0 px-4 py-4">
+      {
+        links.map((l) => (
+          <li class:list={["relative group/mitem", l.dropdown && "has-dropdown-m"]}>
+            {l.dropdown ? (
+              <>
+                <button
+                  type="button"
+                  data-m-trigger
+                  class="flex items-center justify-between w-full gap-1.5 text-base font-medium text-[#05022A] px-4 py-3.5 whitespace-nowrap bg-transparent border-0 cursor-pointer font-[inherit] rounded-xl hover:bg-[#F4F6F9]"
+                >
+                  <span>{l.label}</span>
+                  <svg class="shrink-0 transition-transform duration-300 group-[.active]/mitem:rotate-180" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="m6 9 6 6 6-6" />
+                  </svg>
+                </button>
+                <div class="grid grid-rows-[0fr] group-[.active]/mitem:grid-rows-[1fr] transition-[grid-template-rows] duration-300 ease-out">
+                  <div class="overflow-hidden">
+                    <div class="pl-3 pt-1 pb-2 flex flex-col">
+                      {l.dropdown.map((d) => (
+                        <a
+                          href={d.href}
+                          target={l.label === "Country" ? "_blank" : undefined}
+                          rel={l.label === "Country" ? "noopener noreferrer" : undefined}
+                          class="block px-4 py-2.5 text-sm font-medium text-[#171E28] rounded-lg no-underline hover:bg-[#F4F6F9] hover:text-[#5446FF]"
+                        >
+                          {d.label}
+                        </a>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </>
+            ) : (
+              <a href={l.href} class="block px-4 py-3.5 text-base font-medium text-[#05022A] rounded-xl no-underline hover:bg-[#F4F6F9]">
+                {l.label}
+              </a>
+            )}
+          </li>
+        ))
+      }
+    </ul>
+
+    <div class="px-5 py-4 border-t border-[#F3F4F6]">
+      <a
+        href="javascript:void(0)"
+        onclick="scrollToGiwipRegister(event)"
+        class="inline-flex items-center justify-center w-full gap-2 px-5 py-3.5 text-base font-medium text-[#ECEFFF] bg-[#5446FF] rounded-lg no-underline transition-opacity duration-200 hover:opacity-90"
+      >
+        Request a demo
+        <svg width="18" height="18" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+          <path d="M4 10h12M11 5l5 5-5 5" stroke="#ECEFFF" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        </svg>
+      </a>
+    </div>
+  </div>
+</div>
+
+<script is:inline>
+  (function () {
+    const navbar = document.querySelector("[data-giwip-nav-root]");
+    if (!navbar) return;
+    const mobileToggle = navbar.querySelector("[data-mobile-toggle]");
+    const mobileMenu = navbar.querySelector("[data-mobile-menu]");
+    const mobileClose = navbar.querySelector("[data-mobile-close]");
+    const dropdownItems = navbar.querySelectorAll(".has-dropdown");
+    const mDropdownItems = navbar.querySelectorAll(".has-dropdown-m");
+
+    let scrollLockCount = 0;
+    const lockScroll = () => {
+      scrollLockCount += 1;
+      if (scrollLockCount === 1) document.body.style.overflow = "hidden";
+    };
+    const unlockScroll = () => {
+      scrollLockCount = Math.max(0, scrollLockCount - 1);
+      if (scrollLockCount === 0) document.body.style.overflow = "";
+    };
+
+    window.scrollToGiwipRegister = (e) => {
+      if (e) e.preventDefault();
+      const registerEl =
+        document.getElementById("giwip-contact") ||
+        document.querySelector(".giwip-hs-form-wrap");
+      if (registerEl) {
+        registerEl.scrollIntoView({ behavior: "smooth" });
+      } else {
+        window.location.href = "https://www.cleartax.com/contact-us";
+      }
+    };
+
+    const setMenuOpen = (open) => {
+      if (!mobileMenu) return;
+      const wasOpen = mobileMenu.classList.contains("open");
+      if (open === wasOpen) return;
+      mobileMenu.classList.toggle("open", open);
+      mobileMenu.setAttribute("aria-hidden", open ? "false" : "true");
+      mobileToggle?.classList.toggle("open", open);
+      mobileToggle?.setAttribute("aria-expanded", open ? "true" : "false");
+      if (open) lockScroll();
+      else unlockScroll();
+    };
+
+    dropdownItems.forEach((item) => {
+      const btn = item.querySelector("[data-nav-trigger]");
+      if (!btn) return;
+      btn.addEventListener("click", (e) => {
+        e.preventDefault();
+        const isActive = item.classList.contains("active");
+        dropdownItems.forEach((i) => i.classList.remove("active"));
+        item.classList.toggle("active", !isActive);
+      });
+    });
+
+    mDropdownItems.forEach((item) => {
+      const btn = item.querySelector("[data-m-trigger]");
+      if (!btn) return;
+      btn.addEventListener("click", (e) => {
+        e.preventDefault();
+        item.classList.toggle("active");
+      });
+    });
+
+    document.addEventListener("click", (e) => {
+      if (!e.target.closest(".has-dropdown")) {
+        dropdownItems.forEach((item) => item.classList.remove("active"));
+      }
+    });
+
+    mobileToggle?.addEventListener("click", () => {
+      setMenuOpen(!mobileMenu?.classList.contains("open"));
+    });
+    mobileClose?.addEventListener("click", () => setMenuOpen(false));
+
+    mobileMenu?.addEventListener("click", (e) => {
+      const link = e.target.closest("a[href]");
+      if (!link) return;
+      setMenuOpen(false);
+    });
+
+    document.addEventListener("keydown", (e) => {
+      if (e.key !== "Escape") return;
+      dropdownItems.forEach((item) => item.classList.remove("active"));
+      setMenuOpen(false);
+    });
+  })();
+</script>
