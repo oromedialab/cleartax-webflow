@@ -1,0 +1,280 @@
+---
+interface Props {
+  dotSize?: number;
+  gap?: number;
+  baseColor?: string;
+  activeColor?: string;
+  proximity?: number;
+  speedTrigger?: number;
+  shockRadius?: number;
+  shockStrength?: number;
+  maxSpeed?: number;
+  resistance?: number;
+  returnDuration?: number;
+}
+
+const {
+  dotSize = 4,
+  gap = 22,
+  baseColor = "#A5D200",
+  activeColor = "#799124",
+  proximity = 120,
+  speedTrigger = 100,
+  shockRadius = 250,
+  shockStrength = 6,
+  maxSpeed = 5000,
+  resistance = 450,
+  returnDuration = 1.5,
+} = Astro.props;
+---
+
+<section
+    class="hero-section relative min-h-[700px] bg-[linear-gradient(180deg,#FFFFFF_0%,#F2F1F0_25%,#F2F1F0_75%,#FFFFFF_100%)] overflow-hidden flex items-center pt-28 pb-12 md:pt-30 md:pb-16 lg:pt-35 lg:pb-25"
+    id="hero"
+>
+    <!-- Interactive Dot Grid Background -->
+    <div class="absolute inset-0 z-0 w-full h-full pointer-events-none">
+        <canvas id="hero-dots-canvas" class="absolute inset-0 w-full h-full"></canvas>
+    </div>
+    
+    <!-- Radial Gradient Mask to hide dots in the center (behind text) -->
+    <div 
+        class="absolute inset-0 z-0 bg-[radial-gradient(circle_at_center,_rgba(255,255,255,1)_30%,_rgba(255,255,255,0.7)_40%,_rgba(255,255,255,0)_65%)] pointer-events-none"
+    >
+    </div>
+
+    <div
+        class="absolute inset-0 z-0 bg-gradient-to-b from-white/85 via-white/50 to-transparent hidden max-[630px]:block pointer-events-none"
+    >
+    </div>
+
+    <!-- Bottom fade to blend dots into the background seamlessly -->
+    <div
+        class="absolute bottom-0 inset-x-0 h-48 bg-gradient-to-t from-white via-white/50 to-transparent pointer-events-none z-0"
+    >
+    </div>
+
+    <div class="relative z-10 mx-auto lg:container w-full px-4 lg:px-8 pointer-events-auto">
+        <div class="flex justify-center items-center w-full">
+            <!-- Hero Content -->
+            <div class="hero-content flex flex-col items-center mx-auto text-center">
+                <!-- Headline -->
+                <h2
+                    class="text-[36px] lg:text-[44px] xl:text-[80px] max-w-250 text-black font-semibold font-inter-tight leading-[1.1] mb-4 m-0 text-center"
+                >
+                    AI-powered  <span class="text-black bg-[#C8F006] px-1 rounded-lg">compliance</span>, built for assurance
+                </h2>
+
+                <!-- Description -->
+                <p
+                    class="text-base sm:text-lg max-w-133 text-[#6B7280] font-medium font-google-sans leading-normal mb-7 text-center"
+                >
+                    One intelligent platform for tax, e-invoicing, finance automation and governance across every market you operate in.
+                </p>
+
+                <!-- Call to Action button -->
+                <button
+                    onclick="scrollToContactForm(event)"
+                    class="inline-flex items-center justify-center gap-2 px-12 py-2 md:py-4 font-google-sans rounded-lg font-medium text-white text-base cursor-pointer bg-[#5446FF] border border-[#5446FF]"
+                    style="outline: none;"
+                >
+                    See how it works
+                </button>
+            </div>
+        </div>
+    </div>
+</section>
+
+<script is:inline>
+  // Smooth scroll logic
+  window.scrollToContactForm = (e) => {
+    e.preventDefault();
+    const contactForm = document.getElementById('contact-form');
+    if (contactForm) {
+      contactForm.scrollIntoView({ behavior: 'smooth' });
+      history.replaceState(null, '', window.location.pathname + window.location.search);
+    }
+  };
+
+  document.addEventListener('DOMContentLoaded', () => {
+    const canvas = document.getElementById('hero-dots-canvas');
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+
+    // Configuration matched to your original code
+    const config = {
+      dotSize: 4,
+      gap: 22,
+      baseColor: "#A5D200",
+      activeColor: "#799124",
+      proximity: 120,
+      speedTrigger: 100,
+      shockRadius: 250,
+      shockStrength: 6,
+      maxSpeed: 5000,
+      resistance: 450,
+      returnDuration: 1.5
+    };
+
+    let width, height;
+    let dots = [];
+    let mouse = { x: -9999, y: -9999, vx: 0, vy: 0, speed: 0 };
+    let lastMouse = { x: -9999, y: -9999, time: 0 };
+
+    function initGrid() {
+      width = canvas.parentElement.offsetWidth;
+      height = canvas.parentElement.offsetHeight;
+      
+      const dpr = window.devicePixelRatio || 1;
+      canvas.width = width * dpr;
+      canvas.height = height * dpr;
+      ctx.scale(dpr, dpr);
+      
+      dots = [];
+      const spacing = config.dotSize + config.gap;
+      
+      // Calculate extra space to center the grid
+      const cols = Math.floor(width / spacing);
+      const rows = Math.floor(height / spacing);
+      const startX = (width - (cols * spacing)) / 2 + (config.dotSize / 2);
+      const startY = (height - (rows * spacing)) / 2 + (config.dotSize / 2);
+
+      for (let y = 0; y < rows; y++) {
+        for (let x = 0; x < cols; x++) {
+          const cx = startX + x * spacing;
+          const cy = startY + y * spacing;
+          dots.push({ 
+            x: cx, y: cy, 
+            originX: cx, originY: cy, 
+            vx: 0, vy: 0, 
+            colorIntensity: 0 
+          });
+        }
+      }
+    }
+
+    // Convert hex colors to RGB for easy color transitioning
+    function hexToRgb(hex) {
+      const bigint = parseInt(hex.replace('#', ''), 16);
+      return [(bigint >> 16) & 255, (bigint >> 8) & 255, bigint & 255];
+    }
+    const baseRgb = hexToRgb(config.baseColor);
+    const activeRgb = hexToRgb(config.activeColor);
+
+    let lastTime = performance.now();
+
+    function draw(time) {
+      let dt = (time - lastTime) / 1000;
+      if (dt > 0.05) dt = 0.05; // Cap delta time to prevent huge physics jumps
+      lastTime = time;
+
+      ctx.clearRect(0, 0, width, height);
+
+      // Physics variables for spring-back effect
+      const spring = 30 / config.returnDuration; 
+      const damping = config.resistance / 100;
+
+      dots.forEach((dot) => {
+        // 1. Spring physics pulling dot back to its origin
+        dot.vx -= spring * (dot.x - dot.originX) * dt;
+        dot.vy -= spring * (dot.y - dot.originY) * dt;
+        
+        // 2. Friction (damping) slowing it down
+        dot.vx -= damping * dot.vx * dt;
+        dot.vy -= damping * dot.vy * dt;
+
+        // 3. Cap max speed
+        const speed = Math.sqrt(dot.vx * dot.vx + dot.vy * dot.vy);
+        if (speed > config.maxSpeed) {
+          dot.vx = (dot.vx / speed) * config.maxSpeed;
+          dot.vy = (dot.vy / speed) * config.maxSpeed;
+        }
+
+        // Apply velocity to position
+        dot.x += dot.vx * dt;
+        dot.y += dot.vy * dt;
+
+        // 4. Smooth color transitions based on mouse proximity
+        const dx = mouse.x - dot.originX;
+        const dy = mouse.y - dot.originY;
+        const distance = Math.sqrt(dx * dx + dy * dy);
+        
+        const targetIntensity = distance < config.proximity ? 1 : 0;
+        dot.colorIntensity += (targetIntensity - dot.colorIntensity) * 10 * dt;
+
+        const r = Math.round(baseRgb[0] + (activeRgb[0] - baseRgb[0]) * dot.colorIntensity);
+        const g = Math.round(baseRgb[1] + (activeRgb[1] - baseRgb[1]) * dot.colorIntensity);
+        const b = Math.round(baseRgb[2] + (activeRgb[2] - baseRgb[2]) * dot.colorIntensity);
+
+        ctx.beginPath();
+        ctx.fillStyle = `rgb(${r}, ${g}, ${b})`;
+        ctx.arc(dot.x, dot.y, config.dotSize / 2, 0, Math.PI * 2);
+        ctx.fill();
+      });
+
+      requestAnimationFrame(draw);
+    }
+
+    window.addEventListener('resize', initGrid);
+    initGrid();
+    requestAnimationFrame(draw);
+
+    // --- User Interactions ---
+    const heroSection = document.getElementById('hero');
+
+    heroSection.addEventListener("mousemove", (e) => {
+      const rect = canvas.getBoundingClientRect();
+      const currentX = e.clientX - rect.left;
+      const currentY = e.clientY - rect.top;
+      const now = performance.now();
+
+      // Calculate mouse speed and velocity
+      if (lastMouse.time > 0) {
+        const dtMove = (now - lastMouse.time) / 1000;
+        mouse.vx = (currentX - lastMouse.x) / dtMove;
+        mouse.vy = (currentY - lastMouse.y) / dtMove;
+        mouse.speed = Math.sqrt(mouse.vx * mouse.vx + mouse.vy * mouse.vy);
+        
+        // Push dots away on fast mouse movement
+        if (mouse.speed > config.speedTrigger) {
+          dots.forEach(dot => {
+            const dist = Math.sqrt(Math.pow(dot.originX - currentX, 2) + Math.pow(dot.originY - currentY, 2));
+            if (dist < config.proximity) {
+              dot.vx = (dot.originX - currentX) + mouse.vx * 0.005;
+              dot.vy = (dot.originY - currentY) + mouse.vy * 0.005;
+            }
+          });
+        }
+      }
+
+      lastMouse.x = currentX;
+      lastMouse.y = currentY;
+      lastMouse.time = now;
+      mouse.x = currentX;
+      mouse.y = currentY;
+    });
+
+    heroSection.addEventListener("mouseleave", () => {
+      mouse.x = -9999;
+      mouse.y = -9999;
+      lastMouse.time = 0;
+    });
+
+    // Shockwave click effect
+    heroSection.addEventListener("click", (e) => {
+      const rect = canvas.getBoundingClientRect();
+      const cx = e.clientX - rect.left;
+      const cy = e.clientY - rect.top;
+
+      dots.forEach(dot => {
+        const dist = Math.sqrt(Math.pow(dot.originX - cx, 2) + Math.pow(dot.originY - cy, 2));
+        if (dist < config.shockRadius) {
+          const falloff = Math.max(0, 1 - dist / config.shockRadius);
+          dot.vx = (dot.originX - cx) * config.shockStrength * falloff;
+          dot.vy = (dot.originY - cy) * config.shockStrength * falloff;
+        }
+      });
+    });
+  });
+</script>
+
