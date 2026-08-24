@@ -1540,6 +1540,69 @@ img,svg{display:block;max-width:100%}
             closeCountrySheet();
             if (mobileMenu && mobileMenu.classList.contains('open')) closeMobileMenu();
         });
+        function handleTicker() {
+      const ticker = document.getElementById("ct-announcement-ticker-inner");
+      const main = document.getElementById("main");
+      const hero = document.getElementById("hero");
+      const navContainer = navRoot.querySelector(".glass-nav-outer");
+      if (!ticker) return;
+
+      const isVisible = !!(ticker.offsetWidth || ticker.offsetHeight || ticker.getClientRects().length);
+      if (isVisible) {
+        const tickerHeight = ticker.offsetHeight;
+        const isInsideHero = hero && hero.contains(ticker);
+
+        if (isInsideHero) {
+          if (ticker.style.marginTop !== "76px") {
+            ticker.style.marginTop = "76px";
+          }
+          if (navContainer) {
+            navContainer.style.top = "";
+          }
+          if (main) {
+            main.style.marginTop = "";
+          }
+        } else {
+          if (ticker.style.marginTop !== "") {
+            ticker.style.marginTop = "";
+          }
+          if (main) {
+            main.style.marginTop = tickerHeight + "px";
+          }
+          if (navContainer) {
+            const tickerRect = ticker.getBoundingClientRect();
+            const isStickyOrFixed = window.scrollY > 5 && tickerRect.top > -10;
+            if (isStickyOrFixed) {
+              navContainer.style.top = (tickerHeight + 16) + "px";
+            } else {
+              if (window.scrollY < tickerHeight) {
+                navContainer.style.top = (tickerHeight + 16 - window.scrollY) + "px";
+              } else {
+                navContainer.style.top = "16px";
+              }
+            }
+          }
+        }
+      } else {
+        if (ticker) {
+          ticker.style.marginTop = "";
+        }
+        if (main) {
+          main.style.marginTop = "";
+        }
+        if (navContainer) {
+          navContainer.style.top = "";
+        }
+      }
+    }
+
+    window.addEventListener("scroll", handleTicker);
+    window.addEventListener("resize", handleTicker);
+    if (typeof MutationObserver !== "undefined") {
+      const observer = new MutationObserver(handleTicker);
+      observer.observe(document.body, { childList: true, subtree: true, attributes: true });
+    }
+    handleTicker();
     })();
 </script>
 
