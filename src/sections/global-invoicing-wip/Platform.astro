@@ -20,13 +20,61 @@ const Compliance = [
 
 ---
 
-<section class="bg-white py-12 lg:py-25 border border-y-[#00000033]">
+<section class="bg-white py-12 lg:py-20 border border-y-[#00000033]">
     <div class="mx-auto lg:container w-full px-4 lg:px-6">
 
-        <div class="text-center">
-            <h2 class="text-[26px]">ClearTax is a Continuous Compliance Platform</h2>
-            <p>10,000 e-invoices per second. Infrastructure auto-scales as transactions grow. Month-end peaks. POS surges handled without slowdown.</p>
+        <div class="text-center mx-auto mb-12">
+            <h2 class="text-[26px] sm:text-[32px] lg:text-[40px] font-medium text-[#05022A] max-w-216 mx-auto mb-4 m-0 leading-[1.2]">ClearTax is a Continuous Compliance Platform</h2>
+            <p class="text-[#6B7280] font-medium text-base sm:text-lg leading-[1.55]">Enterprise-grade infrastructure trusted by the world's largest organisations</p>
+        </div>
+
+        <div class="w-full">
+            <div id="compliance-slider" class="flex items-stretch overflow-x-auto gap-6 pb-4 cursor-grab active:cursor-grabbing [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+                {
+                    Compliance.map((item) => (
+                        <div class="bg-white rounded-lg p-4 lg:p-8 w-[90vw] md:w-[48vw] lg:w-[45vw] max-w-[628px] flex-shrink-0 border-2 border-[#CCCCCC] flex flex-col select-none">
+                            <h3 class="text-[26px] lg:text-[32px] font-medium max-w-[564px] leading-[1.26] text-[#05022A] mb-4 md:mb-6 pointer-events-none">{item.title}</h3>
+                            <div class="w-full min-h-[320px] max-w-[564px] mb-4 rounded-sm pointer-events-none" style={`background-color: ${item.img};`}></div>
+                            <p class="text-[#6B7280] font-medium text-base sm:text-lg mt-6 pointer-events-none">{item.desc}</p>
+                        </div>
+                    ))
+                }
+            </div>
         </div>
 
     </div>
 </section>
+
+<script is:inline>
+    const slider = document.getElementById('compliance-slider');
+    let isDown = false;
+    let startX;
+    let scrollLeft;
+
+    if (slider) {
+        slider.addEventListener('mousedown', (e) => {
+            isDown = true;
+            slider.style.cursor = 'grabbing';
+            startX = e.pageX - slider.offsetLeft;
+            scrollLeft = slider.scrollLeft;
+        });
+        
+        slider.addEventListener('mouseleave', () => {
+            isDown = false;
+            slider.style.cursor = 'grab';
+        });
+        
+        slider.addEventListener('mouseup', () => {
+            isDown = false;
+            slider.style.cursor = 'grab';
+        });
+        
+        slider.addEventListener('mousemove', (e) => {
+            if (!isDown) return;
+            e.preventDefault();
+            const x = e.pageX - slider.offsetLeft;
+            const walk = (x - startX) * 2; // Scroll-fast multiplier
+            slider.scrollLeft = scrollLeft - walk;
+        });
+    }
+</script>
