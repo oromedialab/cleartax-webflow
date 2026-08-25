@@ -1,0 +1,94 @@
+---
+/**
+ * Footer — brand v2 primitive. Figma "Container - Footer": light ground, links
+ * left, wordmark right, then a divider with copyright and legal links.
+ *
+ * TAKES PROPS AND IS NEVER PASTED DIRECTLY — the paste unit is a per-page
+ * wrapper (<page>/Footer.astro) that supplies the content.
+ */
+interface Props {
+  links?: { label: string; href: string }[];
+  legal?: { label: string; href: string }[];
+  copyright?: string;
+  logoSrc?: string;
+  logoAlt?: string;
+}
+
+const {
+  links = [],
+  legal = [],
+  copyright = '© 2026 ClearTax Pvt. Ltd. All rights reserved',
+  logoSrc = '',
+  logoAlt = 'cleartax',
+} = Astro.props;
+---
+
+<footer class="rb-footer">
+  <div class="container">
+    <div class="rb-footer-top">
+      <nav class="rb-footer-links" aria-label="Footer">
+        {links.map((l) => <a href={l.href}>{l.label}</a>)}
+      </nav>
+      <div class="rb-footer-logo">
+        {logoSrc ? <img src={logoSrc} alt={logoAlt} /> : <span>cleartax</span>}
+      </div>
+    </div>
+
+    <div class="rb-footer-bottom">
+      <p>{copyright}</p>
+      <nav class="rb-footer-legal" aria-label="Legal">
+        {legal.map((l) => <a href={l.href}>{l.label}</a>)}
+      </nav>
+    </div>
+  </div>
+</footer>
+
+<style is:global>
+  .rb-footer {
+    background: var(--color-surface);
+    color: var(--color-text);
+    border-top: 1px solid var(--color-border);
+    padding-block: var(--spacing-lg) var(--spacing-x-big);
+  }
+
+  .rb-footer-top,
+  .rb-footer-bottom {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--spacing-md);
+  }
+
+  .rb-footer-bottom {
+    margin-top: var(--spacing-xxx-big);
+    padding-top: var(--spacing-md);
+    border-top: 1px solid var(--color-border);
+    font-size: var(--fs-body-sm);
+    line-height: var(--lh-body-sm);
+    color: var(--color-text-muted);
+  }
+
+  .rb-footer-links,
+  .rb-footer-legal {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--spacing-xxx-big);
+    font-size: var(--fs-label);
+    font-weight: var(--font-weight-medium);
+  }
+
+  .rb-footer-legal { font-size: var(--fs-body-sm); }
+
+  .rb-footer-links a:hover,
+  .rb-footer-legal a:hover { color: var(--color-nova-blue); }
+
+  .rb-footer-logo {
+    font-family: var(--font-heading);
+    font-size: var(--fs-h3);
+    font-weight: var(--font-weight-bold);
+    letter-spacing: var(--tracking-heading);
+  }
+
+  .rb-footer-logo img { height: 36px; width: auto; }
+</style>

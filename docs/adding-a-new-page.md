@@ -19,7 +19,7 @@ src/
 └── styles/<page>.css                 ← the page's Tailwind entry bundle
 ```
 
-Plus one wiring step in [scripts/build-css.mjs](../scripts/build-css.mjs).
+Plus one wiring step: a `PAGE_TARGETS` entry in [scripts/css-entries.mjs](../scripts/css-entries.mjs).
 
 ## Step 1 — Create the page file
 
@@ -84,7 +84,7 @@ interface Props { … }
 </script>
 ```
 
-Authoring rules in [README.md](../README.md) (`Authoring rules` section) apply. The `embed-build/[page]/[section].astro` dynamic route picks up new section files via `import.meta.glob` — no registry update needed.
+Authoring rules in [README.md](../README.md) (`Authoring rules` section) apply. The `embed-build/[page]/[section].astro` dynamic route picks up new section files via `import.meta.glob` — no registry update needed. That route imports no CSS and renders unstyled; it exists only so `extract-embeds.mjs` can lift each section's body HTML. Verify with `dist/preview/<page>.html`.
 
 ## Step 3 — Create the CSS entry
 
@@ -112,11 +112,29 @@ Authoring rules in [README.md](../README.md) (`Authoring rules` section) apply. 
 
 - **No `@layer theme, base, utilities;` declaration.** Utilities and any custom CSS in this file must compete in the unlayered cascade so they win against Webflow's element defaults. See [docs/responsive-no-overlap-rule.md](./responsive-no-overlap-rule.md) for the cascade background (the rule itself is no longer load-bearing).
 - **`source(none)` is required** on the utilities import. Without it, Tailwind v4 auto-scans the entire workspace and your bundle becomes ~100 KB of unused utilities. With it, Tailwind only scans what your `@source` directives list.
-- **Don't add `@source '../sections/_shared/…'` lines for shared components.** The build script auto-injects those by parsing your page's frontmatter imports. Adding them manually doesn't hurt but is redundant and drifts out of sync if the page imports change.
+- **Never add `@source` lines for `_shared` components.** The build script auto-injects exactly the ones your page's frontmatter imports. In particular, **never write the wildcard**:
+
+  ```css
+  @source '../sections/_shared/**/*.astro';   /* ← NO. Compiles utilities for all 12 shared components. */
+  ```
+
+  This is not merely redundant — it silently inflates the bundle against Webflow's 50 KB paste cap. Five entries had it; removing it measured:
+
+  | Page | Before | After | Saved |
+  |---|---|---|---|
+  | `resources-overview` | 51,720 | 39,839 | −11.9 KB → single paste |
+  | `home-page` | 38,665 | 27,852 | −10.8 KB |
+  | `global-invoicing-delivery` | 53,083 | 45,087 | −8.0 KB → single paste |
+  | `spain-product` | 74,460 | 67,144 | −7.3 KB |
+  | `oman-e-invoicing` | 59,817 | 54,490 | −5.3 KB |
+
+  `resources-overview` and `global-invoicing-delivery` went from two Webflow pastes to one; `home-page` was already a single paste. Verified safe by an A/B build: every selector dropped belonged to a shared component the page does not import.
+
+  A hand-written per-component `@source` is nearly as bad — it goes stale the moment the page's imports change, and you keep compiling utilities for a component no longer on the page.
 
 ## Step 4 — Wire the build target
 
-[scripts/build-css.mjs](../scripts/build-css.mjs) `TARGETS` array — append:
+[scripts/css-entries.mjs](../scripts/css-entries.mjs) `PAGE_TARGETS` array — append:
 
 ```js
 { name: '<page>', input: 'src/styles/<page>.css', page: 'src/pages/<page>.astro' },
@@ -129,6 +147,8 @@ The `page` field tells the build script to:
 3. Run Tailwind on the generated entry, output to `public/css/<page>.css`.
 
 Targets without a `page` field (currently only `shared` and `fonts`) skip the auto-injection and run Tailwind on the original entry directly.
+
+It also injects `@import '../theme.css'` — the brand `@theme` bindings and the `container` utility — so every page gets the design system without asking.
 
 ## Step 5 — Watch mode (optional)
 
@@ -170,7 +190,7 @@ Per page, one-time:
    ```
    If the page bundle was split, paste `<page>-1.css` then `<page>-2.css` in two separate `<style>` blocks. Order matters.
 
-   Never paste `public/css/fonts.css` — Webflow injects Nohemi + Gilroy itself via Project Settings → Fonts. The `fonts.css` bundle is preview-only.
+   Never paste `public/css/fonts.css` — it self-hosts the **v1** faces (Nohemi/Gilroy) and is preview-only. Brand v2 pages don't import it at all; they load Inter Tight + Google Sans from Google Fonts with a `<link>` in the page head. See [docs/brand/typography.md](./brand/typography.md).
 
 Per section, every change:
 
@@ -183,7 +203,8 @@ Per section, every change:
 - [ ] `src/pages/<page>.astro` created, imports `fonts.css` + `shared.css` + `<page>.css` + each section component.
 - [ ] `src/sections/<page>/*.astro` exist with `<style is:global>` blocks.
 - [ ] `src/styles/<page>.css` created with the structure above (no `@layer theme, base, utilities;` declaration).
-- [ ] `scripts/build-css.mjs` `TARGETS` array has a new entry with `name`, `input`, and `page` fields.
+- [ ] `scripts/css-entries.mjs` `PAGE_TARGETS` array has a new entry with `name`, `input`, and `page` fields.
+- [ ] The page CSS entry contains **no** `_shared` `@source` line of any kind.
 - [ ] `npm run build` succeeds.
 - [ ] `dist/preview/<page>.html` renders correctly in browser.
 - [ ] Webflow paste works without `!important` hacks.
@@ -192,7 +213,7 @@ Per section, every change:
 
 **Forgetting `source(none)`.** Symptom: page bundle is ~100 KB+ and contains utilities for every section in the workspace. Fix: ensure `@import 'tailwindcss/utilities.css' source(none);` (with the `source(none)` modifier).
 
-**Hand-adding `@source '../sections/_shared/X.astro'` to the CSS entry.** Not wrong, but redundant — the build script auto-injects these. If you remove an `_shared` import from the page but leave the `@source` line in CSS, you'll keep compiling utilities for a component that's no longer in the page.
+**Adding any `_shared` `@source` line to the CSS entry — especially the `**/*.astro` wildcard.** The wildcard compiles utilities for all 12 shared components instead of the 2–3 the page uses, costing 5–12 KB against a 50 KB cap and forcing pages into two Webflow pastes. See Step 3. The build auto-injects the right lines; write none yourself.
 
 **Using `@layer` blocks in the page CSS or section `<style is:global>`.** Layered styles always lose to unlayered styles in the cascade, regardless of specificity. Webflow's element defaults are unlayered, so anything you wrap in `@layer base { … }` or `@layer utilities { … }` will lose to them. Keep page CSS unlayered.
 

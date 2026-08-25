@@ -1,0 +1,233 @@
+---
+/**
+ * Integration tabs — reusable primitive. Accordion on the left; selecting an
+ * item swaps the card grid on the right. Interaction ported from the v1
+ * `global/SeamlessIntegration.astro` (its 35 KB was inlined SVG, not logic —
+ * the behaviour itself is ~20 lines).
+ *
+ * THIS FILE TAKES PROPS AND IS NEVER PASTED DIRECTLY. The embed route renders
+ * every section with no props, so the paste unit must be a per-page wrapper
+ * that supplies them:
+ *
+ *   <page>/Integrations.astro   ->  <IntegrationTabs heading="…" groups={…} />
+ *
+ * extract-embeds.mjs follows the wrapper's `.astro` imports, so this file's
+ * <style> ships inside the wrapper's embed. See CLAUDE.md.
+ */
+export interface TabPartner {
+  name: string;
+  body: string;
+  logo?: string;
+}
+
+export interface TabGroup {
+  label: string;
+  body: string;
+  partners: TabPartner[];
+}
+
+interface Props {
+  heading?: string;
+  headingLine2?: string;
+  groups?: TabGroup[];
+  idPrefix?: string;
+}
+
+const {
+  heading = '',
+  headingLine2 = '',
+  groups = [],
+  idPrefix = 'it',
+} = Astro.props;
+---
+
+<section class="it-section">
+  <div class="container">
+    {(heading || headingLine2) && (
+      <div class="gi-section-head">
+        <h2 class="gi-h2">{heading}{headingLine2 && <br />}{headingLine2}</h2>
+      </div>
+    )}
+
+    <div class="it-cols">
+      <div class="it-nav" role="tablist" aria-orientation="vertical">
+        {groups.map((g, i) => (
+          <button
+            class={i === 0 ? 'it-tab is-active' : 'it-tab'}
+            type="button"
+            role="tab"
+            id={`${idPrefix}-tab-${i}`}
+            aria-controls={`${idPrefix}-pane-${i}`}
+            aria-selected={i === 0 ? 'true' : 'false'}
+            data-it-index={String(i)}
+          >
+            <span class="it-tab-row">
+              <span class="it-tab-label">{g.label}</span>
+              <span class="it-tab-mark" aria-hidden="true"></span>
+            </span>
+            <span class="it-tab-body">{g.body}</span>
+          </button>
+        ))}
+      </div>
+
+      <div class="it-panes">
+        {groups.map((g, i) => (
+          <ul
+            class={i === 0 ? 'it-pane is-active' : 'it-pane'}
+            id={`${idPrefix}-pane-${i}`}
+            role="tabpanel"
+            aria-labelledby={`${idPrefix}-tab-${i}`}
+            data-it-index={String(i)}
+          >
+            {g.partners.map((p) => (
+              <li class="it-card">
+                <span class="it-logo" aria-hidden="true">
+                  {p.logo && <img src={p.logo} alt="" loading="lazy" />}
+                </span>
+                <p class="it-name">{p.name}</p>
+                <p class="it-body">{p.body}</p>
+              </li>
+            ))}
+          </ul>
+        ))}
+      </div>
+    </div>
+  </div>
+</section>
+
+<style is:global>
+  .it-section {
+    background: var(--color-surface);
+    border-top: 1px solid var(--color-border);
+    padding-block: var(--spacing-xxx-lg);
+  }
+
+  .it-cols {
+    display: grid;
+    grid-template-columns: 280px minmax(0, 1fr);
+    gap: var(--spacing-x-big);
+    margin-top: var(--spacing-lg);
+    align-items: start;
+  }
+
+  .it-tab {
+    display: block;
+    width: 100%;
+    padding: var(--spacing-md) 0;
+    border: 0;
+    border-bottom: 1px solid var(--color-border);
+    background: none;
+    text-align: start;
+    cursor: pointer;
+    font-family: inherit;
+  }
+
+  .it-tab-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--spacing-sm);
+  }
+
+  .it-tab-label {
+    font-size: var(--fs-body);
+    line-height: var(--lh-body);
+    font-weight: var(--font-weight-semibold);
+    color: var(--color-text);
+  }
+
+  .it-tab-mark {
+    flex: 0 0 9px;
+    height: 9px;
+    border-right: 1.5px solid var(--color-text-muted);
+    border-bottom: 1.5px solid var(--color-text-muted);
+    transform: rotate(45deg);
+    transition: transform var(--transition-base);
+  }
+
+  .it-tab.is-active .it-tab-mark { transform: rotate(225deg); }
+
+  .it-tab-body {
+    display: none;
+    padding-top: var(--spacing-x-sm);
+    font-size: var(--fs-body-sm);
+    line-height: var(--lh-body-sm);
+    color: var(--color-text-muted);
+  }
+
+  .it-tab.is-active .it-tab-body { display: block; }
+
+  .it-pane {
+    display: none;
+    list-style: none;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--spacing-md);
+  }
+
+  .it-pane.is-active { display: grid; }
+
+  .it-card {
+    padding: var(--spacing-md);
+    border: 1px solid var(--color-border);
+    border-radius: 12px;
+    background: var(--palette-generic-00);
+  }
+
+  .it-logo {
+    display: grid;
+    place-items: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    background: var(--palette-nova-50);
+  }
+
+  .it-logo img { width: 20px; height: 20px; object-fit: contain; }
+
+  .it-name {
+    margin-top: var(--spacing-sm);
+    font-size: var(--fs-label);
+    line-height: var(--lh-label);
+    font-weight: var(--font-weight-semibold);
+    color: var(--color-text);
+  }
+
+  .it-body {
+    margin-top: var(--spacing-xx-sm);
+    font-size: var(--fs-label-sm);
+    line-height: var(--lh-label-sm);
+    color: var(--color-text-muted);
+  }
+
+  @media (width < 1024px) {
+    .it-cols { grid-template-columns: 1fr; }
+    .it-pane.is-active { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  }
+
+  @media (width < 640px) {
+    .it-pane.is-active { grid-template-columns: 1fr; }
+  }
+</style>
+
+<script is:inline>
+  (function () {
+    document.querySelectorAll('.it-section').forEach(function (root) {
+      var tabs = root.querySelectorAll('.it-tab');
+      var panes = root.querySelectorAll('.it-pane');
+      tabs.forEach(function (tab) {
+        tab.addEventListener('click', function () {
+          if (tab.classList.contains('is-active')) return;
+          var idx = tab.getAttribute('data-it-index');
+          tabs.forEach(function (t) {
+            var on = t === tab;
+            t.classList.toggle('is-active', on);
+            t.setAttribute('aria-selected', String(on));
+          });
+          panes.forEach(function (p) {
+            p.classList.toggle('is-active', p.getAttribute('data-it-index') === idx);
+          });
+        });
+      });
+    });
+  })();
+</script>

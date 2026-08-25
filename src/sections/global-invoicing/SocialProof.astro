@@ -1,0 +1,93 @@
+---
+/**
+ * Social proof — Figma "Container - Social Proof".
+ * Caption then a greyscale logo ticker, edge-faded.
+ */
+interface Props {
+  caption?: string;
+  logos?: { src: string; alt: string }[];
+}
+
+const {
+  caption = 'Trusted by 5000+ Businesses Worldwide',
+  logos = [],
+} = Astro.props;
+
+const rail = logos.length ? [...logos, ...logos] : [];
+---
+
+<section class="gi-proof">
+  <div class="container">
+    <p class="gi-proof-caption">{caption}</p>
+
+    {rail.length > 0 ? (
+      <div class="gi-proof-rail">
+        <ul class="gi-proof-track">
+          {rail.map((logo, i) => (
+            <li class="gi-proof-item" aria-hidden={i >= logos.length ? 'true' : undefined}>
+              <img src={logo.src} alt={i >= logos.length ? '' : logo.alt} loading="lazy" />
+            </li>
+          ))}
+        </ul>
+      </div>
+    ) : (
+      <ul class="gi-proof-placeholder" aria-hidden="true">
+        {Array.from({ length: 8 }).map(() => <li></li>)}
+      </ul>
+    )}
+  </div>
+</section>
+
+<style is:global>
+  .gi-proof {
+    background: var(--color-surface);
+    border-bottom: 1px solid var(--color-border);
+    padding-block: var(--spacing-xxx-big) var(--spacing-lg);
+  }
+
+  .gi-proof-caption {
+    text-align: center;
+    font-size: var(--fs-label);
+    line-height: var(--lh-label);
+    font-weight: var(--font-weight-semibold);
+    color: var(--color-text);
+  }
+
+  .gi-proof-rail {
+    margin-top: var(--spacing-x-big);
+    overflow: hidden;
+    mask-image: linear-gradient(to right, transparent, #000 8%, #000 92%, transparent);
+  }
+
+  .gi-proof-track {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-xxx-lg);
+    width: max-content;
+    list-style: none;
+    animation: gi-proof-scroll 40s linear infinite;
+  }
+
+  .gi-proof-item img { height: 32px; width: auto; filter: grayscale(1); opacity: 0.55; }
+
+  @keyframes gi-proof-scroll {
+    from { transform: translateX(0); }
+    to   { transform: translateX(-50%); }
+  }
+
+  /* Shown until real logo assets land. */
+  .gi-proof-placeholder {
+    display: flex;
+    justify-content: space-between;
+    gap: var(--spacing-x-big);
+    margin-top: var(--spacing-x-big);
+    list-style: none;
+  }
+
+  .gi-proof-placeholder li {
+    flex: 1;
+    height: 32px;
+    border-radius: 6px;
+    background: var(--palette-ledger-200);
+  }
+</style>

@@ -1,76 +1,349 @@
 /* ==========================================================================
-   Cleartax design tokens — shared across all pages.
-   Tokens live in :root so plain component CSS (var(--color-dark)) resolves.
-   Tailwind v4 tree-shakes @theme tokens that aren't used by utilities, which
-   broke colors before — keep tokens here, opt back into @theme later if/when
-   we author with `bg-dark` style utilities.
+   Cleartax design tokens — brand v2. Shared across all pages.
+   Source of truth: docs/brand/*.md
+
+   HOW THIS FILE IS STRUCTURED — read before adding a token
+   --------------------------------------------------------------------------
+   1. Raw values live in `:root` as `--palette-*`. A plain `:root` block is
+      never tree-shaken, so these always reach the browser.
+   2. Friendly aliases (`--color-*`, `--fs-*`, …) also live in `:root` and
+      point at the palette. Hand-written CSS inside `<style is:global>` uses
+      these: `color: var(--color-vault-navy)`.
+   3. src/styles/theme.css maps the same names into Tailwind via `@theme
+      inline`, so utilities exist: `bg-vault-navy`, `text-flux-lime`,
+      `font-heading`. It is a separate file because per-page bundles never
+      import this one. Because that block is `inline`, Tailwind substitutes the
+      value and emits NO :root vars of its own — which is why the old `@theme`
+      tree-shaking bug (tokens vanishing from :root) can't come back.
+
+   Adding a colour = add the `--palette-*` line here, the `--color-*` alias
+   here, and the matching line in theme.css. All three, or it half-works.
    ========================================================================== */
 
 :root {
-    /* Primary */
-    --color-dark: #171E28;
-    --color-dark-2: #1E2738;
-    --color-white: #FFFFFF;
-    --color-offwhite: #F7F8FB;
-    --color-offwhite2:#F5F5F5;
+    /* ======================================================================
+       BRAND CORE — the four colours. These are the brand.
+       Every published contrast ratio is computed against these exact hexes,
+       NOT against ramp steps. Never substitute a ramp step for a core colour.
+       Ratio (Ledger White ↔ Vault Navy) = 17.75:1 AAA.
+       ====================================================================== */
+    --palette-ledger-white: #F2F1F0;  /* ground — 60% of the frame */
+    --palette-vault-navy:   #05022A;  /* type, authority, dark surfaces — 25% */
+    --palette-nova-blue:    #5446FF;  /* interactive. if it's blue, it does something — 10% */
+    --palette-flux-lime:    #C8F006;  /* one instance per screen. one. — 5% */
 
-    /* Brand */
-    --color-purple: #6355D8;
-    --color-purple-dark: #3025A0;
-    --color-purple-light: #8B7EE8;
-    --grad-btn: linear-gradient(180deg, #6355D8 0%, #3025A0 100%);
-    --grad-btn-hover: linear-gradient(180deg, #7468E8 0%, #4035B8 100%);
-    --grad-recon: linear-gradient(90deg, #9144AB 0%, #3E68FF 100%);
-    --recon-header: linear-gradient(180deg, #AA50C8 0%, #030203 100%);
+    /* ======================================================================
+       RAMPS — tints, shades, borders, hovers, state surfaces.
+       Supporting material only. See docs/brand/colour.md.
+       ====================================================================== */
 
-    /* Secondary */
-    --color-yellow: #FFCF32;
-    --color-green: #22C55E;
-    --color-pink: #FB5B8D;
-    --color-violet: #9F72F2;
-    --color-blue: #1572ED;
+    /* Vault Navy */
+    --palette-navy-50:  #E6ECFF;
+    --palette-navy-100: #D2DCFF;
+    --palette-navy-200: #ADBCFF;
+    --palette-navy-300: #7C91FF;
+    --palette-navy-400: #2123FF;
+    --palette-navy-500: #2123FF;   /* identical to 400 in the Figma export */
+    --palette-navy-600: #1200FF;
+    --palette-navy-700: #1600FF;   /* lighter than 600 in the Figma export */
+    --palette-navy-800: #1000D9;
+    --palette-navy-900: #0F07A8;
+    --palette-navy-950: #05022A;
 
+    /* Ledger White */
+    --palette-ledger-50:  #FAFAF9;
+    --palette-ledger-100: #F5F5F4;
+    --palette-ledger-200: #E8E3E4;
+    --palette-ledger-300: #D7D0D1;
+    --palette-ledger-400: #AA9C9D;
+    --palette-ledger-500: #7B696A;
+    --palette-ledger-600: #594D4C;
+    --palette-ledger-700: #463A3A;
+    --palette-ledger-800: #2A2325;
+    --palette-ledger-900: #1D1617;
+    --palette-ledger-950: #0D0809;
 
-    /* Neutral */
-    --color-text: #0F172A;
-    --color-muted: #64748B;
-    --color-border: #E8EAF0;
-    --color-border-dark: rgba(255, 255, 255, 0.1);
-    --color-surface: rgba(255, 255, 255, 0.06);
-    --color-gray-50: #F8F9FA;
-    --color-gray-100: #F1F3F5;
-    --color-gray-200: #E9ECEF;
-    --color-gray-300: #DEE2E6;
-    --color-gray-400: #ADB5BD;
-    --color-gray-500: #6C757D;
-    --color-gray-600: #495057;
-    --color-gray-700: #343A40;
-    --color-gray-800: #212529;
-    --color-blue-600: #27127A;
-    --color-violet-100: #9144AB;
-    --color-purple-100:#655DFF;
+    /* Nova Blue */
+    --palette-nova-50:  #ECEFFF;
+    --palette-nova-100: #DDE1FF;
+    --palette-nova-200: #C2C8FF;
+    --palette-nova-300: #9CA3FF;
+    --palette-nova-400: #7675FF;
+    --palette-nova-500: #5446FF;
+    --palette-nova-600: #5336F5;
+    --palette-nova-700: #482AD8;
+    --palette-nova-800: #3B25AE;
+    --palette-nova-900: #332689;
+    --palette-nova-950: #1F1650;
 
-    /* Typography — Nohemi headers, Gilroy body. Gilroy needs license from Cleartax. */
-    --font-heading: 'Nohemi', 'Manrope', 'Inter Tight', sans-serif;
-    --font-body: 'Gilroy', 'Manrope', 'Google Sans', sans-serif;
-    --font-inter-tight: 'Inter Tight', sans-serif;
-    --font-google-sans: 'Google Sans', sans-serif;
-    --fs-body: clamp(14px, 1vw + 0.5rem, 16px);
-    --fs-h2: clamp(28px, 2vw + 1rem, 36px);
-    --fs-hero: clamp(40px, 4vw + 1rem, 64px);
+    /* Flux Lime */
+    --palette-lime-50:  #FBFFE7;
+    --palette-lime-100: #F2FFC5;
+    --palette-lime-200: #E9FF8F;
+    --palette-lime-300: #DCFE4F;
+    --palette-lime-400: #D1F91C;
+    --palette-lime-500: #C8F006;
+    --palette-lime-600: #A4BE01;
+    --palette-lime-700: #869405;
+    --palette-lime-800: #70780B;
+    --palette-lime-900: #61660F;
+    --palette-lime-950: #373A04;
 
-    /* Font weights explicitly declared in unlayered :root to prevent Webflow stripping/cascade issues with Tailwind v4 `@layer theme` */
-    --font-weight-normal: 400;
-    --font-weight-medium: 500;
+    /* Neutral — separators, modals, supporting surfaces */
+    --palette-neutral-50:  #F9FAFB;
+    --palette-neutral-100: #F3F4F6;
+    --palette-neutral-200: #E5E7EB;
+    --palette-neutral-300: #D1D5DB;
+    --palette-neutral-400: #9CA3AF;
+    --palette-neutral-500: #6B7280;
+    --palette-neutral-600: #4B5563;
+    --palette-neutral-700: #374151;
+    --palette-neutral-800: #1F2937;
+    --palette-neutral-900: #111827;
+    --palette-neutral-950: #030712;
+
+    /* Generic */
+    --palette-generic-00:  #FFFFFF;
+    --palette-generic-100: #000000;
+
+    /* States */
+    --palette-success-50:  #F0FDF4;
+    --palette-success-100: #DCFCE7;
+    --palette-success-200: #BBF7D0;
+    --palette-success-300: #86EFAC;
+    --palette-success-400: #4ADE80;
+    --palette-success-500: #22C55E;
+    --palette-success-600: #16A34A;
+    --palette-success-700: #15803D;
+    --palette-success-800: #166534;
+    --palette-success-900: #14532D;
+    --palette-success-950: #052E16;
+
+    --palette-warning-50:  #FFFBEB;
+    --palette-warning-100: #FEF3C7;
+    --palette-warning-200: #FDE68A;
+    --palette-warning-300: #FCD24D;
+    --palette-warning-400: #FBBF24;
+    --palette-warning-500: #F59E0B;
+    --palette-warning-600: #D97706;
+    --palette-warning-700: #B45309;
+    --palette-warning-800: #92400E;
+    --palette-warning-900: #78350F;
+    --palette-warning-950: #451A03;
+
+    --palette-destructive-50:  #FEF2F2;
+    --palette-destructive-100: #FEE2E2;
+    --palette-destructive-200: #FECACA;
+    --palette-destructive-300: #EF4444;   /* identical to 400/500 in the Figma export */
+    --palette-destructive-400: #EF4444;
+    --palette-destructive-500: #EF4444;
+    --palette-destructive-600: #DC2626;
+    --palette-destructive-700: #B91C1C;
+    --palette-destructive-800: #991B1B;
+    --palette-destructive-900: #7F1D1D;
+    --palette-destructive-950: #450A0A;
+
+    /* ======================================================================
+       COLOUR ALIASES — what hand-written CSS should use
+       ====================================================================== */
+    --color-ledger-white: var(--palette-ledger-white);
+    --color-vault-navy:   var(--palette-vault-navy);
+    --color-nova-blue:    var(--palette-nova-blue);
+    --color-flux-lime:    var(--palette-flux-lime);
+    --color-generic-00:   var(--palette-generic-00);
+    --color-generic-100:  var(--palette-generic-100);
+
+    /* Semantic roles — prefer these over raw colour names in components */
+    --color-surface:          var(--palette-ledger-white);
+    --color-surface-raised:   var(--palette-ledger-50);
+    --color-surface-inverse:  var(--palette-vault-navy);
+    --color-text:             var(--palette-vault-navy);
+    --color-text-inverse:     var(--palette-ledger-white);
+    --color-text-muted:       var(--palette-ledger-600);
+    --color-text-link:        var(--palette-nova-blue);
+    --color-border:           var(--palette-ledger-200);
+    --color-border-inverse:   rgba(242, 241, 240, 0.12);
+    --color-focus:            var(--palette-generic-100);
+
+    /* ======================================================================
+       TYPOGRAPHY
+       Inter Tight asserts (display + all headings).
+       Google Sans explains (body, labels, overlines, captions).
+       They never cross. Weights never exceed 700.
+       Both SIL OFL 1.1 via Google Fonts.
+       ====================================================================== */
+    --palette-font-heading: 'Inter Tight', 'Inter', system-ui, sans-serif;
+    --palette-font-body:    'Google Sans', 'Inter', system-ui, sans-serif;
+
+    --font-heading: var(--palette-font-heading);
+    --font-body:    var(--palette-font-body);
+
+    /* Weights */
+    --font-weight-normal:   400;
+    --font-weight-medium:   500;
     --font-weight-semibold: 600;
-    --font-weight-bold: 700;
+    --font-weight-bold:     700;   /* never go past this */
 
-    /* Spacing */
+    /* Tracking — display/headings are tight by design */
+    --tracking-heading:  -0.5px;
+    --tracking-body:     0;
+    --tracking-overline: 1px;
+
+    /* Display — hero sections only */
+    --fs-display-xl: 80px;   --lh-display-xl: 88px;
+    --fs-display-lg: 52px;   --lh-display-lg: 56px;
+    --fs-display-sm: 44px;   --lh-display-sm: 48px;
+
+    /* Headings — desktop values; mobile overrides below md (768px) */
+    --fs-h1-lg: 56px;  --lh-h1-lg: 64px;
+    --fs-h1:    40px;  --lh-h1:    48px;
+    --fs-h2:    36px;  --lh-h2:    44px;
+    --fs-h3:    32px;  --lh-h3:    40px;
+    --fs-h4:    28px;  --lh-h4:    36px;
+    --fs-h5:    24px;  --lh-h5:    32px;
+    --fs-h6:    20px;  --lh-h6:    28px;
+
+    /* Paragraph */
+    --fs-body-lg: 18px;  --lh-body-lg: 28px;
+    --fs-body:    16px;  --lh-body:    24px;
+    --fs-body-sm: 14px;  --lh-body-sm: 20px;
+    --fs-body-xs: 12px;  --lh-body-xs: 20px;
+
+    /* Label */
+    --fs-label-lg: 16px;  --lh-label-lg: 18px;
+    --fs-label:    14px;  --lh-label:    16px;
+    --fs-label-sm: 12px;  --lh-label-sm: 16px;
+    --fs-label-xs: 10px;  --lh-label-xs: 14px;
+
+    /* ======================================================================
+       SPACING — 4px system. Tailwind's default scale already matches 1:1
+       (p-1 = 4px … p-48 = 192px), so prefer utilities. These aliases exist
+       for hand-written CSS only.
+       ====================================================================== */
+    --spacing-xx-sm:    4px;
+    --spacing-x-sm:     8px;
+    --spacing-sm:      12px;
+    --spacing-md:      16px;
+    --spacing-big:     20px;
+    --spacing-x-big:   24px;
+    --spacing-xx-big:  28px;
+    --spacing-xxx-big: 32px;
+    --spacing-lg:      40px;
+    --spacing-x-lg:    48px;
+    --spacing-xx-lg:   64px;
+    --spacing-xxx-lg:  80px;
+    --spacing-huge:    96px;
+    --spacing-x-huge: 128px;
+    --spacing-xx-huge:160px;
+    --spacing-xxx-huge:192px;
+
+    /* Grid gutters per breakpoint (brand spec) */
+    --gutter-mobile:  12px;
+    --gutter-tablet:  20px;
+    --gutter-desktop: 32px;
+
+    /* ======================================================================
+       LAYOUT
+       ====================================================================== */
     --navbar-height: 72px;
-    --container-max: 1328px;
+    --container-max: 1328px;   /* applied via @utility container in shared.css */
 
-    /* Transitions */
+    /* ======================================================================
+       TRANSITIONS
+       ====================================================================== */
     --transition-fast: 150ms ease;
     --transition-base: 250ms ease;
     --transition-slow: 350ms ease;
+}
+
+/* Mobile heading scale — brand spec, applied below Tailwind's md (768px) */
+@media (width < 768px) {
+    :root {
+        --fs-h1-lg: 48px;  --lh-h1-lg: 56px;
+        --fs-h1:    36px;  --lh-h1:    44px;
+        --fs-h2:    32px;  --lh-h2:    40px;
+        --fs-h3:    28px;  --lh-h3:    36px;
+        --fs-h4:    24px;  --lh-h4:    32px;
+        --fs-h5:    20px;  --lh-h5:    28px;
+        --fs-h6:    18px;  --lh-h6:    24px;
+    }
+}
+
+/* Tailwind bindings (@theme inline, @utility container) live in
+   src/styles/theme.css — per-page bundles never import this file, so anything
+   Tailwind must see at compile time has to sit there instead. */
+
+/* ==========================================================================
+   COMPATIBILITY ALIASES — v1 token names, v2 values.
+
+   These are the old brand-v1 names (`--color-dark`, `--color-purple`, …) kept
+   alive so that:
+     1. v1 pages still compile and preview, and
+     2. a v1 section copy-pasted into a v2 page renders in the new brand
+        immediately, instead of looking broken until every var is renamed.
+
+   They no longer hold the v1 hexes — each one now points at its nearest v2
+   equivalent, so old markup inherits the rebrand for free. v1 page previews
+   therefore render in v2 colours and will NOT match what is live in Webflow;
+   git history is the reference for how a live v1 page actually looks.
+
+   Still deprecated: never use these names in new work, and delete each one as
+   the last section referencing it is rewritten. Currently referenced:
+   --color-white (41), --color-purple (23), --color-dark (20),
+   --color-gray-500 (12), --color-blue (8), --color-purple-light (3),
+   --color-dark-2 (1).
+   ========================================================================== */
+:root {
+    /* Darks → Vault Navy */
+    --color-dark:          var(--palette-vault-navy);
+    --color-dark-2:        var(--palette-vault-navy);
+
+    /* Lights → Ledger White. Brand rule: never pure #FFFFFF in brand surfaces,
+       so --color-white maps to Ledger White, not to generic white. */
+    --color-white:         var(--palette-ledger-white);
+    --color-offwhite:      var(--palette-ledger-white);
+    --color-offwhite2:     var(--palette-ledger-50);
+
+    /* Purple family → Nova Blue (v1 purple was the old interactive colour) */
+    --color-purple:        var(--palette-nova-blue);
+    --color-purple-dark:   var(--palette-nova-700);
+    --color-purple-light:  var(--palette-nova-400);
+    --color-purple-100:    var(--palette-nova-500);
+    --grad-btn:            linear-gradient(180deg, var(--palette-nova-500) 0%, var(--palette-nova-700) 100%);
+    --grad-btn-hover:      linear-gradient(180deg, var(--palette-nova-400) 0%, var(--palette-nova-600) 100%);
+    --grad-recon:          linear-gradient(90deg, var(--palette-nova-700) 0%, var(--palette-nova-400) 100%);
+    --recon-header:        linear-gradient(180deg, var(--palette-nova-600) 0%, var(--palette-vault-navy) 100%);
+
+    /* Accents. The brand allows no fifth colour, so decorative pink/violet
+       collapse onto Nova Blue; semantic yellow/green map to the state ramps. */
+    --color-yellow:        var(--palette-warning-400);
+    --color-green:         var(--palette-success-500);
+    --color-pink:          var(--palette-nova-blue);
+    --color-violet:        var(--palette-nova-400);
+    --color-blue:          var(--palette-nova-blue);
+    --color-blue-600:      var(--palette-nova-900);
+    --color-violet-100:    var(--palette-nova-700);
+
+    /* Neutrals → Ledger / Neutral ramps */
+    --color-muted:         var(--palette-ledger-600);
+    --color-border-dark:   var(--color-border-inverse);
+    --color-gray-50:       var(--palette-neutral-50);
+    --color-gray-100:      var(--palette-neutral-100);
+    --color-gray-200:      var(--palette-neutral-200);
+    --color-gray-300:      var(--palette-neutral-300);
+    --color-gray-400:      var(--palette-neutral-400);
+    --color-gray-500:      var(--palette-neutral-500);
+    --color-gray-600:      var(--palette-neutral-600);
+    --color-gray-700:      var(--palette-neutral-700);
+    --color-gray-800:      var(--palette-neutral-800);
+
+    /* Fonts → the v2 pair */
+    --font-inter-tight:    var(--palette-font-heading);
+    --font-google-sans:    var(--palette-font-body);
+    --font-gilroy:         var(--palette-font-body);
+
+    /* --fs-h2 deliberately NOT redefined — v2 owns it (36px desktop, 32px mobile).
+       --fs-hero is left as the original clamp on purpose: remapping a SIZE can
+       overflow a v1 layout, whereas remapping a colour or font cannot. */
+    --fs-hero: clamp(40px, 4vw + 1rem, 64px);
 }

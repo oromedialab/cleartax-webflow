@@ -35,14 +35,20 @@ html {
 
 body {
   font-family: var(--font-body);
-  font-size: 16px;
+  font-size: var(--fs-body);
+  line-height: var(--lh-body);
+  font-weight: var(--font-weight-medium);
+  font-optical-sizing: auto; /* Google Sans opsz 17–18 = the small-size reading cut */
+  letter-spacing: var(--tracking-body);
   color: var(--color-text);
-  background-color: var(--color-offwhite);
+  background-color: var(--color-surface);
   overflow-x: hidden;
 }
 
-h1, h2, h3, h4, h6 {
+h1, h2, h3, h4, h5, h6 {
   font-family: var(--font-heading);
+  letter-spacing: var(--tracking-heading);
+  color: var(--color-text);
 }
 
 a {
@@ -56,10 +62,40 @@ img {
   height: auto;
 }
 
+/* Brand rule: every interactive element keeps a visible keyboard focus ring.
+   Never remove this. See docs/brand/accessibility.md. */
+:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Page width: use Tailwind's `container` utility. It is defined in
+   src/styles/theme.css (which every per-page bundle auto-imports), not here —
+   `@utility` only takes effect in a bundle that compiles utilities, and this
+   one deliberately doesn't. Never hand-roll a wrapper class for page width. */
+
 /* ==========================================================================
    Custom display helpers — use these instead of `block` / `grid` when
    Webflow's element defaults outrank plain utilities.
    ========================================================================== */
+
+/* Tabular figures — required for any column of numbers (pricing grids,
+   comparison tables, stat rows). See docs/brand/typography.md § Numbers. */
+.nums-tabular {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum" 1;
+}
 
 .tw-grid {
   display: grid !important;

@@ -94,7 +94,12 @@ function buildCssStyleBlocks(cssImports) {
   return blocks.join('\n');
 }
 
-const pages = readdirSync(PAGES_DIR).filter(f => f.endsWith('.astro') && f !== 'embed');
+// index.astro is the local dev navigation page, not a Webflow page — it has no
+// sections to assemble, so skip it rather than emitting an empty preview.
+const SKIP_PAGES = new Set(['index.astro']);
+
+const pages = readdirSync(PAGES_DIR)
+  .filter(f => f.endsWith('.astro') && f !== 'embed' && !SKIP_PAGES.has(f));
 
 for (const pageFile of pages) {
   const pageName = pageFile.replace(/\.astro$/, '');
@@ -121,7 +126,7 @@ for (const pageFile of pages) {
   // 3. Build Component Map from imports.
   // Top-level folder under /sections/ = page bucket. Any intermediate
   // folders (e.g. v2) get flattened into the section kebab prefix, so
-  // sections/global/v2/NavbarGlobalV2.astro -> page=global, section=v2-navbar-global-v2.
+  // sections/v1-global/v2/NavbarGlobalV2.astro -> page=global, section=v2-navbar-global-v2.
   const componentMap = new Map();
   const importRegex = /import\s+([A-Z][a-zA-Z0-9]+)\s+from\s+['"](.+?)['"]/g;
   let importMatch;

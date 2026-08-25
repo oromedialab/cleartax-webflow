@@ -1,0 +1,285 @@
+---
+/**
+ * Dev index — the landing page for `npm run dev`. Not a Webflow page.
+ *
+ * Everything here is enumerated with `import.meta.glob`, so adding a page or a
+ * section makes it appear automatically. There is no list to keep in sync.
+ *
+ * Excluded from `scripts/assemble-confirmations.mjs`, so it produces no
+ * dist/preview entry — it has no sections to assemble.
+ */
+import "../styles/shared.css";
+
+// Raw source, so pages can be classified by what they actually import.
+const pageSrc = import.meta.glob("./*.astro", { eager: true, query: "?raw", import: "default" }) as Record<string, string>;
+const sectionMods = import.meta.glob("../sections/**/*.astro", { eager: true });
+
+function kebab(s: string) {
+  return s.replace(/([a-z])([A-Z])/g, "$1-$2").replace(/[_\s]+/g, "-").toLowerCase();
+}
+
+const UTILITY = new Set(["test", "thankyou", "pipeline", "brand-test"]);
+
+const routes = Object.keys(pageSrc)
+  .map((p) => p.replace("./", "").replace(/\.astro$/, ""))
+  .filter((n) => n !== "index")
+  .sort();
+
+/**
+ * A page is still brand v1 if it imports `styles/fonts.css` — that bundle
+ * self-hosts Nohemi/Gilroy and only v1 pages need it. Brand v2 pages load
+ * Inter Tight + Google Sans from Google Fonts instead. Matching the import
+ * statement, not the bare path, so a doc comment mentioning the file does not
+ * misclassify the page.
+ */
+const FONTS_IMPORT = /^\s*import\s+["'][^"']*styles\/fonts\.css["']/m;
+const isV1 = (r: string) => FONTS_IMPORT.test(pageSrc[`./${r}.astro`] ?? "");
+
+const groups = [
+  {
+    title: "Brand v2",
+    hint: "Rebranded pages. These are the ones to work on.",
+    items: routes.filter((r) => !UTILITY.has(r) && !isV1(r)),
+  },
+  {
+    title: "Reference & test",
+    hint: "brand-test is the token specimen and parity check.",
+    items: routes.filter((r) => UTILITY.has(r)),
+  },
+  {
+    title: "Brand v1 — retired",
+    hint: "Still on Nohemi/Gilroy. Each gets renamed to -v1 when its rebuild starts, and deleted when the v2 page ships.",
+    items: routes.filter((r) => !UTILITY.has(r) && isV1(r)),
+  },
+];
+
+// sections/<folder>/<Name>.astro -> { folder, section-kebab }, nested dirs
+// flatten into the kebab prefix exactly as the embed route does.
+const sections: Record<string, string[]> = {};
+for (const path of Object.keys(sectionMods)) {
+  const parts = path.split("/");
+  const stem = parts.pop()!.replace(/\.astro$/, "");
+  const rel = parts.slice(parts.indexOf("sections") + 1);
+  const folder = rel.shift()!;
+  const name = rel.length ? `${rel.join("-")}-${kebab(stem)}` : kebab(stem);
+  (sections[folder] ??= []).push(name);
+}
+for (const k of Object.keys(sections)) sections[k].sort();
+const folders = Object.keys(sections).sort();
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Cleartax — dev index</title>
+    <meta name="robots" content="noindex, nofollow" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400..700&family=Google+Sans:opsz,wght@17..18,400..700&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <main class="ix">
+      <header class="ix-head">
+        <p class="ix-overline">Local dev</p>
+        <h1 class="ix-title">Cleartax pages</h1>
+        <p class="ix-lede">
+          {routes.length} routes, {folders.length} section folders. Auto-listed — adding a
+          page or section makes it show up here with no edit to this file.
+        </p>
+        <p class="ix-note">
+          Section links open the isolated view, which is <strong>unstyled beyond its own
+          page bundle</strong> and is not a fidelity check. Verify with
+          <code>dist/preview/&lt;page&gt;.html</code> after <code>npm run build</code>.
+        </p>
+      </header>
+
+      {groups.map((g) => g.items.length > 0 && (
+        <section class="ix-group">
+          <h2 class="ix-h2">{g.title}</h2>
+          <p class="ix-hint">{g.hint}</p>
+          <ul class="ix-cards">
+            {g.items.map((r) => (
+              <li>
+                <a class="ix-card" href={`/${r}`}>
+                  <span class="ix-card-name">{r}</span>
+                  <span class="ix-card-go" aria-hidden="true">→</span>
+                </a>
+              </li>
+            ))}
+          </ul>
+        </section>
+      ))}
+
+      <section class="ix-group">
+        <h2 class="ix-h2">Sections in isolation</h2>
+        <p class="ix-hint">One entry per <code>.astro</code> under <code>src/sections/</code>.</p>
+        {folders.map((f) => (
+          <details class="ix-folder">
+            <summary>
+              <span class="ix-folder-name">{f}</span>
+              <span class="ix-folder-count">{sections[f].length}</span>
+            </summary>
+            <ul class="ix-chips">
+              {sections[f].map((s) => (
+                <li><a class="ix-chip" href={`/embed-build/${f}/${s}`}>{s}</a></li>
+              ))}
+            </ul>
+          </details>
+        ))}
+      </section>
+    </main>
+
+    <style>
+      .ix {
+        max-width: 1000px;
+        margin-inline: auto;
+        padding: 64px 24px 96px;
+      }
+
+      .ix-overline {
+        font-size: 12px;
+        line-height: 20px;
+        font-weight: 600;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        color: var(--color-text-muted);
+      }
+
+      .ix-title {
+        margin-top: 8px;
+        font-family: var(--font-heading);
+        font-size: var(--fs-display-sm);
+        line-height: 1.1;
+        font-weight: 700;
+        letter-spacing: -0.5px;
+      }
+
+      .ix-lede {
+        margin-top: 12px;
+        max-width: 62ch;
+        color: var(--color-text-muted);
+      }
+
+      .ix-note {
+        margin-top: 16px;
+        max-width: 62ch;
+        padding: 12px 16px;
+        border-left: 3px solid var(--color-flux-lime);
+        background: var(--color-surface-raised);
+        font-size: 14px;
+        line-height: 20px;
+        color: var(--color-text-muted);
+      }
+
+      .ix-note code,
+      .ix-hint code {
+        font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+        font-size: 0.92em;
+      }
+
+      .ix-group { margin-top: 56px; }
+
+      .ix-h2 {
+        font-family: var(--font-heading);
+        font-size: var(--fs-h4);
+        line-height: var(--lh-h4);
+        font-weight: 600;
+        letter-spacing: -0.5px;
+      }
+
+      .ix-hint {
+        margin-top: 4px;
+        font-size: 14px;
+        line-height: 20px;
+        color: var(--color-text-muted);
+      }
+
+      .ix-cards {
+        list-style: none;
+        margin-top: 20px;
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+        gap: 12px;
+      }
+
+      .ix-card {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        padding: 16px 20px;
+        border: 1px solid var(--color-border);
+        border-radius: 12px;
+        background: var(--color-surface-raised);
+        transition: border-color 150ms ease, transform 150ms ease;
+      }
+
+      .ix-card:hover {
+        border-color: var(--color-nova-blue);
+        transform: translateY(-1px);
+      }
+
+      .ix-card-name { font-weight: 600; }
+      .ix-card-go { color: var(--color-nova-blue); }
+
+      .ix-folder {
+        margin-top: 8px;
+        border-bottom: 1px solid var(--color-border);
+      }
+
+      .ix-folder summary {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 12px 0;
+        cursor: pointer;
+        list-style: none;
+      }
+
+      .ix-folder summary::-webkit-details-marker { display: none; }
+
+      .ix-folder-name {
+        font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+        font-size: 14px;
+        font-weight: 600;
+      }
+
+      .ix-folder-count {
+        min-width: 24px;
+        padding: 2px 8px;
+        border-radius: 999px;
+        background: var(--color-surface-raised);
+        font-size: 12px;
+        color: var(--color-text-muted);
+      }
+
+      .ix-chips {
+        list-style: none;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        padding: 0 0 16px;
+      }
+
+      .ix-chip {
+        display: inline-block;
+        padding: 6px 12px;
+        border: 1px solid var(--color-border);
+        border-radius: 999px;
+        background: var(--color-surface);
+        font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+        font-size: 12px;
+      }
+
+      .ix-chip:hover {
+        border-color: var(--color-nova-blue);
+        color: var(--color-nova-blue);
+      }
+    </style>
+  </body>
+</html>

@@ -1,0 +1,184 @@
+---
+/**
+ * Hero — Figma "Container - Hero".
+ *
+ * Ledger White ground with a fine dot lattice, Vault Navy type, and a single
+ * Flux Lime highlight behind one word. That highlight is the page's one
+ * permitted Lime instance — do not add another (docs/brand/colour.md).
+ *
+ * The lattice is a CSS radial-gradient, not exported art: it is a repeating
+ * pattern, so an image would cost KB against the 50 KB embed cap for nothing.
+ */
+interface Props {
+  headingLead?: string;
+  headingHighlight?: string;
+  headingRest?: string;
+  headingLine2?: string;
+  body?: string;
+  primaryLabel?: string;
+  primaryHref?: string;
+  secondaryLabel?: string;
+  secondaryHref?: string;
+}
+
+const {
+  headingLead = 'E-Invoicing',
+  headingHighlight = 'Compliance',
+  headingRest = 'Today.',
+  headingLine2 = 'Tax Assurance Tomorrow.',
+  body = 'ClearTax helps you do more than meet the e-invoicing deadline. We prepare you for a future of automated compliance and always-on global compliance.',
+  primaryLabel = 'Request Demo',
+  primaryHref = '#gi-signup',
+  secondaryLabel = 'Watch Video',
+  secondaryHref = '#',
+} = Astro.props;
+---
+
+<section class="gi-hero">
+  <div class="gi-hero-dots" aria-hidden="true"></div>
+
+  <div class="container gi-hero-inner">
+    <h1 class="gi-hero-heading">
+      {headingLead} <span class="gi-mark">{headingHighlight}</span> {headingRest}
+      <br />{headingLine2}
+    </h1>
+
+    <p class="gi-hero-body">{body}</p>
+
+    <div class="gi-hero-actions">
+      <a class="gi-btn" href={primaryHref}>
+        {primaryLabel}<span class="gi-btn-arrow" aria-hidden="true">→</span>
+      </a>
+      <a class="gi-btn-ghost" href={secondaryHref}>
+        {secondaryLabel}<span class="gi-btn-play" aria-hidden="true">▷</span>
+      </a>
+    </div>
+  </div>
+</section>
+
+<style is:global>
+  .gi-hero {
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+    background: var(--color-surface);
+    padding-block: 180px var(--spacing-huge);
+    text-align: center;
+  }
+
+  /* Dot lattice — 4px dots on a 24px grid, faded out toward the bottom. */
+  .gi-hero-dots {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background-image: radial-gradient(var(--palette-ledger-300) 1.5px, transparent 1.5px);
+    background-size: 24px 24px;
+    mask-image: linear-gradient(to bottom, #000 55%, transparent 100%);
+  }
+
+  .gi-hero-heading {
+    max-width: 1080px;
+    margin-inline: auto;
+    font-family: var(--font-heading);
+    font-size: var(--fs-h1-lg);
+    line-height: var(--lh-h1-lg);
+    font-weight: var(--font-weight-bold);
+    letter-spacing: var(--tracking-heading);
+    color: var(--color-text);
+  }
+
+  /* The one Flux Lime instance on the page. */
+  .gi-mark {
+    background: var(--color-flux-lime);
+    border-radius: 6px;
+    padding-inline: 0.12em;
+    box-decoration-break: clone;
+    -webkit-box-decoration-break: clone;
+  }
+
+  .gi-hero-body {
+    max-width: 620px;
+    margin: var(--spacing-x-big) auto 0;
+    font-size: var(--fs-body-sm);
+    line-height: var(--lh-body-sm);
+    color: var(--color-text-muted);
+  }
+
+  .gi-hero-actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: var(--spacing-sm);
+    margin-top: var(--spacing-x-big);
+  }
+
+  /* Buttons — Figma "Button" component. Reused across this page. */
+  .gi-btn,
+  .gi-btn-ghost {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--spacing-x-sm);
+    min-height: 44px;
+    padding-inline: var(--spacing-big);
+    border-radius: 999px;
+    font-family: var(--font-body);
+    font-size: var(--fs-label);
+    line-height: var(--lh-label);
+    font-weight: var(--font-weight-semibold);
+    transition: background-color var(--transition-base), border-color var(--transition-base);
+  }
+
+  .gi-btn {
+    background: var(--color-nova-blue);
+    color: var(--palette-generic-00);
+  }
+
+  .gi-btn:hover { background: var(--palette-nova-600); }
+
+  .gi-btn-ghost {
+    background: var(--palette-generic-00);
+    color: var(--color-text);
+    border: 1px solid var(--color-border);
+  }
+
+  .gi-btn-ghost:hover { border-color: var(--color-nova-blue); }
+
+  .gi-btn-arrow,
+  .gi-btn-play { font-size: 0.9em; }
+
+  /* Section furniture reused by every section on this page. */
+  .gi-section-head {
+    max-width: 720px;
+    margin-inline: auto;
+    text-align: center;
+  }
+
+  .gi-h2 {
+    font-family: var(--font-heading);
+    font-size: var(--fs-h2);
+    line-height: var(--lh-h2);
+    font-weight: var(--font-weight-bold);
+    letter-spacing: var(--tracking-heading);
+    color: var(--color-text);
+  }
+
+  .gi-h5 {
+    font-family: var(--font-heading);
+    font-size: var(--fs-h5);
+    line-height: var(--lh-h5);
+    font-weight: var(--font-weight-semibold);
+    letter-spacing: var(--tracking-heading);
+    color: var(--color-text);
+  }
+
+  .gi-section-body {
+    margin-top: var(--spacing-sm);
+    font-size: var(--fs-body-sm);
+    line-height: var(--lh-body-sm);
+    color: var(--color-text-muted);
+  }
+
+  @media (width < 768px) {
+    .gi-hero { padding-block: 140px var(--spacing-xxx-lg); }
+  }
+</style>

@@ -7,17 +7,18 @@
  * Registry is auto-built from src/sections/<page>/*.astro and
  * src/sections/_shared/*.astro via import.meta.glob.
  */
-import '../../../styles/fonts.css';
-import '../../../styles/shared.css';
-import '../../../styles/.build/uae.css';
-import '../../../styles/.build/uaev2.css';
-import '../../../styles/.build/global-mandate.css';
-import '../../../styles/.build/scale-and-security.css';
-import '../../../styles/.build/erp-connectivity.css';
-import '../../../styles/.build/clear-compliance-cloud.css';
-import '../../../styles/.build/recon-ai-agent.css';
-import '../../../styles/.build/germany-product.css';
+// NO static CSS imports here on purpose — they would bundle into every embed
+// render. Instead the dev server gets plain <link> tags below, pointing at the
+// already-built /css/*.css in public/. Two reasons that is safe:
+//   1. They are wrapped in `import.meta.env.DEV`, so a production build emits
+//      nothing at all.
+//   2. extract-embeds.mjs takes body.innerHTML and discards the whole <head>,
+//      so even in dev they cannot reach dist/_embeds.
+// And unlike the old hand-listed imports, this loads ONLY the bundle that
+// actually compiles this section's utilities — the same CSS it gets on its
+// real page — so the view no longer hides a scoping bug.
 import type { GetStaticPaths } from 'astro';
+import { sectionBundleMap } from '../../../../scripts/css-entries.mjs';
 
 const sectionMods = import.meta.glob('../../../sections/**/*.astro', { eager: true }) as Record<string, { default: any }>;
 
@@ -32,7 +33,7 @@ type RegistryEntry = { page: string; section: string; Component: any };
 
 // Derive page + section key: top-level folder under sections/ is the page,
 // any intermediate folders (e.g. v2) flatten into the section kebab prefix:
-// ../../../sections/global/v2/NavbarGlobalV2.astro -> page=global, section=v2-navbar-global-v2.
+// ../../../sections/v1-global/v2/NavbarGlobalV2.astro -> page=global, section=v2-navbar-global-v2.
 function keyFor(path: string): { page: string; section: string } {
   const parts = path.split('/');
   const stem = parts.pop()!.replace(/\.astro$/, '');
@@ -72,6 +73,13 @@ const { page, section } = Astro.params as { page: string; section: string };
 const match = registry.find((e) => e.page === page && e.section === section);
 if (!match) throw new Error(`No section registered for ${page}/${section}`);
 const { Component } = match;
+
+// Dev-only: which page bundle owns this section's utilities?
+// `_shared` components are keyed by component name, page sections by folder.
+const bundleMap = import.meta.env.DEV ? sectionBundleMap(process.cwd()) : null;
+const bundle = bundleMap
+  ? (page === '_shared' ? bundleMap.shared[section] : bundleMap.folders[page])
+  : null;
 ---
 
 <!doctype html>
@@ -80,6 +88,18 @@ const { Component } = match;
     <meta charset="UTF-8" />
     <meta name="robots" content="noindex, nofollow" />
     <title>{`embed: ${page}/${section}`}</title>
+    {import.meta.env.DEV && (
+      <>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+        <link
+          href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400..700&family=Google+Sans:opsz,wght@17..18,400..700&display=swap"
+          rel="stylesheet"
+        />
+        <link rel="stylesheet" href="/css/shared.css" />
+        {bundle && <link rel="stylesheet" href={`/css/${bundle}.css`} />}
+      </>
+    )}
   </head>
   <body data-embed-root>
     <Component />

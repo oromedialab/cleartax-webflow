@@ -1,0 +1,363 @@
+---
+/**
+ * Brand v2 specimen — the parity test section.
+ *
+ * Exercises every part of the token system in one section so that
+ * `dist/preview/brand-test.html` (the Webflow-paste simulation) can be
+ * compared pixel-for-pixel against `localhost:4321/brand-test` (the Astro dev
+ * render). If the two differ, the build pipeline is dropping something.
+ *
+ * Deliberately mixes both styling routes:
+ *   - Tailwind utilities  (bg-vault-navy, text-lime-500, container, …)
+ *   - hand-written CSS    (var(--color-…), var(--fs-…)) in <style is:global>
+ * A parity break in either route shows up here.
+ *
+ * Flux Lime appears exactly once, per the brand's one-per-screen rule.
+ */
+interface Props {
+  heading?: string;
+}
+
+const { heading = "Brand v2 specimen" } = Astro.props;
+
+const ramps = [
+  { name: "Vault Navy", prefix: "navy" },
+  { name: "Ledger White", prefix: "ledger" },
+  { name: "Nova Blue", prefix: "nova" },
+  { name: "Flux Lime", prefix: "lime" },
+];
+const steps = [50, 100, 200, 300, 400, 500, 600, 700, 800, 900, 950];
+
+const scale = [
+  { label: "Display large", cls: "bt-display-lg", spec: "52 / 56 · Bold" },
+  { label: "Page heading", cls: "bt-h1", spec: "40 / 48 · Bold" },
+  { label: "Section header", cls: "bt-h2", spec: "36 / 44 · Semibold" },
+  { label: "Heading 3", cls: "bt-h3", spec: "32 / 40 · Semibold" },
+  { label: "Subhead", cls: "bt-h5", spec: "24 / 32 · Medium" },
+];
+
+const metrics = [
+  { label: "Invoices cleared", value: "12,480,932" },
+  { label: "Countries live", value: "18" },
+  { label: "Uptime", value: "99.98%" },
+];
+---
+
+<section class="bt-specimen">
+  <div class="container">
+    <p class="bt-overline">Design system</p>
+    <h1 class="bt-display-lg">{heading}</h1>
+    <p class="bt-lede">
+      Two families, four colours, one 4px grid. If this page renders identically
+      in the Astro dev server and in the assembled preview, the pipeline is sound.
+    </p>
+
+    <!-- Type scale -->
+    <h2 class="bt-h2 bt-section-title">Type scale</h2>
+    <div class="bt-stack">
+      {scale.map((row) => (
+        <div class="bt-scale-row">
+          <span class={row.cls}>{row.label}</span>
+          <span class="bt-scale-spec">{row.spec}</span>
+        </div>
+      ))}
+      <p class="bt-body-lg">Paragraph large — 18 / 28, Google Sans Medium.</p>
+      <p class="bt-body">Paragraph medium — 16 / 24, the default body size.</p>
+      <p class="bt-body-sm">Paragraph small — 14 / 20, captions and helper text.</p>
+      <span class="bt-label">Label medium — 14 / 16</span>
+    </div>
+
+    <!-- Colour ramps -->
+    <h2 class="bt-h2 bt-section-title">Colour ramps</h2>
+    <div class="bt-stack">
+      {ramps.map((ramp) => (
+        <div class="bt-ramp">
+          <span class="bt-label bt-ramp-name">{ramp.name}</span>
+          <div class="bt-ramp-row">
+            {steps.map((step) => (
+              <span
+                class="bt-swatch"
+                style={`background: var(--palette-${ramp.prefix}-${step})`}
+                title={`${ramp.name} ${step}`}
+              ></span>
+            ))}
+          </div>
+        </div>
+      ))}
+    </div>
+
+    <!-- Utilities route: identical swatches drawn with Tailwind classes.
+         These must match the hand-written CSS row above exactly. -->
+    <h2 class="bt-h2 bt-section-title">Same colours via Tailwind utilities</h2>
+    <div class="flex flex-wrap gap-2">
+      <span class="bg-vault-navy h-12 w-24 rounded"></span>
+      <span class="bg-nova-blue h-12 w-24 rounded"></span>
+      <span class="bg-ledger-white border-border-default h-12 w-24 rounded border"></span>
+      <span class="bg-navy-300 h-12 w-24 rounded"></span>
+      <span class="bg-nova-700 h-12 w-24 rounded"></span>
+      <span class="bg-neutral-400 h-12 w-24 rounded"></span>
+      <span class="bg-success-500 h-12 w-24 rounded"></span>
+      <span class="bg-warning-500 h-12 w-24 rounded"></span>
+      <span class="bg-destructive-500 h-12 w-24 rounded"></span>
+    </div>
+
+    <!-- Spacing scale -->
+    <h2 class="bt-h2 bt-section-title">Spacing — 4px system</h2>
+    <div class="bt-stack">
+      {[4, 8, 12, 16, 24, 32, 48, 64, 96].map((px) => (
+        <div class="bt-space-row">
+          <span class="bt-space-bar" style={`width: ${px}px`}></span>
+          <span class="bt-scale-spec nums-tabular">{px}px</span>
+        </div>
+      ))}
+    </div>
+
+    <!-- Interactive + focus -->
+    <h2 class="bt-h2 bt-section-title">Interactive</h2>
+    <div class="bt-actions">
+      <a class="bt-btn" href="#specimen-dark">Book a demo</a>
+      <a class="bt-btn-ghost" href="#specimen-dark">Talk to sales</a>
+      <a class="bt-link" href="#specimen-dark">A Nova Blue link</a>
+    </div>
+    <p class="bt-body-sm bt-note">
+      Tab through the three controls above — each must show a 2px black focus ring.
+    </p>
+  </div>
+
+  <!-- Inverse surface -->
+  <div class="bt-dark" id="specimen-dark">
+    <div class="container">
+      <p class="bt-overline bt-overline-inverse">Vault Navy surface</p>
+      <h2 class="bt-h2 bt-dark-title">Ledger White on Vault Navy — 17.75:1</h2>
+      <div class="bt-metrics">
+        {metrics.map((m, i) => (
+          <div class="bt-metric">
+            <span class={i === 0 ? "bt-metric-value bt-metric-accent" : "bt-metric-value"}>
+              {m.value}
+            </span>
+            <span class="bt-metric-label">{m.label}</span>
+          </div>
+        ))}
+      </div>
+      <p class="bt-dark-note">
+        Figures use tabular numerals. Flux Lime appears once on this page — on the
+        first metric — and nowhere else.
+      </p>
+    </div>
+  </div>
+</section>
+
+<style is:global>
+  .bt-specimen {
+    background: var(--color-surface);
+    color: var(--color-text);
+    padding-block: var(--spacing-xxx-lg);
+  }
+
+  /* --- type -------------------------------------------------------------- */
+  .bt-overline {
+    font-family: var(--font-body);
+    font-size: var(--fs-label-sm);
+    line-height: var(--lh-label-sm);
+    font-weight: var(--font-weight-semibold);
+    letter-spacing: var(--tracking-overline);
+    text-transform: uppercase;
+    color: var(--color-text-muted);
+    margin-bottom: var(--spacing-sm);
+  }
+
+  .bt-display-lg,
+  .bt-h1,
+  .bt-h2,
+  .bt-h3,
+  .bt-h5 {
+    font-family: var(--font-heading);
+    letter-spacing: var(--tracking-heading);
+    color: var(--color-text);
+  }
+
+  .bt-display-lg { font-size: var(--fs-display-lg); line-height: var(--lh-display-lg); font-weight: var(--font-weight-bold); }
+  .bt-h1         { font-size: var(--fs-h1);         line-height: var(--lh-h1);         font-weight: var(--font-weight-bold); }
+  .bt-h2         { font-size: var(--fs-h2);         line-height: var(--lh-h2);         font-weight: var(--font-weight-semibold); }
+  .bt-h3         { font-size: var(--fs-h3);         line-height: var(--lh-h3);         font-weight: var(--font-weight-semibold); }
+  .bt-h5         { font-size: var(--fs-h5);         line-height: var(--lh-h5);         font-weight: var(--font-weight-medium); }
+
+  .bt-lede {
+    font-family: var(--font-body);
+    font-size: var(--fs-body-lg);
+    line-height: var(--lh-body-lg);
+    color: var(--color-text-muted);
+    max-width: 62ch;
+    margin-top: var(--spacing-md);
+  }
+
+  .bt-body-lg { font-size: var(--fs-body-lg); line-height: var(--lh-body-lg); }
+  .bt-body    { font-size: var(--fs-body);    line-height: var(--lh-body); }
+  .bt-body-sm { font-size: var(--fs-body-sm); line-height: var(--lh-body-sm); color: var(--color-text-muted); }
+
+  .bt-label {
+    font-size: var(--fs-label);
+    line-height: var(--lh-label);
+    font-weight: var(--font-weight-semibold);
+  }
+
+  .bt-section-title {
+    margin-top: var(--spacing-xxx-lg);
+    padding-bottom: var(--spacing-md);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .bt-stack {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-x-big);
+    margin-top: var(--spacing-x-big);
+  }
+
+  .bt-scale-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--spacing-md);
+  }
+
+  .bt-scale-spec {
+    font-size: var(--fs-label-sm);
+    line-height: var(--lh-label-sm);
+    color: var(--color-text-muted);
+  }
+
+  /* --- ramps ------------------------------------------------------------- */
+  .bt-ramp-name { display: block; margin-bottom: var(--spacing-x-sm); }
+
+  .bt-ramp-row {
+    display: grid;
+    grid-template-columns: repeat(11, 1fr);
+    gap: var(--spacing-xx-sm);
+  }
+
+  .bt-swatch {
+    display: block;
+    height: 48px;
+    border-radius: 4px;
+    border: 1px solid var(--color-border);
+  }
+
+  /* --- spacing ----------------------------------------------------------- */
+  .bt-space-row {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-md);
+  }
+
+  .bt-space-bar {
+    display: block;
+    height: 16px;
+    background: var(--color-nova-blue);
+    border-radius: 2px;
+  }
+
+  /* --- interactive ------------------------------------------------------- */
+  .bt-actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--spacing-md);
+    margin-top: var(--spacing-x-big);
+  }
+
+  .bt-btn,
+  .bt-btn-ghost {
+    font-family: var(--font-body);
+    font-size: var(--fs-label-lg);
+    line-height: var(--lh-label-lg);
+    font-weight: var(--font-weight-semibold);
+    padding: var(--spacing-sm) var(--spacing-x-big);
+    border-radius: 8px;
+    transition: background-color var(--transition-base), color var(--transition-base);
+  }
+
+  .bt-btn {
+    background: var(--color-nova-blue);
+    color: var(--color-ledger-white);
+  }
+
+  .bt-btn:hover { background: var(--palette-nova-600); }
+
+  .bt-btn-ghost {
+    background: transparent;
+    color: var(--color-vault-navy);
+    border: 1px solid var(--color-border);
+  }
+
+  .bt-btn-ghost:hover { background: var(--color-surface-raised); }
+
+  .bt-link {
+    color: var(--color-text-link);
+    font-weight: var(--font-weight-semibold);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+
+  .bt-note { margin-top: var(--spacing-md); }
+
+  /* --- inverse surface --------------------------------------------------- */
+  .bt-dark {
+    background: var(--color-surface-inverse);
+    color: var(--color-text-inverse);
+    padding-block: var(--spacing-xxx-lg);
+    margin-top: var(--spacing-xxx-lg);
+  }
+
+  .bt-overline-inverse { color: var(--palette-ledger-400); }
+
+  .bt-dark-title { color: var(--color-text-inverse); }
+
+  .bt-metrics {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--spacing-x-lg);
+    margin-top: var(--spacing-x-lg);
+  }
+
+  .bt-metric {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-x-sm);
+    padding-top: var(--spacing-md);
+    border-top: 1px solid var(--color-border-inverse);
+  }
+
+  .bt-metric-value {
+    font-family: var(--font-heading);
+    font-size: var(--fs-h1);
+    line-height: var(--lh-h1);
+    font-weight: var(--font-weight-bold);
+    letter-spacing: var(--tracking-heading);
+    font-variant-numeric: tabular-nums;
+    font-feature-settings: "tnum" 1;
+    color: var(--color-text-inverse);
+  }
+
+  /* The single Flux Lime instance on this page. */
+  .bt-metric-accent { color: var(--color-flux-lime); }
+
+  .bt-metric-label {
+    font-size: var(--fs-label);
+    line-height: var(--lh-label);
+    color: var(--palette-ledger-400);
+  }
+
+  .bt-dark-note {
+    font-size: var(--fs-body-sm);
+    line-height: var(--lh-body-sm);
+    color: var(--palette-ledger-400);
+    margin-top: var(--spacing-x-lg);
+    max-width: 62ch;
+  }
+
+  @media (width >= 768px) {
+    .bt-metrics { grid-template-columns: repeat(3, 1fr); }
+  }
+</style>

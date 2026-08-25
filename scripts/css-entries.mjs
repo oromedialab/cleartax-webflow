@@ -14,29 +14,74 @@ import { resolve } from 'node:path';
  * gets its `_shared` @sources auto-injected from the page's frontmatter.
  */
 export const PAGE_TARGETS = [
-  { name: 'uae', input: 'src/styles/uae.css', page: 'src/pages/uae.astro' },
-  { name: 'uaev2', input: 'src/styles/uaev2.css', page: 'src/pages/uaev2.astro' },
-  { name: 'oman-e-invoicing', input: 'src/styles/oman-e-invoicing.css', page: 'src/pages/oman-e-invoicing.astro' },
-  { name: 'global-mandate', input: 'src/styles/global-mandate.css', page: 'src/pages/global-mandate.astro' },
-  { name: 'global-mandate-v2', input: 'src/styles/global-mandate-v2.css', page: 'src/pages/global-mandate-v2.astro' },
-  { name: 'scale-and-security', input: 'src/styles/scale-and-security.css', page: 'src/pages/scale-and-security.astro' },
-  { name: 'erp-connectivity', input: 'src/styles/erp-connectivity.css', page: 'src/pages/erp-connectivity.astro' },
-  { name: 'clear-compliance-cloud', input: 'src/styles/clear-compliance-cloud.css', page: 'src/pages/clear-compliance-cloud.astro' },
-  { name: 'recon-ai-agent', input: 'src/styles/recon-ai-agent.css', page: 'src/pages/recon-ai-agent.astro' },
-  { name: 'germany-product', input: 'src/styles/germany-product.css', page: 'src/pages/germany-product.astro' },
+  { name: 'brand-test', input: 'src/styles/brand-test.css', page: 'src/pages/brand-test.astro' },
+  { name: 'v1-uae', input: 'src/styles/v1-uae.css', page: 'src/pages/v1-uae.astro' },
+  { name: 'v1-uaev2', input: 'src/styles/v1-uaev2.css', page: 'src/pages/v1-uaev2.astro' },
+  { name: 'v1-oman-e-invoicing', input: 'src/styles/v1-oman-e-invoicing.css', page: 'src/pages/v1-oman-e-invoicing.astro' },
+  { name: 'v1-global-mandate', input: 'src/styles/v1-global-mandate.css', page: 'src/pages/v1-global-mandate.astro' },
+  { name: 'v1-global-mandate-v2', input: 'src/styles/v1-global-mandate-v2.css', page: 'src/pages/v1-global-mandate-v2.astro' },
+  { name: 'v1-scale-and-security', input: 'src/styles/v1-scale-and-security.css', page: 'src/pages/v1-scale-and-security.astro' },
+  { name: 'v1-erp-connectivity', input: 'src/styles/v1-erp-connectivity.css', page: 'src/pages/v1-erp-connectivity.astro' },
+  { name: 'v1-clear-compliance-cloud', input: 'src/styles/v1-clear-compliance-cloud.css', page: 'src/pages/v1-clear-compliance-cloud.astro' },
+  { name: 'v1-recon-ai-agent', input: 'src/styles/v1-recon-ai-agent.css', page: 'src/pages/v1-recon-ai-agent.astro' },
+  { name: 'v1-germany-product', input: 'src/styles/v1-germany-product.css', page: 'src/pages/v1-germany-product.astro' },
   { name: 'test', input: 'src/styles/test.css', page: 'src/pages/test.astro' },
-  { name: 'france-product', input: 'src/styles/france-product.css', page: 'src/pages/france-product.astro' },
-  { name: 'philippines-product', input: 'src/styles/philippines-product.css', page: 'src/pages/philippines-product.astro' },
-  { name: 'oman-product', input: 'src/styles/oman-product.css', page: 'src/pages/oman-product.astro' },
-  { name: 'spain-product', input: 'src/styles/spain-product.css', page: 'src/pages/spain-product.astro' },
-  { name: 'blog', input: 'src/styles/blog.css', page: 'src/pages/blog.astro' },
-  { name: 'global-invoicing-delivery', input: 'src/styles/global-invoicing-delivery.css', page: 'src/pages/global-e-invoicing-delivery.astro' },
-  { name: 'resources-overview', input: 'src/styles/resources-overview.css', page: 'src/pages/resources-overview.astro' },
-  { name: 'home-page', input: 'src/styles/home-page.css', page: 'src/pages/home-page.astro' },
+  { name: 'v1-france-product', input: 'src/styles/v1-france-product.css', page: 'src/pages/v1-france-product.astro' },
+  { name: 'v1-philippines-product', input: 'src/styles/v1-philippines-product.css', page: 'src/pages/v1-philippines-product.astro' },
+  { name: 'v1-oman-product', input: 'src/styles/v1-oman-product.css', page: 'src/pages/v1-oman-product.astro' },
+  { name: 'v1-spain-product', input: 'src/styles/v1-spain-product.css', page: 'src/pages/v1-spain-product.astro' },
+  { name: 'v1-blog', input: 'src/styles/v1-blog.css', page: 'src/pages/v1-blog.astro' },
+  { name: 'v1-global-invoicing-delivery', input: 'src/styles/v1-global-invoicing-delivery.css', page: 'src/pages/v1-global-invoicing-delivery.astro' },
+  { name: 'global-invoicing', input: 'src/styles/global-invoicing.css', page: 'src/pages/global-invoicing.astro' },
+  { name: 'v1-resources-overview', input: 'src/styles/v1-resources-overview.css', page: 'src/pages/v1-resources-overview.astro' },
+  { name: 'v1-home-page', input: 'src/styles/v1-home-page.css', page: 'src/pages/v1-home-page.astro' },
   { name: 'global-invoicing-wip', input: 'src/styles/global-invoicing-wip.css', page: 'src/pages/global-invoicing-wip.astro' },
 ];
 
 const SHARED_IMPORT_RE = /import\s+[A-Z][A-Za-z0-9]*\s+from\s+['"]\.\.\/sections\/_shared\/([A-Za-z0-9_-]+)\.astro['"]/g;
+
+const ANY_SECTION_IMPORT_RE = /import\s+[A-Z][A-Za-z0-9]*\s+from\s+['"]\.\.\/sections\/([A-Za-z0-9_-]+)\/[^'"]+\.astro['"]/g;
+
+function kebabName(s) {
+  return s.replace(/([a-z])([A-Z])/g, '$1-$2').replace(/[_\s]+/g, '-').toLowerCase();
+}
+
+/**
+ * Maps a section back to the page bundle that compiles its utilities, so the
+ * isolated dev view at /embed-build/<page>/<section> can load exactly that one
+ * bundle — the same CSS the section gets on its real page, and nothing else.
+ *
+ * Returns { folders, shared }:
+ *   folders[<sectionFolder>]      -> bundle name  (e.g. oman-invoicing -> oman-e-invoicing)
+ *   shared[<kebab component>]     -> bundle name of the FIRST page importing it
+ *
+ * Dev-only concern. Build output never depends on this — extract-embeds.mjs
+ * takes body.innerHTML and discards the head entirely.
+ */
+export function sectionBundleMap(root) {
+  const folders = {};
+  const shared = {};
+  for (const target of PAGE_TARGETS) {
+    let src;
+    try { src = readFileSync(resolve(root, target.page), 'utf8'); } catch { continue; }
+    const frontmatter = src.split('---')[1] ?? '';
+
+    ANY_SECTION_IMPORT_RE.lastIndex = 0;
+    let m;
+    while ((m = ANY_SECTION_IMPORT_RE.exec(frontmatter)) !== null) {
+      const folder = m[1];
+      if (folder === '_shared') continue;
+      if (!folders[folder]) folders[folder] = target.name;
+    }
+
+    SHARED_IMPORT_RE.lastIndex = 0;
+    while ((m = SHARED_IMPORT_RE.exec(frontmatter)) !== null) {
+      const key = kebabName(m[1]);
+      if (!shared[key]) shared[key] = target.name;
+    }
+  }
+  return { folders, shared };
+}
 
 /**
  * Parse a page astro file's frontmatter for `_shared` component imports.
@@ -70,7 +115,12 @@ export function writeGeneratedEntry(target, root) {
   mkdirSync(buildDir, { recursive: true });
   const lines = [
     `/* AUTO-GENERATED by scripts/build-css.mjs. Do not edit. */`,
+    // Page entry first — it carries the `@import 'tailwindcss/…'` lines, which
+    // must lead. Brand theme bindings (@theme inline colour/font tokens +
+    // @utility container) follow. Injected here rather than hand-imported in
+    // each page entry so a new page can't silently miss the design system.
     `@import '../${target.input.split('/').pop()}';`,
+    `@import '../theme.css';`,
     ...names.map((n) => `@source '../../sections/_shared/${n}.astro';`),
     '',
   ];

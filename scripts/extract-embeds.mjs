@@ -70,7 +70,7 @@ function walk(dir, predicate) {
 // Build map: "<page>/<section>" -> source .astro path.
 // Top-level folder under sections/ = page. Any intermediate folders (e.g. v2)
 // flatten into the section kebab prefix so output stays one-file-per-section:
-// sections/global/v2/NavbarGlobalV2.astro -> global/v2-navbar-global-v2.
+// sections/v1-global/v2/NavbarGlobalV2.astro -> v1-global/v2-navbar-global-v2.
 const sourceMap = new Map();
 for (const file of walk(SECTIONS_DIR, (n) => n.endsWith('.astro'))) {
   const rel = file.slice(SECTIONS_DIR.length + 1).replace(/\\/g, '/');
@@ -194,14 +194,67 @@ function writeSectionOutput(outPath, combined) {
   });
 }
 
-function readSectionStyles(sourcePath) {
-  const src = readFileSync(sourcePath, 'utf8');
+/**
+ * Strips an .astro file's frontmatter fence so it can't be scanned for markup.
+ * Without this, a `<style …>` written inside a frontmatter comment (docs
+ * describing the authoring convention, for instance) is matched as a real
+ * style block, and everything from that comment to the section's true
+ * `</style>` gets emitted into the embed as CSS.
+ */
+function stripFrontmatter(src) {
+  if (!src.startsWith('---')) return src;
+  const end = src.indexOf('\n---', 3);
+  if (end === -1) return src;
+  return src.slice(src.indexOf('\n', end + 1) + 1);
+}
+
+const ASTRO_IMPORT = /import\s+[A-Z][A-Za-z0-9]*\s+from\s+['"](\.[^'"]+\.astro)['"]/g;
+
+/**
+ * Collects a section's `<style>` blocks, following relative `.astro` imports so
+ * a section can compose a shared primitive and still ship its CSS.
+ *
+ * This is what makes props-based reuse work. The embed route renders each
+ * section with NO props, so the paste artifact is always the default render —
+ * which means a page cannot parameterise a shared component. The way round it
+ * is a thin per-page wrapper that supplies the props itself:
+ *
+ *   _shared/Thing.astro           the primitive: props + its own <style>
+ *   <page>/Thing.astro            <Thing foo="bar" />   <- the paste unit
+ *
+ * Without following imports the wrapper's embed would carry the primitive's
+ * markup but none of its CSS. Imported styles are emitted BEFORE the section's
+ * own so a wrapper can override the primitive.
+ *
+ * Depth-limited and cycle-safe; each file contributes at most once.
+ */
+function collectStyles(sourcePath, seen = new Set(), depth = 0) {
+  const resolved = resolve(sourcePath);
+  if (seen.has(resolved) || depth > 4) return [];
+  seen.add(resolved);
+
+  const raw = readFileSync(resolved, 'utf8');
   const blocks = [];
-  for (const m of src.matchAll(STYLE_BLOCK)) {
-    const css = m[1].trim();
-    if (css) blocks.push(`<style>${minify(css)}</style>`);
+
+  const parts = raw.split('---');
+  const frontmatter = parts.length > 2 ? parts[1] : '';
+  ASTRO_IMPORT.lastIndex = 0;
+  let m;
+  while ((m = ASTRO_IMPORT.exec(frontmatter)) !== null) {
+    const dep = resolve(dirname(resolved), m[1]);
+    if (existsSync(dep)) blocks.push(...collectStyles(dep, seen, depth + 1));
   }
-  return blocks.join('');
+
+  for (const s of stripFrontmatter(raw).matchAll(STYLE_BLOCK)) {
+    const css = s[1].trim();
+    if (css) blocks.push(minify(css));
+  }
+  return blocks;
+}
+
+function readSectionStyles(sourcePath) {
+  const blocks = collectStyles(sourcePath);
+  return blocks.length ? `<style>${blocks.join('')}</style>` : '';
 }
 
 const files = walk(SRC_DIR, (n) => n === 'index.html');

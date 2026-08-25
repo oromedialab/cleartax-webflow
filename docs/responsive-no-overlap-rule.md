@@ -1,5 +1,13 @@
 # Responsive utilities — no-overlap rule
 
+> **Status: historical. Do not treat this as a current authoring rule.**
+>
+> Tailwind v4 emits breakpoint variants after their base utilities in a deterministic order, so `py-12 lg:py-25` resolves correctly without the exclusive-range discipline below. In practice 1,223 of 5,262 class attributes in `src/sections/` (23%) already mix a base utility with a variant of the same property, and those pages render correctly in Webflow.
+>
+> What remains true and load-bearing is the **cascade context** in "Why" below: our bundles are emitted unlayered so they can compete with Webflow's element defaults. Never wrap page CSS or section styles in `@layer`.
+>
+> Kept for background on why the output is shaped this way.
+
 ## TL;DR
 
 When two Tailwind utilities target the **same CSS property** on the same element, their `@media` ranges must be **mutually exclusive**. Never mix a base utility with a breakpoint-prefixed variant of the same property.
