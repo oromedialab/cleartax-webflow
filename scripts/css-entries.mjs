@@ -35,7 +35,7 @@ export const PAGE_TARGETS = [
   { name: 'global-invoicing', input: 'src/styles/global-invoicing.css', page: 'src/pages/global-invoicing.astro' },
   { name: 'v1-resources-overview', input: 'src/styles/v1-resources-overview.css', page: 'src/pages/v1-resources-overview.astro' },
   { name: 'v1-home-page', input: 'src/styles/v1-home-page.css', page: 'src/pages/v1-home-page.astro' },
-  { name: 'global-invoicing-wip', input: 'src/styles/global-invoicing-wip.css', page: 'src/pages/global-invoicing-wip.astro' },
+  { name: 'v1-global-invoicing-wip', input: 'src/styles/v1-global-invoicing-wip.css', page: 'src/pages/v1-global-invoicing-wip.astro' },
 ];
 
 const SHARED_IMPORT_RE = /import\s+[A-Z][A-Za-z0-9]*\s+from\s+['"]\.\.\/sections\/_shared\/([A-Za-z0-9_-]+)\.astro['"]/g;
