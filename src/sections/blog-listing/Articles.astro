@@ -1,0 +1,320 @@
+---
+/**
+ * Article grid + Load more — Figma node 12289:26928.
+ *
+ * This section owns both the data and the filtering behaviour. The controls it
+ * reads live in `Filters.astro`, a separate Embed, so the script binds its
+ * listeners on `document` instead of on the form: delegation makes the wiring
+ * independent of which Embed Webflow renders first, and of whether the filter
+ * bar is present at all.
+ *
+ * `topic` / `country` must match the option lists in `Filters.astro`.
+ * `image: ''` falls back to the Figma "Visual Placeholder" tint.
+ */
+interface Post {
+  title: string;
+  excerpt: string;
+  date: string;
+  href: string;
+  image: string;
+  topic: string;
+  country: string;
+}
+
+const posts: Post[] = [
+  {
+    title: 'UAE Invoicing Readiness list',
+    excerpt: 'A practical framework to get ahead of the mandate',
+    date: 'July 12 2026',
+    href: 'https://www.cleartax.com/ae/e-invoicing-uae',
+    image: '',
+    topic: 'E-Invoicing',
+    country: 'UAE',
+  },
+  {
+    title: 'ZATCA Phase II: integration checklist',
+    excerpt: 'What to validate before your onboarding window opens',
+    date: 'July 12 2026',
+    href: 'https://www.cleartax.com/sa/ksa-einvoicing',
+    image: '',
+    topic: 'Compliance',
+    country: 'Saudi Arabia',
+  },
+  {
+    title: 'Connecting SAP to a global e-invoicing platform',
+    excerpt: 'Middleware, IDocs and the trade-offs between them',
+    date: 'July 12 2026',
+    href: 'https://www.cleartax.com/global/erp-integration',
+    image: '',
+    topic: 'ERP Integration',
+    country: 'Global',
+  },
+  {
+    title: 'France e-invoicing: the 2026 timeline',
+    excerpt: 'Who is in scope, when, and what Chorus Pro changes',
+    date: 'July 12 2026',
+    href: 'https://www.cleartax.com/fr/en/e-invoicing-france',
+    image: '',
+    topic: 'E-Invoicing',
+    country: 'France',
+  },
+  {
+    title: 'Germany B2B e-invoicing, explained',
+    excerpt: 'Preparing for a mandate that starts with receiving, not sending',
+    date: 'July 12 2026',
+    href: 'https://www.cleartax.com/de/en/e-invoicing-germany',
+    image: '',
+    topic: 'Compliance',
+    country: 'Germany',
+  },
+  {
+    title: 'Malaysia MyInvois beyond the first wave',
+    excerpt: 'Lessons from the enterprises that went live early',
+    date: 'July 12 2026',
+    href: 'https://www.cleartax.com/my/en/e-invoicing-malaysia',
+    image: '',
+    topic: 'E-Invoicing',
+    country: 'Malaysia',
+  },
+  {
+    title: 'Reconciliation without the spreadsheet',
+    excerpt: 'How AI agents close the gap between invoice and ledger',
+    date: 'July 12 2026',
+    href: 'https://www.cleartax.com/global/recon-ai',
+    image: '',
+    topic: 'Tax Technology',
+    country: 'Global',
+  },
+  {
+    title: 'KSeF and the Polish rollout',
+    excerpt: 'A migration plan for groups filing across several entities',
+    date: 'July 12 2026',
+    href: 'https://www.cleartax.com/pl/en/e-invoicing-poland',
+    image: '',
+    topic: 'Compliance',
+    country: 'Poland',
+  },
+  {
+    title: 'InvoiceNow in Singapore',
+    excerpt: 'Peppol-first invoicing and what it asks of your billing stack',
+    date: 'July 12 2026',
+    href: 'https://www.cleartax.com/sg/en/e-invoicing-singapore',
+    image: '',
+    topic: 'E-Invoicing',
+    country: 'Singapore',
+  },
+  {
+    title: 'Scaling to a million invoices a day',
+    excerpt: 'The architecture behind peak-period filing',
+    date: 'July 12 2026',
+    href: 'https://www.cleartax.com/global/scale-security',
+    image: '',
+    topic: 'Tax Technology',
+    country: 'Global',
+  },
+  {
+    title: 'Oracle and NetSuite connectors, end to end',
+    excerpt: 'Mapping tax determination once and reusing it everywhere',
+    date: 'July 12 2026',
+    href: 'https://www.cleartax.com/global/erp-integration',
+    image: '',
+    topic: 'ERP Integration',
+    country: 'Global',
+  },
+  {
+    title: "What's new in the compliance cloud",
+    excerpt: 'Product updates from the last quarter, in one place',
+    date: 'July 12 2026',
+    href: 'https://www.cleartax.com/global/compliance',
+    image: '',
+    topic: 'Product',
+    country: 'Global',
+  },
+];
+---
+
+<section class="bg-generic-00 py-12 md:py-20" data-blog-articles>
+  <!-- Icon sprite: defined once, referenced by all cards. Keeps the pasted
+       Embed small — the calendar path alone is ~900 characters. -->
+  <svg width="0" height="0" class="absolute" aria-hidden="true" focusable="false">
+    <symbol id="ct-blog-card-calendar" viewBox="0 0 20 20">
+      <path
+        d="M16.25 2.5H14.375V1.875C14.375 1.70924 14.3092 1.55027 14.1919 1.43306C14.0747 1.31585 13.9158 1.25 13.75 1.25C13.5842 1.25 13.4253 1.31585 13.3081 1.43306C13.1908 1.55027 13.125 1.70924 13.125 1.875V2.5H6.875V1.875C6.875 1.70924 6.80915 1.55027 6.69194 1.43306C6.57473 1.31585 6.41576 1.25 6.25 1.25C6.08424 1.25 5.92527 1.31585 5.80806 1.43306C5.69085 1.55027 5.625 1.70924 5.625 1.875V2.5H3.75C3.41848 2.5 3.10054 2.6317 2.86612 2.86612C2.6317 3.10054 2.5 3.41848 2.5 3.75V16.25C2.5 16.5815 2.6317 16.8995 2.86612 17.1339C3.10054 17.3683 3.41848 17.5 3.75 17.5H16.25C16.5815 17.5 16.8995 17.3683 17.1339 17.1339C17.3683 16.8995 17.5 16.5815 17.5 16.25V3.75C17.5 3.41848 17.3683 3.10054 17.1339 2.86612C16.8995 2.6317 16.5815 2.5 16.25 2.5ZM5.625 3.75V4.375C5.625 4.54076 5.69085 4.69973 5.80806 4.81694C5.92527 4.93415 6.08424 5 6.25 5C6.41576 5 6.57473 4.93415 6.69194 4.81694C6.80915 4.69973 6.875 4.54076 6.875 4.375V3.75H13.125V4.375C13.125 4.54076 13.1908 4.69973 13.3081 4.81694C13.4253 4.93415 13.5842 5 13.75 5C13.9158 5 14.0747 4.93415 14.1919 4.81694C14.3092 4.69973 14.375 4.54076 14.375 4.375V3.75H16.25V6.25H3.75V3.75H5.625ZM16.25 16.25H3.75V7.5H16.25V16.25Z"
+        fill="currentColor"></path>
+    </symbol>
+    <symbol id="ct-blog-card-arrow" viewBox="0 0 24 24">
+      <path
+        fill-rule="evenodd"
+        clip-rule="evenodd"
+        d="M8.25 3.75L19.5 3.75C19.6989 3.75 19.8897 3.82902 20.0303 3.96967C20.171 4.11032 20.25 4.30109 20.25 4.5V15.75C20.25 16.1642 19.9142 16.5 19.5 16.5C19.0858 16.5 18.75 16.1642 18.75 15.75V6.31066L5.03033 20.0303C4.73744 20.3232 4.26256 20.3232 3.96967 20.0303C3.67678 19.7374 3.67678 19.2626 3.96967 18.9697L17.6893 5.25L8.25 5.25C7.83579 5.25 7.5 4.91421 7.5 4.5C7.5 4.08579 7.83579 3.75 8.25 3.75Z"
+        fill="currentColor"></path>
+    </symbol>
+  </svg>
+
+  <div class="container">
+    <div class="flex flex-col items-center gap-12">
+      <div
+        class="grid w-full grid-cols-1 gap-x-6 gap-y-12 sm:grid-cols-2 lg:grid-cols-3"
+        data-blog-grid
+      >
+        {
+          posts.map((post, index) => (
+            <a
+              href={post.href}
+              data-blog-card
+              data-topic={post.topic}
+              data-country={post.country}
+              data-search={`${post.title} ${post.excerpt} ${post.topic} ${post.country}`.toLowerCase()}
+              class="group flex flex-col gap-6 self-start rounded-xl no-underline"
+            >
+              <div class="relative aspect-video w-full overflow-hidden rounded-lg bg-visual-placeholder">
+                {post.image && (
+                  <img
+                    src={post.image}
+                    alt={post.title}
+                    width="1280"
+                    height="720"
+                    loading={index < 3 ? 'eager' : 'lazy'}
+                    decoding="async"
+                    class="h-full w-full object-cover"
+                  />
+                )}
+                <span class="absolute right-4 top-4 flex h-10 w-10 items-center justify-center rounded-lg bg-ledger-white text-vault-navy transition-colors duration-200 group-hover:bg-nova-blue group-hover:text-ledger-white">
+                  <svg width="20" height="20" aria-hidden="true" focusable="false">
+                    <use href="#ct-blog-card-arrow" />
+                  </svg>
+                </span>
+              </div>
+
+              <div class="flex flex-col gap-2">
+                {/* Clamped so a long title or excerpt can't leave one card in
+                    the row taller than its neighbours. */}
+                <h3 class="line-clamp-2 font-body font-medium text-vault-navy text-[length:var(--fs-label-lg)] leading-[var(--lh-label-lg)] tracking-[var(--tracking-body)] m-0 transition-colors duration-200 group-hover:text-nova-blue">
+                  {post.title}
+                </h3>
+                <p class="line-clamp-2 font-body font-normal text-neutral-500 text-[length:var(--fs-body)] leading-[var(--lh-body)] m-0">
+                  {post.excerpt}
+                </p>
+                <p class="flex items-center gap-2 font-body font-normal text-neutral-500 text-[length:var(--fs-body-sm)] leading-[var(--lh-body-sm)] m-0">
+                  <svg width="20" height="20" class="shrink-0" aria-hidden="true" focusable="false">
+                    <use href="#ct-blog-card-calendar" />
+                  </svg>
+                  {post.date}
+                </p>
+              </div>
+            </a>
+          ))
+        }
+      </div>
+
+      <p
+        data-blog-empty
+        role="status"
+        class="hidden font-body font-normal text-neutral-500 text-[length:var(--fs-body-lg)] leading-[var(--lh-body-lg)] text-center m-0"
+      >
+        No articles match those filters yet. Try a broader search.
+      </p>
+
+      <button
+        type="button"
+        data-blog-load-more
+        class="rounded-lg border border-nova-blue bg-generic-00 px-5 py-3.5 font-body font-medium text-nova-blue text-[length:var(--fs-label-lg)] leading-[var(--lh-label-lg)] shadow-[0px_2px_6px_0px_rgba(16,24,40,0.06)] cursor-pointer transition-colors duration-150 hover:bg-nova-blue hover:text-ledger-white"
+      >
+        Load more
+      </button>
+    </div>
+  </div>
+</section>
+
+<script is:inline>
+  (function () {
+    var root = document.querySelector('[data-blog-articles]');
+    if (!root) return;
+
+    var cards = Array.prototype.slice.call(root.querySelectorAll('[data-blog-card]'));
+    var moreBtn = root.querySelector('[data-blog-load-more]');
+    var empty = root.querySelector('[data-blog-empty]');
+
+    var PAGE_SIZE = 9;
+    var shown = PAGE_SIZE;
+
+    // Visibility is toggled inline, not with a class: the utilities pasted into
+    // Webflow are unlayered, so a `.hidden` class would have to out-order
+    // `.flex` on the same element. An inline style always wins.
+    function setVisible(el, visible) {
+      if (!el) return;
+      el.style.display = visible ? '' : 'none';
+    }
+
+    function readFilters() {
+      var form = document.querySelector('[data-blog-filter]');
+      if (!form) return { q: '', topic: '', country: '' };
+      var search = form.querySelector('[data-blog-search]');
+      var topic = form.querySelector('[data-blog-topic]');
+      var country = form.querySelector('[data-blog-country]');
+      return {
+        q: search ? search.value.trim().toLowerCase() : '',
+        topic: topic ? topic.value : '',
+        country: country ? country.value : '',
+      };
+    }
+
+    function matches(card, f) {
+      if (f.topic && card.getAttribute('data-topic') !== f.topic) return false;
+      if (f.country && card.getAttribute('data-country') !== f.country) return false;
+      if (f.q && (card.getAttribute('data-search') || '').indexOf(f.q) === -1) return false;
+      return true;
+    }
+
+    function render() {
+      var f = readFilters();
+      var hits = [];
+
+      cards.forEach(function (card) {
+        if (matches(card, f)) hits.push(card);
+        setVisible(card, false);
+      });
+
+      hits.slice(0, shown).forEach(function (card) {
+        setVisible(card, true);
+      });
+
+      setVisible(empty, hits.length === 0);
+      setVisible(moreBtn, hits.length > shown);
+    }
+
+    function reset() {
+      shown = PAGE_SIZE;
+      render();
+    }
+
+    // Delegated on `document` so the filter bar can live in a different Webflow
+    // Embed, mount later, or not exist at all.
+    document.addEventListener('input', function (e) {
+      if (e.target.closest && e.target.closest('[data-blog-filter]')) reset();
+    });
+
+    document.addEventListener('change', function (e) {
+      if (e.target.closest && e.target.closest('[data-blog-filter]')) reset();
+    });
+
+    document.addEventListener('submit', function (e) {
+      if (e.target.closest && e.target.closest('[data-blog-filter]')) {
+        e.preventDefault();
+        reset();
+      }
+    });
+
+    document.addEventListener('click', function (e) {
+      if (e.target.closest && e.target.closest('[data-blog-load-more]')) {
+        shown += PAGE_SIZE;
+        render();
+      }
+    });
+
+    render();
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', render);
+    }
+  })();
+</script>

@@ -1,0 +1,669 @@
+---
+/**
+ * "Stay ahead of every compliance update" CTA — Figma node 12289:26940.
+ *
+ * The dotted field is the interactive canvas grid from
+ * `sections/global-invoicing/Hero.astro` — dots spring away from a fast cursor
+ * and shockwave on click — recoloured from the hero's lime to the Nova Blue
+ * ramp. A radial mask clears the centre so the copy sits on plain ground, and
+ * top/bottom fades blend the field into the white sections either side.
+ *
+ * The tunables below are rendered onto the section as `data-*` and read back by
+ * the script, rather than being restated inside it. The hero declares the same
+ * values twice — as props and again as a literal `config` — so editing the prop
+ * there changes nothing. One source here.
+ *
+ * IDs are prefixed `blog-cta-` so this can never collide with the hero's
+ * `hero-dots-canvas` if both ever land on one Webflow page.
+ */
+const heading = 'Stay ahead of every compliance update';
+const body =
+  'Get expert insights, e-invoicing updates, and tax compliance guides delivered to your inbox.';
+const ctaLabel = 'Book a demo';
+/* Kept as a real href so the CTA still goes somewhere if JS never runs — the
+   click handler calls preventDefault and opens the modal instead. */
+const ctaHref = 'https://www.cleartax.com/global/book-a-demo';
+
+/* HubSpot demo form. Same portal/form the site's other CTAs use — see
+   `_shared/ContactFormRb.astro`. The embed script is NOT loaded on page load:
+   it is injected the first time the modal opens, so this Embed stays
+   self-contained in Webflow and visitors who never click pay nothing. */
+const hubspotPortalId = '245744706';
+const hubspotFormId = '5c52d4ba-5345-413a-b3cd-0ccec450aa30';
+const hubspotRegion = 'na2';
+const modalTitle = 'Book a demo';
+const modalBlurb = 'Tell us little about you and we will be in touch.';
+
+/* dotSize + gap = 26px pitch, matching the hero's 4 + 22. The dot itself is a
+   touch finer here because this field sits behind body copy, not a headline. */
+const dotSize = 3;
+const gap = 23;
+const baseColor = '#9CA3FF'; /* --palette-nova-300 */
+const activeColor = '#5336F5'; /* --palette-nova-600 */
+const proximity = 120;
+---
+
+<section
+  id="blog-cta"
+  class="relative flex min-h-[400px] items-center overflow-hidden bg-generic-00 py-16 md:py-20"
+  data-dot-size={String(dotSize)}
+  data-gap={String(gap)}
+  data-base-color={baseColor}
+  data-active-color={activeColor}
+  data-proximity={String(proximity)}
+>
+  <!-- Interactive dot grid -->
+  <div class="pointer-events-none absolute inset-0 z-0 h-full w-full">
+    <canvas id="blog-cta-dots-canvas" class="absolute inset-0 h-full w-full"></canvas>
+  </div>
+
+  <!-- Radial clearing so the dots never run under the copy -->
+  <div
+    class="pointer-events-none absolute inset-0 z-0 bg-[radial-gradient(circle_at_center,_rgba(255,255,255,1)_25%,_rgba(255,255,255,0.7)_40%,_rgba(255,255,255,0)_65%)]"
+  >
+  </div>
+
+  <!-- Edge fades into the white sections above and below -->
+  <div
+    class="pointer-events-none absolute inset-x-0 top-0 z-0 h-20 bg-gradient-to-b from-generic-00 to-transparent"
+  >
+  </div>
+  <div
+    class="pointer-events-none absolute inset-x-0 bottom-0 z-0 h-20 bg-gradient-to-t from-generic-00 to-transparent"
+  >
+  </div>
+
+  <div class="container relative z-10">
+    <div class="mx-auto flex max-w-[764px] flex-col items-center gap-6 text-center">
+      <div class="flex flex-col items-center gap-4">
+        <h2
+          class="font-heading font-medium text-vault-navy text-[length:var(--fs-h2)] leading-[var(--lh-h2)] tracking-[var(--tracking-body)] m-0"
+        >
+          {heading}
+        </h2>
+        <p
+          class="font-body font-medium text-vault-navy/60 text-[length:var(--fs-body-lg)] leading-[var(--lh-body-lg)] m-0"
+        >
+          {body}
+        </p>
+      </div>
+
+      <a
+        href={ctaHref}
+        data-demo-open
+        class="inline-flex w-full max-w-[240px] cursor-pointer items-center justify-center gap-2 rounded-lg border border-nova-blue bg-nova-blue px-5 py-3.5 font-body font-medium text-ledger-white text-[length:var(--fs-label-lg)] leading-[var(--lh-label-lg)] no-underline shadow-[0px_2px_3px_0px_rgba(16,24,40,0.06)] transition-colors duration-150 hover:bg-nova-600 hover:border-nova-600"
+      >
+        {ctaLabel}
+      </a>
+    </div>
+  </div>
+
+  <!-- Demo modal. `fixed`, so the section's overflow-hidden does not clip it. -->
+  <div
+    data-demo-modal
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="blog-cta-demo-title"
+    aria-hidden="true"
+    class="fixed inset-0 z-[2000] hidden items-center justify-center bg-generic-100/70 p-4 backdrop-blur-sm"
+  >
+    <div
+      class="relative max-h-[90vh] w-full max-w-[560px] overflow-y-auto rounded-xl bg-generic-00 p-6 shadow-[0_24px_64px_rgba(5,2,42,0.24)] md:p-8"
+    >
+      <button
+        type="button"
+        data-demo-close
+        aria-label="Close"
+        class="absolute right-4 top-4 inline-flex h-9 w-9 cursor-pointer items-center justify-center rounded-lg border-0 bg-transparent text-neutral-500 transition-colors duration-150 hover:bg-ledger-100 hover:text-vault-navy"
+      >
+        <svg
+          width="16"
+          height="16"
+          viewBox="0 0 14 14"
+          fill="none"
+          aria-hidden="true"
+          focusable="false"
+        >
+          <path
+            d="M13 1L1 13M1 1L13 13"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"></path>
+        </svg>
+      </button>
+
+      <h3
+        id="blog-cta-demo-title"
+        class="font-heading font-medium text-vault-navy text-[length:var(--fs-h5)] leading-[var(--lh-h5)] tracking-[var(--tracking-heading)] m-0 pr-10"
+      >
+        {modalTitle}
+      </h3>
+      <p
+        class="font-body font-normal text-neutral-500 text-[length:var(--fs-body-sm)] leading-[var(--lh-body-sm)] m-0 mt-2"
+      >
+        {modalBlurb}
+      </p>
+
+      <!-- HubSpot mounts here on first open -->
+      <div
+        id="blog-cta-hs-form"
+        class="blog-cta-hs-form mt-6"
+        data-portal-id={hubspotPortalId}
+        data-form-id={hubspotFormId}
+        data-region={hubspotRegion}
+      >
+        <p
+          data-demo-loading
+          class="font-body font-normal text-neutral-500 text-[length:var(--fs-body-sm)] leading-[var(--lh-body-sm)] m-0"
+        >
+          Loading form…
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script is:inline>
+  (function () {
+    var section = document.getElementById('blog-cta');
+    if (!section) return;
+    var canvas = document.getElementById('blog-cta-dots-canvas');
+    if (!canvas || !canvas.getContext) return;
+    var ctx = canvas.getContext('2d');
+
+    function num(name, fallback) {
+      var v = parseFloat(section.getAttribute(name));
+      return isNaN(v) ? fallback : v;
+    }
+
+    var config = {
+      dotSize: num('data-dot-size', 3),
+      gap: num('data-gap', 23),
+      baseColor: section.getAttribute('data-base-color') || '#9CA3FF',
+      activeColor: section.getAttribute('data-active-color') || '#5336F5',
+      proximity: num('data-proximity', 120),
+      speedTrigger: 100,
+      shockRadius: 250,
+      shockStrength: 6,
+      maxSpeed: 5000,
+      resistance: 450,
+      returnDuration: 1.5,
+    };
+
+    var width = 0;
+    var height = 0;
+    var dots = [];
+    var mouse = { x: -9999, y: -9999, vx: 0, vy: 0, speed: 0 };
+    var lastMouse = { x: -9999, y: -9999, time: 0 };
+
+    function initGrid() {
+      var parent = canvas.parentElement;
+      width = parent.offsetWidth;
+      height = parent.offsetHeight;
+      if (!width || !height) return;
+
+      var dpr = window.devicePixelRatio || 1;
+      canvas.width = Math.round(width * dpr);
+      canvas.height = Math.round(height * dpr);
+      // setTransform, not scale: scale() multiplies the existing matrix, so
+      // every resize would compound the DPR and shrink the grid.
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+      dots = [];
+      var spacing = config.dotSize + config.gap;
+      var cols = Math.floor(width / spacing);
+      var rows = Math.floor(height / spacing);
+      var startX = (width - cols * spacing) / 2 + config.dotSize / 2;
+      var startY = (height - rows * spacing) / 2 + config.dotSize / 2;
+
+      for (var y = 0; y <= rows; y++) {
+        for (var x = 0; x <= cols; x++) {
+          var cx = startX + x * spacing;
+          var cy = startY + y * spacing;
+          dots.push({ x: cx, y: cy, originX: cx, originY: cy, vx: 0, vy: 0, colorIntensity: 0 });
+        }
+      }
+    }
+
+    function hexToRgb(hex) {
+      var bigint = parseInt(hex.replace('#', ''), 16);
+      return [(bigint >> 16) & 255, (bigint >> 8) & 255, bigint & 255];
+    }
+    var baseRgb = hexToRgb(config.baseColor);
+    var activeRgb = hexToRgb(config.activeColor);
+
+    function paint() {
+      ctx.clearRect(0, 0, width, height);
+      for (var i = 0; i < dots.length; i++) {
+        var dot = dots[i];
+        var r = Math.round(baseRgb[0] + (activeRgb[0] - baseRgb[0]) * dot.colorIntensity);
+        var g = Math.round(baseRgb[1] + (activeRgb[1] - baseRgb[1]) * dot.colorIntensity);
+        var b = Math.round(baseRgb[2] + (activeRgb[2] - baseRgb[2]) * dot.colorIntensity);
+        ctx.beginPath();
+        ctx.fillStyle = 'rgb(' + r + ', ' + g + ', ' + b + ')';
+        ctx.arc(dot.x, dot.y, config.dotSize / 2, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    }
+
+    var reduceMotion =
+      window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    if (reduceMotion) {
+      // Static field. No physics loop, no cursor reaction.
+      initGrid();
+      paint();
+      window.addEventListener('resize', function () {
+        initGrid();
+        paint();
+      });
+      return;
+    }
+
+    var lastTime = performance.now();
+
+    function draw(time) {
+      var dt = (time - lastTime) / 1000;
+      if (dt > 0.05) dt = 0.05; // cap so a backgrounded tab can't jolt the grid
+      lastTime = time;
+
+      var spring = 30 / config.returnDuration;
+      var damping = config.resistance / 100;
+
+      for (var i = 0; i < dots.length; i++) {
+        var dot = dots[i];
+
+        dot.vx -= spring * (dot.x - dot.originX) * dt;
+        dot.vy -= spring * (dot.y - dot.originY) * dt;
+
+        dot.vx -= damping * dot.vx * dt;
+        dot.vy -= damping * dot.vy * dt;
+
+        var speed = Math.sqrt(dot.vx * dot.vx + dot.vy * dot.vy);
+        if (speed > config.maxSpeed) {
+          dot.vx = (dot.vx / speed) * config.maxSpeed;
+          dot.vy = (dot.vy / speed) * config.maxSpeed;
+        }
+
+        dot.x += dot.vx * dt;
+        dot.y += dot.vy * dt;
+
+        var dx = mouse.x - dot.originX;
+        var dy = mouse.y - dot.originY;
+        var distance = Math.sqrt(dx * dx + dy * dy);
+        var target = distance < config.proximity ? 1 : 0;
+        dot.colorIntensity += (target - dot.colorIntensity) * 10 * dt;
+      }
+
+      paint();
+      requestAnimationFrame(draw);
+    }
+
+    window.addEventListener('resize', initGrid);
+    initGrid();
+    requestAnimationFrame(draw);
+
+    section.addEventListener('mousemove', function (e) {
+      var rect = canvas.getBoundingClientRect();
+      var currentX = e.clientX - rect.left;
+      var currentY = e.clientY - rect.top;
+      var now = performance.now();
+
+      if (lastMouse.time > 0) {
+        var dtMove = (now - lastMouse.time) / 1000;
+        if (dtMove > 0) {
+          mouse.vx = (currentX - lastMouse.x) / dtMove;
+          mouse.vy = (currentY - lastMouse.y) / dtMove;
+          mouse.speed = Math.sqrt(mouse.vx * mouse.vx + mouse.vy * mouse.vy);
+
+          if (mouse.speed > config.speedTrigger) {
+            for (var i = 0; i < dots.length; i++) {
+              var dot = dots[i];
+              var dist = Math.sqrt(
+                Math.pow(dot.originX - currentX, 2) + Math.pow(dot.originY - currentY, 2)
+              );
+              if (dist < config.proximity) {
+                dot.vx = dot.originX - currentX + mouse.vx * 0.005;
+                dot.vy = dot.originY - currentY + mouse.vy * 0.005;
+              }
+            }
+          }
+        }
+      }
+
+      lastMouse.x = currentX;
+      lastMouse.y = currentY;
+      lastMouse.time = now;
+      mouse.x = currentX;
+      mouse.y = currentY;
+    });
+
+    section.addEventListener('mouseleave', function () {
+      mouse.x = -9999;
+      mouse.y = -9999;
+      lastMouse.time = 0;
+    });
+
+    section.addEventListener('click', function (e) {
+      var rect = canvas.getBoundingClientRect();
+      var cx = e.clientX - rect.left;
+      var cy = e.clientY - rect.top;
+
+      for (var i = 0; i < dots.length; i++) {
+        var dot = dots[i];
+        var dist = Math.sqrt(Math.pow(dot.originX - cx, 2) + Math.pow(dot.originY - cy, 2));
+        if (dist < config.shockRadius) {
+          var falloff = Math.max(0, 1 - dist / config.shockRadius);
+          dot.vx = (dot.originX - cx) * config.shockStrength * falloff;
+          dot.vy = (dot.originY - cy) * config.shockStrength * falloff;
+        }
+      }
+    });
+  })();
+</script>
+
+<script is:inline>
+  /* Book a demo → HubSpot form in a modal. The embed script is fetched on the
+     first open, not on page load. */
+  (function () {
+    var section = document.getElementById('blog-cta');
+    if (!section) return;
+
+    var modal = section.querySelector('[data-demo-modal]');
+    var mount = section.querySelector('#blog-cta-hs-form');
+    if (!modal || !mount) return;
+
+    var panel = modal.firstElementChild;
+    var closeBtn = modal.querySelector('[data-demo-close]');
+    var openers = section.querySelectorAll('[data-demo-open]');
+
+    var lastFocused = null;
+    var scriptRequested = false;
+    var formCreated = false;
+
+    function createForm() {
+      if (formCreated || !window.hbspt || !window.hbspt.forms) return;
+      formCreated = true;
+
+      window.hbspt.forms.create({
+        portalId: mount.getAttribute('data-portal-id'),
+        formId: mount.getAttribute('data-form-id'),
+        region: mount.getAttribute('data-region') || 'na2',
+        target: '#blog-cta-hs-form',
+        onFormReady: function ($form) {
+          var loading = mount.querySelector('[data-demo-loading]');
+          if (loading && loading.parentNode) loading.parentNode.removeChild(loading);
+
+          // Carry campaign attribution through, same as the site's other forms.
+          var formEl = $form && $form[0] ? $form[0] : $form;
+          if (!formEl || !formEl.querySelector) return;
+          var params = new URLSearchParams(window.location.search);
+          var utms = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 'utm_content'];
+          for (var i = 0; i < utms.length; i++) {
+            var value = params.get(utms[i]);
+            if (!value) continue;
+            var input = formEl.querySelector('input[name="' + utms[i] + '"]');
+            if (input) input.value = value;
+          }
+        },
+      });
+    }
+
+    function loadHubspot() {
+      if (scriptRequested) return;
+      scriptRequested = true;
+
+      if (window.hbspt && window.hbspt.forms) {
+        createForm();
+        return;
+      }
+
+      // Reuse the loader if the page already has one (e.g. another form
+      // section, or a paste in Webflow's page head) rather than adding a second.
+      var loader = document.querySelector('script[src*="hsforms.net"]');
+      if (!loader) {
+        loader = document.createElement('script');
+        loader.src = 'https://js-na2.hsforms.net/forms/embed/v2.js';
+        loader.charset = 'utf-8';
+        loader.async = true;
+        document.head.appendChild(loader);
+      }
+      loader.addEventListener('load', createForm);
+
+      // Backstop: a cached loader may have fired `load` before we listened.
+      var tries = 0;
+      var poll = setInterval(function () {
+        tries++;
+        if (window.hbspt && window.hbspt.forms) {
+          clearInterval(poll);
+          createForm();
+        } else if (tries > 100) {
+          clearInterval(poll);
+        }
+      }, 100);
+    }
+
+    // Inline display, not a class swap: the utilities pasted into Webflow are
+    // unlayered, so `flex` and `hidden` on one element would race on source
+    // order. Inline always wins.
+    function openModal(e) {
+      if (e) e.preventDefault();
+      // The clicked opener, not activeElement: browsers differ on whether a
+      // click focuses an anchor, and on close focus has to land somewhere
+      // predictable rather than on the document root.
+      lastFocused = (e && e.currentTarget) || document.activeElement;
+      modal.style.display = 'flex';
+      modal.setAttribute('aria-hidden', 'false');
+      document.body.style.overflow = 'hidden';
+      loadHubspot();
+      if (closeBtn) closeBtn.focus();
+    }
+
+    function closeModal() {
+      modal.style.display = 'none';
+      modal.setAttribute('aria-hidden', 'true');
+      document.body.style.overflow = '';
+      if (lastFocused && lastFocused.focus) lastFocused.focus();
+    }
+
+    function isOpen() {
+      return modal.style.display === 'flex';
+    }
+
+    for (var i = 0; i < openers.length; i++) {
+      openers[i].addEventListener('click', openModal);
+    }
+
+    if (closeBtn) closeBtn.addEventListener('click', closeModal);
+
+    modal.addEventListener('click', function (e) {
+      if (e.target === modal) closeModal();
+    });
+
+    document.addEventListener('keydown', function (e) {
+      if (!isOpen()) return;
+
+      if (e.key === 'Escape') {
+        closeModal();
+        return;
+      }
+
+      // Keep Tab inside the dialog — `aria-modal` claims the rest is inert, so
+      // focus must not walk out into the page behind it.
+      if (e.key !== 'Tab' || !panel) return;
+      var focusable = panel.querySelectorAll(
+        'a[href], button:not([disabled]), input:not([disabled]):not([type="hidden"]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
+      );
+      if (!focusable.length) return;
+      var first = focusable[0];
+      var last = focusable[focusable.length - 1];
+
+      if (e.shiftKey && document.activeElement === first) {
+        e.preventDefault();
+        last.focus();
+      } else if (!e.shiftKey && document.activeElement === last) {
+        e.preventDefault();
+        first.focus();
+      }
+    });
+  })();
+</script>
+
+<style is:global>
+  /* Styling for HubSpot's injected markup — utilities can't reach a form that
+     does not exist at build time. Prefixed `blog-cta-` per the section-CSS
+     rule; the shape follows `_shared/ContactFormRb.astro` so both forms on the
+     site read the same. */
+  .blog-cta-hs-form form {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 16px !important;
+  }
+  .blog-cta-hs-form .hs-form-field {
+    margin-bottom: 0 !important;
+  }
+  .blog-cta-hs-form .hs-form-field > label {
+    display: block !important;
+    font-family: var(--font-body) !important;
+    font-size: var(--fs-label) !important;
+    font-weight: var(--font-weight-medium) !important;
+    color: var(--color-vault-navy) !important;
+    margin-bottom: var(--spacing-x-sm) !important;
+  }
+  .blog-cta-hs-form .hs-form-field > label .hs-form-required {
+    color: var(--palette-destructive-500) !important;
+    margin-left: 2px !important;
+  }
+  .blog-cta-hs-form input[type="text"],
+  .blog-cta-hs-form input[type="email"],
+  .blog-cta-hs-form input[type="tel"],
+  .blog-cta-hs-form input[type="number"],
+  .blog-cta-hs-form select,
+  .blog-cta-hs-form textarea {
+    width: 100% !important;
+    box-sizing: border-box !important;
+    height: 40px !important;
+    padding: var(--spacing-x-sm) var(--spacing-sm) !important;
+    border: 1px solid var(--palette-neutral-200) !important;
+    border-radius: var(--spacing-x-sm) !important;
+    background-color: var(--palette-generic-00) !important;
+    font-family: var(--font-body) !important;
+    font-size: var(--fs-label) !important;
+    color: var(--color-vault-navy) !important;
+    outline: none !important;
+    box-shadow: 0 1px 1px rgba(16, 24, 40, 0.04) !important;
+    transition: border-color var(--transition-fast), box-shadow var(--transition-fast) !important;
+  }
+  .blog-cta-hs-form input::placeholder,
+  .blog-cta-hs-form textarea::placeholder {
+    color: var(--palette-neutral-400) !important;
+  }
+  .blog-cta-hs-form input:focus,
+  .blog-cta-hs-form select:focus,
+  .blog-cta-hs-form textarea:focus {
+    border-color: var(--color-nova-blue) !important;
+    box-shadow: 0 0 0 3px rgba(84, 70, 255, 0.12) !important;
+  }
+  .blog-cta-hs-form textarea {
+    height: auto !important;
+    min-height: 80px !important;
+    resize: vertical !important;
+  }
+  .blog-cta-hs-form fieldset {
+    max-width: none !important;
+    border: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    display: flex !important;
+    flex-direction: row !important;
+    gap: var(--spacing-md) !important;
+  }
+  @media (width < 640px) {
+    .blog-cta-hs-form fieldset {
+      flex-direction: column !important;
+    }
+  }
+  .blog-cta-hs-form fieldset .hs-form-field {
+    flex: 1 !important;
+  }
+  .blog-cta-hs-form .hs-form-booleancheckbox label,
+  .blog-cta-hs-form .legal-consent-container label {
+    display: flex !important;
+    align-items: flex-start !important;
+    gap: var(--spacing-x-sm) !important;
+    font-family: var(--font-body) !important;
+    font-size: var(--fs-body-sm) !important;
+    font-weight: var(--font-weight-normal) !important;
+    line-height: var(--lh-body-sm) !important;
+    color: var(--palette-neutral-500) !important;
+    cursor: pointer !important;
+  }
+  .blog-cta-hs-form .hs-form-booleancheckbox label a,
+  .blog-cta-hs-form .legal-consent-container label a {
+    color: var(--color-nova-blue) !important;
+    font-weight: var(--font-weight-medium) !important;
+    text-decoration: underline !important;
+  }
+  .blog-cta-hs-form input[type="checkbox"] {
+    width: 20px !important;
+    height: 20px !important;
+    margin-top: 2px !important;
+    flex-shrink: 0 !important;
+    accent-color: var(--color-nova-blue) !important;
+    cursor: pointer !important;
+  }
+  .blog-cta-hs-form .inputs-list {
+    list-style: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+  .blog-cta-hs-form .hs-submit {
+    margin-top: var(--spacing-xx-sm) !important;
+  }
+  .blog-cta-hs-form input[type="submit"],
+  .blog-cta-hs-form .hs-button {
+    width: 100% !important;
+    padding: var(--spacing-sm) var(--spacing-xxx-big) !important;
+    border: 1px solid var(--color-nova-blue) !important;
+    border-radius: var(--spacing-x-sm) !important;
+    background: var(--color-nova-blue) !important;
+    color: var(--palette-nova-50) !important;
+    font-family: var(--font-body) !important;
+    font-size: var(--fs-label-lg) !important;
+    font-weight: var(--font-weight-medium) !important;
+    cursor: pointer !important;
+    box-shadow: 0 2px 3px rgba(16, 24, 40, 0.06) !important;
+    transition: opacity var(--transition-fast) !important;
+  }
+  .blog-cta-hs-form input[type="submit"]:hover,
+  .blog-cta-hs-form .hs-button:hover {
+    opacity: 0.92 !important;
+  }
+  .blog-cta-hs-form .hs-error-msgs {
+    list-style: none !important;
+    padding: 0 !important;
+    margin: var(--spacing-xx-sm) 0 0 !important;
+    font-size: var(--fs-body-xs) !important;
+    color: var(--palette-destructive-500) !important;
+  }
+  .blog-cta-hs-form .hs-error-msg {
+    color: var(--palette-destructive-500) !important;
+  }
+  .blog-cta-hs-form .submitted-message {
+    padding: var(--spacing-big) !important;
+    border: 1px solid var(--palette-neutral-300) !important;
+    border-radius: var(--spacing-x-sm) !important;
+    background: var(--palette-nova-50) !important;
+    color: var(--color-vault-navy) !important;
+    font-family: var(--font-body) !important;
+    font-size: var(--fs-body-sm) !important;
+    font-weight: var(--font-weight-semibold) !important;
+    text-align: center !important;
+  }
+  /* HubSpot renders the UTM fields it prefills; they are not for the visitor. */
+  .blog-cta-hs-form fieldset:has([class*="hs_utm_"]),
+  .blog-cta-hs-form .hs-form-field[style*="display: none"] {
+    display: none !important;
+  }
+</style>
