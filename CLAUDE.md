@@ -20,7 +20,7 @@ Page CSS entries must declare **only** their own sources:
 @source '../sections/<page>/**/*.astro';
 ```
 
-`scripts/css-entries.mjs` parses the page's frontmatter and auto-injects one `@source` line per `_shared` component the page actually imports, plus `@import '../theme.css'`.
+`scripts/css-entries.mjs` auto-injects one `@source` line per `_shared` component the page actually uses, plus `@import '../theme.css'`. It follows relative `.astro` imports **transitively**, so a primitive reached through a wrapper (`page → <page>/Navbar.astro → _shared/NavbarRb.astro`) is still found. Scanning only the page's own frontmatter used to miss those, and Tailwind silently dropped every utility used solely inside the primitive.
 
 **Never write a `_shared` `@source` line yourself, and never the wildcard:**
 
@@ -60,6 +60,8 @@ Rules for that pattern:
 For a section only one page will ever use, skip the indirection: put the content in that section's own defaults.
 
 Verify with `dist/preview/<page>.html` — it is built from embeds, so a props leak shows up there as content reverting to defaults.
+
+**Nothing outside a section file is pasted — including `<style>`.** The preview copies a page's `<head>`, so a `<style>` block written in a page renders in dev *and* in `dist/preview`, yet reaches no CSS bundle and no embed. Preview then looks right while Webflow differs, which defeats the one guarantee preview exists for. Page-level CSS belongs in `shared.css` (site-wide) or the page's own `.css` entry (that page only). Same for markup: the GTM `<noscript>` in a page body never ships, which is correct — it belongs in Webflow's page custom code.
 
 ## Styling rules
 

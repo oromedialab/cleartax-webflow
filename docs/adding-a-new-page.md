@@ -84,6 +84,12 @@ interface Props { … }
 </script>
 ```
 
+**Put CSS in a section, never in the page.** A `<style>` block written in a page file
+renders in dev and in `dist/preview` (which copies the page `<head>`) but reaches no CSS
+bundle and no embed — so it never gets pasted into Webflow, and preview stops being an
+accurate mirror. Site-wide CSS goes in `shared.css`; page-only CSS goes at the bottom of
+`src/styles/<page>.css`.
+
 Authoring rules in [README.md](../README.md) (`Authoring rules` section) apply. The `embed-build/[page]/[section].astro` dynamic route picks up new section files via `import.meta.glob` — no registry update needed. That route imports no CSS and renders unstyled; it exists only so `extract-embeds.mjs` can lift each section's body HTML. Verify with `dist/preview/<page>.html`.
 
 ## Step 3 — Create the CSS entry
@@ -142,7 +148,7 @@ Authoring rules in [README.md](../README.md) (`Authoring rules` section) apply. 
 
 The `page` field tells the build script to:
 
-1. Parse `src/pages/<page>.astro` frontmatter for `import X from '../sections/_shared/X.astro'` lines.
+1. Parse `src/pages/<page>.astro` frontmatter — and, transitively, the frontmatter of every relative `.astro` it imports — for `_shared` component imports. The recursion is what makes the wrapper pattern work: a page importing `<page>/Navbar.astro`, which imports `_shared/NavbarRb.astro`, still gets `NavbarRb` sourced.
 2. Generate a temporary entry CSS at `src/styles/.build/<page>.css` (gitignored) that re-imports your `<page>.css` and appends `@source '../sections/_shared/X.astro'` for each discovered import.
 3. Run Tailwind on the generated entry, output to `public/css/<page>.css`.
 

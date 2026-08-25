@@ -148,7 +148,7 @@ See [docs/adding-a-new-page.md](docs/adding-a-new-page.md) for the end-to-end wa
 
 Short version: create `src/pages/<page>.astro` (importing `shared.css` + your `<page>.css` + each section), create `src/sections/<page>/*.astro` for page-specific sections, create `src/styles/<page>.css` (no `@layer theme, base, utilities;` declaration — see the doc), and add `{ name: '<page>', input: 'src/styles/<page>.css', page: 'src/pages/<page>.astro' }` to `PAGE_TARGETS` in [scripts/css-entries.mjs](scripts/css-entries.mjs). That is the only wiring step.
 
-The build auto-injects `@source` directives for the `_shared` components your page imports, plus `@import '../theme.css'`. **Never hand-list `_shared` sources in the CSS entry**, and never the `@source '../sections/_shared/**/*.astro'` wildcard — it compiles all 12 shared components into the page and costs 5–12 KB against Webflow's 50 KB paste cap.
+The build auto-injects `@source` directives for the `_shared` components your page uses — following relative `.astro` imports transitively, so primitives reached through a per-page wrapper are included — plus `@import '../theme.css'`. **Never hand-list `_shared` sources in the CSS entry**, and never the `@source '../sections/_shared/**/*.astro'` wildcard — it compiles all 12 shared components into the page and costs 5–12 KB against Webflow's 50 KB paste cap.
 
 ## Brand fonts
 

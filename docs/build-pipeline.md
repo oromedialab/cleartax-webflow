@@ -22,7 +22,7 @@ How `.astro` + Tailwind sources become the per-section HTML + per-page CSS that 
 ┌─────────────────────────────────────────────────────────────────────┐
 │  STEP 1 — scripts/build-css.mjs                                     │
 │    For each page target:                                            │
-│      • Parse page.astro frontmatter for _shared/* imports.          │
+│      • Parse page + its section imports for _shared/* (transitive). │
 │      • Generate src/styles/.build/<page>.css that @imports the      │
 │        original entry and @sources each _shared component.          │
 │      • Run @tailwindcss/cli → public/css/<page>.css.                │
@@ -152,7 +152,9 @@ The `is:global` flag is the critical convention — without it Astro injects sco
 
 For each target with a `page` field:
 
-1. **Discover shared imports** — read the page astro file, regex its frontmatter for
+1. **Discover shared imports** — read the page astro file and, recursively, every
+   relative `.astro` it imports (so a `_shared` primitive reached through a per-page
+   wrapper is still found; cycle-safe, depth-limited). Regex each frontmatter for
    ```
    import <Capitalized> from '../sections/_shared/<File>.astro'
    ```
