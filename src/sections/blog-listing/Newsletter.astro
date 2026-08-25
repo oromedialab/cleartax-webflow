@@ -101,6 +101,7 @@ const proximity = 120;
   <!-- Demo modal. `fixed`, so the section's overflow-hidden does not clip it. -->
   <div
     data-demo-modal
+    id="contactForm"
     role="dialog"
     aria-modal="true"
     aria-labelledby="blog-cta-demo-title"
@@ -376,7 +377,6 @@ const proximity = 120;
 
     var panel = modal.firstElementChild;
     var closeBtn = modal.querySelector('[data-demo-close]');
-    var openers = section.querySelectorAll('[data-demo-open]');
 
     var lastFocused = null;
     var scriptRequested = false;
@@ -447,12 +447,12 @@ const proximity = 120;
     // Inline display, not a class swap: the utilities pasted into Webflow are
     // unlayered, so `flex` and `hidden` on one element would race on source
     // order. Inline always wins.
-    function openModal(e) {
+    function openModal(e, opener) {
       if (e) e.preventDefault();
       // The clicked opener, not activeElement: browsers differ on whether a
       // click focuses an anchor, and on close focus has to land somewhere
       // predictable rather than on the document root.
-      lastFocused = (e && e.currentTarget) || document.activeElement;
+      lastFocused = opener || document.activeElement;
       modal.style.display = 'flex';
       modal.setAttribute('aria-hidden', 'false');
       document.body.style.overflow = 'hidden';
@@ -471,8 +471,34 @@ const proximity = 120;
       return modal.style.display === 'flex';
     }
 
-    for (var i = 0; i < openers.length; i++) {
-      openers[i].addEventListener('click', openModal);
+    // Delegated, so it does not matter which Embed mounts first or whether the
+    // opener existed when this ran.
+    document.addEventListener('click', function (e) {
+      if (!e.target.closest) return;
+      var opener = e.target.closest('[data-demo-open]');
+      if (!opener) return;
+      openModal(e, opener);
+    });
+
+    // The navbar's "Book a demo" buttons — desktop and mobile — live in
+    // `_shared/NavbarRb.astro`, which Global Invoicing also uses, so they can't
+    // be changed at the source: there `#contactForm` is a real section and the
+    // scroll is correct. Here it resolves to this modal, which is fixed and
+    // display:none, so the inline handler is a no-op. Adopt them instead —
+    // strip the dead handler and mark them as openers.
+    function adoptNavbarCtas() {
+      var ctas = document.querySelectorAll('a[onclick*="contactForm"]');
+      for (var i = 0; i < ctas.length; i++) {
+        ctas[i].removeAttribute('onclick');
+        ctas[i].onclick = null;
+        ctas[i].setAttribute('data-demo-open', '');
+      }
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', adoptNavbarCtas);
+    } else {
+      adoptNavbarCtas();
     }
 
     if (closeBtn) closeBtn.addEventListener('click', closeModal);
