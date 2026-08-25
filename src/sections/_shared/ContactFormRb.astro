@@ -1,0 +1,357 @@
+---
+export interface FormPoint {
+  icon: string;
+  title: string;
+  desc: string;
+}
+
+export interface Props {
+  points?: FormPoint[];
+  hubspotPortalId?: string;
+  hubspotFormId?: string;
+  hubspotRegion?: string;
+}
+
+
+
+const {
+  points = [],
+  hubspotPortalId = "245744706",
+  hubspotFormId = "5c52d4ba-5345-413a-b3cd-0ccec450aa30",
+  hubspotRegion = "na2",
+} = Astro.props as Props;
+
+---
+
+<section class="bg-white py-16 lg:py-20" id="contactForm">
+  <div class="wf-container mx-auto px-4">
+    <div class="flex flex-col items-center gap-4 text-center mb-12">
+      <h2 class="m-0 text-[28px] sm:text-[36px] lg:text-[40px] leading-[1.2] font-medium text-vault-navy">
+        Ready to become <span class="bg-flux-lime rounded-lg px-2">Without Limits?</span>
+      </h2>
+      <p class="m-0 max-w-2xl text-base lg:text-lg leading-[1.55] text-neutral-500">
+        Join 5,000+ global enterprises that trust ClearTax for uninterrupted, multi-jurisdiction e-invoicing compliance.
+      </p>
+    </div>
+
+    <div class="max-w-6xl mx-auto border-2 border-neutral-300 rounded-lg flex flex-col lg:flex-row items-stretch gap-12 px-6 py-8 lg:px-8 lg:py-12">
+      <!-- Feature bullets -->
+      <div class="flex flex-col gap-8 lg:gap-12 w-full lg:w-100 shrink-0">
+        {points.map((p) => (
+          <div class="flex items-start gap-4">
+            <div class="shrink-0 size-8 flex items-center justify-center">
+                <img src={p.icon} alt="icon" class="size-full object-contain" />
+            </div>
+            <div class="flex flex-col gap-3">
+              <p class="m-0 text-base font-semibold text-black">{p.title}</p>
+              <p class="m-0 text-base leading-6 text-neutral-500">{p.desc}</p>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      <!-- Divider -->
+      <div class="hidden lg:block w-px bg-neutral-300 shrink-0"></div>
+
+      <!-- Sign up form -->
+      <div class="flex-1 min-w-0 flex flex-col gap-6">
+        <h3 class="m-0 text-xl font-medium text-vault-navy">Sign up here</h3>
+
+        <!-- HubSpot Form Mount Container -->
+        <div id="giwip-contact" class="giwip-hs-form-wrap" data-portal-id={hubspotPortalId} data-form-id={hubspotFormId} data-region={hubspotRegion}>
+          <!-- Form Skeleton Loader -->
+          <div id="giwip-form-skeleton" class="form-skeleton">
+            <div>
+              <div class="skeleton-label shimmer"></div>
+              <div class="skeleton-input shimmer"></div>
+            </div>
+            <div>
+              <div class="skeleton-label shimmer" style="width: 100px;"></div>
+              <div class="skeleton-input shimmer"></div>
+            </div>
+            <div>
+              <div class="skeleton-label shimmer" style="width: 120px;"></div>
+              <div class="skeleton-input shimmer"></div>
+            </div>
+            <div class="skeleton-button shimmer"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script is:inline>
+  // HubSpot form embed with URL parameters auto-prefill
+  (() => {
+    let initialized = false;
+
+    const initForm = () => {
+      if (initialized) return;
+      const container = document.getElementById("giwip-contact");
+      if (!container) return;
+      const portalId = container.getAttribute("data-portal-id");
+      const formId = container.getAttribute("data-form-id");
+      const region = container.getAttribute("data-region") || "na2";
+
+      if (window.hbspt && window.hbspt.forms) {
+        initialized = true;
+        window.hbspt.forms.create({
+          portalId: portalId,
+          formId: formId,
+          region: region,
+          target: "#giwip-contact",
+          onFormReady: function ($form) {
+            const skeleton = document.getElementById("giwip-form-skeleton");
+            if (skeleton) skeleton.remove();
+
+            const formEl = $form && $form[0] ? $form[0] : $form;
+            if (formEl && formEl.querySelector) {
+              const urlParams = new URLSearchParams(window.location.search);
+              const utms = ["utm_source", "utm_medium", "utm_campaign", "utm_term", "utm_content"];
+              utms.forEach((utm) => {
+                const value = urlParams.get(utm);
+                if (value) {
+                  const input = formEl.querySelector('input[name="' + utm + '"]');
+                  if (input) input.value = value;
+                }
+              });
+            }
+          },
+        });
+      }
+    };
+
+    const checkAndInit = () => {
+      if (window.hbspt && window.hbspt.forms) {
+        initForm();
+      } else {
+        const script = document.querySelector('script[src*="hsforms.net"]');
+        if (script) script.addEventListener("load", initForm);
+        let pollCount = 0;
+        const interval = setInterval(() => {
+          pollCount++;
+          if (window.hbspt && window.hbspt.forms) {
+            clearInterval(interval);
+            initForm();
+          } else if (pollCount > 100) {
+            clearInterval(interval);
+          }
+        }, 100);
+      }
+    };
+
+    if (document.readyState === "loading") {
+      document.addEventListener("DOMContentLoaded", checkAndInit);
+    } else {
+      checkAndInit();
+    }
+  })();
+</script>
+
+<style is:global>
+  .giwip-hs-form-wrap {
+    width: 100%;
+    min-height: 260px;
+  }
+  .giwip-hs-form-wrap form {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 20px !important;
+  }
+  .giwip-hs-form-wrap .hs-form-field {
+    margin-bottom: 0 !important;
+  }
+  .giwip-hs-form-wrap .hs-form-field > label {
+    display: block !important;
+    font-size: 14px !important;
+    font-weight: 500 !important;
+    color: var(--color-vault-navy) !important;
+    margin-bottom: 8px !important;
+  }
+  .giwip-hs-form-wrap .hs-form-field > label .hs-form-required {
+    color: var(--palette-destructive-500) !important;
+    margin-left: 2px !important;
+  }
+  .giwip-hs-form-wrap input[type="text"],
+  .giwip-hs-form-wrap input[type="email"],
+  .giwip-hs-form-wrap input[type="tel"],
+  .giwip-hs-form-wrap input[type="number"],
+  .giwip-hs-form-wrap select,
+  .giwip-hs-form-wrap textarea {
+    width: 100% !important;
+    border-radius: 8px !important;
+    border: 1px solid var(--palette-neutral-200) !important;
+    background-color: var(--palette-generic-00) !important;
+    padding: 8px 12px !important;
+    height: 40px !important;
+    font-size: 14px !important;
+    color: var(--color-vault-navy) !important;
+    outline: none !important;
+    transition: all 0.2s ease !important;
+    box-sizing: border-box !important;
+    box-shadow: 0 1px 1px rgba(16, 24, 40, 0.04) !important;
+  }
+  .giwip-hs-form-wrap input::placeholder,
+  .giwip-hs-form-wrap textarea::placeholder {
+    color: #9ca3af !important;
+  }
+  .giwip-hs-form-wrap input:focus,
+  .giwip-hs-form-wrap select:focus,
+  .giwip-hs-form-wrap textarea:focus {
+    border-color: var(--color-nova-blue) !important;
+    box-shadow: 0 0 0 3px rgba(84, 70, 255, 0.12) !important;
+  }
+  .giwip-hs-form-wrap textarea {
+    min-height: 80px !important;
+    height: auto !important;
+    resize: vertical !important;
+  }
+  .giwip-hs-form-wrap fieldset {
+    max-width: none !important;
+    border: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    display: flex !important;
+    flex-direction: row !important;
+    gap: 20px !important;
+  }
+  @media (max-width: 640px) {
+    .giwip-hs-form-wrap fieldset {
+      flex-direction: column !important;
+      gap: 20px !important;
+    }
+  }
+  .giwip-hs-form-wrap fieldset .hs-form-field {
+    flex: 1 !important;
+  }
+  .giwip-hs-form-wrap .hs-form-booleancheckbox label,
+  .giwip-hs-form-wrap .legal-consent-container label {
+    display: flex !important;
+    align-items: flex-start !important;
+    font-size: 14px !important;
+    color: var(--palette-neutral-500) !important;
+    line-height: 20px !important;
+    font-weight: 400 !important;
+    cursor: pointer !important;
+  }
+  .giwip-hs-form-wrap .hs-form-booleancheckbox label a,
+  .giwip-hs-form-wrap .legal-consent-container label a {
+    color: var(--color-nova-blue) !important;
+    font-weight: 500 !important;
+    text-decoration: underline !important;
+  }
+  .giwip-hs-form-wrap input[type="checkbox"] {
+    margin-top: 2px !important;
+    flex-shrink: 0 !important;
+    accent-color: var(--color-nova-blue) !important;
+    width: 20px !important;
+    height: 20px !important;
+    border-radius: 4px !important;
+    cursor: pointer !important;
+  }
+  .giwip-hs-form-wrap .hs-submit {
+    margin-top: 4px !important;
+  }
+  .giwip-hs-form-wrap .inputs-list {
+    list-style: none;
+  }
+  .giwip-hs-form-wrap input[type="submit"],
+  .giwip-hs-form-wrap .hs-button {
+    background: var(--color-nova-blue) !important;
+    color: var(--palette-nova-50) !important;
+    padding: 14px 32px !important;
+    border-radius: 8px !important;
+    font-weight: 500 !important;
+    font-size: 16px !important;
+    border: 1px solid var(--color-nova-blue) !important;
+    cursor: pointer !important;
+    font-family: inherit !important;
+    transition: all 0.2s ease !important;
+    box-shadow: 0 2px 3px rgba(16, 24, 40, 0.06) !important;
+  }
+  .giwip-hs-form-wrap input[type="submit"]:hover,
+  .giwip-hs-form-wrap .hs-button:hover {
+    opacity: 0.92 !important;
+  }
+  .giwip-hs-form-wrap .hs-error-msgs {
+    list-style: none !important;
+    padding: 0 !important;
+    margin: 4px 0 0 !important;
+    font-size: 12px !important;
+    color: var(--palette-destructive-500) !important;
+  }
+  .giwip-hs-form-wrap .hs-error-msg {
+    color: var(--palette-destructive-500) !important;
+  }
+  .giwip-hs-form-wrap .submitted-message {
+    background: #f5f4fa !important;
+    color: var(--color-vault-navy) !important;
+    padding: 18px !important;
+    border-radius: 8px !important;
+    font-size: 14.5px !important;
+    font-weight: 600 !important;
+    text-align: center !important;
+    border: 1px solid var(--palette-neutral-300) !important;
+  }
+  .giwip-hs-form-wrap fieldset:has([class*="hs_utm_"]),
+  .giwip-hs-form-wrap .hs-form-field[style*="display: none"] {
+    display: none !important;
+  }
+
+  /* Skeleton shimmer */
+  .form-skeleton {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    width: 100%;
+    min-height: 260px;
+  }
+  .skeleton-label {
+    height: 14px;
+    width: 80px;
+    background: rgba(0, 0, 0, 0.08);
+    border-radius: 4px;
+    margin-bottom: 8px;
+  }
+  .skeleton-input {
+    height: 40px;
+    background: rgba(0, 0, 0, 0.03);
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    border-radius: 8px;
+    width: 100%;
+  }
+  .skeleton-button {
+    height: 46px;
+    width: 148px;
+    background: rgba(84, 70, 255, 0.25);
+    border-radius: 8px;
+    margin-top: 4px;
+  }
+  .shimmer {
+    position: relative;
+    overflow: hidden;
+  }
+  .shimmer::after {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    transform: translateX(-100%);
+    background-image: linear-gradient(
+      90deg,
+      rgba(255, 255, 255, 0) 0%,
+      rgba(255, 255, 255, 0.6) 20%,
+      rgba(255, 255, 255, 0.6) 60%,
+      rgba(255, 255, 255, 0) 100%
+    );
+    animation: shimmer-anim 1.6s infinite;
+    content: "";
+  }
+  @keyframes shimmer-anim {
+    100% {
+      transform: translateX(100%);
+    }
+  }
+</style>

@@ -1,15 +1,7 @@
 ---
 /**
- * Navbar — brand v2 primitive. Figma "Navbar - 4": a white pill floating over
- * the hero, with link dropdowns and a country switcher.
- *
- * TAKES PROPS AND IS NEVER PASTED DIRECTLY. The embed route renders sections
- * with no props, so the paste unit is a per-page wrapper that supplies content:
- *
- *   <page>/Navbar.astro  ->  <NavbarRb links={…} countries={…} />
- *
- * `Rb` suffix only because `Navbar.astro` is the v1 component and both
- * generations must live in _shared/. Rename once the last v1 page is gone.
+ * global-invoicing-wip navbar — flat bordered bar per Figma (node 12239:15725),
+ * distinct from the floating glass-pill _shared/NavbarGlobalV2.astro used elsewhere.
  */
 export interface NavLink {
   label: string;
@@ -17,356 +9,299 @@ export interface NavLink {
   dropdown?: { label: string; href: string }[];
 }
 
-export interface CountryOption {
-  name: string;
-  flag: string;
-  href: string;
-  lang?: string;
-}
+
 
 interface Props {
   links?: NavLink[];
-  countries?: CountryOption[];
-  countryLabel?: string;
-  ctaLabel?: string;
-  ctaHref?: string;
-  logoSrc?: string;
-  logoAlt?: string;
-  homeHref?: string;
-  idPrefix?: string;
 }
 
 const {
   links = [],
-  countries = [],
-  countryLabel = 'Global',
-  ctaLabel = 'Request a demo',
-  ctaHref = '#gi-signup',
-  logoSrc = '',
-  logoAlt = 'cleartax',
-  homeHref = '/',
-  idPrefix = 'rbnav',
 } = Astro.props;
+
 ---
 
+<div data-giwip-nav-root>
+  <div class="fixed top-4 inset-x-0 z-[1000] pointer-events-none">
+    <div class="max-w-[var(--container-max)] mx-auto pointer-events-auto">
+      <div class="w-full max-w-[1280px] mx-auto bg-white border-2 border-[#ECECF4] rounded-xl shadow-[0px_2px_6px_rgba(16,24,40,0.06)] flex items-center justify-between p-2 -mx-4">
+        <a href="/" class="flex items-center shrink-0 pl-6 py-3">
+          <img
+            src="https://cdn.prod.website-files.com/6093bce33d9b4bae841b04e3/69dfcff6071b983201f5f097_logo-cleartax.svg"
+            alt="ClearTax"
+            class="h-6 w-auto"
+            width="112"
+            height="24"
+            loading="eager"
+            fetchpriority="high"
+            decoding="async"
+          />
+        </a>
 
-<header class="rb-nav">
-  <div class="container">
-    <div class="rb-nav-bar">
-      <a class="rb-nav-logo" href={homeHref} aria-label={logoAlt}>
-        {logoSrc ? <img src={logoSrc} alt={logoAlt} /> : <span>cleartax</span>}
-      </a>
+        <div class="hidden lg:flex items-center gap-6">
+          <ul class="flex items-center list-none m-0 p-0" data-nav-menu>
+            {
+              links.map((l) => (
+                <li class:list={["relative group/item", l.dropdown && "has-dropdown"]}>
+                  {l.dropdown ? (
+                    <>
+                      <button
+                        type="button"
+                        data-nav-trigger
+                        class="flex items-center gap-2 text-sm font-medium text-vault-navy px-5 py-3.5 rounded-lg whitespace-nowrap bg-transparent border-0 cursor-pointer font-[inherit] transition-colors hover:bg-slate-50"
+                      >
+                        {l.label}
+                        <svg
+                          class="shrink-0 transition-transform duration-200 group-[.active]/item:rotate-180"
+                          width="20"
+                          height="20"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          stroke-width="2"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                        >
+                          <path d="m6 9 6 6 6-6" />
+                        </svg>
+                      </button>
+                      <div
+                        class:list={[
+                          "absolute top-full left-0 translate-y-2.5 mt-2.5 bg-white rounded-xl shadow-[0_12px_40px_rgba(0,0,0,0.12)] py-2 opacity-0 invisible transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] z-[1001] group-[.active]/item:opacity-100 group-[.active]/item:visible",
+                          l.label === "Country" ? "grid grid-cols-2 w-90" : "min-w-50 max-w-70",
+                        ]}
+                      >
+                        {l.dropdown.map((d) => (
+                          <a
+                            href={d.href}
+                            target={l.label === "Country" ? "_blank" : undefined}
+                            rel={l.label === "Country" ? "noopener noreferrer" : undefined}
+                            class="block px-5 py-2.5 text-sm font-medium text-vault-navy no-underline transition-colors hover:bg-slate-50 hover:text-nova-blue"
+                          >
+                            {d.label}
+                          </a>
+                        ))}
+                      </div>
+                    </>
+                  ) : (
+                    <a
+                      href={l.href}
+                      class="inline-flex items-center text-sm font-medium text-vault-navy px-5 py-3.5 rounded-lg whitespace-nowrap no-underline transition-colors hover:bg-slate-50"
+                    >
+                      {l.label}
+                    </a>
+                  )}
+                </li>
+              ))
+            }
+          </ul>
 
-      <nav class="rb-nav-links" aria-label="Primary">
-        {links.map((l, i) => (
-          l.dropdown ? (
-            <div class="rb-nav-item">
-              <button
-                class="rb-nav-trigger"
-                type="button"
-                aria-expanded="false"
-                aria-controls={`${idPrefix}-menu-${i}`}
-              >
-                {l.label}<span class="rb-nav-caret" aria-hidden="true"></span>
-              </button>
-              <div class="rb-nav-drop" id={`${idPrefix}-menu-${i}`}>
-                {l.dropdown.map((d) => <a href={d.href}>{d.label}</a>)}
-              </div>
-            </div>
-          ) : (
-            <a class="rb-nav-item" href={l.href}>{l.label}</a>
-          )
-        ))}
-      </nav>
-
-      {countries.length > 0 && (
-        <div class="rb-nav-item rb-nav-country">
-          <button
-            class="rb-nav-trigger"
-            type="button"
-            aria-expanded="false"
-            aria-controls={`${idPrefix}-country`}
+          <a
+            href="javascript:void(0)" onclick="document.getElementById('contactForm').scrollIntoView({behavior:'smooth'})"
+            class="inline-flex items-center gap-2 px-5 py-3.5 text-base font-medium text-nova-50 bg-nova-blue rounded-lg whitespace-nowrap no-underline shadow-[0px_2px_3px_rgba(16,24,40,0.06)] transition-opacity duration-200 hover:opacity-90"
           >
-            <span class="rb-nav-globe" aria-hidden="true"></span>
-            {countryLabel}<span class="rb-nav-caret" aria-hidden="true"></span>
-          </button>
-          <div class="rb-nav-drop rb-nav-drop-wide" id={`${idPrefix}-country`}>
-            {countries.map((c) => (
-              <a href={c.href}>
-                <img src={c.flag} alt="" loading="lazy" />
-                <span>
-                  {c.name}
-                  {c.lang && <em>{c.lang}</em>}
-                </span>
-              </a>
-            ))}
-          </div>
+            Book a demo
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+              <path
+                d="M4 10h12M11 5l5 5-5 5"
+                stroke="var(--palette-nova-50)"
+                stroke-width="1.5"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+            </svg>
+          </a>
         </div>
-      )}
 
-      <a class="rb-nav-cta" href={ctaHref}>
-        {ctaLabel}<span class="rb-arrow" aria-hidden="true">\u2192</span>
+        <button
+          type="button"
+          data-mobile-toggle
+          aria-label="Toggle menu"
+          aria-expanded="false"
+          class="group/toggle lg:hidden relative w-10 h-10 mr-1 bg-transparent border-0 cursor-pointer p-2"
+        >
+          <span class="block absolute left-[9px] top-[13px] w-[22px] h-0.5 bg-vault-navy rounded-sm transition-all duration-300 group-[.open]/toggle:top-[19px] group-[.open]/toggle:rotate-45" />
+          <span class="block absolute left-[9px] top-[19px] w-[22px] h-0.5 bg-vault-navy rounded-sm transition-opacity duration-200 group-[.open]/toggle:opacity-0" />
+          <span class="block absolute left-[9px] top-[25px] w-[22px] h-0.5 bg-vault-navy rounded-sm transition-all duration-300 group-[.open]/toggle:top-[19px] group-[.open]/toggle:-rotate-45" />
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Mobile menu -->
+  <div
+    class="lg:hidden fixed inset-0 z-[1100] bg-white translate-x-full pointer-events-none transition-transform duration-400 ease-[cubic-bezier(0.16,1,0.3,1)] [&.open]:translate-x-0 [&.open]:pointer-events-auto flex flex-col"
+    data-mobile-menu
+    aria-hidden="true"
+  >
+    <div class="flex items-center justify-between px-5 py-4 border-b border-neutral-100">
+      <a href="/" class="flex items-center shrink-0">
+        <img
+          src="https://cdn.prod.website-files.com/6093bce33d9b4bae841b04e3/69dfcff6071b983201f5f097_logo-cleartax.svg"
+          alt="ClearTax"
+          class="h-6 w-auto"
+          width="112"
+          height="24"
+          loading="eager"
+          decoding="async"
+        />
       </a>
-
-      <button class="rb-nav-toggle" type="button" aria-expanded="false" aria-controls={`${idPrefix}-mobile`} aria-label="Open menu">
-        <span aria-hidden="true"></span>
+      <button
+        type="button"
+        data-mobile-close
+        aria-label="Close menu"
+        class="inline-flex items-center justify-center w-10 h-10 rounded-full bg-transparent border-0 cursor-pointer text-vault-navy hover:bg-slate-50 transition-colors"
+      >
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M18 6 6 18" />
+          <path d="m6 6 12 12" />
+        </svg>
       </button>
     </div>
 
-    <div class="rb-nav-menu" id={`${idPrefix}-mobile`} hidden>
-      {links.map((l) => (
-        l.dropdown
-          ? l.dropdown.map((d) => <a href={d.href}>{d.label}</a>)
-          : <a href={l.href}>{l.label}</a>
-      ))}
-      <a class="rb-nav-cta" href={ctaHref}>{ctaLabel}</a>
+    <ul class="flex-1 overflow-y-auto flex flex-col gap-1 list-none m-0 px-4 py-4">
+      {
+        links.map((l) => (
+          <li class:list={["relative group/mitem", l.dropdown && "has-dropdown-m"]}>
+            {l.dropdown ? (
+              <>
+                <button
+                  type="button"
+                  data-m-trigger
+                  class="flex items-center justify-between w-full gap-1.5 text-base font-medium text-vault-navy px-4 py-3.5 whitespace-nowrap bg-transparent border-0 cursor-pointer font-[inherit] rounded-xl hover:bg-slate-50"
+                >
+                  <span>{l.label}</span>
+                  <svg class="shrink-0 transition-transform duration-300 group-[.active]/mitem:rotate-180" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="m6 9 6 6 6-6" />
+                  </svg>
+                </button>
+                <div class="grid grid-rows-[0fr] group-[.active]/mitem:grid-rows-[1fr] transition-[grid-template-rows] duration-300 ease-out">
+                  <div class="overflow-hidden">
+                    <div class="pl-3 pt-1 pb-2 flex flex-col">
+                      {l.dropdown.map((d) => (
+                        <a
+                          href={d.href}
+                          target={l.label === "Country" ? "_blank" : undefined}
+                          rel={l.label === "Country" ? "noopener noreferrer" : undefined}
+                          class="block px-4 py-2.5 text-sm font-medium text-vault-navy rounded-lg no-underline hover:bg-slate-50 hover:text-nova-blue"
+                        >
+                          {d.label}
+                        </a>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </>
+            ) : (
+              <a href={l.href} class="block px-4 py-3.5 text-base font-medium text-vault-navy rounded-xl no-underline hover:bg-slate-50">
+                {l.label}
+              </a>
+            )}
+          </li>
+        ))
+      }
+    </ul>
+
+    <div class="px-5 py-4 border-t border-neutral-100">
+      <a
+        href="javascript:void(0)"
+        onclick="scrollToGiwipRegister(event)"
+        class="inline-flex items-center justify-center w-full gap-2 px-5 py-3.5 text-base font-medium text-nova-50 bg-nova-blue rounded-lg no-underline transition-opacity duration-200 hover:opacity-90"
+      >
+        Book a demo
+        <svg width="18" height="18" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+          <path d="M4 10h12M11 5l5 5-5 5" stroke="var(--palette-nova-50)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        </svg>
+      </a>
     </div>
   </div>
-</header>
-
-<style is:global>
-  .rb-nav {
-    position: absolute;
-    inset-inline: 0;
-    top: var(--spacing-x-big);
-    z-index: 50;
-  }
-
-  .rb-nav-bar {
-    display: flex;
-    align-items: center;
-    gap: var(--spacing-x-big);
-    min-height: 64px;
-    padding-inline: var(--spacing-x-big);
-    border-radius: 999px;
-    border: 1px solid var(--color-border);
-    background: var(--palette-generic-00);
-    box-shadow: 0 1px 2px rgb(5 2 42 / 0.04);
-  }
-
-  .rb-nav-logo {
-    font-family: var(--font-heading);
-    font-size: var(--fs-h6);
-    font-weight: var(--font-weight-bold);
-    letter-spacing: var(--tracking-heading);
-    color: var(--color-text);
-  }
-
-  .rb-nav-logo img { height: 26px; width: auto; display: block; }
-
-  .rb-nav-links {
-    display: flex;
-    align-items: center;
-    gap: var(--spacing-x-big);
-    margin-inline-start: auto;
-  }
-
-  .rb-nav-item {
-    position: relative;
-    font-size: var(--fs-label);
-    line-height: var(--lh-label);
-    font-weight: var(--font-weight-medium);
-    color: var(--color-text);
-  }
-
-  .rb-nav-item:hover,
-  .rb-nav-trigger:hover { color: var(--color-nova-blue); }
-
-  .rb-nav-trigger {
-    display: inline-flex;
-    align-items: center;
-    gap: var(--spacing-xx-sm);
-    padding: 0;
-    border: 0;
-    background: none;
-    cursor: pointer;
-    font: inherit;
-    color: inherit;
-  }
-
-  .rb-nav-caret {
-    width: 6px;
-    height: 6px;
-    border-right: 1.5px solid currentColor;
-    border-bottom: 1.5px solid currentColor;
-    transform: translateY(-2px) rotate(45deg);
-    transition: transform var(--transition-fast);
-  }
-
-  .rb-nav-trigger[aria-expanded='true'] .rb-nav-caret { transform: translateY(1px) rotate(225deg); }
-
-  .rb-nav-globe {
-    width: 14px;
-    height: 14px;
-    border-radius: 50%;
-    border: 1.5px solid currentColor;
-  }
-
-  .rb-nav-drop {
-    position: absolute;
-    inset-inline-start: 0;
-    top: calc(100% + var(--spacing-sm));
-    display: none;
-    flex-direction: column;
-    min-width: 220px;
-    padding: var(--spacing-x-sm);
-    border: 1px solid var(--color-border);
-    border-radius: 12px;
-    background: var(--palette-generic-00);
-    box-shadow: 0 8px 24px rgb(5 2 42 / 0.08);
-  }
-
-  .rb-nav-drop.is-open { display: flex; }
-
-  .rb-nav-drop a {
-    padding: var(--spacing-x-sm) var(--spacing-sm);
-    border-radius: 8px;
-    font-size: var(--fs-label);
-    color: var(--color-text);
-    white-space: nowrap;
-  }
-
-  .rb-nav-drop a:hover { background: var(--color-surface); color: var(--color-nova-blue); }
-
-  .rb-nav-country { margin-inline-start: 0; }
-
-  .rb-nav-drop-wide {
-    inset-inline-start: auto;
-    inset-inline-end: 0;
-    display: none;
-    min-width: 460px;
-    max-height: 60vh;
-    overflow-y: auto;
-  }
-
-  .rb-nav-drop-wide.is-open {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: var(--spacing-xx-sm);
-  }
-
-  .rb-nav-drop-wide a {
-    display: flex;
-    align-items: center;
-    gap: var(--spacing-x-sm);
-  }
-
-  .rb-nav-drop-wide img { width: 20px; height: 14px; object-fit: cover; border-radius: 2px; }
-
-  .rb-nav-drop-wide em {
-    display: block;
-    font-style: normal;
-    font-size: var(--fs-label-xs);
-    color: var(--color-text-muted);
-  }
-
-  .rb-nav-cta {
-    display: inline-flex;
-    align-items: center;
-    gap: var(--spacing-x-sm);
-    min-height: 40px;
-    padding-inline: var(--spacing-md);
-    border-radius: 999px;
-    background: var(--color-nova-blue);
-    color: var(--palette-generic-00);
-    font-size: var(--fs-label);
-    font-weight: var(--font-weight-semibold);
-    white-space: nowrap;
-  }
-
-  .rb-nav-cta:hover { background: var(--palette-nova-600); }
-
-  .rb-arrow { font-size: 0.9em; }
-
-  .rb-nav-toggle { display: none; }
-
-  @media (width < 1100px) {
-    .rb-nav-links,
-    .rb-nav-country,
-    .rb-nav-bar > .rb-nav-cta { display: none; }
-
-    .rb-nav-toggle {
-      display: block;
-      margin-inline-start: auto;
-      width: 40px;
-      height: 40px;
-      background: none;
-      border: 0;
-      cursor: pointer;
-    }
-
-    .rb-nav-toggle span,
-    .rb-nav-toggle span::before,
-    .rb-nav-toggle span::after {
-      display: block;
-      height: 2px;
-      background: var(--color-text);
-      content: '';
-    }
-
-    .rb-nav-toggle span::before { transform: translateY(-7px); }
-    .rb-nav-toggle span::after  { transform: translateY(5px); }
-
-    .rb-nav-menu {
-      display: flex;
-      flex-direction: column;
-      gap: var(--spacing-sm);
-      margin-top: var(--spacing-x-sm);
-      padding: var(--spacing-x-big);
-      border-radius: 20px;
-      border: 1px solid var(--color-border);
-      background: var(--palette-generic-00);
-      font-size: var(--fs-label);
-    }
-
-    .rb-nav-menu[hidden] { display: none; }
-  }
-</style>
+</div>
 
 <script is:inline>
   (function () {
-    document.querySelectorAll('.rb-nav').forEach(function (nav) {
-      var triggers = nav.querySelectorAll('.rb-nav-trigger');
+    const navbar = document.querySelector("[data-giwip-nav-root]");
+    if (!navbar) return;
+    const mobileToggle = navbar.querySelector("[data-mobile-toggle]");
+    const mobileMenu = navbar.querySelector("[data-mobile-menu]");
+    const mobileClose = navbar.querySelector("[data-mobile-close]");
+    const dropdownItems = navbar.querySelectorAll(".has-dropdown");
+    const mDropdownItems = navbar.querySelectorAll(".has-dropdown-m");
 
-      function closeAll(except) {
-        triggers.forEach(function (t) {
-          if (t === except) return;
-          t.setAttribute('aria-expanded', 'false');
-          var d = document.getElementById(t.getAttribute('aria-controls'));
-          if (d) d.classList.remove('is-open');
-        });
+    let scrollLockCount = 0;
+    const lockScroll = () => {
+      scrollLockCount += 1;
+      if (scrollLockCount === 1) document.body.style.overflow = "hidden";
+    };
+    const unlockScroll = () => {
+      scrollLockCount = Math.max(0, scrollLockCount - 1);
+      if (scrollLockCount === 0) document.body.style.overflow = "";
+    };
+
+    window.scrollToGiwipRegister = (e) => {
+      if (e) e.preventDefault();
+      const registerEl =
+        document.getElementById("giwip-contact") ||
+        document.querySelector(".giwip-hs-form-wrap");
+      if (registerEl) {
+        registerEl.scrollIntoView({ behavior: "smooth" });
+      } else {
+        window.location.href = "https://www.cleartax.com/contact-us";
       }
+    };
 
-      triggers.forEach(function (t) {
-        t.addEventListener('click', function (e) {
-          e.stopPropagation();
-          var drop = document.getElementById(t.getAttribute('aria-controls'));
-          if (!drop) return;
-          var open = t.getAttribute('aria-expanded') === 'true';
-          closeAll(t);
-          t.setAttribute('aria-expanded', String(!open));
-          drop.classList.toggle('is-open', !open);
-        });
+    const setMenuOpen = (open) => {
+      if (!mobileMenu) return;
+      const wasOpen = mobileMenu.classList.contains("open");
+      if (open === wasOpen) return;
+      mobileMenu.classList.toggle("open", open);
+      mobileMenu.setAttribute("aria-hidden", open ? "false" : "true");
+      mobileToggle?.classList.toggle("open", open);
+      mobileToggle?.setAttribute("aria-expanded", open ? "true" : "false");
+      if (open) lockScroll();
+      else unlockScroll();
+    };
+
+    dropdownItems.forEach((item) => {
+      const btn = item.querySelector("[data-nav-trigger]");
+      if (!btn) return;
+      btn.addEventListener("click", (e) => {
+        e.preventDefault();
+        const isActive = item.classList.contains("active");
+        dropdownItems.forEach((i) => i.classList.remove("active"));
+        item.classList.toggle("active", !isActive);
       });
+    });
 
-      document.addEventListener('click', function (e) {
-        if (!nav.contains(e.target)) closeAll(null);
+    mDropdownItems.forEach((item) => {
+      const btn = item.querySelector("[data-m-trigger]");
+      if (!btn) return;
+      btn.addEventListener("click", (e) => {
+        e.preventDefault();
+        item.classList.toggle("active");
       });
+    });
 
-      document.addEventListener('keydown', function (e) {
-        if (e.key === 'Escape') closeAll(null);
-      });
-
-      var toggle = nav.querySelector('.rb-nav-toggle');
-      var menu = toggle && document.getElementById(toggle.getAttribute('aria-controls'));
-      if (toggle && menu) {
-        toggle.addEventListener('click', function () {
-          var open = toggle.getAttribute('aria-expanded') === 'true';
-          toggle.setAttribute('aria-expanded', String(!open));
-          toggle.setAttribute('aria-label', open ? 'Open menu' : 'Close menu');
-          menu.hidden = open;
-        });
+    document.addEventListener("click", (e) => {
+      if (!e.target.closest(".has-dropdown")) {
+        dropdownItems.forEach((item) => item.classList.remove("active"));
       }
+    });
+
+    mobileToggle?.addEventListener("click", () => {
+      setMenuOpen(!mobileMenu?.classList.contains("open"));
+    });
+    mobileClose?.addEventListener("click", () => setMenuOpen(false));
+
+    mobileMenu?.addEventListener("click", (e) => {
+      const link = e.target.closest("a[href]");
+      if (!link) return;
+      setMenuOpen(false);
+    });
+
+    document.addEventListener("keydown", (e) => {
+      if (e.key !== "Escape") return;
+      dropdownItems.forEach((item) => item.classList.remove("active"));
+      setMenuOpen(false);
     });
   })();
 </script>

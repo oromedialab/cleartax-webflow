@@ -1,94 +1,150 @@
 ---
 /**
- * Footer — brand v2 primitive. Figma "Container - Footer": light ground, links
- * left, wordmark right, then a divider with copyright and legal links.
- *
- * TAKES PROPS AND IS NEVER PASTED DIRECTLY — the paste unit is a per-page
- * wrapper (<page>/Footer.astro) that supplies the content.
+ * global-invoicing-wip footer — light theme per Figma (node 12239:15601),
+ * distinct from the dark _shared/Footer.astro used elsewhere on the site.
  */
+interface LinkItem {
+  label: string;
+  href: string;
+}
+interface LinkBlock {
+  title: string;
+  items: LinkItem[];
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 interface Props {
-  links?: { label: string; href: string }[];
-  legal?: { label: string; href: string }[];
-  copyright?: string;
-  logoSrc?: string;
-  logoAlt?: string;
+  companyLinks?: LinkItem[];
+  socialLinks?: LinkItem[];
+  productLinks?: LinkItem[];
+  resourceLinks?: LinkItem[];
+  toolLinks?: LinkItem[];
+  regionGroups?: LinkBlock[];
+  complianceBadges?: LinkItem[];
 }
 
 const {
-  links = [],
-  legal = [],
-  copyright = '© 2026 ClearTax Pvt. Ltd. All rights reserved',
-  logoSrc = '',
-  logoAlt = 'cleartax',
+  companyLinks = [],
+  socialLinks = [],
+  productLinks = [],
+  resourceLinks = [],
+  toolLinks = [],
+  regionGroups = [],
+  complianceBadges = [],
 } = Astro.props;
+
 ---
 
-<footer class="rb-footer">
-  <div class="container">
-    <div class="rb-footer-top">
-      <nav class="rb-footer-links" aria-label="Footer">
-        {links.map((l) => <a href={l.href}>{l.label}</a>)}
-      </nav>
-      <div class="rb-footer-logo">
-        {logoSrc ? <img src={logoSrc} alt={logoAlt} /> : <span>cleartax</span>}
+<footer class="bg-white border-t border-neutral-300">
+  <div class="max-w-[var(--container-max)] mx-auto flex flex-col gap-12 py-12 px-8">
+    <div class="grid grid-cols-1 md:grid-cols-3 xl:grid-cols-5 gap-x-12.5 gap-y-10">
+      <!-- Company + Social -->
+      <div class="flex flex-col gap-6 w-40">
+        <div class="flex flex-col gap-4">
+          <p class="m-0 text-sm font-medium text-vault-navy">Company</p>
+          <div class="flex flex-col gap-3">
+            {companyLinks.map((it) => (
+              <a href={it.href} class="text-sm font-medium text-neutral-500 no-underline hover:text-vault-navy transition-colors">
+                {it.label}
+              </a>
+            ))}
+          </div>
+        </div>
+        <div class="flex flex-col gap-4">
+          <p class="m-0 text-sm font-medium text-vault-navy">Social</p>
+          <div class="flex flex-col gap-3">
+            {socialLinks.map((it) => (
+              <a href={it.href} target="_blank" rel="noopener noreferrer" class="text-sm font-medium text-neutral-500 no-underline hover:text-vault-navy transition-colors">
+                {it.label}
+              </a>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      <!-- Product -->
+      <div class="flex flex-col gap-4 w-65">
+        <p class="m-0 text-sm font-medium text-vault-navy">Product</p>
+        <div class="flex flex-col gap-3">
+          {productLinks.map((it) => (
+            <a href={it.href} class="text-sm font-medium text-neutral-500 no-underline hover:text-vault-navy transition-colors">
+              {it.label}
+            </a>
+          ))}
+        </div>
+      </div>
+
+      <!-- Resources & Guides -->
+      <div class="flex flex-col gap-4 w-59">
+        <p class="m-0 text-sm font-medium text-vault-navy">Resources &amp; Guides</p>
+        <div class="flex flex-col gap-3">
+          {resourceLinks.map((it) => (
+            <a href={it.href} class="text-sm font-medium text-neutral-500 no-underline hover:text-vault-navy transition-colors">
+              {it.label}
+            </a>
+          ))}
+        </div>
+      </div>
+
+      <!-- Tools -->
+      <div class="flex flex-col gap-4 w-48.75">
+        <p class="m-0 text-sm font-medium text-vault-navy">Tools</p>
+        <div class="flex flex-col gap-3">
+          {toolLinks.map((it) => (
+            <a href={it.href} class="text-sm font-medium text-neutral-500 no-underline hover:text-vault-navy transition-colors">
+              {it.label}
+            </a>
+          ))}
+        </div>
+      </div>
+
+      <!-- Region groups -->
+      <div class="flex flex-col gap-6">
+        {regionGroups.map((group) => (
+          <div class="flex flex-col gap-4 w-39.5">
+            <p class="m-0 text-sm font-medium text-vault-navy">{group.title}</p>
+            <div class="flex flex-col gap-3">
+              {group.items.map((it) => (
+                <a href={it.href} class="text-sm font-medium text-neutral-500 no-underline hover:text-vault-navy transition-colors">
+                  {it.label}
+                </a>
+              ))}
+            </div>
+          </div>
+        ))}
       </div>
     </div>
 
-    <div class="rb-footer-bottom">
-      <p>{copyright}</p>
-      <nav class="rb-footer-legal" aria-label="Legal">
-        {legal.map((l) => <a href={l.href}>{l.label}</a>)}
-      </nav>
+    <!-- Bottom bar -->
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6 border-t border-neutral-200 pt-6">
+      <div class="flex flex-col gap-4">
+        <div class="flex items-center gap-3">
+          <a href="https://www.cleartax.com/s/legal" class="text-sm font-medium text-neutral-500 no-underline hover:text-vault-navy transition-colors">Legal</a>
+          <a href="https://www.cleartax.com/meta/privacy" class="text-sm font-medium text-neutral-500 no-underline hover:text-vault-navy transition-colors">Privacy Policy</a>
+        </div>
+        <p class="m-0 text-sm text-neutral-500">ClearTax is a product by Defmacro Software Pvt. Ltd.</p>
+      </div>
+      <div class="flex flex-col items-start sm:items-end gap-3">
+        <div class="flex items-center gap-2.5">
+          {complianceBadges.map((b) => (
+            <img src={b.src} alt={b.alt} class="w-12 h-12 object-contain" loading="lazy" decoding="async" />
+          ))}
+        </div>
+        <p class="m-0 text-sm text-neutral-500">Your data security and privacy matter most to us.</p>
+      </div>
     </div>
   </div>
 </footer>
-
-<style is:global>
-  .rb-footer {
-    background: var(--color-surface);
-    color: var(--color-text);
-    border-top: 1px solid var(--color-border);
-    padding-block: var(--spacing-lg) var(--spacing-x-big);
-  }
-
-  .rb-footer-top,
-  .rb-footer-bottom {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    justify-content: space-between;
-    gap: var(--spacing-md);
-  }
-
-  .rb-footer-bottom {
-    margin-top: var(--spacing-xxx-big);
-    padding-top: var(--spacing-md);
-    border-top: 1px solid var(--color-border);
-    font-size: var(--fs-body-sm);
-    line-height: var(--lh-body-sm);
-    color: var(--color-text-muted);
-  }
-
-  .rb-footer-links,
-  .rb-footer-legal {
-    display: flex;
-    flex-wrap: wrap;
-    gap: var(--spacing-xxx-big);
-    font-size: var(--fs-label);
-    font-weight: var(--font-weight-medium);
-  }
-
-  .rb-footer-legal { font-size: var(--fs-body-sm); }
-
-  .rb-footer-links a:hover,
-  .rb-footer-legal a:hover { color: var(--color-nova-blue); }
-
-  .rb-footer-logo {
-    font-family: var(--font-heading);
-    font-size: var(--fs-h3);
-    font-weight: var(--font-weight-bold);
-    letter-spacing: var(--tracking-heading);
-  }
-
-  .rb-footer-logo img { height: 36px; width: auto; }
-</style>

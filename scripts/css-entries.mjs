@@ -7,7 +7,7 @@
  * when a page's frontmatter changes).
  */
 import { readFileSync, writeFileSync, mkdirSync } from 'node:fs';
-import { resolve } from 'node:path';
+import { resolve, dirname } from 'node:path';
 
 /**
  * Per-page Tailwind targets. Each entry produces public/css/<name>.css and
@@ -83,18 +83,55 @@ export function sectionBundleMap(root) {
   return { folders, shared };
 }
 
+const RELATIVE_ASTRO_IMPORT = /import\s+[A-Z][A-Za-z0-9]*\s+from\s+['"](\.[^'"]+\.astro)['"]/g;
+
+// Matches a _shared import from ANY depth. The page says
+// '../sections/_shared/X.astro'; a wrapper inside src/sections/<page>/ says
+// '../_shared/X.astro'. SHARED_IMPORT_RE only matches the first form, which is
+// why the recursion below needs its own path-agnostic pattern.
+const ANY_SHARED_IMPORT = /import\s+[A-Z][A-Za-z0-9]*\s+from\s+['"][^'"]*_shared\/([A-Za-z0-9_-]+)\.astro['"]/g;
+
 /**
- * Parse a page astro file's frontmatter for `_shared` component imports.
- * Returns deduped component names (e.g. ['NavbarGlobalV2', 'Footer']).
+ * Parse a page for `_shared` component imports, following section imports
+ * transitively. Returns deduped component names (e.g. ['NavbarRb', 'Footer']).
+ *
+ * The recursion matters. A page may not import a `_shared` primitive directly —
+ * the reuse pattern is a thin per-page wrapper section that imports it:
+ *
+ *   page  ->  <page>/Navbar.astro  ->  _shared/NavbarRb.astro
+ *
+ * Scanning only the page's own frontmatter misses the primitive entirely, so
+ * Tailwind never sees its markup and silently omits every utility used only
+ * inside it. That failure is invisible at build time and shows up as a section
+ * rendering unstyled — e.g. a navbar whose dropdowns are permanently open
+ * because `opacity-0` / `invisible` were never emitted.
+ *
+ * Cycle-safe and depth-limited.
  */
-export function discoverSharedSources(pagePath, root) {
-  const src = readFileSync(resolve(root, pagePath), 'utf8');
+export function discoverSharedSources(pagePath, root, seen = new Set(), depth = 0) {
+  const abs = resolve(root, pagePath);
+  if (seen.has(abs) || depth > 4) return [];
+  seen.add(abs);
+
+  let src;
+  try { src = readFileSync(abs, 'utf8'); } catch { return []; }
   const parts = src.split('---');
   const frontmatter = parts.length > 2 ? parts[1] : '';
+
   const names = new Set();
-  SHARED_IMPORT_RE.lastIndex = 0;
+
+  ANY_SHARED_IMPORT.lastIndex = 0;
   let m;
-  while ((m = SHARED_IMPORT_RE.exec(frontmatter)) !== null) names.add(m[1]);
+  while ((m = ANY_SHARED_IMPORT.exec(frontmatter)) !== null) names.add(m[1]);
+
+  // Follow every relative .astro import (wrappers, nested sections) and merge
+  // whatever `_shared` components they pull in.
+  RELATIVE_ASTRO_IMPORT.lastIndex = 0;
+  while ((m = RELATIVE_ASTRO_IMPORT.exec(frontmatter)) !== null) {
+    const dep = resolve(dirname(abs), m[1]);
+    for (const n of discoverSharedSources(dep, root, seen, depth + 1)) names.add(n);
+  }
+
   return Array.from(names);
 }
 

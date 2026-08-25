@@ -1,101 +1,55 @@
 ---
 /**
- * Testimonials — Figma "Trusted by industry leaders across the world".
- * Three cards in view on the shared .gi-rail, the rest scrolling past.
+ * Testimonials for the Global Invoicing page — the paste unit.
+ *
+ * Structure, styling and behaviour live in `_shared/TestimonialsRb.astro`;
+ * this file owns the content. Props must be supplied here, inside a section
+ * file, because the embed route renders sections with no props.
+ *
+ * Content carried over verbatim from the team's v1-global-invoicing-wip page.
  */
-interface Props {
-  heading?: string;
-  testimonials?: { quote: string; name: string; role: string; logo?: string; logoAlt?: string }[];
-}
+import TestimonialsRb from '../_shared/TestimonialsRb.astro';
 
-const {
-  heading = 'Trusted by industry leaders across the world',
-  testimonials = [
-    { quote: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse varius enim in eros.', name: 'Abdulbary Atassi', role: 'DIRECTOR OF IT, Zamil Industrial (KSA) — Saudi Arabia' },
-    { quote: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse varius enim in eros.', name: 'Abdulbary Atassi', role: 'DIRECTOR OF IT, Zamil Industrial (KSA) — Saudi Arabia' },
-    { quote: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse varius enim in eros.', name: 'Abdulbary Atassi', role: 'DIRECTOR OF IT, Zamil Industrial (KSA) — Saudi Arabia' },
-  ],
-} = Astro.props;
+const Leaders = [
+    {
+        img: 'https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6a8c38e1ba10b568d7349d1c_Logo-1.png',
+        desc: "ClearTax has transformed the way we handle GST compliance. Real-time creation of e-Invoices and e-Way bills plays a significant role in providing us with critical insight into our business.",
+        name: "Pratush Kumar",
+        role: "DGM-IT, JK Tyre",
+        place: "India"
+    },
+    {
+        img: 'https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6a8c38e8493b8aa05903e536_Logo-2.png',
+        desc: "ClearTax is simplifying e-Invoicing They enabled us to implement the e-Invoicing system in time and handled all our business complexities with ease. Thank you for the effort and good job!",
+        name: "Raj Kiran",
+        role: "Head, Taxation & Retail Finance, Puma",
+        place: "India"
+    },
+    {
+        img: 'https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6a8c38eeb29d8c48e4fac8f1_Logo-3.png',
+        desc: "We appreciate ClearTax for successfully completing the complex ZATCA E-Invoicing Phase II Integration project. Their platform enabled seamless management of multiple business units. Kudos to the team for their timely delivery.",
+        name: "Abdulbary Atassi",
+        role: "DIRECTOR OF IT, Zamil Industrial",
+        place: "Saudi Arabia"
+    },
+    {
+        img: 'https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6a8d25ef944ad3a1f9ed2d7f_Logo-4.png',
+        desc: "Collaborating with ClearTax was an exceptional experience. They streamlined the entire process, even under tight deadlines, worked closely to address the unique challenges of e-invoice integration with our diverse ERP systems.",
+        name: "V Bharathy",
+        role: "Manager, Finance Applications, Gamuda Land",
+        place: "Malaysia"
+    },
+    {
+        img: 'https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6a8d25ef2309578fd6d29736_Logo-5.png',
+        desc: "Salam's search for a reliable partner ended with ClearTax. Their tailored solutions ensured a smooth transition for all 8 of our systems in just 3 months.",
+        name: "Arslan Choudhary",
+        role: "Director of Enterprise Enablement, Salam Telco",
+        place: "Saudi Arabia"
+    }
+];
+
 ---
 
-<section class="gi-testimonials">
-  <div class="container">
-    <div class="gi-section-head">
-      <h2 class="gi-h2">{heading}</h2>
-    </div>
-  </div>
-
-  <div class="gi-rail gi-testimonials-rail">
-    <ul class="gi-rail-track">
-      {testimonials.map((t) => (
-        <li class="gi-tcard">
-          <span class="gi-tcard-logo" aria-hidden="true">
-            {t.logo && <img src={t.logo} alt={t.logoAlt ?? ''} loading="lazy" />}
-          </span>
-          <blockquote class="gi-tcard-quote">{t.quote}</blockquote>
-          <div>
-            <p class="gi-tcard-name">{t.name}</p>
-            <p class="gi-tcard-role">{t.role}</p>
-          </div>
-        </li>
-      ))}
-    </ul>
-  </div>
-</section>
-
-<style is:global>
-  .gi-testimonials {
-    background: var(--color-surface);
-    border-top: 1px solid var(--color-border);
-    padding-block: var(--spacing-xxx-lg);
-  }
-
-  .gi-testimonials-rail { margin-top: var(--spacing-lg); }
-
-  .gi-tcard {
-    scroll-snap-align: start;
-    flex: 0 0 400px;
-    max-width: 85vw;
-    display: flex;
-    flex-direction: column;
-    gap: var(--spacing-md);
-    padding: var(--spacing-x-big);
-    border: 1px solid var(--color-border);
-    border-radius: 12px;
-    background: var(--palette-generic-00);
-  }
-
-  .gi-tcard-logo {
-    display: grid;
-    place-items: center;
-    width: 44px;
-    height: 44px;
-    border-radius: 8px;
-    background: var(--palette-ledger-200);
-  }
-
-  .gi-tcard-logo img { max-width: 28px; height: auto; }
-
-  .gi-tcard-quote {
-    flex: 1;
-    font-size: var(--fs-body-sm);
-    line-height: var(--lh-body-sm);
-    color: var(--color-text-muted);
-  }
-
-  .gi-tcard-name {
-    font-size: var(--fs-label);
-    line-height: var(--lh-label);
-    font-weight: var(--font-weight-semibold);
-    color: var(--color-text);
-  }
-
-  .gi-tcard-role {
-    margin-top: var(--spacing-xx-sm);
-    font-size: var(--fs-label-xs);
-    line-height: var(--lh-label-xs);
-    letter-spacing: var(--tracking-overline);
-    text-transform: uppercase;
-    color: var(--color-text-muted);
-  }
-</style>
+<TestimonialsRb
+  Leaders={Leaders}
+/>
