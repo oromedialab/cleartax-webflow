@@ -1,0 +1,151 @@
+---
+/**
+ * Search / Topic / Country filter bar — Figma node 12289:26922.
+ *
+ * Markup only. The filtering logic lives in `Articles.astro`, which owns the
+ * card grid, and reaches these controls through the `data-blog-*` hooks below
+ * using document-level delegation — so it does not matter which Embed element
+ * Webflow renders first.
+ *
+ * The two option lists must stay in sync with the `topic` / `country` values in
+ * `Articles.astro`. They are duplicated rather than shared because each section
+ * is pasted into Webflow as an independent Embed and cannot import from a
+ * sibling at runtime.
+ */
+const topics: string[] = [
+  'E-Invoicing',
+  'Compliance',
+  'ERP Integration',
+  'Tax Technology',
+  'Product',
+];
+
+const countries: string[] = [
+  'Global',
+  'UAE',
+  'Saudi Arabia',
+  'Malaysia',
+  'France',
+  'Germany',
+  'Poland',
+  'Singapore',
+];
+
+const fieldClass =
+  'h-10 w-full rounded-lg border border-neutral-200 bg-generic-00 px-3 py-2 font-body font-normal text-[length:var(--fs-label)] leading-[var(--lh-label)] text-neutral-900 shadow-[0px_1px_2px_0px_rgba(16,24,40,0.04)] outline-none transition-colors duration-150 placeholder:text-neutral-400 focus:border-nova-blue';
+
+const labelClass =
+  'font-body font-medium text-[length:var(--fs-label)] leading-[var(--lh-label)] text-neutral-900';
+---
+
+<section
+  class="bg-generic-00 shadow-[0px_2px_6px_0px_rgba(16,24,40,0.06)] pt-12 pb-8 md:pt-20 md:pb-10"
+>
+  <div class="container">
+    <form
+      data-blog-filter
+      role="search"
+      aria-label="Filter articles"
+      class="flex flex-col items-stretch justify-center gap-6 md:flex-row md:flex-wrap md:items-end"
+    >
+      <!-- Search -->
+      <div class="flex w-full flex-col gap-2 md:w-[320px]">
+        <label class={labelClass} for="blog-filter-search">Search</label>
+        <input
+          id="blog-filter-search"
+          name="search"
+          type="search"
+          autocomplete="off"
+          placeholder="Enter"
+          data-blog-search
+          class={fieldClass}
+        />
+      </div>
+
+      <!-- Topic -->
+      <div class="flex w-full flex-col gap-2 md:w-[300px]">
+        <label class={labelClass} for="blog-filter-topic">Topic</label>
+        <div class="relative">
+          <select
+            id="blog-filter-topic"
+            name="topic"
+            data-blog-topic
+            class={`${fieldClass} cursor-pointer appearance-none pr-10`}
+          >
+            <option value="">Select</option>
+            {topics.map((topic) => <option value={topic}>{topic}</option>)}
+          </select>
+          <svg
+            class="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-neutral-500"
+            width="20"
+            height="20"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            aria-hidden="true"
+            focusable="false"
+          >
+            <path d="m6 9 6 6 6-6"></path>
+          </svg>
+        </div>
+      </div>
+
+      <!-- Country -->
+      <div class="flex w-full flex-col gap-2 md:w-[300px]">
+        <label class={labelClass} for="blog-filter-country">Country</label>
+        <div class="relative">
+          <select
+            id="blog-filter-country"
+            name="country"
+            data-blog-country
+            class={`${fieldClass} cursor-pointer appearance-none pr-10`}
+          >
+            <option value="">Select</option>
+            {countries.map((country) => <option value={country}>{country}</option>)}
+          </select>
+          <svg
+            class="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-neutral-500"
+            width="20"
+            height="20"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            aria-hidden="true"
+            focusable="false"
+          >
+            <path d="m6 9 6 6 6-6"></path>
+          </svg>
+        </div>
+      </div>
+
+      <!-- Submit -->
+      <button
+        type="submit"
+        aria-label="Search articles"
+        class="flex h-10 w-10 shrink-0 items-center justify-center self-end rounded-lg border border-neutral-200 bg-generic-00 text-neutral-700 shadow-[0px_1px_2px_0px_rgba(16,24,40,0.04)] cursor-pointer transition-colors duration-150 hover:border-nova-blue hover:text-nova-blue max-md:w-full"
+      >
+        <svg
+          width="20"
+          height="20"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          aria-hidden="true"
+          focusable="false"
+        >
+          <circle cx="11" cy="11" r="7"></circle>
+          <path d="m20 20-3.5-3.5"></path>
+        </svg>
+      </button>
+    </form>
+  </div>
+</section>

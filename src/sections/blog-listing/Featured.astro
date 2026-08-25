@@ -1,0 +1,199 @@
+---
+/**
+ * Featured post + "Also for you" rail — Figma node 12289:26903.
+ *
+ * Content lives in this file, not in props: the embed route renders every
+ * section standalone with no props, so anything the page passed would be
+ * invisible in the pasted HTML. Edit the two arrays below to change the page.
+ *
+ * `image: ''` renders the Figma "Visual Placeholder" tint on its own, which is
+ * what the mockup shows. Drop in a Webflow asset URL to replace it — never a
+ * `data:` URI, that alone can blow the 50 KB Embed budget.
+ */
+interface Post {
+  title: string;
+  excerpt: string;
+  date: string;
+  href: string;
+  image: string;
+}
+
+const featured: Post = {
+  title: 'UAE Invoicing Readiness list',
+  excerpt: 'A practical framework to get ahead of the mandate',
+  date: 'July 12 2026',
+  href: 'https://www.cleartax.com/ae/e-invoicing-uae',
+  image: '',
+};
+
+const alsoForYou: Post[] = [
+  {
+    title: 'What ZATCA Phase II means for your ERP',
+    excerpt: 'Integration checkpoints every finance team should clear first',
+    date: 'July 12 2026',
+    href: 'https://www.cleartax.com/sa/ksa-einvoicing',
+    image: '',
+  },
+  {
+    title: 'France e-invoicing: the 2026 timeline',
+    excerpt: 'Who is in scope, when, and what Chorus Pro changes',
+    date: 'July 12 2026',
+    href: 'https://www.cleartax.com/fr/en/e-invoicing-france',
+    image: '',
+  },
+  {
+    title: 'Malaysia MyInvois beyond the first wave',
+    excerpt: 'Lessons from the enterprises that went live early',
+    date: 'July 12 2026',
+    href: 'https://www.cleartax.com/my/en/e-invoicing-malaysia',
+    image: '',
+  },
+  {
+    title: 'Germany B2B e-invoicing, explained',
+    excerpt: 'Preparing for a mandate that starts with receiving, not sending',
+    date: 'July 12 2026',
+    href: 'https://www.cleartax.com/de/en/e-invoicing-germany',
+    image: '',
+  },
+];
+---
+
+<section class="bg-generic-00 py-12 md:py-20">
+  <!-- Icon sprite: defined once, referenced by every card below. Keeps the
+       pasted Embed small — the calendar path alone is ~900 characters. -->
+  <svg width="0" height="0" class="absolute" aria-hidden="true" focusable="false">
+    <symbol id="ct-blog-featured-calendar" viewBox="0 0 20 20">
+      <path
+        d="M16.25 2.5H14.375V1.875C14.375 1.70924 14.3092 1.55027 14.1919 1.43306C14.0747 1.31585 13.9158 1.25 13.75 1.25C13.5842 1.25 13.4253 1.31585 13.3081 1.43306C13.1908 1.55027 13.125 1.70924 13.125 1.875V2.5H6.875V1.875C6.875 1.70924 6.80915 1.55027 6.69194 1.43306C6.57473 1.31585 6.41576 1.25 6.25 1.25C6.08424 1.25 5.92527 1.31585 5.80806 1.43306C5.69085 1.55027 5.625 1.70924 5.625 1.875V2.5H3.75C3.41848 2.5 3.10054 2.6317 2.86612 2.86612C2.6317 3.10054 2.5 3.41848 2.5 3.75V16.25C2.5 16.5815 2.6317 16.8995 2.86612 17.1339C3.10054 17.3683 3.41848 17.5 3.75 17.5H16.25C16.5815 17.5 16.8995 17.3683 17.1339 17.1339C17.3683 16.8995 17.5 16.5815 17.5 16.25V3.75C17.5 3.41848 17.3683 3.10054 17.1339 2.86612C16.8995 2.6317 16.5815 2.5 16.25 2.5ZM5.625 3.75V4.375C5.625 4.54076 5.69085 4.69973 5.80806 4.81694C5.92527 4.93415 6.08424 5 6.25 5C6.41576 5 6.57473 4.93415 6.69194 4.81694C6.80915 4.69973 6.875 4.54076 6.875 4.375V3.75H13.125V4.375C13.125 4.54076 13.1908 4.69973 13.3081 4.81694C13.4253 4.93415 13.5842 5 13.75 5C13.9158 5 14.0747 4.93415 14.1919 4.81694C14.3092 4.69973 14.375 4.54076 14.375 4.375V3.75H16.25V6.25H3.75V3.75H5.625ZM16.25 16.25H3.75V7.5H16.25V16.25Z"
+        fill="currentColor"></path>
+    </symbol>
+    <symbol id="ct-blog-featured-arrow" viewBox="0 0 24 24">
+      <path
+        fill-rule="evenodd"
+        clip-rule="evenodd"
+        d="M8.25 3.75L19.5 3.75C19.6989 3.75 19.8897 3.82902 20.0303 3.96967C20.171 4.11032 20.25 4.30109 20.25 4.5V15.75C20.25 16.1642 19.9142 16.5 19.5 16.5C19.0858 16.5 18.75 16.1642 18.75 15.75V6.31066L5.03033 20.0303C4.73744 20.3232 4.26256 20.3232 3.96967 20.0303C3.67678 19.7374 3.67678 19.2626 3.96967 18.9697L17.6893 5.25L8.25 5.25C7.83579 5.25 7.5 4.91421 7.5 4.5C7.5 4.08579 7.83579 3.75 8.25 3.75Z"
+        fill="currentColor"></path>
+    </symbol>
+  </svg>
+
+  <div class="container">
+    <!-- `items-start`: the two columns keep their own heights. Stretching the
+         card to match the rail is what Figma shows, but only because it drew
+         the rail with single-line titles — at real title lengths the rail runs
+         taller and the card grows a hole under the date (or, if the image
+         absorbs it, a portrait-shaped hero image). -->
+    <div class="grid grid-cols-1 items-start gap-8 lg:grid-cols-[786fr_461fr]">
+      <!-- Featured post -->
+      <a
+        href={featured.href}
+        class="group flex flex-col gap-6 rounded-xl border-2 border-ledger-200 bg-generic-00 p-6 no-underline transition-colors duration-200 hover:border-nova-blue"
+      >
+        <div class="relative aspect-video w-full overflow-hidden rounded-lg bg-visual-placeholder">
+          {
+            featured.image && (
+              <img
+                src={featured.image}
+                alt={featured.title}
+                width="1280"
+                height="720"
+                loading="eager"
+                decoding="async"
+                class="h-full w-full object-cover"
+              />
+            )
+          }
+          <span
+            class="absolute right-5 top-5 flex h-10 w-10 items-center justify-center rounded-lg bg-ledger-white text-vault-navy transition-colors duration-200 group-hover:bg-nova-blue group-hover:text-ledger-white"
+          >
+            <svg width="20" height="20" aria-hidden="true" focusable="false"
+              ><use href="#ct-blog-featured-arrow"></use></svg
+            >
+          </span>
+        </div>
+
+        <div class="flex flex-col gap-3">
+          <div class="flex flex-col gap-2">
+            <h2
+              class="font-heading font-medium text-vault-navy text-[length:var(--fs-h3)] leading-[var(--lh-h3)] tracking-[var(--tracking-heading)] m-0"
+            >
+              {featured.title}
+            </h2>
+            <p
+              class="font-body font-normal text-neutral-500 text-[length:var(--fs-body)] leading-[var(--lh-body)] m-0"
+            >
+              {featured.excerpt}
+            </p>
+          </div>
+          <p
+            class="flex items-center gap-2 font-body font-normal text-neutral-500 text-[length:var(--fs-body-sm)] leading-[var(--lh-body-sm)] m-0"
+          >
+            <svg width="20" height="20" class="shrink-0" aria-hidden="true" focusable="false"
+              ><use href="#ct-blog-featured-calendar"></use></svg
+            >
+            {featured.date}
+          </p>
+        </div>
+      </a>
+
+      <!-- Also for you -->
+      <div class="flex flex-col gap-8">
+        <h2
+          class="font-heading font-medium text-vault-navy text-[length:var(--fs-h5)] leading-[var(--lh-h5)] tracking-[var(--tracking-heading)] m-0"
+        >
+          Also for you
+        </h2>
+
+        <div class="flex flex-col gap-6">
+          {
+            alsoForYou.map((post) => (
+              <a
+                href={post.href}
+                class="group flex items-center gap-6 rounded-xl no-underline"
+              >
+                <span class="relative block w-[120px] shrink-0 overflow-hidden rounded-lg bg-visual-placeholder aspect-video sm:w-[160px] xl:w-[181px]">
+                  {post.image && (
+                    <img
+                      src={post.image}
+                      alt={post.title}
+                      width="1280"
+                      height="720"
+                      loading="lazy"
+                      decoding="async"
+                      class="h-full w-full object-cover"
+                    />
+                  )}
+                  {/* Revealed on hover/focus. The featured card carries the same
+                      badge permanently; on the rail it would compete with four
+                      thumbnails at once, so it only shows for the card in play. */}
+                  <span class="absolute left-1/2 top-1/2 flex h-8 w-8 -translate-x-1/2 -translate-y-1/2 scale-90 items-center justify-center text-vault-navy opacity-0 transition-all duration-200 group-hover:scale-100 group-hover:opacity-100 group-focus-visible:scale-100 group-focus-visible:opacity-100 sm:h-10 sm:w-10">
+                    <svg width="20" height="20" aria-hidden="true" focusable="false">
+                      <use href="#ct-blog-featured-arrow" />
+                    </svg>
+                  </span>
+                </span>
+
+                <span class="flex min-w-0 flex-1 flex-col gap-2">
+                  {/* Clamped: the rail column is narrow, and an unbounded
+                      third or fourth line on one card pushes the whole
+                      column out of step with the featured card beside it. */}
+                  <span class="line-clamp-2 font-body font-medium text-vault-navy text-[length:var(--fs-label-lg)] leading-[var(--lh-label-lg)] transition-colors duration-200 group-hover:text-nova-blue">
+                    {post.title}
+                  </span>
+                  <span class="line-clamp-2 font-body font-normal text-neutral-500 text-[length:var(--fs-body)] leading-[var(--lh-body)]">
+                    {post.excerpt}
+                  </span>
+                  <span class="flex items-center gap-2 font-body font-normal text-neutral-500 text-[length:var(--fs-body-sm)] leading-[var(--lh-body-sm)]">
+                    <svg width="20" height="20" class="shrink-0" aria-hidden="true" focusable="false">
+                      <use href="#ct-blog-featured-calendar" />
+                    </svg>
+                    {post.date}
+                  </span>
+                </span>
+              </a>
+            ))
+          }
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
