@@ -989,14 +989,19 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 function ctShowLocalTime(){
   try{
     var evt = new Date("2026-09-16T07:00:00Z");
-    var timeFmt = new Intl.DateTimeFormat(undefined,{hour:'numeric',minute:'2-digit'});
-    var zoneFmt = new Intl.DateTimeFormat(undefined,{timeZoneName:'short'});
-    var dateFmt = new Intl.DateTimeFormat(undefined,{weekday:'short',day:'numeric',month:'short'});
+    var timeFmt = new Intl.DateTimeFormat('en-GB',{hour:'numeric',minute:'2-digit'});
+    var zoneFmt = new Intl.DateTimeFormat('en-GB',{timeZoneName:'short'});
+    var dateFmt = new Intl.DateTimeFormat('en-GB',{weekday:'short',day:'numeric',month:'short'});
+    var fullDateFmt = new Intl.DateTimeFormat('en-GB',{day:'numeric',month:'long',year:'numeric'});
     var zoneName = '';
     zoneFmt.formatToParts(evt).forEach(function(p){ if(p.type==='timeZoneName') zoneName = p.value; });
     var el = document.getElementById('ct-zone-you');
     if(el){
       el.innerHTML = '<b>'+timeFmt.format(evt)+'</b> <span>'+(zoneName||'Your time')+' · '+dateFmt.format(evt)+'</span>';
+    }
+    var elCta = document.getElementById('ct-zone-you-cta');
+    if(elCta){
+      elCta.textContent = fullDateFmt.format(evt)+' · '+timeFmt.format(evt)+' '+(zoneName||'your time');
     }
   }catch(e){ /* Intl unsupported — static regional chips remain as-is */ }
 }
@@ -1159,7 +1164,7 @@ if(document.readyState === 'loading'){
     <div class="ct-dots" aria-hidden="true"></div>
     <div class="ct-cta-inner">
       <div>
-        <span class="ct-eyebrow ct-eyebrow--on-dark">16 September 2026 · 11 AM GST</span>
+        <span class="ct-eyebrow ct-eyebrow--on-dark" id="ct-zone-you-cta">16 September 2026 · 11 AM GST</span>
         <h2>Reserve my seat</h2>
         <p class="ct-cta-lede">A live episode of the ClearTax podcast, recorded with an audience. Bring a question — you'll be able to put it to Eoin directly.</p>
         <ul class="ct-cta-list">
