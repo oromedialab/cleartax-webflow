@@ -38,10 +38,27 @@ const labelClass =
   'font-body font-medium text-[length:var(--fs-label)] leading-[var(--lh-label)] text-neutral-900';
 ---
 
+<!--
+  The Figma band's vertical space is split between the section and the bar
+  (section pt-16 + bar pt-4 = the original 80px, and 4 + 6 = the original 40px)
+  so that the BAR'S OWN HEIGHT NEVER CHANGES between pinned and unpinned.
+
+  That is the whole trick. The section keeps the band's spacing and stands in as
+  the spacer while the bar is fixed, so the document height is identical in both
+  states and nothing below ever moves. It also means the pin threshold — the
+  bar's own resting position — is the exact point where fixed and static render
+  the bar in the same place, so the swap is a visual no-op and jitter around the
+  threshold cannot flicker.
+-->
 <section
-  class="bg-generic-00 shadow-[0px_2px_6px_0px_rgba(16,24,40,0.06)] pt-12 pb-8 md:pt-20 md:pb-10"
+  data-filter-root
+  class="bg-generic-00 shadow-[0px_2px_6px_0px_rgba(16,24,40,0.06)] pt-8 pb-4 md:pt-16 md:pb-6 data-[pinned]:shadow-none"
 >
-  <div class="container">
+  <div
+    data-filter-bar
+    class="py-4 transition-shadow duration-200 data-[pinned]:bg-generic-00 data-[pinned]:shadow-[0px_2px_6px_0px_rgba(16,24,40,0.06)]"
+  >
+    <div class="container">
     <form
       data-blog-filter
       role="search"
@@ -147,5 +164,190 @@ const labelClass =
         </svg>
       </button>
     </form>
+    </div>
   </div>
 </section>
+
+
+<script is:inline>
+  /* Pin the filter bar to the top of the screen for the length of the article
+     grid, then release it and let the navbar have the top back.
+
+     Everything is queried from `document` and null-checked, because the navbar,
+     the bar and the grid are three separate Webflow Embeds and none of them can
+     assume another is present or has mounted first. */
+  (function () {
+    // Deferred to DOM-ready on purpose. This Embed is pasted above the grid, so
+    // at parse time `[data-blog-articles]` does not exist yet and setup would
+    // bail every time.
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', init);
+    } else {
+      init();
+    }
+
+    function init() {
+      var root = document.querySelector('[data-filter-root]');
+      if (!root) return;
+      var bar = root.querySelector('[data-filter-bar]');
+      var articles = document.querySelector('[data-blog-articles]');
+      // No grid to scroll through means nothing to pin against — leave the bar
+      // in flow rather than sticking it to the top forever.
+      if (!bar || !articles) return;
+
+      var navRoot = document.querySelector('[data-giwip-nav-root]');
+      var navBar = navRoot ? navRoot.firstElementChild : null;
+
+      // Stacked on a phone the form is several hundred pixels tall; pinning it
+      // would eat the screen. Desktop layout only.
+      var wideEnough = window.matchMedia('(min-width: 768px)');
+
+      var EASE = 'cubic-bezier(0.4, 0, 0.2, 1)';
+      var EXIT = 260;
+      var NAV_FADE = 220;
+      // Dead band for the navbar only. The bar swap is invisible at the
+      // threshold, but a fade retriggering on every jitter pixel is not.
+      var NAV_HIDE_AT = 40;
+      var NAV_SHOW_AT = 8;
+
+      var reduceMotion =
+        window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+      var pinned = false;
+      var navHidden = false;
+      var releasedBelow = false; // left downwards, so re-entry must animate in
+      var sectionHeight = 0;
+      var barTop = 0; // the bar's resting position in the document
+      var releaseTimer = null;
+      var ticking = false;
+
+      function measure() {
+        // Meaningless while the bar is out of flow.
+        if (pinned) return;
+        sectionHeight = root.offsetHeight;
+        barTop = bar.getBoundingClientRect().top + window.pageYOffset;
+      }
+
+      function setNav(hidden) {
+        if (!navBar || hidden === navHidden) return;
+        navHidden = hidden;
+        // Opacity and a 6px lift, nothing more. The pinned bar sits on top of
+        // the navbar anyway, so a long slide is motion nobody can see and only
+        // adds to the churn at the handover.
+        navBar.style.transition = reduceMotion
+          ? 'none'
+          : 'opacity ' + NAV_FADE + 'ms ' + EASE + ', transform ' + NAV_FADE + 'ms ' + EASE;
+        navBar.style.transform = hidden ? 'translateY(-6px)' : '';
+        navBar.style.opacity = hidden ? '0' : '';
+        navBar.style.pointerEvents = hidden ? 'none' : '';
+      }
+
+      function pin(animateIn) {
+        if (pinned) return;
+        if (releaseTimer) {
+          clearTimeout(releaseTimer);
+          releaseTimer = null;
+        }
+        pinned = true;
+        releasedBelow = false;
+
+        root.style.height = sectionHeight + 'px';
+        root.setAttribute('data-pinned', '');
+        bar.setAttribute('data-pinned', '');
+        bar.style.position = 'fixed';
+        bar.style.top = '0';
+        bar.style.left = '0';
+        bar.style.right = '0';
+        bar.style.zIndex = '1200';
+
+        // Entering from above, fixed and static put the bar in the same place,
+        // so there is nothing to animate — animating would invent motion the
+        // scroll did not ask for. Only a re-entry from below needs to travel.
+        if (!animateIn || reduceMotion) {
+          bar.style.transition = '';
+          bar.style.transform = '';
+          return;
+        }
+
+        bar.style.transition = 'none';
+        bar.style.transform = 'translateY(-100%)';
+        void bar.offsetHeight; // flush, or both assignments collapse into one paint
+        bar.style.transition = 'transform ' + EXIT + 'ms ' + EASE;
+        bar.style.transform = 'translateY(0)';
+      }
+
+      function reset() {
+        root.removeAttribute('data-pinned');
+        bar.removeAttribute('data-pinned');
+        bar.style.position = '';
+        bar.style.top = '';
+        bar.style.left = '';
+        bar.style.right = '';
+        bar.style.zIndex = '';
+        bar.style.transition = '';
+        bar.style.transform = '';
+        root.style.height = '';
+        measure();
+      }
+
+      // Releasing upwards is a straight swap: the bar's fixed and resting
+      // positions coincide at the threshold, so there is nothing to animate.
+      // Releasing downwards it has to leave the screen, so it slides.
+      function unpin(animateOut) {
+        if (!pinned) return;
+        pinned = false;
+        releasedBelow = !!animateOut;
+
+        if (!animateOut || reduceMotion) {
+          reset();
+          return;
+        }
+
+        bar.style.transition = 'transform ' + EXIT + 'ms ' + EASE;
+        bar.style.transform = 'translateY(-100%)';
+        releaseTimer = setTimeout(function () {
+          releaseTimer = null;
+          if (pinned) return; // re-pinned mid-flight; leave it alone
+          reset();
+        }, EXIT);
+      }
+
+      function update() {
+        ticking = false;
+
+        if (!wideEnough.matches) {
+          if (pinned) unpin(false);
+          setNav(false);
+          return;
+        }
+
+        var scrollY = window.pageYOffset;
+        var past = scrollY - barTop; // how far the bar's resting slot is above us
+        var articlesBottom = articles.getBoundingClientRect().bottom + scrollY;
+        var stillOverGrid = articlesBottom - scrollY > bar.offsetHeight;
+
+        if (past >= 0 && stillOverGrid) pin(releasedBelow);
+        else if (pinned) unpin(past >= 0); // past the grid → slide out
+
+        // Hysteresis: hide late, show early, so the two thresholds never meet.
+        if (pinned && past > NAV_HIDE_AT) setNav(true);
+        else if (!pinned || past < NAV_SHOW_AT) setNav(false);
+      }
+
+      function onScroll() {
+        if (ticking) return;
+        ticking = true;
+        requestAnimationFrame(update);
+      }
+
+      window.addEventListener('scroll', onScroll, { passive: true });
+      window.addEventListener('resize', function () {
+        measure();
+        onScroll();
+      });
+
+      measure();
+      update();
+    }
+  })();
+</script>
