@@ -11,6 +11,7 @@ interface Props {
   maxSpeed?: number;
   resistance?: number;
   returnDuration?: number;
+  videoId?: string;
 }
 
 const {
@@ -25,12 +26,14 @@ const {
   maxSpeed = 5000,
   resistance = 450,
   returnDuration = 1.5,
+  videoId = "UX0Yt61EdfY",
 } = Astro.props;
 ---
 
 <section
     class="hero-section relative min-h-[700px] bg-[linear-gradient(180deg,#FFFFFF_0%,#F2F1F0_25%,#F2F1F0_75%,#FFFFFF_100%)] overflow-hidden flex items-center pt-28 pb-12 md:pt-30 md:pb-16 lg:pt-35 lg:pb-25"
     id="hero"
+    data-video-id={videoId}
 >
     <!-- Interactive Dot Grid Background -->
     <div class="absolute inset-0 z-0 w-full h-full pointer-events-none">
@@ -74,19 +77,21 @@ const {
 
                 <!-- Call to Action buttons -->
                 <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
-                    <button
-                        onclick="scrollToContactForm(event)"
-                        class="inline-flex items-center justify-center gap-2 px-8 md:px-10 py-3 md:py-4 font-google-sans rounded-lg font-medium text-white text-base cursor-pointer bg-[#5446FF] border border-[#5446FF] hover:bg-[#4538E6] transition-colors"
+                    <a
+                        href="javascript:void(0)" onclick="document.getElementById('contactForm').scrollIntoView({behavior:'smooth'})"
+                        class="inline-flex items-center justify-center gap-2 px-8 md:px-10 py-3 md:py-4 font-google-sans rounded-lg font-medium text-white text-base cursor-pointer bg-[#5446FF] border border-[#5446FF] hover:bg-[#FFFFFF] hover:text-[#5446FF] transition-all duration-150 ease-in-out"
                         style="outline: none;"
                     >
-                        Request Demo
+                        Book a Demo
                         <svg width="14" height="9" viewBox="0 0 14 9" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path fill-rule="evenodd" clip-rule="evenodd" d="M9.00628 0.256282C9.34799 -0.0854272 9.90201 -0.0854272 10.2437 0.256282L13.7437 3.75628C14.0854 4.09799 14.0854 4.65201 13.7437 4.99372L10.2437 8.49372C9.90201 8.83543 9.34799 8.83543 9.00628 8.49372C8.66457 8.15201 8.66457 7.59799 9.00628 7.25628L11.0126 5.25H0.875001C0.391751 5.25 -2.11235e-08 4.85825 0 4.375C2.11235e-08 3.89175 0.391751 3.5 0.875001 3.5H11.0126L9.00628 1.49372C8.66457 1.15201 8.66457 0.59799 9.00628 0.256282Z" fill="#ECEFFF"/>
+                            <path fill-rule="evenodd" clip-rule="evenodd" d="M9.00628 0.256282C9.34799 -0.0854272 9.90201 -0.0854272 10.2437 0.256282L13.7437 3.75628C14.0854 4.09799 14.0854 4.65201 13.7437 4.99372L10.2437 8.49372C9.90201 8.83543 9.34799 8.83543 9.00628 8.49372C8.66457 8.15201 8.66457 7.59799 9.00628 7.25628L11.0126 5.25H0.875001C0.391751 5.25 -2.11235e-08 4.85825 0 4.375C2.11235e-08 3.89175 0.391751 3.5 0.875001 3.5H11.0126L9.00628 1.49372C8.66457 1.15201 8.66457 0.59799 9.00628 0.256282Z" fill="currentColor"/>
                         </svg>
-                    </button>
+                      </a>
 
                     <button
-                        class="inline-flex items-center justify-center gap-2 px-8 md:px-10 py-3 md:py-4 font-google-sans rounded-lg font-medium text-[#5446FF] text-base cursor-pointer bg-transparent border border-[#5446FF] hover:bg-[#5446FF]/5 transition-colors"
+                        type="button"
+                        data-video-open
+                        class="inline-flex items-center justify-center gap-2 px-8 md:px-10 py-3 md:py-4 font-google-sans rounded-lg font-medium text-[#5446FF] text-base cursor-pointer bg-transparent border border-[#5446FF] hover:bg-[#ECEFFF] transition-colors duration-150"
                         style="outline: none;"
                     >
                         Watch Video
@@ -95,13 +100,86 @@ const {
                         </svg>
                     </button>
                 </div>
-                
+
             </div>
+        </div>
+    </div>
+
+    <!-- Video Modal -->
+    <div
+        class="fixed inset-0 z-2000 hidden items-center justify-center bg-black/70 backdrop-blur-sm p-4"
+        data-video-modal
+        aria-hidden="true"
+    >
+        <div class="relative w-full max-w-4xl">
+            <div class="relative w-full aspect-video bg-black rounded-xl overflow-hidden shadow-2xl">
+                <div
+                    class="absolute inset-0 [&_iframe]:absolute [&_iframe]:inset-0 [&_iframe]:w-full [&_iframe]:h-full [&_iframe]:border-0"
+                    data-video-wrap
+                >
+                </div>
+            </div>
+            <button
+                type="button"
+                data-video-close
+                aria-label="Close video"
+                class="absolute -top-12 right-0 z-10 inline-flex items-center justify-center w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 text-white transition-colors cursor-pointer border-0"
+            >
+                <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M13 1L1 13M1 1L13 13" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+                </svg>
+            </button>
         </div>
     </div>
 </section>
 
 <script is:inline>
+  // Watch Video modal logic
+  (function () {
+    const section = document.getElementById('hero');
+    if (!section) return;
+    const videoId = section.getAttribute('data-video-id') || 'UX0Yt61EdfY';
+    const modal = section.querySelector('[data-video-modal]');
+    const wrap = modal ? modal.querySelector('[data-video-wrap]') : null;
+    const openBtns = section.querySelectorAll('[data-video-open]');
+    const closeBtn = modal ? modal.querySelector('[data-video-close]') : null;
+
+    function openModal() {
+      if (!modal || !wrap) return;
+      if (!wrap.innerHTML.trim()) {
+        const iframe = document.createElement('iframe');
+        const origin = window.location.origin;
+        iframe.src = `https://www.youtube-nocookie.com/embed/${videoId}?autoplay=1&rel=0&enablejsapi=1&origin=${encodeURIComponent(origin)}`;
+        iframe.allow = 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture';
+        iframe.allowFullscreen = true;
+        iframe.referrerPolicy = 'strict-origin-when-cross-origin';
+        wrap.appendChild(iframe);
+      }
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+      modal.setAttribute('aria-hidden', 'false');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeModal() {
+      if (!modal || !wrap) return;
+      modal.classList.add('hidden');
+      modal.classList.remove('flex');
+      modal.setAttribute('aria-hidden', 'true');
+      wrap.innerHTML = '';
+      document.body.style.overflow = '';
+    }
+
+    openBtns.forEach((btn) => btn.addEventListener('click', openModal));
+    closeBtn?.addEventListener('click', closeModal);
+    modal?.addEventListener('click', (e) => {
+      if (e.target === modal) closeModal();
+    });
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') closeModal();
+    });
+  })();
+
   // Smooth scroll logic
   window.scrollToContactForm = (e) => {
     e.preventDefault();
