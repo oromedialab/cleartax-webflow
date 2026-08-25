@@ -55,13 +55,17 @@ const Compliance = [
         
         if (!container || !track || !section) return;
         
-        // Function to dynamically get the header heightl
+        // Function to dynamically get the header height
         const getHeaderHeight = () => {
             const header = document.querySelector('header');
             return header ? header.offsetHeight : 72; // Default to 72px if no header
         };
         
-        const updateHeight = () => {
+        let maxTranslate = 0;
+        let totalScrollable = 0;
+        let stickyTop = 0;
+        
+        const updateMeasurements = () => {
             const sectionHeight = section.offsetHeight;
             const windowHeight = window.innerHeight;
             const headerHeight = getHeaderHeight();
@@ -69,50 +73,44 @@ const Compliance = [
             // If the section is taller than the available viewport, 
             // stick it to the bottom so the cards are visible.
             // Otherwise, stick it to the top (below the header).
-            const stickyTop = sectionHeight > (windowHeight - headerHeight)
+            stickyTop = sectionHeight > (windowHeight - headerHeight)
                 ? windowHeight - sectionHeight 
                 : headerHeight;
                 
             section.style.top = `${stickyTop}px`;
             
-            const maxTranslate = Math.max(0, track.scrollWidth - track.parentElement.offsetWidth);
-            container.style.height = `${maxTranslate + Math.max(windowHeight, sectionHeight)}px`;
+            // Calculate max translation using section width
+            const sectionWidth = section.getBoundingClientRect().width;
+            maxTranslate = Math.max(0, track.scrollWidth - sectionWidth);
+            
+            // Calculate container height using viewport height
+            container.style.height = `${maxTranslate + windowHeight}px`;
+            
+            // The total distance the container can be scrolled while stuck
+            totalScrollable = container.getBoundingClientRect().height - sectionHeight;
         };
         
-        updateHeight();
+        updateMeasurements();
         
         if (window.ResizeObserver) {
-            const ro = new ResizeObserver(updateHeight);
+            const ro = new ResizeObserver(updateMeasurements);
             ro.observe(section);
             ro.observe(track);
         }
-        window.addEventListener('resize', updateHeight);
+        window.addEventListener('resize', updateMeasurements);
         
         let ticking = false;
         
-        window.addEventListener('scroll', () => {
+        const handleScroll = () => {
             if (!ticking) {
                 window.requestAnimationFrame(() => {
                     const containerRect = container.getBoundingClientRect();
-                    const sectionHeight = section.offsetHeight;
-                    const windowHeight = window.innerHeight;
-                    const headerHeight = getHeaderHeight();
-                    
-                    const stickyTop = sectionHeight > (windowHeight - headerHeight)
-                        ? windowHeight - sectionHeight 
-                        : headerHeight;
                     
                     // Calculate how far down the container the user has scrolled from the stick point
                     const scrolledDistance = Math.max(0, stickyTop - containerRect.top);
                     
-                    // The total distance the container can be scrolled while stuck
-                    const totalScrollable = containerRect.height - sectionHeight;
-                    
                     let progress = totalScrollable > 0 ? scrolledDistance / totalScrollable : 0;
                     progress = Math.max(0, Math.min(1, progress));
-                    
-                    // Calculate the max pixel distance the track can be pushed left
-                    const maxTranslate = Math.max(0, track.scrollWidth - track.parentElement.offsetWidth);
                     
                     // Apply translation
                     track.style.transform = `translate3d(-${progress * maxTranslate}px, 0, 0)`;
@@ -121,6 +119,23 @@ const Compliance = [
                 });
                 ticking = true;
             }
+        };
+
+        // Use Intersection Observer to only listen to scroll when container is in view
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    window.addEventListener('scroll', handleScroll, { passive: true });
+                    // Trigger once to ensure correct position when entering viewport
+                    handleScroll();
+                } else {
+                    window.removeEventListener('scroll', handleScroll);
+                }
+            });
+        }, {
+            rootMargin: '100% 0px 100% 0px' // Start listening before it comes into full view
         });
+
+        observer.observe(container);
     });
 </script>
