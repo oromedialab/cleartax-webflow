@@ -1,31 +1,50 @@
 ---
+/**
+ * The dot field is the one from `sections/blog-listing/Newsletter.astro`, in the
+ * hero's own lime. The long explanation of the geometry lives in that file; the
+ * short version is that the field is a plain grid of dots until a pointer
+ * enters, and each dot then draws out into a stroke aimed at the cursor, longest
+ * right beside it and back to a dot by `lengthRadius`.
+ *
+ * These are rendered onto the section as `data-*` and read back by the script.
+ * The old grid declared its numbers twice — as props here and again as a literal
+ * `config` in the script — so editing a prop changed nothing. One source now.
+ *
+ * The props that drove the old spring physics (`speedTrigger`, `shockRadius`,
+ * `maxSpeed`, `resistance`, `returnDuration`, `proximity`, `activeColor`) are
+ * gone with it. No page passed any of them.
+ */
 interface Props {
-  dotSize?: number;
+  lineWidth?: number;
   gap?: number;
+  maxLength?: number;
+  lengthRadius?: number;
+  tilt?: number;
   baseColor?: string;
-  activeColor?: string;
-  proximity?: number;
-  speedTrigger?: number;
-  shockRadius?: number;
-  shockStrength?: number;
-  maxSpeed?: number;
-  resistance?: number;
-  returnDuration?: number;
+  cursorRadius?: number;
+  pull?: number;
+  fadeRadius?: number;
   videoId?: string;
 }
 
 const {
-  dotSize = 4,
-  gap = 22,
-  baseColor = "#A5D200",
-  activeColor = "#799124",
-  proximity = 120,
-  speedTrigger = 100,
-  shockRadius = 250,
-  shockStrength = 6,
-  maxSpeed = 5000,
-  resistance = 450,
-  returnDuration = 1.5,
+  /* lineWidth is the old dotSize: the width of a stroke, and so the diameter of
+     the dot that stroke becomes at rest. 2 + 24 holds the hero's 26px pitch,
+     with a finer dot than the 4px it used to draw. */
+  lineWidth = 2,
+  gap = 24,
+  /* Longest a stroke gets, in px. Must stay under the 26px pitch or the field
+     starts knitting into a mesh — the guarantee is spelt out in
+     Newsletter.astro. */
+  maxLength = 6,
+  lengthRadius = 260,
+  /* Leave at 1. A partial turn cannot be continuous, and strokes flip as the
+     cursor crosses them — see the note in Newsletter.astro. */
+  tilt = 1,
+  baseColor = "#C8F006",
+  cursorRadius = 320,
+  pull = 14,
+  fadeRadius = 40,
   videoId = "UX0Yt61EdfY",
 } = Astro.props;
 ---
@@ -34,6 +53,15 @@ const {
     class="hero-section relative min-h-[700px] bg-[linear-gradient(180deg,#FFFFFF_0%,#F2F1F0_25%,#F2F1F0_75%,#FFFFFF_100%)] overflow-hidden flex items-center pt-28 pb-12 md:pt-30 md:pb-16 lg:pt-35 lg:pb-25"
     id="hero"
     data-video-id={videoId}
+    data-line-width={String(lineWidth)}
+    data-gap={String(gap)}
+    data-max-length={String(maxLength)}
+    data-length-radius={String(lengthRadius)}
+    data-tilt={String(tilt)}
+    data-base-color={baseColor}
+    data-cursor-radius={String(cursorRadius)}
+    data-pull={String(pull)}
+    data-fade-radius={String(fadeRadius)}
 >
     <!-- Interactive Dot Grid Background -->
     <div class="absolute inset-0 z-0 w-full h-full pointer-events-none">
@@ -190,86 +218,292 @@ const {
     }
   };
 
+  /* Interactive stroke field — the one from
+     `sections/blog-listing/Newsletter.astro`, which carries the full explanation
+     of the geometry. Here in the hero's lime. */
   document.addEventListener('DOMContentLoaded', () => {
+    const section = document.getElementById('hero');
+    if (!section) return;
     const canvas = document.getElementById('hero-dots-canvas');
-    if (!canvas) return;
+    if (!canvas || !canvas.getContext) return;
     const ctx = canvas.getContext('2d');
 
+    function num(name, fallback) {
+      const value = parseFloat(section.getAttribute(name));
+      return isNaN(value) ? fallback : value;
+    }
+
     const config = {
-      dotSize: 4,
-      gap: 22,
-      baseColor: "#A5D200",
-      hideRadius: 180 // Adjust this for a larger or smaller cutout
+      lineWidth: num('data-line-width', 2),
+      gap: num('data-gap', 24),
+      maxLength: num('data-max-length', 12),
+      lengthRadius: num('data-length-radius', 260),
+      tilt: num('data-tilt', 1),
+      baseColor: section.getAttribute('data-base-color') || '#C8F006',
+      cursorRadius: num('data-cursor-radius', 320),
+      pull: num('data-pull', 14),
+      fadeRadius: num('data-fade-radius', 40),
+      fadeSpeed: 12,
+      followSpeed: 7,
+      engageSpeed: 4,
+      focusSpeed: 5,
     };
 
-    let width, height;
+    const HALF_PI = Math.PI / 2; // straight down — the resting angle
+
+    let width = 0;
+    let height = 0;
     let dots = [];
-    let mouse = { x: -9999, y: -9999 };
+    const mouse = { x: -9999, y: -9999, prevX: -9999, prevY: -9999 };
+    let hover = false;
+    let speed = 0; // smoothed cursor travel, px per frame
+    let engagement = 0; // 0–1, how awake the field is
+    let presence = 0; // 0–1, whether a pointer is over the section at all
+    let focusX = 0;
+    let focusY = 0;
 
     function initGrid() {
-      width = canvas.parentElement.offsetWidth;
-      height = canvas.parentElement.offsetHeight;
-      
+      const parent = canvas.parentElement;
+      width = parent.offsetWidth;
+      height = parent.offsetHeight;
+      if (!width || !height) return;
+
       const dpr = window.devicePixelRatio || 1;
-      canvas.width = width * dpr;
-      canvas.height = height * dpr;
-      ctx.scale(dpr, dpr);
-      
+      canvas.width = Math.round(width * dpr);
+      canvas.height = Math.round(height * dpr);
+      // setTransform, not scale: scale() multiplies the existing matrix, so
+      // every resize would compound the DPR and shrink the grid.
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
       dots = [];
-      const spacing = config.dotSize + config.gap;
-      
+      const spacing = config.lineWidth + config.gap;
       const cols = Math.floor(width / spacing);
       const rows = Math.floor(height / spacing);
-      const startX = (width - (cols * spacing)) / 2 + (config.dotSize / 2);
-      const startY = (height - (rows * spacing)) / 2 + (config.dotSize / 2);
+      const startX = (width - cols * spacing) / 2 + config.lineWidth / 2;
+      const startY = (height - rows * spacing) / 2 + config.lineWidth / 2;
 
-      for (let y = 0; y < rows; y++) {
-        for (let x = 0; x < cols; x++) {
-          dots.push({ x: startX + x * spacing, y: startY + y * spacing });
+      for (let y = 0; y <= rows; y++) {
+        for (let x = 0; x <= cols; x++) {
+          const cx = startX + x * spacing;
+          const cy = startY + y * spacing;
+          // ox/oy is the stroke's home and the point it is drawn centred on;
+          // x/y is where that centre is now; hx/hy is half its segment vector.
+          dots.push({ x: cx, y: cy, ox: cx, oy: cy, alpha: 1, hx: 0, hy: 0 });
         }
+      }
+
+      if (!hover) {
+        focusX = width / 2;
+        focusY = height / 2;
+      }
+      aim();
+    }
+
+    // Length and angle, both straight off the focus. The focus and `presence`
+    // are already eased, so neither needs easing here.
+    function aim() {
+      const longest = config.maxLength / 2;
+      const turn = presence * config.tilt;
+
+      for (let i = 0; i < dots.length; i++) {
+        const dot = dots[i];
+        const dx = focusX - dot.ox;
+        const dy = focusY - dot.oy;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+
+        // 1 at the pointer, 0 by `lengthRadius`. Scaled by `presence`, so with
+        // no cursor on the section every stroke is a plain dot.
+        let t = dist / config.lengthRadius;
+        if (t > 1) t = 1;
+        const grow = 1 - t;
+        let reach = longest * grow * grow * (3 - 2 * grow) * presence;
+        // A canvas subpath of exactly zero length is not reliably painted, even
+        // with a round cap. A quarter pixel is a dot and is always drawn.
+        if (reach < 0.25) reach = 0.25;
+
+        let ux = 0;
+        let uy = 1;
+
+        if (turn > 0.001 && dist > 0.01) {
+          // Folded into a quarter turn either side: a segment drawn about its
+          // centre looks the same pointed either way, so this takes the short
+          // way round. Only seamless because `turn` reaches 1 — scaling the
+          // angle by any fraction makes strokes flip as the cursor crosses them.
+          let off = Math.atan2(dy, dx) - HALF_PI;
+          while (off > HALF_PI) off -= Math.PI;
+          while (off < -HALF_PI) off += Math.PI;
+
+          const angle = HALF_PI + off * turn;
+          ux = Math.cos(angle);
+          uy = Math.sin(angle);
+        }
+
+        dot.hx = ux * reach;
+        dot.hy = uy * reach;
       }
     }
 
-    function hexToRgb(hex) {
-      const bigint = parseInt(hex.replace('#', ''), 16);
-      return [(bigint >> 16) & 255, (bigint >> 8) & 255, bigint & 255];
-    }
-    const baseRgb = hexToRgb(config.baseColor);
-
-    function draw() {
+    function paint() {
       ctx.clearRect(0, 0, width, height);
+      ctx.strokeStyle = config.baseColor;
+      ctx.lineWidth = config.lineWidth;
+      ctx.lineCap = 'round'; // so a stroke shrunk to nothing reads as a dot
 
-      dots.forEach((dot) => {
-        let scale = 1;
-        if (mouse.x !== -9999) {
-          const dx = mouse.x - dot.x;
-          const dy = mouse.y - dot.y;
-          const distance = Math.sqrt(dx * dx + dy * dy);
-          if (distance < config.hideRadius) {
-            // Shrink the dot size instead of fading opacity
-            scale = Math.pow(distance / config.hideRadius, 2);
+      // Two passes. Only the strokes the cursor is touching have an alpha of
+      // their own; the rest of the field goes down as one path in one stroke
+      // call. Setting globalAlpha per stroke across the whole grid stutters.
+      ctx.globalAlpha = 1;
+      ctx.beginPath();
+      for (let i = 0; i < dots.length; i++) {
+        const dot = dots[i];
+        if (dot.alpha < 0.995) continue;
+        ctx.moveTo(dot.x - dot.hx, dot.y - dot.hy);
+        ctx.lineTo(dot.x + dot.hx, dot.y + dot.hy);
+      }
+      ctx.stroke();
+
+      for (let j = 0; j < dots.length; j++) {
+        const fading = dots[j];
+        if (fading.alpha >= 0.995 || fading.alpha < 0.01) continue;
+        ctx.globalAlpha = fading.alpha;
+        ctx.beginPath();
+        ctx.moveTo(fading.x - fading.hx, fading.y - fading.hy);
+        ctx.lineTo(fading.x + fading.hx, fading.y + fading.hy);
+        ctx.stroke();
+      }
+
+      ctx.globalAlpha = 1;
+    }
+
+    const reduceMotion =
+      window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    if (reduceMotion) {
+      // Static dot grid. No animation loop, no cursor reaction.
+      initGrid();
+      paint();
+      window.addEventListener('resize', () => {
+        initGrid();
+        paint();
+      });
+      return;
+    }
+
+    let lastTime = performance.now();
+
+    function draw(time) {
+      let dt = (time - lastTime) / 1000;
+      if (dt > 0.05) dt = 0.05; // cap so a backgrounded tab can't jolt the grid
+      lastTime = time;
+
+      const fadeEase = Math.min(1, config.fadeSpeed * dt);
+      const followEase = Math.min(1, config.followSpeed * dt);
+      const engageEase = Math.min(1, config.engageSpeed * dt);
+      const focusEase = Math.min(1, config.focusSpeed * dt);
+
+      const travelX = mouse.x - mouse.prevX;
+      const travelY = mouse.y - mouse.prevY;
+      mouse.prevX = mouse.x;
+      mouse.prevY = mouse.y;
+      speed += (Math.sqrt(travelX * travelX + travelY * travelY) - speed) * 0.5;
+      if (speed < 0.01) speed = 0;
+
+      engagement += ((hover ? Math.min(speed / 6, 1) : 0) - engagement) * engageEase;
+      if (engagement < 0.001) engagement = 0;
+
+      // A parked cursor still holds the field open, just more gently.
+      const grip = hover ? 0.4 + 0.6 * engagement : 0;
+
+      const wantX = hover ? mouse.x : width / 2;
+      const wantY = hover ? mouse.y : height / 2;
+      const swungX = wantX - focusX;
+      const swungY = wantY - focusY;
+      let swung = swungX > 0.05 || swungX < -0.05 || swungY > 0.05 || swungY < -0.05;
+      if (swung) {
+        focusX += swungX * focusEase;
+        focusY += swungY * focusEase;
+      } else if (focusX !== wantX || focusY !== wantY) {
+        focusX = wantX;
+        focusY = wantY;
+        swung = true;
+      }
+
+      const wantPresence = hover ? 1 : 0;
+      const presenceDiff = wantPresence - presence;
+      if (presenceDiff > 0.002 || presenceDiff < -0.002) {
+        presence += presenceDiff * focusEase;
+        swung = true;
+      } else if (presence !== wantPresence) {
+        presence = wantPresence;
+        swung = true;
+      }
+
+      // Length and angle hang off those two, so they only need recomputing on
+      // the frames one of them actually moved.
+      if (swung) aim();
+
+      const crSq = config.cursorRadius * config.cursorRadius;
+      let moving = swung;
+
+      for (let i = 0; i < dots.length; i++) {
+        const dot = dots[i];
+
+        // Measured from the stroke's home, not its current position, or one
+        // that has moved toward the focus reads as closer and runs away into it.
+        const dx = focusX - dot.ox;
+        const dy = focusY - dot.oy;
+        const distSq = dx * dx + dy * dy;
+
+        let targetAlpha = 1;
+        let targetX = dot.ox;
+        let targetY = dot.oy;
+
+        if (distSq < crSq) {
+          const dist = Math.sqrt(distSq);
+
+          if (grip > 0.001) {
+            const t = 1 - dist / config.cursorRadius;
+            let push = t * t * config.pull * grip;
+            // A stroke must never reach the cursor: past it, it crosses to the
+            // far side and the field knots up around the pointer.
+            if (push > dist * 0.75) push = dist * 0.75;
+            const step = dist > 0.01 ? push / dist : 0;
+            targetX += dx * step;
+            targetY += dy * step;
+          }
+
+          if (dist < config.fadeRadius) {
+            const ft = dist / config.fadeRadius;
+            const hole = ft * ft * (3 - 2 * ft);
+            // Also the pointer's doing, so the resting grid keeps every dot.
+            targetAlpha = 1 - (1 - hole) * presence;
           }
         }
 
-        const currentRadius = (config.dotSize / 2) * scale;
-
-        // Only draw if the dot is large enough to be visible
-        if (currentRadius > 0.1) {
-          ctx.beginPath();
-          ctx.fillStyle = `rgb(${baseRgb[0]}, ${baseRgb[1]}, ${baseRgb[2]})`;
-          ctx.arc(dot.x, dot.y, currentRadius, 0, Math.PI * 2);
-          ctx.fill();
+        const offX = targetX - dot.x;
+        const offY = targetY - dot.y;
+        if (offX > 0.05 || offX < -0.05 || offY > 0.05 || offY < -0.05) {
+          dot.x += offX * followEase;
+          dot.y += offY * followEase;
+          moving = true;
+        } else if (dot.x !== targetX || dot.y !== targetY) {
+          dot.x = targetX;
+          dot.y = targetY;
+          moving = true;
         }
-      });
 
-      // Draw the central colored dot following the cursor
-      if (mouse.x !== -9999) {
-        ctx.beginPath();
-        ctx.fillStyle = "#635BFF"; // Indigo/purple color
-        ctx.arc(mouse.x, mouse.y, (config.dotSize / 2) + 1, 0, Math.PI * 2);
-        ctx.fill();
+        const diff = targetAlpha - dot.alpha;
+        if (diff > 0.002 || diff < -0.002) {
+          dot.alpha += diff * fadeEase;
+          moving = true;
+        } else if (dot.alpha !== targetAlpha) {
+          dot.alpha = targetAlpha;
+          moving = true;
+        }
       }
 
+      // A settled field is repainted zero times a second, not sixty.
+      if (moving) paint();
       requestAnimationFrame(draw);
     }
 
@@ -277,17 +511,27 @@ const {
     initGrid();
     requestAnimationFrame(draw);
 
-    const heroSection = document.getElementById('hero');
-
-    heroSection.addEventListener("mousemove", (e) => {
+    section.addEventListener('mousemove', (e) => {
       const rect = canvas.getBoundingClientRect();
-      mouse.x = e.clientX - rect.left;
-      mouse.y = e.clientY - rect.top;
+      const nx = e.clientX - rect.left;
+      const ny = e.clientY - rect.top;
+      if (!hover) {
+        // Re-entering: seed prev with the entry point, or the jump from the last
+        // position would register as a colossal cursor speed.
+        mouse.prevX = nx;
+        mouse.prevY = ny;
+      }
+      hover = true;
+      mouse.x = nx;
+      mouse.y = ny;
     });
 
-    heroSection.addEventListener("mouseleave", () => {
-      mouse.x = -9999;
-      mouse.y = -9999;
+    section.addEventListener('mouseleave', () => {
+      // Dropping `hover` is what matters: the focus starts its swing back to the
+      // centre, the strokes reel in and the pull lets go. Nothing reads the
+      // parked coordinates while `hover` is false, and re-entry reseeds them.
+      hover = false;
+      speed = 0;
     });
   });
 </script>
