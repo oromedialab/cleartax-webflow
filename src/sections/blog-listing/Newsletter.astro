@@ -2,16 +2,30 @@
 /**
  * "Stay ahead of every compliance update" CTA — Figma node 12289:26940.
  *
- * The dotted field is the interactive canvas grid from
- * `sections/global-invoicing/Hero.astro` — dots spring away from a fast cursor
- * and shockwave on click — recoloured from the hero's lime to the Nova Blue
- * ramp. A radial mask clears the centre so the copy sits on plain ground, and
+ * The dotted field is a vanilla port of React Bits' <DotField /> (MIT), grafted
+ * onto the canvas grid this section already had. Ported rather than installed:
+ * sections compile to standalone HTML pasted into Webflow Embeds, so there is
+ * no React runtime on the page and no bundle to import from — see the
+ * portability rules in CLAUDE.md.
+ *
+ * What came across from DotField:
+ *   - dots ease toward a target derived from the cursor, never a velocity, so
+ *     they cannot overshoot or oscillate;
+ *   - a speed-driven `engagement` value, so the field reacts to a moving
+ *     pointer and settles under a parked one;
+ *   - one diagonal gradient filling every dot in a single path.
+ * Its dots bulge *away* from the cursor; these lean *toward* it and fade out as
+ * they go, which is the effect this section wants. Its cursor glow, `sparkle`
+ * and `waveAmplitude` are not ported — the glow is unwanted here, the other two
+ * default to off upstream, and dead code still costs Embed budget.
+ *
+ * A radial mask clears the middle so the copy sits on plain ground, and
  * top/bottom fades blend the field into the white sections either side.
  *
  * The tunables below are rendered onto the section as `data-*` and read back by
- * the script, rather than being restated inside it. The hero declares the same
- * values twice — as props and again as a literal `config` — so editing the prop
- * there changes nothing. One source here.
+ * the script, rather than being restated inside it — they are this component's
+ * props. The hero declares the same values twice — as props and again as a
+ * literal `config` — so editing the prop there changes nothing. One source here.
  *
  * IDs are prefixed `blog-cta-` so this can never collide with the hero's
  * `hero-dots-canvas` if both ever land on one Webflow page.
@@ -38,9 +52,20 @@ const modalBlurb = 'Tell us little about you and we will be in touch.';
    touch finer here because this field sits behind body copy, not a headline. */
 const dotSize = 3;
 const gap = 23;
-const baseColor = '#9CA3FF'; /* --palette-nova-300 */
-const activeColor = '#5336F5'; /* --palette-nova-600 */
-const proximity = 120;
+/* Every dot is filled from one gradient laid corner to corner across the
+   canvas, so the field shades Nova Blue → Nova 300 across the section. */
+const gradientFrom = 'rgba(84, 70, 255, 0.55)'; /* --palette-nova-blue */
+const gradientTo = 'rgba(156, 163, 255, 0.35)'; /* --palette-nova-300 */
+/* How far the cursor's pull reaches, in px. Wide and soft — the whole
+   neighbourhood leans in, rather than a tight ring snapping around. */
+const cursorRadius = 320;
+/* Peak displacement toward the cursor, in px. Kept under one grid pitch (26px),
+   so the dots lean without ever crowding into their neighbours' places. */
+const pull = 18;
+/* Radius of the hole the cursor clears, in px — smaller than `cursorRadius`, so
+   dots start leaning in well before they start fading out. Falloff is a
+   smoothstep: gone under the pointer, untouched at the rim. */
+const fadeRadius = 120;
 ---
 
 <section
@@ -48,9 +73,11 @@ const proximity = 120;
   class="relative flex min-h-[400px] items-center overflow-hidden bg-generic-00 py-16 md:py-20"
   data-dot-size={String(dotSize)}
   data-gap={String(gap)}
-  data-base-color={baseColor}
-  data-active-color={activeColor}
-  data-proximity={String(proximity)}
+  data-gradient-from={gradientFrom}
+  data-gradient-to={gradientTo}
+  data-cursor-radius={String(cursorRadius)}
+  data-pull={String(pull)}
+  data-fade-radius={String(fadeRadius)}
 >
   <!-- Interactive dot grid -->
   <div class="pointer-events-none absolute inset-0 z-0 h-full w-full">
@@ -181,22 +208,26 @@ const proximity = 120;
     var config = {
       dotSize: num('data-dot-size', 3),
       gap: num('data-gap', 23),
-      baseColor: section.getAttribute('data-base-color') || '#9CA3FF',
-      activeColor: section.getAttribute('data-active-color') || '#5336F5',
-      proximity: num('data-proximity', 120),
-      speedTrigger: 100,
-      shockRadius: 250,
-      shockStrength: 6,
-      maxSpeed: 5000,
-      resistance: 450,
-      returnDuration: 1.5,
+      gradientFrom: section.getAttribute('data-gradient-from') || 'rgba(84, 70, 255, 0.55)',
+      gradientTo: section.getAttribute('data-gradient-to') || 'rgba(156, 163, 255, 0.35)',
+      cursorRadius: num('data-cursor-radius', 320),
+      pull: num('data-pull', 40),
+      fadeRadius: num('data-fade-radius', 120),
+      fadeSpeed: 12, // how fast a dot eases to its target opacity
+      // Slower than the fade on purpose: the dots lag the cursor slightly, and
+      // that lag is what reads as following rather than as the grid snapping.
+      followSpeed: 7,
+      engageSpeed: 4, // how fast the field wakes to a moving cursor and settles
     };
 
     var width = 0;
     var height = 0;
     var dots = [];
-    var mouse = { x: -9999, y: -9999, vx: 0, vy: 0, speed: 0 };
-    var lastMouse = { x: -9999, y: -9999, time: 0 };
+    var mouse = { x: -9999, y: -9999, prevX: -9999, prevY: -9999 };
+    var hover = false;
+    var speed = 0; // smoothed cursor travel, px per frame
+    var engagement = 0; // 0–1, how awake the field is
+    var dotFill = null; // one gradient shared by every dot — rebuilt on resize
 
     function initGrid() {
       var parent = canvas.parentElement;
@@ -211,6 +242,11 @@ const proximity = 120;
       // every resize would compound the DPR and shrink the grid.
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
 
+      // Corner to corner, so the shading follows the section, not the viewport.
+      dotFill = ctx.createLinearGradient(0, 0, width, height);
+      dotFill.addColorStop(0, config.gradientFrom);
+      dotFill.addColorStop(1, config.gradientTo);
+
       dots = [];
       var spacing = config.dotSize + config.gap;
       var cols = Math.floor(width / spacing);
@@ -222,37 +258,49 @@ const proximity = 120;
         for (var x = 0; x <= cols; x++) {
           var cx = startX + x * spacing;
           var cy = startY + y * spacing;
-          dots.push({ x: cx, y: cy, originX: cx, originY: cy, vx: 0, vy: 0, colorIntensity: 0 });
+          // ox/oy is the dot's home in the grid; x/y is where it is right now.
+          dots.push({ x: cx, y: cy, ox: cx, oy: cy, alpha: 1 });
         }
       }
     }
 
-    function hexToRgb(hex) {
-      var bigint = parseInt(hex.replace('#', ''), 16);
-      return [(bigint >> 16) & 255, (bigint >> 8) & 255, bigint & 255];
-    }
-    var baseRgb = hexToRgb(config.baseColor);
-    var activeRgb = hexToRgb(config.activeColor);
-
     function paint() {
       ctx.clearRect(0, 0, width, height);
+      var radius = config.dotSize / 2;
+      var tau = Math.PI * 2;
+      ctx.fillStyle = dotFill;
+
+      // Two passes. Only the few dozen dots the cursor is touching have an
+      // alpha of their own; the rest of the field is untouched and goes down as
+      // a single path in one fill. Setting globalAlpha per dot across ~900 dots
+      // is what made this stutter.
+      ctx.globalAlpha = 1;
+      ctx.beginPath();
       for (var i = 0; i < dots.length; i++) {
         var dot = dots[i];
-        var r = Math.round(baseRgb[0] + (activeRgb[0] - baseRgb[0]) * dot.colorIntensity);
-        var g = Math.round(baseRgb[1] + (activeRgb[1] - baseRgb[1]) * dot.colorIntensity);
-        var b = Math.round(baseRgb[2] + (activeRgb[2] - baseRgb[2]) * dot.colorIntensity);
+        if (dot.alpha < 0.995) continue;
+        ctx.moveTo(dot.x + radius, dot.y); // moveTo, or arcs chain into one blob
+        ctx.arc(dot.x, dot.y, radius, 0, tau);
+      }
+      ctx.fill();
+
+      for (var j = 0; j < dots.length; j++) {
+        var fading = dots[j];
+        if (fading.alpha >= 0.995 || fading.alpha < 0.01) continue;
+        ctx.globalAlpha = fading.alpha;
         ctx.beginPath();
-        ctx.fillStyle = 'rgb(' + r + ', ' + g + ', ' + b + ')';
-        ctx.arc(dot.x, dot.y, config.dotSize / 2, 0, Math.PI * 2);
+        ctx.arc(fading.x, fading.y, radius, 0, tau);
         ctx.fill();
       }
+
+      ctx.globalAlpha = 1;
     }
 
     var reduceMotion =
       window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
     if (reduceMotion) {
-      // Static field. No physics loop, no cursor reaction.
+      // Static field. No animation loop, no cursor reaction.
       initGrid();
       paint();
       window.addEventListener('resize', function () {
@@ -269,35 +317,95 @@ const proximity = 120;
       if (dt > 0.05) dt = 0.05; // cap so a backgrounded tab can't jolt the grid
       lastTime = time;
 
-      var spring = 30 / config.returnDuration;
-      var damping = config.resistance / 100;
+      var fadeEase = Math.min(1, config.fadeSpeed * dt);
+      var followEase = Math.min(1, config.followSpeed * dt);
+      var engageEase = Math.min(1, config.engageSpeed * dt);
+
+      // How fast the cursor is travelling, smoothed. DotField samples this on a
+      // 20ms interval; a frame is close enough and needs no second timer.
+      var travelX = mouse.x - mouse.prevX;
+      var travelY = mouse.y - mouse.prevY;
+      mouse.prevX = mouse.x;
+      mouse.prevY = mouse.y;
+      speed += (Math.sqrt(travelX * travelX + travelY * travelY) - speed) * 0.5;
+      if (speed < 0.01) speed = 0;
+
+      engagement += ((hover ? Math.min(speed / 6, 1) : 0) - engagement) * engageEase;
+      if (engagement < 0.001) engagement = 0;
+
+      // A parked cursor still holds the field open, it just holds it more
+      // gently — the pull ranges over the top 60% as the cursor speeds up.
+      // Without the floor the dots would slump home whenever you stopped, which
+      // reads as the effect breaking rather than as the field resting.
+      var grip = hover ? 0.4 + 0.6 * engagement : 0;
+
+      var crSq = config.cursorRadius * config.cursorRadius;
+      var moving = false;
 
       for (var i = 0; i < dots.length; i++) {
         var dot = dots[i];
 
-        dot.vx -= spring * (dot.x - dot.originX) * dt;
-        dot.vy -= spring * (dot.y - dot.originY) * dt;
+        // Measured from the dot's home, not its current position — otherwise a
+        // dot that has moved toward the cursor reads as closer, pulls harder,
+        // and runs away into the pointer.
+        var dx = mouse.x - dot.ox;
+        var dy = mouse.y - dot.oy;
+        var distSq = dx * dx + dy * dy;
 
-        dot.vx -= damping * dot.vx * dt;
-        dot.vy -= damping * dot.vy * dt;
+        var targetAlpha = 1;
+        var targetX = dot.ox;
+        var targetY = dot.oy;
 
-        var speed = Math.sqrt(dot.vx * dot.vx + dot.vy * dot.vy);
-        if (speed > config.maxSpeed) {
-          dot.vx = (dot.vx / speed) * config.maxSpeed;
-          dot.vy = (dot.vy / speed) * config.maxSpeed;
+        if (distSq < crSq) {
+          var dist = Math.sqrt(distSq);
+
+          if (grip > 0.001) {
+            // Squared falloff, zero at the rim, so a dot entering the radius
+            // starts from no displacement instead of jumping.
+            var t = 1 - dist / config.cursorRadius;
+            var push = t * t * config.pull * grip;
+            // A dot must never reach the cursor: past it, it would cross to the
+            // far side and the field would knot up around the pointer.
+            if (push > dist * 0.75) push = dist * 0.75;
+            var step = dist > 0.01 ? push / dist : 0;
+            targetX += dx * step;
+            targetY += dy * step;
+          }
+
+          if (dist < config.fadeRadius) {
+            // Smoothstep, not a linear ramp: flat at both ends, so the hole has
+            // no visible crease at its rim and no hard edge at its centre.
+            var ft = dist / config.fadeRadius;
+            targetAlpha = ft * ft * (3 - 2 * ft);
+          }
         }
 
-        dot.x += dot.vx * dt;
-        dot.y += dot.vy * dt;
+        var offX = targetX - dot.x;
+        var offY = targetY - dot.y;
+        if (offX > 0.05 || offX < -0.05 || offY > 0.05 || offY < -0.05) {
+          dot.x += offX * followEase;
+          dot.y += offY * followEase;
+          moving = true;
+        } else if (dot.x !== targetX || dot.y !== targetY) {
+          dot.x = targetX;
+          dot.y = targetY;
+          moving = true;
+        }
 
-        var dx = mouse.x - dot.originX;
-        var dy = mouse.y - dot.originY;
-        var distance = Math.sqrt(dx * dx + dy * dy);
-        var target = distance < config.proximity ? 1 : 0;
-        dot.colorIntensity += (target - dot.colorIntensity) * 10 * dt;
+        var diff = targetAlpha - dot.alpha;
+        if (diff > 0.002 || diff < -0.002) {
+          dot.alpha += diff * fadeEase;
+          moving = true;
+        } else if (dot.alpha !== targetAlpha) {
+          // Snap the last hundredth rather than easing at it forever, so the
+          // field can go fully idle once the cursor is away.
+          dot.alpha = targetAlpha;
+          moving = true;
+        }
       }
 
-      paint();
+      // A settled field is repainted zero times a second, not sixty.
+      if (moving) paint();
       requestAnimationFrame(draw);
     }
 
@@ -305,61 +413,32 @@ const proximity = 120;
     initGrid();
     requestAnimationFrame(draw);
 
+    // Scoped to the section, not the window as DotField does: several of these
+    // Embeds can share a Webflow page, and a global listener would have each
+    // one reacting to a cursor nowhere near it.
     section.addEventListener('mousemove', function (e) {
       var rect = canvas.getBoundingClientRect();
-      var currentX = e.clientX - rect.left;
-      var currentY = e.clientY - rect.top;
-      var now = performance.now();
-
-      if (lastMouse.time > 0) {
-        var dtMove = (now - lastMouse.time) / 1000;
-        if (dtMove > 0) {
-          mouse.vx = (currentX - lastMouse.x) / dtMove;
-          mouse.vy = (currentY - lastMouse.y) / dtMove;
-          mouse.speed = Math.sqrt(mouse.vx * mouse.vx + mouse.vy * mouse.vy);
-
-          if (mouse.speed > config.speedTrigger) {
-            for (var i = 0; i < dots.length; i++) {
-              var dot = dots[i];
-              var dist = Math.sqrt(
-                Math.pow(dot.originX - currentX, 2) + Math.pow(dot.originY - currentY, 2)
-              );
-              if (dist < config.proximity) {
-                dot.vx = dot.originX - currentX + mouse.vx * 0.005;
-                dot.vy = dot.originY - currentY + mouse.vy * 0.005;
-              }
-            }
-          }
-        }
+      var nx = e.clientX - rect.left;
+      var ny = e.clientY - rect.top;
+      if (!hover) {
+        // Re-entering: seed prev with the entry point, or the jump from the
+        // parked -9999 would register as a colossal cursor speed.
+        mouse.prevX = nx;
+        mouse.prevY = ny;
       }
-
-      lastMouse.x = currentX;
-      lastMouse.y = currentY;
-      lastMouse.time = now;
-      mouse.x = currentX;
-      mouse.y = currentY;
+      hover = true;
+      mouse.x = nx;
+      mouse.y = ny;
     });
 
     section.addEventListener('mouseleave', function () {
+      // Parked far outside, so every dot's target is its own home again.
+      hover = false;
+      speed = 0;
       mouse.x = -9999;
       mouse.y = -9999;
-      lastMouse.time = 0;
-    });
-
-    section.addEventListener('click', function (e) {
-      var rect = canvas.getBoundingClientRect();
-      var cx = e.clientX - rect.left;
-      var cy = e.clientY - rect.top;
-
-      for (var i = 0; i < dots.length; i++) {
-        var dot = dots[i];
-        var dist = Math.sqrt(Math.pow(dot.originX - cx, 2) + Math.pow(dot.originY - cy, 2));
-        if (dist < config.shockRadius) {
-          var falloff = Math.max(0, 1 - dist / config.shockRadius);
-          dot.vx = (dot.originX - cx) * config.shockStrength * falloff;
-          dot.vy = (dot.originY - cy) * config.shockStrength * falloff;
-        }
-      }
+      mouse.prevX = -9999;
+      mouse.prevY = -9999;
     });
   })();
 </script>

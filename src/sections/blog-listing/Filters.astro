@@ -11,6 +11,14 @@
  * `Articles.astro`. They are duplicated rather than shared because each section
  * is pasted into Webflow as an independent Embed and cannot import from a
  * sibling at runtime.
+ *
+ * Topic and Country are custom listboxes, not bare `<select>`s: a native select
+ * paints its open list through the OS, so `appearance: none` styles the closed
+ * control and nothing else — the list itself lands as Windows chrome in the
+ * middle of the brand. The real `<select>` is still in the DOM, screen-reader
+ * hidden, as the value store. Choosing an option writes to it and fires a
+ * bubbling `change`, which is exactly what `Articles.astro` already listens for,
+ * so none of the filtering logic knows this UI exists.
  */
 const topics: string[] = [
   'E-Invoicing',
@@ -36,6 +44,41 @@ const fieldClass =
 
 const labelClass =
   'font-body font-medium text-[length:var(--fs-label)] leading-[var(--lh-label)] text-neutral-900';
+
+/* The trigger has to line up with the search input to the pixel, so it starts
+   from the same `fieldClass` and only adds what a button needs. */
+const triggerClass = `${fieldClass} group flex cursor-pointer items-center justify-between gap-2 text-left aria-expanded:border-nova-blue data-[placeholder]:text-neutral-400`;
+
+const panelClass =
+  'absolute left-0 right-0 top-[calc(100%+6px)] z-20 hidden max-h-64 overflow-y-auto rounded-lg border border-neutral-200 bg-generic-00 p-1 shadow-[0px_12px_24px_-6px_rgba(16,24,40,0.12)]';
+
+const optionClass =
+  'group flex cursor-pointer items-center justify-between gap-2 rounded-md px-3 py-2 font-body font-normal text-[length:var(--fs-label)] leading-[var(--lh-label)] text-neutral-900 outline-none transition-colors duration-100 hover:bg-ledger-100 focus:bg-ledger-100 aria-selected:bg-nova-50 aria-selected:font-medium aria-selected:text-nova-blue';
+
+/* One shape, rendered twice. `hook` carries the `data-blog-*` attribute the
+   grid queries by, spread onto the native select. */
+const selects: Array<{
+  id: string;
+  name: string;
+  label: string;
+  hook: Record<string, string>;
+  options: string[];
+}> = [
+  {
+    id: 'blog-filter-topic',
+    name: 'topic',
+    label: 'Topic',
+    hook: { 'data-blog-topic': '' },
+    options: topics,
+  },
+  {
+    id: 'blog-filter-country',
+    name: 'country',
+    label: 'Country',
+    hook: { 'data-blog-country': '' },
+    options: countries,
+  },
+];
 ---
 
 <!--
@@ -79,95 +122,276 @@ const labelClass =
         />
       </div>
 
-      <!-- Topic -->
-      <div class="flex w-full flex-col gap-2 md:w-[300px]">
-        <label class={labelClass} for="blog-filter-topic">Topic</label>
-        <div class="relative">
-          <select
-            id="blog-filter-topic"
-            name="topic"
-            data-blog-topic
-            class={`${fieldClass} cursor-pointer appearance-none pr-10`}
-          >
-            <option value="">Select</option>
-            {topics.map((topic) => <option value={topic}>{topic}</option>)}
-          </select>
-          <svg
-            class="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-neutral-500"
-            width="20"
-            height="20"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            aria-hidden="true"
-            focusable="false"
-          >
-            <path d="m6 9 6 6 6-6"></path>
-          </svg>
-        </div>
-      </div>
+      {
+        selects.map((field) => (
+          <div class="flex w-full flex-col gap-2 md:w-[300px]">
+            {/* A span, not a <label for>: the control it would point at is the
+                hidden select. The trigger names itself through aria-labelledby. */}
+            <span class={labelClass} id={`${field.id}-label`}>
+              {field.label}
+            </span>
 
-      <!-- Country -->
-      <div class="flex w-full flex-col gap-2 md:w-[300px]">
-        <label class={labelClass} for="blog-filter-country">Country</label>
-        <div class="relative">
-          <select
-            id="blog-filter-country"
-            name="country"
-            data-blog-country
-            class={`${fieldClass} cursor-pointer appearance-none pr-10`}
-          >
-            <option value="">Select</option>
-            {countries.map((country) => <option value={country}>{country}</option>)}
-          </select>
-          <svg
-            class="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-neutral-500"
-            width="20"
-            height="20"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            aria-hidden="true"
-            focusable="false"
-          >
-            <path d="m6 9 6 6 6-6"></path>
-          </svg>
-        </div>
-      </div>
+            <div class="relative" data-blog-select>
+              <select
+                {...field.hook}
+                id={field.id}
+                name={field.name}
+                class="sr-only"
+                tabindex="-1"
+                aria-hidden="true"
+              >
+                <option value="">Select</option>
+                {field.options.map((option) => (
+                  <option value={option}>{option}</option>
+                ))}
+              </select>
 
-      <!-- Submit -->
-      <button
-        type="submit"
-        aria-label="Search articles"
-        class="flex h-10 w-10 shrink-0 items-center justify-center self-end rounded-lg border border-neutral-200 bg-generic-00 text-neutral-700 shadow-[0px_1px_2px_0px_rgba(16,24,40,0.04)] cursor-pointer transition-colors duration-150 hover:border-nova-blue hover:text-nova-blue max-md:w-full"
-      >
-        <svg
-          width="20"
-          height="20"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          aria-hidden="true"
-          focusable="false"
-        >
-          <circle cx="11" cy="11" r="7"></circle>
-          <path d="m20 20-3.5-3.5"></path>
-        </svg>
-      </button>
+              <button
+                type="button"
+                data-select-trigger
+                data-placeholder
+                id={`${field.id}-button`}
+                role="combobox"
+                aria-haspopup="listbox"
+                aria-expanded="false"
+                aria-controls={`${field.id}-list`}
+                aria-labelledby={`${field.id}-label ${field.id}-button`}
+                class={triggerClass}
+              >
+                <span data-select-value class="truncate">
+                  Select
+                </span>
+                <svg
+                  class="shrink-0 text-neutral-500 transition-transform duration-150 group-aria-expanded:rotate-180"
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  aria-hidden="true"
+                  focusable="false"
+                >
+                  <path d="m6 9 6 6 6-6" />
+                </svg>
+              </button>
+
+              <div
+                data-select-panel
+                id={`${field.id}-list`}
+                role="listbox"
+                tabindex="-1"
+                aria-labelledby={`${field.id}-label`}
+                class={panelClass}
+              >
+                <div
+                  data-select-option
+                  data-value=""
+                  role="option"
+                  aria-selected="true"
+                  tabindex="-1"
+                  class={optionClass}
+                >
+                  <span class="truncate">Select</span>
+                  <svg
+                    class="shrink-0 opacity-0 group-aria-selected:opacity-100"
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2.5"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    aria-hidden="true"
+                    focusable="false"
+                  >
+                    <path d="M20 6 9 17l-5-5" />
+                  </svg>
+                </div>
+
+                {field.options.map((option) => (
+                  <div
+                    data-select-option
+                    data-value={option}
+                    role="option"
+                    aria-selected="false"
+                    tabindex="-1"
+                    class={optionClass}
+                  >
+                    <span class="truncate">{option}</span>
+                    <svg
+                      class="shrink-0 opacity-0 group-aria-selected:opacity-100"
+                      width="16"
+                      height="16"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2.5"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      aria-hidden="true"
+                      focusable="false"
+                    >
+                      <path d="M20 6 9 17l-5-5" />
+                    </svg>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        ))
+      }
     </form>
     </div>
   </div>
 </section>
 
+
+<script is:inline>
+  /* Custom listbox behaviour for Topic and Country.
+
+     The visible control is a button plus a panel of `role="option"` rows; the
+     real `<select>` next to them stays the value store. Selecting writes to it
+     and fires a bubbling `change`, so `Articles.astro` filters exactly as it did
+     when these were native selects. */
+  (function () {
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', init);
+    } else {
+      init();
+    }
+
+    function init() {
+      var roots = document.querySelectorAll('[data-blog-select]');
+      for (var i = 0; i < roots.length; i++) setup(roots[i]);
+    }
+
+    function setup(root) {
+      var select = root.querySelector('select');
+      var trigger = root.querySelector('[data-select-trigger]');
+      var panel = root.querySelector('[data-select-panel]');
+      var valueEl = root.querySelector('[data-select-value]');
+      if (!select || !trigger || !panel || !valueEl) return;
+
+      var options = panel.querySelectorAll('[data-select-option]');
+      if (!options.length) return;
+
+      // Inline display, not a class swap: the utilities pasted into Webflow are
+      // unlayered, so `hidden` and `block` on one element would race on source
+      // order. Inline always wins.
+      function isOpen() {
+        return trigger.getAttribute('aria-expanded') === 'true';
+      }
+
+      function open() {
+        panel.style.display = 'block';
+        trigger.setAttribute('aria-expanded', 'true');
+        var current = panel.querySelector('[aria-selected="true"]') || options[0];
+        if (current) {
+          current.focus();
+          // The selected row can be well down a scrolling panel.
+          if (current.scrollIntoView) current.scrollIntoView({ block: 'nearest' });
+        }
+      }
+
+      function close(returnFocus) {
+        panel.style.display = 'none';
+        trigger.setAttribute('aria-expanded', 'false');
+        if (returnFocus) trigger.focus();
+      }
+
+      function choose(option) {
+        var value = option.getAttribute('data-value');
+
+        for (var i = 0; i < options.length; i++) {
+          options[i].setAttribute('aria-selected', options[i] === option ? 'true' : 'false');
+        }
+
+        valueEl.textContent = option.textContent.trim();
+        if (value) trigger.removeAttribute('data-placeholder');
+        else trigger.setAttribute('data-placeholder', '');
+
+        select.value = value;
+        // Dispatched from the select, not the button, so the grid's delegated
+        // listener sees the same event shape a native select would have sent.
+        select.dispatchEvent(new Event('change', { bubbles: true }));
+
+        close(true);
+      }
+
+      function step(from, delta) {
+        var index = -1;
+        for (var i = 0; i < options.length; i++) {
+          if (options[i] === from) index = i;
+        }
+        var next = index + delta;
+        if (next < 0) next = options.length - 1;
+        if (next > options.length - 1) next = 0;
+        options[next].focus();
+        if (options[next].scrollIntoView) options[next].scrollIntoView({ block: 'nearest' });
+      }
+
+      trigger.addEventListener('click', function () {
+        if (isOpen()) close(false);
+        else open();
+      });
+
+      trigger.addEventListener('keydown', function (e) {
+        if (e.key === 'ArrowDown' || e.key === 'ArrowUp' || e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault(); // or Space scrolls the page and Enter submits the form
+          open();
+        } else if (e.key === 'Escape') {
+          close(false);
+        }
+      });
+
+      panel.addEventListener('click', function (e) {
+        if (!e.target.closest) return;
+        var option = e.target.closest('[data-select-option]');
+        if (option) choose(option);
+      });
+
+      panel.addEventListener('keydown', function (e) {
+        if (!e.target.closest) return;
+        var option = e.target.closest('[data-select-option]');
+        if (!option) return;
+
+        if (e.key === 'ArrowDown') {
+          e.preventDefault();
+          step(option, 1);
+        } else if (e.key === 'ArrowUp') {
+          e.preventDefault();
+          step(option, -1);
+        } else if (e.key === 'Home') {
+          e.preventDefault();
+          options[0].focus();
+        } else if (e.key === 'End') {
+          e.preventDefault();
+          options[options.length - 1].focus();
+        } else if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          choose(option);
+        } else if (e.key === 'Escape') {
+          e.preventDefault();
+          close(true);
+        } else if (e.key === 'Tab') {
+          // Let focus go where it was heading, just don't leave the panel open
+          // behind it.
+          close(false);
+        }
+      });
+
+      document.addEventListener('click', function (e) {
+        if (!isOpen()) return;
+        if (root.contains(e.target)) return;
+        close(false);
+      });
+    }
+  })();
+</script>
 
 <script is:inline>
   /* Pin the filter bar to the top of the screen for the length of the article
