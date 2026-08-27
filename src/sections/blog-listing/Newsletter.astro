@@ -10,8 +10,12 @@
  * dots reads as ground for the copy, which is what this section wants.
  *
  * With a pointer, each dot draws out into a stroke that does two things:
- *   - LENGTH GROWS WITH DISTANCE from the focus — still a dot underneath the
- *     pointer, full length out at the edges;
+ *   - LENGTH FALLS OFF WITH DISTANCE from the focus — longest right at the
+ *     pointer, back to a plain dot by `lengthRadius`. So the strokes are a
+ *     local disturbance the cursor carries with it, and the rest of the section
+ *     stays the dot grid. Growing the other way — long far out, short close in —
+ *     puts the whole far flank of the field at full length pointing back at a
+ *     distant cursor, which lies almost flat and reads as dashed rules;
  *   - ANGLE TILTS TOWARD the pointer — every stroke in the field, by the same
  *     fraction, so they all lie along their own line to it. The tilt holds while
  *     the cursor is parked and unwinds when it leaves, so a still pointer keeps
@@ -25,6 +29,20 @@
  * The turn is interpolated as an ANGLE, not as a blend of two direction vectors.
  * Blending vectors and renormalising sweeps through the angles unevenly — fast
  * at one end, slow at the other — which reads as a bend while it winds up.
+ *
+ * THE TURN MUST BE A FULL ONE, and `tilt` is 1 for that reason. A stroke is
+ * symmetric about its centre, so its angle only means anything modulo 180° —
+ * pointing at the cursor and pointing directly away draw the same segment. That
+ * is what lets a stroke pass through horizontal smoothly as the cursor crosses
+ * its line. Scale the angle by any fraction — a partial `tilt`, or a ceiling on
+ * how far it may turn — and the two ends of that fold no longer agree: one side
+ * of horizontal lands leaning left, the other leaning right, and every stroke
+ * the cursor crosses snaps between them. A 45° ceiling was tried here to keep
+ * the far flank from lying flat and it flipped for exactly this reason. Length
+ * falling off with distance solves that problem instead, without touching the
+ * angle: strokes far enough out to lie flat are dots, so their angle is moot.
+ * (The wind-up is a partial turn by definition, so a stroke can flip during the
+ * ~200ms `presence` ease. Brief, and only on entering or leaving.)
  * The focus is the cursor while the pointer is over the section, and the
  * section's own centre otherwise. That resting position is not visible — nothing
  * scales by distance while `presence` is 0 — it is just where the field is
@@ -83,20 +101,14 @@ const lineWidth = 2;
 const gap = 24;
 /* Longest a stroke ever gets, in px. Must stay under the 26px pitch — see the
    no-touching guarantee above. */
-const maxLength = 10;
-/* Distance from the focus at which a stroke reaches `maxLength`. Beyond it,
-   strokes stay at full length rather than growing further. */
+const maxLength = 6;
+/* How far the strokes reach from the focus, in px. `maxLength` at the pointer,
+   shrinking back to a dot at this distance and staying a dot beyond it. */
 const lengthRadius = 260;
-/* How far a stroke turns from upright toward the pointer. 1 aims it straight at
-   the pointer; 0.5 leaves it halfway. Applied to every stroke equally — see the
-   note on falloff above. */
+/* How far a stroke turns from upright toward the pointer. LEAVE THIS AT 1 — see
+   the note on flipping above. Anything less is a partial turn, and a partial
+   turn cannot be continuous. */
 const tilt = 1;
-/* Ceiling on that turn, in degrees from upright. A stroke way off to one side
-   has a near-horizontal line to the pointer, and a whole flank of the section
-   lying flat reads as dashed rules rather than as a field. The approach is
-   asymptotic, so nothing bands up at exactly this angle and strokes that were
-   never near horizontal keep pointing where they were. */
-const maxTilt = 45;
 /* Every stroke is painted from one gradient laid corner to corner across the
    canvas, so the field shades Nova Blue → Nova 300 across the section. */
 const gradientFrom = 'rgba(84, 70, 255, 0.55)'; /* --palette-nova-blue */
@@ -107,9 +119,11 @@ const cursorRadius = 320;
 /* Peak displacement toward the cursor, in px. Small: it moves the homes the
    no-touching guarantee is measured from, so it eats into that budget. */
 const pull = 14;
-/* Radius of the hole the focus clears, in px. Strokes are already shrinking to
-   dots here; the fade takes them the rest of the way out. */
-const fadeRadius = 90;
+/* Radius of the hole the focus clears, in px. Small now that the strokes are
+   LONGEST at the pointer rather than shortest: at the old 90 the fade ate the
+   whole core of the effect and left a ring. 40 keeps a clean gap right under the
+   cursor with the burst starting just outside it. 0 turns the hole off. */
+const fadeRadius = 40;
 ---
 
 <section
@@ -120,7 +134,6 @@ const fadeRadius = 90;
   data-max-length={String(maxLength)}
   data-length-radius={String(lengthRadius)}
   data-tilt={String(tilt)}
-  data-max-tilt={String(maxTilt)}
   data-gradient-from={gradientFrom}
   data-gradient-to={gradientTo}
   data-cursor-radius={String(cursorRadius)}
@@ -259,7 +272,6 @@ const fadeRadius = 90;
       maxLength: num('data-max-length', 16),
       lengthRadius: num('data-length-radius', 260),
       tilt: num('data-tilt', 1),
-      maxTilt: num('data-max-tilt', 45),
       gradientFrom: section.getAttribute('data-gradient-from') || 'rgba(84, 70, 255, 0.55)',
       gradientTo: section.getAttribute('data-gradient-to') || 'rgba(156, 163, 255, 0.35)',
       cursorRadius: num('data-cursor-radius', 320),
@@ -345,7 +357,6 @@ const fadeRadius = 90;
       var longest = config.maxLength / 2;
       // One value for the whole field: how far through the turn it is.
       var turn = presence * config.tilt;
-      var ceiling = (config.maxTilt * Math.PI) / 180;
 
       for (var i = 0; i < dots.length; i++) {
         var dot = dots[i];
@@ -353,13 +364,14 @@ const fadeRadius = 90;
         var dy = focusY - dot.oy;
         var dist = Math.sqrt(dx * dx + dy * dy);
 
+        // 1 at the pointer, 0 at `lengthRadius` and beyond. Smoothstep again, so
+        // the strokes reel in without a crease at either end. Scaled by
+        // `presence`, so length is something the pointer brings with it: with no
+        // cursor on the section every stroke is a plain dot.
         var t = dist / config.lengthRadius;
         if (t > 1) t = 1;
-        // Smoothstep again: a stroke leaves the focus as a dot and eases up to
-        // full length, rather than ramping linearly and creasing at both ends.
-        // Scaled by `presence`, so length is something the pointer brings with
-        // it: with no cursor on the section every stroke is a plain dot.
-        var reach = longest * t * t * (3 - 2 * t) * presence;
+        var grow = 1 - t;
+        var reach = longest * grow * grow * (3 - 2 * grow) * presence;
         // A canvas subpath of exactly zero length is not reliably painted, even
         // with a round cap. A quarter pixel is a dot and is always drawn.
         if (reach < 0.25) reach = 0.25;
@@ -373,16 +385,17 @@ const fadeRadius = 90;
           // segment drawn about its centre looks the same pointed either way,
           // so fold that offset into a quarter turn either side: the stroke
           // always takes the short way round and never sweeps past horizontal.
+          //
+          // The fold is only invisible because `turn` reaches 1. At the ends of
+          // the range, ±90° folds to the same horizontal segment, so a stroke
+          // whose line to the pointer crosses horizontal passes through it
+          // without a seam. Scale that offset by anything less — a ceiling, a
+          // partial tilt — and the two ends land on different-looking angles,
+          // which is the flip: strokes snapping between leaning left and leaning
+          // right as the cursor crosses their horizontal.
           var off = Math.atan2(dy, dx) - HALF_PI;
           while (off > HALF_PI) off -= Math.PI;
           while (off < -HALF_PI) off += Math.PI;
-
-          // Squash that offset into ±`maxTilt`. tanh, not a clamp: a clamp puts
-          // every stroke past the limit at exactly the limit, and a whole flank
-          // of the grid sharing one angle looks like a printed hatch. tanh is
-          // near-linear for small offsets — so strokes that were never going to
-          // lie flat barely move — and closes on the ceiling without reaching it.
-          if (ceiling > 0) off = ceiling * Math.tanh(off / ceiling);
 
           // Interpolate the ANGLE. Every stroke turns by the same fraction of
           // its own offset, so the whole field tilts at once instead of bending
