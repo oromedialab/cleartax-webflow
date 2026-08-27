@@ -2,22 +2,51 @@
 /**
  * "Stay ahead of every compliance update" CTA — Figma node 12289:26940.
  *
- * The dotted field is a vanilla port of React Bits' <DotField /> (MIT), grafted
- * onto the canvas grid this section already had. Ported rather than installed:
- * sections compile to standalone HTML pasted into Webflow Embeds, so there is
- * no React runtime on the page and no bundle to import from — see the
- * portability rules in CLAUDE.md.
+ * The field is a plain grid of dots until a pointer enters the section. The
+ * strokes are entirely the cursor's doing: length, angle and the cleared hole
+ * all scale by `presence`, which is 0 with no pointer over the section, so with
+ * nothing to react to the field is exactly a dot grid and completely still. A
+ * static field of strokes reads as a texture someone chose; a static field of
+ * dots reads as ground for the copy, which is what this section wants.
  *
- * What came across from DotField:
- *   - dots ease toward a target derived from the cursor, never a velocity, so
- *     they cannot overshoot or oscillate;
- *   - a speed-driven `engagement` value, so the field reacts to a moving
- *     pointer and settles under a parked one;
- *   - one diagonal gradient filling every dot in a single path.
- * Its dots bulge *away* from the cursor; these lean *toward* it and fade out as
- * they go, which is the effect this section wants. Its cursor glow, `sparkle`
- * and `waveAmplitude` are not ported — the glow is unwanted here, the other two
- * default to off upstream, and dead code still costs Embed budget.
+ * With a pointer, each dot draws out into a stroke that does two things:
+ *   - LENGTH GROWS WITH DISTANCE from the focus — still a dot underneath the
+ *     pointer, full length out at the edges;
+ *   - ANGLE TILTS TOWARD the pointer — every stroke in the field, by the same
+ *     fraction, so they all lie along their own line to it. The tilt holds while
+ *     the cursor is parked and unwinds when it leaves, so a still pointer keeps
+ *     its field.
+ * The tilt deliberately has NO distance falloff. Aiming the near strokes while
+ * leaving the far ones upright makes the angle change gradually across the grid,
+ * and a gradual change in angle is a curve: the field reads as bent streamlines
+ * rather than as a straight tilt. Every stroke turns by the same fraction, so
+ * the only thing distance controls is length.
+ *
+ * The turn is interpolated as an ANGLE, not as a blend of two direction vectors.
+ * Blending vectors and renormalising sweeps through the angles unevenly — fast
+ * at one end, slow at the other — which reads as a bend while it winds up.
+ * The focus is the cursor while the pointer is over the section, and the
+ * section's own centre otherwise. That resting position is not visible — nothing
+ * scales by distance while `presence` is 0 — it is just where the field is
+ * already pointed when you arrive, so the strokes draw out from a sensible
+ * place instead of from wherever the last visitor left the cursor.
+ *
+ * NO TWO STROKES MAY EVER TOUCH. That is guaranteed geometrically, not by
+ * eyeballing it: each stroke is drawn centred on its grid home, so whatever
+ * angle it takes it stays inside a circle of radius `maxLength / 2` — 8px —
+ * around that home. Grid pitch is 26px, and `pull`, which does move homes closer
+ * together, leaves ~23px between neighbours at worst. 8 + 8 is comfortably under
+ * that, at every angle, so the field can never knit itself into a mesh. Raising
+ * `maxLength` or `pull` spends that budget.
+ *
+ * The motion model is a vanilla port of React Bits' <DotField /> (MIT), kept
+ * from the dot version of this section: strokes ease toward a target derived
+ * from where the cursor is now, never a velocity, so nothing can overshoot or
+ * oscillate; a speed-driven `engagement` wakes the field to a moving pointer
+ * and settles it under a parked one; one diagonal gradient paints the whole
+ * field in a single stroke call. Ported rather than installed — sections compile
+ * to standalone HTML pasted into Webflow Embeds, so there is no React runtime on
+ * the page and nothing to import from. See the portability rules in CLAUDE.md.
  *
  * A radial mask clears the middle so the copy sits on plain ground, and
  * top/bottom fades blend the field into the white sections either side.
@@ -48,31 +77,50 @@ const hubspotRegion = 'na2';
 const modalTitle = 'Book a demo';
 const modalBlurb = 'Tell us little about you and we will be in touch.';
 
-/* dotSize + gap = 26px pitch, matching the hero's 4 + 22. The dot itself is a
-   touch finer here because this field sits behind body copy, not a headline. */
-const dotSize = 3;
-const gap = 23;
-/* Every dot is filled from one gradient laid corner to corner across the
+/* lineWidth + gap = the 26px pitch this section has always used, matching the
+   hero's 4 + 22. Stroke ends are round, so a zero-length stroke is a dot. */
+const lineWidth = 2;
+const gap = 24;
+/* Longest a stroke ever gets, in px. Must stay under the 26px pitch — see the
+   no-touching guarantee above. */
+const maxLength = 10;
+/* Distance from the focus at which a stroke reaches `maxLength`. Beyond it,
+   strokes stay at full length rather than growing further. */
+const lengthRadius = 260;
+/* How far a stroke turns from upright toward the pointer. 1 aims it straight at
+   the pointer; 0.5 leaves it halfway. Applied to every stroke equally — see the
+   note on falloff above. */
+const tilt = 1;
+/* Ceiling on that turn, in degrees from upright. A stroke way off to one side
+   has a near-horizontal line to the pointer, and a whole flank of the section
+   lying flat reads as dashed rules rather than as a field. The approach is
+   asymptotic, so nothing bands up at exactly this angle and strokes that were
+   never near horizontal keep pointing where they were. */
+const maxTilt = 45;
+/* Every stroke is painted from one gradient laid corner to corner across the
    canvas, so the field shades Nova Blue → Nova 300 across the section. */
 const gradientFrom = 'rgba(84, 70, 255, 0.55)'; /* --palette-nova-blue */
 const gradientTo = 'rgba(156, 163, 255, 0.35)'; /* --palette-nova-300 */
 /* How far the cursor's pull reaches, in px. Wide and soft — the whole
    neighbourhood leans in, rather than a tight ring snapping around. */
 const cursorRadius = 320;
-/* Peak displacement toward the cursor, in px. Kept under one grid pitch (26px),
-   so the dots lean without ever crowding into their neighbours' places. */
-const pull = 18;
-/* Radius of the hole the cursor clears, in px — smaller than `cursorRadius`, so
-   dots start leaning in well before they start fading out. Falloff is a
-   smoothstep: gone under the pointer, untouched at the rim. */
-const fadeRadius = 120;
+/* Peak displacement toward the cursor, in px. Small: it moves the homes the
+   no-touching guarantee is measured from, so it eats into that budget. */
+const pull = 14;
+/* Radius of the hole the focus clears, in px. Strokes are already shrinking to
+   dots here; the fade takes them the rest of the way out. */
+const fadeRadius = 90;
 ---
 
 <section
   id="blog-cta"
   class="relative flex min-h-[400px] items-center overflow-hidden bg-generic-00 py-16 md:py-20"
-  data-dot-size={String(dotSize)}
+  data-line-width={String(lineWidth)}
   data-gap={String(gap)}
+  data-max-length={String(maxLength)}
+  data-length-radius={String(lengthRadius)}
+  data-tilt={String(tilt)}
+  data-max-tilt={String(maxTilt)}
   data-gradient-from={gradientFrom}
   data-gradient-to={gradientTo}
   data-cursor-radius={String(cursorRadius)}
@@ -206,18 +254,26 @@ const fadeRadius = 120;
     }
 
     var config = {
-      dotSize: num('data-dot-size', 3),
-      gap: num('data-gap', 23),
+      lineWidth: num('data-line-width', 2),
+      gap: num('data-gap', 24),
+      maxLength: num('data-max-length', 16),
+      lengthRadius: num('data-length-radius', 260),
+      tilt: num('data-tilt', 1),
+      maxTilt: num('data-max-tilt', 45),
       gradientFrom: section.getAttribute('data-gradient-from') || 'rgba(84, 70, 255, 0.55)',
       gradientTo: section.getAttribute('data-gradient-to') || 'rgba(156, 163, 255, 0.35)',
       cursorRadius: num('data-cursor-radius', 320),
-      pull: num('data-pull', 40),
-      fadeRadius: num('data-fade-radius', 120),
-      fadeSpeed: 12, // how fast a dot eases to its target opacity
-      // Slower than the fade on purpose: the dots lag the cursor slightly, and
-      // that lag is what reads as following rather than as the grid snapping.
+      pull: num('data-pull', 14),
+      fadeRadius: num('data-fade-radius', 90),
+      fadeSpeed: 12, // how fast a stroke eases to its target opacity
+      // Slower than the fade on purpose: the strokes lag the cursor slightly,
+      // and that lag is what reads as following rather than as the grid
+      // snapping.
       followSpeed: 7,
       engageSpeed: 4, // how fast the field wakes to a moving cursor and settles
+      // How fast the focus travels between the cursor and its resting place at
+      // the centre. Slow, because every stroke in the section swings with it.
+      focusSpeed: 5,
     };
 
     var width = 0;
@@ -227,7 +283,15 @@ const fadeRadius = 120;
     var hover = false;
     var speed = 0; // smoothed cursor travel, px per frame
     var engagement = 0; // 0–1, how awake the field is
-    var dotFill = null; // one gradient shared by every dot — rebuilt on resize
+    // The single point every stroke aims at: the cursor, or the section's centre
+    // once the pointer leaves. Eased, so the field swings rather than snaps.
+    var focusX = 0;
+    var focusY = 0;
+    // 0–1, whether the pointer is over the section at all. Separate from
+    // `engagement`, which tracks its speed: the tilt has to hold under a parked
+    // cursor, and only unwind when the pointer actually leaves.
+    var presence = 0;
+    var strokeFill = null; // one gradient for the whole field — rebuilt on resize
 
     function initGrid() {
       var parent = canvas.parentElement;
@@ -243,54 +307,124 @@ const fadeRadius = 120;
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
 
       // Corner to corner, so the shading follows the section, not the viewport.
-      dotFill = ctx.createLinearGradient(0, 0, width, height);
-      dotFill.addColorStop(0, config.gradientFrom);
-      dotFill.addColorStop(1, config.gradientTo);
+      strokeFill = ctx.createLinearGradient(0, 0, width, height);
+      strokeFill.addColorStop(0, config.gradientFrom);
+      strokeFill.addColorStop(1, config.gradientTo);
 
       dots = [];
-      var spacing = config.dotSize + config.gap;
+      var spacing = config.lineWidth + config.gap;
       var cols = Math.floor(width / spacing);
       var rows = Math.floor(height / spacing);
-      var startX = (width - cols * spacing) / 2 + config.dotSize / 2;
-      var startY = (height - rows * spacing) / 2 + config.dotSize / 2;
+      var startX = (width - cols * spacing) / 2 + config.lineWidth / 2;
+      var startY = (height - rows * spacing) / 2 + config.lineWidth / 2;
 
       for (var y = 0; y <= rows; y++) {
         for (var x = 0; x <= cols; x++) {
           var cx = startX + x * spacing;
           var cy = startY + y * spacing;
-          // ox/oy is the dot's home in the grid; x/y is where it is right now.
-          dots.push({ x: cx, y: cy, ox: cx, oy: cy, alpha: 1 });
+          // ox/oy is the stroke's home in the grid and the point it is drawn
+          // centred on; x/y is where that centre is right now. hx/hy is half its
+          // segment vector, so it runs from (x-hx, y-hy) to (x+hx, y+hy) — that
+          // carries its angle and its length in one pair.
+          dots.push({ x: cx, y: cy, ox: cx, oy: cy, alpha: 1, hx: 0, hy: 0 });
         }
+      }
+
+      if (!hover) {
+        focusX = width / 2;
+        focusY = height / 2;
+      }
+      aim();
+    }
+
+    // Give every stroke its length and its angle, both from where the focus is.
+    // The focus and `presence` are already eased, so neither needs easing here.
+    var HALF_PI = Math.PI / 2; // straight down — the resting angle
+
+    function aim() {
+      var longest = config.maxLength / 2;
+      // One value for the whole field: how far through the turn it is.
+      var turn = presence * config.tilt;
+      var ceiling = (config.maxTilt * Math.PI) / 180;
+
+      for (var i = 0; i < dots.length; i++) {
+        var dot = dots[i];
+        var dx = focusX - dot.ox;
+        var dy = focusY - dot.oy;
+        var dist = Math.sqrt(dx * dx + dy * dy);
+
+        var t = dist / config.lengthRadius;
+        if (t > 1) t = 1;
+        // Smoothstep again: a stroke leaves the focus as a dot and eases up to
+        // full length, rather than ramping linearly and creasing at both ends.
+        // Scaled by `presence`, so length is something the pointer brings with
+        // it: with no cursor on the section every stroke is a plain dot.
+        var reach = longest * t * t * (3 - 2 * t) * presence;
+        // A canvas subpath of exactly zero length is not reliably painted, even
+        // with a round cap. A quarter pixel is a dot and is always drawn.
+        if (reach < 0.25) reach = 0.25;
+
+        // Upright, unless the pointer is here to turn it.
+        var ux = 0;
+        var uy = 1;
+
+        if (turn > 0.001 && dist > 0.01) {
+          // How far this stroke's line to the pointer sits from vertical. A
+          // segment drawn about its centre looks the same pointed either way,
+          // so fold that offset into a quarter turn either side: the stroke
+          // always takes the short way round and never sweeps past horizontal.
+          var off = Math.atan2(dy, dx) - HALF_PI;
+          while (off > HALF_PI) off -= Math.PI;
+          while (off < -HALF_PI) off += Math.PI;
+
+          // Squash that offset into ±`maxTilt`. tanh, not a clamp: a clamp puts
+          // every stroke past the limit at exactly the limit, and a whole flank
+          // of the grid sharing one angle looks like a printed hatch. tanh is
+          // near-linear for small offsets — so strokes that were never going to
+          // lie flat barely move — and closes on the ceiling without reaching it.
+          if (ceiling > 0) off = ceiling * Math.tanh(off / ceiling);
+
+          // Interpolate the ANGLE. Every stroke turns by the same fraction of
+          // its own offset, so the whole field tilts at once instead of bending
+          // across the grid.
+          var angle = HALF_PI + off * turn;
+          ux = Math.cos(angle);
+          uy = Math.sin(angle);
+        }
+
+        dot.hx = ux * reach;
+        dot.hy = uy * reach;
       }
     }
 
     function paint() {
       ctx.clearRect(0, 0, width, height);
-      var radius = config.dotSize / 2;
-      var tau = Math.PI * 2;
-      ctx.fillStyle = dotFill;
+      ctx.strokeStyle = strokeFill;
+      ctx.lineWidth = config.lineWidth;
+      ctx.lineCap = 'round'; // so a stroke shrunk to nothing reads as a dot
 
-      // Two passes. Only the few dozen dots the cursor is touching have an
+      // Two passes. Only the few dozen strokes the cursor is touching have an
       // alpha of their own; the rest of the field is untouched and goes down as
-      // a single path in one fill. Setting globalAlpha per dot across ~900 dots
-      // is what made this stutter.
+      // a single path in one stroke call. Setting globalAlpha per stroke across
+      // ~900 of them is what made this stutter.
       ctx.globalAlpha = 1;
       ctx.beginPath();
       for (var i = 0; i < dots.length; i++) {
         var dot = dots[i];
         if (dot.alpha < 0.995) continue;
-        ctx.moveTo(dot.x + radius, dot.y); // moveTo, or arcs chain into one blob
-        ctx.arc(dot.x, dot.y, radius, 0, tau);
+        ctx.moveTo(dot.x - dot.hx, dot.y - dot.hy);
+        ctx.lineTo(dot.x + dot.hx, dot.y + dot.hy);
       }
-      ctx.fill();
+      ctx.stroke();
 
       for (var j = 0; j < dots.length; j++) {
         var fading = dots[j];
         if (fading.alpha >= 0.995 || fading.alpha < 0.01) continue;
         ctx.globalAlpha = fading.alpha;
         ctx.beginPath();
-        ctx.arc(fading.x, fading.y, radius, 0, tau);
-        ctx.fill();
+        ctx.moveTo(fading.x - fading.hx, fading.y - fading.hy);
+        ctx.lineTo(fading.x + fading.hx, fading.y + fading.hy);
+        ctx.stroke();
       }
 
       ctx.globalAlpha = 1;
@@ -320,6 +454,7 @@ const fadeRadius = 120;
       var fadeEase = Math.min(1, config.fadeSpeed * dt);
       var followEase = Math.min(1, config.followSpeed * dt);
       var engageEase = Math.min(1, config.engageSpeed * dt);
+      var focusEase = Math.min(1, config.focusSpeed * dt);
 
       // How fast the cursor is travelling, smoothed. DotField samples this on a
       // 20ms interval; a frame is close enough and needs no second timer.
@@ -339,17 +474,49 @@ const fadeRadius = 120;
       // reads as the effect breaking rather than as the field resting.
       var grip = hover ? 0.4 + 0.6 * engagement : 0;
 
+      // Chase the cursor, or fall back to the middle of the section once it
+      // leaves. Everything downstream aims at this, not at the raw pointer.
+      var wantX = hover ? mouse.x : width / 2;
+      var wantY = hover ? mouse.y : height / 2;
+      var swungX = wantX - focusX;
+      var swungY = wantY - focusY;
+      var swung = swungX > 0.05 || swungX < -0.05 || swungY > 0.05 || swungY < -0.05;
+      if (swung) {
+        focusX += swungX * focusEase;
+        focusY += swungY * focusEase;
+      } else if (focusX !== wantX || focusY !== wantY) {
+        focusX = wantX;
+        focusY = wantY;
+        swung = true;
+      }
+
+      // The tilt winds up when the pointer arrives and unwinds when it leaves,
+      // on the same clock as the focus swing.
+      var wantPresence = hover ? 1 : 0;
+      var presenceDiff = wantPresence - presence;
+      if (presenceDiff > 0.002 || presenceDiff < -0.002) {
+        presence += presenceDiff * focusEase;
+        swung = true;
+      } else if (presence !== wantPresence) {
+        presence = wantPresence;
+        swung = true;
+      }
+
+      // Every stroke's length and angle hang off those two, so they only need
+      // recomputing on the frames one of them actually moved.
+      if (swung) aim();
+
       var crSq = config.cursorRadius * config.cursorRadius;
-      var moving = false;
+      var moving = swung;
 
       for (var i = 0; i < dots.length; i++) {
         var dot = dots[i];
 
-        // Measured from the dot's home, not its current position — otherwise a
-        // dot that has moved toward the cursor reads as closer, pulls harder,
-        // and runs away into the pointer.
-        var dx = mouse.x - dot.ox;
-        var dy = mouse.y - dot.oy;
+        // Measured from the stroke's home, not its current position —
+        // otherwise one that has moved toward the focus reads as closer, pulls
+        // harder, and runs away into it.
+        var dx = focusX - dot.ox;
+        var dy = focusY - dot.oy;
         var distSq = dx * dx + dy * dy;
 
         var targetAlpha = 1;
@@ -360,12 +527,12 @@ const fadeRadius = 120;
           var dist = Math.sqrt(distSq);
 
           if (grip > 0.001) {
-            // Squared falloff, zero at the rim, so a dot entering the radius
+            // Squared falloff, zero at the rim, so a stroke entering the radius
             // starts from no displacement instead of jumping.
             var t = 1 - dist / config.cursorRadius;
             var push = t * t * config.pull * grip;
-            // A dot must never reach the cursor: past it, it would cross to the
-            // far side and the field would knot up around the pointer.
+            // A stroke must never reach the cursor: past it, it would cross to
+            // the far side and the field would knot up around the pointer.
             if (push > dist * 0.75) push = dist * 0.75;
             var step = dist > 0.01 ? push / dist : 0;
             targetX += dx * step;
@@ -376,7 +543,10 @@ const fadeRadius = 120;
             // Smoothstep, not a linear ramp: flat at both ends, so the hole has
             // no visible crease at its rim and no hard edge at its centre.
             var ft = dist / config.fadeRadius;
-            targetAlpha = ft * ft * (3 - 2 * ft);
+            var hole = ft * ft * (3 - 2 * ft);
+            // Also the pointer's doing, so the resting grid keeps every dot
+            // rather than carrying a bald patch where the focus parks.
+            targetAlpha = 1 - (1 - hole) * presence;
           }
         }
 
@@ -432,7 +602,9 @@ const fadeRadius = 120;
     });
 
     section.addEventListener('mouseleave', function () {
-      // Parked far outside, so every dot's target is its own home again.
+      // Dropping `hover` is what matters: the focus starts its swing back to the
+      // centre and the pull lets go. The parked coordinates just keep a stale
+      // pointer position from being read as a real one.
       hover = false;
       speed = 0;
       mouse.x = -9999;
