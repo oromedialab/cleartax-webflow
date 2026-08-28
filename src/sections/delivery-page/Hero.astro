@@ -26,7 +26,10 @@ interface Props {
   cursorRadius?: number;
   pull?: number;
   fadeRadius?: number;
-  videoId?: string;
+  titlePrefix?: string;
+  titleHighlight?: string;
+  titleSuffix?: string;
+  description?: string;
 }
 
 const {
@@ -47,14 +50,16 @@ const {
   cursorRadius = 320,
   pull = 14,
   fadeRadius = 40,
-  videoId = "UX0Yt61EdfY",
+  titlePrefix = "The mandate",
+  titleHighlight = "changes by country.",
+  titleSuffix = "The delivery burden doesn't.",
+  description = "Global e-invoicing succeeds on three things most vendors skip: understanding how mandates diverge, surviving what actually breaks multi-country delivery, and owning it after go-live — everywhere, not just market one.",
 } = Astro.props;
 ---
 
 <section
     class="hero-section relative min-h-[700px] bg-[linear-gradient(180deg,_#FFF_0%,_rgba(242,_241,_240,_0.25)_30.04%,_rgba(242,_241,_240,_0.25)_87.79%,_#FFF_100%)] overflow-hidden flex items-center pt-28 pb-12 md:pt-30 md:pb-16 lg:pt-35 lg:pb-25"
     id="hero"
-    data-video-id={videoId}
 >
     <!-- Interactive Dot Grid Background -->
     <DotgridRb 
@@ -93,16 +98,16 @@ const {
             <div class="hero-content flex flex-col items-center mx-auto text-center">
                 <!-- Headline -->
                 <h2
-                    class="text-[length:var(--fs-h1)] lg:text-[length:var(--fs-display-sm)] xl:text-[length:var(--fs-display-xl)] leading-[length:var(--lh-h1)] lg:leading-[length:var(--lh-display-sm)] xl:leading-[length:var(--lh-display-xl)] max-w-280 text-generic-100 font-semibold font-heading mb-4 m-0 text-center"
+                    class="text-[length:var(--fs-h1)] lg:text-[length:var(--fs-display-sm)] xl:text-[length:var(--fs-display-xl)] leading-[length:var(--lh-h1)] lg:leading-[length:var(--lh-display-sm)] xl:leading-[length:var(--lh-display-xl)] max-w-310 text-generic-100 font-semibold font-heading mb-4 m-0 text-center"
                 >
-                    E-Invoicing  <span class="text-generic-100 bg-flux-lime px-1 rounded-lg">Compliance</span> Today. Tax Assurance Tomorrow.
+                    {titlePrefix} {titleHighlight && <span class="text-generic-100 bg-flux-lime px-1 rounded-lg">{titleHighlight}</span>} {titleSuffix}
                 </h2>
 
                 <!-- Description -->
                 <p
-                    class="text-[length:var(--fs-body)] leading-[length:var(--lh-body)] sm:text-[length:var(--fs-body-lg)] sm:leading-[length:var(--lh-body-lg)] max-w-167 text-neutral-500 font-medium font-body mb-7 text-center"
+                    class="text-[length:var(--fs-body)] leading-[length:var(--lh-body)] sm:text-[length:var(--fs-body-lg)] sm:leading-[length:var(--lh-body-lg)] max-w-235 text-neutral-500 font-medium font-body mb-7 text-center"
                 >
-                ClearTax helps you do more than meet the e-invoicing deadline. We prepare you for a future of automated tax scrutiny and always-on global compliance.
+                {description}
                 </p>
 
                 <!-- Call to Action buttons -->
@@ -118,98 +123,22 @@ const {
                         </svg>
                       </a>
 
-                    <button
-                        type="button"
-                        data-video-open
-                        class="inline-flex items-center justify-center gap-2 px-5 py-3.5 font-body rounded-lg font-medium text-nova-blue text-[length:var(--fs-body)] leading-[length:var(--lh-body)] cursor-pointer bg-transparent border border-nova-blue hover:bg-nova-50 transition-colors duration-150"
-                        style="outline: none;"
-                    >
-                        Watch Video
-                        <svg width="13" height="14" viewBox="0 0 13 14" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M0.75 1.69079C0.75 0.977723 1.5145 0.525696 2.1393 0.869336L11.7565 6.15877C12.4041 6.51495 12.4041 7.44549 11.7565 7.80167L2.1393 13.0911C1.5145 13.4347 0.75 12.9827 0.75 12.2697V1.69079Z" stroke="var(--color-nova-blue)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                        </svg>
-                    </button>
+                </div>
+
+                <!-- Feature Grid Cards -->
+                <div class="pt-16 md:pt-25 flex flex-wrap justify-center items-center gap-6 md:gap-12 w-full mx-auto z-10 relative">
+                    <div class="w-[100px] h-[100px] md:w-[120px] md:h-[120px] bg-[#E8FFE1] rounded-2xl"></div>
+                    <div class="w-[100px] h-[100px] md:w-[120px] md:h-[120px] bg-[#E8FFE1] rounded-2xl"></div>
+                    <div class="w-[100px] h-[100px] md:w-[120px] md:h-[120px] bg-[#E8FFE1] rounded-2xl"></div>
+                    <div class="w-[100px] h-[100px] md:w-[120px] md:h-[120px] bg-[#E8FFE1] rounded-2xl"></div>
                 </div>
 
             </div>
-        </div>
-    </div>
-
-    <!-- Video Modal -->
-    <div
-        class="fixed inset-0 z-2000 hidden items-center justify-center bg-black/70 backdrop-blur-sm p-4"
-        data-video-modal
-        aria-hidden="true"
-    >
-        <div class="relative w-full max-w-4xl">
-            <div class="relative w-full aspect-video bg-black rounded-xl overflow-hidden shadow-2xl">
-                <div
-                    class="absolute inset-0 [&_iframe]:absolute [&_iframe]:inset-0 [&_iframe]:w-full [&_iframe]:h-full [&_iframe]:border-0"
-                    data-video-wrap
-                >
-                </div>
-            </div>
-            <button
-                type="button"
-                data-video-close
-                aria-label="Close video"
-                class="absolute -top-12 right-0 z-10 inline-flex items-center justify-center w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 text-white transition-colors cursor-pointer border-0"
-            >
-                <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M13 1L1 13M1 1L13 13" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
-                </svg>
-            </button>
         </div>
     </div>
 </section>
 
 <script is:inline>
-  // Watch Video modal logic
-  (function () {
-    const section = document.getElementById('hero');
-    if (!section) return;
-    const videoId = section.getAttribute('data-video-id') || 'UX0Yt61EdfY';
-    const modal = section.querySelector('[data-video-modal]');
-    const wrap = modal ? modal.querySelector('[data-video-wrap]') : null;
-    const openBtns = section.querySelectorAll('[data-video-open]');
-    const closeBtn = modal ? modal.querySelector('[data-video-close]') : null;
-
-    function openModal() {
-      if (!modal || !wrap) return;
-      if (!wrap.innerHTML.trim()) {
-        const iframe = document.createElement('iframe');
-        const origin = window.location.origin;
-        iframe.src = `https://www.youtube-nocookie.com/embed/${videoId}?autoplay=1&rel=0&enablejsapi=1&origin=${encodeURIComponent(origin)}`;
-        iframe.allow = 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture';
-        iframe.allowFullscreen = true;
-        iframe.referrerPolicy = 'strict-origin-when-cross-origin';
-        wrap.appendChild(iframe);
-      }
-      modal.classList.remove('hidden');
-      modal.classList.add('flex');
-      modal.setAttribute('aria-hidden', 'false');
-      document.body.style.overflow = 'hidden';
-    }
-
-    function closeModal() {
-      if (!modal || !wrap) return;
-      modal.classList.add('hidden');
-      modal.classList.remove('flex');
-      modal.setAttribute('aria-hidden', 'true');
-      wrap.innerHTML = '';
-      document.body.style.overflow = '';
-    }
-
-    openBtns.forEach((btn) => btn.addEventListener('click', openModal));
-    closeBtn?.addEventListener('click', closeModal);
-    modal?.addEventListener('click', (e) => {
-      if (e.target === modal) closeModal();
-    });
-    document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape') closeModal();
-    });
-  })();
-
   // Smooth scroll logic
   window.scrollToContactForm = (e) => {
     e.preventDefault();
