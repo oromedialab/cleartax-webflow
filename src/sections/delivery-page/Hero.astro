@@ -1,0 +1,224 @@
+---
+/**
+ * The dot field is the one from `sections/blog-listing/Newsletter.astro`, in the
+ * hero's own lime. The long explanation of the geometry lives in that file; the
+ * short version is that the field is a plain grid of dots until a pointer
+ * enters, and each dot then draws out into a stroke aimed at the cursor, longest
+ * right beside it and back to a dot by `lengthRadius`.
+ *
+ * These are rendered onto the section as `data-*` and read back by the script.
+ * The old grid declared its numbers twice — as props here and again as a literal
+ * `config` in the script — so editing a prop changed nothing. One source now.
+ *
+ * The props that drove the old spring physics (`speedTrigger`, `shockRadius`,
+ * `maxSpeed`, `resistance`, `returnDuration`, `proximity`, `activeColor`) are
+ * gone with it. No page passed any of them.
+ */
+import DotgridRb from '../_shared/DotgridRb.astro';
+
+interface Props {
+  lineWidth?: number;
+  gap?: number;
+  maxLength?: number;
+  lengthRadius?: number;
+  tilt?: number;
+  baseColor?: string;
+  cursorRadius?: number;
+  pull?: number;
+  fadeRadius?: number;
+  videoId?: string;
+}
+
+const {
+  /* lineWidth is the old dotSize: the width of a stroke, and so the diameter of
+     the dot that stroke becomes at rest. 2 + 24 holds the hero's 26px pitch,
+     with a finer dot than the 4px it used to draw. */
+  lineWidth = 2,
+  gap = 24,
+  /* Longest a stroke gets, in px. Must stay under the 26px pitch or the field
+     starts knitting into a mesh — the guarantee is spelt out in
+     Newsletter.astro. */
+  maxLength = 6,
+  lengthRadius = 260,
+  /* Leave at 1. A partial turn cannot be continuous, and strokes flip as the
+     cursor crosses them — see the note in Newsletter.astro. */
+  tilt = 1,
+  baseColor = "#C8F006",
+  cursorRadius = 320,
+  pull = 14,
+  fadeRadius = 40,
+  videoId = "UX0Yt61EdfY",
+} = Astro.props;
+---
+
+<section
+    class="hero-section relative min-h-[700px] bg-[linear-gradient(180deg,_#FFF_0%,_rgba(242,_241,_240,_0.25)_30.04%,_rgba(242,_241,_240,_0.25)_87.79%,_#FFF_100%)] overflow-hidden flex items-center pt-28 pb-12 md:pt-30 md:pb-16 lg:pt-35 lg:pb-25"
+    id="hero"
+    data-video-id={videoId}
+>
+    <!-- Interactive Dot Grid Background -->
+    <DotgridRb 
+        containerId="hero" 
+        lineWidth={lineWidth} 
+        gap={gap} 
+        maxLength={maxLength} 
+        lengthRadius={lengthRadius} 
+        tilt={tilt} 
+        baseColor={baseColor} 
+        cursorRadius={cursorRadius} 
+        pull={pull} 
+        fadeRadius={fadeRadius} 
+    />
+    
+    <!-- Radial Gradient Mask to hide dots in the center (behind text) -->
+    <div 
+        class="absolute inset-0 z-0 bg-[radial-gradient(circle_at_center,_rgba(255,255,255,1)_30%,_rgba(255,255,255,0.7)_40%,_rgba(255,255,255,0)_65%)] pointer-events-none"
+    >
+    </div>
+
+    <div
+        class="absolute inset-0 z-0 bg-gradient-to-b from-white/85 via-white/50 to-transparent hidden max-[630px]:block pointer-events-none"
+    >
+    </div>
+
+    <!-- Bottom fade to blend dots into the background seamlessly -->
+    <div
+        class="absolute bottom-0 inset-x-0 h-48 bg-gradient-to-t from-white via-white/50 to-transparent pointer-events-none z-0"
+    >
+    </div>
+
+    <div class="relative z-10 mx-auto lg:container w-full px-4 lg:px-8 pointer-events-auto">
+        <div class="flex justify-center items-center w-full">
+            <!-- Hero Content -->
+            <div class="hero-content flex flex-col items-center mx-auto text-center">
+                <!-- Headline -->
+                <h2
+                    class="text-[length:var(--fs-h1)] lg:text-[length:var(--fs-display-sm)] xl:text-[length:var(--fs-display-xl)] leading-[length:var(--lh-h1)] lg:leading-[length:var(--lh-display-sm)] xl:leading-[length:var(--lh-display-xl)] max-w-280 text-generic-100 font-semibold font-heading mb-4 m-0 text-center"
+                >
+                    E-Invoicing  <span class="text-generic-100 bg-flux-lime px-1 rounded-lg">Compliance</span> Today. Tax Assurance Tomorrow.
+                </h2>
+
+                <!-- Description -->
+                <p
+                    class="text-[length:var(--fs-body)] leading-[length:var(--lh-body)] sm:text-[length:var(--fs-body-lg)] sm:leading-[length:var(--lh-body-lg)] max-w-167 text-neutral-500 font-medium font-body mb-7 text-center"
+                >
+                ClearTax helps you do more than meet the e-invoicing deadline. We prepare you for a future of automated tax scrutiny and always-on global compliance.
+                </p>
+
+                <!-- Call to Action buttons -->
+                <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
+                    <a
+                        href="javascript:void(0)" onclick="document.getElementById('contactForm').scrollIntoView({behavior:'smooth'})"
+                        class="inline-flex items-center justify-center gap-2 px-5 py-3.5 font-body rounded-lg font-medium text-white text-[length:var(--fs-body)] leading-[length:var(--lh-body)] cursor-pointer bg-nova-blue border border-nova-blue hover:bg-generic-00 hover:text-nova-blue transition-all duration-150 ease-in-out"
+                        style="outline: none;"
+                    >
+                        Book a Demo
+                        <svg width="14" height="9" viewBox="0 0 14 9" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path fill-rule="evenodd" clip-rule="evenodd" d="M9.00628 0.256282C9.34799 -0.0854272 9.90201 -0.0854272 10.2437 0.256282L13.7437 3.75628C14.0854 4.09799 14.0854 4.65201 13.7437 4.99372L10.2437 8.49372C9.90201 8.83543 9.34799 8.83543 9.00628 8.49372C8.66457 8.15201 8.66457 7.59799 9.00628 7.25628L11.0126 5.25H0.875001C0.391751 5.25 -2.11235e-08 4.85825 0 4.375C2.11235e-08 3.89175 0.391751 3.5 0.875001 3.5H11.0126L9.00628 1.49372C8.66457 1.15201 8.66457 0.59799 9.00628 0.256282Z" fill="currentColor"/>
+                        </svg>
+                      </a>
+
+                    <button
+                        type="button"
+                        data-video-open
+                        class="inline-flex items-center justify-center gap-2 px-5 py-3.5 font-body rounded-lg font-medium text-nova-blue text-[length:var(--fs-body)] leading-[length:var(--lh-body)] cursor-pointer bg-transparent border border-nova-blue hover:bg-nova-50 transition-colors duration-150"
+                        style="outline: none;"
+                    >
+                        Watch Video
+                        <svg width="13" height="14" viewBox="0 0 13 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M0.75 1.69079C0.75 0.977723 1.5145 0.525696 2.1393 0.869336L11.7565 6.15877C12.4041 6.51495 12.4041 7.44549 11.7565 7.80167L2.1393 13.0911C1.5145 13.4347 0.75 12.9827 0.75 12.2697V1.69079Z" stroke="var(--color-nova-blue)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- Video Modal -->
+    <div
+        class="fixed inset-0 z-2000 hidden items-center justify-center bg-black/70 backdrop-blur-sm p-4"
+        data-video-modal
+        aria-hidden="true"
+    >
+        <div class="relative w-full max-w-4xl">
+            <div class="relative w-full aspect-video bg-black rounded-xl overflow-hidden shadow-2xl">
+                <div
+                    class="absolute inset-0 [&_iframe]:absolute [&_iframe]:inset-0 [&_iframe]:w-full [&_iframe]:h-full [&_iframe]:border-0"
+                    data-video-wrap
+                >
+                </div>
+            </div>
+            <button
+                type="button"
+                data-video-close
+                aria-label="Close video"
+                class="absolute -top-12 right-0 z-10 inline-flex items-center justify-center w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 text-white transition-colors cursor-pointer border-0"
+            >
+                <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M13 1L1 13M1 1L13 13" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+                </svg>
+            </button>
+        </div>
+    </div>
+</section>
+
+<script is:inline>
+  // Watch Video modal logic
+  (function () {
+    const section = document.getElementById('hero');
+    if (!section) return;
+    const videoId = section.getAttribute('data-video-id') || 'UX0Yt61EdfY';
+    const modal = section.querySelector('[data-video-modal]');
+    const wrap = modal ? modal.querySelector('[data-video-wrap]') : null;
+    const openBtns = section.querySelectorAll('[data-video-open]');
+    const closeBtn = modal ? modal.querySelector('[data-video-close]') : null;
+
+    function openModal() {
+      if (!modal || !wrap) return;
+      if (!wrap.innerHTML.trim()) {
+        const iframe = document.createElement('iframe');
+        const origin = window.location.origin;
+        iframe.src = `https://www.youtube-nocookie.com/embed/${videoId}?autoplay=1&rel=0&enablejsapi=1&origin=${encodeURIComponent(origin)}`;
+        iframe.allow = 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture';
+        iframe.allowFullscreen = true;
+        iframe.referrerPolicy = 'strict-origin-when-cross-origin';
+        wrap.appendChild(iframe);
+      }
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+      modal.setAttribute('aria-hidden', 'false');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeModal() {
+      if (!modal || !wrap) return;
+      modal.classList.add('hidden');
+      modal.classList.remove('flex');
+      modal.setAttribute('aria-hidden', 'true');
+      wrap.innerHTML = '';
+      document.body.style.overflow = '';
+    }
+
+    openBtns.forEach((btn) => btn.addEventListener('click', openModal));
+    closeBtn?.addEventListener('click', closeModal);
+    modal?.addEventListener('click', (e) => {
+      if (e.target === modal) closeModal();
+    });
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') closeModal();
+    });
+  })();
+
+  // Smooth scroll logic
+  window.scrollToContactForm = (e) => {
+    e.preventDefault();
+    const contactForm = document.getElementById('contact-form');
+    if (contactForm) {
+      contactForm.scrollIntoView({ behavior: 'smooth' });
+      history.replaceState(null, '', window.location.pathname + window.location.search);
+    }
+  };
+
+
+</script>

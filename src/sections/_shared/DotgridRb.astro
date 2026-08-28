@@ -1,0 +1,349 @@
+---
+/**
+ * Interactive Dot Grid Background Component
+ * 
+ * Reusable dot grid that animates into strokes following the mouse cursor.
+ * The dot field is a plain grid of dots until a pointer enters, and each 
+ * dot then draws out into a stroke aimed at the cursor.
+ */
+interface Props {
+  lineWidth?: number;
+  gap?: number;
+  maxLength?: number;
+  lengthRadius?: number;
+  tilt?: number;
+  baseColor?: string;
+  cursorRadius?: number;
+  pull?: number;
+  fadeRadius?: number;
+  containerId: string;
+  canvasId?: string;
+}
+
+const {
+  lineWidth = 2,
+  gap = 24,
+  maxLength = 6,
+  lengthRadius = 260,
+  tilt = 1,
+  baseColor = "#C8F006",
+  cursorRadius = 320,
+  pull = 14,
+  fadeRadius = 40,
+  containerId,
+  canvasId = `${containerId}-canvas`,
+} = Astro.props;
+---
+
+<div
+  class="dot-grid-wrapper absolute inset-0 z-0 w-full h-full pointer-events-none"
+  data-dot-grid-container={containerId}
+  data-canvas-id={canvasId}
+  data-line-width={String(lineWidth)}
+  data-gap={String(gap)}
+  data-max-length={String(maxLength)}
+  data-length-radius={String(lengthRadius)}
+  data-tilt={String(tilt)}
+  data-base-color={baseColor}
+  data-cursor-radius={String(cursorRadius)}
+  data-pull={String(pull)}
+  data-fade-radius={String(fadeRadius)}
+>
+  <canvas id={canvasId} class="absolute inset-0 w-full h-full"></canvas>
+</div>
+
+<script>
+  // Script runs once per page, initializes all dot grids found
+  document.addEventListener('DOMContentLoaded', () => {
+    const grids = document.querySelectorAll('.dot-grid-wrapper');
+    
+    grids.forEach(wrapper => {
+      const containerId = wrapper.getAttribute('data-dot-grid-container');
+      const canvasId = wrapper.getAttribute('data-canvas-id');
+      
+      if (!containerId || !canvasId) return;
+      
+      const section = document.getElementById(containerId);
+      const canvas = document.getElementById(canvasId) as HTMLCanvasElement;
+      
+      if (!section || !canvas || !canvas.getContext) return;
+      
+      const ctx = canvas.getContext('2d');
+
+      function num(name: string, fallback: number) {
+        const value = parseFloat(wrapper.getAttribute(name) || "");
+        return isNaN(value) ? fallback : value;
+      }
+
+      const config = {
+        lineWidth: num('data-line-width', 2),
+        gap: num('data-gap', 24),
+        maxLength: num('data-max-length', 12),
+        lengthRadius: num('data-length-radius', 260),
+        tilt: num('data-tilt', 1),
+        baseColor: wrapper.getAttribute('data-base-color') || '#C8F006',
+        cursorRadius: num('data-cursor-radius', 320),
+        pull: num('data-pull', 14),
+        fadeRadius: num('data-fade-radius', 40),
+        fadeSpeed: 12,
+        followSpeed: 7,
+        engageSpeed: 4,
+        focusSpeed: 5,
+      };
+
+      const HALF_PI = Math.PI / 2;
+
+      let width = 0;
+      let height = 0;
+      let dots: any[] = [];
+      const mouse = { x: -9999, y: -9999, prevX: -9999, prevY: -9999 };
+      let hover = false;
+      let speed = 0;
+      let engagement = 0;
+      let presence = 0;
+      let focusX = 0;
+      let focusY = 0;
+
+      function initGrid() {
+        const parent = canvas.parentElement;
+        if (!parent) return;
+        width = parent.offsetWidth;
+        height = parent.offsetHeight;
+        if (!width || !height) return;
+
+        const dpr = window.devicePixelRatio || 1;
+        canvas.width = Math.round(width * dpr);
+        canvas.height = Math.round(height * dpr);
+        if (ctx) ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+        dots = [];
+        const spacing = config.lineWidth + config.gap;
+        const cols = Math.floor(width / spacing);
+        const rows = Math.floor(height / spacing);
+        const startX = (width - cols * spacing) / 2 + config.lineWidth / 2;
+        const startY = (height - rows * spacing) / 2 + config.lineWidth / 2;
+
+        for (let y = 0; y <= rows; y++) {
+          for (let x = 0; x <= cols; x++) {
+            const cx = startX + x * spacing;
+            const cy = startY + y * spacing;
+            dots.push({ x: cx, y: cy, ox: cx, oy: cy, alpha: 1, hx: 0, hy: 0 });
+          }
+        }
+
+        if (!hover) {
+          focusX = width / 2;
+          focusY = height / 2;
+        }
+        aim();
+      }
+
+      function aim() {
+        const longest = config.maxLength / 2;
+        const turn = presence * config.tilt;
+
+        for (let i = 0; i < dots.length; i++) {
+          const dot = dots[i];
+          const dx = focusX - dot.ox;
+          const dy = focusY - dot.oy;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+
+          let t = dist / config.lengthRadius;
+          if (t > 1) t = 1;
+          const grow = 1 - t;
+          let reach = longest * grow * grow * (3 - 2 * grow) * presence;
+          if (reach < 0.25) reach = 0.25;
+
+          let ux = 0;
+          let uy = 1;
+
+          if (turn > 0.001 && dist > 0.01) {
+            let off = Math.atan2(dy, dx) - HALF_PI;
+            while (off > HALF_PI) off -= Math.PI;
+            while (off < -HALF_PI) off += Math.PI;
+
+            const angle = HALF_PI + off * turn;
+            ux = Math.cos(angle);
+            uy = Math.sin(angle);
+          }
+
+          dot.hx = ux * reach;
+          dot.hy = uy * reach;
+        }
+      }
+
+      function paint() {
+        if (!ctx) return;
+        ctx.clearRect(0, 0, width, height);
+        ctx.strokeStyle = config.baseColor;
+        ctx.lineWidth = config.lineWidth;
+        ctx.lineCap = 'round';
+
+        ctx.globalAlpha = 1;
+        ctx.beginPath();
+        for (let i = 0; i < dots.length; i++) {
+          const dot = dots[i];
+          if (dot.alpha < 0.995) continue;
+          ctx.moveTo(dot.x - dot.hx, dot.y - dot.hy);
+          ctx.lineTo(dot.x + dot.hx, dot.y + dot.hy);
+        }
+        ctx.stroke();
+
+        for (let j = 0; j < dots.length; j++) {
+          const fading = dots[j];
+          if (fading.alpha >= 0.995 || fading.alpha < 0.01) continue;
+          ctx.globalAlpha = fading.alpha;
+          ctx.beginPath();
+          ctx.moveTo(fading.x - fading.hx, fading.y - fading.hy);
+          ctx.lineTo(fading.x + fading.hx, fading.y + fading.hy);
+          ctx.stroke();
+        }
+
+        ctx.globalAlpha = 1;
+      }
+
+      const reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+      if (reduceMotion) {
+        initGrid();
+        paint();
+        window.addEventListener('resize', () => {
+          initGrid();
+          paint();
+        });
+        return;
+      }
+
+      let lastTime = performance.now();
+
+      function draw(time: number) {
+        let dt = (time - lastTime) / 1000;
+        if (dt > 0.05) dt = 0.05;
+        lastTime = time;
+
+        const fadeEase = Math.min(1, config.fadeSpeed * dt);
+        const followEase = Math.min(1, config.followSpeed * dt);
+        const engageEase = Math.min(1, config.engageSpeed * dt);
+        const focusEase = Math.min(1, config.focusSpeed * dt);
+
+        const travelX = mouse.x - mouse.prevX;
+        const travelY = mouse.y - mouse.prevY;
+        mouse.prevX = mouse.x;
+        mouse.prevY = mouse.y;
+        speed += (Math.sqrt(travelX * travelX + travelY * travelY) - speed) * 0.5;
+        if (speed < 0.01) speed = 0;
+
+        engagement += ((hover ? Math.min(speed / 6, 1) : 0) - engagement) * engageEase;
+        if (engagement < 0.001) engagement = 0;
+
+        const grip = hover ? 0.4 + 0.6 * engagement : 0;
+
+        const wantX = hover ? mouse.x : width / 2;
+        const wantY = hover ? mouse.y : height / 2;
+        const swungX = wantX - focusX;
+        const swungY = wantY - focusY;
+        let swung = swungX > 0.05 || swungX < -0.05 || swungY > 0.05 || swungY < -0.05;
+        if (swung) {
+          focusX += swungX * focusEase;
+          focusY += swungY * focusEase;
+        } else if (focusX !== wantX || focusY !== wantY) {
+          focusX = wantX;
+          focusY = wantY;
+          swung = true;
+        }
+
+        const wantPresence = hover ? 1 : 0;
+        const presenceDiff = wantPresence - presence;
+        if (presenceDiff > 0.002 || presenceDiff < -0.002) {
+          presence += presenceDiff * focusEase;
+          swung = true;
+        } else if (presence !== wantPresence) {
+          presence = wantPresence;
+          swung = true;
+        }
+
+        if (swung) aim();
+
+        const crSq = config.cursorRadius * config.cursorRadius;
+        let moving = swung;
+
+        for (let i = 0; i < dots.length; i++) {
+          const dot = dots[i];
+
+          const dx = focusX - dot.ox;
+          const dy = focusY - dot.oy;
+          const distSq = dx * dx + dy * dy;
+
+          let targetAlpha = 1;
+          let targetX = dot.ox;
+          let targetY = dot.oy;
+
+          if (distSq < crSq) {
+            const dist = Math.sqrt(distSq);
+
+            if (grip > 0.001) {
+              const t = 1 - dist / config.cursorRadius;
+              let push = t * t * config.pull * grip;
+              if (push > dist * 0.75) push = dist * 0.75;
+              const step = dist > 0.01 ? push / dist : 0;
+              targetX += dx * step;
+              targetY += dy * step;
+            }
+
+            if (dist < config.fadeRadius) {
+              const ft = dist / config.fadeRadius;
+              const hole = ft * ft * (3 - 2 * ft);
+              targetAlpha = 1 - (1 - hole) * presence;
+            }
+          }
+
+          const offX = targetX - dot.x;
+          const offY = targetY - dot.y;
+          if (offX > 0.05 || offX < -0.05 || offY > 0.05 || offY < -0.05) {
+            dot.x += offX * followEase;
+            dot.y += offY * followEase;
+            moving = true;
+          } else if (dot.x !== targetX || dot.y !== targetY) {
+            dot.x = targetX;
+            dot.y = targetY;
+            moving = true;
+          }
+
+          const diff = targetAlpha - dot.alpha;
+          if (diff > 0.002 || diff < -0.002) {
+            dot.alpha += diff * fadeEase;
+            moving = true;
+          } else if (dot.alpha !== targetAlpha) {
+            dot.alpha = targetAlpha;
+            moving = true;
+          }
+        }
+
+        if (moving) paint();
+        requestAnimationFrame(draw);
+      }
+
+      window.addEventListener('resize', initGrid);
+      initGrid();
+      requestAnimationFrame(draw);
+
+      section.addEventListener('mousemove', (e: MouseEvent) => {
+        const rect = canvas.getBoundingClientRect();
+        const nx = e.clientX - rect.left;
+        const ny = e.clientY - rect.top;
+        if (!hover) {
+          mouse.prevX = nx;
+          mouse.prevY = ny;
+        }
+        hover = true;
+        mouse.x = nx;
+        mouse.y = ny;
+      });
+
+      section.addEventListener('mouseleave', () => {
+        hover = false;
+        speed = 0;
+      });
+    });
+  });
+</script>
