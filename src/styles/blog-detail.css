@@ -1,0 +1,712 @@
+/**
+ * Blog detail (brand v2) — Figma node 12612:9425 ("Blog -> Detail").
+ * Paste into the Webflow Collection Page's <head> AFTER shared.css.
+ *
+ * WYSIWYG STYLESHEET — READ THIS BEFORE EDITING
+ * ---------------------------------------------------------------------------
+ * There are exactly THREE class hooks in this file, one per page region:
+ *
+ *     .ct-blog           article + table of contents
+ *     .ct-blog-faq       the FAQ block
+ *     .ct-blog-related   the related-articles block
+ *
+ * Everything below those is an ELEMENT selector — h1, h2, p, ul, table,
+ * figure, aside, details, time, hr. Nothing inside a region carries a class.
+ *
+ * That is the whole point. In Webflow the post body is a CMS Rich Text field,
+ * and a Rich Text field emits bare tags with no class attribute at all:
+ *
+ *     <h2>What is e-invoicing?</h2><p>…</p><ul><li>…</li></ul>
+ *
+ * Utilities cannot reach those tags, and an editor writing a post cannot be
+ * asked to add classes. Element selectors style whatever the editor produces,
+ * automatically, forever. Add a class-based rule here and the first paragraph
+ * someone types in the CMS renders unstyled.
+ *
+ * WHERE THE WYSIWYG ZONE IS: `.ct-blog article`. That subtree is the Rich Text
+ * field — style it only by tag. The header, FAQ and related blocks are fixed
+ * Webflow layouts, so a positional selector (`p:nth-of-type(2)`) is safe there
+ * and is used where two sibling tags need to differ.
+ *
+ * Unlayered on purpose: Webflow's element defaults are unlayered, and a layered
+ * rule loses to them regardless of specificity. Never wrap any of this in
+ * `@layer`.
+ *
+ * Values come from src/styles/tokens.css, which ships inside shared.css — paste
+ * that first or every `var()` here falls back to the browser default.
+ */
+@import 'tailwindcss/theme.css' layer(theme);
+@import 'tailwindcss/utilities.css' source(none);
+
+/* `container` and `bg-generic-00` are the ONLY utilities this page uses, and
+   they are named explicitly rather than found by scanning the page.
+ *
+ * `bg-generic-00` is on <body>. It is needed because shared.css sets
+ * `body { background-color: var(--color-surface) }` — Ledger White #F2F1F0 —
+ * while this page's Figma frame is #FFFFFF. Without the override the page
+ * renders off-white and the white FAQ and related-article cards float on a
+ * warm grey the design never asked for. The listing page carries the same
+ * override for the same reason.
+ *
+ * Scanning is actively wrong here. Tailwind reads the .astro file as a bag of
+ * candidate class names, and this page is mostly English prose — so the words
+ * "table", "grid", "start", "end" and "contents" in the copy each compiled a
+ * real rule (`.table{display:table}`, `.grid{display:grid}`, …). Those get
+ * pasted into the Webflow page <head>, where a Webflow element named `grid` or
+ * `table` would silently inherit them. A page with no utility classes must
+ * emit no utilities.
+ *
+ * (A file glob would also need care: `[slug]` is a glob character class, so
+ * `@source '…/[slug].astro'` matches nothing.) */
+@source inline("container bg-generic-00");
+
+@config '../../tailwind.config.js';
+
+/* ==========================================================================
+   SHARED FOUNDATION
+   The one `container` utility on each region carries page width, so the
+   1328px identity stays defined once in theme.css. Everything else is here.
+   ========================================================================== */
+.ct-blog,
+.ct-blog-faq,
+.ct-blog-related {
+    font-family: var(--font-body);
+    letter-spacing: var(--tracking-body);
+    color: var(--palette-neutral-500);
+}
+
+.ct-blog *,
+.ct-blog-faq *,
+.ct-blog-related * {
+    box-sizing: border-box;
+}
+
+.ct-blog a,
+.ct-blog-faq a,
+.ct-blog-related a {
+    color: var(--palette-nova-blue);
+    text-decoration: none;
+}
+
+.ct-blog img,
+.ct-blog-related img {
+    display: block;
+    max-width: 100%;
+    height: auto;
+}
+
+/* ==========================================================================
+   LAYOUT — Figma: 960 article + 80 gap + 240 sidebar = 1280 content
+   Three grid children, not two. Splitting the post into <header> and <article>
+   is what lets the <aside> land BETWEEN them on mobile while sitting beside
+   both on desktop; a single article column with the TOC after it would strand
+   the TOC at the foot of the page on a phone.
+   ========================================================================== */
+.ct-blog {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    row-gap: var(--spacing-x-lg);
+    /* Figma puts the breadcrumb 200px down. That is not decoration: the navbar
+       is `fixed top-4` and out of flow, so this padding is the only thing
+       keeping the breadcrumb from rendering underneath it.
+       A literal, not a token — the spacing scale steps 160 -> 192 and neither
+       is 200. The listing page's hero hard-codes the same `pt-[200px]`, and
+       the two pages sit next to each other, so they must agree. */
+    padding-top: 200px;
+    padding-bottom: var(--spacing-xxx-lg);
+}
+
+@media (width >= 1024px) {
+    .ct-blog {
+        grid-template-columns: minmax(0, 1fr) 240px;
+        column-gap: var(--spacing-xxx-lg);
+    }
+
+    .ct-blog > header  { grid-column: 1; grid-row: 1; }
+    .ct-blog > article { grid-column: 1; grid-row: 2; }
+
+    /* `align-self: start` is load-bearing: without it the item stretches to
+       fill both rows and `position: sticky` has no room left to travel. */
+    .ct-blog > aside {
+        grid-column: 2;
+        grid-row: 1 / span 2;
+        align-self: start;
+        position: sticky;
+        top: var(--spacing-xxx-big);
+    }
+}
+
+/* ==========================================================================
+   HEADER — breadcrumb, back link, title, meta, author. Figma 12612:9430.
+   Fixed Webflow layout, so positional selectors are safe here.
+   ========================================================================== */
+/* No `gap` here on purpose. Every child below sets its own top margin to the
+   exact Figma step (48 / 12 / 16 / 12 / 48 / 48), and a flex gap would add
+   itself to each of them. */
+.ct-blog > header {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+.ct-blog > header > p:first-of-type { margin: 0; }
+
+/* Breadcrumb */
+.ct-blog > header > nav ol {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--spacing-xx-sm);
+    margin: 0 0 var(--spacing-xxx-big);
+    padding: 0;
+    list-style: none;
+    font-size: var(--fs-label);
+    line-height: var(--lh-label);
+}
+
+.ct-blog > header > nav li {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-xx-sm);
+    color: var(--palette-neutral-500);
+}
+
+/* The separator, drawn rather than marked up — a chevron typed into the
+   markup would be read aloud between every crumb. */
+.ct-blog > header > nav li + li::before {
+    content: '';
+    width: 6px;
+    height: 6px;
+    border-top: 1.5px solid var(--palette-neutral-400);
+    border-right: 1.5px solid var(--palette-neutral-400);
+    transform: rotate(45deg);
+}
+
+.ct-blog > header > nav a { color: var(--palette-neutral-500); }
+.ct-blog > header > nav a:hover { color: var(--palette-nova-blue); }
+.ct-blog > header > nav [aria-current] { color: var(--palette-nova-800); }
+
+/* Back link — the first paragraph in the header */
+.ct-blog > header > p:first-of-type a {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--spacing-x-sm);
+    font-weight: var(--font-weight-medium);
+    font-size: var(--fs-label-lg);
+    line-height: var(--lh-label-lg);
+    color: var(--palette-neutral-500);
+}
+
+.ct-blog > header > p:first-of-type a:hover { color: var(--palette-nova-blue); }
+
+.ct-blog > header h1 {
+    margin: var(--spacing-sm) 0 0;
+    font-family: var(--font-heading);
+    font-weight: var(--font-weight-semibold);
+    font-size: var(--fs-h1-lg);
+    line-height: var(--lh-h1-lg);
+    letter-spacing: var(--tracking-heading);
+    color: var(--palette-vault-navy);
+}
+
+/* p2 = standfirst, p3 = date/read time. Both are header chrome, not body
+   copy, so they are addressed by position rather than by tag alone. */
+.ct-blog > header > p:nth-of-type(2) {
+    margin: var(--spacing-md) 0 0;
+    font-size: var(--fs-body-lg);
+    line-height: var(--lh-body-lg);
+}
+
+.ct-blog > header > p:nth-of-type(3) {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--spacing-sm);
+    margin: var(--spacing-sm) 0 0;
+    font-size: var(--fs-body);
+    line-height: var(--lh-body);
+}
+
+.ct-blog > header > p:nth-of-type(3) > span,
+.ct-blog > header > p:nth-of-type(3) > time {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--spacing-x-sm);
+}
+
+/* The hairline between date and read time. An empty <span> is the divider. */
+.ct-blog > header > p:nth-of-type(3) > span:empty {
+    width: 1px;
+    height: 16px;
+    border-radius: var(--spacing-xx-sm);
+    background: var(--palette-neutral-300);
+}
+
+.ct-blog svg {
+    width: 20px;
+    height: 20px;
+    flex-shrink: 0;
+}
+
+/* Author card */
+.ct-blog address {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--spacing-md);
+    margin: var(--spacing-xxx-big) 0 0;
+    padding: var(--spacing-sm) var(--spacing-x-big) var(--spacing-sm) var(--spacing-md);
+    border: 1px solid var(--palette-neutral-200);
+    border-radius: 12px;
+    background: var(--palette-generic-00);
+    font-style: normal;
+}
+
+/* Avatar. Initials until a real image is dropped in — the same empty state the
+   listing cards use for a post with no artwork. */
+.ct-blog address > span:first-child {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 56px;
+    height: 56px;
+    flex-shrink: 0;
+    overflow: hidden;
+    border-radius: 50%;
+    background: var(--palette-nova-50);
+    font-weight: var(--font-weight-medium);
+    font-size: var(--fs-body);
+    color: var(--palette-nova-blue);
+}
+
+.ct-blog address > span:first-child img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.ct-blog address > span:last-child {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-x-sm);
+    font-size: var(--fs-body);
+    line-height: var(--lh-body);
+}
+
+.ct-blog address strong {
+    font-weight: var(--font-weight-medium);
+    color: var(--palette-vault-navy);
+}
+
+.ct-blog > header hr {
+    width: 100%;
+    height: 1px;
+    margin: var(--spacing-x-lg) 0 0;
+    border: 0;
+    background: var(--palette-ledger-200);
+}
+
+/* ==========================================================================
+   TABLE OF CONTENTS — Figma 12612:9482
+   The active entry is marked with aria-current by the script in the page, so
+   the highlight is announced as well as drawn — no class needed either way.
+   ========================================================================== */
+.ct-blog > aside > h2 {
+    margin: 0 0 var(--spacing-x-big);
+    font-family: var(--font-body);
+    font-weight: var(--font-weight-medium);
+    font-size: var(--fs-body-lg);
+    line-height: var(--lh-body-lg);
+    letter-spacing: var(--tracking-body);
+    color: var(--palette-vault-navy);
+}
+
+.ct-blog > aside ol {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-sm);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.ct-blog > aside a {
+    display: block;
+    font-size: var(--fs-body);
+    line-height: var(--lh-body);
+    color: var(--palette-neutral-400);
+    transition: color var(--transition-fast);
+}
+
+.ct-blog > aside a:hover { color: var(--palette-nova-blue); }
+
+.ct-blog > aside a[aria-current] {
+    font-weight: var(--font-weight-medium);
+    color: var(--palette-nova-blue);
+}
+
+/* ==========================================================================
+   ARTICLE BODY — the WYSIWYG zone. Figma 12612:9429.
+   TAG SELECTORS ONLY BELOW THIS LINE. Every rule must survive a CMS Rich Text
+   field that emits classless markup in any order.
+   Rhythm: 18px between paragraphs, 48px between blocks.
+   ========================================================================== */
+.ct-blog > article {
+    font-size: var(--fs-body-lg);
+    line-height: var(--lh-body-lg);
+}
+
+.ct-blog > article > :first-child { margin-top: 0; }
+.ct-blog > article > :last-child { margin-bottom: 0; }
+
+.ct-blog > article p {
+    margin: 0 0 18px;
+}
+
+.ct-blog > article h2,
+.ct-blog > article h3,
+.ct-blog > article h4 {
+    margin: var(--spacing-x-lg) 0 18px;
+    font-family: var(--font-body);
+    font-weight: var(--font-weight-medium);
+    font-size: var(--fs-body-lg);
+    line-height: var(--lh-body-lg);
+    letter-spacing: var(--tracking-body);
+    color: var(--palette-vault-navy);
+    /* Cleared so a jump from the table of contents doesn't park the heading
+       under a sticky Webflow navbar. */
+    scroll-margin-top: var(--spacing-huge);
+}
+
+.ct-blog > article h3,
+.ct-blog > article h4 {
+    font-size: var(--fs-label-lg);
+    line-height: var(--lh-body);
+}
+
+.ct-blog > article a:hover { text-decoration: underline; }
+
+.ct-blog > article strong,
+.ct-blog > article b {
+    font-weight: var(--font-weight-medium);
+    color: var(--palette-vault-navy);
+}
+
+.ct-blog > article ul,
+.ct-blog > article ol {
+    margin: 0 0 18px;
+    padding-left: 22px;
+}
+
+.ct-blog > article li { margin: 0 0 18px; }
+.ct-blog > article li:last-child { margin-bottom: 0; }
+
+.ct-blog > article figure {
+    margin: var(--spacing-x-lg) 0;
+}
+
+.ct-blog > article img {
+    width: 100%;
+    border-radius: var(--spacing-x-sm);
+}
+
+/* Empty figure = the Figma "Visual Placeholder" tint standing in for artwork
+   that hasn't been uploaded, at the designed 16:9. */
+.ct-blog > article figure:empty {
+    aspect-ratio: 16 / 9;
+    border-radius: var(--spacing-x-sm);
+    background: var(--palette-visual-placeholder);
+}
+
+.ct-blog > article blockquote {
+    margin: var(--spacing-x-lg) 0;
+    padding: 0 0 0 var(--spacing-x-big);
+    border-left: 2px solid var(--palette-nova-blue);
+    color: var(--palette-vault-navy);
+}
+
+/* Key Takeaways — Figma 12612:9455. `> article aside`, so it can never be
+   confused with the table of contents, which is `.ct-blog > aside`. */
+.ct-blog > article aside {
+    margin: var(--spacing-x-lg) 0;
+    padding: var(--spacing-x-big);
+    border-radius: 12px;
+    background: var(--palette-nova-50);
+}
+
+.ct-blog > article aside > :last-child { margin-bottom: 0; }
+
+.ct-blog > article aside h2 {
+    margin: 0 0 18px;
+    scroll-margin-top: 0;
+}
+
+.ct-blog > article code {
+    padding: 2px 6px;
+    border-radius: var(--spacing-xx-sm);
+    background: var(--palette-neutral-100);
+    font-size: var(--fs-body);
+    color: var(--palette-vault-navy);
+}
+
+/* Tables — Figma 12612:9458 */
+.ct-blog > article table {
+    width: 100%;
+    margin: var(--spacing-x-lg) 0;
+    /* `separate` is not a preference. `collapse` merges each pair of adjacent
+       borders into a single edge owned by the table, and browsers then ignore
+       border-radius on the cells entirely — the corners below would silently
+       do nothing. The cost of `separate` is doubled edges, which the
+       single-side borders further down avoid. */
+    border-collapse: separate;
+    border-spacing: 0;
+    font-size: var(--fs-body-sm);
+    line-height: var(--lh-body-sm);
+}
+
+.ct-blog > article caption {
+    margin-bottom: var(--spacing-sm);
+    text-align: left;
+    font-size: var(--fs-body-sm);
+    line-height: var(--lh-body-sm);
+    color: var(--palette-neutral-400);
+}
+
+.ct-blog > article th {
+    padding: 10px 12px;
+    text-align: left;
+    font-weight: var(--font-weight-medium);
+    color: var(--palette-vault-navy);
+    background: var(--palette-nova-50);
+}
+
+/* The radius belongs to the table as a whole, so the header owns the top two
+   corners and the final row owns the bottom two. Rounding all four corners of
+   the header instead leaves a notch either side of the seam, where a rounded
+   bar meets the square body underneath it. 12px is Figma's --radius/m. */
+.ct-blog > article thead tr:first-child th:first-child { border-top-left-radius: 12px; }
+.ct-blog > article thead tr:first-child th:last-child  { border-top-right-radius: 12px; }
+
+.ct-blog > article tbody tr:last-child td:first-child { border-bottom-left-radius: 12px; }
+.ct-blog > article tbody tr:last-child td:last-child  { border-bottom-right-radius: 12px; }
+
+/* Every edge drawn exactly ONCE. `border: 1px` on all four sides of each cell
+   doubles every internal rule to 2px under `border-collapse: separate`, and a
+   2px seam running into a 12px corner is the other half of why the corners
+   looked broken. Each cell draws its top and right; the first in a row adds
+   the left; the last row adds the bottom. Shared edges then belong to exactly
+   one cell, and the outer edge is still complete.
+   Giving `td` a top border rather than hanging it off the header also means a
+   table the CMS produced with no <thead> at all still closes its top edge. */
+.ct-blog > article td {
+    padding: 12px;
+    border-top: 1px solid var(--palette-neutral-200);
+    border-right: 1px solid var(--palette-neutral-200);
+    vertical-align: top;
+}
+
+.ct-blog > article td:first-child {
+    border-left: 1px solid var(--palette-neutral-200);
+}
+
+.ct-blog > article tbody tr:last-child td {
+    border-bottom: 1px solid var(--palette-neutral-200);
+}
+
+/* A table the CMS produced can have any number of columns, and a wide one
+   would otherwise stretch the whole page. `display: block` turns it into its
+   own scroll container; the rows still lay out as a table inside. */
+@media (width < 768px) {
+    .ct-blog > article table {
+        display: block;
+        overflow-x: auto;
+        white-space: nowrap;
+    }
+}
+
+/* ==========================================================================
+   FAQ — Figma 12612:9497. Native <details>, so no JavaScript.
+   ========================================================================== */
+.ct-blog-faq {
+    padding-bottom: var(--spacing-xxx-lg);
+}
+
+.ct-blog-faq > h2,
+.ct-blog-related > h2 {
+    margin: 0;
+    font-family: var(--font-heading);
+    font-weight: var(--font-weight-medium);
+    font-size: var(--fs-h2);
+    line-height: var(--lh-h2);
+    letter-spacing: var(--tracking-heading);
+    color: var(--palette-vault-navy);
+}
+
+.ct-blog-faq details {
+    margin-top: var(--spacing-sm);
+    padding: 0 var(--spacing-x-big);
+    border: 1px solid var(--palette-neutral-200);
+    border-radius: 12px;
+    background: var(--palette-generic-00);
+}
+
+.ct-blog-faq > h2 + details { margin-top: var(--spacing-xxx-big); }
+
+.ct-blog-faq summary {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--spacing-sm);
+    padding: var(--spacing-x-big) 0;
+    cursor: pointer;
+    list-style: none;
+    font-weight: var(--font-weight-medium);
+    font-size: var(--fs-body);
+    line-height: var(--lh-body);
+    color: var(--palette-vault-navy);
+}
+
+/* Safari draws its own disclosure triangle through `list-style: none`. */
+.ct-blog-faq summary::-webkit-details-marker { display: none; }
+
+/* The chevron, drawn rather than marked up — nothing to add in the CMS. */
+.ct-blog-faq summary::after {
+    content: '';
+    width: 8px;
+    height: 8px;
+    flex-shrink: 0;
+    margin-top: -4px;
+    border-bottom: 1.5px solid var(--palette-neutral-500);
+    border-right: 1.5px solid var(--palette-neutral-500);
+    transform: rotate(45deg);
+    transition: transform var(--transition-base);
+}
+
+.ct-blog-faq details[open] summary::after {
+    margin-top: 4px;
+    transform: rotate(-135deg);
+}
+
+.ct-blog-faq details p {
+    margin: 0;
+    padding-bottom: var(--spacing-x-big);
+    font-size: var(--fs-body);
+    line-height: var(--lh-body);
+}
+
+/* ==========================================================================
+   RELATED ARTICLES — Figma 12612:9520
+   ========================================================================== */
+.ct-blog-related {
+    padding-bottom: var(--spacing-xxx-lg);
+}
+
+.ct-blog-related > p {
+    margin: var(--spacing-x-sm) 0 0;
+    font-size: var(--fs-body-lg);
+    line-height: var(--lh-body-lg);
+}
+
+.ct-blog-related ul {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--spacing-x-big);
+    margin: var(--spacing-x-lg) 0 0;
+    padding: 0;
+    list-style: none;
+}
+
+@media (width >= 640px)  { .ct-blog-related ul { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (width >= 1024px) { .ct-blog-related ul { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+
+.ct-blog-related li > a {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-md);
+    height: 100%;
+    padding: var(--spacing-x-big);
+    border: 1px solid var(--palette-neutral-200);
+    border-radius: 16px;
+    background: var(--palette-generic-00);
+    transition: border-color var(--transition-base);
+}
+
+.ct-blog-related li > a:hover { border-color: var(--palette-nova-blue); }
+
+/* Badge row: category on the left, the optional "New" flag on the right. */
+.ct-blog-related li > a > p:first-child {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: var(--spacing-x-sm);
+    margin: 0;
+}
+
+.ct-blog-related li span,
+.ct-blog-related li mark {
+    padding: 6px 12px;
+    border-radius: 8px;
+    font-weight: var(--font-weight-medium);
+    font-size: var(--fs-label);
+    line-height: var(--lh-label);
+}
+
+.ct-blog-related li span {
+    background: var(--palette-neutral-100);
+    color: var(--palette-neutral-700);
+}
+
+.ct-blog-related li mark {
+    background: var(--palette-nova-blue);
+    color: var(--palette-generic-00);
+}
+
+.ct-blog-related li h3 {
+    /* Clamped: the Figma cards truncate at two lines, and without it one long
+       title leaves a card taller than the rest of its row. */
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    margin: 0;
+    font-family: var(--font-body);
+    font-weight: var(--font-weight-semibold);
+    font-size: var(--fs-body-lg);
+    line-height: var(--lh-body-lg);
+    letter-spacing: var(--tracking-body);
+    color: var(--palette-vault-navy);
+    transition: color var(--transition-base);
+}
+
+.ct-blog-related li > a:hover h3 { color: var(--palette-nova-blue); }
+
+.ct-blog-related li > a > p:last-child {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    margin: calc(var(--spacing-x-sm) * -1) 0 0;
+    font-size: var(--fs-body);
+    line-height: var(--lh-body);
+}
+
+/* ==========================================================================
+   MOBILE — the heading scale already steps down in tokens.css below 768px.
+   ========================================================================== */
+@media (width < 768px) {
+    /* Still has to clear the fixed navbar, so this is well above the 48px the
+       rest of the mobile rhythm uses. */
+    .ct-blog {
+        padding-top: var(--spacing-x-huge);
+        padding-bottom: var(--spacing-x-lg);
+    }
+
+    .ct-blog-faq,
+    .ct-blog-related {
+        padding-bottom: var(--spacing-x-lg);
+    }
+
+    .ct-blog address {
+        display: flex;
+        width: 100%;
+    }
+}

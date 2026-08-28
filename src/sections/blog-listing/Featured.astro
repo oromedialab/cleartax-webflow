@@ -10,52 +10,15 @@
  * what the mockup shows. Drop in a Webflow asset URL to replace it — never a
  * `data:` URI, that alone can blow the 50 KB Embed budget.
  */
-interface Post {
-  title: string;
-  excerpt: string;
-  date: string;
-  href: string;
-  image: string;
-}
+// The post list is shared with `/blog-listing/[slug]`, which generates one
+// detail page per entry. Keeping a second copy here would let a card link to a
+// slug that has no page — a 404 nothing in the build would catch.
+import { posts, postPath } from '../../data/blog-posts';
 
-const featured: Post = {
-  title: 'UAE Invoicing Readiness list',
-  excerpt: 'A practical framework to get ahead of the mandate',
-  date: 'July 12 2026',
-  href: 'https://www.cleartax.com/ae/e-invoicing-uae',
-  image: '',
-};
-
-const alsoForYou: Post[] = [
-  {
-    title: 'What ZATCA Phase II means for your ERP',
-    excerpt: 'Integration checkpoints every finance team should clear first',
-    date: 'July 12 2026',
-    href: 'https://www.cleartax.com/sa/ksa-einvoicing',
-    image: '',
-  },
-  {
-    title: 'France e-invoicing: the 2026 timeline',
-    excerpt: 'Who is in scope, when, and what Chorus Pro changes',
-    date: 'July 12 2026',
-    href: 'https://www.cleartax.com/fr/en/e-invoicing-france',
-    image: '',
-  },
-  {
-    title: 'Malaysia MyInvois beyond the first wave',
-    excerpt: 'Lessons from the enterprises that went live early',
-    date: 'July 12 2026',
-    href: 'https://www.cleartax.com/my/en/e-invoicing-malaysia',
-    image: '',
-  },
-  {
-    title: 'Germany B2B e-invoicing, explained',
-    excerpt: 'Preparing for a mandate that starts with receiving, not sending',
-    date: 'July 12 2026',
-    href: 'https://www.cleartax.com/de/en/e-invoicing-germany',
-    image: '',
-  },
-];
+// Lead story, then the next four. Position in the list is the editorial
+// decision; reorder `blog-posts.ts` to change what leads.
+const featured = posts[0];
+const alsoForYou = posts.slice(1, 5);
 ---
 
 <section class="bg-generic-00 py-12 md:py-20">
@@ -85,7 +48,7 @@ const alsoForYou: Post[] = [
     <div class="grid grid-cols-1 items-start gap-8 lg:grid-cols-[786fr_461fr]">
       <!-- Featured post -->
       <a
-        href={featured.href}
+        href={postPath(featured.slug)}
         class="group flex flex-col gap-6 rounded-xl border-2 border-ledger-200 bg-generic-00 p-6 no-underline transition-colors duration-200 hover:border-nova-blue"
       >
         <div class="relative aspect-video w-full overflow-hidden rounded-lg bg-visual-placeholder">
@@ -147,7 +110,7 @@ const alsoForYou: Post[] = [
           {
             alsoForYou.map((post) => (
               <a
-                href={post.href}
+                href={postPath(post.slug)}
                 class="group flex items-center gap-6 rounded-xl no-underline"
               >
                 <span class="relative block w-[120px] shrink-0 overflow-hidden rounded-lg bg-visual-placeholder aspect-video sm:w-[160px] xl:w-[181px]">

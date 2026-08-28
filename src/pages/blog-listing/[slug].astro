@@ -1,0 +1,406 @@
+---
+/**
+ * Blog detail — one page per post in `src/data/blog-posts.ts`.
+ * Figma node 12612:9425 ("Blog -> Detail").
+ *
+ * NO CLASSES IN THE MARKUP except three region hooks — `ct-blog`,
+ * `ct-blog-faq`, `ct-blog-related` — plus `container`, which carries page
+ * width so the 1328px identity stays defined once in theme.css. Everything
+ * else is styled by tag from `src/styles/blog-detail.css`.
+ *
+ * That is deliberate, not lazy. In Webflow the post body is a CMS Rich Text
+ * field, and a Rich Text field emits classless `<h2>`/`<p>`/`<ul>`/`<table>`.
+ * Only element selectors can reach those, so an editor can write a post and
+ * have it come out designed without touching a single class.
+ *
+ * THE STRUCTURE IS THE API. The stylesheet reads this DOM shape:
+ *
+ *   .ct-blog > header    breadcrumb, back, h1, standfirst, meta, author, hr
+ *   .ct-blog > aside     table of contents
+ *   .ct-blog > article   the post body — the WYSIWYG zone
+ *
+ * Three grid children, not two: splitting the post into <header> and <article>
+ * is what lets the <aside> land BETWEEN them on mobile while sitting beside
+ * both on desktop. Reordering or nesting these will silently unstyle things.
+ *
+ * Navbar and Footer are the listing page's own wrappers, imported rather than
+ * copied. This route lives *inside* /blog-listing/, so the two pages are one
+ * family and their chrome should never drift; `discoverSharedSources` follows
+ * the relative import chain (page -> blog-listing/Navbar -> _shared/NavbarRb),
+ * so both primitives still get their `@source` line and their utilities.
+ */
+import '../../styles/shared.css';
+import '../../styles/.build/blog-detail.css';
+
+import Navbar from '../../sections/blog-listing/Navbar.astro';
+import Footer from '../../sections/blog-listing/Footer.astro';
+import { posts, postPath } from '../../data/blog-posts';
+import type { BlogPost } from '../../data/blog-posts';
+
+export function getStaticPaths() {
+  return posts.map((post) => ({
+    params: { slug: post.slug },
+    props: { post },
+  }));
+}
+
+interface Props {
+  post: BlogPost;
+}
+
+const { post } = Astro.props;
+
+// Three others, wrapping round the end so the last post still gets a full set
+// instead of an empty rail.
+const others = posts.filter((p) => p.slug !== post.slug);
+const start = posts.findIndex((p) => p.slug === post.slug);
+const related = [0, 1, 2].map((i) => others[(start + i) % others.length]);
+
+// Initials stand in for a missing avatar, the same way the placeholder tint
+// stands in for a missing thumbnail on the listing page.
+const initials = post.author
+  .split(' ')
+  .map((part) => part.charAt(0))
+  .join('')
+  .slice(0, 2)
+  .toUpperCase();
+
+// Mirrors the <h2>s in the body below. The script re-derives this from the
+// rendered headings on load, so in Webflow — where the body is a Rich Text
+// field this file has never seen — it still comes out right.
+const toc = [
+  { id: 'what-is-e-invoicing-in-uae', label: 'What is e-invoicing in the UAE?' },
+  { id: 'key-takeaways', label: 'Key takeaways' },
+  { id: 'vat-code-requirements', label: 'VAT code requirements for e-invoices' },
+  { id: 'how-cleartax-helps', label: 'How ClearTax helps' },
+];
+
+const faqs = [
+  {
+    q: 'What is global e-invoicing and how does it work?',
+    a: "Global e-invoicing is the exchange of invoices in a structured, machine-readable format between a supplier, a buyer and — under most mandates — the tax authority. Your ERP produces the invoice, a compliance layer validates it against the destination country's schema, and an accredited network delivers it and returns the authority's acknowledgement.",
+  },
+  {
+    q: 'Why do multinational businesses need a global e-invoicing solution?',
+    a: 'Every country writes its own schema, its own clearance model and its own timeline. One connector per country means a separate integration, release cycle and team to keep each current. A single platform absorbs those differences behind one integration with your ERP.',
+  },
+  {
+    q: 'What is a global e-invoicing network, and how do businesses connect to it?',
+    a: 'A network is a set of accredited providers that agree on a common transport and document format, so any sender can reach any receiver without a bilateral integration. Businesses connect through one accredited provider, which handles routing, delivery receipts and format conversion on their behalf.',
+  },
+  {
+    q: 'What is the Peppol e-invoicing network and which countries use it?',
+    a: 'Peppol is the most widely adopted of those networks, originally European and now used well beyond it — Belgium, France, Germany, Poland, Singapore, Malaysia, Australia, New Zealand and the UAE. Countries usually publish a national specialisation, such as PINT-AE in the UAE.',
+  },
+  {
+    q: 'What are the biggest challenges businesses face with global e-invoicing regulations?',
+    a: 'Master data quality, overlapping go-live dates, and change. Mandates move: scopes widen, deadlines shift, schemas get revised. The work is less about the first integration than about keeping every country current without a project each time.',
+  },
+];
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{post.title} — ClearTax</title>
+    <meta name="description" content={post.excerpt} />
+    <meta content="noindex, nofollow" name="robots" />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="32x32"
+      href="https://cdn.prod.website-files.com/63ede4a3da6dbd6b05c4612f/63ede4a3da6dbd7162c46439_32by32.png"
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400..700&family=Google+Sans:opsz,wght@17..18,400..700&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body class="bg-generic-00">
+    <Navbar />
+
+    <div class="container ct-blog">
+      <header>
+        <nav aria-label="Breadcrumb">
+          <ol>
+            <li><a href="https://www.cleartax.com/global">Home</a></li>
+            <li><a href="/blog-listing">Blog</a></li>
+            <li aria-current="page">{post.title}</li>
+          </ol>
+        </nav>
+
+        <p>
+          <a href="/blog-listing">
+            <svg viewBox="0 0 20 20" fill="none" aria-hidden="true" focusable="false">
+              <path
+                d="M16.25 10H3.75M3.75 10L8.75 5M3.75 10L8.75 15"
+                stroke="currentColor"
+                stroke-width="1.5"
+                stroke-linecap="round"
+                stroke-linejoin="round"></path>
+            </svg>
+            Back
+          </a>
+        </p>
+
+        <h1>{post.title}</h1>
+
+        <p>{post.excerpt}</p>
+
+        <p>
+          <time datetime={post.datetime}>
+            <svg viewBox="0 0 20 20" fill="none" aria-hidden="true" focusable="false">
+              <rect
+                x="2.5"
+                y="3.75"
+                width="15"
+                height="13.75"
+                rx="1.25"
+                stroke="currentColor"
+                stroke-width="1.25"></rect>
+              <path
+                d="M2.5 7.5H17.5M6.25 2.5V5M13.75 2.5V5"
+                stroke="currentColor"
+                stroke-width="1.25"
+                stroke-linecap="round"></path>
+            </svg>
+            {post.date}
+          </time>
+          <span></span>
+          <span>
+            <svg viewBox="0 0 20 20" fill="none" aria-hidden="true" focusable="false">
+              <circle cx="10" cy="10" r="7.5" stroke="currentColor" stroke-width="1.25"></circle>
+              <path
+                d="M10 5.625V10H14.375"
+                stroke="currentColor"
+                stroke-width="1.25"
+                stroke-linecap="round"
+                stroke-linejoin="round"></path>
+            </svg>
+            {post.readTime} read
+          </span>
+        </p>
+
+        <address>
+          <span>{post.image ? <img src={post.image} alt={post.author} /> : initials}</span>
+          <span>
+            <strong>{post.author}</strong>
+            <span>{post.authorRole}</span>
+          </span>
+        </address>
+
+        <hr />
+      </header>
+
+      <aside aria-labelledby="toc-heading">
+        <h2 id="toc-heading">Table of contents</h2>
+        <ol>
+          {toc.map((entry) => <li><a href={`#${entry.id}`}>{entry.label}</a></li>)}
+        </ol>
+      </aside>
+
+      <article>
+        <p>
+          UAE e-invoicing under the <a href="https://www.cleartax.com/ae/e-invoicing-uae"
+            >Electronic Invoicing System (EIS UAE)</a
+          > starts from 30 October 2026 (extended timeline). Businesses handling B2B or B2G transactions
+          in the UAE, whether VAT registered or not, will need to issue invoices in structured XML format,
+          then send them through an Accredited Service Provider (ASP).
+        </p>
+
+        {
+          /* An empty <figure> renders the Figma "Visual Placeholder" tint at
+             16:9 — the stylesheet handles it with `figure:empty`. Set
+             `post.image` to a Webflow asset URL to fill it; never a `data:`
+             URI, that alone can blow the 50 KB Embed budget. */
+        }
+        {post.image ? <figure><img src={post.image} alt={post.title} width="1920" height="1080" /></figure> : <figure />}
+
+        <h2 id="what-is-e-invoicing-in-uae">What is e-invoicing in the UAE?</h2>
+        <p>
+          E-invoicing in the UAE refers to the electronic creation, exchange, and storage of invoices
+          in a structured digital format under the government's new Electronic Invoicing System (EIS).
+          This move is part of the UAE's wider strategy to digitize tax administration, enhance VAT
+          compliance, and align with international best practices.
+        </p>
+        <p>Traditional PDFs or scanned invoices won't qualify anymore. A valid UAE e-invoice must:</p>
+        <ul>
+          <li>Be issued in structured formats like XML using standards such as Peppol PINT-AE.</li>
+          <li>
+            Be transmitted through an Accredited Service Provider under the Peppol-based DCTCE model,
+            sometimes called the 5-corner model.
+          </li>
+          <li>
+            Be exchanged through ASPs while required Tax Data gets reported to the FTA with electronic
+            confirmations for compliance monitoring.
+          </li>
+        </ul>
+
+        <aside>
+          <h2 id="key-takeaways">Key takeaways</h2>
+          <ul>
+            <li>The mandate starts 30 October 2026 and covers B2B and B2G, VAT registered or not.</li>
+            <li>Structured XML only — a PDF, however it is produced, is not an e-invoice.</li>
+            <li>Delivery goes through an Accredited Service Provider, not direct to the buyer.</li>
+            <li>Tax data is reported to the FTA, which returns an electronic confirmation.</li>
+          </ul>
+        </aside>
+
+        <h2 id="vat-code-requirements">VAT code requirements for e-invoices</h2>
+        <p>
+          Invoices in France must include the same compulsory details as paper invoices. Under Article
+          289 II of the French VAT Code, a Council of State decree defines those mandatory fields:
+          seller and buyer identifiers (name, address, VAT number), details of goods and services, date,
+          invoice number, and <a href="https://www.cleartax.com/fr/en/vat-calculator">VAT calculation</a>
+          elements. The code lists below are the ones an e-invoice is validated against.
+        </p>
+
+        <table>
+          <caption>Code lists referenced by the e-invoicing schema</caption>
+          <thead>
+            <tr>
+              <th scope="col">Code list</th>
+              <th scope="col">What it identifies</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td>ISO 3166-1</td><td>Country codes</td></tr>
+            <tr><td>ISO 4217</td><td>Currency codes</td></tr>
+            <tr><td>ISO 6523</td><td>Identifier scheme codes</td></tr>
+            <tr><td>UNTDID 1001</td><td>Document type codes</td></tr>
+            <tr><td>UNTDID 4461</td><td>Payment means codes</td></tr>
+            <tr><td>UNTDID 5305</td><td>Tax category codes</td></tr>
+            <tr><td>UNTDID 7143</td><td>Item classification codes</td></tr>
+            <tr><td>UN/ECE Recommendation 20</td><td>Unit of measure codes</td></tr>
+          </tbody>
+        </table>
+
+        <h2 id="how-cleartax-helps">How ClearTax helps</h2>
+        <p>
+          ClearTax connects to your existing ERP, validates every invoice against the mandate's schema
+          before it leaves your system, and transmits it through an accredited network — so compliance
+          is a step in your billing run rather than a project beside it.
+        </p>
+      </article>
+    </div>
+
+    <section class="container ct-blog-faq">
+      <h2>Frequently Asked Questions</h2>
+      {
+        /* Native <details>, so the accordion needs no JavaScript and no class
+           to mark the open state — `details[open]` already does. */
+      }
+      {
+        faqs.map((faq) => (
+          <details>
+            <summary>{faq.q}</summary>
+            <p>{faq.a}</p>
+          </details>
+        ))
+      }
+    </section>
+
+    <section class="container ct-blog-related">
+      <h2>Related Articles</h2>
+      <p>Learn from the people building compliance every day.</p>
+      <ul>
+        {
+          related.map((item, i) => (
+            <li>
+              <a href={postPath(item.slug)}>
+                <p>
+                  <span>{item.topic}</span>
+                  {i === 0 && <mark>New</mark>}
+                </p>
+                <h3>{item.title}</h3>
+                <p>{item.excerpt}</p>
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </section>
+
+    <Footer />
+
+    <script is:inline>
+      (function () {
+        var article = document.querySelector('.ct-blog > article');
+        var aside = document.querySelector('.ct-blog > aside');
+        if (!article || !aside) return;
+
+        var list = aside.querySelector('ol');
+        var headings = Array.prototype.slice.call(article.querySelectorAll('h2'));
+        if (!list || !headings.length) return;
+
+        function slugify(text, index) {
+          var slug = text
+            .toLowerCase()
+            .replace(/[^a-z0-9]+/g, '-')
+            .replace(/^-+|-+$/g, '');
+          return slug ? slug : 'section-' + index;
+        }
+
+        // Rebuilt from the headings actually rendered, not from the list the
+        // page shipped. In Webflow the body is a CMS Rich Text field whose
+        // headings this file never saw — and Rich Text emits no ids, so one is
+        // minted here when missing. An id already in the markup always wins;
+        // it may be linked to from somewhere else.
+        list.innerHTML = '';
+        var links = headings.map(function (heading, index) {
+          if (!heading.id) heading.id = slugify(heading.textContent || '', index);
+          var li = document.createElement('li');
+          var a = document.createElement('a');
+          a.href = '#' + heading.id;
+          a.textContent = heading.textContent || '';
+          li.appendChild(a);
+          list.appendChild(li);
+          return a;
+        });
+
+        // `aria-current` rather than a class: the highlight is then announced
+        // as well as drawn, and the stylesheet needs no class hook.
+        function setActive(index) {
+          links.forEach(function (a, i) {
+            if (i === index) a.setAttribute('aria-current', 'true');
+            else a.removeAttribute('aria-current');
+          });
+        }
+
+        // Plain scroll maths rather than IntersectionObserver: the active entry
+        // is "the last heading past the top of the viewport", which an observer
+        // only reports at the moment a heading crosses. Scrolling past several
+        // in one gesture — or landing deep in the page from a fragment link —
+        // leaves an observer with nothing to say.
+        var ticking = false;
+
+        function update() {
+          ticking = false;
+          var line = window.pageYOffset + 120;
+          var active = 0;
+          for (var i = 0; i < headings.length; i++) {
+            var top = headings[i].getBoundingClientRect().top + window.pageYOffset;
+            if (top <= line) active = i;
+          }
+          setActive(active);
+        }
+
+        window.addEventListener(
+          'scroll',
+          function () {
+            if (ticking) return;
+            ticking = true;
+            window.requestAnimationFrame(update);
+          },
+          { passive: true }
+        );
+
+        update();
+      })();
+    </script>
+  </body>
+</html>

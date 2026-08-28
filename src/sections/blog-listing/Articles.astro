@@ -11,126 +11,10 @@
  * `topic` / `country` must match the option lists in `Filters.astro`.
  * `image: ''` falls back to the Figma "Visual Placeholder" tint.
  */
-interface Post {
-  title: string;
-  excerpt: string;
-  date: string;
-  href: string;
-  image: string;
-  topic: string;
-  country: string;
-}
-
-const posts: Post[] = [
-  {
-    title: 'UAE Invoicing Readiness list',
-    excerpt: 'A practical framework to get ahead of the mandate',
-    date: 'July 12 2026',
-    href: 'https://www.cleartax.com/ae/e-invoicing-uae',
-    image: '',
-    topic: 'E-Invoicing',
-    country: 'UAE',
-  },
-  {
-    title: 'ZATCA Phase II: integration checklist',
-    excerpt: 'What to validate before your onboarding window opens',
-    date: 'July 12 2026',
-    href: 'https://www.cleartax.com/sa/ksa-einvoicing',
-    image: '',
-    topic: 'Compliance',
-    country: 'Saudi Arabia',
-  },
-  {
-    title: 'Connecting SAP to a global e-invoicing platform',
-    excerpt: 'Middleware, IDocs and the trade-offs between them',
-    date: 'July 12 2026',
-    href: 'https://www.cleartax.com/global/erp-integration',
-    image: '',
-    topic: 'ERP Integration',
-    country: 'Global',
-  },
-  {
-    title: 'France e-invoicing: the 2026 timeline',
-    excerpt: 'Who is in scope, when, and what Chorus Pro changes',
-    date: 'July 12 2026',
-    href: 'https://www.cleartax.com/fr/en/e-invoicing-france',
-    image: '',
-    topic: 'E-Invoicing',
-    country: 'France',
-  },
-  {
-    title: 'Germany B2B e-invoicing, explained',
-    excerpt: 'Preparing for a mandate that starts with receiving, not sending',
-    date: 'July 12 2026',
-    href: 'https://www.cleartax.com/de/en/e-invoicing-germany',
-    image: '',
-    topic: 'Compliance',
-    country: 'Germany',
-  },
-  {
-    title: 'Malaysia MyInvois beyond the first wave',
-    excerpt: 'Lessons from the enterprises that went live early',
-    date: 'July 12 2026',
-    href: 'https://www.cleartax.com/my/en/e-invoicing-malaysia',
-    image: '',
-    topic: 'E-Invoicing',
-    country: 'Malaysia',
-  },
-  {
-    title: 'Reconciliation without the spreadsheet',
-    excerpt: 'How AI agents close the gap between invoice and ledger',
-    date: 'July 12 2026',
-    href: 'https://www.cleartax.com/global/recon-ai',
-    image: '',
-    topic: 'Tax Technology',
-    country: 'Global',
-  },
-  {
-    title: 'KSeF and the Polish rollout',
-    excerpt: 'A migration plan for groups filing across several entities',
-    date: 'July 12 2026',
-    href: 'https://www.cleartax.com/pl/en/e-invoicing-poland',
-    image: '',
-    topic: 'Compliance',
-    country: 'Poland',
-  },
-  {
-    title: 'InvoiceNow in Singapore',
-    excerpt: 'Peppol-first invoicing and what it asks of your billing stack',
-    date: 'July 12 2026',
-    href: 'https://www.cleartax.com/sg/en/e-invoicing-singapore',
-    image: '',
-    topic: 'E-Invoicing',
-    country: 'Singapore',
-  },
-  {
-    title: 'Scaling to a million invoices a day',
-    excerpt: 'The architecture behind peak-period filing',
-    date: 'July 12 2026',
-    href: 'https://www.cleartax.com/global/scale-security',
-    image: '',
-    topic: 'Tax Technology',
-    country: 'Global',
-  },
-  {
-    title: 'Oracle and NetSuite connectors, end to end',
-    excerpt: 'Mapping tax determination once and reusing it everywhere',
-    date: 'July 12 2026',
-    href: 'https://www.cleartax.com/global/erp-integration',
-    image: '',
-    topic: 'ERP Integration',
-    country: 'Global',
-  },
-  {
-    title: "What's new in the compliance cloud",
-    excerpt: 'Product updates from the last quarter, in one place',
-    date: 'July 12 2026',
-    href: 'https://www.cleartax.com/global/compliance',
-    image: '',
-    topic: 'Product',
-    country: 'Global',
-  },
-];
+// The post list is shared with `/blog-listing/[slug]`, which generates one
+// detail page per entry. Keeping it here as well would let a card link to a
+// slug that has no page — a 404 nothing in the build would catch.
+import { posts, postPath } from '../../data/blog-posts';
 ---
 
 <section class="bg-generic-00 py-12 md:py-20" data-blog-articles>
@@ -160,7 +44,7 @@ const posts: Post[] = [
         {
           posts.map((post, index) => (
             <a
-              href={post.href}
+              href={postPath(post.slug)}
               data-blog-card
               data-topic={post.topic}
               data-country={post.country}
