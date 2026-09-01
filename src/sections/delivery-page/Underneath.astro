@@ -1,6 +1,7 @@
 ---
+import UnderneathMandate from '../_shared/UnderneathMandate.astro';
 
-const Compliance = [
+const ComplianceData = [
     {
         title: 'Systems that don\'t talk to each other',
         img: 'var(--palette-visual-placeholder)',
@@ -21,133 +22,10 @@ const Compliance = [
         img: 'var(--palette-visual-placeholder)',
         desc: 'A new vendor, a new build, per geography. Complexity compounds instead of stacking.',
     }
-]
-
+];
 ---
 
-<div id="sticky-scroll-container">
-    <section class="sticky top-0 flex flex-col justify-center bg-generic-00 py-12 md:py-20 border border-y-[#00000033] overflow-hidden">
-        <div class="mx-auto lg:container w-full px-4 lg:px-6">
-
-            <div class="text-center mx-auto mb-12">
-                <h2 class="text-[length:var(--fs-h1)] leading-[length:var(--lh-h1)] font-medium text-vault-navy max-w-216 mx-auto mb-4 m-0">It's never the mandate. It's what's underneath.</h2>
-            </div>
-
-            <div class="w-full h-auto">
-                <div id="compliance-scroll-track" class="flex items-stretch gap-6 w-max transition-transform duration-[250ms] ease-out will-change-transform">
-                    {
-                        Compliance.map((item) => (
-                            <div class="bg-generic-00 rounded-lg p-4 lg:p-8 w-[90vw] md:w-[48vw] lg:w-[45vw] max-w-[628px] border-2 border-neutral-300 flex flex-col select-none">
-                                <h3 class="text-[26px] xl:text-[30px] leading-[1.26] font-medium max-w-[564px] text-vault-navy mb-4 md:mb-6 pointer-events-none">{item.title}</h3>
-                                <div class="w-full h-[40vh] min-h-[180px] max-h-[320px] max-w-[564px] rounded-sm pointer-events-none" style={`background-color: ${item.img};`}></div>
-                                <p class="text-neutral-500 font-medium text-[length:var(--fs-body)] leading-[length:var(--lh-body)] sm:text-[length:var(--fs-body-lg)] sm:leading-[length:var(--lh-body-lg)] mt-6 pointer-events-none">{item.desc}</p>
-                            </div>
-                        ))
-                    }
-                </div>
-            </div>
-
-        </div>
-    </section>
-</div>
-
-<script is:inline>
-    document.addEventListener('DOMContentLoaded', () => {
-        const container = document.getElementById('sticky-scroll-container');
-        const track = document.getElementById('compliance-scroll-track');
-        const section = container ? container.querySelector('section') : null;
-        
-        if (!container || !track || !section) return;
-        
-        // Function to dynamically get the header height
-        const getHeaderHeight = () => {
-            const header = document.querySelector('header, .navbar, .w-nav');
-            return header ? header.offsetHeight : 80; // Default to 80px if no header found
-        };
-        
-        let maxTranslate = 0;
-        let totalScrollable = 0;
-        let stickyTop = 0;
-        
-        const updateMeasurements = () => {
-            const sectionHeight = section.offsetHeight;
-            const windowHeight = window.innerHeight;
-            const headerHeight = getHeaderHeight();
-            
-            // Calculate how far the track is from the top of the section
-            const trackOffset = track.parentElement.getBoundingClientRect().top - section.getBoundingClientRect().top;
-            const trackHeight = track.offsetHeight;
-            const availableSpace = windowHeight - headerHeight;
-            
-            // We want to vertically center the cards track in the available viewport space below the navbar
-            // But we enforce a minimum gap of 40px so it never slides under the navbar
-            const idealTrackTop = headerHeight + Math.max(40, (availableSpace - trackHeight) / 2);
-            
-            // Calculate the section's stickyTop required to place the track exactly at idealTrackTop
-            let calculatedTop = idealTrackTop - trackOffset;
-            
-            // Cap it so the section itself never drops below the header (keeps it flush on large screens)
-            stickyTop = Math.min(headerHeight, calculatedTop);
-                
-            section.style.top = `${stickyTop}px`;
-            
-            // Calculate max translation using the inner container's width
-            const containerWidth = track.parentElement.getBoundingClientRect().width;
-            maxTranslate = Math.max(0, track.scrollWidth - containerWidth);
-            
-            // Calculate container height using viewport height
-            container.style.height = `${maxTranslate + windowHeight}px`;
-            
-            // The total distance the container can be scrolled while stuck
-            totalScrollable = container.getBoundingClientRect().height - sectionHeight;
-        };
-        
-        updateMeasurements();
-        
-        if (window.ResizeObserver) {
-            const ro = new ResizeObserver(updateMeasurements);
-            ro.observe(section);
-            ro.observe(track);
-        }
-        window.addEventListener('resize', updateMeasurements);
-        
-        let ticking = false;
-        
-        const handleScroll = () => {
-            if (!ticking) {
-                window.requestAnimationFrame(() => {
-                    const containerRect = container.getBoundingClientRect();
-                    
-                    // Calculate how far down the container the user has scrolled from the stick point
-                    const scrolledDistance = Math.max(0, stickyTop - containerRect.top);
-                    
-                    let progress = totalScrollable > 0 ? scrolledDistance / totalScrollable : 0;
-                    progress = Math.max(0, Math.min(1, progress));
-                    
-                    // Apply translation
-                    track.style.transform = `translate3d(-${progress * maxTranslate}px, 0, 0)`;
-                    
-                    ticking = false;
-                });
-                ticking = true;
-            }
-        };
-
-        // Use Intersection Observer to only listen to scroll when container is in view
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    window.addEventListener('scroll', handleScroll, { passive: true });
-                    // Trigger once to ensure correct position when entering viewport
-                    handleScroll();
-                } else {
-                    window.removeEventListener('scroll', handleScroll);
-                }
-            });
-        }, {
-            rootMargin: '100% 0px 100% 0px' // Start listening before it comes into full view
-        });
-
-        observer.observe(container);
-    });
-</script>
+<UnderneathMandate 
+    title="It's never the mandate. It's what's underneath."
+    items={ComplianceData}
+/>
