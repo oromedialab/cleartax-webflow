@@ -68,6 +68,8 @@ img,svg{display:block;max-width:100%}
 :focus-visible{outline:2px solid var(--ct-blueish-indigo);outline-offset:2px;border-radius:var(--ct-r-4)}
 .ct-wrap{max-width:var(--ct-max);margin:0 auto;padding-inline:var(--ct-s-24)}
 .ct-section{padding-block:var(--ct-s-96)}
+/* clears the 72px sticky nav when a link scrolls a section into view */
+section[id]{scroll-margin-top:96px}
 .ct-section--grey{background:var(--ct-greyish-white)}
 .ct-section--dark{position:relative;overflow:hidden;background:var(--ct-deep-midnight-blue);color:#fff}
 .ct-section--dark h2,.ct-section--dark h3{color:#fff}
@@ -192,15 +194,11 @@ img,svg{display:block;max-width:100%}
 .ct-split p{font-size:17px;line-height:1.85;color:var(--ct-navy-60);margin-bottom:var(--ct-s-20)}
 .ct-split p:last-child{margin-bottom:0}
 .ct-split strong{color:var(--ct-deep-midnight-blue);font-weight:var(--ct-fw-medium)}
-/* Video goes here — swap this block for the embed */
+/* Video embed */
+/* Video embed */
 .ct-video{position:relative;aspect-ratio:16/10;border-radius:var(--ct-r-16);overflow:hidden;
-  background:var(--ct-deep-midnight-blue);display:grid;place-items:center}
-.ct-video-dots{position:absolute;inset:0;opacity:.24;
-  background-image:radial-gradient(circle,var(--ct-electric-lime-green) 1.6px,transparent 1.6px);background-size:30px 30px}
-.ct-video-play{position:relative;width:72px;height:72px;border-radius:50%;background:rgba(255,255,255,.12);
-  border:1.5px solid rgba(255,255,255,.5);display:grid;place-items:center}
-.ct-video-play svg{width:26px;height:26px;fill:none;stroke:#fff;stroke-width:1.5;stroke-linejoin:round}
-.ct-video-label{position:absolute;bottom:var(--ct-s-20);inset-inline:0;text-align:center;font-size:13px;color:var(--ct-on-navy)}
+  background:var(--ct-deep-midnight-blue)}
+.ct-video iframe{position:absolute;inset:0;width:100%;height:100%;border:0;display:block}
 
 /* ══════ at a glance — regime map ══════ */
 .ct-regimes{display:grid;grid-template-columns:repeat(3,1fr);gap:var(--ct-s-24)}
@@ -435,7 +433,7 @@ img,svg{display:block;max-width:100%}
 <header class="ct-nav">
   <div class="ct-wrap">
    <div class="ct-nav-bar">
-    <a href="#" aria-label="ClearTax home"><svg class="ct-logo" viewBox="0 0 218 50" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Cleartax">
+    <a href="javascript:void(0)" onclick="window.scrollTo({top:0,behavior:'smooth'})" aria-label="ClearTax home"><svg class="ct-logo" viewBox="0 0 218 50" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Cleartax">
 <path fill="currentColor" d="M16.2455 49.2718C6.40215 49.2718 0 42.035 0 31.7169C0 21.3989 6.40215 14.1621 16.2455 14.1621C23.6613 14.1621 28.863 18.5437 30.4902 23.3494C30.9171 24.678 30.3569 25.3565 29.5566 25.7523L26.5956 27.1374C25.3418 27.7311 24.4082 27.2788 23.9014 26.4024C22.701 24.4802 20.7536 21.8229 16.2455 21.8229C10.857 21.8229 7.52253 25.413 7.52253 31.7452C7.52253 38.0774 10.857 41.6675 16.2455 41.6675C20.7536 41.6675 22.701 39.0102 23.9014 37.088C24.4082 36.2117 25.3418 35.7594 26.5956 36.353L29.5566 37.7382C30.3835 38.1339 30.9971 38.8124 30.4902 40.141C28.7297 44.8336 23.6613 49.2718 16.2455 49.2718Z"/>
 <path fill="currentColor" d="M36.8393 48.5372C35.7189 48.5372 34.9453 47.7457 34.9453 46.5302V2.00707C34.9453 0.81979 35.6922 0 36.8393 0H40.6005C41.7208 0 42.4944 0.791522 42.4944 2.00707V46.5584C42.4944 47.7457 41.7475 48.5655 40.6005 48.5655H36.8393V48.5372Z"/>
 <path fill="currentColor" d="M63.5696 49.2152C53.4596 49.2152 47.3242 43.2223 47.3242 31.6604C47.3242 21.5402 53.673 14.1621 63.1962 14.1621C72.4793 14.1621 77.5743 21.4837 77.5743 30.3318C77.5743 32.5367 76.5606 33.9784 74.1865 33.9784H54.3666C54.74 39.8866 58.1278 42.2329 63.7831 42.2329C67.4109 42.2329 69.9451 41.3 71.679 40.5085C73.0662 39.9148 73.9998 39.83 74.6934 41.3L75.5737 43.2223C76.2139 44.6074 76.0805 45.6251 75.0135 46.3601C73.5463 47.3495 69.3316 49.2152 63.5696 49.2152ZM54.3932 28.8053H70.532C70.1052 23.2929 67.0908 21.1445 63.0095 21.1445C58.4746 21.1445 54.9801 23.2646 54.3932 28.8053Z"/>
@@ -446,14 +444,14 @@ img,svg{display:block;max-width:100%}
 <path fill="currentColor" d="M193.029 48.537H188.761C187.641 48.537 187.321 47.4063 187.828 46.6147L197.484 31.5758L187.828 16.7348C187.267 15.8584 187.641 14.8125 188.761 14.8125H193.216C194.843 14.8125 195.67 15.1517 196.364 16.339L202.446 26.3178L208.475 16.339C209.168 15.2083 209.968 14.8125 211.622 14.8125H215.89C217.011 14.8125 217.331 15.9432 216.824 16.7348L207.167 31.802L216.824 46.643C217.384 47.5193 217.011 48.5653 215.89 48.5653H211.436C209.808 48.5653 208.981 48.1695 208.288 47.0388L202.206 37.0317L196.23 46.8974C195.484 48.0847 194.683 48.537 193.029 48.537Z"/>
 </svg></a>
     <ul>
-      <li><a href="#changing">Qué cambia</a></li>
-      <li><a href="#glance">De un vistazo</a></li>
-      <li><a href="#steps">Pasos a seguir</a></li>
-      <li><a href="#how">Cómo funciona</a></li>
-      <li><a href="#faq">Preguntas frecuentes</a></li>
+      <li><a href="javascript:void(0)" onclick="document.getElementById('changing').scrollIntoView({behavior:'smooth'})">Qué cambia</a></li>
+      <li><a href="javascript:void(0)" onclick="document.getElementById('glance').scrollIntoView({behavior:'smooth'})">De un vistazo</a></li>
+      <li><a href="javascript:void(0)" onclick="document.getElementById('steps').scrollIntoView({behavior:'smooth'})">Pasos a seguir</a></li>
+      <li><a href="javascript:void(0)" onclick="document.getElementById('how').scrollIntoView({behavior:'smooth'})">Cómo funciona</a></li>
+      <li><a href="javascript:void(0)" onclick="document.getElementById('faq').scrollIntoView({behavior:'smooth'})">Preguntas frecuentes</a></li>
     </ul>
     <div class="ct-nav-right">
-      <a href="#demo" class="ct-btn ct-btn--primary ct-btn--sm">Solicitar una demo</a>
+      <a href="javascript:void(0)" onclick="document.getElementById('demo').scrollIntoView({behavior:'smooth',block:'center'})" class="ct-btn ct-btn--primary ct-btn--sm">Solicitar una demo</a>
     </div>
     <button class="ct-nav-toggle" aria-label="Abrir menú"><span></span><span></span><span></span></button>
    </div>
@@ -479,7 +477,7 @@ img,svg{display:block;max-width:100%}
         <li><span class="ct-tick"><svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7"/></svg></span>Integración con IA con cualquier ERP, sistema de gestión o TPV</li>
         <li><span class="ct-tick"><svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7"/></svg></span>Una única API global de facturación electrónica, compatible con más de 50 normativas nacionales</li>
       </ul>
-      <a href="#demo" class="ct-btn ct-btn--primary">Solicitar una demo
+      <a href="javascript:void(0)" onclick="document.getElementById('demo').scrollIntoView({behavior:'smooth',block:'center'})" class="ct-btn ct-btn--primary">Solicitar una demo
         <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12h15M14 6l6 6-6 6"/></svg>
       </a>
     </div>
@@ -564,11 +562,10 @@ img,svg{display:block;max-width:100%}
         <p>Las empresas deben prepararse para varios requisitos normativos: <strong>VeriFactu</strong>, para el software de facturación certificado; la <strong>Ley Crea y Crece</strong>, para la facturación electrónica B2B obligatoria; <strong>Facturae</strong>, para la facturación al sector público; y <strong>TicketBAI</strong>, para las empresas que operan en el País Vasco.</p>
         <p>En lugar de gestionar soluciones de cumplimiento por separado, cada vez más empresas adoptan una única plataforma que cubre todos los requisitos y se mantiene preparada para las futuras actualizaciones normativas.</p>
       </div>
-      <!-- Sustituir este bloque por el vídeo incrustado -->
       <div class="ct-video">
-        <div class="ct-video-dots" aria-hidden="true"></div>
-        <div class="ct-video-play" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M8 5.5l11 6.5-11 6.5z"/></svg></div>
-        <p class="ct-video-label">Espacio reservado para el vídeo</p>
+        <iframe src="https://drive.google.com/file/d/1LAfSCmF0A0KnCy12KYYEBpy0Z0DBDl-r/preview"
+                title="Facturación electrónica en España" width="640" height="400"
+                allow="autoplay; fullscreen" allowfullscreen></iframe>
       </div>
     </div>
   </div>
@@ -668,7 +665,7 @@ img,svg{display:block;max-width:100%}
     </div>
 
     <div style="text-align:center;margin-top:var(--ct-s-48)">
-      <a href="#demo" class="ct-btn ct-btn--primary">Solicitar una demo</a>
+      <a href="javascript:void(0)" onclick="document.getElementById('demo').scrollIntoView({behavior:'smooth',block:'center'})" class="ct-btn ct-btn--primary">Solicitar una demo</a>
     </div>
   </div>
 </section>
@@ -1048,23 +1045,23 @@ img,svg{display:block;max-width:100%}
       <div>
         <h4>España</h4>
         <ul>
-          <li><a href="#glance">España de un vistazo</a></li><li><a href="#steps">Pasos a seguir</a></li>
-          <li><a href="#how">Cómo funciona</a></li><li><a href="#">VeriFactu</a></li>
-          <li><a href="#">Crea y Crece</a></li><li><a href="#">TicketBAI</a></li>
+          <li><a href="javascript:void(0)" onclick="document.getElementById('glance').scrollIntoView({behavior:'smooth'})">España de un vistazo</a></li><li><a href="javascript:void(0)" onclick="document.getElementById('steps').scrollIntoView({behavior:'smooth'})">Pasos a seguir</a></li>
+          <li><a href="javascript:void(0)" onclick="document.getElementById('how').scrollIntoView({behavior:'smooth'})">Cómo funciona</a></li><li><a href="javascript:void(0)">VeriFactu</a></li>
+          <li><a href="javascript:void(0)">Crea y Crece</a></li><li><a href="javascript:void(0)">TicketBAI</a></li>
         </ul>
       </div>
       <div>
         <h4>Compañía</h4>
         <ul>
-          <li><a href="#">Quiénes somos</a></li><li><a href="#">Contacto</a></li>
-          <li><a href="#">Plataforma global de facturación electrónica</a></li><li><a href="#">Recursos</a></li>
-          <li><a href="#">Confianza y seguridad</a></li>
+          <li><a href="javascript:void(0)">Quiénes somos</a></li><li><a href="javascript:void(0)">Contacto</a></li>
+          <li><a href="javascript:void(0)">Plataforma global de facturación electrónica</a></li><li><a href="javascript:void(0)">Recursos</a></li>
+          <li><a href="javascript:void(0)">Confianza y seguridad</a></li>
         </ul>
       </div>
     </div>
     <div class="ct-footer-bottom">
       <span>© 2026 ClearTax. Un producto de Defmacro Software Pvt. Ltd.</span>
-      <nav><a href="#">Aviso legal</a><a href="#">Política de privacidad</a><a href="#">Condiciones de uso</a></nav>
+      <nav><a href="javascript:void(0)">Aviso legal</a><a href="javascript:void(0)">Política de privacidad</a><a href="javascript:void(0)">Condiciones de uso</a></nav>
     </div>
   </div>
 </footer>
