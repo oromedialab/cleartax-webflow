@@ -1,0 +1,303 @@
+---
+/**
+ * "Clarity AI by ClearTax empowers finance to build with AI" — Figma node
+ * 13049:22786.
+ *
+ * Three numbered steps threaded by a vertical progress rail. The Figma ships
+ * this as two variants, state "1" and state "3": in state 1 only the first card
+ * is focused and the rail is part-filled in Nova Blue; in state 3 all three are
+ * focused, the rail is full and turns Flux Lime, and the closing pill fades in.
+ * Both are reproduced as one scroll-driven progression — a card latches on when
+ * it reaches the middle of the viewport and stays latched, which is what makes
+ * the end state equal state 3.
+ *
+ * Without JS every card renders in its resting border and the rail sits empty;
+ * the content is unaffected.
+ */
+interface Row {
+  title: string;
+  desc: string;
+  /** First row of step 2 is the only one with a real icon in the design. */
+  icon?: "files";
+}
+
+interface Step {
+  n: string;
+  title: string;
+  lede: string;
+  chips?: string[];
+  rows?: Row[];
+}
+
+const steps: Step[] = [
+  {
+    n: "1",
+    title: "Business systems",
+    lede: "Every system you run, always current",
+    chips: [
+      "ERP",
+      "POS",
+      "OMS",
+      "WMS",
+      "Customer data lakes",
+      "Government systems",
+      "Banking & payments",
+      "Documents & mail",
+    ],
+  },
+  {
+    n: "2",
+    title: "Financial context",
+    lede: "The layer behind AI output you can trust.",
+    rows: [
+      {
+        title: "Linked records",
+        desc: "Every system joined at transaction level",
+        icon: "files",
+      },
+      {
+        title: "Statutory logic",
+        desc: "Rates, classification and filing rules, across 50+ countries",
+      },
+      {
+        title: "Your logic",
+        desc: "GL structure, credit notes, vendor and item definitions, the recons and checks you run",
+      },
+      {
+        title: "Institutional memory",
+        desc: "Every investigation and the decision it led to",
+      },
+    ],
+  },
+  {
+    n: "3",
+    title: "Studios & surfaces",
+    lede: "Where your agents run, with context ready instead of rebuilt on every query.",
+    rows: [
+      {
+        title: "CFO Studio",
+        desc: "Apps and workflows you can ask questions of",
+      },
+      {
+        title: "Agent Studio",
+        desc: "Always-on agents that flag exceptions, send reports and alerts",
+      },
+      {
+        title: "Surfaces you already own",
+        desc: "Any agent, via MCP or API",
+      },
+    ],
+  },
+];
+---
+
+<section class="bg-generic-00 max-lg:py-12 lg:py-20" data-gh-clarity>
+  <div class="container mx-auto">
+    <div class="flex flex-col items-center gap-12">
+      <h2
+        class="m-0 text-center font-heading font-medium text-vault-navy text-[length:var(--fs-h1)] leading-[length:var(--lh-h1)] tracking-[-0.5px]"
+      >
+        Clarity AI by ClearTax empowers finance to build with AI
+      </h2>
+
+      <div class="relative w-full">
+        <!-- Progress rail. Sits behind the rows, centred on the column gap. -->
+        <div
+          class="gh-clarity-rail absolute inset-y-0 left-1/2 hidden w-2 -translate-x-1/2 overflow-hidden rounded-t-full bg-[#EFEFEF] lg:block"
+          aria-hidden="true"
+        >
+          <div class="gh-clarity-fill absolute inset-x-0 top-0 h-0 rounded-2xl bg-nova-blue"></div>
+        </div>
+
+        <div class="relative flex flex-col gap-12">
+          {
+            steps.map((step, i) => (
+              <div
+                class="flex items-center gap-20 max-lg:flex-col max-lg:gap-6"
+                data-gh-step
+                data-step-index={i}
+              >
+                <div class="gh-clarity-card flex w-[600px] flex-col justify-between self-stretch overflow-hidden rounded-xl border border-[#CCCCCC] bg-generic-00 max-lg:w-full">
+                  <div class="flex flex-col gap-6 border-b border-[#CCCCCC] p-6">
+                    <div class="flex flex-col gap-4">
+                      <span class="inline-flex h-[30px] w-[30px] items-center justify-center rounded-lg border border-[#C3C7CD] bg-[#FBFBFC] text-[length:var(--fs-label-sm)] leading-[length:var(--lh-label-sm)] font-medium text-[#5B6068] font-body">
+                        {step.n}
+                      </span>
+                      <div class="flex flex-col gap-1.5">
+                        <h3 class="m-0 font-heading font-medium text-vault-navy text-[length:var(--fs-h6)] leading-[length:var(--lh-h6)]">
+                          {step.title}
+                        </h3>
+                        <p class="m-0 font-body text-neutral-500 text-[length:var(--fs-body)] leading-[length:var(--lh-body)]">
+                          {step.lede}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="p-6">
+                    {step.chips && (
+                      <div class="flex flex-wrap items-start gap-2">
+                        {step.chips.map((c) => (
+                          <span class="inline-flex h-12 items-center justify-center rounded-lg border border-neutral-200 px-3 py-1.5 text-center text-[length:var(--fs-label)] leading-[length:var(--lh-label)] font-medium text-neutral-700 font-body">
+                            {c}
+                          </span>
+                        ))}
+                      </div>
+                    )}
+
+                    {step.rows && (
+                      <div class="flex flex-col gap-6">
+                        {step.rows.map((r, ri) => (
+                          <>
+                            {ri > 0 && <div class="h-px w-full bg-[#F2F1F0]" aria-hidden="true" />}
+                            <div class="flex items-start gap-4">
+                              {r.icon === "files" ? (
+                                <span class="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg border border-[#CCCCCC] text-vault-navy">
+                                  <svg
+                                    width="24"
+                                    height="24"
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    stroke-width="1.6"
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    aria-hidden="true"
+                                  >
+                                    <path d="M8 3.5h7l4.5 4.5v10a1.5 1.5 0 0 1-1.5 1.5H8a1.5 1.5 0 0 1-1.5-1.5v-13A1.5 1.5 0 0 1 8 3.5Z" />
+                                    <path d="M15 3.5V8h4.5" />
+                                    <path d="M4 7v12.5A1.5 1.5 0 0 0 5.5 21H16" />
+                                  </svg>
+                                </span>
+                              ) : (
+                                <span class="h-12 w-12 shrink-0 rounded-lg bg-visual-placeholder" />
+                              )}
+                              <div class="flex min-w-0 flex-1 flex-col gap-2">
+                                <p class="m-0 font-body font-medium text-vault-navy text-[length:var(--fs-label)] leading-[length:var(--lh-body-sm)]">
+                                  {r.title}
+                                </p>
+                                <p class="m-0 font-body text-neutral-500 text-[length:var(--fs-label)] leading-[length:var(--lh-body-sm)]">
+                                  {r.desc}
+                                </p>
+                              </div>
+                            </div>
+                          </>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                <div class="h-[515px] w-[600px] shrink-0 rounded-lg bg-visual-placeholder max-lg:h-64 max-lg:w-full" />
+              </div>
+            ))
+          }
+        </div>
+      </div>
+
+      <!-- Closing pill -->
+      <div
+        class="gh-clarity-pill flex items-center justify-center gap-6 rounded-lg border-4 border-flux-lime p-6 max-md:flex-col max-md:gap-4"
+      >
+        <span class="gh-clarity-dots max-md:hidden" aria-hidden="true"></span>
+        <p
+          class="m-0 text-center font-heading font-medium text-vault-navy text-[length:var(--fs-h6)] leading-[length:var(--lh-h6)]"
+        >
+          Give the model a foundation, and it stops guessing
+        </p>
+        <span class="gh-clarity-dots max-md:hidden" aria-hidden="true"></span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style is:global>
+  .gh-clarity-fill {
+    transition: height 0.45s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.45s ease;
+  }
+
+  /* Every step latched → the rail reads "complete" and flips to Flux Lime,
+     which is the Figma's state-3 treatment. */
+  [data-gh-clarity].is-complete .gh-clarity-fill {
+    background-color: var(--color-flux-lime);
+  }
+
+  .gh-clarity-card {
+    transition: border-color 0.35s ease, box-shadow 0.35s ease;
+  }
+
+  [data-gh-step].is-active .gh-clarity-card {
+    border-color: #3355ff;
+    border-width: 2px;
+  }
+
+  /* The 158×29 dot block flanking the closing line. */
+  .gh-clarity-dots {
+    display: block;
+    width: 158px;
+    height: 4px;
+    background-image: radial-gradient(
+      circle,
+      var(--color-flux-lime) 1.94px,
+      transparent 2px
+    );
+    background-size: 25.2px 4px;
+    background-repeat: repeat-x;
+  }
+</style>
+
+<script is:inline>
+  (function () {
+    const root = document.querySelector("[data-gh-clarity]");
+    if (!root) return;
+
+    const steps = Array.from(root.querySelectorAll("[data-gh-step]"));
+    const fill = root.querySelector(".gh-clarity-fill");
+    if (!steps.length) return;
+
+    if (!("IntersectionObserver" in window)) {
+      steps.forEach((s) => s.classList.add("is-active"));
+      root.classList.add("is-complete");
+      if (fill) fill.style.height = "100%";
+      return;
+    }
+
+    // Latch-only: once a step is reached it stays active, so scrolling back up
+    // does not unwind the rail. That matches the Figma, where state 3 is an end
+    // state rather than a hover.
+    const latched = new Set();
+
+    const paint = () => {
+      if (!fill) return;
+      if (latched.size === 0) {
+        fill.style.height = "0px";
+        return;
+      }
+      const last = steps[Math.max(...latched)];
+      const railTop = steps[0].offsetTop;
+      fill.style.height = `${last.offsetTop + last.offsetHeight - railTop}px`;
+      root.classList.toggle("is-complete", latched.size === steps.length);
+    };
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        let changed = false;
+        entries.forEach((entry) => {
+          if (!entry.isIntersecting) return;
+          const el = entry.target;
+          const i = Number(el.getAttribute("data-step-index"));
+          if (latched.has(i)) return;
+          latched.add(i);
+          el.classList.add("is-active");
+          changed = true;
+        });
+        if (changed) paint();
+      },
+      // Fires when the step crosses the vertical middle of the viewport.
+      { rootMargin: "-45% 0px -45% 0px", threshold: 0 },
+    );
+
+    steps.forEach((s) => observer.observe(s));
+    window.addEventListener("resize", paint);
+  })();
+</script>

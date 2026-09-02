@@ -1,0 +1,204 @@
+---
+/**
+ * "Proven to work in the real world" — Figma node 13049:22787.
+ *
+ * Six rows, each a use-case card joined to an outcome card by a dot bridge.
+ *
+ * DEVIATION, DELIBERATE: the Figma row instances carry `opacity: 50%`. Applied
+ * literally that drops the body copy to roughly 2.4:1 against white, which
+ * fails WCAG AA and is almost certainly a WIP dim rather than intent — the
+ * design's own colour tokens (Vault Navy titles, #6B7280 body) already encode
+ * the intended hierarchy. Rows therefore render at full opacity and instead
+ * fade in with the repo's existing `.premium-reveal`, which is how every other
+ * page in this codebase handles a staged reveal.
+ */
+interface Row {
+  title: string;
+  desc: string;
+  stats: { value: string; label: string }[];
+  attribution: string;
+}
+
+const rows: Row[] = [
+  {
+    title: "Sourcing & supply chain",
+    desc: "Where orders stall and what the delay costs, daily.",
+    stats: [
+      { value: "6 days", label: "cut from order to delivery" },
+      { value: "18%", label: "less stock in transit" },
+    ],
+    attribution: "Multi-site distributor, GCC",
+  },
+  {
+    title: "Audit and tax litigation",
+    desc: "Every notice type, answered with the transactions behind it.",
+    stats: [
+      { value: "7×", label: "faster end to end" },
+      { value: "3 days", label: "vs 20–30 days before" },
+    ],
+    attribution: "Large multi-entity enterprise, India",
+  },
+  {
+    title: "Pricing and revenue integrity",
+    desc: "Every contract checked against every transaction.",
+    stats: [
+      { value: "4%", label: "of SKUs selling off-contract" },
+      { value: "800", label: "contracts checked continuously" },
+    ],
+    attribution: "Manufacturer, KSA",
+  },
+  {
+    title: "Fraud detection",
+    desc: "Duplicate payments and ghost vendors caught before payout.",
+    stats: [
+      { value: "0.4%", label: "of payment value recovered" },
+      { value: "100%", label: "of invoices screened, daily" },
+    ],
+    attribution: "Retail group, UAE",
+  },
+  {
+    title: "Vendor and procurement",
+    desc: "Every vendor ranked on cost, quality and delivery.",
+    stats: [
+      { value: "12,000+", label: "vendors scored on live data" },
+      { value: "3%", label: "of spend redirected" },
+    ],
+    attribution: "Diversified conglomerate, India",
+  },
+  {
+    title: "Plant and controls",
+    desc: "Output, downtime and yield in one view.",
+    stats: [
+      { value: "9%", label: "less unplanned downtime" },
+      { value: "100%", label: "of control breaks with a named owner" },
+    ],
+    attribution: "Industrial group, Malaysia",
+  },
+];
+---
+
+<section class="bg-generic-00 max-lg:py-12 lg:py-20" data-gh-proven>
+  <div class="container mx-auto">
+    <div class="flex flex-col gap-12">
+      <div class="flex flex-col items-center gap-4 text-center">
+        <p
+          class="m-0 font-body font-medium uppercase text-neutral-400 text-[length:var(--fs-label)] leading-[length:var(--lh-body-sm)] tracking-[1px]"
+        >
+          Data already flows in. Finance logic already built.
+        </p>
+        <div class="flex flex-col items-center gap-4">
+          <h2
+            class="m-0 font-heading font-medium text-vault-navy text-[length:var(--fs-h2)] leading-[length:var(--lh-h2)] tracking-[-0.5px]"
+          >
+            Proven to work in the real world
+          </h2>
+          <p
+            class="m-0 font-body text-neutral-500 text-[length:var(--fs-body-lg)] leading-[length:var(--lh-body-lg)]"
+          >
+            Live with enterprise customers today.
+          </p>
+        </div>
+      </div>
+
+      <ul class="m-0 flex list-none flex-col gap-8 p-0">
+        {
+          rows.map((row) => (
+            <li class="premium-reveal flex items-center justify-center gap-8 max-lg:flex-col max-lg:gap-4">
+              <div class="flex flex-1 items-center gap-6 self-stretch rounded-xl border border-[#CCCCCC] bg-generic-00 p-6 max-lg:w-full">
+                <span class="h-20 w-20 shrink-0 rounded-xl bg-visual-placeholder" aria-hidden="true" />
+                <div class="flex min-w-0 flex-col gap-3">
+                  <h3 class="m-0 font-heading font-medium text-vault-navy text-[length:var(--fs-h5)] leading-[length:var(--lh-h5)] tracking-[-0.5px]">
+                    {row.title}
+                  </h3>
+                  <p class="m-0 font-body font-medium text-neutral-500 text-[length:var(--fs-body-lg)] leading-[length:var(--lh-body-lg)]">
+                    {row.desc}
+                  </p>
+                </div>
+              </div>
+
+              <span class="gh-proven-bridge shrink-0 max-lg:hidden" aria-hidden="true" />
+
+              <div class="flex flex-1 items-start rounded-xl border border-[#CCCCCC] bg-generic-00 p-6 max-lg:w-full">
+                <div class="flex min-w-0 flex-1 flex-col gap-6">
+                  <div class="flex items-start gap-6">
+                    {row.stats.map((s) => (
+                      <div class="flex min-w-0 flex-1 flex-col gap-3">
+                        <p class="m-0 font-heading font-medium text-vault-navy text-[length:var(--fs-h5)] leading-[length:var(--lh-h5)] tracking-[-0.5px]">
+                          {s.value}
+                        </p>
+                        <p class="m-0 font-body font-medium text-neutral-500 text-[length:var(--fs-body-lg)] leading-[length:var(--lh-body-lg)]">
+                          {s.label}
+                        </p>
+                      </div>
+                    ))}
+                  </div>
+                  <p class="m-0 font-body text-vault-navy text-[length:var(--fs-label)] leading-[length:var(--lh-body-sm)]">
+                    {row.attribution}
+                  </p>
+                </div>
+              </div>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </div>
+</section>
+
+<style is:global>
+  /* The 30×82 dot bridge between the two cards: two columns, four rows,
+     3.88px dots on a 25.22px pitch — the Figma's Frame 2147225847. */
+  .gh-proven-bridge {
+    display: block;
+    width: 29.1px;
+    height: 79.54px;
+    /* `at 1.94px 1.94px` anchors the dot to the tile's top-left rather than its
+       centre, so two columns fit inside 29.1px and four rows inside 79.54px.
+       A centred dot renders only one column — the second falls outside the box. */
+    background-image: radial-gradient(
+      circle at 1.94px 1.94px,
+      var(--color-flux-lime) 1.94px,
+      transparent 2px
+    );
+    background-size: 25.22px 25.22px;
+    background-repeat: repeat;
+  }
+</style>
+
+<script is:inline>
+  (function () {
+    const root = document.querySelector("[data-gh-proven]");
+    if (!root) return;
+    const items = Array.from(root.querySelectorAll(".premium-reveal"));
+    if (!items.length) return;
+
+    if (
+      !("IntersectionObserver" in window) ||
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches
+    ) {
+      items.forEach((el) => el.classList.add("is-visible"));
+      return;
+    }
+
+    // `is-ready` is what arms the hidden state in shared.css. Adding it here,
+    // rather than in the markup, means a JS failure leaves the rows visible
+    // instead of permanently blank.
+    items.forEach((el, i) => {
+      el.classList.add("is-ready");
+      el.style.transitionDelay = `${Math.min(i, 5) * 80}ms`;
+    });
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (!entry.isIntersecting) return;
+          entry.target.classList.add("is-visible");
+          observer.unobserve(entry.target);
+        });
+      },
+      { rootMargin: "0px 0px -12% 0px", threshold: 0.1 },
+    );
+
+    items.forEach((el) => observer.observe(el));
+  })();
+</script>

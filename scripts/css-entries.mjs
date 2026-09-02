@@ -43,6 +43,7 @@ export const PAGE_TARGETS = [
   { name: 'v1-home-page', input: 'src/styles/v1-home-page.css', page: 'src/pages/v1-home-page.astro' },
   { name: 'v1-global-invoicing-wip', input: 'src/styles/v1-global-invoicing-wip.css', page: 'src/pages/v1-global-invoicing-wip.astro' },
   { name: 'delivery-page', input: 'src/styles/delivery-page.css', page: 'src/pages/delivery-page.astro' },
+  { name: 'global-homepage', input: 'src/styles/global-homepage.css', page: 'src/pages/global-homepage.astro' },
 ];
 
 const SHARED_IMPORT_RE = /import\s+[A-Z][A-Za-z0-9]*\s+from\s+['"]\.\.\/sections\/_shared\/([A-Za-z0-9_-]+)\.astro['"]/g;

@@ -1,0 +1,119 @@
+---
+/**
+ * "Why Generic AI Fails for Finance" — Figma node 13049:22785.
+ *
+ * A sticky stack: the heading pins to the top, then five cards pin in turn with
+ * a stepped top offset so each new card slides over the previous one and leaves
+ * a sliver of it showing. That is exactly the Figma structure (a `sticky`
+ * wrapper per card with increasing `padding-top`), so it is reproduced rather
+ * than reinterpreted.
+ *
+ * IMPORTANT: no ancestor of a `.gh-why-sticky` may set `overflow` to anything
+ * but `visible` — that silently kills `position: sticky`.
+ *
+ * CONTENT NOTE: all five cards carry the same "Financial Planning & Analysis"
+ * copy because the Figma has them as five untouched instances of one component.
+ * The array below is the seam — drop the real per-card copy in and nothing else
+ * has to change.
+ */
+interface Card {
+  title: string;
+  genericCaption: string;
+  cleartaxCaption: string;
+}
+
+const cards: Card[] = Array.from({ length: 5 }, () => ({
+  title: "Financial Planning & Analysis",
+  genericCaption: "It can extract trends from your spreadsheet.",
+  cleartaxCaption:
+    "Builds the forecast from live actuals, with embedded context such as your entity structure and cost drivers.",
+}));
+---
+
+<section class="bg-generic-00 max-lg:py-12 lg:py-20">
+  <div class="container mx-auto">
+    <div class="flex flex-col items-center gap-12">
+      <div
+        class="gh-why-head sticky top-0 z-10 flex w-full flex-col items-center gap-4 bg-generic-00 text-center max-lg:pt-16 lg:pt-40"
+      >
+        <h2
+          class="m-0 font-heading font-medium text-vault-navy text-[length:var(--fs-h1)] leading-[length:var(--lh-h1)] tracking-[-0.5px]"
+        >
+          Why Generic AI Fails for Finance.
+        </h2>
+        <p
+          class="m-0 font-body text-neutral-500 text-[length:var(--fs-body-lg)] leading-[length:var(--lh-body-lg)] max-w-[628px]"
+        >
+          ClearTax gives you clean finance data and the business context AI needs, so
+          your finance team can build and use AI with confidence.
+        </p>
+      </div>
+
+      <div class="flex w-full flex-col gap-8">
+        {
+          cards.map((card, i) => (
+            <div
+              class="gh-why-sticky sticky top-0 flex w-full flex-col"
+              style={`padding-top:${320 + i * 10}px`}
+            >
+              <article class="flex w-full flex-col rounded-xl border-2 border-[#CCCCCC] bg-generic-00 p-6">
+                <div class="flex w-full flex-col gap-6">
+                  <h3 class="m-0 text-center font-heading font-medium text-vault-navy text-[length:var(--fs-h6)] leading-[length:var(--lh-h6)]">
+                    {card.title}
+                  </h3>
+
+                  <div class="flex w-full items-start gap-8 max-md:flex-col">
+                    <div class="flex flex-1 flex-col gap-6 max-md:w-full">
+                      <div class="relative aspect-[600/400] w-full overflow-hidden rounded-lg bg-visual-placeholder">
+                        <span class="absolute left-4 top-4 inline-flex items-center gap-2 rounded-lg border border-neutral-200 bg-generic-00 px-3 py-1.5 text-[length:var(--fs-label)] leading-[length:var(--lh-label)] font-medium text-neutral-700 font-body">
+                          <span class="block h-4 w-4 shrink-0 rounded-[3px] bg-neutral-900 opacity-20" />
+                          GENERIC AI
+                        </span>
+                      </div>
+                      <p class="m-0 font-body text-neutral-500 text-[length:var(--fs-body)] leading-[length:var(--lh-body)]">
+                        {card.genericCaption}
+                      </p>
+                    </div>
+
+                    <div class="flex flex-1 flex-col gap-6 max-md:w-full">
+                      <div class="relative aspect-[600/400] w-full overflow-hidden rounded-lg bg-visual-placeholder">
+                        <span class="absolute left-4 top-4 inline-flex items-center gap-2 rounded-lg bg-nova-blue px-3 py-1.5 text-[length:var(--fs-label)] leading-[length:var(--lh-label)] font-medium text-generic-00 font-body">
+                          <span class="block h-4 w-4 shrink-0 rounded-[3px] bg-generic-00 opacity-20" />
+                          CLEARTAX AI
+                        </span>
+                      </div>
+                      <p class="m-0 font-body text-neutral-500 text-[length:var(--fs-body)] leading-[length:var(--lh-body)]">
+                        {card.cleartaxCaption}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </article>
+            </div>
+          ))
+        }
+      </div>
+    </div>
+  </div>
+</section>
+
+<style is:global>
+  /* The stepped offsets are inline (they differ per card); this only softens the
+     stack on short viewports, where 320px of lead-in would push the first card
+     off-screen entirely. */
+  @media (max-height: 800px), (max-width: 1024px) {
+    .gh-why-sticky {
+      padding-top: 96px !important;
+    }
+  }
+
+  /* Sticky is a progressive enhancement here — if a browser drops it the cards
+     simply read as a normal stack, which is still correct. */
+  @media (prefers-reduced-motion: reduce) {
+    .gh-why-sticky,
+    .gh-why-head {
+      position: static;
+      padding-top: 0 !important;
+    }
+  }
+</style>

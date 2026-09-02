@@ -1,217 +1,403 @@
 ---
 /**
- * global-invoicing-wip navbar — flat bordered bar per Figma (node 12239:15725),
- * distinct from the floating glass-pill _shared/NavbarGlobalV2.astro used elsewhere.
+ * Shared brand-v2 navbar — flat bordered bar per Figma (node 13049:24439).
+ *
+ * Layout is three groups: a "Menu" disclosure on the left, the wordmark
+ * centred, and the globe / "Book a demo" pair on the right. The nav links are
+ * NOT laid out inline any more — they live in the panel the Menu button opens,
+ * which is the same panel at every breakpoint. That is why this file no longer
+ * carries a separate mobile drawer: one panel, one set of markup, one set of
+ * utilities for Tailwind to emit.
+ *
+ * `links` keeps the shape it has always had, so the existing wrappers
+ * (global-invoicing, delivery-page, blog-listing) compile unchanged — a link
+ * with a `dropdown` becomes a titled column in the panel instead of a hover
+ * menu, and a bare link becomes a standalone entry.
  */
+/** A leaf in a menu column. `children` renders a chevron and an expandable sub-list. */
+export interface NavChild {
+  label: string;
+  href?: string;
+  children?: { label: string; href: string }[];
+}
+
 export interface NavLink {
   label: string;
   href?: string;
-  dropdown?: { label: string; href: string }[];
+  dropdown?: NavChild[];
 }
 
-
+export interface CountryOption {
+  name: string;
+  /** Optional: a country with no flag asset yet renders a neutral swatch. */
+  flag?: string;
+  /** Optional: a country with no site yet renders as a non-interactive chip. */
+  href?: string;
+  lang?: string;
+}
 
 export interface Props {
   links?: NavLink[];
+  countries?: CountryOption[];
+  ctaLabel?: string;
+  ctaHref?: string;
+  /** Label on the globe control. Shows the active region, updates on selection. */
+  countryLabel?: string;
+  /** Prefixes every generated id so two navbars on one page cannot collide. */
+  idPrefix?: string;
 }
+
+/**
+ * Default country list — order and membership per the country-panel design.
+ * Supplied here rather than in each wrapper because the globe is chrome, not
+ * page content: every page wants the same list, and a wrapper that forgot to
+ * pass it would ship an empty selector.
+ *
+ * `flag` and `href` stay optional: an entry missing either still renders, as a
+ * neutral swatch and a non-interactive chip respectively, rather than shipping a
+ * broken image or a dead link.
+ */
+const DEFAULT_COUNTRIES: CountryOption[] = [
+  { name: "Bahrain", flag: "https://cdn.prod.website-files.com/6141e3720a248d2024615d96/63e29d6c2e1ddc75a632d00f_Group%201000003292.svg", href: "https://www.cleartax.com/bh" },
+  { name: "France", flag: "https://cdn.prod.website-files.com/6141e3720a248d2024615d96/64999768870655432964457d_france_flag.png", href: "https://www.cleartax.com/fr/en" },
+  { name: "India", flag: "https://cdn.prod.website-files.com/6141e3720a248d2024615d96/649999dbc3faf054134a1e01_India_flag.png", href: "https://www.clear.in/" },
+  { name: "Malaysia", flag: "https://cdn.prod.website-files.com/6141e3720a248d2024615d96/649a7b4653733f5dbda826ea_malaysia%20v1.png", href: "https://www.cleartax.com/my/en" },
+  { name: "Oman", flag: "https://cdn.prod.website-files.com/6141e3720a248d2024615d96/63e29d499e782b5935404547_Group%201000003291.svg", href: "https://www.cleartax.com/om" },
+  { name: "Singapore", flag: "https://cdn.prod.website-files.com/6141e3720a248d2024615d96/66716d4c6753fb52078bec02_singapore%20flag%203.png", href: "https://www.cleartax.com/sg/e-invoicing-software" },
+  { name: "Spain", flag: "https://cdn.prod.website-files.com/6141e3720a248d2024615d96/64999a546cfce1e0515f0f60_spain%20flag.png", href: "https://www.cleartax.com/es/en" },
+  { name: "Belgium", flag: "https://cdn.prod.website-files.com/6141e3720a248d2024615d96/67e3e6ae1e19488131f26dfd_belgium_flag.png", href: "https://www.cleartax.com/be/en" },
+  { name: "Germany", flag: "https://assets.clear.in/cleartax/images/1771829770_flagforflaggermanysvgrepocom1.svg", href: "https://www.cleartax.com/de/en" },
+  { name: "KSA", flag: "https://cdn.prod.website-files.com/6141e3720a248d2024615d96/63e28756aeabe12df79ff5d5_Rectangle%202515530.svg", href: "https://www.cleartax.com/sa" },
+  { name: "Norway" , flag: "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6a7999a2fdf9fde123422a1b_Flag_of_Norway.svg.webp", href: "https://www.cleartax.com/no" },
+  { name: "Philippines", flag: "https://cdn.prod.website-files.com/6141e3720a248d2024615d96/6a2935c197e9e718191d8d34_Flag_of_the_Philippines.svg", href: "https://www.cleartax.com/ph" },
+  { name: "Slovakia", flag: "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6a7c4a36ac18ccf3dcb998be_slovakia-flag.png", href: "https://www.cleartax.com/sk" },
+  { name: "UAE", flag: "https://cdn.prod.website-files.com/6141e3720a248d2024615d96/63e29d24f310792735ab4bba_Mask%20group%20(3).svg", href: "https://www.cleartax.com/ae" },
+];
 
 const {
   links = [],
+  countries = DEFAULT_COUNTRIES,
+  ctaLabel = "Book a demo",
+  ctaHref = "https://www.cleartax.com/contact-us",
+  countryLabel = "Global",
+  idPrefix = "ctnav",
 } = Astro.props;
 
+const panelId = `${idPrefix}-panel`;
+const countryId = `${idPrefix}-country`;
+
+// A bare link has no column of its own — the panel groups those together in a
+// trailing "More" column so a 1-item column never sits next to a 5-item one.
+const groups = links.filter((l) => l.dropdown && l.dropdown.length > 0);
+const singles = links.filter((l) => !l.dropdown || l.dropdown.length === 0);
+
+/**
+ * Split a column's items into blocks. A block is the collapse unit: its rows
+ * hide and show together. Spacing is a uniform 12px step throughout, so blocks
+ * affect behaviour, not rhythm.
+ *
+ * A run of consecutive childless items collapses into ONE block, and any item
+ * with children is a block of its own. That single rule reproduces all four
+ * columns of the design — "Enterprise Solution" and "Company" are one run each,
+ * while "AI Platform" alternates single / group / group / single — without the
+ * primitive needing to know anything about the content.
+ */
+type Block =
+  | { kind: "run"; items: NavChild[] }
+  | { kind: "group"; item: NavChild };
+
+function toBlocks(items: NavChild[]): Block[] {
+  const blocks: Block[] = [];
+  let run: { kind: "run"; items: NavChild[] } | null = null;
+  for (const item of items) {
+    if (item.children && item.children.length > 0) {
+      run = null;
+      blocks.push({ kind: "group", item });
+    } else {
+      if (!run) {
+        run = { kind: "run", items: [] };
+        blocks.push(run);
+      }
+      run.items.push(item);
+    }
+  }
+  return blocks;
+}
 ---
 
 <div data-giwip-nav-root>
   <div class="fixed top-4 inset-x-0 z-[1000] pointer-events-none">
-    <div class="max-w-[var(--container-max)] mx-auto pointer-events-auto">
-      <div class="w-full max-w-[1280px] mx-auto bg-generic-00 border-2 border-[#ECECF4] rounded-xl shadow-[0px_2px_6px_rgba(16,24,40,0.06)] flex items-center justify-between p-2 -mx-4">
-        <a href="/" class="flex items-center shrink-0 pl-6 py-3">
-          <img
-            src="https://cdn.prod.website-files.com/6093bce33d9b4bae841b04e3/69dfcff6071b983201f5f097_logo-cleartax.svg"
-            alt="ClearTax"
-            class="h-6 w-auto"
-            width="112"
-            height="24"
-            loading="eager"
-            fetchpriority="high"
-            decoding="async"
-          />
-        </a>
+    <div class="container mx-auto pointer-events-auto">
+      <div
+        data-nav-card
+        class="w-full bg-generic-00 border-2 border-[#ECECF4] rounded-xl shadow-[0px_6px_15px_-2px_rgba(16,24,40,0.08)] p-2"
+      >
+        <div class="flex items-center justify-between gap-2">
+          <!-- Menu disclosure -->
+          <div class="flex items-center lg:w-52 shrink-0">
+            <button
+              type="button"
+              data-nav-toggle
+              aria-expanded="false"
+              aria-controls={panelId}
+              class="group/toggle flex items-center gap-2 px-3 py-2 rounded-lg bg-transparent border-0 cursor-pointer font-[inherit] transition-colors hover:bg-slate-50"
+            >
+<!-- Two bars that quarter-turn on open: horizontal when closed, vertical
+                   when the panel is out. That rotation is the Figma component's own
+                   `rotate-90` on the List glyph — not a hamburger-to-X morph. -->
+              <span
+                class="relative block w-6 h-6 shrink-0 transition-transform duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] group-[.open]/toggle:rotate-90"
+                aria-hidden="true"
+              >
+                <span
+                  class="block absolute left-0 top-[9px] w-6 h-0.5 bg-vault-navy rounded-sm"
+                ></span>
+                <span
+                  class="block absolute left-0 top-[14px] w-6 h-0.5 bg-vault-navy rounded-sm"
+                ></span>
+              </span>
+              <span
+                class="text-[length:var(--fs-label-lg)] leading-[length:var(--lh-label-lg)] font-semibold text-vault-navy font-body"
+                >Menu</span
+              >
+            </button>
+          </div>
 
-        <div class="hidden lg:flex items-center gap-6">
-          <ul class="flex items-center list-none m-0 p-0" data-nav-menu>
-            {
-              links.map((l) => (
-                <li class:list={["relative group/item", l.dropdown && "has-dropdown"]}>
-                  {l.dropdown ? (
-                    <>
-                      <button
-                        type="button"
-                        data-nav-trigger
-                        class="flex items-center gap-2 text-[length:var(--fs-body-sm)] leading-[length:var(--lh-body-sm)] font-medium text-vault-navy px-5 py-3.5 rounded-lg whitespace-nowrap bg-transparent border-0 cursor-pointer font-[inherit] transition-colors hover:bg-slate-50"
-                      >
-                        {l.label}
-                        <svg
-                          class="shrink-0 transition-transform duration-200 group-[.active]/item:rotate-180"
-                          width="20"
-                          height="20"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          stroke="currentColor"
-                          stroke-width="2"
-                          stroke-linecap="round"
-                          stroke-linejoin="round"
-                        >
-                          <path d="m6 9 6 6 6-6" />
-                        </svg>
-                      </button>
-                      <div
-                        class:list={[
-                          "absolute top-full left-0 translate-y-2.5 mt-2.5 bg-white rounded-xl shadow-[0_12px_40px_rgba(0,0,0,0.12)] py-2 opacity-0 invisible transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] z-[1001] group-[.active]/item:opacity-100 group-[.active]/item:visible",
-                          l.label === "Country" ? "grid grid-cols-2 w-90" : "min-w-50 max-w-70",
-                        ]}
-                      >
-                        {l.dropdown.map((d) => (
-                          <a
-                            href={d.href}
-                            target={l.label === "Country" ? "_blank" : undefined}
-                            rel={l.label === "Country" ? "noopener noreferrer" : undefined}
-                            class="block px-5 py-2.5 text-[length:var(--fs-body-sm)] leading-[length:var(--lh-body-sm)] font-medium text-vault-navy no-underline transition-colors hover:bg-slate-50 hover:text-nova-blue"
-                          >
-                            {d.label}
-                          </a>
-                        ))}
-                      </div>
-                    </>
-                  ) : (
-                    <a
-                      href={l.href}
-                      class="inline-flex items-center text-[length:var(--fs-body-sm)] leading-[length:var(--lh-body-sm)] font-medium text-vault-navy px-5 py-3.5 rounded-lg whitespace-nowrap no-underline transition-colors hover:bg-slate-50"
-                    >
-                      {l.label}
-                    </a>
-                  )}
-                </li>
-              ))
-            }
-          </ul>
-
-          <a
-            href="javascript:void(0)" onclick="document.getElementById('contactForm').scrollIntoView({behavior:'smooth'})"
-            class="inline-flex items-center gap-2 px-5 py-3.5 text-[length:var(--fs-body)] leading-[length:var(--lh-body)] font-medium text-nova-50 bg-nova-blue rounded-lg whitespace-nowrap no-underline shadow-[0px_2px_3px_rgba(16,24,40,0.06)] transition-opacity duration-200 hover:opacity-90"
-          >
-            Book a demo
-            <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true">
-              <path
-                d="M4 10h12M11 5l5 5-5 5"
-                stroke="var(--palette-nova-50)"
-                stroke-width="1.5"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-              />
-            </svg>
+          <!-- Wordmark -->
+          <a href="/" class="flex items-center shrink-0" aria-label="ClearTax home">
+            <img
+              src="https://cdn.prod.website-files.com/6093bce33d9b4bae841b04e3/69dfcff6071b983201f5f097_logo-cleartax.svg"
+              alt="ClearTax"
+              class="h-6 w-28"
+              width="112"
+              height="24"
+              loading="eager"
+              fetchpriority="high"
+              decoding="async"
+            />
           </a>
+
+          <!-- Country + CTA -->
+          <div class="flex items-center gap-2 justify-end shrink-0">
+            <button
+              type="button"
+              data-country-btn
+              aria-expanded="false"
+              aria-controls={countryId}
+              class="group/country inline-flex items-center justify-center gap-2 h-[46px] px-[14px] bg-generic-00 border border-[#CCCCCC] rounded-lg shadow-[0px_2px_6px_rgba(16,24,40,0.06)] cursor-pointer font-[inherit] transition-colors hover:bg-slate-50"
+            >
+              <span class="inline-flex items-center justify-center w-5 h-5 shrink-0 text-vault-navy">
+                <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M9.75 0C7.82164 0 5.93657 0.571828 4.33319 1.64317C2.72982 2.71452 1.48013 4.23726 0.742179 6.01884C0.00422448 7.80042 -0.188858 9.76082 0.187348 11.6521C0.563554 13.5434 1.49215 15.2807 2.85571 16.6443C4.21927 18.0079 5.95656 18.9365 7.84787 19.3127C9.73919 19.6889 11.6996 19.4958 13.4812 18.7578C15.2627 18.0199 16.7855 16.7702 17.8568 15.1668C18.9282 13.5634 19.5 11.6784 19.5 9.75C19.4973 7.16498 18.4692 4.68661 16.6413 2.85872C14.8134 1.03084 12.335 0.00272983 9.75 0ZM9.75 1.5C11.3484 1.4983 12.9125 1.96361 14.25 2.83875V4.6875L12.1716 7.10063L9.22125 7.5L9.19219 7.47937L7.34813 6.27375C7.18464 6.15858 6.99976 6.07727 6.80439 6.0346C6.60901 5.99192 6.40707 5.98875 6.21045 6.02526C6.01382 6.06177 5.82649 6.13723 5.65945 6.24721C5.49242 6.35718 5.34906 6.49944 5.23782 6.66562L3.27469 9.6C3.11115 9.84453 3.02312 10.1318 3.02157 10.4259L3 13.8225L2.69344 14.0241C1.93558 12.7728 1.52404 11.3426 1.50101 9.87988C1.47798 8.4172 1.84429 6.9747 2.56238 5.70021C3.28048 4.42573 4.32454 3.3651 5.58756 2.62703C6.85058 1.88896 8.28714 1.5 9.75 1.5ZM3.58969 15.2316L3.82594 15.0769C4.03224 14.9408 4.20172 14.7559 4.31932 14.5385C4.43691 14.3211 4.49898 14.0781 4.5 13.8309L4.51969 10.4344L6.48469 7.5C6.49432 7.50741 6.50433 7.51429 6.51469 7.52063L8.35875 8.72719C8.66779 8.9453 9.04805 9.0381 9.42282 8.98688L12.375 8.58656C12.7391 8.53798 13.0726 8.35751 13.3125 8.07938L15.3909 5.66437C15.6234 5.39204 15.7507 5.04554 15.75 4.6875V4.09406C16.7644 5.16731 17.4717 6.49352 17.7978 7.93387C18.1238 9.37422 18.0567 10.8757 17.6034 12.2812L16.0903 10.8975C15.88 10.7044 15.6189 10.5754 15.3377 10.5256C15.0566 10.4757 14.767 10.5072 14.5031 10.6163L11.6475 11.8022C11.4087 11.9024 11.1998 12.0625 11.0408 12.2669C10.8819 12.4713 10.7783 12.7133 10.74 12.9694L10.5159 14.4872C10.4621 14.8525 10.5449 15.2249 10.7485 15.533C10.9521 15.841 11.2622 16.0632 11.6194 16.1569L13.6313 16.6875L13.8525 16.9097C12.2096 17.8523 10.2921 18.2001 8.42288 17.8944C6.55362 17.5888 4.84676 16.6484 3.58969 15.2316ZM15.0938 16.0312L14.6906 15.6272C14.5026 15.4384 14.2677 15.3032 14.01 15.2353L12 14.7047L12.2241 13.1869L15.0788 12L16.9688 13.7325C16.487 14.6052 15.8519 15.384 15.0938 16.0312Z" fill="#05022A"/>
+                </svg>
+              </span>
+<!-- Label rides the open state: the closed bar is icon-only, and the
+                   region name appears once the country panel is out. Keyed off the
+                   button's own aria-expanded, so there is no second flag to keep in
+                   sync with the panel. -->
+              <span
+                data-country-current
+                class="hidden group-aria-expanded/country:inline text-[length:var(--fs-label-lg)] leading-[length:var(--lh-label-lg)] font-medium text-vault-navy font-body"
+                >{countryLabel}</span
+              >
+            </button>
+
+            <a
+              href={ctaHref}
+              data-nav-cta
+              class="hidden sm:inline-flex items-center justify-center gap-2 px-5 py-3.5 text-[length:var(--fs-label-lg)] leading-[length:var(--lh-label-lg)] font-medium text-nova-50 bg-nova-blue border border-nova-blue rounded-lg whitespace-nowrap no-underline shadow-[0px_2px_3px_rgba(16,24,40,0.06)] transition-opacity duration-200 hover:opacity-90"
+            >
+              {ctaLabel}
+            </a>
+          </div>
         </div>
 
-        <button
-          type="button"
-          data-mobile-toggle
-          aria-label="Toggle menu"
-          aria-expanded="false"
-          class="group/toggle lg:hidden relative w-10 h-10 mr-1 bg-transparent border-0 cursor-pointer p-2"
+        <!-- Menu panel. Both panels live INSIDE the bar's card and collapse with a
+             0fr→1fr grid, so they animate without a hard-coded height and the card
+             grows around them. No divider rule above either one — the design runs
+             the panel straight off the bar. -->
+        <div
+          id={panelId}
+          data-nav-panel
+          class="grid grid-rows-[0fr] transition-[grid-template-rows] duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] [&.open]:grid-rows-[1fr]"
         >
-          <span class="block absolute left-[9px] top-[13px] w-[22px] h-0.5 bg-vault-navy rounded-sm transition-all duration-300 group-[.open]/toggle:top-[19px] group-[.open]/toggle:rotate-45" />
-          <span class="block absolute left-[9px] top-[19px] w-[22px] h-0.5 bg-vault-navy rounded-sm transition-opacity duration-200 group-[.open]/toggle:opacity-0" />
-          <span class="block absolute left-[9px] top-[25px] w-[22px] h-0.5 bg-vault-navy rounded-sm transition-all duration-300 group-[.open]/toggle:top-[19px] group-[.open]/toggle:-rotate-45" />
-        </button>
-      </div>
-    </div>
-  </div>
+          <div class="overflow-hidden">
+            <div class="pt-6 pb-4 px-2">
+              <!-- justify-between with content-width columns is what produces the
+                   design's uneven column gaps; the columns are not a 4-up grid. -->
+              <div class="flex flex-wrap items-start justify-between gap-4 ">
+                {
+                  groups.map((g) => (
+                    <div class="flex flex-col gap-4 p-4 max-sm:p-2">
+                      <p class="m-0 font-body font-medium text-vault-navy text-[length:var(--fs-body-lg)] leading-[length:var(--lh-body-lg)]">
+                        {g.label}
+                      </p>
 
-  <!-- Mobile menu -->
-  <div
-    class="lg:hidden fixed inset-0 z-[1100] bg-white translate-x-full pointer-events-none transition-transform duration-400 ease-[cubic-bezier(0.16,1,0.3,1)] [&.open]:translate-x-0 [&.open]:pointer-events-auto flex flex-col"
-    data-mobile-menu
-    aria-hidden="true"
-  >
-    <div class="flex items-center justify-between px-5 py-4 border-b border-neutral-100">
-      <a href="/" class="flex items-center shrink-0">
-        <img
-          src="https://cdn.prod.website-files.com/6093bce33d9b4bae841b04e3/69dfcff6071b983201f5f097_logo-cleartax.svg"
-          alt="ClearTax"
-          class="h-6 w-auto"
-          width="112"
-          height="24"
-          loading="eager"
-          decoding="async"
-        />
-      </a>
-      <button
-        type="button"
-        data-mobile-close
-        aria-label="Close menu"
-        class="inline-flex items-center justify-center w-10 h-10 rounded-full bg-transparent border-0 cursor-pointer text-vault-navy hover:bg-slate-50 transition-colors"
-      >
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <path d="M18 6 6 18" />
-          <path d="m6 6 12 12" />
-        </svg>
-      </button>
-    </div>
-
-    <ul class="flex-1 overflow-y-auto flex flex-col gap-1 list-none m-0 px-4 py-4">
-      {
-        links.map((l) => (
-          <li class:list={["relative group/mitem", l.dropdown && "has-dropdown-m"]}>
-            {l.dropdown ? (
-              <>
-                <button
-                  type="button"
-                  data-m-trigger
-                  class="flex items-center justify-between w-full gap-1.5 text-[length:var(--fs-body)] leading-[length:var(--lh-body)] font-medium text-vault-navy px-4 py-3.5 whitespace-nowrap bg-transparent border-0 cursor-pointer font-[inherit] rounded-xl hover:bg-slate-50"
-                >
-                  <span>{l.label}</span>
-                  <svg class="shrink-0 transition-transform duration-300 group-[.active]/mitem:rotate-180" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="m6 9 6 6 6-6" />
-                  </svg>
-                </button>
-                <div class="grid grid-rows-[0fr] group-[.active]/mitem:grid-rows-[1fr] transition-[grid-template-rows] duration-300 ease-out">
-                  <div class="overflow-hidden">
-                    <div class="pl-3 pt-1 pb-2 flex flex-col">
-                      {l.dropdown.map((d) => (
-                        <a
-                          href={d.href}
-                          target={l.label === "Country" ? "_blank" : undefined}
-                          rel={l.label === "Country" ? "noopener noreferrer" : undefined}
-                          class="block px-4 py-2.5 text-[length:var(--fs-body-sm)] leading-[length:var(--lh-body-sm)] font-medium text-vault-navy rounded-lg no-underline hover:bg-slate-50 hover:text-nova-blue"
-                        >
-                          {d.label}
-                        </a>
-                      ))}
+                      {/* One rhythm, everywhere: 12px between every row and
+                          every block, expanded or collapsed. The design separates
+                          blocks by 32px, but that makes a collapsed group sit in a
+                          block-sized gap around nothing, so the panel is kept on a
+                          single 12px step instead. */}
+                      <div class="flex flex-col gap-3">
+                        {toBlocks(g.dropdown!).map((block) =>
+                          block.kind === "run" ? (
+                            <ul class="list-none m-0 p-0 flex flex-col gap-3">
+                              {block.items.map((d) => (
+                                <li>
+                                  <a href={d.href} class="block no-underline font-medium font-body text-neutral-500 text-[length:var(--fs-body-lg)] leading-[length:var(--lh-body-lg)] transition-colors hover:text-nova-blue">
+                                    {d.label}
+                                  </a>
+                                </li>
+                              ))}
+                            </ul>
+                          ) : (
+                            // Rendered COLLAPSED. The caret reveals a group. Safe
+                            // to hide by default because the panel itself only
+                            // opens via JS — with scripting off nothing here is
+                            // reachable either way, so this hides no content that
+                            // would otherwise have been available.
+                            // No `gap` on this wrapper: the flex gap would still
+                            // apply between the button and the zero-height
+                            // container while collapsed, leaving a phantom 12px
+                            // under every closed group. The spacing lives on the
+                            // collapsible child (`pt-3`) so it collapses with it.
+                            <div class="group/sub flex flex-col" data-nav-sub>
+                              <button
+                                type="button"
+                                data-sub-trigger
+                                aria-expanded="false"
+                                class="flex items-center gap-2 p-0 m-0 bg-transparent border-0 cursor-pointer text-left font-medium font-body text-neutral-500 text-[length:var(--fs-body-lg)] leading-[length:var(--lh-body-lg)] transition-colors hover:text-nova-blue"
+                              >
+                                <span>{block.item.label}</span>
+                                <svg
+                                  class="shrink-0 transition-transform duration-200 group-[.open]/sub:rotate-180"
+                                  width="14"
+                                  height="14"
+                                  viewBox="0 0 24 24"
+                                  fill="none"
+                                  stroke="currentColor"
+                                  stroke-width="2.5"
+                                  stroke-linecap="round"
+                                  stroke-linejoin="round"
+                                  aria-hidden="true"
+                                >
+                                  <path d="m6 9 6 6 6-6" />
+                                </svg>
+                              </button>
+                              {/* Collapse is height + opacity, never `display:none`
+                                  — the rows stay in the accessibility tree and the
+                                  fade reads as a transition rather than a cut. */}
+                              <div class="grid grid-rows-[0fr] opacity-0 group-[.open]/sub:grid-rows-[1fr] group-[.open]/sub:opacity-100 transition-[grid-template-rows,opacity] duration-300 ease-[cubic-bezier(0.16,1,0.3,1)]">
+                                <div class="overflow-hidden">
+                                  {/* No indent — the design runs children flush with
+                                      the parent, so the parent reads as a label over
+                                      its group rather than a branch. pt-3 rather than
+                                      a gap on the wrapper, so it collapses too. */}
+                                  <ul class="list-none m-0 p-0 pt-3 flex flex-col gap-3">
+                                    {block.item.children!.map((c) => (
+                                      <li>
+                                        <a href={c.href} class="block no-underline font-body text-neutral-500 text-[length:var(--fs-body-lg)] leading-[length:var(--lh-body-lg)] transition-colors hover:text-nova-blue">
+                                          {c.label}
+                                        </a>
+                                      </li>
+                                    ))}
+                                  </ul>
+                                </div>
+                              </div>
+                            </div>
+                          ),
+                        )}
+                      </div>
                     </div>
-                  </div>
-                </div>
-              </>
-            ) : (
-              <a href={l.href} class="block px-4 py-3.5 text-[length:var(--fs-body)] leading-[length:var(--lh-body)] font-medium text-vault-navy rounded-xl no-underline hover:bg-slate-50">
-                {l.label}
-              </a>
-            )}
-          </li>
-        ))
-      }
-    </ul>
+                  ))
+                }
+                {
+                  singles.length > 0 && (
+                    <div class="flex flex-col gap-4 p-4 max-sm:p-2">
+                      <p class="m-0 font-body font-medium text-vault-navy text-[length:var(--fs-body-lg)] leading-[length:var(--lh-body-lg)]">
+                        More
+                      </p>
+                      <ul class="list-none m-0 p-0 flex flex-col gap-3">
+                        {singles.map((l) => (
+                          <li>
+                            <a href={l.href} class="block no-underline font-medium font-body text-neutral-500 text-[length:var(--fs-body-lg)] leading-[length:var(--lh-body-lg)] transition-colors hover:text-nova-blue">
+                              {l.label}
+                            </a>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )
+                }
+              </div>
 
-    <div class="px-5 py-4 border-t border-neutral-100">
-      <a
-        href="javascript:void(0)" onclick="document.getElementById('contactForm').scrollIntoView({behavior:'smooth'})"
-        class="inline-flex items-center justify-center w-full gap-2 px-5 py-3.5 text-[length:var(--fs-body)] leading-[length:var(--lh-body)] font-medium text-nova-50 bg-nova-blue rounded-lg no-underline transition-opacity duration-200 hover:opacity-90"
-      >
-        Book a demo
-        <svg width="18" height="18" viewBox="0 0 20 20" fill="none" aria-hidden="true">
-          <path d="M4 10h12M11 5l5 5-5 5" stroke="var(--palette-nova-50)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
-        </svg>
-      </a>
+              <a
+                href={ctaHref}
+                class="sm:hidden inline-flex items-center justify-center w-full gap-2 mt-6 px-5 py-3.5 text-[length:var(--fs-label-lg)] leading-[length:var(--lh-label-lg)] font-medium text-nova-50 bg-nova-blue rounded-lg no-underline transition-opacity duration-200 hover:opacity-90"
+              >
+                {ctaLabel}
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Country panel. Same in-card treatment as the menu; a flat chip grid
+             rather than a right-aligned dropdown. A country with no `href` yet
+             renders as a non-interactive chip instead of a dead link. -->
+        <div
+          id={countryId}
+          data-country-panel
+          class="grid grid-rows-[0fr] transition-[grid-template-rows] duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] [&.open]:grid-rows-[1fr]"
+        >
+          <div class="overflow-hidden">
+            <div class="px-4 pt-6 pb-4 max-lg:px-2">
+              <ul
+                class="list-none m-0 p-0 grid gap-2 grid-cols-2 sm:grid-cols-4 lg:grid-cols-7"
+              >
+                {
+                  countries.map((c) => {
+                    const inner = (
+                      <>
+                        {c.flag ? (
+                          <img
+                            src={c.flag}
+                            alt=""
+                            class="h-4 w-6 shrink-0 rounded-[2px] object-contain"
+                            loading="lazy"
+                            decoding="async"
+                          />
+                        ) : (
+                          <span class="h-4 w-6 shrink-0 rounded-[2px] bg-neutral-200" aria-hidden="true" />
+                        )}
+                        <span>{c.name}</span>
+                      </>
+                    );
+                    return (
+                      <li>
+                        {c.href ? (
+                          <a
+                            href={c.href}
+                            class="flex items-center gap-2 w-full px-3 py-2.5 rounded-lg border border-neutral-200 bg-generic-00 text-[length:var(--fs-label)] leading-[length:var(--lh-label)] font-medium text-vault-navy font-body no-underline transition-colors hover:bg-slate-50 hover:border-nova-blue"
+                          >
+                            {inner}
+                          </a>
+                        ) : (
+                          <span
+                            class="flex items-center gap-2 w-full px-3 py-2.5 rounded-lg border border-neutral-200 bg-generic-00 text-[length:var(--fs-label)] leading-[length:var(--lh-label)] font-medium text-neutral-400 font-body"
+                            title={`${c.name} — coming soon`}
+                          >
+                            {inner}
+                          </span>
+                        )}
+                      </li>
+                    );
+                  })
+                }
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </div>
@@ -220,87 +406,197 @@ const {
   (function () {
     const navbar = document.querySelector("[data-giwip-nav-root]");
     if (!navbar) return;
-    const mobileToggle = navbar.querySelector("[data-mobile-toggle]");
-    const mobileMenu = navbar.querySelector("[data-mobile-menu]");
-    const mobileClose = navbar.querySelector("[data-mobile-close]");
-    const dropdownItems = navbar.querySelectorAll(".has-dropdown");
-    const mDropdownItems = navbar.querySelectorAll(".has-dropdown-m");
 
-    let scrollLockCount = 0;
-    const lockScroll = () => {
-      scrollLockCount += 1;
-      if (scrollLockCount === 1) document.body.style.overflow = "hidden";
-    };
-    const unlockScroll = () => {
-      scrollLockCount = Math.max(0, scrollLockCount - 1);
-      if (scrollLockCount === 0) document.body.style.overflow = "";
-    };
+    const toggle = navbar.querySelector("[data-nav-toggle]");
+    const panel = navbar.querySelector("[data-nav-panel]");
+    const card = navbar.querySelector("[data-nav-card]");
+    const countryBtn = navbar.querySelector("[data-country-btn]");
+    const countryPanel = navbar.querySelector("[data-country-panel]");
+    const subItems = Array.from(navbar.querySelectorAll("[data-nav-sub]"));
 
-    window.scrollToGiwipRegister = (e) => {
-      if (e) e.preventDefault();
-      const registerEl =
-        document.getElementById("giwip-contact") ||
-        document.querySelector(".giwip-hs-form-wrap");
-      if (registerEl) {
-        registerEl.scrollIntoView({ behavior: "smooth" });
-      } else {
-        window.location.href = "https://www.cleartax.com/contact-us";
-      }
-    };
+    // Hover-to-open is for mice only. On touch, a tap fires a synthetic
+    // mouseenter before the click, so wiring it up there would open the panel
+    // and immediately have the click toggle it shut again.
+    const canHover =
+      typeof window.matchMedia === "function" &&
+      window.matchMedia("(hover: hover) and (pointer: fine)").matches;
 
-    const setMenuOpen = (open) => {
-      if (!mobileMenu) return;
-      const wasOpen = mobileMenu.classList.contains("open");
-      if (open === wasOpen) return;
-      mobileMenu.classList.toggle("open", open);
-      mobileMenu.setAttribute("aria-hidden", open ? "false" : "true");
-      mobileToggle?.classList.toggle("open", open);
-      mobileToggle?.setAttribute("aria-expanded", open ? "true" : "false");
-      if (open) lockScroll();
-      else unlockScroll();
+    // Which panel — "menu", "country" or null — is showing purely because the
+    // cursor is on it. That is what makes it safe to auto-close on mouseleave; a
+    // panel the user deliberately clicked open is "pinned" and only closes on
+    // click-out or Esc.
+    let hoverOpenedKey = null;
+    let closeTimer;
+    const cancelClose = () => clearTimeout(closeTimer);
+
+    // Groups showing because the cursor is on them. Same pin rule as the two
+    // panels: hover-opened auto-closes on the way out, click-opened stays.
+    const hoverOpenedSubs = new Set();
+    const subCloseTimers = new Map();
+    const cancelSubClose = (item) => {
+      clearTimeout(subCloseTimers.get(item));
+      subCloseTimers.delete(item);
     };
 
-    dropdownItems.forEach((item) => {
-      const btn = item.querySelector("[data-nav-trigger]");
-      if (!btn) return;
-      btn.addEventListener("click", (e) => {
-        e.preventDefault();
-        const isActive = item.classList.contains("active");
-        dropdownItems.forEach((i) => i.classList.remove("active"));
-        item.classList.toggle("active", !isActive);
+    // Collapse every submenu, so reopening the panel is always a clean slate
+    // rather than whatever the last visitor left expanded.
+    const resetSubs = () => {
+      subItems.forEach((item) => {
+        item.classList.remove("open");
+        item.querySelector("[data-sub-trigger]")?.setAttribute("aria-expanded", "false");
+        // Clear the hover bookkeeping too, or a group pinned in the last session
+        // would still count as pinned the next time the panel opens.
+        hoverOpenedSubs.delete(item);
+        clearTimeout(subCloseTimers.get(item));
+        subCloseTimers.delete(item);
       });
-    });
+    };
 
-    mDropdownItems.forEach((item) => {
-      const btn = item.querySelector("[data-m-trigger]");
-      if (!btn) return;
-      btn.addEventListener("click", (e) => {
+    // The bars turn while EITHER panel is out, not just the menu — both open
+    // states in the design show them vertical.
+    const syncToggleIcon = () => {
+      const anyOpen =
+        !!panel?.classList.contains("open") || !!countryPanel?.classList.contains("open");
+      toggle?.classList.toggle("open", anyOpen);
+    };
+
+    const setPanelOpen = (open) => {
+      if (!panel || !toggle) return;
+      panel.classList.toggle("open", open);
+      toggle.setAttribute("aria-expanded", open ? "true" : "false");
+      if (!open) {
+        resetSubs();
+        if (hoverOpenedKey === "menu") hoverOpenedKey = null;
+      }
+      syncToggleIcon();
+    };
+
+    const setCountryOpen = (open) => {
+      if (!countryPanel || !countryBtn) return;
+      countryPanel.classList.toggle("open", open);
+      countryBtn.setAttribute("aria-expanded", open ? "true" : "false");
+      if (!open && hoverOpenedKey === "country") hoverOpenedKey = null;
+      syncToggleIcon();
+    };
+
+    // The two panels share the card, so opening one always closes the other.
+    const PANELS = {
+      menu: { el: () => panel, set: setPanelOpen, setOther: setCountryOpen },
+      country: { el: () => countryPanel, set: setCountryOpen, setOther: setPanelOpen },
+    };
+
+    const onTriggerClick = (key) => (e) => {
+      e.stopPropagation();
+      // Already showing because of hover: the click pins it rather than toggling
+      // it shut, which is otherwise the first thing a mouse user does by
+      // accident once the panel appears under their cursor.
+      if (hoverOpenedKey === key) {
+        hoverOpenedKey = null;
+        return;
+      }
+      const p = PANELS[key];
+      const open = !p.el()?.classList.contains("open");
+      p.set(open);
+      if (open) p.setOther(false);
+    };
+
+    const onTriggerHover = (key) => () => {
+      cancelClose();
+      const p = PANELS[key];
+      if (p.el()?.classList.contains("open")) return;
+      // Claim the key BEFORE toggling: closing the sibling panel would otherwise
+      // clear it again on the way past, and this one would never auto-close.
+      hoverOpenedKey = key;
+      p.setOther(false);
+      p.set(true);
+    };
+
+    toggle?.addEventListener("click", onTriggerClick("menu"));
+    countryBtn?.addEventListener("click", onTriggerClick("country"));
+
+    if (canHover && card) {
+      toggle?.addEventListener("mouseenter", onTriggerHover("menu"));
+      countryBtn?.addEventListener("mouseenter", onTriggerHover("country"));
+
+      // Close on leaving the whole card, not the trigger — both panels hang
+      // below the bar inside the same card, so the cursor never leaves it on the
+      // way down. The grace period covers a cursor that clips a corner in transit.
+      card.addEventListener("mouseenter", cancelClose);
+      card.addEventListener("mouseleave", () => {
+        const key = hoverOpenedKey;
+        if (!key) return;
+        cancelClose();
+        closeTimer = setTimeout(() => PANELS[key].set(false), 180);
+      });
+    }
+
+    const setSubOpen = (item, open) => {
+      item.classList.toggle("open", open);
+      item
+        .querySelector("[data-sub-trigger]")
+        ?.setAttribute("aria-expanded", open ? "true" : "false");
+    };
+
+    subItems.forEach((item) => {
+      const trigger = item.querySelector("[data-sub-trigger]");
+
+      trigger?.addEventListener("click", (e) => {
         e.preventDefault();
-        item.classList.toggle("active");
+        // Open by hover already — pin it rather than toggling it shut.
+        if (hoverOpenedSubs.has(item)) {
+          hoverOpenedSubs.delete(item);
+          return;
+        }
+        setSubOpen(item, !item.classList.contains("open"));
+      });
+
+      if (!canHover) return;
+
+      item.addEventListener("mouseenter", () => {
+        cancelClose();
+        cancelSubClose(item);
+        if (item.classList.contains("open")) return;
+        hoverOpenedSubs.add(item);
+        setSubOpen(item, true);
+      });
+
+      // The children live inside this same element, so moving from the parent
+      // row down into them never fires mouseleave — only actually leaving the
+      // group does. The delay covers a cursor that clips the edge in transit,
+      // and re-entering cancels it.
+      item.addEventListener("mouseleave", () => {
+        if (!hoverOpenedSubs.has(item)) return;
+        cancelSubClose(item);
+        subCloseTimers.set(
+          item,
+          setTimeout(() => {
+            setSubOpen(item, false);
+            hoverOpenedSubs.delete(item);
+            subCloseTimers.delete(item);
+          }, 160),
+        );
       });
     });
 
     document.addEventListener("click", (e) => {
-      if (!e.target.closest(".has-dropdown")) {
-        dropdownItems.forEach((item) => item.classList.remove("active"));
+      if (!e.target.closest("[data-giwip-nav-root]")) {
+        setPanelOpen(false);
+        setCountryOpen(false);
       }
     });
 
-    mobileToggle?.addEventListener("click", () => {
-      setMenuOpen(!mobileMenu?.classList.contains("open"));
+    panel?.addEventListener("click", (e) => {
+      if (e.target.closest("a[href]")) setPanelOpen(false);
     });
-    mobileClose?.addEventListener("click", () => setMenuOpen(false));
 
-    mobileMenu?.addEventListener("click", (e) => {
-      const link = e.target.closest("a[href]");
-      if (!link) return;
-      setMenuOpen(false);
+    countryPanel?.addEventListener("click", (e) => {
+      if (e.target.closest("a[href]")) setCountryOpen(false);
     });
 
     document.addEventListener("keydown", (e) => {
       if (e.key !== "Escape") return;
-      dropdownItems.forEach((item) => item.classList.remove("active"));
-      setMenuOpen(false);
+      setPanelOpen(false);
+      setCountryOpen(false);
     });
   })();
 </script>

@@ -1,0 +1,260 @@
+---
+/**
+ * "E-invoicing is where the foundation starts" — Figma node 13049:22801.
+ *
+ * Two blocks: a compliance-only vs foundation-first comparison joined by a dot
+ * bridge, then a country-coverage panel with the globe.
+ *
+ * ICONS: the five bullet glyphs (Mailbox, Brain, HandCoins, HardDrives, Growth)
+ * are hand-drawn 24px strokes rather than the Figma exports. Each icon slot in
+ * the design returns two candidate vectors with no marker for which one is the
+ * rendered variant, and the dense Phosphor paths would add roughly 20 KB to a
+ * single Embed. If exact Phosphor outlines are wanted, swap these five <svg>
+ * bodies — nothing else depends on them.
+ *
+ * FLAGS: `flag` stays optional — a country without one renders a neutral swatch
+ * rather than a broken image.
+ */
+const complianceOnly = [
+  { icon: "mailbox", text: "Invoice data sent to the government and forgotten" },
+  { icon: "brain", text: "You don’t use the data to build more intelligence." },
+  { icon: "handcoins", text: "You pay multiple times for the same extraction." },
+];
+
+const foundationFirst = [
+  {
+    icon: "harddrives",
+    text: "The invoice data is validated, tagged and joined across systems.",
+  },
+  {
+    icon: "growth",
+    text: "The next finance use cases start from a data foundation instead of another extraction.",
+  },
+];
+
+interface Country {
+  name: string;
+  flag?: string;
+}
+
+const countries: Country[] = [
+  { name: "Bahrain", flag: "https://cdn.prod.website-files.com/6141e3720a248d2024615d96/63e29d6c2e1ddc75a632d00f_Group%201000003292.svg" },
+  { name: "France", flag: "https://cdn.prod.website-files.com/6141e3720a248d2024615d96/64999768870655432964457d_france_flag.png" },
+  { name: "India", flag: "https://cdn.prod.website-files.com/6141e3720a248d2024615d96/649999dbc3faf054134a1e01_India_flag.png" },
+  { name: "Malaysia", flag: "https://cdn.prod.website-files.com/6141e3720a248d2024615d96/649a7b4653733f5dbda826ea_malaysia%20v1.png" },
+  { name: "Oman", flag: "https://cdn.prod.website-files.com/6141e3720a248d2024615d96/63e29d499e782b5935404547_Group%201000003291.svg" },
+  { name: "Singapore", flag: "https://cdn.prod.website-files.com/6141e3720a248d2024615d96/66716d4c6753fb52078bec02_singapore%20flag%203.png" },
+  { name: "Spain", flag: "https://cdn.prod.website-files.com/6141e3720a248d2024615d96/64999a546cfce1e0515f0f60_spain%20flag.png" },
+  { name: "Belgium", flag: "https://cdn.prod.website-files.com/6141e3720a248d2024615d96/67e3e6ae1e19488131f26dfd_belgium_flag.png" },
+  { name: "Germany", flag: "https://assets.clear.in/cleartax/images/1771829770_flagforflaggermanysvgrepocom1.svg" },
+  { name: "KSA", flag: "https://cdn.prod.website-files.com/6141e3720a248d2024615d96/63e28756aeabe12df79ff5d5_Rectangle%202515530.svg" },
+  { name: "Norway", flag: "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6a7999a2fdf9fde123422a1b_Flag_of_Norway.svg.webp" },
+  { name: "Philippines", flag: "https://cdn.prod.website-files.com/6141e3720a248d2024615d96/6a2935c197e9e718191d8d34_Flag_of_the_Philippines.svg" },
+  { name: "Slovakia", flag: "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6a7c4a36ac18ccf3dcb998be_slovakia-flag.png" },
+  { name: "UAE", flag: "https://cdn.prod.website-files.com/6141e3720a248d2024615d96/63e29d24f310792735ab4bba_Mask%20group%20(3).svg" },
+];
+---
+
+<section class="bg-generic-00 max-lg:py-12 lg:py-20">
+  <div class="container mx-auto">
+    <div class="flex flex-col gap-16">
+      <!-- Comparison -->
+      <div class="flex flex-col gap-9">
+        <div class="flex flex-col items-center gap-4 text-center">
+          <h2
+            class="m-0 font-heading font-medium text-vault-navy text-[length:var(--fs-h1)] leading-[length:var(--lh-h1)] tracking-[-0.5px]"
+          >
+            E-invoicing is where the foundation starts
+          </h2>
+          <p
+            class="m-0 font-body text-neutral-500 text-[length:var(--fs-body-lg)] leading-[length:var(--lh-body-lg)]"
+          >
+            The mandates already structure your data. The only question is whether you
+            build on it.
+          </p>
+        </div>
+
+        <div class="flex items-stretch gap-8 max-lg:flex-col">
+          <!-- Compliance-only -->
+          <div
+            class="flex flex-1 flex-col gap-6 rounded-xl border border-[#CCCCCC] bg-generic-00 p-6"
+          >
+            <p
+              class="m-0 font-body font-medium uppercase text-vault-navy text-[length:var(--fs-body)] leading-[length:var(--lh-body)] tracking-[0.5px]"
+            >
+              Compliance-only
+            </p>
+            <div class="aspect-[542/400] w-full rounded-lg bg-visual-placeholder" aria-hidden="true"></div>
+            <ul class="m-0 flex list-none flex-col p-0">
+              {
+                complianceOnly.map((b, i) => (
+                  <li
+                    class:list={[
+                      "flex items-start gap-3 py-6 first:pt-0 last:pb-0",
+                      i > 0 && "border-t border-[#F2F1F0]",
+                    ]}
+                  >
+                    <span class="mt-0.5 inline-flex h-6 w-6 shrink-0 items-center justify-center text-vault-navy">
+                      {b.icon === "mailbox" && (
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                          <path d="M3 12a4 4 0 0 1 8 0v7H5a2 2 0 0 1-2-2v-5Z" />
+                          <path d="M11 12a4 4 0 0 1 8 0v5a2 2 0 0 1-2 2h-6" />
+                          <path d="M7 12h1.5" />
+                          <path d="M15 19v-6h4" />
+                        </svg>
+                      )}
+                      {b.icon === "brain" && (
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                          <path d="M12 5.5a2.5 2.5 0 0 0-4.9-.7A2.6 2.6 0 0 0 4.4 8a2.7 2.7 0 0 0-.6 4.3A2.7 2.7 0 0 0 5 17a2.6 2.6 0 0 0 3.6 2.2A2.5 2.5 0 0 0 12 18.5Z" />
+                          <path d="M12 5.5a2.5 2.5 0 0 1 4.9-.7A2.6 2.6 0 0 1 19.6 8a2.7 2.7 0 0 1 .6 4.3A2.7 2.7 0 0 1 19 17a2.6 2.6 0 0 1-3.6 2.2A2.5 2.5 0 0 1 12 18.5Z" />
+                          <path d="M12 5.5v13" />
+                        </svg>
+                      )}
+                      {b.icon === "handcoins" && (
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                          <circle cx="8" cy="6" r="2.6" />
+                          <circle cx="15.5" cy="5.5" r="2.1" />
+                          <path d="M2.5 17.5 5 15h4l3 1.2" />
+                          <path d="M9 18.2h3.6l5.2-2.4a1.5 1.5 0 0 1 1.9 2.2l-4.3 3.1a3 3 0 0 1-1.8.6H5l-2.5 1.3" />
+                        </svg>
+                      )}
+                    </span>
+                    <p class="m-0 font-body text-neutral-500 text-[length:var(--fs-body)] leading-[length:var(--lh-body-lg)]">
+                      {b.text}
+                    </p>
+                  </li>
+                ))
+              }
+            </ul>
+          </div>
+
+          <span class="gh-ei-bridge self-center max-lg:hidden" aria-hidden="true"></span>
+
+          <!-- Foundation-first -->
+          <div
+            class="flex flex-1 flex-col gap-6 rounded-xl border-2 border-nova-blue bg-generic-00 p-6"
+          >
+            <p
+              class="m-0 font-body font-medium uppercase text-nova-blue text-[length:var(--fs-body)] leading-[length:var(--lh-body)] tracking-[0.5px]"
+            >
+              Foundation-first
+            </p>
+            <div class="aspect-[542/400] w-full rounded-lg bg-visual-placeholder" aria-hidden="true"></div>
+            <ul class="m-0 flex list-none flex-col p-0">
+              {
+                foundationFirst.map((b, i) => (
+                  <li
+                    class:list={[
+                      "flex items-start gap-3 py-6 first:pt-0 last:pb-0",
+                      i > 0 && "border-t border-[#F2F1F0]",
+                    ]}
+                  >
+                    <span class="mt-0.5 inline-flex h-6 w-6 shrink-0 items-center justify-center text-nova-blue">
+                      {b.icon === "harddrives" && (
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                          <rect x="3" y="4" width="18" height="7" rx="1.5" />
+                          <rect x="3" y="13" width="18" height="7" rx="1.5" />
+                          <path d="M17.5 7.5h.01M17.5 16.5h.01" />
+                        </svg>
+                      )}
+                      {b.icon === "growth" && (
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                          <path d="M3 19h18" />
+                          <path d="M6 19v-5M11 19V9M16 19v-8M21 19V5" />
+                        </svg>
+                      )}
+                    </span>
+                    <p class="m-0 font-body text-neutral-500 text-[length:var(--fs-body)] leading-[length:var(--lh-body-lg)]">
+                      {b.text}
+                    </p>
+                  </li>
+                ))
+              }
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- Country coverage -->
+      <div
+        class="flex items-center gap-12 rounded-xl border border-[#CCCCCC] bg-generic-00 p-12 max-lg:flex-col max-lg:gap-8 max-lg:p-6"
+      >
+        <div class="flex flex-1 flex-col gap-6">
+          <div class="flex flex-col gap-4">
+            <h3
+              class="m-0 font-heading font-medium text-vault-navy text-[length:var(--fs-h3)] leading-[length:var(--lh-h3)] tracking-[-0.5px] max-w-[528px]"
+            >
+              e-Invoicing compliance across 50+ countries with one API.
+            </h3>
+            <p
+              class="m-0 font-body text-neutral-500 text-[length:var(--fs-body)] leading-[length:var(--lh-body-lg)] max-w-[400px]"
+            >
+              Avoid the needless complexity of managing multiple vendors and projects
+              across countries
+            </p>
+          </div>
+
+          <ul class="m-0 flex list-none flex-wrap gap-2 p-0">
+            {
+              countries.map((c) => (
+                <li class="inline-flex items-center gap-2 rounded-lg border border-neutral-200 bg-generic-00 px-3 py-2.5 text-[length:var(--fs-label)] leading-[length:var(--lh-label)] font-medium text-vault-navy font-body">
+                  {c.flag ? (
+                    <img
+                      src={c.flag}
+                      alt=""
+                      class="h-4 w-6 shrink-0 rounded-[2px] object-contain"
+                      loading="lazy"
+                      decoding="async"
+                    />
+                  ) : (
+                    <span
+                      class="h-4 w-6 shrink-0 rounded-[2px] bg-neutral-200"
+                      aria-hidden="true"
+                    />
+                  )}
+                  {c.name}
+                </li>
+              ))
+            }
+            <li class="inline-flex items-center rounded-lg border border-neutral-200 bg-generic-00 px-3 py-2.5 text-[length:var(--fs-label)] leading-[length:var(--lh-label)] font-medium text-neutral-500 font-body">
+              + more
+            </li>
+          </ul>
+        </div>
+
+<!-- The design's globe is a light wireframe with country pins. The only globe
+             assets in this repo are dark space photographs, which fight a white
+             panel, so this stays a placeholder like every other unshipped image on
+             the page. Upload the wireframe globe to Webflow assets and swap this
+             div for an <img> to finish it. -->
+        <div
+          class="h-[400px] w-[447px] shrink-0 rounded-lg bg-visual-placeholder max-lg:h-64 max-lg:w-full max-lg:max-w-[447px]"
+          aria-hidden="true"
+        ></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style is:global>
+  /* Dot bridge between the two comparison cards — the Figma's 29×80 block,
+     Nova Blue here rather than lime because this pair is an interactive
+     comparison, matching the screenshot. */
+  .gh-ei-bridge {
+    display: block;
+    width: 29.1px;
+    height: 79.54px;
+    flex-shrink: 0;
+    /* `at 1.94px 1.94px` anchors the dot to the tile's top-left rather than its
+       centre, which is what yields two columns inside 29.1px and four rows
+       inside 79.54px — the Figma's 2×4 arrangement. Centred dots give one
+       column, because the second would fall outside the box. */
+    background-image: radial-gradient(
+      circle at 1.94px 1.94px,
+      var(--color-nova-blue) 1.94px,
+      transparent 2px
+    );
+    background-size: 25.22px 25.22px;
+    background-repeat: repeat;
+  }
+</style>
