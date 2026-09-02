@@ -186,7 +186,19 @@ document.addEventListener('DOMContentLoaded', () => {
 
     window.addEventListener('scroll', onScroll, { passive: true });
     window.addEventListener('resize', onScroll);
-    window.addEventListener('load', update, { once: true }); // catch late font/image layout shifts
+    
+    const handleLayoutShift = () => {
+        setTops();
+        update();
+    };
+    
+    window.addEventListener('load', handleLayoutShift, { once: true }); // catch late font/image layout shifts
+    
+    if (textEl && typeof ResizeObserver !== 'undefined') {
+        const ro = new ResizeObserver(handleLayoutShift);
+        ro.observe(textEl);
+    }
+
     update();
 });
 </script>
