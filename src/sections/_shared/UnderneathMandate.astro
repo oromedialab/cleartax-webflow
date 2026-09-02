@@ -72,8 +72,13 @@ const { title = '', items = [] } = Astro.props;
             // Calculate the section's stickyTop required to place the track exactly at idealTrackTop
             let calculatedTop = idealTrackTop - trackOffset;
             
-            // Cap it so the section itself never drops below the header (keeps it flush on large screens)
-            stickyTop = Math.min(headerHeight, calculatedTop);
+            if (window.innerWidth >= 1280) {
+                // Center vertically on large screens (xl and above)
+                stickyTop = Math.max(headerHeight, (windowHeight - sectionHeight) / 2);
+            } else {
+                // Cap it so the section itself never drops below the header (keeps it flush on smaller screens)
+                stickyTop = Math.min(headerHeight, calculatedTop);
+            }
                 
             section.style.top = `${stickyTop}px`;
             

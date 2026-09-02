@@ -139,9 +139,23 @@ document.addEventListener('DOMContentLoaded', () => {
         
         inners[0].style.transform = originalTransform;
         
-        // The first wrapper sticks at 100px. 
-        // So the first card's true visual top is 100px + its internal offset.
-        const baseTop = 100 + cardOffset;
+        // Default top position
+        let firstTop = 100;
+        
+        // Center vertically on large screens (xl and above)
+        if (window.innerWidth >= 1280) {
+            const cardHeight = inners[0].getBoundingClientRect().height;
+            // Total height includes the header text (cardOffset), the card itself, and the stacked offsets
+            const totalStackHeight = cardOffset + cardHeight + (outers.length - 1) * 16;
+            firstTop = Math.max(100, (window.innerHeight - totalStackHeight) / 2);
+        }
+        
+        // Set the top for the first wrapper
+        outers[0].style.top = firstTop + 'px';
+        
+        // The first wrapper sticks at `firstTop`. 
+        // So the first card's true visual top is `firstTop` + its internal offset.
+        const baseTop = firstTop + cardOffset;
         
         for(let i=1; i<outers.length; i++) {
             outers[i].style.top = (baseTop + i * 16) + 'px';
