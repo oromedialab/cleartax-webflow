@@ -15,7 +15,7 @@
             <p class="font-body text-[length:var(--fs-body)] md:text-[length:var(--fs-body-lg)] leading-[length:var(--lh-body)] md:leading-[length:var(--lh-body-lg)] text-neutral-500 max-w-197 mx-auto">One invoice leaves your ERP. What it has to become — and how it has to travel — changes the moment it crosses a border.</p>
         </div>
 
-        <div id="invoice-stack-container" class="mx-auto w-full flex flex-col gap-[30vh] md:gap-[50vh]">
+        <div id="invoice-stack-container" class="mx-auto w-full flex flex-col gap-[25vh] md:gap-[35vh]">
             <div class="invoice-stack-sticky sticky" style="top: 100px; z-index: 0;">
                 <!-- Desktop Header (Sticky) -->
                 <div id="invoice-header-text" class="hidden md:block text-center w-full mx-auto mb-2 md:mb-4 bg-generic-00">
@@ -132,7 +132,6 @@ document.addEventListener('DOMContentLoaded', () => {
         inners[0].style.transform = 'none';
         
         // Measure exactly how far down the card sits inside its sticky wrapper
-        // This naturally accounts for ALL text, margins, webflow quirks, or wrapping.
         const outerTop = outers[0].getBoundingClientRect().top;
         const innerTop = inners[0].getBoundingClientRect().top;
         const cardOffset = innerTop - outerTop;
@@ -140,62 +139,61 @@ document.addEventListener('DOMContentLoaded', () => {
         inners[0].style.transform = originalTransform;
         
         // Default top position
-        let firstTop = 100;
+        let firstTop = 90;
         
         // Center vertically on large screens (xl and above)
         if (window.innerWidth >= 1280) {
             const cardHeight = inners[0].getBoundingClientRect().height;
-            // Total height includes the header text (cardOffset), the card itself, and the stacked offsets
             const totalStackHeight = cardOffset + cardHeight + (outers.length - 1) * 16;
-            firstTop = Math.max(100, (window.innerHeight - totalStackHeight) / 2);
+            firstTop = Math.max(90, (window.innerHeight - totalStackHeight) / 2);
         }
         
         // Set the top for the first wrapper
         outers[0].style.top = firstTop + 'px';
         
-        // The first wrapper sticks at `firstTop`. 
-        // So the first card's true visual top is `firstTop` + its internal offset.
+        // The first wrapper sticks at `firstTop`.
         const baseTop = firstTop + cardOffset;
         
-        for(let i=1; i<outers.length; i++) {
+        for(let i = 1; i < outers.length; i++) {
             outers[i].style.top = (baseTop + i * 16) + 'px';
         }
     };
     window.addEventListener('resize', setTops);
     setTops();
 
-    // How much scroll distance the shrink takes, once the next card starts closing in.
-    const revealDistance = 260;
-
-    // Card 0 shrinks the most (0.88), each subsequent card a little less.
-    const targetScaleFor = (i) => 0.88 + i * 0.04;
-
     let ticking = false;
 
     const update = () => {
-        // Read every outer wrapper's CURRENT position first (outers are never
-        // transformed, so getBoundingClientRect on them is always accurate —
-        // no feedback loop, unlike measuring a transformed element).
-        const tops = outers.map((el) => el.getBoundingClientRect().top);
+        const viewportHeight = window.innerHeight;
+        // Range over which card scaling occurs (smooth transition zone)
+        const revealRange = Math.min(viewportHeight * 0.45, 380);
 
+        // Compute smooth progress for each card step (smoothP[k] represents how much card k+1 has stacked over the cards above it)
+        const progresses = [];
+        for (let i = 0; i < outers.length - 1; i++) {
+            const nextOuter = outers[i + 1];
+            const nextTargetTop = nextOuter.style.top
+                ? parseFloat(nextOuter.style.top)
+                : 0;
+            const distanceToStick = nextOuter.getBoundingClientRect().top - nextTargetTop;
+            
+            // Raw ratio (0 when far away, 1 when fully stuck)
+            const rawP = Math.min(1, Math.max(0, 1 - distanceToStick / revealRange));
+            // Smoothstep cubic easing: 3t^2 - 2t^3 for silky smooth acceleration and deceleration
+            const smoothP = rawP * rawP * (3 - 2 * rawP);
+            progresses.push(smoothP);
+        }
+
+        // Calculate continuous scale for each card
         inners.forEach((inner, i) => {
-            const isLast = i === inners.length - 1;
-            if (isLast) {
-                inner.style.transform = 'scale(1)';
-                return;
+            // Sum of progresses for all cards stacked on top of card i
+            let stackDepth = 0;
+            for (let j = i; j < progresses.length; j++) {
+                stackDepth += progresses[j];
             }
 
-            // sticky clamps an element's rect.top at its own `top` value once stuck,
-            // and keeps decreasing beforehand — so this distance naturally goes to 0
-            // and stays there once card i+1 is fully stuck. No further calc needed.
-            const nextStickyTopPx = outers[i + 1].style.top
-                ? parseFloat(getComputedStyle(outers[i + 1]).top)
-                : 0;
-            const distanceToStick = tops[i + 1] - nextStickyTopPx;
-
-            const progress = Math.min(1, Math.max(0, 1 - distanceToStick / revealDistance));
-            const targetScale = targetScaleFor(i);
-            const scale = 1 - progress * (1 - targetScale);
+            // Scale shrinks by 0.04 per stacked layer (down to ~0.84 max)
+            const scale = Math.max(0.84, 1 - stackDepth * 0.04);
 
             inner.style.transform = `scale(${scale.toFixed(4)})`;
         });
@@ -218,7 +216,7 @@ document.addEventListener('DOMContentLoaded', () => {
         update();
     };
     
-    window.addEventListener('load', handleLayoutShift, { once: true }); // catch late font/image layout shifts
+    window.addEventListener('load', handleLayoutShift, { once: true });
     
     if (textEl && typeof ResizeObserver !== 'undefined') {
         const ro = new ResizeObserver(handleLayoutShift);

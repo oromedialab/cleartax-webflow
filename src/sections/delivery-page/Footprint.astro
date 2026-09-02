@@ -1,13 +1,19 @@
 ---
-import Dotgrid from '../_shared/Dotgrid.astro';
+const COLUMN_OFFSETS = ["-205px", "-153px", "-101px", "-49px", "-101px", "-153px", "-205px"];
 ---
 <section class="relative py-24 md:py-32 bg-generic-00 overflow-hidden w-full flex items-center justify-center min-h-[400px]" id="footprint">
-    <!-- Interactive Dot Grid Background -->
-    <Dotgrid containerId="footprint" />
-    
-    <!-- White overlays fading out dots at edges and behind text -->
-    <div class="absolute inset-0 z-0 bg-[linear-gradient(to_bottom,_#FFFFFF_0%,_transparent_20%,_transparent_80%,_#FFFFFF_100%)] pointer-events-none"></div>
-    <div class="absolute inset-0 z-0 bg-[radial-gradient(ellipse_70%_50%_at_50%_50%,_#FFFFFF_20%,_transparent_60%)] pointer-events-none"></div>
+    <!-- 7-Column Dot Grid Background -->
+    <div class="absolute inset-0 pointer-events-none" aria-hidden="true">
+        {
+            COLUMN_OFFSETS.map((top, i) => (
+                <div
+                    class="footprint-col absolute top-0 bottom-0"
+                    style={`left:${(i * 100) / 7}%;width:${100 / 7}%;background-position-y:${top}`}
+                />
+            ))
+        }
+        <div class="footprint-wash absolute inset-0"></div>
+    </div>
 
     <div class="relative z-10 lg:container mx-auto px-4 md:px-6 flex flex-col items-center text-center">
         <h2 class="text-[length:var(--fs-h2)] md:text-[length:var(--fs-h1)] leading-[length:var(--lh-h2)] md:leading-[length:var(--lh-h1)] font-medium text-text-default max-w-[800px] m-0 mb-4 md:mb-6">
@@ -24,3 +30,25 @@ import Dotgrid from '../_shared/Dotgrid.astro';
         </a>
     </div>
 </section>
+
+<style>
+    .footprint-col {
+        background-image: radial-gradient(
+            circle,
+            rgba(84, 70, 255, 0.28) 1.6px,
+            transparent 1.7px
+        );
+        background-size: 26px 26px;
+        background-repeat: repeat;
+    }
+
+    .footprint-wash {
+        background: radial-gradient(
+            ellipse 45% 65% at 50% 50%,
+            #ffffff 0%,
+            rgba(255, 255, 255, 0.9) 50%,
+            rgba(255, 255, 255, 0) 85%
+        );
+    }
+</style>
+
