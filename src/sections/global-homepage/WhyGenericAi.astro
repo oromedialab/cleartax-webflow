@@ -2,14 +2,28 @@
 /**
  * "Why Generic AI Fails for Finance" — Figma node 13049:22785.
  *
- * A sticky stack: the heading pins to the top, then five cards pin in turn with
- * a stepped top offset so each new card slides over the previous one and leaves
- * a sliver of it showing. That is exactly the Figma structure (a `sticky`
- * wrapper per card with increasing `padding-top`), so it is reproduced rather
- * than reinterpreted.
+ * Card stack, built on the same implementation as
+ * `sections/delivery-page/Invoice.astro`:
+ *
+ *   - Two layers per card. The OUTER wrapper (`.gh-why-sticky`) is what
+ *     `position: sticky` acts on and is NEVER transformed, so measuring it with
+ *     getBoundingClientRect is always accurate. The INNER card (`.gh-why-card`)
+ *     is the only thing JS scales — measuring a transformed element would feed
+ *     its own transform back into the next frame.
+ *   - Each wrapper sticks 16px below the previous one, with a rising z-index, so
+ *     the stack leaves a visible sliver of every card behind it.
+ *   - A card shrinks as the next one closes in, most for the earliest card, and
+ *     the last one never shrinks.
+ *   - `setTops()` measures the real offset of the card inside its wrapper rather
+ *     than assuming one, so wrapped headings or late-loading fonts can't push
+ *     the stack out of alignment.
  *
  * IMPORTANT: no ancestor of a `.gh-why-sticky` may set `overflow` to anything
  * but `visible` — that silently kills `position: sticky`.
+ *
+ * The header is duplicated (mobile copy scrolls away, desktop copy rides inside
+ * the first sticky wrapper), matching Invoice.astro. That does put two <h2>s in
+ * the DOM; it is how the existing stack does it, so the two stay consistent.
  *
  * CONTENT NOTE: all five cards carry the same "Financial Planning & Analysis"
  * copy because the Figma has them as five untouched instances of one component.
@@ -28,92 +42,214 @@ const cards: Card[] = Array.from({ length: 5 }, () => ({
   cleartaxCaption:
     "Builds the forecast from live actuals, with embedded context such as your entity structure and cost drivers.",
 }));
+
+const HEADING = "Why Generic AI Fails for Finance.";
+const LEDE =
+  "ClearTax gives you clean finance data and the business context AI needs, so your finance team can build and use AI with confidence.";
 ---
 
-<section class="bg-generic-00 max-lg:py-12 lg:py-20">
+<section class="bg-generic-00 py-16 md:py-20">
   <div class="container mx-auto">
-    <div class="flex flex-col items-center gap-12">
-      <div
-        class="gh-why-head sticky top-0 z-10 flex w-full flex-col items-center gap-4 bg-generic-00 text-center max-lg:pt-16 lg:pt-40"
+    <!-- Mobile header — scrolls away, so the stack gets the full viewport -->
+    <div class="md:hidden text-center w-full mx-auto mb-8 bg-generic-00">
+      <h2
+        class="m-0 mb-3 font-heading font-medium text-vault-navy text-[length:var(--fs-h2)] leading-[length:var(--lh-h2)] tracking-[-0.5px]"
       >
-        <h2
-          class="m-0 font-heading font-medium text-vault-navy text-[length:var(--fs-h1)] leading-[length:var(--lh-h1)] tracking-[-0.5px]"
-        >
-          Why Generic AI Fails for Finance.
-        </h2>
-        <p
-          class="m-0 font-body text-neutral-500 text-[length:var(--fs-body-lg)] leading-[length:var(--lh-body-lg)] max-w-[628px]"
-        >
-          ClearTax gives you clean finance data and the business context AI needs, so
-          your finance team can build and use AI with confidence.
-        </p>
-      </div>
+        {HEADING}
+      </h2>
+      <p
+        class="m-0 mx-auto max-w-[628px] font-body text-neutral-500 text-[length:var(--fs-body)] leading-[length:var(--lh-body)]"
+      >
+        {LEDE}
+      </p>
+    </div>
 
-      <div class="flex w-full flex-col gap-8">
-        {
-          cards.map((card, i) => (
-            <div
-              class="gh-why-sticky sticky top-0 flex w-full flex-col"
-              style={`padding-top:${320 + i * 10}px`}
+    <div
+      id="gh-why-stack"
+      class="gh-why-stack mx-auto flex w-full flex-col gap-[30vh] md:gap-[50vh]"
+    >
+      {
+        cards.map((card, i) => (
+          <div class="gh-why-sticky sticky" style={`top:${100 + i * 16}px;z-index:${i};`}>
+            {i === 0 && (
+              <div
+                id="gh-why-header"
+                class="hidden md:block text-center w-full mx-auto mb-4 bg-generic-00"
+              >
+                <h2 class="m-0 mb-3 font-heading font-medium text-vault-navy text-[length:var(--fs-h1)] leading-[length:var(--lh-h1)] tracking-[-0.5px]">
+                  {HEADING}
+                </h2>
+                <p class="m-0 mx-auto max-w-[628px] font-body text-neutral-500 text-[length:var(--fs-body-lg)] leading-[length:var(--lh-body-lg)]">
+                  {LEDE}
+                </p>
+              </div>
+            )}
+
+            <article
+              class="gh-why-card flex w-full flex-col gap-6 rounded-xl border-2 border-[#CCCCCC] bg-generic-00 p-6 will-change-transform md:h-[clamp(380px,calc(100vh-300px),560px)]"
+              style="transform-origin: top center;"
             >
-              <article class="flex w-full flex-col rounded-xl border-2 border-[#CCCCCC] bg-generic-00 p-6">
-                <div class="flex w-full flex-col gap-6">
-                  <h3 class="m-0 text-center font-heading font-medium text-vault-navy text-[length:var(--fs-h6)] leading-[length:var(--lh-h6)]">
-                    {card.title}
-                  </h3>
+              <h3 class="m-0 text-center font-heading font-medium text-vault-navy text-[length:var(--fs-h6)] leading-[length:var(--lh-h6)]">
+                {card.title}
+              </h3>
 
-                  <div class="flex w-full items-start gap-8 max-md:flex-col">
-                    <div class="flex flex-1 flex-col gap-6 max-md:w-full">
-                      <div class="relative aspect-[600/400] w-full overflow-hidden rounded-lg bg-visual-placeholder">
-                        <span class="absolute left-4 top-4 inline-flex items-center gap-2 rounded-lg border border-neutral-200 bg-generic-00 px-3 py-1.5 text-[length:var(--fs-label)] leading-[length:var(--lh-label)] font-medium text-neutral-700 font-body">
-                          <span class="block h-4 w-4 shrink-0 rounded-[3px] bg-neutral-900 opacity-20" />
-                          GENERIC AI
-                        </span>
-                      </div>
-                      <p class="m-0 font-body text-neutral-500 text-[length:var(--fs-body)] leading-[length:var(--lh-body)]">
-                        {card.genericCaption}
-                      </p>
-                    </div>
-
-                    <div class="flex flex-1 flex-col gap-6 max-md:w-full">
-                      <div class="relative aspect-[600/400] w-full overflow-hidden rounded-lg bg-visual-placeholder">
-                        <span class="absolute left-4 top-4 inline-flex items-center gap-2 rounded-lg bg-nova-blue px-3 py-1.5 text-[length:var(--fs-label)] leading-[length:var(--lh-label)] font-medium text-generic-00 font-body">
-                          <span class="block h-4 w-4 shrink-0 rounded-[3px] bg-generic-00 opacity-20" />
-                          CLEARTAX AI
-                        </span>
-                      </div>
-                      <p class="m-0 font-body text-neutral-500 text-[length:var(--fs-body)] leading-[length:var(--lh-body)]">
-                        {card.cleartaxCaption}
-                      </p>
-                    </div>
+              {/* min-h-0 on the row and on each image holder is what lets the
+                  images absorb the height clamp instead of overflowing it. */}
+              <div class="flex w-full flex-1 items-stretch gap-8 max-md:flex-col max-md:items-start md:min-h-0">
+                <div class="flex flex-1 flex-col gap-6 max-md:w-full md:min-h-0">
+                  <div class="relative w-full overflow-hidden rounded-lg bg-visual-placeholder max-md:aspect-[600/400] md:min-h-0 md:flex-1">
+                    <span class="absolute left-4 top-4 inline-flex items-center gap-2 rounded-lg border border-neutral-200 bg-generic-00 px-3 py-1.5 text-[length:var(--fs-label)] leading-[length:var(--lh-label)] font-medium text-neutral-700 font-body">
+                      <span class="block h-4 w-4 shrink-0 rounded-[3px] bg-neutral-900 opacity-20" />
+                      GENERIC AI
+                    </span>
                   </div>
+                  <p class="m-0 font-body text-neutral-500 text-[length:var(--fs-body)] leading-[length:var(--lh-body)]">
+                    {card.genericCaption}
+                  </p>
                 </div>
-              </article>
-            </div>
-          ))
-        }
-      </div>
+
+                <div class="flex flex-1 flex-col gap-6 max-md:w-full md:min-h-0">
+                  <div class="relative w-full overflow-hidden rounded-lg bg-visual-placeholder max-md:aspect-[600/400] md:min-h-0 md:flex-1">
+                    <span class="absolute left-4 top-4 inline-flex items-center gap-2 rounded-lg bg-nova-blue px-3 py-1.5 text-[length:var(--fs-label)] leading-[length:var(--lh-label)] font-medium text-generic-00 font-body">
+                      <span class="block h-4 w-4 shrink-0 rounded-[3px] bg-generic-00 opacity-20" />
+                      CLEARTAX AI
+                    </span>
+                  </div>
+                  <p class="m-0 font-body text-neutral-500 text-[length:var(--fs-body)] leading-[length:var(--lh-body)]">
+                    {card.cleartaxCaption}
+                  </p>
+                </div>
+              </div>
+            </article>
+          </div>
+        ))
+      }
+
+      <!-- Tail room so the last card can finish sticking before the next section -->
+      <div style="height: 80px;"></div>
     </div>
   </div>
 </section>
 
 <style is:global>
-  /* The stepped offsets are inline (they differ per card); this only softens the
-     stack on short viewports, where 320px of lead-in would push the first card
-     off-screen entirely. */
-  @media (max-height: 800px), (max-width: 1024px) {
-    .gh-why-sticky {
-      padding-top: 96px !important;
-    }
-  }
-
-  /* Sticky is a progressive enhancement here — if a browser drops it the cards
-     simply read as a normal stack, which is still correct. */
+  /* Sticky and the scroll-driven shrink are both enhancements. Switched off, the
+     cards read as a plain stack — so the huge scroll gaps that exist only to give
+     the stack travel have to go with them. */
   @media (prefers-reduced-motion: reduce) {
-    .gh-why-sticky,
-    .gh-why-head {
-      position: static;
-      padding-top: 0 !important;
+    .gh-why-stack {
+      gap: 2rem !important;
+    }
+    .gh-why-sticky {
+      position: static !important;
+    }
+    .gh-why-card {
+      transform: none !important;
+      height: auto !important;
     }
   }
 </style>
+
+<script is:inline>
+  document.addEventListener("DOMContentLoaded", () => {
+    const stack = document.getElementById("gh-why-stack");
+    if (!stack) return;
+
+    const textEl = document.getElementById("gh-why-header");
+    // Outers are never transformed, so their rects are always safe to measure.
+    const outers = Array.from(stack.querySelectorAll(".gh-why-sticky"));
+    const inners = Array.from(stack.querySelectorAll(".gh-why-card"));
+    if (!outers.length || outers.length !== inners.length) return;
+
+    const reduceMotion =
+      window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (reduceMotion) return;
+
+    const STACK_OFFSET = 16; // visible sliver of each card behind the next
+    const REVEAL_DISTANCE = 260; // scroll px the shrink takes once the next card closes in
+
+    // Card 0 shrinks most, each subsequent one less; the last never shrinks.
+    const targetScaleFor = (i) => 0.88 + i * 0.03;
+
+    const setTops = () => {
+      // Clear the transform first, or the measured offset includes the scale.
+      const originalTransform = inners[0].style.transform;
+      inners[0].style.transform = "none";
+
+      // Measure how far the card actually sits inside its wrapper, rather than
+      // assuming — this absorbs a wrapped heading, late fonts, anything.
+      const outerTop = outers[0].getBoundingClientRect().top;
+      const innerTop = inners[0].getBoundingClientRect().top;
+      const cardOffset = innerTop - outerTop;
+
+      inners[0].style.transform = originalTransform;
+
+      let firstTop = 100;
+
+      // Centre the whole stack vertically once there is room for it.
+      if (window.innerWidth >= 1280) {
+        const cardHeight = inners[0].getBoundingClientRect().height;
+        const totalStackHeight =
+          cardOffset + cardHeight + (outers.length - 1) * STACK_OFFSET;
+        firstTop = Math.max(100, (window.innerHeight - totalStackHeight) / 2);
+      }
+
+      outers[0].style.top = firstTop + "px";
+
+      // Wrapper 0 sticks at firstTop, so card 0's true visual top is firstTop
+      // plus whatever sits above it inside the wrapper.
+      const baseTop = firstTop + cardOffset;
+      for (let i = 1; i < outers.length; i++) {
+        outers[i].style.top = baseTop + i * STACK_OFFSET + "px";
+      }
+    };
+
+    let ticking = false;
+
+    const update = () => {
+      // Read every wrapper position BEFORE writing any transform, so a write
+      // can't invalidate a later read in the same frame.
+      const tops = outers.map((el) => el.getBoundingClientRect().top);
+
+      inners.forEach((inner, i) => {
+        if (i === inners.length - 1) {
+          inner.style.transform = "scale(1)";
+          return;
+        }
+
+        // sticky clamps rect.top at the element's own `top` once stuck and keeps
+        // decreasing before that, so this distance falls to 0 and stays there
+        // the moment card i+1 is fully stuck. No extra bookkeeping needed.
+        const nextStickyTopPx = parseFloat(getComputedStyle(outers[i + 1]).top) || 0;
+        const distanceToStick = tops[i + 1] - nextStickyTopPx;
+
+        const progress = Math.min(1, Math.max(0, 1 - distanceToStick / REVEAL_DISTANCE));
+        const scale = 1 - progress * (1 - targetScaleFor(i));
+        inner.style.transform = `scale(${scale.toFixed(4)})`;
+      });
+
+      ticking = false;
+    };
+
+    const onScroll = () => {
+      if (ticking) return;
+      ticking = true;
+      requestAnimationFrame(update);
+    };
+
+    const handleLayoutShift = () => {
+      setTops();
+      update();
+    };
+
+    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", handleLayoutShift);
+    window.addEventListener("load", handleLayoutShift, { once: true });
+
+    if (textEl && typeof ResizeObserver !== "undefined") {
+      new ResizeObserver(handleLayoutShift).observe(textEl);
+    }
+
+    setTops();
+    update();
+  });
+</script>
