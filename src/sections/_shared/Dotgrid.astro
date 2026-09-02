@@ -52,25 +52,27 @@ const {
   <canvas id={canvasId} class="absolute inset-0 w-full h-full"></canvas>
 </div>
 
-<script>
+<script is:inline>
   // Script runs once per page, initializes all dot grids found
   document.addEventListener('DOMContentLoaded', () => {
     const grids = document.querySelectorAll('.dot-grid-wrapper');
     
     grids.forEach(wrapper => {
+      if (wrapper.dataset.initialized) return;
+      wrapper.dataset.initialized = 'true';
       const containerId = wrapper.getAttribute('data-dot-grid-container');
       const canvasId = wrapper.getAttribute('data-canvas-id');
       
       if (!containerId || !canvasId) return;
       
       const section = document.getElementById(containerId);
-      const canvas = document.getElementById(canvasId) as HTMLCanvasElement;
+      const canvas = document.getElementById(canvasId);
       
       if (!section || !canvas || !canvas.getContext) return;
       
       const ctx = canvas.getContext('2d');
 
-      function num(name: string, fallback: number) {
+      function num(name, fallback) {
         const value = parseFloat(wrapper.getAttribute(name) || "");
         return isNaN(value) ? fallback : value;
       }
@@ -95,7 +97,7 @@ const {
 
       let width = 0;
       let height = 0;
-      let dots: any[] = [];
+      let dots = [];
       const mouse = { x: -9999, y: -9999, prevX: -9999, prevY: -9999 };
       let hover = false;
       let speed = 0;
@@ -216,7 +218,7 @@ const {
 
       let lastTime = performance.now();
 
-      function draw(time: number) {
+      function draw(time) {
         let dt = (time - lastTime) / 1000;
         if (dt > 0.05) dt = 0.05;
         lastTime = time;
@@ -327,7 +329,7 @@ const {
       initGrid();
       requestAnimationFrame(draw);
 
-      section.addEventListener('mousemove', (e: MouseEvent) => {
+      section.addEventListener('mousemove', (e) => {
         const rect = canvas.getBoundingClientRect();
         const nx = e.clientX - rect.left;
         const ny = e.clientY - rect.top;
