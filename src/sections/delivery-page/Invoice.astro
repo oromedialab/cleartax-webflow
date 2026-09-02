@@ -11,7 +11,7 @@
         -->
         <!-- Mobile Header (Scrolls away) -->
         <div class="md:hidden text-center w-full mx-auto mb-8 bg-generic-00">
-            <h2 class="font-heading font-medium text-[length:var(--fs-h2)] leading-[length:var(--lh-h2)] md:text-[length:var(--fs-h1)] md:leading-[length:var(--lh-h1)] text-text-default max-w-250 mx-auto mb-3">Same invoice. Different rulebook, every market.</h2>
+            <h2 class="font-heading font-medium text-[length:var(--fs-h2)] leading-[length:var(--lh-h2)] md:text-[length:var(--fs-h1)] md:leading-[length:var(--lh-h1)] text-text-default max-w-250 mx-auto m-0 mb-3">Same invoice. Different rulebook, every market.</h2>
             <p class="font-body text-[length:var(--fs-body)] md:text-[length:var(--fs-body-lg)] leading-[length:var(--lh-body)] md:leading-[length:var(--lh-body-lg)] text-neutral-500 max-w-197 mx-auto">One invoice leaves your ERP. What it has to become — and how it has to travel — changes the moment it crosses a border.</p>
         </div>
 
@@ -125,12 +125,24 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!outers.length || outers.length !== inners.length) return;
 
     const setTops = () => {
-        if (!textEl) return;
-        const style = window.getComputedStyle(textEl);
-        const isHidden = style.display === 'none';
-        const h = isHidden ? 0 : textEl.offsetHeight;
-        const mb = isHidden ? 0 : parseFloat(style.marginBottom);
-        const baseTop = 100 + h + mb;
+        if (!outers.length || !inners.length) return;
+        
+        // Temporarily clear transform on the first card to get its true layout position
+        const originalTransform = inners[0].style.transform;
+        inners[0].style.transform = 'none';
+        
+        // Measure exactly how far down the card sits inside its sticky wrapper
+        // This naturally accounts for ALL text, margins, webflow quirks, or wrapping.
+        const outerTop = outers[0].getBoundingClientRect().top;
+        const innerTop = inners[0].getBoundingClientRect().top;
+        const cardOffset = innerTop - outerTop;
+        
+        inners[0].style.transform = originalTransform;
+        
+        // The first wrapper sticks at 100px. 
+        // So the first card's true visual top is 100px + its internal offset.
+        const baseTop = 100 + cardOffset;
+        
         for(let i=1; i<outers.length; i++) {
             outers[i].style.top = (baseTop + i * 16) + 'px';
         }
