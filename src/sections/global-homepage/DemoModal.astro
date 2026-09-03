@@ -1,0 +1,403 @@
+---
+/**
+ * "Book a demo" → HubSpot form in a modal, for the Global homepage.
+ *
+ * This section renders nothing visible. It is page furniture: a `fixed` dialog
+ * plus the delegated click handler that opens it. It exists as its own paste
+ * unit rather than living inside `Cta.astro` because every "Book a demo" on the
+ * page depends on it — the navbar's two, the hero's, and the closing band's. If
+ * it rode along inside a content section, dropping or reordering that section
+ * would silently turn all four back into plain links to contact-us.
+ *
+ * Openers are marked `data-demo-open`; the handler is delegated on `document`,
+ * so it does not matter which Webflow Embed mounts first or whether the opener
+ * existed when this ran. An opener with no modal on the page is not broken — it
+ * keeps its real `href` and navigates, which is why marking NavbarRb's CTA is
+ * inert on the pages that do not paste this section.
+ *
+ * The pattern (and the HubSpot form CSS below) follows
+ * `blog-listing/Newsletter.astro`, which does the same job for the blog page.
+ */
+
+/* Same portal/form the site's other CTAs use — see `_shared/ContactFormRb.astro`.
+   The embed script is NOT loaded on page load: it is injected the first time the
+   modal opens, so this Embed stays self-contained in Webflow and visitors who
+   never click pay nothing. */
+const hubspotPortalId = '245744706';
+const hubspotFormId = '5c52d4ba-5345-413a-b3cd-0ccec450aa30';
+const hubspotRegion = 'na2';
+
+const modalTitle = 'Book a demo';
+const modalBlurb = 'Tell us a little about you and we will be in touch.';
+---
+
+<div id="gh-demo-root">
+  <div
+    data-demo-modal
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="gh-demo-title"
+    aria-hidden="true"
+    class="fixed inset-0 z-[2000] hidden items-center justify-center bg-generic-100/70 p-4 backdrop-blur-sm"
+  >
+    <div
+      class="relative max-h-[90vh] w-full max-w-[560px] overflow-y-auto rounded-xl bg-generic-00 p-6 shadow-[0_24px_64px_rgba(5,2,42,0.24)] md:p-8"
+    >
+      <button
+        type="button"
+        data-demo-close
+        aria-label="Close"
+        class="absolute right-4 top-4 inline-flex h-9 w-9 cursor-pointer items-center justify-center rounded-lg border-0 bg-transparent text-neutral-500 transition-colors duration-150 hover:bg-ledger-100 hover:text-vault-navy"
+      >
+        <svg
+          width="16"
+          height="16"
+          viewBox="0 0 14 14"
+          fill="none"
+          aria-hidden="true"
+          focusable="false"
+        >
+          <path
+            d="M13 1L1 13M1 1L13 13"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"></path>
+        </svg>
+      </button>
+
+      <h3
+        id="gh-demo-title"
+        class="m-0 pr-10 font-heading font-medium text-vault-navy text-[length:var(--fs-h5)] leading-[var(--lh-h5)] tracking-[var(--tracking-heading)]"
+      >
+        {modalTitle}
+      </h3>
+      <p
+        class="m-0 mt-2 font-body font-normal text-neutral-500 text-[length:var(--fs-body-sm)] leading-[var(--lh-body-sm)]"
+      >
+        {modalBlurb}
+      </p>
+
+      <!-- HubSpot mounts here on first open -->
+      <div
+        id="gh-demo-hs-form"
+        class="gh-demo-hs-form mt-6"
+        data-portal-id={hubspotPortalId}
+        data-form-id={hubspotFormId}
+        data-region={hubspotRegion}
+      >
+        <p
+          data-demo-loading
+          class="m-0 font-body font-normal text-neutral-500 text-[length:var(--fs-body-sm)] leading-[var(--lh-body-sm)]"
+        >
+          Loading form…
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script is:inline>
+  /* Book a demo → HubSpot form in a modal. The embed script is fetched on the
+     first open, not on page load. */
+  (function () {
+    var root = document.getElementById('gh-demo-root');
+    if (!root) return;
+
+    var modal = root.querySelector('[data-demo-modal]');
+    var mount = root.querySelector('#gh-demo-hs-form');
+    if (!modal || !mount) return;
+
+    var panel = modal.firstElementChild;
+    var closeBtn = modal.querySelector('[data-demo-close]');
+
+    var lastFocused = null;
+    var scriptRequested = false;
+    var formCreated = false;
+
+    function createForm() {
+      if (formCreated || !window.hbspt || !window.hbspt.forms) return;
+      formCreated = true;
+
+      window.hbspt.forms.create({
+        portalId: mount.getAttribute('data-portal-id'),
+        formId: mount.getAttribute('data-form-id'),
+        region: mount.getAttribute('data-region') || 'na2',
+        target: '#gh-demo-hs-form',
+        onFormReady: function ($form) {
+          var loading = mount.querySelector('[data-demo-loading]');
+          if (loading && loading.parentNode) loading.parentNode.removeChild(loading);
+
+          // Carry campaign attribution through, same as the site's other forms.
+          var formEl = $form && $form[0] ? $form[0] : $form;
+          if (!formEl || !formEl.querySelector) return;
+          var params = new URLSearchParams(window.location.search);
+          var utms = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 'utm_content'];
+          for (var i = 0; i < utms.length; i++) {
+            var value = params.get(utms[i]);
+            if (!value) continue;
+            var input = formEl.querySelector('input[name="' + utms[i] + '"]');
+            if (input) input.value = value;
+          }
+        },
+      });
+    }
+
+    function loadHubspot() {
+      if (scriptRequested) return;
+      scriptRequested = true;
+
+      if (window.hbspt && window.hbspt.forms) {
+        createForm();
+        return;
+      }
+
+      // Reuse the loader if the page already has one (the Astro page head has
+      // one; in Webflow it may be pasted into the page head) rather than adding
+      // a second.
+      var loader = document.querySelector('script[src*="hsforms.net"]');
+      if (!loader) {
+        loader = document.createElement('script');
+        loader.src = 'https://js-na2.hsforms.net/forms/embed/v2.js';
+        loader.charset = 'utf-8';
+        loader.async = true;
+        document.head.appendChild(loader);
+      }
+      loader.addEventListener('load', createForm);
+
+      // Backstop: a cached loader may have fired `load` before we listened.
+      var tries = 0;
+      var poll = setInterval(function () {
+        tries++;
+        if (window.hbspt && window.hbspt.forms) {
+          clearInterval(poll);
+          createForm();
+        } else if (tries > 100) {
+          clearInterval(poll);
+        }
+      }, 100);
+    }
+
+    // Inline display, not a class swap: the utilities pasted into Webflow are
+    // unlayered, so `flex` and `hidden` on one element would race on source
+    // order. Inline always wins.
+    function openModal(e, opener) {
+      if (e) e.preventDefault();
+      // The clicked opener, not activeElement: browsers differ on whether a
+      // click focuses an anchor, and on close focus has to land somewhere
+      // predictable rather than on the document root.
+      lastFocused = opener || document.activeElement;
+      modal.style.display = 'flex';
+      modal.setAttribute('aria-hidden', 'false');
+      document.body.style.overflow = 'hidden';
+      loadHubspot();
+      if (closeBtn) closeBtn.focus();
+    }
+
+    function closeModal() {
+      modal.style.display = 'none';
+      modal.setAttribute('aria-hidden', 'true');
+      document.body.style.overflow = '';
+      if (lastFocused && lastFocused.focus) lastFocused.focus();
+    }
+
+    function isOpen() {
+      return modal.style.display === 'flex';
+    }
+
+    // Delegated, so it does not matter which Embed mounts first or whether the
+    // opener existed when this ran.
+    document.addEventListener('click', function (e) {
+      if (!e.target.closest) return;
+      var opener = e.target.closest('[data-demo-open]');
+      if (!opener) return;
+      openModal(e, opener);
+    });
+
+    if (closeBtn) closeBtn.addEventListener('click', closeModal);
+
+    modal.addEventListener('click', function (e) {
+      if (e.target === modal) closeModal();
+    });
+
+    document.addEventListener('keydown', function (e) {
+      if (!isOpen()) return;
+
+      if (e.key === 'Escape') {
+        closeModal();
+        return;
+      }
+
+      // Keep Tab inside the dialog — `aria-modal` claims the rest is inert, so
+      // focus must not walk out into the page behind it.
+      if (e.key !== 'Tab' || !panel) return;
+      var focusable = panel.querySelectorAll(
+        'a[href], button:not([disabled]), input:not([disabled]):not([type="hidden"]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
+      );
+      if (!focusable.length) return;
+      var first = focusable[0];
+      var last = focusable[focusable.length - 1];
+
+      if (e.shiftKey && document.activeElement === first) {
+        e.preventDefault();
+        last.focus();
+      } else if (!e.shiftKey && document.activeElement === last) {
+        e.preventDefault();
+        first.focus();
+      }
+    });
+  })();
+</script>
+
+<style is:global>
+  /* Styling for HubSpot's injected markup — utilities can't reach a form that
+     does not exist at build time. Prefixed `gh-demo-` per the section-CSS rule;
+     the shape follows `_shared/ContactFormRb.astro` so every form on the site
+     reads the same. */
+  .gh-demo-hs-form form {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 16px !important;
+  }
+  .gh-demo-hs-form .hs-form-field {
+    margin-bottom: 0 !important;
+  }
+  .gh-demo-hs-form .hs-form-field > label {
+    display: block !important;
+    font-family: var(--font-body) !important;
+    font-size: var(--fs-label) !important;
+    font-weight: var(--font-weight-medium) !important;
+    color: var(--color-vault-navy) !important;
+    margin-bottom: var(--spacing-x-sm) !important;
+  }
+  .gh-demo-hs-form .hs-form-field > label .hs-form-required {
+    color: var(--palette-destructive-500) !important;
+    margin-left: 2px !important;
+  }
+  .gh-demo-hs-form input[type="text"],
+  .gh-demo-hs-form input[type="email"],
+  .gh-demo-hs-form input[type="tel"],
+  .gh-demo-hs-form input[type="number"],
+  .gh-demo-hs-form select,
+  .gh-demo-hs-form textarea {
+    width: 100% !important;
+    box-sizing: border-box !important;
+    height: 40px !important;
+    padding: var(--spacing-xx-sm) var(--spacing-sm) !important;
+    border: 1px solid var(--palette-neutral-300) !important;
+    border-radius: var(--spacing-x-sm) !important;
+    background: var(--color-generic-00) !important;
+    font-family: var(--font-body) !important;
+    font-size: var(--fs-body-sm) !important;
+    color: var(--color-vault-navy) !important;
+    box-shadow: 0 1px 1px rgba(16, 24, 40, 0.04) !important;
+    transition: border-color var(--transition-fast), box-shadow var(--transition-fast) !important;
+  }
+  .gh-demo-hs-form input::placeholder,
+  .gh-demo-hs-form textarea::placeholder {
+    color: var(--palette-neutral-400) !important;
+  }
+  .gh-demo-hs-form input:focus,
+  .gh-demo-hs-form select:focus,
+  .gh-demo-hs-form textarea:focus {
+    border-color: var(--color-nova-blue) !important;
+    box-shadow: 0 0 0 3px rgba(84, 70, 255, 0.12) !important;
+  }
+  .gh-demo-hs-form textarea {
+    height: auto !important;
+    min-height: 80px !important;
+    resize: vertical !important;
+  }
+  .gh-demo-hs-form fieldset {
+    max-width: none !important;
+    border: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    display: flex !important;
+    gap: var(--spacing-md) !important;
+  }
+  @media (width < 640px) {
+    .gh-demo-hs-form fieldset {
+      flex-direction: column !important;
+    }
+  }
+  .gh-demo-hs-form fieldset .hs-form-field {
+    flex: 1 !important;
+  }
+  .gh-demo-hs-form .hs-form-booleancheckbox label,
+  .gh-demo-hs-form .legal-consent-container label {
+    display: flex !important;
+    align-items: flex-start !important;
+    gap: var(--spacing-x-sm) !important;
+    font-family: var(--font-body) !important;
+    font-size: var(--fs-body-xs) !important;
+    line-height: var(--lh-body-xs) !important;
+    color: var(--palette-neutral-500) !important;
+    cursor: pointer !important;
+  }
+  .gh-demo-hs-form .hs-form-booleancheckbox label a,
+  .gh-demo-hs-form .legal-consent-container label a {
+    color: var(--color-nova-blue) !important;
+    font-weight: var(--font-weight-medium) !important;
+    text-decoration: underline !important;
+  }
+  .gh-demo-hs-form input[type="checkbox"] {
+    width: 20px !important;
+    height: 20px !important;
+    margin-top: 2px !important;
+    flex-shrink: 0 !important;
+    accent-color: var(--color-nova-blue) !important;
+    cursor: pointer !important;
+  }
+  .gh-demo-hs-form .inputs-list {
+    list-style: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+  .gh-demo-hs-form .hs-submit {
+    margin-top: var(--spacing-xx-sm) !important;
+  }
+  .gh-demo-hs-form input[type="submit"],
+  .gh-demo-hs-form .hs-button {
+    width: 100% !important;
+    padding: var(--spacing-sm) var(--spacing-xxx-big) !important;
+    border: 1px solid var(--color-nova-blue) !important;
+    border-radius: var(--spacing-x-sm) !important;
+    background: var(--color-nova-blue) !important;
+    color: var(--color-nova-50) !important;
+    font-family: var(--font-body) !important;
+    font-size: var(--fs-label-lg) !important;
+    font-weight: var(--font-weight-medium) !important;
+    cursor: pointer !important;
+    box-shadow: 0 2px 3px rgba(16, 24, 40, 0.06) !important;
+    transition: opacity var(--transition-fast) !important;
+  }
+  .gh-demo-hs-form input[type="submit"]:hover,
+  .gh-demo-hs-form .hs-button:hover {
+    opacity: 0.92 !important;
+  }
+  .gh-demo-hs-form .hs-error-msgs {
+    list-style: none !important;
+    padding: 0 !important;
+    margin: var(--spacing-xx-sm) 0 0 !important;
+    font-size: var(--fs-body-xs) !important;
+    color: var(--palette-destructive-500) !important;
+  }
+  .gh-demo-hs-form .hs-error-msg {
+    color: var(--palette-destructive-500) !important;
+  }
+  .gh-demo-hs-form .submitted-message {
+    padding: var(--spacing-big) !important;
+    border: 1px solid var(--palette-neutral-300) !important;
+    border-radius: var(--spacing-x-sm) !important;
+    font-family: var(--font-body) !important;
+    font-size: var(--fs-body-sm) !important;
+    color: var(--color-vault-navy) !important;
+    text-align: center !important;
+  }
+  /* HubSpot renders the UTM fields it prefills; they are not for the visitor. */
+  .gh-demo-hs-form fieldset:has([class*="hs_utm_"]),
+  .gh-demo-hs-form .hs-form-field[style*="display: none"] {
+    display: none !important;
+  }
+</style>

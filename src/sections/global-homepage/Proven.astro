@@ -4,17 +4,28 @@
  *
  * Six rows, each a use-case card joined to an outcome card by a dot bridge.
  *
- * Only the row at the middle of the viewport keeps the Flux Lime bridge; the
- * rest rest at #EFEFEF, so scrolling walks the accent down the list. That is a
- * second IntersectionObserver, independent of the reveal one below.
+ * Row focus is a second IntersectionObserver, independent of the reveal one
+ * below. Figma node 12745:19646 specimens the two states as component variants:
  *
- * DEVIATION, DELIBERATE: the Figma row instances carry `opacity: 50%`. Applied
- * literally that drops the body copy to roughly 2.4:1 against white, which
- * fails WCAG AA and is almost certainly a WIP dim rather than intent — the
- * design's own colour tokens (Vault Navy titles, #6B7280 body) already encode
- * the intended hierarchy. Rows therefore render at full opacity and instead
- * fade in with the repo's existing `.premium-reveal`, which is how every other
- * page in this codebase handles a staged reveal.
+ *   Default  (resting) — opacity 50%, bridge dots #A6C705
+ *   Variant2 (focused) — full opacity, bridge dots #5446FF Nova Blue
+ *
+ * The focused row additionally scales to 1.02. That is ours, not the Figma's —
+ * the specimen only varies opacity and dot colour.
+ *
+ * The row at the middle of the viewport gets Variant2, so scrolling walks the
+ * focus down the list.
+ *
+ * ON THE 50% DIM: an earlier note here rejected the Figma's `opacity: 50%`,
+ * reading it as a WIP artifact, because at ~2.4:1 the body copy fails WCAG AA.
+ * That reasoning held while every row was permanently dim. It no longer does:
+ * the dim is now the RESTING half of a focus pair, and the row being read is
+ * always the full-opacity one. Rows you are not looking at are de-emphasised;
+ * the row you are looking at is not. If it still reads too faint on a real
+ * screen, `.gh-proven-row > *` is the single place to raise it.
+ *
+ * Without JS, or with reduced motion, every row renders focused — full opacity
+ * and lit bridge — rather than the whole list sitting dimmed.
  */
 interface Row {
   title: string;
@@ -150,18 +161,44 @@ const rows: Row[] = [
 </section>
 
 <style is:global>
+  /* Row focus, per Figma node 12745:19646, which specimens the two states side
+     by side. The row at the middle of the viewport is the "Variant2" instance —
+     full opacity, Nova Blue dots. Every other row is "Default" — 50% opacity,
+     #A6C705 dots. Scrolling therefore walks the focus down the list.
+
+     The focused row also lifts slightly. Both the dim and the scale sit on the
+     row's CHILDREN, not the row: shared.css ends the premium-reveal with
+     `opacity: 1 !important` AND `transform: translateY(0) !important` on the
+     <li>, so either property set there would be wiped the moment the row
+     reveals. Each child scales about its own centre, so the dot bridge stays
+     centred between the two cards.
+
+     scale(1.02) is deliberately small. At 1440 it grows each card by ~6px per
+     side, which stays inside the container's 24px gutter — anything larger
+     starts pushing the cards past the page edge. */
+  .gh-proven-row > * {
+    opacity: 0.5;
+    transform: scale(0.95);
+    transition: all 0.35s ease;
+  }
+
+  .gh-proven-row.is-centered > * {
+    opacity: 1;
+    transform: scale(1);
+  }
+
   /* The 30×82 dot bridge between the two cards: two columns, four rows,
      3.88px dots on a 25.22px pitch — the Figma's Frame 2147225847.
 
-     Only the row sitting at the middle of the viewport carries the Flux Lime;
-     every other row's bridge rests at #EFEFEF, so scrolling walks the accent
-     down the list. Painted from currentColor because `color` is transitionable
-     and a background-image is not — a fixed colour stop would snap. */
+     #A6C705 is a one-off in this component, not a brand token — it is the fill
+     Figma exports for the resting bridge. Painted from currentColor because
+     `color` is transitionable and a background-image is not; a fixed colour
+     stop would snap between states while the opacity eased. */
   .gh-proven-bridge {
     display: block;
     width: 29.1px;
     height: 79.54px;
-    color: #efefef;
+    color: #a6c705;
     /* `at 1.94px 1.94px` anchors the dot to the tile's top-left rather than its
        centre, so two columns fit inside 29.1px and four rows inside 79.54px.
        A centred dot renders only one column — the second falls outside the box. */
@@ -176,7 +213,7 @@ const rows: Row[] = [
   }
 
   .gh-proven-row.is-centered .gh-proven-bridge {
-    color: var(--color-flux-lime);
+    color: var(--color-nova-blue);
   }
 </style>
 
@@ -199,14 +236,6 @@ const rows: Row[] = [
       });
       return;
     }
-
-    // `is-ready` is what arms the hidden state in shared.css. Adding it here,
-    // rather than in the markup, means a JS failure leaves the rows visible
-    // instead of permanently blank.
-    items.forEach((el, i) => {
-      el.classList.add("is-ready");
-      el.style.transitionDelay = `${Math.min(i, 5) * 80}ms`;
-    });
 
     const observer = new IntersectionObserver(
       (entries) => {
