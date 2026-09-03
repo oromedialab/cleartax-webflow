@@ -101,9 +101,12 @@ const steps: Step[] = [
       </h2>
 
       <div class="relative w-full">
-        <!-- Progress rail. Sits behind the rows, centred on the column gap. -->
+        <!-- Progress rail. Sits behind the rows, centred on the column gap.
+             -bottom-12 cancels the gap-12 between this wrapper and the closing
+             pill, so the rail runs all the way down and meets the top edge of
+             the box instead of stopping short at the last card. -->
         <div
-          class="gh-clarity-rail absolute inset-y-0 left-1/2 hidden w-2 -translate-x-1/2 overflow-hidden rounded-t-full bg-[#EFEFEF] lg:block"
+          class="gh-clarity-rail absolute -bottom-12 top-0 left-1/2 hidden w-2 -translate-x-1/2 overflow-hidden rounded-t-full bg-[#EFEFEF] lg:block"
           aria-hidden="true"
         >
           <div class="gh-clarity-fill absolute inset-x-0 top-0 h-0 rounded-2xl bg-nova-blue"></div>
@@ -113,11 +116,24 @@ const steps: Step[] = [
           {
             steps.map((step, i) => (
               <div
-                class="flex items-center gap-20 max-lg:flex-col max-lg:gap-6"
+                class="max-lg:flex max-lg:flex-col max-lg:gap-6 lg:grid lg:grid-cols-2 lg:items-center lg:gap-20"
                 data-gh-step
                 data-step-index={i}
               >
-                <div class="gh-clarity-card flex w-[600px] flex-col justify-between self-stretch overflow-hidden rounded-xl border border-[#CCCCCC] bg-generic-00 max-lg:w-full">
+                {/* A 2-col GRID at lg, and neither column carries a width.
+                    The rail is pinned at left-1/2, so the column gap has to sit
+                    at exactly 50% or the line reads off centre. It did before:
+                    a fixed w-[600px] card that was allowed to shrink beside a
+                    shrink-0 image moved the gap left by 24px under 1328px, and
+                    even as two flex-1 children the pair still resolved 601/599.
+                    Grid columns are exact halves by definition, so the gap
+                    centre and the rail land on the same pixel at every width.
+
+                    box-border on the card keeps its border inside that column:
+                    these bundles carry no preflight, and .is-active takes the
+                    border from 1px to 2px, which would otherwise nudge the row
+                    every time a card latched. */}
+                <div class="gh-clarity-card box-border flex flex-col justify-between self-stretch overflow-hidden rounded-xl border border-[#CCCCCC] bg-generic-00 max-lg:w-full lg:min-w-0">
                   <div class="flex flex-col gap-6 border-b border-[#CCCCCC] p-6">
                     <div class="flex flex-col gap-4">
                       <span class="inline-flex h-[30px] w-[30px] items-center justify-center rounded-lg border border-[#C3C7CD] bg-[#FBFBFC] text-[length:var(--fs-label-sm)] leading-[length:var(--lh-label-sm)] font-medium text-[#5B6068] font-body">
@@ -188,7 +204,7 @@ const steps: Step[] = [
                   </div>
                 </div>
 
-                <div class="h-[515px] w-[600px] shrink-0 rounded-lg bg-visual-placeholder max-lg:h-64 max-lg:w-full" />
+                <div class="h-[515px] rounded-lg bg-visual-placeholder max-lg:h-64 max-lg:w-full lg:min-w-0" />
               </div>
             ))
           }
@@ -197,9 +213,12 @@ const steps: Step[] = [
 
       <!-- Closing pill -->
       <div
-        class="gh-clarity-pill flex items-center justify-center gap-6 rounded-lg border-4 border-flux-lime p-6 max-md:flex-col max-md:gap-4"
+        class="gh-clarity-pill flex items-center justify-center gap-6 rounded-lg border-4 border-current p-6 max-md:flex-col max-md:gap-4"
       >
         <span class="gh-clarity-dots max-md:hidden" aria-hidden="true"></span>
+        <!-- Explicitly Vault Navy, so it does NOT inherit the pill's colour.
+             The border and dots go #EFEFEF -> Flux Lime; the sentence stays
+             black throughout and has to opt out of that. -->
         <p
           class="m-0 text-center font-heading font-medium text-vault-navy text-[length:var(--fs-h6)] leading-[length:var(--lh-h6)]"
         >
@@ -212,14 +231,25 @@ const steps: Step[] = [
 </section>
 
 <style is:global>
+  /* Three colours, in order: the unfilled track is Neutral 500, the progress
+     fills over it in Nova Blue, and the whole line turns Flux Lime once it is
+     full — the Figma's state-3 treatment.
+
+     Only background-color is eased. Height is deliberately not: it is rewritten
+     every frame while the rail is on screen, so easing it would make the bar lag
+     behind the scroll rather than track it. */
   .gh-clarity-fill {
-    transition: height 0.45s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.45s ease;
+    transition: background-color 0.45s ease;
   }
 
-  /* Every step latched → the rail reads "complete" and flips to Flux Lime,
-     which is the Figma's state-3 treatment. */
+  /* Rail full → flip to Flux Lime. The fill's rounded bottom is its travelling
+     head, which is right mid-scroll but lets the grey track show through the
+     corners once the line has to meet the pill's border flush, so the cap is
+     squared off at the same moment. */
   [data-gh-clarity].is-complete .gh-clarity-fill {
     background-color: var(--color-flux-lime);
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
   }
 
   .gh-clarity-card {
@@ -227,8 +257,29 @@ const steps: Step[] = [
   }
 
   [data-gh-step].is-active .gh-clarity-card {
-    border-color: #3355ff;
+    border-color: var(--color-nova-blue);
     border-width: 2px;
+  }
+
+  /* The closing pill waits its turn. Inactive it is entirely #EFEFEF — the same
+     grey as the rail's unfilled track, so it reads as the far end of the line
+     rather than a separate element — and it takes the Flux Lime at the moment
+     the rail finishes and meets its top edge. The line arriving is what lights
+     the box up.
+
+     One `color` drives the frame: the border is border-current and the dots
+     paint their gradient from currentColor, so a single transition moves both
+     together. It has to work this way — `color` is transitionable, a
+     background-image is not, so a dot gradient with a fixed colour stop would
+     snap while the border eased. The sentence itself opts out with an explicit
+     text-vault-navy and stays black the whole way through. */
+  .gh-clarity-pill {
+    color: #efefef;
+    transition: color 0.45s ease;
+  }
+
+  [data-gh-clarity].is-complete .gh-clarity-pill {
+    color: var(--color-flux-lime);
   }
 
   /* The 158×29 dot block flanking the closing line. */
@@ -236,11 +287,7 @@ const steps: Step[] = [
     display: block;
     width: 158px;
     height: 4px;
-    background-image: radial-gradient(
-      circle,
-      var(--color-flux-lime) 1.94px,
-      transparent 2px
-    );
+    background-image: radial-gradient(circle, currentColor 1.94px, transparent 2px);
     background-size: 25.2px 4px;
     background-repeat: repeat-x;
   }
@@ -252,6 +299,7 @@ const steps: Step[] = [
     if (!root) return;
 
     const steps = Array.from(root.querySelectorAll("[data-gh-step]"));
+    const rail = root.querySelector(".gh-clarity-rail");
     const fill = root.querySelector(".gh-clarity-fill");
     if (!steps.length) return;
 
@@ -262,42 +310,72 @@ const steps: Step[] = [
       return;
     }
 
+    // ---- Cards -----------------------------------------------------------
     // Latch-only: once a step is reached it stays active, so scrolling back up
-    // does not unwind the rail. That matches the Figma, where state 3 is an end
+    // does not unwind it. That matches the Figma, where state 3 is an end
     // state rather than a hover.
-    const latched = new Set();
-
-    const paint = () => {
-      if (!fill) return;
-      if (latched.size === 0) {
-        fill.style.height = "0px";
-        return;
-      }
-      const last = steps[Math.max(...latched)];
-      const railTop = steps[0].offsetTop;
-      fill.style.height = `${last.offsetTop + last.offsetHeight - railTop}px`;
-      root.classList.toggle("is-complete", latched.size === steps.length);
-    };
-
-    const observer = new IntersectionObserver(
+    const stepObserver = new IntersectionObserver(
       (entries) => {
-        let changed = false;
         entries.forEach((entry) => {
-          if (!entry.isIntersecting) return;
-          const el = entry.target;
-          const i = Number(el.getAttribute("data-step-index"));
-          if (latched.has(i)) return;
-          latched.add(i);
-          el.classList.add("is-active");
-          changed = true;
+          if (entry.isIntersecting) entry.target.classList.add("is-active");
         });
-        if (changed) paint();
       },
       // Fires when the step crosses the vertical middle of the viewport.
       { rootMargin: "-45% 0px -45% 0px", threshold: 0 },
     );
 
-    steps.forEach((s) => observer.observe(s));
-    window.addEventListener("resize", paint);
+    steps.forEach((s) => stepObserver.observe(s));
+
+    // ---- Rail ------------------------------------------------------------
+    // A progress bar has to answer "how far", which is a continuous question —
+    // IntersectionObserver only ever answers "has it crossed", so it cannot
+    // drive the height directly. It is used as the ON/OFF switch instead: a
+    // second observer starts a measuring loop when the rail comes on screen and
+    // stops it when it leaves. Nothing is measured while the section is out of
+    // view, and the page carries no scroll listener at all.
+    if (!rail || !fill) return;
+
+    let running = false;
+    let frame = 0;
+    let last = -1;
+
+    const draw = () => {
+      const r = rail.getBoundingClientRect();
+
+      // The progress marker is the middle of the viewport, so the rail is
+      // filled to exactly the point being read — and it tracks scrolling up as
+      // well as down.
+      const filled = Math.min(r.height, Math.max(0, window.innerHeight / 2 - r.top));
+
+      // Skip the write when the value has not moved, so an idle tab in view
+      // costs a rect read and nothing else.
+      if (filled !== last) {
+        last = filled;
+        fill.style.height = filled + "px";
+        // 1px of slack so the flip to Flux Lime does not chatter at the end.
+        root.classList.toggle("is-complete", r.height > 0 && filled >= r.height - 1);
+      }
+
+      if (running) frame = requestAnimationFrame(draw);
+    };
+
+    const railObserver = new IntersectionObserver(
+      (entries) => {
+        const visible = entries.some((e) => e.isIntersecting);
+        if (visible === running) return;
+        running = visible;
+        if (running) {
+          frame = requestAnimationFrame(draw);
+        } else {
+          cancelAnimationFrame(frame);
+          // One last pass so the rail settles at full or empty rather than
+          // freezing wherever the final frame happened to land.
+          draw();
+        }
+      },
+      { threshold: 0 },
+    );
+
+    railObserver.observe(rail);
   })();
 </script>

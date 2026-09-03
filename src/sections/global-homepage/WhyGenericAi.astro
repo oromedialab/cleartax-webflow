@@ -25,10 +25,8 @@
  * the first sticky wrapper), matching Invoice.astro. That does put two <h2>s in
  * the DOM; it is how the existing stack does it, so the two stay consistent.
  *
- * CONTENT NOTE: all five cards carry the same "Financial Planning & Analysis"
- * copy because the Figma has them as five untouched instances of one component.
- * The array below is the seam — drop the real per-card copy in and nothing else
- * has to change.
+ * Card copy is per-card, taken from Figma node 13091:15387. The image holders
+ * are still the Figma placeholders — no artwork exists for them yet.
  */
 interface Card {
   title: string;
@@ -36,22 +34,52 @@ interface Card {
   cleartaxCaption: string;
 }
 
-const cards: Card[] = Array.from({ length: 5 }, () => ({
-  title: "Financial Planning & Analysis",
-  genericCaption: "It can extract trends from your spreadsheet.",
-  cleartaxCaption:
-    "Builds the forecast from live actuals, with embedded context such as your entity structure and cost drivers.",
-}));
+const cards: Card[] = [
+  {
+    title: "Financial Planning & Analysis",
+    genericCaption: "It can extract trends from your spreadsheet.",
+    cleartaxCaption:
+      "Builds the forecast from live actuals, with embedded context such as your entity structure and cost drivers.",
+  },
+  {
+    title: "Fraud Prevention",
+    genericCaption:
+      "Flags duplicates across whatever files you upload. Can only analyse a sample of your transactions, not all.",
+    cleartaxCaption:
+      "Flags unusual things that you are likely to miss, because it looks at every transaction and compares it to the specific contract, invoice, and shipping details.",
+  },
+  {
+    title: "CFO Insights",
+    genericCaption:
+      "Summarises the file you paste in or translates data inside your ERP into a visual graph or trend line.",
+    cleartaxCaption:
+      "Meaningfully answers why and how metrics changed, because it's connected to live systems with your business context.",
+  },
+  {
+    title: "Tax Automation",
+    genericCaption: "Matches invoice number, date, amount, and formats a return.",
+    cleartaxCaption:
+      "Computes return at line item level, reconciled against all your systems, based on statutory rules for each country",
+  },
+  {
+    title: "Accounts Payable",
+    genericCaption:
+      "Reads each invoice PDF, extracts fields, and uploads to your ERP/AP/AR systems",
+    cleartaxCaption:
+      "Receives from Peppol, email and vendor portals. De-duplicates, links documents, checks for fraud, and keeps the full trail.",
+  },
+];
 
-const HEADING = "Why Generic AI Fails for Finance.";
+const HEADING = "General Purpose AI was not built to solve Finance Use-Cases";
 const LEDE =
   "ClearTax gives you clean finance data and the business context AI needs, so your finance team can build and use AI with confidence.";
 ---
 
 <section class="bg-generic-00 py-16 md:py-20">
   <div class="container mx-auto">
-    <!-- Mobile header — scrolls away, so the stack gets the full viewport -->
-    <div class="md:hidden text-center w-full mx-auto mb-8 bg-generic-00">
+    <!-- Scroll-away header — gives the stack the full viewport. Used on mobile
+         AND on any short window; see .gh-why-header-* in the style block. -->
+    <div class="gh-why-header-flow text-center w-full mx-auto mb-8 bg-generic-00">
       <h2
         class="m-0 mb-3 font-heading font-medium text-vault-navy text-[length:var(--fs-h2)] leading-[length:var(--lh-h2)] tracking-[-0.5px]"
       >
@@ -74,7 +102,7 @@ const LEDE =
             {i === 0 && (
               <div
                 id="gh-why-header"
-                class="hidden md:block text-center w-full mx-auto mb-4 bg-generic-00"
+                class="gh-why-header-stuck text-center w-full mx-auto mb-8 lg:mb-12 bg-generic-00"
               >
                 <h2 class="m-0 mb-3 font-heading font-medium text-vault-navy text-[length:var(--fs-h1)] leading-[length:var(--lh-h1)] tracking-[-0.5px]">
                   {HEADING}
@@ -86,39 +114,41 @@ const LEDE =
             )}
 
             <article
-              class="gh-why-card flex w-full flex-col gap-6 rounded-xl border-2 border-[#CCCCCC] bg-generic-00 p-6 will-change-transform md:h-[clamp(380px,calc(100vh-300px),560px)]"
+              class="gh-why-card flex w-full flex-col gap-6 rounded-xl border-2 border-[#CCCCCC] bg-generic-00 p-6 will-change-transform md:h-(--gh-why-card-h)"
               style="transform-origin: top center;"
             >
               <h3 class="m-0 text-center font-heading font-medium text-vault-navy text-[length:var(--fs-h6)] leading-[length:var(--lh-h6)]">
                 {card.title}
               </h3>
 
-              {/* min-h-0 on the row and on each image holder is what lets the
-                  images absorb the height clamp instead of overflowing it. */}
-              <div class="flex w-full flex-1 items-stretch gap-8 max-md:flex-col max-md:items-start md:min-h-0">
-                <div class="flex flex-1 flex-col gap-6 max-md:w-full md:min-h-0">
-                  <div class="relative w-full overflow-hidden rounded-lg bg-visual-placeholder max-md:aspect-[600/400] md:min-h-0 md:flex-1">
-                    <span class="absolute left-4 top-4 inline-flex items-center gap-2 rounded-lg border border-neutral-200 bg-generic-00 px-3 py-1.5 text-[length:var(--fs-label)] leading-[length:var(--lh-label)] font-medium text-neutral-700 font-body">
-                      <span class="block h-4 w-4 shrink-0 rounded-[3px] bg-neutral-900 opacity-20" />
-                      GENERIC AI
-                    </span>
-                  </div>
-                  <p class="m-0 font-body text-neutral-500 text-[length:var(--fs-body)] leading-[length:var(--lh-body)]">
-                    {card.genericCaption}
-                  </p>
+              {/* One grid, not two flex columns. The two image holders share a
+                  grid row, so they are always exactly the same height — as flex
+                  columns a caption that wrapped to three lines stole the height
+                  from its own image, which only showed up once the two sides
+                  stopped carrying identical copy. Row 2 is auto, sized by the
+                  taller caption, so the captions share a baseline too.
+                  minmax(0,1fr) + min-h-0 is what lets the image row absorb the
+                  card's height clamp instead of overflowing it. */}
+              <div class="grid w-full flex-1 grid-cols-1 gap-y-6 md:min-h-0 md:grid-cols-2 md:grid-rows-[minmax(0,1fr)_auto] md:gap-x-8">
+                <div class="relative w-full overflow-hidden rounded-lg bg-visual-placeholder max-md:aspect-[600/400] md:col-start-1 md:row-start-1 md:min-h-0">
+                  <span class="absolute left-4 top-4 inline-flex items-center gap-2 rounded-lg border border-neutral-200 bg-generic-00 px-3 py-1.5 text-[length:var(--fs-label)] leading-[length:var(--lh-label)] font-medium text-neutral-700 font-body">
+                    <span class="block h-4 w-4 shrink-0 rounded-[3px] bg-neutral-900 opacity-20" />
+                    GENERIC AI
+                  </span>
                 </div>
+                <p class="m-0 font-body text-neutral-500 text-[length:var(--fs-body)] leading-[length:var(--lh-body)] md:col-start-1 md:row-start-2">
+                  {card.genericCaption}
+                </p>
 
-                <div class="flex flex-1 flex-col gap-6 max-md:w-full md:min-h-0">
-                  <div class="relative w-full overflow-hidden rounded-lg bg-visual-placeholder max-md:aspect-[600/400] md:min-h-0 md:flex-1">
-                    <span class="absolute left-4 top-4 inline-flex items-center gap-2 rounded-lg bg-nova-blue px-3 py-1.5 text-[length:var(--fs-label)] leading-[length:var(--lh-label)] font-medium text-generic-00 font-body">
-                      <span class="block h-4 w-4 shrink-0 rounded-[3px] bg-generic-00 opacity-20" />
-                      CLEARTAX AI
-                    </span>
-                  </div>
-                  <p class="m-0 font-body text-neutral-500 text-[length:var(--fs-body)] leading-[length:var(--lh-body)]">
-                    {card.cleartaxCaption}
-                  </p>
+                <div class="relative w-full overflow-hidden rounded-lg bg-visual-placeholder max-md:aspect-[600/400] md:col-start-2 md:row-start-1 md:min-h-0">
+                  <span class="absolute left-4 top-4 inline-flex items-center gap-2 rounded-lg bg-nova-blue px-3 py-1.5 text-[length:var(--fs-label)] leading-[length:var(--lh-label)] font-medium text-generic-00 font-body">
+                    <span class="block h-4 w-4 shrink-0 rounded-[3px] bg-generic-00 opacity-20" />
+                    CLEARTAX AI
+                  </span>
                 </div>
+                <p class="m-0 font-body text-neutral-500 text-[length:var(--fs-body)] leading-[length:var(--lh-body)] md:col-start-2 md:row-start-2">
+                  {card.cleartaxCaption}
+                </p>
               </div>
             </article>
           </div>
@@ -132,6 +162,48 @@ const LEDE =
 </section>
 
 <style is:global>
+  /* Which header shows is a question of available HEIGHT, not just width, so it
+     cannot be a plain Tailwind breakpoint. Driving both copies from one rule
+     here also means there is no specificity race between a `hidden` utility in
+     the head bundle and an override in this block, which is pasted later.
+
+     Above 860px tall the header rides inside the first sticky wrapper (the
+     Figma layout). Below that, its ~200px would push the card's captions under
+     the fold, so it reverts to scrolling away like the mobile copy does. */
+  .gh-why-header-stuck {
+    display: none;
+  }
+
+  @media (min-width: 768px) and (min-height: 860px) {
+    .gh-why-header-flow {
+      display: none;
+    }
+    .gh-why-header-stuck {
+      display: block;
+    }
+  }
+
+  /* Card height budget. The whole stack has to fit in the viewport or the
+     captions at the bottom of the front card are unreachable — it is sticky, so
+     you cannot scroll to them.
+
+       top offset (100px, clears the fixed navbar) + header + card
+         + 16px sliver x 4 cards behind  <=  100vh
+
+     The stuck-header regime therefore subtracts 380px, not 300px: 100 top + ~212
+     header + 64 slivers. The old 300px under-counted by ~76px, which is why the
+     card overflowed the window at every height below ~940px. With the header
+     scrolled away there is no header to pay for, so 190px is enough. */
+  .gh-why-card {
+    --gh-why-card-h: clamp(300px, calc(100vh - 190px), 560px);
+  }
+
+  @media (min-height: 860px) {
+    .gh-why-card {
+      --gh-why-card-h: clamp(380px, calc(100vh - 380px), 560px);
+    }
+  }
+
   /* Sticky and the scroll-driven shrink are both enhancements. Switched off, the
      cards read as a plain stack — so the huge scroll gaps that exist only to give
      the stack travel have to go with them. */

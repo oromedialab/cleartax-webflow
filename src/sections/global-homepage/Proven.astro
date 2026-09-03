@@ -4,6 +4,10 @@
  *
  * Six rows, each a use-case card joined to an outcome card by a dot bridge.
  *
+ * Only the row at the middle of the viewport keeps the Flux Lime bridge; the
+ * rest rest at #EFEFEF, so scrolling walks the accent down the list. That is a
+ * second IntersectionObserver, independent of the reveal one below.
+ *
  * DEVIATION, DELIBERATE: the Figma row instances carry `opacity: 50%`. Applied
  * literally that drops the body copy to roughly 2.4:1 against white, which
  * fails WCAG AA and is almost certainly a WIP dim rather than intent — the
@@ -103,7 +107,7 @@ const rows: Row[] = [
       <ul class="m-0 flex list-none flex-col gap-8 p-0">
         {
           rows.map((row) => (
-            <li class="premium-reveal flex items-center justify-center gap-8 max-lg:flex-col max-lg:gap-4">
+            <li class="gh-proven-row premium-reveal flex items-center justify-center gap-8 max-lg:flex-col max-lg:gap-4">
               <div class="flex flex-1 items-center gap-6 self-stretch rounded-xl border border-[#CCCCCC] bg-generic-00 p-6 max-lg:w-full">
                 <span class="h-20 w-20 shrink-0 rounded-xl bg-visual-placeholder" aria-hidden="true" />
                 <div class="flex min-w-0 flex-col gap-3">
@@ -147,21 +151,32 @@ const rows: Row[] = [
 
 <style is:global>
   /* The 30×82 dot bridge between the two cards: two columns, four rows,
-     3.88px dots on a 25.22px pitch — the Figma's Frame 2147225847. */
+     3.88px dots on a 25.22px pitch — the Figma's Frame 2147225847.
+
+     Only the row sitting at the middle of the viewport carries the Flux Lime;
+     every other row's bridge rests at #EFEFEF, so scrolling walks the accent
+     down the list. Painted from currentColor because `color` is transitionable
+     and a background-image is not — a fixed colour stop would snap. */
   .gh-proven-bridge {
     display: block;
     width: 29.1px;
     height: 79.54px;
+    color: #efefef;
     /* `at 1.94px 1.94px` anchors the dot to the tile's top-left rather than its
        centre, so two columns fit inside 29.1px and four rows inside 79.54px.
        A centred dot renders only one column — the second falls outside the box. */
     background-image: radial-gradient(
       circle at 1.94px 1.94px,
-      var(--color-flux-lime) 1.94px,
+      currentColor 1.94px,
       transparent 2px
     );
     background-size: 25.22px 25.22px;
     background-repeat: repeat;
+    transition: color 0.35s ease;
+  }
+
+  .gh-proven-row.is-centered .gh-proven-bridge {
+    color: var(--color-flux-lime);
   }
 </style>
 
@@ -176,7 +191,12 @@ const rows: Row[] = [
       !("IntersectionObserver" in window) ||
       window.matchMedia("(prefers-reduced-motion: reduce)").matches
     ) {
-      items.forEach((el) => el.classList.add("is-visible"));
+      // No observer, or motion is unwelcome: show every row and light every
+      // bridge, rather than leaving the whole list dimmed to #EFEFEF.
+      items.forEach((el) => {
+        el.classList.add("is-visible");
+        el.classList.add("is-centered");
+      });
       return;
     }
 
@@ -200,5 +220,55 @@ const rows: Row[] = [
     );
 
     items.forEach((el) => observer.observe(el));
+
+    // ---- Centred row -----------------------------------------------------
+    // A thin 1% band pinned across the middle of the viewport, so "centred"
+    // means the row the centre line is actually inside. That matters: the
+    // observer only fires when a row enters or leaves the band, and nothing
+    // recomputes in between. A wide band would let the nearest row change with
+    // no crossing to trigger it, leaving the accent a row behind. Kept thin,
+    // every change of row IS a crossing, so the two can never drift apart.
+    //
+    // `inBand` holds the running set because two rows can straddle the line for
+    // a frame; pick() resolves that by distance rather than callback order.
+    let centred = null;
+    const inBand = new Set();
+
+    const pick = () => {
+      // Nothing in the band means the middle has landed in a gap between rows.
+      // Hold the last choice instead of clearing, so the accent never blinks off.
+      if (!inBand.size) return;
+
+      const middle = window.innerHeight / 2;
+      let best = null;
+      let bestDistance = Infinity;
+
+      inBand.forEach((el) => {
+        const r = el.getBoundingClientRect();
+        const distance = Math.abs((r.top + r.bottom) / 2 - middle);
+        if (distance < bestDistance) {
+          bestDistance = distance;
+          best = el;
+        }
+      });
+
+      if (!best || best === centred) return;
+      if (centred) centred.classList.remove("is-centered");
+      centred = best;
+      centred.classList.add("is-centered");
+    };
+
+    const centreObserver = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) inBand.add(entry.target);
+          else inBand.delete(entry.target);
+        });
+        pick();
+      },
+      { rootMargin: "-49.5% 0px -49.5% 0px", threshold: 0 },
+    );
+
+    items.forEach((el) => centreObserver.observe(el));
   })();
 </script>
