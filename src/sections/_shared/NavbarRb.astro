@@ -41,6 +41,15 @@ export interface Props {
   countries?: CountryOption[];
   ctaLabel?: string;
   ctaHref?: string;
+  /**
+   * Marks both CTAs (desktop and the one inside the mobile panel) as openers for
+   * a `[data-demo-modal]` on the page — see
+   * `global-homepage/DemoModal.astro`. Opt-in so the pages without that section
+   * render byte-identical markup and need no re-paste. `ctaHref` stays the real
+   * link either way: with no modal present, or before its script runs, the CTA
+   * just navigates.
+   */
+  ctaOpensModal?: boolean;
   /** Label on the globe control. Shows the active region, updates on selection. */
   countryLabel?: string;
   /** Prefixes every generated id so two navbars on one page cannot collide. */
@@ -79,9 +88,14 @@ const {
   countries = DEFAULT_COUNTRIES,
   ctaLabel = "Book a demo",
   ctaHref = "https://www.cleartax.com/contact-us",
+  ctaOpensModal = false,
   countryLabel = "Global",
   idPrefix = "ctnav",
 } = Astro.props;
+
+/* Astro drops an attribute set to `undefined`, so this emits `data-demo-open`
+   only when opted in — no empty attribute left behind on the other pages. */
+const demoOpenAttr = ctaOpensModal ? "" : undefined;
 
 const panelId = `${idPrefix}-panel`;
 const countryId = `${idPrefix}-country`;
@@ -205,6 +219,7 @@ function toBlocks(items: NavChild[]): Block[] {
             <a
               href={ctaHref}
               data-nav-cta
+              data-demo-open={demoOpenAttr}
               class="hidden sm:inline-flex items-center justify-center gap-2 px-5 py-3.5 text-[length:var(--fs-label-lg)] leading-[length:var(--lh-label-lg)] font-medium text-nova-50 bg-nova-blue border border-nova-blue rounded-lg whitespace-nowrap no-underline shadow-[0px_2px_3px_rgba(16,24,40,0.06)] transition-opacity duration-200 hover:opacity-90"
             >
               {ctaLabel}
@@ -333,6 +348,7 @@ function toBlocks(items: NavChild[]): Block[] {
 
               <a
                 href={ctaHref}
+                data-demo-open={demoOpenAttr}
                 class="sm:hidden inline-flex items-center justify-center w-full gap-2 mt-6 px-5 py-3.5 text-[length:var(--fs-label-lg)] leading-[length:var(--lh-label-lg)] font-medium text-nova-50 bg-nova-blue rounded-lg no-underline transition-opacity duration-200 hover:opacity-90"
               >
                 {ctaLabel}
