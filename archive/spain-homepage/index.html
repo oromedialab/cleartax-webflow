@@ -100,21 +100,99 @@ section[id]{scroll-margin-top:96px}
 .ct-btn--sm{padding:10px 18px;font-size:14px}
 .ct-btn svg{width:18px;height:18px;flex:none}
 
-/* ══════ nav ══════ */
-.ct-nav{position:sticky;top:0;z-index:60;padding-block:var(--ct-s-16);background:transparent}
-.ct-nav-bar{display:flex;align-items:center;gap:var(--ct-s-32);background:#fff;border-radius:var(--ct-r-16);
-  box-shadow:0 1px 2px rgba(5,2,42,.04),0 10px 30px -8px rgba(5,2,42,.10);
-  padding:var(--ct-s-12);padding-inline-start:var(--ct-s-24);min-height:72px}
-.ct-nav ul{display:flex;align-items:center;gap:var(--ct-s-24);list-style:none;margin:0 auto;padding:0;font-size:15px}
-.ct-nav ul a{color:var(--ct-deep-midnight-blue)}
-.ct-nav ul a:hover{color:var(--ct-blueish-indigo)}
-.ct-nav-right{display:flex;align-items:center;gap:var(--ct-s-12)}
-.ct-nav-toggle{display:none;margin-inline-start:auto;background:none;cursor:pointer;border:1px solid var(--ct-hairline);border-radius:var(--ct-r-8);padding:8px}
-.ct-nav-toggle span{display:block;width:18px;height:1.6px;background:var(--ct-deep-midnight-blue);margin:3px 0}
+/* ══════ nav — ported from src/sections/_shared/NavbarRb.astro ══════
+   This page carries no Tailwind, so the component's utilities are re-expressed
+   as plain CSS here. Values are the component's own tokens, not approximations:
+   label-lg 16/18, body-lg 18/28, label 14/16, Vault Navy #05022A, Nova Blue
+   #5446FF, Nova-50 #ECEFFF, neutral-500 #6B7280. Prefixed rbnav- so nothing
+   collides with this page's ct- system.
+
+   The bar is FIXED, not sticky like the old one — it takes no space in flow,
+   which is why .ct-hero no longer pulls itself up with a negative margin. */
+.rbnav-root{position:fixed;top:16px;inset-inline:0;z-index:1000;pointer-events:none}
+.rbnav-shell{max-width:var(--ct-max);margin:0 auto;padding-inline:var(--ct-s-24);pointer-events:auto}
+.rbnav-card{width:100%;background:#fff;border:2px solid #ECECF4;border-radius:var(--ct-r-12);
+  box-shadow:0 6px 15px -2px rgba(16,24,40,.08);padding:8px}
+.rbnav-bar{display:flex;align-items:center;justify-content:space-between;gap:8px}
+
+.rbnav-left{display:flex;align-items:center;flex:none}
+@media(min-width:1024px){.rbnav-left{width:208px}}
+.rbnav-toggle{display:flex;align-items:center;gap:8px;padding:8px 12px;border-radius:var(--ct-r-8);
+  background:transparent;border:0;cursor:pointer;font-family:inherit;transition:background-color .16s ease}
+.rbnav-toggle:hover{background:#F8FAFC}
+/* Two bars that quarter-turn on open — the Figma component's rotate-90 on the
+   List glyph, not a hamburger-to-X morph. */
+.rbnav-bars{position:relative;display:block;width:24px;height:24px;flex:none;
+  transition:transform .3s cubic-bezier(.16,1,.3,1)}
+.rbnav-toggle.open .rbnav-bars{transform:rotate(90deg)}
+.rbnav-bars span{display:block;position:absolute;left:0;width:24px;height:2px;
+  background:var(--ct-deep-midnight-blue);border-radius:2px}
+.rbnav-bars span:first-child{top:9px}
+.rbnav-bars span:last-child{top:14px}
+.rbnav-toggle-label{font-size:16px;line-height:18px;font-weight:var(--ct-fw-semibold);color:var(--ct-deep-midnight-blue)}
+
+.rbnav-logo{display:flex;align-items:center;flex:none}
+.rbnav-logo img{height:24px;width:112px}
+
+.rbnav-right{display:flex;align-items:center;justify-content:flex-end;gap:8px;flex:none}
+.rbnav-country-btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;height:46px;padding:0 14px;
+  background:#fff;border:1px solid #CCCCCC;border-radius:var(--ct-r-8);box-shadow:0 2px 6px rgba(16,24,40,.06);
+  cursor:pointer;font-family:inherit;transition:background-color .16s ease}
+.rbnav-country-btn:hover{background:#F8FAFC}
+/* Closed bar is icon-only; the region name appears with the panel. Keyed off the
+   button's own aria-expanded, so there is no second bit of state to sync. */
+.rbnav-country-label{display:none;font-size:16px;line-height:18px;font-weight:var(--ct-fw-medium);color:var(--ct-deep-midnight-blue)}
+.rbnav-country-btn[aria-expanded="true"] .rbnav-country-label{display:inline}
+
+.rbnav-cta{display:none;align-items:center;justify-content:center;gap:8px;padding:14px 20px;
+  font-size:16px;line-height:18px;font-weight:var(--ct-fw-medium);color:#ECEFFF;background:var(--ct-blueish-indigo);
+  border:1px solid var(--ct-blueish-indigo);border-radius:var(--ct-r-8);white-space:nowrap;text-decoration:none;
+  box-shadow:0 2px 3px rgba(16,24,40,.06);transition:opacity .2s ease}
+.rbnav-cta:hover{opacity:.9;color:#ECEFFF}
+@media(min-width:640px){.rbnav-cta{display:inline-flex}}
+
+/* Both panels live inside the card and collapse with a 0fr→1fr grid, so they
+   animate without a hard-coded height and the card grows around them. */
+.rbnav-panel{display:grid;grid-template-rows:0fr;transition:grid-template-rows .3s cubic-bezier(.16,1,.3,1)}
+.rbnav-panel.open{grid-template-rows:1fr}
+.rbnav-panel>div{overflow:hidden}
+
+.rbnav-menu-inner{padding:24px 8px 16px}
+/* justify-between over content-width columns is what produces the design's
+   uneven column gaps; this is not a 4-up grid. */
+.rbnav-cols{display:flex;flex-wrap:wrap;align-items:flex-start;justify-content:space-between;gap:16px}
+.rbnav-col{display:flex;flex-direction:column;gap:16px;padding:16px}
+@media(max-width:639px){.rbnav-col{padding:8px}}
+.rbnav-col-title{margin:0;font-size:18px;line-height:28px;font-weight:var(--ct-fw-medium);color:var(--ct-deep-midnight-blue)}
+.rbnav-list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:12px}
+.rbnav-list a{display:block;font-size:18px;line-height:28px;font-weight:var(--ct-fw-medium);
+  color:#6B7280;text-decoration:none;transition:color .16s ease}
+.rbnav-list a:hover{color:var(--ct-blueish-indigo)}
+
+.rbnav-cta-mobile{display:inline-flex;align-items:center;justify-content:center;width:100%;gap:8px;margin-top:24px;
+  padding:14px 20px;font-size:16px;line-height:18px;font-weight:var(--ct-fw-medium);color:#ECEFFF;
+  background:var(--ct-blueish-indigo);border-radius:var(--ct-r-8);text-decoration:none;transition:opacity .2s ease}
+.rbnav-cta-mobile:hover{opacity:.9;color:#ECEFFF}
+@media(min-width:640px){.rbnav-cta-mobile{display:none}}
+
+.rbnav-country-inner{padding:24px 16px 16px}
+@media(max-width:1023px){.rbnav-country-inner{padding-inline:8px}}
+.rbnav-country-grid{list-style:none;margin:0;padding:0;display:grid;gap:8px;grid-template-columns:repeat(2,1fr)}
+@media(min-width:640px){.rbnav-country-grid{grid-template-columns:repeat(4,1fr)}}
+@media(min-width:1024px){.rbnav-country-grid{grid-template-columns:repeat(7,1fr)}}
+.rbnav-country-chip{display:flex;align-items:center;gap:8px;width:100%;padding:10px 12px;border-radius:var(--ct-r-8);
+  border:1px solid #E5E7EB;background:#fff;font-size:14px;line-height:16px;font-weight:var(--ct-fw-medium);
+  color:var(--ct-deep-midnight-blue);text-decoration:none;
+  transition:background-color .16s ease,border-color .16s ease}
+.rbnav-country-chip:hover{background:#F8FAFC;border-color:var(--ct-blueish-indigo);color:var(--ct-deep-midnight-blue)}
+.rbnav-country-chip img{height:16px;width:24px;flex:none;border-radius:2px;object-fit:contain}
 
 /* ══════ hero ══════ */
+/* No negative margin-top any more: the old nav was sticky and occupied ~104px
+   of flow that the hero had to pull itself back up through. The RB navbar is
+   fixed, so the hero starts at the top of the document and its own top padding
+   is what clears the bar (16px offset + 62px bar = 78px). */
 .ct-hero{position:relative;overflow:hidden;
-  margin-top:calc(-1 * (72px + var(--ct-s-32)));
   padding-block:calc(72px + var(--ct-s-80)) var(--ct-s-64);
   background:
     radial-gradient(ellipse 60% 64% at 34% 46%, #FFFFFF 0%, rgba(255,255,255,.55) 48%, rgba(255,255,255,0) 80%),
@@ -388,20 +466,39 @@ section[id]{scroll-margin-top:96px}
 .ct-answer ul{margin:var(--ct-s-12) 0 0;padding-inline-start:var(--ct-s-20)}
 .ct-answer li{margin-bottom:var(--ct-s-8)}
 
-/* ══════ footer ══════ */
-.ct-footer{background:var(--ct-deep-midnight-blue);color:var(--ct-on-navy);padding-block:var(--ct-s-64) var(--ct-s-32);font-size:15px}
-.ct-footer-top{display:grid;grid-template-columns:1.6fr 1fr 1fr;gap:var(--ct-s-40);padding-bottom:var(--ct-s-40);border-bottom:1px solid rgba(255,255,255,.14)}
-.ct-footer h4{color:#fff;font-family:var(--ct-font-body);font-size:12px;font-weight:var(--ct-fw-medium);letter-spacing:.16em;text-transform:uppercase;margin-bottom:var(--ct-s-20)}
-.ct-footer ul{list-style:none;margin:0;padding:0;display:grid;gap:var(--ct-s-12);font-size:14px}
-.ct-footer a{color:var(--ct-on-navy)}
-.ct-footer a:hover{color:#fff}
-.ct-footer-bottom{padding-top:var(--ct-s-24);display:flex;justify-content:space-between;flex-wrap:wrap;gap:var(--ct-s-16);font-size:13px}
-.ct-footer-bottom nav{display:flex;gap:var(--ct-s-24)}
+/* ══════ footer — ported from src/sections/_shared/FooterRb.astro ══════
+   LIGHT theme, replacing this page's previous dark footer. Same plain-CSS port
+   as the navbar above; body-sm 14/20 throughout, neutral-500 #6B7280 links.
+
+   DEVIATION: FooterRb pins each column to a fixed width (w-40, w-65, w-59,
+   w-48.75, w-39.5) on top of its grid. Those are dropped here and the grid
+   tracks share the row evenly — the fixed widths overflow a 5-up grid once the
+   Product and Resources columns carry 15-18 items each. */
+.rbfoot{background:#fff;border-top:1px solid #D1D5DB}
+.rbfoot-inner{max-width:var(--ct-max);margin:0 auto;display:flex;flex-direction:column;gap:var(--ct-s-48);padding:var(--ct-s-48) var(--ct-s-32)}
+.rbfoot-grid{display:grid;grid-template-columns:1fr;gap:var(--ct-s-40) 50px}
+@media(min-width:768px){.rbfoot-grid{grid-template-columns:repeat(3,1fr)}}
+@media(min-width:1280px){.rbfoot-grid{grid-template-columns:repeat(5,1fr)}}
+.rbfoot-stack{display:flex;flex-direction:column;gap:var(--ct-s-24)}
+.rbfoot-block{display:flex;flex-direction:column;gap:var(--ct-s-16)}
+.rbfoot-title{margin:0;font-size:14px;line-height:20px;font-weight:var(--ct-fw-medium);color:var(--ct-deep-midnight-blue)}
+.rbfoot-links{display:flex;flex-direction:column;gap:var(--ct-s-12)}
+.rbfoot-links a{font-size:14px;line-height:20px;font-weight:var(--ct-fw-medium);color:#6B7280;text-decoration:none;transition:color .16s ease}
+.rbfoot-links a:hover{color:var(--ct-deep-midnight-blue)}
+.rbfoot-bottom{display:flex;flex-direction:column;gap:var(--ct-s-24);border-top:1px solid #E5E7EB;padding-top:var(--ct-s-24)}
+@media(min-width:640px){.rbfoot-bottom{flex-direction:row;align-items:center;justify-content:space-between}}
+.rbfoot-legal{display:flex;flex-direction:column;gap:var(--ct-s-16)}
+.rbfoot-legal-links{display:flex;align-items:center;gap:var(--ct-s-12)}
+.rbfoot-legal-links a{font-size:14px;line-height:20px;font-weight:var(--ct-fw-medium);color:#6B7280;text-decoration:none;transition:color .16s ease}
+.rbfoot-legal-links a:hover{color:var(--ct-deep-midnight-blue)}
+.rbfoot-note{margin:0;font-size:14px;line-height:20px;color:#6B7280}
+.rbfoot-badges{display:flex;flex-direction:column;align-items:flex-start;gap:var(--ct-s-12)}
+@media(min-width:640px){.rbfoot-badges{align-items:flex-end}}
+.rbfoot-badge-row{display:flex;align-items:center;gap:10px}
+.rbfoot-badge-row img{width:48px;height:48px;object-fit:contain}
 
 /* ══════ responsive ══════ */
 @media(max-width:1024px){
-  .ct-nav ul,.ct-nav-right .ct-btn{display:none}
-  .ct-nav-toggle{display:block}
   .ct-hero .ct-wrap,.ct-split,.ct-close-inner{grid-template-columns:1fr;gap:var(--ct-s-40)}
   .ct-grid-3,.ct-trust-grid,.ct-quotes{grid-template-columns:repeat(2,1fr)}
   .ct-regimes{grid-template-columns:repeat(2,1fr)}
@@ -416,7 +513,6 @@ section[id]{scroll-margin-top:96px}
   .ct-regimes,.ct-meta{grid-template-columns:1fr}
   .ct-regime--feature{grid-column:span 1}
   .ct-regime--feature dl{grid-template-columns:1fr}
-  .ct-footer-top{grid-template-columns:1fr;gap:var(--ct-s-32)}
   .ct-hero{padding-block:calc(72px + var(--ct-s-48)) var(--ct-s-48)}
   .ct-step-body{padding-inline:var(--ct-s-24)}
   .ct-axis-grid{grid-template-columns:1fr;gap:var(--ct-s-24)}
@@ -429,34 +525,107 @@ section[id]{scroll-margin-top:96px}
 </head>
 <body>
 
-<!-- ══════ NAV ══════ -->
-<header class="ct-nav">
-  <div class="ct-wrap">
-   <div class="ct-nav-bar">
-    <a href="javascript:void(0)" onclick="window.scrollTo({top:0,behavior:'smooth'})" aria-label="ClearTax home"><svg class="ct-logo" viewBox="0 0 218 50" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Cleartax">
-<path fill="currentColor" d="M16.2455 49.2718C6.40215 49.2718 0 42.035 0 31.7169C0 21.3989 6.40215 14.1621 16.2455 14.1621C23.6613 14.1621 28.863 18.5437 30.4902 23.3494C30.9171 24.678 30.3569 25.3565 29.5566 25.7523L26.5956 27.1374C25.3418 27.7311 24.4082 27.2788 23.9014 26.4024C22.701 24.4802 20.7536 21.8229 16.2455 21.8229C10.857 21.8229 7.52253 25.413 7.52253 31.7452C7.52253 38.0774 10.857 41.6675 16.2455 41.6675C20.7536 41.6675 22.701 39.0102 23.9014 37.088C24.4082 36.2117 25.3418 35.7594 26.5956 36.353L29.5566 37.7382C30.3835 38.1339 30.9971 38.8124 30.4902 40.141C28.7297 44.8336 23.6613 49.2718 16.2455 49.2718Z"/>
-<path fill="currentColor" d="M36.8393 48.5372C35.7189 48.5372 34.9453 47.7457 34.9453 46.5302V2.00707C34.9453 0.81979 35.6922 0 36.8393 0H40.6005C41.7208 0 42.4944 0.791522 42.4944 2.00707V46.5584C42.4944 47.7457 41.7475 48.5655 40.6005 48.5655H36.8393V48.5372Z"/>
-<path fill="currentColor" d="M63.5696 49.2152C53.4596 49.2152 47.3242 43.2223 47.3242 31.6604C47.3242 21.5402 53.673 14.1621 63.1962 14.1621C72.4793 14.1621 77.5743 21.4837 77.5743 30.3318C77.5743 32.5367 76.5606 33.9784 74.1865 33.9784H54.3666C54.74 39.8866 58.1278 42.2329 63.7831 42.2329C67.4109 42.2329 69.9451 41.3 71.679 40.5085C73.0662 39.9148 73.9998 39.83 74.6934 41.3L75.5737 43.2223C76.2139 44.6074 76.0805 45.6251 75.0135 46.3601C73.5463 47.3495 69.3316 49.2152 63.5696 49.2152ZM54.3932 28.8053H70.532C70.1052 23.2929 67.0908 21.1445 63.0095 21.1445C58.4746 21.1445 54.9801 23.2646 54.3932 28.8053Z"/>
-<path fill="currentColor" d="M101.342 44.4944C99.021 47.0951 94.9397 49.2152 90.5382 49.2152C83.896 49.2152 80.0547 45.2293 80.0547 39.0385C80.0547 32.9325 84.6429 28.6074 93.1791 28.6074C96.1401 28.6074 98.6476 29.201 100.702 29.936V26.9961C100.702 23.4625 98.6209 21.2858 94.3528 21.2858C91.2051 21.2858 88.8843 22.2187 86.937 23.095C85.9233 23.5473 84.9363 23.4342 84.4295 22.36L83.3091 19.9572C82.6689 18.6851 82.8023 17.5543 84.1894 16.7628C86.7503 15.2929 90.5915 14.1621 94.8596 14.1621C102.382 14.1621 107.984 17.9501 107.984 26.7417V46.558C107.984 47.7453 107.237 48.565 106.09 48.565H103.209C102.089 48.565 101.315 47.7735 101.315 46.558V44.4944H101.342ZM92.3788 42.6286C95.5265 42.6286 98.4075 41.4413 100.595 39.6322V35.3071C98.7009 34.9113 96.7003 34.6286 94.2461 34.6286C90.0314 34.6286 87.6039 36.0986 87.6039 38.9537C87.6039 41.2435 89.2844 42.6286 92.3788 42.6286Z"/>
-<path fill="currentColor" d="M119.929 48.537H116.167C115.047 48.537 114.273 47.7455 114.273 46.5299V16.8196C114.273 15.6323 115.02 14.8125 116.167 14.8125H119.609C120.729 14.8125 121.503 15.604 121.503 16.8196V20.4662C123.263 17.809 126.331 14.8125 131.106 14.8125C132.36 14.8125 133 15.604 133 16.8196V20.6076C133 21.7383 132.253 22.4733 131.106 22.4733H130.092C125.957 22.4733 123.743 23.4627 121.796 25.2719V46.5582C121.796 47.7455 121.049 48.537 119.929 48.537Z"/>
-<path fill="currentColor" d="M151.494 48.5379H149.36C139.756 48.5379 136.422 43.7605 136.422 36.8347V6.64379C136.422 5.45651 137.169 4.63672 138.316 4.63672H142.077C143.197 4.63672 143.971 5.42824 143.971 6.64379V14.8134H151.494C152.614 14.8134 153.388 15.605 153.388 16.8205V19.817C153.388 21.0043 152.641 21.8241 151.494 21.8241H143.971V37.7958C143.971 40.3117 145.598 41.5838 148.479 41.5838H151.494C152.614 41.5838 153.388 42.3754 153.388 43.5909V46.5874C153.388 47.7464 152.614 48.5379 151.494 48.5379Z"/>
-<path fill="currentColor" d="M177.475 44.4944C175.154 47.0951 171.072 49.2152 166.671 49.2152C160.029 49.2152 156.188 45.2293 156.188 39.0385C156.188 32.9325 160.776 28.6074 169.312 28.6074C172.273 28.6074 174.78 29.201 176.834 29.936V26.9961C176.834 23.4625 174.754 21.2858 170.486 21.2858C167.338 21.2858 165.017 22.2187 163.07 23.095C162.056 23.5473 161.069 23.4342 160.562 22.36L159.442 19.9572C158.802 18.6851 158.935 17.5543 160.322 16.7628C162.883 15.2929 166.724 14.1621 170.992 14.1621C178.515 14.1621 184.117 17.9501 184.117 26.7417V46.558C184.117 47.7453 183.37 48.565 182.223 48.565H179.342C178.222 48.565 177.448 47.7735 177.448 46.558V44.4944H177.475ZM168.512 42.6286C171.659 42.6286 174.54 41.4413 176.728 39.6322V35.3071C174.834 34.9113 172.833 34.6286 170.379 34.6286C166.164 34.6286 163.737 36.0986 163.737 38.9537C163.737 41.2435 165.417 42.6286 168.512 42.6286Z"/>
-<path fill="currentColor" d="M193.029 48.537H188.761C187.641 48.537 187.321 47.4063 187.828 46.6147L197.484 31.5758L187.828 16.7348C187.267 15.8584 187.641 14.8125 188.761 14.8125H193.216C194.843 14.8125 195.67 15.1517 196.364 16.339L202.446 26.3178L208.475 16.339C209.168 15.2083 209.968 14.8125 211.622 14.8125H215.89C217.011 14.8125 217.331 15.9432 216.824 16.7348L207.167 31.802L216.824 46.643C217.384 47.5193 217.011 48.5653 215.89 48.5653H211.436C209.808 48.5653 208.981 48.1695 208.288 47.0388L202.206 37.0317L196.23 46.8974C195.484 48.0847 194.683 48.537 193.029 48.537Z"/>
-</svg></a>
-    <ul>
-      <li><a href="javascript:void(0)" onclick="document.getElementById('changing').scrollIntoView({behavior:'smooth'})">Qué cambia</a></li>
-      <li><a href="javascript:void(0)" onclick="document.getElementById('glance').scrollIntoView({behavior:'smooth'})">De un vistazo</a></li>
-      <li><a href="javascript:void(0)" onclick="document.getElementById('steps').scrollIntoView({behavior:'smooth'})">Pasos a seguir</a></li>
-      <li><a href="javascript:void(0)" onclick="document.getElementById('how').scrollIntoView({behavior:'smooth'})">Cómo funciona</a></li>
-      <li><a href="javascript:void(0)" onclick="document.getElementById('faq').scrollIntoView({behavior:'smooth'})">Preguntas frecuentes</a></li>
-    </ul>
-    <div class="ct-nav-right">
-      <a href="javascript:void(0)" onclick="document.getElementById('demo').scrollIntoView({behavior:'smooth',block:'center'})" class="ct-btn ct-btn--primary ct-btn--sm">Solicitar una demo</a>
+<!-- ══════ NAV — ported from src/sections/_shared/NavbarRb.astro ══════
+     Three groups: a "Menu" disclosure on the left, the wordmark centred, and
+     the globe / CTA pair on the right. The links are NOT laid out inline any
+     more — they live in the panel the Menu button opens, and that is the same
+     panel at every breakpoint, so there is no separate mobile drawer.
+
+     Link content is the set from archive/norway-homepage/index.html; the
+     country list is NavbarRb's own DEFAULT_COUNTRIES. -->
+<div class="rbnav-root" data-giwip-nav-root>
+  <div class="rbnav-shell">
+    <div class="rbnav-card" data-nav-card>
+      <div class="rbnav-bar">
+
+        <div class="rbnav-left">
+          <button type="button" class="rbnav-toggle" data-nav-toggle aria-expanded="false" aria-controls="rbnav-panel">
+            <span class="rbnav-bars" aria-hidden="true"><span></span><span></span></span>
+            <span class="rbnav-toggle-label">Menu</span>
+          </button>
+        </div>
+
+        <a href="/" class="rbnav-logo" aria-label="ClearTax home">
+          <img src="https://cdn.prod.website-files.com/6093bce33d9b4bae841b04e3/69dfcff6071b983201f5f097_logo-cleartax.svg"
+               alt="ClearTax" width="112" height="24" loading="eager" fetchpriority="high" decoding="async">
+        </a>
+
+        <div class="rbnav-right">
+          <button type="button" class="rbnav-country-btn" data-country-btn aria-expanded="false" aria-controls="rbnav-country">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M9.75 0C7.82164 0 5.93657 0.571828 4.33319 1.64317C2.72982 2.71452 1.48013 4.23726 0.742179 6.01884C0.00422448 7.80042 -0.188858 9.76082 0.187348 11.6521C0.563554 13.5434 1.49215 15.2807 2.85571 16.6443C4.21927 18.0079 5.95656 18.9365 7.84787 19.3127C9.73919 19.6889 11.6996 19.4958 13.4812 18.7578C15.2627 18.0199 16.7855 16.7702 17.8568 15.1668C18.9282 13.5634 19.5 11.6784 19.5 9.75C19.4973 7.16498 18.4692 4.68661 16.6413 2.85872C14.8134 1.03084 12.335 0.00272983 9.75 0ZM9.75 1.5C11.3484 1.4983 12.9125 1.96361 14.25 2.83875V4.6875L12.1716 7.10063L9.22125 7.5L9.19219 7.47937L7.34813 6.27375C7.18464 6.15858 6.99976 6.07727 6.80439 6.0346C6.60901 5.99192 6.40707 5.98875 6.21045 6.02526C6.01382 6.06177 5.82649 6.13723 5.65945 6.24721C5.49242 6.35718 5.34906 6.49944 5.23782 6.66562L3.27469 9.6C3.11115 9.84453 3.02312 10.1318 3.02157 10.4259L3 13.8225L2.69344 14.0241C1.93558 12.7728 1.52404 11.3426 1.50101 9.87988C1.47798 8.4172 1.84429 6.9747 2.56238 5.70021C3.28048 4.42573 4.32454 3.3651 5.58756 2.62703C6.85058 1.88896 8.28714 1.5 9.75 1.5ZM3.58969 15.2316L3.82594 15.0769C4.03224 14.9408 4.20172 14.7559 4.31932 14.5385C4.43691 14.3211 4.49898 14.0781 4.5 13.8309L4.51969 10.4344L6.48469 7.5C6.49432 7.50741 6.50433 7.51429 6.51469 7.52063L8.35875 8.72719C8.66779 8.9453 9.04805 9.0381 9.42282 8.98688L12.375 8.58656C12.7391 8.53798 13.0726 8.35751 13.3125 8.07938L15.3909 5.66437C15.6234 5.39204 15.7507 5.04554 15.75 4.6875V4.09406C16.7644 5.16731 17.4717 6.49352 17.7978 7.93387C18.1238 9.37422 18.0567 10.8757 17.6034 12.2812L16.0903 10.8975C15.88 10.7044 15.6189 10.5754 15.3377 10.5256C15.0566 10.4757 14.767 10.5072 14.5031 10.6163L11.6475 11.8022C11.4087 11.9024 11.1998 12.0625 11.0408 12.2669C10.8819 12.4713 10.7783 12.7133 10.74 12.9694L10.5159 14.4872C10.4621 14.8525 10.5449 15.2249 10.7485 15.533C10.9521 15.841 11.2622 16.0632 11.6194 16.1569L13.6313 16.6875L13.8525 16.9097C12.2096 17.8523 10.2921 18.2001 8.42288 17.8944C6.55362 17.5888 4.84676 16.6484 3.58969 15.2316ZM15.0938 16.0312L14.6906 15.6272C14.5026 15.4384 14.2677 15.3032 14.01 15.2353L12 14.7047L12.2241 13.1869L15.0788 12L16.9688 13.7325C16.487 14.6052 15.8519 15.384 15.0938 16.0312Z" fill="#05022A"/></svg>
+            <span class="rbnav-country-label" data-country-current>Spain</span>
+          </button>
+          <a href="javascript:void(0)" onclick="document.getElementById('demo').scrollIntoView({behavior:'smooth',block:'center'})" class="rbnav-cta">Book a demo</a>
+        </div>
+      </div>
+
+      <!-- Menu panel. Both panels sit INSIDE the card and collapse with a
+           0fr→1fr grid, so they animate without a hard-coded height. -->
+      <div class="rbnav-panel" id="rbnav-panel" data-nav-panel>
+        <div>
+          <div class="rbnav-menu-inner">
+            <div class="rbnav-cols">
+              <div class="rbnav-col">
+                <p class="rbnav-col-title">Products</p>
+                <ul class="rbnav-list">
+                  <li><a href="http://cleartax.com/global/recon-ai">AI Reconciliation</a></li>
+                  <li><a href="http://cleartax.com/global/compliance">Compliance</a></li>
+                  <li><a href="https://www.cleartax.com/global/e-invoicing-solution">Global E-Invoicing</a></li>
+                  <li><a href="http://cleartax.com/global/erp-integration">Integration</a></li>
+                  <li><a href="http://cleartax.com/global/scale-security">Scale &amp; Security</a></li>
+                </ul>
+              </div>
+              <div class="rbnav-col">
+                <p class="rbnav-col-title">Resources</p>
+                <ul class="rbnav-list">
+                  <li><a href="https://www.cleartax.com/electronic-invoicing#country-select">Blogs</a></li>
+                  <li><a href="https://www.cleartax.com/case-studies">Case Studies</a></li>
+                  <li><a href="https://www.cleartax.com/ae/press">Press Releases</a></li>
+                </ul>
+              </div>
+              <!-- Bare links group into a trailing "More" column, so a 1-item
+                   column never sits next to a 5-item one. -->
+              <div class="rbnav-col">
+                <p class="rbnav-col-title">More</p>
+                <ul class="rbnav-list">
+                  <li><a href="https://www.cleartax.com/contact-us">Contact Us</a></li>
+                  <li><a href="https://www.cleartax.com/global/partner-program">Partners</a></li>
+                </ul>
+              </div>
+            </div>
+            <a href="javascript:void(0)" onclick="document.getElementById('demo').scrollIntoView({behavior:'smooth',block:'center'})" class="rbnav-cta-mobile">Book a demo</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Country panel. Same in-card treatment as the menu; a flat chip grid
+           rather than a right-aligned dropdown. -->
+      <div class="rbnav-panel" id="rbnav-country" data-country-panel>
+        <div>
+          <div class="rbnav-country-inner">
+            <ul class="rbnav-country-grid">
+          <li><a class="rbnav-country-chip" href="https://www.cleartax.com/bh"><img src="https://cdn.prod.website-files.com/6141e3720a248d2024615d96/63e29d6c2e1ddc75a632d00f_Group%201000003292.svg" alt="" loading="lazy" decoding="async"><span>Bahrain</span></a></li>
+          <li><a class="rbnav-country-chip" href="https://www.cleartax.com/fr/en"><img src="https://cdn.prod.website-files.com/6141e3720a248d2024615d96/64999768870655432964457d_france_flag.png" alt="" loading="lazy" decoding="async"><span>France</span></a></li>
+          <li><a class="rbnav-country-chip" href="https://www.clear.in/"><img src="https://cdn.prod.website-files.com/6141e3720a248d2024615d96/649999dbc3faf054134a1e01_India_flag.png" alt="" loading="lazy" decoding="async"><span>India</span></a></li>
+          <li><a class="rbnav-country-chip" href="https://www.cleartax.com/my/en"><img src="https://cdn.prod.website-files.com/6141e3720a248d2024615d96/649a7b4653733f5dbda826ea_malaysia%20v1.png" alt="" loading="lazy" decoding="async"><span>Malaysia</span></a></li>
+          <li><a class="rbnav-country-chip" href="https://www.cleartax.com/om"><img src="https://cdn.prod.website-files.com/6141e3720a248d2024615d96/63e29d499e782b5935404547_Group%201000003291.svg" alt="" loading="lazy" decoding="async"><span>Oman</span></a></li>
+          <li><a class="rbnav-country-chip" href="https://www.cleartax.com/sg/e-invoicing-software"><img src="https://cdn.prod.website-files.com/6141e3720a248d2024615d96/66716d4c6753fb52078bec02_singapore%20flag%203.png" alt="" loading="lazy" decoding="async"><span>Singapore</span></a></li>
+          <li><a class="rbnav-country-chip" href="https://www.cleartax.com/es/en"><img src="https://cdn.prod.website-files.com/6141e3720a248d2024615d96/64999a546cfce1e0515f0f60_spain%20flag.png" alt="" loading="lazy" decoding="async"><span>Spain</span></a></li>
+          <li><a class="rbnav-country-chip" href="https://www.cleartax.com/be/en"><img src="https://cdn.prod.website-files.com/6141e3720a248d2024615d96/67e3e6ae1e19488131f26dfd_belgium_flag.png" alt="" loading="lazy" decoding="async"><span>Belgium</span></a></li>
+          <li><a class="rbnav-country-chip" href="https://www.cleartax.com/de/en"><img src="https://assets.clear.in/cleartax/images/1771829770_flagforflaggermanysvgrepocom1.svg" alt="" loading="lazy" decoding="async"><span>Germany</span></a></li>
+          <li><a class="rbnav-country-chip" href="https://www.cleartax.com/sa"><img src="https://cdn.prod.website-files.com/6141e3720a248d2024615d96/63e28756aeabe12df79ff5d5_Rectangle%202515530.svg" alt="" loading="lazy" decoding="async"><span>KSA</span></a></li>
+          <li><a class="rbnav-country-chip" href="https://www.cleartax.com/no"><img src="https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6a7999a2fdf9fde123422a1b_Flag_of_Norway.svg.webp" alt="" loading="lazy" decoding="async"><span>Norway</span></a></li>
+          <li><a class="rbnav-country-chip" href="https://www.cleartax.com/ph"><img src="https://cdn.prod.website-files.com/6141e3720a248d2024615d96/6a2935c197e9e718191d8d34_Flag_of_the_Philippines.svg" alt="" loading="lazy" decoding="async"><span>Philippines</span></a></li>
+          <li><a class="rbnav-country-chip" href="https://www.cleartax.com/sk"><img src="https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6a7c4a36ac18ccf3dcb998be_slovakia-flag.png" alt="" loading="lazy" decoding="async"><span>Slovakia</span></a></li>
+          <li><a class="rbnav-country-chip" href="https://www.cleartax.com/ae"><img src="https://cdn.prod.website-files.com/6141e3720a248d2024615d96/63e29d24f310792735ab4bba_Mask%20group%20(3).svg" alt="" loading="lazy" decoding="async"><span>UAE</span></a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
     </div>
-    <button class="ct-nav-toggle" aria-label="Abrir menú"><span></span><span></span><span></span></button>
-   </div>
   </div>
-</header>
+</div>
 
 <!-- ══════ FOLD 1 — HERO ══════ -->
 <section class="ct-hero" id="ct-hero"
@@ -1025,43 +1194,125 @@ section[id]{scroll-margin-top:96px}
   </div>
 </section>
 
-<!-- ══════ FOOTER ══════ -->
-<footer class="ct-footer">
-  <div class="ct-wrap">
-    <div class="ct-footer-top">
-      <div>
-        <svg class="ct-logo ct-logo--inverse" viewBox="0 0 218 50" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Cleartax">
-<path fill="currentColor" d="M16.2455 49.2718C6.40215 49.2718 0 42.035 0 31.7169C0 21.3989 6.40215 14.1621 16.2455 14.1621C23.6613 14.1621 28.863 18.5437 30.4902 23.3494C30.9171 24.678 30.3569 25.3565 29.5566 25.7523L26.5956 27.1374C25.3418 27.7311 24.4082 27.2788 23.9014 26.4024C22.701 24.4802 20.7536 21.8229 16.2455 21.8229C10.857 21.8229 7.52253 25.413 7.52253 31.7452C7.52253 38.0774 10.857 41.6675 16.2455 41.6675C20.7536 41.6675 22.701 39.0102 23.9014 37.088C24.4082 36.2117 25.3418 35.7594 26.5956 36.353L29.5566 37.7382C30.3835 38.1339 30.9971 38.8124 30.4902 40.141C28.7297 44.8336 23.6613 49.2718 16.2455 49.2718Z"/>
-<path fill="currentColor" d="M36.8393 48.5372C35.7189 48.5372 34.9453 47.7457 34.9453 46.5302V2.00707C34.9453 0.81979 35.6922 0 36.8393 0H40.6005C41.7208 0 42.4944 0.791522 42.4944 2.00707V46.5584C42.4944 47.7457 41.7475 48.5655 40.6005 48.5655H36.8393V48.5372Z"/>
-<path fill="currentColor" d="M63.5696 49.2152C53.4596 49.2152 47.3242 43.2223 47.3242 31.6604C47.3242 21.5402 53.673 14.1621 63.1962 14.1621C72.4793 14.1621 77.5743 21.4837 77.5743 30.3318C77.5743 32.5367 76.5606 33.9784 74.1865 33.9784H54.3666C54.74 39.8866 58.1278 42.2329 63.7831 42.2329C67.4109 42.2329 69.9451 41.3 71.679 40.5085C73.0662 39.9148 73.9998 39.83 74.6934 41.3L75.5737 43.2223C76.2139 44.6074 76.0805 45.6251 75.0135 46.3601C73.5463 47.3495 69.3316 49.2152 63.5696 49.2152ZM54.3932 28.8053H70.532C70.1052 23.2929 67.0908 21.1445 63.0095 21.1445C58.4746 21.1445 54.9801 23.2646 54.3932 28.8053Z"/>
-<path fill="currentColor" d="M101.342 44.4944C99.021 47.0951 94.9397 49.2152 90.5382 49.2152C83.896 49.2152 80.0547 45.2293 80.0547 39.0385C80.0547 32.9325 84.6429 28.6074 93.1791 28.6074C96.1401 28.6074 98.6476 29.201 100.702 29.936V26.9961C100.702 23.4625 98.6209 21.2858 94.3528 21.2858C91.2051 21.2858 88.8843 22.2187 86.937 23.095C85.9233 23.5473 84.9363 23.4342 84.4295 22.36L83.3091 19.9572C82.6689 18.6851 82.8023 17.5543 84.1894 16.7628C86.7503 15.2929 90.5915 14.1621 94.8596 14.1621C102.382 14.1621 107.984 17.9501 107.984 26.7417V46.558C107.984 47.7453 107.237 48.565 106.09 48.565H103.209C102.089 48.565 101.315 47.7735 101.315 46.558V44.4944H101.342ZM92.3788 42.6286C95.5265 42.6286 98.4075 41.4413 100.595 39.6322V35.3071C98.7009 34.9113 96.7003 34.6286 94.2461 34.6286C90.0314 34.6286 87.6039 36.0986 87.6039 38.9537C87.6039 41.2435 89.2844 42.6286 92.3788 42.6286Z"/>
-<path fill="currentColor" d="M119.929 48.537H116.167C115.047 48.537 114.273 47.7455 114.273 46.5299V16.8196C114.273 15.6323 115.02 14.8125 116.167 14.8125H119.609C120.729 14.8125 121.503 15.604 121.503 16.8196V20.4662C123.263 17.809 126.331 14.8125 131.106 14.8125C132.36 14.8125 133 15.604 133 16.8196V20.6076C133 21.7383 132.253 22.4733 131.106 22.4733H130.092C125.957 22.4733 123.743 23.4627 121.796 25.2719V46.5582C121.796 47.7455 121.049 48.537 119.929 48.537Z"/>
-<path fill="currentColor" d="M151.494 48.5379H149.36C139.756 48.5379 136.422 43.7605 136.422 36.8347V6.64379C136.422 5.45651 137.169 4.63672 138.316 4.63672H142.077C143.197 4.63672 143.971 5.42824 143.971 6.64379V14.8134H151.494C152.614 14.8134 153.388 15.605 153.388 16.8205V19.817C153.388 21.0043 152.641 21.8241 151.494 21.8241H143.971V37.7958C143.971 40.3117 145.598 41.5838 148.479 41.5838H151.494C152.614 41.5838 153.388 42.3754 153.388 43.5909V46.5874C153.388 47.7464 152.614 48.5379 151.494 48.5379Z"/>
-<path fill="currentColor" d="M177.475 44.4944C175.154 47.0951 171.072 49.2152 166.671 49.2152C160.029 49.2152 156.188 45.2293 156.188 39.0385C156.188 32.9325 160.776 28.6074 169.312 28.6074C172.273 28.6074 174.78 29.201 176.834 29.936V26.9961C176.834 23.4625 174.754 21.2858 170.486 21.2858C167.338 21.2858 165.017 22.2187 163.07 23.095C162.056 23.5473 161.069 23.4342 160.562 22.36L159.442 19.9572C158.802 18.6851 158.935 17.5543 160.322 16.7628C162.883 15.2929 166.724 14.1621 170.992 14.1621C178.515 14.1621 184.117 17.9501 184.117 26.7417V46.558C184.117 47.7453 183.37 48.565 182.223 48.565H179.342C178.222 48.565 177.448 47.7735 177.448 46.558V44.4944H177.475ZM168.512 42.6286C171.659 42.6286 174.54 41.4413 176.728 39.6322V35.3071C174.834 34.9113 172.833 34.6286 170.379 34.6286C166.164 34.6286 163.737 36.0986 163.737 38.9537C163.737 41.2435 165.417 42.6286 168.512 42.6286Z"/>
-<path fill="currentColor" d="M193.029 48.537H188.761C187.641 48.537 187.321 47.4063 187.828 46.6147L197.484 31.5758L187.828 16.7348C187.267 15.8584 187.641 14.8125 188.761 14.8125H193.216C194.843 14.8125 195.67 15.1517 196.364 16.339L202.446 26.3178L208.475 16.339C209.168 15.2083 209.968 14.8125 211.622 14.8125H215.89C217.011 14.8125 217.331 15.9432 216.824 16.7348L207.167 31.802L216.824 46.643C217.384 47.5193 217.011 48.5653 215.89 48.5653H211.436C209.808 48.5653 208.981 48.1695 208.288 47.0388L202.206 37.0317L196.23 46.8974C195.484 48.0847 194.683 48.537 193.029 48.537Z"/>
-</svg>
-        <p style="margin-top:var(--ct-s-16);max-width:38ch">La infraestructura de facturación electrónica que procesa más de mil millones de facturas al año en más de 50 regímenes fiscales.</p>
+<!-- ══════ FOOTER — ported from src/sections/_shared/FooterRb.astro ══════
+     Light theme, replacing this page's previous dark footer. Structure and
+     bottom bar are FooterRb's; the four link lists are the set from
+     archive/slovakia-homepage/index.html. Region groups stay FooterRb's own,
+     since the slovakia footer has no equivalent list. -->
+<footer class="rbfoot">
+  <div class="rbfoot-inner">
+    <div class="rbfoot-grid">
+
+      <div class="rbfoot-stack">
+        <div class="rbfoot-block">
+          <p class="rbfoot-title">Company</p>
+          <div class="rbfoot-links">
+            <a href="https://www.cleartax.com/about-us">About us</a>
+            <a href="http://cleartax.com/contact-us">Contact us</a>
+            <a href="https://www.cleartax.com/ae/press">Media &amp; Press</a>
+            <a href="https://cleartax.in/s/trust">Trust &amp; Safety</a>
+            <a href="https://www.cleartax.com/global/partner-program">Partners</a>
+          </div>
+        </div>
+        <div class="rbfoot-block">
+          <p class="rbfoot-title">Social</p>
+          <div class="rbfoot-links">
+            <a href="https://www.linkedin.com/company/cleartaxmiddleeast" target="_blank" rel="noopener noreferrer">LinkedIn</a>
+            <a href="https://x.com/ClearTax_ME" target="_blank" rel="noopener noreferrer">X</a>
+          </div>
+        </div>
       </div>
-      <div>
-        <h4>España</h4>
-        <ul>
-          <li><a href="javascript:void(0)" onclick="document.getElementById('glance').scrollIntoView({behavior:'smooth'})">España de un vistazo</a></li><li><a href="javascript:void(0)" onclick="document.getElementById('steps').scrollIntoView({behavior:'smooth'})">Pasos a seguir</a></li>
-          <li><a href="javascript:void(0)" onclick="document.getElementById('how').scrollIntoView({behavior:'smooth'})">Cómo funciona</a></li><li><a href="javascript:void(0)">VeriFactu</a></li>
-          <li><a href="javascript:void(0)">Crea y Crece</a></li><li><a href="javascript:void(0)">TicketBAI</a></li>
-        </ul>
+
+      <div class="rbfoot-block">
+        <p class="rbfoot-title">Product</p>
+        <div class="rbfoot-links">
+          <a href="https://www.cleartax.com/global/e-invoicing-solution">Global E-invoicing Platform</a>
+          <a href="https://www.cleartax.com/no/e-invoicing-software">E-Invoicing Software (Norway)</a>
+          <a href="https://www.cleartax.com/fr/en">E-Invoicing Software (France)</a>
+          <a href="https://www.cleartax.com/be">E-Invoicing Software (Belgium)</a>
+          <a href="https://www.cleartax.com/ae">E-Invoicing Software (UAE)</a>
+          <a href="https://www.cleartax.com/sg/e-invoicing-software">E-invoicing Software (Singapore)</a>
+          <a href="https://www.cleartax.com/in">E-invoicing Software (India)</a>
+          <a href="https://www.cleartax.com/my/en">E-Invoicing Software (Malaysia)</a>
+        </div>
       </div>
-      <div>
-        <h4>Compañía</h4>
-        <ul>
-          <li><a href="javascript:void(0)">Quiénes somos</a></li><li><a href="javascript:void(0)">Contacto</a></li>
-          <li><a href="javascript:void(0)">Plataforma global de facturación electrónica</a></li><li><a href="javascript:void(0)">Recursos</a></li>
-          <li><a href="javascript:void(0)">Confianza y seguridad</a></li>
-        </ul>
+
+      <div class="rbfoot-block">
+        <p class="rbfoot-title">Resources &amp; Guides</p>
+        <div class="rbfoot-links">
+          <a href="https://www.cleartax.com/sa/ksa-einvoicing">E-Invoicing in Saudi Arabia</a>
+          <a href="https://www.cleartax.com/ae/e-invoicing-uae">E-Invoicing in UAE</a>
+          <a href="https://www.cleartax.com/om/e-invoicing-oman">E-Invoicing in Oman</a>
+          <a href="https://www.cleartax.com/fr/en/e-invoicing-france">E-Invoicing in France</a>
+          <a href="https://www.cleartax.com/be/e-invoicing-belgium">E-Invoicing in Belgium</a>
+          <a href="https://www.cleartax.com/de/en/e-invoicing-germany">E-Invoicing in Germany</a>
+          <a href="https://www.cleartax.com/my/en/e-invoicing-malaysia">E-Invoicing in Malaysia</a>
+          <a href="https://cleartax.com/sg/en/e-invoicing-singapore">E-Invoicing in Singapore</a>
+        </div>
       </div>
+
+      <div class="rbfoot-block">
+        <p class="rbfoot-title">Tools</p>
+        <div class="rbfoot-links">
+          <a href="https://www.cleartax.com/sa/vat-calculator">VAT Calculator Saudi Arabia</a>
+          <a href="https://www.cleartax.com/ae/vat-calculator">VAT Calculator UAE</a>
+          <a href="https://www.cleartax.com/fr/en/vat-calculator">VAT Calculator France</a>
+          <a href="https://www.cleartax.com/be/vat-calculator">VAT Calculator Belgium</a>
+          <a href="https://www.cleartax.com/my/en/sst-calculator">SST Calculator</a>
+        </div>
+      </div>
+
+      <div class="rbfoot-stack">
+        <div class="rbfoot-block">
+          <p class="rbfoot-title">MENA</p>
+          <div class="rbfoot-links">
+            <a href="https://www.cleartax.com/sa">Saudi Arabia</a>
+            <a href="https://www.cleartax.com/ae">UAE</a>
+            <a href="https://www.cleartax.com/om">Oman</a>
+            <a href="https://www.cleartax.com/qa/e-invoicing-qatar">Qatar</a>
+            <a href="https://www.cleartax.com/bh">Bahrain</a>
+          </div>
+        </div>
+        <div class="rbfoot-block">
+          <p class="rbfoot-title">Europe</p>
+          <div class="rbfoot-links">
+            <a href="https://www.cleartax.com/fr/en">France</a>
+            <a href="https://www.cleartax.com/be">Belgium</a>
+            <a href="https://www.cleartax.com/de/en">Germany</a>
+            <a href="https://www.cleartax.com/es/en">Spain</a>
+            <a href="https://www.cleartax.com/pl/en">Poland</a>
+          </div>
+        </div>
+        <div class="rbfoot-block">
+          <p class="rbfoot-title">APAC</p>
+          <div class="rbfoot-links">
+            <a href="https://www.clear.in/">India</a>
+            <a href="https://www.cleartax.com/my/en">Malaysia</a>
+            <a href="https://www.cleartax.com/ph/en">Philippines</a>
+            <a href="https://www.cleartax.com/sg/e-invoicing-software">Singapore</a>
+          </div>
+        </div>
+      </div>
+
     </div>
-    <div class="ct-footer-bottom">
-      <span>© 2026 ClearTax. Un producto de Defmacro Software Pvt. Ltd.</span>
-      <nav><a href="javascript:void(0)">Aviso legal</a><a href="javascript:void(0)">Política de privacidad</a><a href="javascript:void(0)">Condiciones de uso</a></nav>
+
+    <div class="rbfoot-bottom">
+      <div class="rbfoot-legal">
+        <div class="rbfoot-legal-links">
+          <a href="https://www.clear.in/s/legal">Legal</a>
+          <a href="https://www.clear.in/meta/privacy">Privacy Policy</a>
+        </div>
+        <p class="rbfoot-note">ClearTax is a product by Defmacro Software Pvt. Ltd.</p>
+      </div>
+      <div class="rbfoot-badges">
+        <div class="rbfoot-badge-row">
+            <img src="https://cdn.prod.website-files.com/6093bce33d9b4bae841b04e3/69fb0ff41b9a63ce3e1f50d9_iso.png" alt="ISO Certified" loading="lazy" decoding="async">
+            <img src="https://cdn.prod.website-files.com/6093bce33d9b4bae841b04e3/69fad934822abf67d7c25954_soc.png" alt="SOC Certified" loading="lazy" decoding="async">
+            <img src="https://cdn.prod.website-files.com/6093bce33d9b4bae841b04e3/6a154210439a661bb4313f68_ssll.png" alt="SSL Secured" loading="lazy" decoding="async">
+            <img src="https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6a153c9e423a6b967412239c_gdpr.png" alt="GDPR Compliant" loading="lazy" decoding="async">
+        </div>
+        <p class="rbfoot-note">Your data security and privacy matter most to us.</p>
+      </div>
     </div>
   </div>
 </footer>
@@ -1413,6 +1664,132 @@ section[id]{scroll-margin-top:96px}
   if(document.readyState === 'loading'){
     document.addEventListener('DOMContentLoaded', loadHubspot);
   } else { loadHubspot(); }
+})();
+</script>
+
+<script>
+/* Navbar behaviour — ported from src/sections/_shared/NavbarRb.astro.
+   The sub-group (chevron) logic from the component is omitted: none of the
+   links on this page carry children, so there is nothing for it to drive. */
+(function () {
+  var navbar = document.querySelector('[data-giwip-nav-root]');
+  if (!navbar) return;
+
+  var toggle = navbar.querySelector('[data-nav-toggle]');
+  var panel = navbar.querySelector('[data-nav-panel]');
+  var card = navbar.querySelector('[data-nav-card]');
+  var countryBtn = navbar.querySelector('[data-country-btn]');
+  var countryPanel = navbar.querySelector('[data-country-panel]');
+
+  /* Hover-to-open is for mice only. On touch a tap fires a synthetic
+     mouseenter before the click, so wiring it there would open the panel and
+     have the click immediately toggle it shut again. */
+  var canHover = typeof window.matchMedia === 'function' &&
+    window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+
+  /* Which panel is showing purely because the cursor is on it. That is what
+     makes auto-close on mouseleave safe: a panel the user deliberately clicked
+     is "pinned" and only closes on click-out or Esc. */
+  var hoverOpenedKey = null;
+  var closeTimer;
+  function cancelClose() { clearTimeout(closeTimer); }
+
+  /* The bars turn while EITHER panel is out, not just the menu. */
+  function syncToggleIcon() {
+    var anyOpen = (panel && panel.classList.contains('open')) ||
+                  (countryPanel && countryPanel.classList.contains('open'));
+    if (toggle) toggle.classList.toggle('open', !!anyOpen);
+  }
+
+  function setPanelOpen(open) {
+    if (!panel || !toggle) return;
+    panel.classList.toggle('open', open);
+    toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+    if (!open && hoverOpenedKey === 'menu') hoverOpenedKey = null;
+    syncToggleIcon();
+  }
+
+  function setCountryOpen(open) {
+    if (!countryPanel || !countryBtn) return;
+    countryPanel.classList.toggle('open', open);
+    countryBtn.setAttribute('aria-expanded', open ? 'true' : 'false');
+    if (!open && hoverOpenedKey === 'country') hoverOpenedKey = null;
+    syncToggleIcon();
+  }
+
+  /* The two panels share the card, so opening one always closes the other. */
+  var PANELS = {
+    menu: { el: function () { return panel; }, set: setPanelOpen, setOther: setCountryOpen },
+    country: { el: function () { return countryPanel; }, set: setCountryOpen, setOther: setPanelOpen }
+  };
+
+  function onTriggerClick(key) {
+    return function (e) {
+      e.stopPropagation();
+      /* Already showing because of hover: the click pins it rather than
+         toggling it shut, which is otherwise the first thing a mouse user does
+         by accident once the panel appears under their cursor. */
+      if (hoverOpenedKey === key) { hoverOpenedKey = null; return; }
+      var p = PANELS[key];
+      var open = !(p.el() && p.el().classList.contains('open'));
+      p.set(open);
+      if (open) p.setOther(false);
+    };
+  }
+
+  function onTriggerHover(key) {
+    return function () {
+      cancelClose();
+      var p = PANELS[key];
+      if (p.el() && p.el().classList.contains('open')) return;
+      /* Claim the key BEFORE toggling: closing the sibling panel would
+         otherwise clear it on the way past, and this one would never
+         auto-close. */
+      hoverOpenedKey = key;
+      p.setOther(false);
+      p.set(true);
+    };
+  }
+
+  if (toggle) toggle.addEventListener('click', onTriggerClick('menu'));
+  if (countryBtn) countryBtn.addEventListener('click', onTriggerClick('country'));
+
+  if (canHover && card) {
+    if (toggle) toggle.addEventListener('mouseenter', onTriggerHover('menu'));
+    if (countryBtn) countryBtn.addEventListener('mouseenter', onTriggerHover('country'));
+
+    /* Close on leaving the whole card, not the trigger — both panels hang below
+       the bar inside the same card, so the cursor never leaves it on the way
+       down. The grace period covers a cursor that clips a corner in transit. */
+    card.addEventListener('mouseenter', cancelClose);
+    card.addEventListener('mouseleave', function () {
+      var key = hoverOpenedKey;
+      if (!key) return;
+      cancelClose();
+      closeTimer = setTimeout(function () { PANELS[key].set(false); }, 180);
+    });
+  }
+
+  document.addEventListener('click', function (e) {
+    if (!e.target.closest || !e.target.closest('[data-giwip-nav-root]')) {
+      setPanelOpen(false);
+      setCountryOpen(false);
+    }
+  });
+
+  if (panel) panel.addEventListener('click', function (e) {
+    if (e.target.closest && e.target.closest('a[href]')) setPanelOpen(false);
+  });
+
+  if (countryPanel) countryPanel.addEventListener('click', function (e) {
+    if (e.target.closest && e.target.closest('a[href]')) setCountryOpen(false);
+  });
+
+  document.addEventListener('keydown', function (e) {
+    if (e.key !== 'Escape') return;
+    setPanelOpen(false);
+    setCountryOpen(false);
+  });
 })();
 </script>
 </body>
