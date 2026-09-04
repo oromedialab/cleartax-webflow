@@ -1,25 +1,49 @@
 ---
 /**
  * "Clarity AI, by ClearTax: Making AI work for Finance" — Figma node
- * 13275:28481.
+ * 13275:28481, with the per-tab card sets from the component set at
+ * 13091:18569 (Default / Variant2 / Variant3, one per tab).
  *
- * A three-tab control over a sticky card stack. The Figma only designs the
- * "For CFO" panel — four agent cards — so that is the only panel with content;
- * see the TODO on `tabs` below. The tab machinery is real either way, so
- * filling the other two is a data-only change.
+ * ONE DECK, THREE TABS. All eleven cards are a single sticky stack pinning at
+ * a single spot on the page — the three tabs are not three stacks in sequence,
+ * they are labels for stretches of the same one. The pill bar rides along above
+ * it and follows the front card: reach the first Tax Teams card and the
+ * highlight slides to "For Tax Teams" on its own. Clicking a pill scrolls that
+ * group's first card to the front of the deck.
  *
- * STACK: pure CSS `position: sticky`, no scroll listener. Each wrapper sticks
- * 12px below the one before it with a rising z-index, so every card leaves a
- * sliver of the one behind visible — the same effect `WhyGenericAi.astro`
- * builds on the Global homepage, without that section's scroll-driven scale
- * (these cards are a single column and do not need the depth cue).
+ * That is also why the ARIA is `aria-current` on plain buttons rather than
+ * tab/tabpanel. There are no panels — there is one deck, and the pills report
+ * position in it.
+ *
+ * SLIVER OFFSET is clamped at four (see `STACK_DEPTH`). Each card sits 12px
+ * below the one behind so the stack has visible depth, but eleven cards at 12px
+ * would push the front card 120px down the viewport and eat the height the card
+ * needs. Past the fourth, cards pin at the same offset and cover each other
+ * exactly; the deck reads as three slivers plus a front card the whole way.
  *
  * IMPORTANT: no ancestor of `.ih-maiw-sticky` may set `overflow` to anything
- * but `visible`, or sticky silently stops working.
+ * but `visible`, or sticky silently stops working. The pill bar's own
+ * `overflow-x` is safe — it is a sibling of the stack, not an ancestor.
  *
- * The active tab's label is Nova Blue. Figma reports `--vault-navy/600` at
- * #1200FF there, which is an unresolved token in the export — the rendered
- * design is the brand's Nova Blue (#5446FF), so that is what this uses.
+ * THE HEADING PINS ONLY WHERE IT FITS. The Figma sticks the whole header — H2,
+ * lede and pills — which is right on a large window and wrong on a small one:
+ * ~150px of permanently parked heading is height the card needs more than the
+ * heading does, and a pinned card cannot be scrolled to reveal its own
+ * overflow. So the H2 and lede pin above the pills only past
+ * `--ih-maiw-pin-intro`'s breakpoint (see the media query below) and scroll away
+ * otherwise. Available HEIGHT is half the question, so it cannot be a plain
+ * Tailwind breakpoint.
+ *
+ * That breakpoint is declared once, in CSS, and read back by the script through
+ * `--ih-maiw-pin-intro`. Restating it as a matchMedia string in JS would be two
+ * sources of truth for one decision, and they would drift.
+ *
+ * The active pill is Nova Blue. Figma reports `--vault-navy/600` at #1200FF
+ * there, which is an unresolved token in the export — the rendered design is
+ * the brand's Nova Blue (#5446FF), so that is what this uses.
+ *
+ * "Audit and Advisory Agent" appearing under both For CFO and For Tax Teams is
+ * the design's own repetition, not a copy-paste slip.
  */
 interface Card {
   title: string;
@@ -28,13 +52,13 @@ interface Card {
   caption: string;
 }
 
-interface Tab {
+interface Group {
   id: string;
   label: string;
   cards: Card[];
 }
 
-const tabs: Tab[] = [
+const groups: Group[] = [
   {
     id: "cfo",
     label: "For CFO",
@@ -65,146 +89,319 @@ const tabs: Tab[] = [
       },
     ],
   },
-  // TODO Copy pending. The Figma designs the "For CFO" panel only; these two
-  // render as empty panels until their cards are written. Add Card entries and
-  // nothing else has to change.
-  { id: "tax-teams", label: "For Tax Teams", cards: [] },
+  {
+    id: "tax-teams",
+    label: "For Tax Teams",
+    cards: [
+      {
+        title: "Litigation Agent",
+        claim:
+          "Every notice type answered with the transactions behind it, inside the deadline",
+        caption:
+          "Drafts from the actual records: invoice, line item, date, counterparty, GSTIN and the rule in force on that date. At-scale reconciliation, case law from verified databases.",
+      },
+      {
+        title: "Refund Agent",
+        claim: "The bottleneck is data preparation, not filing",
+        caption:
+          "Reads your specific scenario, whether inverted duty, excess payment or unutilised balance, and prepares a complete dossier: refund quantum, supporting data and justification trail.",
+      },
+      {
+        title: "Audit and Advisory Agent",
+        claim: "The monthly CA audit, on every entity, without adding headcount",
+        caption:
+          "Maps your GL, assess completeness, calculate an independent position and compare it to what you filed. Maps findings to known notice patterns to score risk.",
+      },
+    ],
+  },
   {
     id: "controllers",
     label: "For Finance Controllers and AP/AR",
-    cards: [],
+    cards: [
+      {
+        title: "180-Day Reversal and Reclaim Agent",
+        claim: "Section 16(2)(b), computed per document",
+        caption:
+          "Takes your Table-4 data and open payments report from SAP or your ERP, identifies documents needing reversal, eligible for reclaim and falling due next month, and calculates reversal and interest per document",
+      },
+      {
+        title: "ERP Writeback Agent",
+        claim: "Codify your transformation logic once, then it runs itself",
+        caption:
+          "Learns the transformation once from your writebacks and a sample ingestion file. Your team approves the logic; from then on it applies automatically every month.",
+      },
+      {
+        title: "RCM and Ineligible Classification Agent",
+        claim: "A prioritised review queue instead of a line-by-line scan",
+        caption:
+          "Auto-triages every line item using ledger codes, vendor master data and transaction commentary, assigning High or Medium confidence for RCM applicability and ITC ineligibility.",
+      },
+      {
+        title: "Advance Adjustment Agent",
+        claim: "Catches unmatched advances before they become a penalty",
+        caption:
+          "Tracks advances and matches them against invoices received, flags gaps before they become compliance issues, and generates the adjustment recommendations.",
+      },
+    ],
   },
 ];
+
+/** Slivers stop accumulating after this many cards. See the note above. */
+const STACK_DEPTH = 3;
+
+/* One flat deck. The group only survives as a tag on each slide — it is what
+   the pill bar reads to know which label the front card belongs to — plus an
+   id on each group's first slide, which is where its pill scrolls to. */
+const slides = groups.flatMap((group) =>
+  group.cards.map((card, ci) => ({
+    card,
+    group: group.id,
+    anchor: ci === 0 ? `ih-maiw-group-${group.id}` : undefined,
+  })),
+);
 ---
 
-<section class="bg-generic-00 max-lg:py-12 lg:py-20" data-ih-maiw>
+<section class="ih-maiw bg-generic-00 max-lg:py-12 lg:py-20" data-ih-maiw>
   <div class="container mx-auto">
-    <div class="flex flex-col items-center gap-8">
-      <div class="flex flex-col items-center gap-6">
-        <div class="flex flex-col items-center gap-4 text-center">
-          <h2
-            class="m-0 font-heading font-medium text-vault-navy text-[length:var(--fs-h1)] leading-[length:var(--lh-h1)] tracking-[-0.5px]"
-          >
-            Clarity AI, by ClearTax: Making AI work for Finance
-          </h2>
-          <p
-            class="m-0 font-body text-neutral-500 text-[length:var(--fs-body-lg)] leading-[length:var(--lh-body-lg)] max-w-[597px]"
-          >
-            ClearTax gives you clean finance data and the business context AI
-            needs, so your finance team can build and use AI with confidence.
-          </p>
-        </div>
+    <!-- z-30 is inert until the media query below makes this sticky; z-index
+         does nothing on a static box. Same for the background, which only has
+         slides to cover once it is pinned. -->
+    <div
+      class="ih-maiw-intro z-30 flex flex-col items-center gap-4 bg-generic-00 text-center"
+    >
+      <h2
+        class="m-0 font-heading font-medium text-vault-navy text-[length:var(--fs-h1)] leading-[length:var(--lh-h1)] tracking-[-0.5px]"
+      >
+        Clarity AI, by ClearTax: Making AI work for Finance
+      </h2>
+      <p
+        class="m-0 font-body text-neutral-500 text-[length:var(--fs-body-lg)] leading-[length:var(--lh-body-lg)] max-w-[597px]"
+      >
+        ClearTax gives you clean finance data and the business context AI needs,
+        so your finance team can build and use AI with confidence.
+      </p>
+    </div>
 
-        <div
-          class="ih-maiw-tablist flex flex-wrap items-center justify-center gap-1 rounded-xl bg-neutral-100 px-1 py-1.5"
-          role="tablist"
-          aria-label="Clarity AI agents by team"
-        >
-          {
-            tabs.map((tab, i) => (
-              <button
-                type="button"
-                role="tab"
-                id={`ih-maiw-tab-${tab.id}`}
-                class="ih-maiw-tab cursor-pointer rounded-lg border-0 bg-transparent px-6 py-2 text-center font-body text-[length:var(--fs-label)] leading-[length:var(--lh-label)] font-medium text-neutral-700"
-                aria-controls={`ih-maiw-panel-${tab.id}`}
-                aria-selected={i === 0 ? "true" : "false"}
-                tabindex={i === 0 ? "0" : "-1"}
-                data-ih-maiw-tab={tab.id}
-              >
-                {tab.label}
-              </button>
-            ))
-          }
-        </div>
-      </div>
-
-      <div class="w-full">
+    <!-- Rides along above the deck. The wrapper is what sticks and what carries
+         the background, so cards passing behind are covered; the bar inside it
+         can scroll horizontally on narrow viewports without the wrapper needing
+         an overflow of its own. -->
+    <div class="ih-maiw-bar sticky z-30 flex justify-center bg-generic-00 pb-4">
+      <div
+        class="ih-maiw-tablist relative flex max-w-full items-center gap-1 overflow-x-auto rounded-xl bg-neutral-100 px-1 py-1.5"
+        role="group"
+        aria-label="Jump to Clarity AI agents by team"
+      >
+        <span class="ih-maiw-thumb" aria-hidden="true"></span>
         {
-          tabs.map((tab, i) => (
-            <div
-              id={`ih-maiw-panel-${tab.id}`}
-              class="ih-maiw-panel"
-              role="tabpanel"
-              aria-labelledby={`ih-maiw-tab-${tab.id}`}
-              hidden={i !== 0}
-              data-ih-maiw-panel={tab.id}
+          groups.map((group, i) => (
+            <button
+              type="button"
+              class="ih-maiw-tab relative z-10 shrink-0 cursor-pointer whitespace-nowrap rounded-lg border-0 bg-transparent px-6 py-2 text-center font-body text-[length:var(--fs-label)] leading-[length:var(--lh-label)] font-medium text-neutral-700"
+              aria-current={i === 0 ? "true" : "false"}
+              aria-controls={`ih-maiw-group-${group.id}`}
+              data-ih-maiw-tab={group.id}
             >
-              <div class="ih-maiw-stack mx-auto flex w-full max-w-[880px] flex-col gap-[30vh] md:gap-[45vh]">
-                {tab.cards.map((card, ci) => (
-                  <div
-                    class="ih-maiw-sticky sticky"
-                    style={`top:${96 + ci * 12}px;z-index:${ci};`}
-                  >
-                    <article class="flex w-full flex-col items-center gap-6 rounded-xl border border-[#DCDEE2] bg-generic-00 p-6">
-                      <div class="flex w-full flex-col items-center gap-2 text-center">
-                        <h3 class="m-0 font-heading font-medium text-vault-navy text-[length:var(--fs-h6)] leading-[length:var(--lh-h6)]">
-                          {card.title}
-                        </h3>
-                        <p class="m-0 font-body font-medium text-nova-blue text-[length:var(--fs-label)] leading-[length:var(--lh-body-sm)]">
-                          {card.claim}
-                        </p>
-                      </div>
-
-                      {/* Artwork slot. Figma ships it as the flat Visual
-                          Placeholder at 894x320; no image exists yet. */}
-                      <div class="ih-maiw-visual w-full rounded-lg bg-visual-placeholder" />
-
-                      <p class="m-0 w-full text-center font-body text-neutral-500 text-[length:var(--fs-label)] leading-[length:var(--lh-body-sm)]">
-                        {card.caption}
-                      </p>
-                    </article>
-                  </div>
-                ))}
-
-                {/* Tail room so the last card finishes sticking inside the
-                    section rather than under the one after it. */}
-                {tab.cards.length > 0 && <div class="h-20" />}
-              </div>
-            </div>
+              {group.label}
+            </button>
           ))
         }
       </div>
+    </div>
+
+    <div class="ih-maiw-stack">
+      {
+        slides.map((slide, i) => (
+          <div
+            id={slide.anchor}
+            class="ih-maiw-sticky sticky"
+            style={`--ih-maiw-i:${Math.min(i, STACK_DEPTH)};--ih-maiw-z:${i}`}
+            data-ih-maiw-slide={slide.group}
+          >
+            <article class="flex w-full flex-col items-center gap-6 rounded-xl border border-[#DCDEE2] bg-generic-00 p-6">
+              <div class="flex w-full flex-col items-center gap-2 text-center">
+                <h3 class="m-0 font-heading font-medium text-vault-navy text-[length:var(--fs-h6)] leading-[length:var(--lh-h6)]">
+                  {slide.card.title}
+                </h3>
+                <p class="m-0 font-body font-medium text-nova-blue text-[length:var(--fs-label)] leading-[length:var(--lh-body-sm)]">
+                  {slide.card.claim}
+                </p>
+              </div>
+
+              {/* Artwork slot. Figma ships it as the flat Visual Placeholder at
+                  894x320; no image exists yet. */}
+              <div class="ih-maiw-visual w-full rounded-lg bg-visual-placeholder" />
+
+              <p class="m-0 w-full text-center font-body text-neutral-500 text-[length:var(--fs-label)] leading-[length:var(--lh-body-sm)]">
+                {slide.card.caption}
+              </p>
+            </article>
+          </div>
+        ))
+      }
     </div>
   </div>
 </section>
 
 <style is:global>
-  .ih-maiw-tab {
-    transition:
-      background-color 0.2s ease,
-      color 0.2s ease,
-      box-shadow 0.2s ease;
+  /* --ih-maiw-top  clears the fixed navbar (top-4 plus its ~62px height).
+     --ih-maiw-head is the pill bar's measured height; the fallback is close
+     enough that the first paint is right before JS runs.
+     --ih-maiw-step is the scroll travel per card — how long each one holds the
+     front of the deck before the next arrives. */
+  .ih-maiw {
+    --ih-maiw-top: 88px;
+    --ih-maiw-head: 76px;
+    --ih-maiw-step: 22vh;
+    /* Height the pinned H2 + lede occupy above the pills. 0 unless the window
+       is big enough to spare it; the script fills in the measured value. */
+    --ih-maiw-intro: 0px;
+    --ih-maiw-pin-intro: 0;
   }
 
-  .ih-maiw-tab[aria-selected="true"] {
-    background-color: var(--color-generic-00);
+  @media (min-width: 1024px) {
+    .ih-maiw {
+      --ih-maiw-step: 30vh;
+    }
+  }
+
+  /* Wide enough that the H2 holds one line at 40px, and tall enough that the
+     card still clears the viewport underneath it. Both conditions matter — a
+     wide but short window is exactly where a parked heading hurts most. The
+     flag is what the script reads; changing this query changes both.
+
+     ON THE 800px: unlike the table in Outputs.astro, this one has a hard floor
+     rather than a comfort threshold. The card below is PINNED, so anything that
+     does not fit cannot be scrolled to — parking a heading on a short window
+     does not just crowd the card, it puts the caption permanently out of reach.
+     860px was over-cautious enough to miss a 1080p desktop's ~900px viewport by
+     a hair on some setups; 800px still leaves the card its room. It will not
+     match a 1366x768 laptop, and that is the correct answer there. */
+  @media (min-width: 1280px) and (min-height: 800px) {
+    .ih-maiw {
+      --ih-maiw-pin-intro: 1;
+    }
+
+    .ih-maiw-intro {
+      position: sticky;
+      top: 0;
+      padding-top: var(--ih-maiw-top);
+      padding-bottom: 4px;
+    }
+
+  }
+
+  /* Sits directly under the intro when that is pinned, and at the very top when
+     it is not — the offset is the same expression either way, because
+     --ih-maiw-intro is 0 in the second case.
+
+     Whichever of the two lands at the top pays the navbar's clearance as its
+     own padding rather than pinning below it. Pinning at 88px left a strip that
+     the deck scrolled through in full view: the navbar is a floating pill with
+     a gap above it and open space either side, so it hides almost none of that
+     strip. As padding it sits inside this block's opaque background instead.
+     `pb-4` is a utility on the element; padding-top is only here, so the two
+     never race. */
+  .ih-maiw-bar {
+    top: var(--ih-maiw-intro);
+    padding-top: var(--ih-maiw-top);
+  }
+
+  /* MUST follow the rule above, not sit inside the pin query further up: both
+     selectors are one class, so source order is the only tie-breaker and a
+     media query buys no extra weight. Declared earlier, this loses and the
+     clearance gets paid twice — once by the pinned intro, once here. */
+  @media (min-width: 1280px) and (min-height: 800px) {
+    .ih-maiw-bar {
+      padding-top: 0;
+    }
+  }
+
+  /* No --ih-maiw-top term: whichever block is parked above already carries the
+     navbar clearance inside its own measured height. */
+  .ih-maiw-sticky {
+    top: calc(
+      var(--ih-maiw-intro) + var(--ih-maiw-head) + var(--ih-maiw-i) * 12px
+    );
+    z-index: var(--ih-maiw-z);
+    margin: 0 auto;
+    width: 100%;
+    max-width: 880px;
+  }
+
+  /* The gap IS the travel: it is the distance the page scrolls between one card
+     reaching the front and the next one covering it. */
+  .ih-maiw-sticky + .ih-maiw-sticky {
+    margin-top: var(--ih-maiw-step);
+  }
+
+  /* 894x320 in the design. An aspect ratio rather than a fixed height so the
+     slot holds its proportions at every card width; the cap is what keeps the
+     whole card inside the viewport, since a pinned card cannot be scrolled to
+     reveal its own overflow. The max() floor stops the calc going negative on
+     very short windows, which would collapse the slot to nothing. */
+  .ih-maiw-visual {
+    aspect-ratio: 894 / 320;
+    max-height: max(
+      140px,
+      calc(100vh - var(--ih-maiw-intro) - var(--ih-maiw-head) - 250px)
+    );
+  }
+
+  .ih-maiw-tab {
+    transition: color 0.2s ease;
+  }
+
+  .ih-maiw-tab[aria-current="true"] {
     color: var(--color-nova-blue);
+  }
+
+  /* The moving pill. Sliding one element beats cross-fading three backgrounds:
+     the highlight reads as travelling to the next group, which is what the
+     scroll just did. */
+  .ih-maiw-thumb {
+    position: absolute;
+    top: 6px;
+    bottom: 6px;
+    left: 0;
+    width: 0;
+    border-radius: 8px;
+    background-color: var(--color-generic-00);
+    box-shadow:
+      0 1px 2px 0 rgba(16, 24, 40, 0.04),
+      0 1px 2px 0 rgba(16, 24, 40, 0.04);
+    opacity: 0;
+    transition:
+      transform 0.35s cubic-bezier(0.4, 0, 0.2, 1),
+      width 0.35s cubic-bezier(0.4, 0, 0.2, 1),
+      opacity 0.2s ease;
+  }
+
+  .ih-maiw-tablist.is-ready .ih-maiw-thumb {
+    opacity: 1;
+  }
+
+  /* No JS, no thumb — so the current pill paints its own background instead.
+     Suppressed the moment JS marks the bar ready, or the two would double up. */
+  .ih-maiw-tablist:not(.is-ready) .ih-maiw-tab[aria-current="true"] {
+    background-color: var(--color-generic-00);
     box-shadow:
       0 1px 2px 0 rgba(16, 24, 40, 0.04),
       0 1px 2px 0 rgba(16, 24, 40, 0.04);
   }
 
-  /* 894x320 in the design. An aspect ratio rather than a fixed height so the
-     slot keeps its proportions at every card width.
-
-     The cap is what keeps the stack inside the viewport — it is sticky, so
-     anything below the fold on the front card is unreachable. 340px is the
-     96px sticky top, the 36px of slivers behind, and the card's own padding,
-     title and caption. */
-  .ih-maiw-visual {
-    aspect-ratio: 894 / 320;
-    max-height: calc(100vh - 340px);
-  }
-
-  /* Sticky is an enhancement. Off, the cards read as a plain stack — so the
-     large scroll gaps, which exist only to give the stack travel, go too. */
+  /* Pinning and the travel that feeds it are an enhancement. Off, the deck
+     reads as a plain list, so the large gaps that exist only to give it travel
+     go too — and the thumb stops sliding. */
   @media (prefers-reduced-motion: reduce) {
-    .ih-maiw-stack {
-      gap: 2rem !important;
+    .ih-maiw {
+      --ih-maiw-step: 2rem;
     }
     .ih-maiw-sticky {
       position: static !important;
+    }
+    .ih-maiw-thumb {
+      transition: opacity 0.2s ease;
     }
   }
 </style>
@@ -214,46 +411,173 @@ const tabs: Tab[] = [
     const root = document.querySelector("[data-ih-maiw]");
     if (!root) return;
 
+    const intro = root.querySelector(".ih-maiw-intro");
+    const bar = root.querySelector(".ih-maiw-bar");
+    const tablist = root.querySelector(".ih-maiw-tablist");
+    const thumb = root.querySelector(".ih-maiw-thumb");
     const tabs = Array.from(root.querySelectorAll("[data-ih-maiw-tab]"));
-    const panels = Array.from(root.querySelectorAll("[data-ih-maiw-panel]"));
-    if (!tabs.length) return;
+    const slides = Array.from(root.querySelectorAll("[data-ih-maiw-slide]"));
+    if (!bar || !tablist || !tabs.length || !slides.length) return;
 
-    function select(id, focus) {
-      tabs.forEach((tab) => {
-        const on = tab.getAttribute("data-ih-maiw-tab") === id;
-        tab.setAttribute("aria-selected", on ? "true" : "false");
-        tab.setAttribute("tabindex", on ? "0" : "-1");
-        if (on && focus) tab.focus();
+    const ids = tabs.map((t) => t.getAttribute("data-ih-maiw-tab"));
+    const reduceMotion =
+      window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+    let current = -1;
+    /** Group index a click is travelling to, or -1 when scroll owns the pill. */
+    let locked = -1;
+
+    function moveThumb(i) {
+      if (!thumb) return;
+      const tab = tabs[i];
+      thumb.style.width = tab.offsetWidth + "px";
+      thumb.style.transform = "translateX(" + tab.offsetLeft + "px)";
+      tablist.classList.add("is-ready");
+    }
+
+    function setActive(i) {
+      if (i < 0 || i === current) return;
+      current = i;
+
+      tabs.forEach((tab, n) => {
+        tab.setAttribute("aria-current", n === i ? "true" : "false");
       });
-      panels.forEach((panel) => {
-        panel.hidden = panel.getAttribute("data-ih-maiw-panel") !== id;
+      moveThumb(i);
+
+      // Narrow viewports scroll the bar rather than wrapping it, so an
+      // auto-advance off-screen would leave the highlight invisible.
+      if (tablist.scrollWidth > tablist.clientWidth) {
+        const tab = tabs[i];
+        tablist.scrollTo({
+          left: tab.offsetLeft - (tablist.clientWidth - tab.offsetWidth) / 2,
+          behavior: reduceMotion ? "auto" : "smooth",
+        });
+      }
+    }
+
+    /** The px offset a slide pins at, read from the CSS rather than duplicated. */
+    function stickyTop(el) {
+      return parseFloat(getComputedStyle(el).top) || 0;
+    }
+
+    /**
+     * Where a slide sits in the document with sticky taken out of the picture.
+     *
+     * This cannot be `getBoundingClientRect().top + pageYOffset`: once a slide
+     * is pinned, sticky clamps that rect to the pin offset, so the sum comes
+     * back as "wherever you already are". Scrolling to it was therefore a no-op
+     * for every slide behind the current one — clicking back to an earlier tab
+     * did nothing at all. Dropping the element to `static` for the measurement
+     * gives its real flow position; it is restored in the same tick, before the
+     * browser paints, so nothing moves on screen.
+     */
+    function flowTop(el) {
+      const prev = el.style.position;
+      el.style.position = "static";
+      const top = el.getBoundingClientRect().top + window.pageYOffset;
+      el.style.position = prev;
+      return top;
+    }
+
+    // Sticky clamps an element's rect.top at its own `top` once pinned and
+    // leaves it higher before that, so the LAST slide that has reached its
+    // offset is the one at the front of the deck. Its group owns the highlight,
+    // which is what makes the pill advance the moment a new group's first card
+    // arrives.
+    function update() {
+      let front = 0;
+      for (let i = 0; i < slides.length; i++) {
+        if (slides[i].getBoundingClientRect().top <= stickyTop(slides[i]) + 1) {
+          front = i;
+        }
+      }
+      const next = ids.indexOf(slides[front].getAttribute("data-ih-maiw-slide"));
+
+      // A click owns the pill until the deck actually gets there, so the
+      // highlight does not run backwards through every group in between while
+      // the smooth scroll is still travelling.
+      if (locked >= 0) {
+        if (next === locked) locked = -1;
+        return;
+      }
+
+      setActive(next);
+    }
+
+    // Only measured while the section is on screen; scrolling the rest of the
+    // page costs nothing.
+    let running = false;
+    let ticking = false;
+
+    function onScroll() {
+      if (!running || ticking) return;
+      ticking = true;
+      requestAnimationFrame(() => {
+        ticking = false;
+        update();
       });
     }
 
-    tabs.forEach((tab) => {
+    if ("IntersectionObserver" in window) {
+      new IntersectionObserver(
+        (entries) => {
+          running = entries.some((e) => e.isIntersecting);
+          if (running) update();
+        },
+        { threshold: 0 },
+      ).observe(root);
+    } else {
+      running = true;
+    }
+
+    tabs.forEach((tab, i) => {
       tab.addEventListener("click", () => {
-        select(tab.getAttribute("data-ih-maiw-tab"), false);
+        const target = document.getElementById("ih-maiw-group-" + ids[i]);
+        if (!target) return;
+
+        // Scroll exactly far enough for that slide to pin — it lands at the
+        // front of the deck rather than somewhere near it. Works in both
+        // directions because `flowTop` ignores where the slide is currently
+        // pinned; see the note on that helper.
+        const pin = stickyTop(target);
+        window.scrollTo({
+          top: flowTop(target) - pin,
+          behavior: reduceMotion ? "auto" : "smooth",
+        });
+
+        locked = i;
+        setActive(i);
       });
     });
 
-    // Roving focus, per the WAI-ARIA tabs pattern: arrows move between tabs,
-    // Home/End jump to the ends. Without it the tablist is a keyboard trap of
-    // three separate stops that do not announce as one control.
-    root.querySelector(".ih-maiw-tablist").addEventListener("keydown", (e) => {
-      const current = tabs.findIndex(
-        (t) => t.getAttribute("aria-selected") === "true",
-      );
-      if (current < 0) return;
-
-      let next = -1;
-      if (e.key === "ArrowRight") next = (current + 1) % tabs.length;
-      else if (e.key === "ArrowLeft") next = (current - 1 + tabs.length) % tabs.length;
-      else if (e.key === "Home") next = 0;
-      else if (e.key === "End") next = tabs.length - 1;
-      if (next < 0) return;
-
-      e.preventDefault();
-      select(tabs[next].getAttribute("data-ih-maiw-tab"), true);
+    // Any manual scroll input hands the pill straight back, so a click that is
+    // interrupted — or one whose target the browser cannot quite reach, such as
+    // the last group at the very bottom of the page — can never strand it.
+    ["wheel", "touchstart", "keydown"].forEach((evt) => {
+      window.addEventListener(evt, () => { locked = -1; }, { passive: true });
     });
+
+    function refresh() {
+      // The breakpoint lives in the stylesheet; this only reads back its
+      // verdict, so there is one place to change it.
+      const pinsIntro =
+        getComputedStyle(root).getPropertyValue("--ih-maiw-pin-intro").trim() === "1";
+
+      // Publish the real heights so the deck pins under whatever is actually
+      // parked above it — however the heading wraps, however the pills wrap.
+      root.style.setProperty(
+        "--ih-maiw-intro",
+        (pinsIntro && intro ? intro.offsetHeight : 0) + "px",
+      );
+      root.style.setProperty("--ih-maiw-head", bar.offsetHeight + "px");
+      if (current >= 0) moveThumb(current);
+      update();
+    }
+
+    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", refresh);
+    window.addEventListener("load", refresh, { once: true });
+
+    refresh();
   })();
 </script>
