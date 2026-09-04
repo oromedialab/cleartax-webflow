@@ -6,10 +6,22 @@
  * A nine-row comparison: what Clarity AI does on the left, the artwork slot in
  * the middle, what a general assistant does on the right.
  *
- * The Figma draws the column header as its own bordered box sitting on top of
- * a separately-bordered row list. Here it is one bordered card with a header
- * row inside it — identical rendering, one fewer element, and no seam to keep
- * aligned between two boxes.
+ * THE HEADING AND COLUMN LABELS PIN TOGETHER. Nine rows is more than anyone
+ * holds in their head, so both stay parked below the navbar while the rows
+ * scroll under them.
+ *
+ * They pin as a single element on purpose. Sticking the heading at 88px and the
+ * labels at 88px + heading-height would mean something has to know how tall the
+ * heading wrapped to — a magic number that goes stale the moment the copy
+ * changes, or a script measuring it every resize. One sticky block has neither
+ * problem. It also restores the Figma's own structure: it draws the labels as
+ * their own bordered box on top of a separately-bordered row list, which this
+ * file had merged into a single card.
+ *
+ * Two consequences worth knowing: the row list can never take `overflow-hidden`
+ * (a clipping ancestor kills sticky — see the comment on that element), and the
+ * 48px between heading and labels is pinned along with them, because it is
+ * inside the block that sticks.
  *
  * The row divider is deliberately not a plain rule: it is two segments with a
  * 240px gap, so the line passes behind the artwork column rather than through
@@ -80,16 +92,21 @@ const THEIRS = "General AI assistants";
 
 <section class="bg-generic-00 max-lg:py-12 lg:py-20">
   <div class="container mx-auto">
-    <div class="flex flex-col items-center gap-12">
-      <h2
-        class="m-0 max-w-[550px] text-center font-heading font-medium text-vault-navy text-[length:var(--fs-h1)] leading-[length:var(--lh-h1)] tracking-[-0.5px]"
-      >
-        Clarity AI produces outputs generic tools structurally cannot
-      </h2>
+    <div class="flex flex-col items-center">
+      <!-- Heading AND column labels pin as ONE element, which is what makes the
+           offset arithmetic disappear: nothing has to know how tall the heading
+           wrapped to. The labels box moving out of the row list to sit here is
+           also closer to the Figma, which draws it as its own bordered box on
+           top of a separately-bordered list. -->
+      <div class="ih-out-top flex w-full flex-col items-center bg-generic-00">
+        <h2
+          class="m-0 mb-12 max-w-[550px] text-center font-heading font-medium text-vault-navy text-[length:var(--fs-h1)] leading-[length:var(--lh-h1)] tracking-[-0.5px]"
+        >
+          Clarity AI produces outputs generic tools structurally cannot
+        </h2>
 
-      <div class="w-full overflow-hidden rounded-xl border border-[#CCCCCC]">
         <div
-          class="flex items-center justify-between border-b border-[#CCCCCC] px-6 py-6"
+          class="flex w-full items-center justify-between rounded-t-xl border border-[#CCCCCC] px-6 py-6"
         >
           <p
             class="m-0 font-body font-medium text-nova-blue text-[length:var(--fs-body-lg)] leading-[length:var(--lh-body-lg)]"
@@ -102,7 +119,14 @@ const THEIRS = "General AI assistants";
             {THEIRS}
           </p>
         </div>
+      </div>
 
+      <!-- NO `overflow-hidden` here, deliberately: a clipping ancestor kills
+           `position: sticky` on the block above, and this is the element that
+           would do it. Nothing needs clipping anyway — the rows carry no
+           background of their own, so the rounded border has nothing to cut.
+           `border-t-0` because the labels box above already drew that edge. -->
+      <div class="w-full rounded-b-xl border border-t-0 border-[#CCCCCC]">
         {
           rows.map((row, i) => (
             <>
@@ -150,3 +174,38 @@ const THEIRS = "General AI assistants";
     </div>
   </div>
 </section>
+
+<style is:global>
+  /* Wide enough that the heading holds two lines rather than three, and tall
+     enough that ~220px of parked heading plus labels still leaves the rows
+     worth reading. Available HEIGHT is half the question, so this cannot be a
+     plain `lg:sticky` utility.
+
+     ON THE 600px: this gate was 800px and that was simply wrong. A 1366x768
+     laptop — still one of the most common screens there is — gives a viewport
+     around 640px tall once browser chrome is taken out, so the query never
+     matched and nothing pinned on the machines most likely to be looking at it.
+     600px is the honest floor: below it, 220px of parked header is more than
+     a third of the window and the rows stop being readable. Nothing here can
+     overflow out of reach the way a pinned card can, so this is a judgement
+     about comfort, not correctness.
+
+     Below the gate nothing pins, and nothing is lost: the stacked layout
+     already repeats both column headings inside every row, so the labels are
+     never out of reach on a narrow screen. 88px is the fixed navbar's
+     clearance, the same offset MakingAiWork.astro pins its pill bar at. */
+  @media (min-width: 1024px) and (min-height: 600px) {
+    .ih-out-top {
+      position: sticky;
+      /* Pins to the very top and pays the navbar's clearance as padding, rather
+         than pinning at 88px. Pinning below the navbar left an 88px strip that
+         the rows scrolled through in full view — the navbar is a floating pill
+         with a gap above it and open space either side, so it hides almost none
+         of that strip. As padding, the strip sits inside this block's own opaque
+         background, and the navbar (fixed, z-1000) floats over solid colour. */
+      top: 0;
+      padding-top: 88px;
+      z-index: 10;
+    }
+  }
+</style>
