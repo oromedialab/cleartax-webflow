@@ -1,53 +1,119 @@
 ---
 /**
- * Global logos marquee V2 — Tailwind optimized
- * Different visual from the UAE marquee (white bg, multiply blend, soft mask edges).
+ * Shared Logos Marquee component — supporting both simple marquee with H2 title
+ * and achievements strip with tile logos.
  */
 
+export interface Achievement {
+  label: string;
+  emphasis?: boolean;
+}
 
 export interface Props {
   logos?: string[];
+  title?: string | null;
+  achievements?: Achievement[];
+  variant?: 'default' | 'tiles';
+  bgClass?: string;
 }
 
 const {
   logos = [],
+  achievements = [],
+  variant = achievements.length > 0 ? 'tiles' : 'default',
+  title = achievements.length > 0 ? null : 'Trusted by <span class="text-nova-blue">5000+</span> Businesses Worldwide',
+  bgClass = achievements.length > 0 ? 'bg-generic-00 py-6' : 'bg-gradient-to-t from-[#F3F1F9] to-generic-00 py-12',
 } = Astro.props;
-
 
 const doubled = [...logos, ...logos];
 ---
 
-<section class="bg-gradient-to-t from-[#F3F1F9] to-generic-00 py-12 overflow-hidden w-full">
-  <div class="max-w-[var(--container-max)] mx-auto px-4 md:px-6">
-    <h2
-      class="v2-logos-title text-center text-[length:var(--fs-h2)] leading-[length:var(--lh-h2)] font-medium! text-vault-navy mb-8 tracking-[-0.5px] max-lg:mb-11 max-sm:mb-9"
-    >
-      Trusted by <span class="text-nova-blue">5000+</span> Businesses Worldwide
-    </h2>
-    <div
-      class="relative w-full overflow-hidden bg-transparent [mask-image:linear-gradient(to_right,transparent_0%,black_4%,black_96%,transparent_100%)] [-webkit-mask-image:linear-gradient(to_right,transparent_0%,black_4%,black_96%,transparent_100%)] group"
-    >
-      <div
-        class="flex items-center gap-16 [zoom:1.3] w-max origin-left animate-[scroll-logos-global_45s_linear_infinite] py-2 group-hover:[animation-play-state:paused] max-lg:gap-16 max-sm:gap-12 motion-reduce:animate-none"
-      >
-        {
-          doubled.map((src, i) => (
-            <img
-              src={src}
-              alt={i < logos.length ? "Customer logo" : ""}
-              aria-hidden={i >= logos.length}
-              class="shrink-0 h-[26px] w-[86px] object-contain mix-blend-multiply transition-all duration-150 ease-in-out hover:scale-105 max-lg:h-[26px] max-lg:w-[76px] max-sm:h-14 max-sm:w-[60px]"
-              loading="lazy"
-              decoding="async"
+<section class:list={[bgClass, "overflow-hidden w-full"]}>
+  {
+    variant === 'tiles' ? (
+      <div class="container mx-auto">
+        <div class="flex flex-col items-center gap-6">
+          {achievements.length > 0 && (
+            <div class="sp-achievements relative w-full">
+              <ul class="flex flex-wrap items-center justify-center gap-x-8 gap-y-2 list-none m-0 p-0 max-md:gap-x-5">
+                {achievements.map((a, i) => (
+                  <>
+                    {i > 0 && (
+                      <li
+                        class="h-4 w-px shrink-0 rounded-full bg-[#CCCCCC] max-md:hidden"
+                        aria-hidden="true"
+                      />
+                    )}
+                    <li
+                      class:list={[
+                        "text-center font-body text-vault-navy",
+                        a.emphasis
+                          ? "text-[length:var(--fs-body-lg)] leading-[length:var(--lh-body-lg)] font-medium"
+                          : "text-[length:var(--fs-body)] leading-[length:var(--lh-body)]",
+                      ]}
+                    >
+                      {a.label}
+                    </li>
+                  </>
+                ))}
+              </ul>
+            </div>
+          )}
+
+          {title && (
+            <h2
+              class="v2-logos-title text-center text-[length:var(--fs-h2)] leading-[length:var(--lh-h2)] font-medium! text-vault-navy mb-2 tracking-[-0.5px]"
+              set:html={title}
             />
-          ))
-        }
+          )}
+
+          <div class="sp-marquee relative w-full overflow-hidden">
+            <div class="sp-track flex w-max items-center gap-2 motion-reduce:animate-none">
+              {doubled.map((src, i) => (
+                <span class="flex h-12 w-[124px] shrink-0 items-center justify-center rounded-lg bg-[#F5F5F5]">
+                  <img
+                    src={src}
+                    alt={i < logos.length ? "Customer logo" : ""}
+                    aria-hidden={i >= logos.length}
+                    class="h-[26px] w-[86px] object-contain mix-blend-multiply"
+                    loading="lazy"
+                    decoding="async"
+                  />
+                </span>
+              ))}
+            </div>
+          </div>
+        </div>
       </div>
-    </div>
-  </div>
+    ) : (
+      <div class="max-w-[var(--container-max)] mx-auto px-4 md:px-6">
+        {title && (
+          <h2
+            class="v2-logos-title text-center text-[length:var(--fs-h2)] leading-[length:var(--lh-h2)] font-medium! text-vault-navy mb-8 tracking-[-0.5px] max-lg:mb-11 max-sm:mb-9"
+            set:html={title}
+          />
+        )}
+        <div class="relative w-full overflow-hidden bg-transparent [mask-image:linear-gradient(to_right,transparent_0%,black_4%,black_96%,transparent_100%)] [-webkit-mask-image:linear-gradient(to_right,transparent_0%,black_4%,black_96%,transparent_100%)] group">
+          <div class="flex items-center gap-16 [zoom:1.3] w-max origin-left animate-[scroll-logos-global_45s_linear_infinite] py-2 group-hover:[animation-play-state:paused] max-lg:gap-16 max-sm:gap-12 motion-reduce:animate-none">
+            {doubled.map((src, i) => (
+              <img
+                src={src}
+                alt={i < logos.length ? "Customer logo" : ""}
+                aria-hidden={i >= logos.length}
+                class="shrink-0 h-[26px] w-[86px] object-contain mix-blend-multiply transition-all duration-150 ease-in-out hover:scale-105 max-lg:h-[26px] max-lg:w-[76px] max-sm:h-14 max-sm:w-[60px]"
+                loading="lazy"
+                decoding="async"
+              />
+            ))}
+          </div>
+        </div>
+      </div>
+    )
+  }
 </section>
 
 <style is:global>
+  /* Standard / V2 logo strip styles */
   .v2-logos-title {
     text-align: center !important;
     font-weight: 500 !important;
@@ -72,6 +138,61 @@ const doubled = [...logos, ...logos];
     }
     100% {
       transform: translateX(-50%);
+    }
+  }
+
+  /* Achievements / Tiles logo strip styles */
+  .sp-achievements::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background: linear-gradient(
+      90deg,
+      #ffffff 0%,
+      rgba(255, 255, 255, 0) 5%,
+      rgba(255, 255, 255, 0) 95%,
+      #ffffff 100%
+    );
+  }
+
+  .sp-marquee {
+    -webkit-mask-image: linear-gradient(
+      to right,
+      transparent 0%,
+      #000 6%,
+      #000 94%,
+      transparent 100%
+    );
+    mask-image: linear-gradient(
+      to right,
+      transparent 0%,
+      #000 6%,
+      #000 94%,
+      transparent 100%
+    );
+  }
+
+  .sp-track {
+    animation: sp-scroll 60s linear infinite;
+  }
+
+  .sp-marquee:hover .sp-track {
+    animation-play-state: paused;
+  }
+
+  @keyframes sp-scroll {
+    from {
+      transform: translateX(0);
+    }
+    to {
+      transform: translateX(-50%);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .sp-track {
+      animation: none;
     }
   }
 </style>
