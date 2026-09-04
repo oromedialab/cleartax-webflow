@@ -1,0 +1,270 @@
+---
+/**
+ * "Clarity AI is new; the data layer is not." — Figma node 13275:28483.
+ *
+ * Three blocks: the source-systems / platform / tax-portals diagram, a
+ * prevent-automate-detect row, and a secondary CTA.
+ *
+ * LOGOS, TODO: four tiles have no artwork on the Webflow CDN yet — Oracle,
+ * GSTN, TRACES and the Income Tax Department emblem. Each renders its name as
+ * text meanwhile, which is how the OMS and POS tiles are drawn in the design
+ * anyway, so the column still reads correctly. To finish them, upload the four
+ * images to Webflow assets and set `src` on the matching entry below. Nothing
+ * else changes. (`oracle-retail-logo.png` is already on the CDN, but it is the
+ * Oracle Retail wordmark, not the plain Oracle mark this design shows.)
+ *
+ * HEXAGON: three nested regular hexagons, drawn as one inline SVG rather than
+ * three exported vectors. Figma has them at 344 / 366 / 386px tall; the SVG
+ * scales as a unit so the ring spacing survives at any width.
+ *
+ * DOT COLUMNS: eight columns per side, 4px wide on a 26px pitch, in the same
+ * #A6C705 the bridge dots in `Proven.astro` use. CSS gradients, not images —
+ * the design's exported <img> per column would be sixteen requests for what is
+ * two background-image declarations.
+ *
+ * "Yours Taxes" is verbatim from the Figma. It reads like a typo for "Your
+ * Taxes" but changing approved copy is not this file's call — flag it with the
+ * designer.
+ */
+interface Tile {
+  name: string;
+  /** Webflow asset URL. Absent → the tile renders `name` as text. */
+  src?: string;
+}
+
+const books: Tile[] = [
+  {
+    name: "SAP",
+    src: "https://cdn.prod.website-files.com/63ede4a3da6dbd6b05c4612f/6a06bfe3956ddb4d4f844ba3_sap-logo.png",
+  },
+  { name: "Oracle" },
+  {
+    name: "Microsoft Dynamics",
+    src: "https://cdn.prod.website-files.com/63ede4a3da6dbd6b05c4612f/6a06bfe11b9d1549ee39553a_microsoft-dynamics.png",
+  },
+  { name: "OMS" },
+  { name: "POS" },
+];
+
+const portals: Tile[] = [
+  {
+    name: "NIC",
+    src: "https://cdn.prod.website-files.com/6093bce33d9b4bae841b04e3/69eb07be66482af8235e233a_nic.png",
+  },
+  { name: "GSTN" },
+  { name: "TRACES" },
+  { name: "Income Tax" },
+];
+
+const platformPills = ["GL Data", "Govt Data & Notices", "Compliance Registers"];
+
+/** Column heights, outermost first. Mirrored on the right-hand side. */
+const dotColumns = [290, 264, 238, 212, 186, 160, 108, 82];
+
+const stages = [
+  {
+    overline: "Prevent",
+    title: "Fixed at source",
+    body: "Every data point tagged by source, type and tax relevance. Formats standardised, de-duplicates and missing fields caught early.",
+  },
+  {
+    overline: "Automate",
+    title: "Transformed by rule",
+    body: "Raw GL data lands in tax-compliant form every month.",
+  },
+  {
+    overline: "Detect",
+    title: "Caught early",
+    body: "Comparison against your books, your data and the ecosystem data flags discrepancies as they appear",
+  },
+];
+---
+
+<section class="bg-generic-00 max-lg:py-12 lg:py-20">
+  <div class="container mx-auto">
+    <div class="flex flex-col items-center gap-12">
+      <div class="flex flex-col items-center gap-4 text-center">
+        <h2
+          class="m-0 font-heading font-medium text-vault-navy text-[length:var(--fs-h1)] leading-[length:var(--lh-h1)] tracking-[-0.5px]"
+        >
+          Clarity AI is new; the data layer is not.
+        </h2>
+        <p
+          class="m-0 font-body text-neutral-500 text-[length:var(--fs-body-lg)] leading-[length:var(--lh-body-lg)] max-w-[572px]"
+        >
+          The data layer has been running your compliance for years on Clear
+          Compliance Cloud. That is why Clarity AI works on day one.
+        </p>
+      </div>
+
+      <!-- Diagram -->
+      <div
+        class="flex w-full items-stretch gap-10 max-lg:flex-col max-lg:items-center max-lg:gap-8"
+      >
+        <div
+          class="flex flex-1 flex-col items-center gap-6 rounded-xl border border-[#CCCCCC] bg-generic-00 p-6 max-lg:w-full max-lg:max-w-[420px] lg:min-w-0"
+        >
+          <h3
+            class="m-0 font-heading font-medium text-vault-navy text-[length:var(--fs-h6)] leading-[length:var(--lh-h6)]"
+          >
+            Your Books
+          </h3>
+          <div class="flex w-full flex-col gap-2">
+            {
+              books.map((tile) => (
+                <div class="flex h-14 items-center justify-center rounded-lg border border-[#CCCCCC] px-3">
+                  {tile.src ? (
+                    <img
+                      src={tile.src}
+                      alt={tile.name}
+                      class="max-h-[30px] w-auto max-w-full object-contain"
+                      loading="lazy"
+                      decoding="async"
+                    />
+                  ) : (
+                    <span class="font-body font-medium text-vault-navy text-[length:var(--fs-body-lg)] leading-[length:var(--lh-body-lg)]">
+                      {tile.name}
+                    </span>
+                  )}
+                </div>
+              ))
+            }
+          </div>
+        </div>
+
+        <div class="flex shrink-0 items-center gap-6 max-lg:hidden">
+          <div class="ih-dl-dots flex items-center gap-6" aria-hidden="true">
+            {dotColumns.map((h) => <span style={`height:${h}px`} />)}
+          </div>
+
+          <div class="relative flex w-[280px] shrink-0 items-center justify-center">
+            <svg
+              class="absolute left-1/2 top-1/2 h-[386px] w-[334px] -translate-x-1/2 -translate-y-1/2"
+              viewBox="0 0 334 386"
+              fill="none"
+              aria-hidden="true"
+            >
+              <polygon
+                points="167,0 334,96.5 334,289.5 167,386 0,289.5 0,96.5"
+                stroke="#EFEFEF"
+                stroke-width="1.5"></polygon>
+              <polygon
+                points="167,10 325.4,101.5 325.4,284.5 167,376 8.6,284.5 8.6,101.5"
+                stroke="#EFEFEF"
+                stroke-width="1.5"></polygon>
+              <polygon
+                points="167,21 315.9,107 315.9,279 167,365 18.1,279 18.1,107"
+                fill="#FFFFFF"
+                stroke="#D9DCE1"
+                stroke-width="1.5"></polygon>
+            </svg>
+
+            <div class="relative z-10 flex w-[166px] flex-col items-center gap-3">
+              <p
+                class="m-0 text-center font-body font-medium text-vault-navy text-[22px] leading-[34px]"
+              >
+                Compliance<br />Data Platform
+              </p>
+              <div class="flex w-full flex-col gap-2.5">
+                {
+                  platformPills.map((pill) => (
+                    <span class="flex h-7 items-center justify-center rounded-3xl border border-neutral-200 bg-generic-00 px-3 text-center font-body text-[length:var(--fs-label)] leading-[length:var(--lh-label)] font-medium text-nova-blue">
+                      {pill}
+                    </span>
+                  ))
+                }
+              </div>
+            </div>
+          </div>
+
+          <div class="ih-dl-dots flex items-center gap-6" aria-hidden="true">
+            {[...dotColumns].reverse().map((h) => <span style={`height:${h}px`} />)}
+          </div>
+        </div>
+
+        <div
+          class="flex flex-1 flex-col items-center gap-6 rounded-xl border border-[#CCCCCC] bg-generic-00 p-6 max-lg:w-full max-lg:max-w-[420px] lg:min-w-0"
+        >
+          <h3
+            class="m-0 font-heading font-medium text-vault-navy text-[length:var(--fs-h6)] leading-[length:var(--lh-h6)]"
+          >
+            Yours Taxes
+          </h3>
+          <div class="flex w-full flex-1 flex-col gap-2">
+            {
+              portals.map((tile) => (
+                <div class="flex h-14 flex-1 items-center justify-center rounded-lg border border-[#CCCCCC] px-3">
+                  {tile.src ? (
+                    <img
+                      src={tile.src}
+                      alt={tile.name}
+                      class="max-h-[30px] w-auto max-w-full object-contain"
+                      loading="lazy"
+                      decoding="async"
+                    />
+                  ) : (
+                    <span class="font-body font-medium text-vault-navy text-[length:var(--fs-body-lg)] leading-[length:var(--lh-body-lg)]">
+                      {tile.name}
+                    </span>
+                  )}
+                </div>
+              ))
+            }
+          </div>
+        </div>
+      </div>
+
+      <!-- Prevent / Automate / Detect -->
+      <div class="flex w-full items-stretch max-lg:flex-col max-lg:gap-4">
+        {
+          stages.map((stage, i) => (
+            <>
+              {i > 0 && (
+                <span
+                  class="h-0.5 w-10 shrink-0 self-center bg-[#CCCCCC] max-lg:hidden"
+                  aria-hidden="true"
+                />
+              )}
+              <div class="flex flex-1 flex-col items-center gap-6 rounded-xl border border-[#CCCCCC] p-6 lg:min-w-0">
+                <div class="flex w-full flex-col items-center gap-3 text-center">
+                  <div class="flex w-full flex-col items-center gap-2">
+                    <p class="m-0 font-body font-semibold uppercase tracking-[1px] text-neutral-500 text-[length:var(--fs-label)] leading-[length:var(--lh-body-sm)]">
+                      {stage.overline}
+                    </p>
+                    <p class="m-0 font-heading font-medium text-vault-navy text-[length:var(--fs-h6)] leading-[length:var(--lh-h6)]">
+                      {stage.title}
+                    </p>
+                  </div>
+                  <p class="m-0 w-full font-body text-neutral-500 text-[length:var(--fs-body)] leading-[length:var(--lh-body)]">
+                    {stage.body}
+                  </p>
+                </div>
+              </div>
+            </>
+          ))
+        }
+      </div>
+
+      <a
+        href="https://cleartax.in/s/clear-compliance-cloud"
+        class="inline-flex items-center justify-center gap-2 rounded-lg border border-nova-blue bg-generic-00 px-5 py-3.5 text-[length:var(--fs-label-lg)] leading-[length:var(--lh-label-lg)] font-medium text-nova-blue no-underline shadow-[0px_2px_6px_rgba(16,24,40,0.06)] transition-opacity duration-200 hover:opacity-80"
+      >
+        Explore Clear Compliance Cloud
+      </a>
+    </div>
+  </div>
+</section>
+
+<style is:global>
+  /* One dot every 26px down a 4px column — the design's 4px dot on a 24px gap.
+     `height` comes off the inline style per column, which is what gives the
+     two fans their taper. */
+  .ih-dl-dots > span {
+    display: block;
+    width: 4px;
+    flex: none;
+    background-image: radial-gradient(circle, #a6c705 2px, transparent 2px);
+    background-size: 4px 26px;
+    background-repeat: repeat-y;
+  }
+</style>

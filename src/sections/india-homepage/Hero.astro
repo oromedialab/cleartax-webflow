@@ -1,0 +1,492 @@
+---
+/**
+ * India homepage hero — Figma node 13275:26865.
+ *
+ * Same construction as `global-homepage/Hero.astro`; the only content
+ * difference is the middle badge, which reads "AI hallucinations" here rather
+ * than "AI output you can't trust". Copied rather than shared because a page's
+ * CSS entry only sources its own section folder, so a section imported across
+ * folders would compile none of its utilities into this bundle.
+ *
+ * Background is the interactive stroke field from
+ * `sections/global-invoicing/Hero.astro` (originally
+ * `sections/blog-listing/Newsletter.astro`, which carries the full explanation of
+ * the geometry): a plain grid of lime dots until a pointer enters, at which point
+ * each dot draws out into a stroke aimed at the cursor, longest beside it and back
+ * to a dot by `lengthRadius`. Same four gradient layers over it — page gradient,
+ * radial wash behind the copy, a mobile-only top fade, and a bottom fade.
+ *
+ * Ids and the canvas id are `ih-`prefixed rather than the `hero` /
+ * `hero-dots-canvas` those files use, because embeds share one namespace per page
+ * and a bare `hero` is exactly the kind of name that collides later.
+ *
+ * The badge icons are the exported Figma vectors (HardDrives / Robot / Headset),
+ * two-tone by design — navy body, Nova Blue accent. `black` in the export is the
+ * unresolved brand token, so it maps to `currentColor` and the box sets the navy.
+ */
+interface Props {
+  /** Stroke width, and so the diameter of the dot it becomes at rest. */
+  lineWidth?: number;
+  gap?: number;
+  /** Must stay under the grid pitch or the field knits into a mesh. */
+  maxLength?: number;
+  lengthRadius?: number;
+  /** Leave at 1 — a partial turn makes strokes flip as the cursor crosses them. */
+  tilt?: number;
+  baseColor?: string;
+  cursorRadius?: number;
+  pull?: number;
+  fadeRadius?: number;
+}
+
+const {
+  lineWidth = 2,
+  gap = 24,
+  maxLength = 6,
+  lengthRadius = 260,
+  tilt = 1,
+  baseColor = "#C8F006",
+  cursorRadius = 320,
+  pull = 14,
+  fadeRadius = 40,
+} = Astro.props;
+
+const badges = [
+  { label: "Messy data", icon: "harddrives" },
+  { label: "AI hallucinations", icon: "robot" },
+  { label: "dependence on IT", icon: "headset" },
+];
+---
+
+<section
+  id="ih-hero"
+  class="ih-hero relative overflow-hidden bg-[linear-gradient(180deg,_#FFF_0%,_rgba(242,_241,_240,_0.25)_30.04%,_rgba(242,_241,_240,_0.25)_87.79%,_#FFF_100%)]"
+  data-line-width={String(lineWidth)}
+  data-gap={String(gap)}
+  data-max-length={String(maxLength)}
+  data-length-radius={String(lengthRadius)}
+  data-tilt={String(tilt)}
+  data-base-color={baseColor}
+  data-cursor-radius={String(cursorRadius)}
+  data-pull={String(pull)}
+  data-fade-radius={String(fadeRadius)}
+>
+  <!-- Interactive stroke field -->
+  <div class="absolute inset-0 z-0 w-full h-full pointer-events-none">
+    <canvas id="ih-hero-dots" class="absolute inset-0 w-full h-full"></canvas>
+  </div>
+
+  <!-- Radial wash, so the headline keeps its contrast over the field -->
+  <div
+    class="absolute inset-0 z-0 bg-[radial-gradient(circle_at_center,_rgba(255,255,255,1)_30%,_rgba(255,255,255,0.7)_40%,_rgba(255,255,255,0)_65%)] pointer-events-none"
+  >
+  </div>
+
+  <!-- Narrow viewports get a top fade instead, where the radial is too tight -->
+  <div
+    class="absolute inset-0 z-0 bg-gradient-to-b from-white/85 via-white/50 to-transparent hidden max-[630px]:block pointer-events-none"
+  >
+  </div>
+
+  <!-- Bottom fade, blending the field into the section below -->
+  <div
+    class="absolute bottom-0 inset-x-0 h-48 bg-gradient-to-t from-white via-white/50 to-transparent pointer-events-none z-0"
+  >
+  </div>
+
+  <div class="container mx-auto relative z-10">
+    <div
+      class="flex flex-col items-center gap-6 text-center max-lg:pt-32 max-lg:pb-16 lg:pt-[257px] lg:pb-[161px]"
+    >
+      <div class="flex flex-col items-center gap-6 w-full">
+        <h1
+          class="m-0 font-heading font-semibold text-vault-navy text-[length:var(--fs-display-xl)] leading-[length:var(--lh-display-xl)] tracking-[-1px] max-w-[1280px]"
+        >
+          Close the gap between <br class="max-md:hidden" />AI’s promise and{" "}
+          <span class="ih-hero-mark">finance reality</span>
+        </h1>
+
+        <div class="flex flex-col items-center gap-4">
+          <p
+            class="m-0 font-body text-neutral-500 text-[length:var(--fs-body-lg)] leading-[length:var(--lh-body-lg)] max-w-[486px]"
+          >
+            Fix the three things holding AI back in finance
+          </p>
+
+          <div class="flex flex-wrap items-center justify-center gap-2">
+            {
+              badges.map((b) => (
+                <span class="inline-flex h-12 items-center justify-center gap-2 rounded-lg border border-neutral-200 bg-generic-00 px-3 py-1.5 text-[length:var(--fs-label)] leading-[length:var(--lh-label)] font-medium text-neutral-700 font-body">
+                  <span class="inline-flex h-4 w-4 shrink-0 items-center justify-center text-vault-navy">
+                    {b.icon === "harddrives" && (
+                      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M4.125 5C4.125 5.12361 4.16166 5.24445 4.23033 5.34723C4.29901 5.45001 4.39662 5.53012 4.51082 5.57742C4.62503 5.62473 4.75069 5.63711 4.87193 5.61299C4.99317 5.58888 5.10453 5.52935 5.19194 5.44194C5.27935 5.35453 5.33887 5.24317 5.36299 5.12193C5.38711 5.00069 5.37473 4.87503 5.32742 4.76082C5.28012 4.64662 5.20001 4.54901 5.09723 4.48033C4.99445 4.41166 4.87361 4.375 4.75 4.375C4.58424 4.375 4.42527 4.44085 4.30806 4.55806C4.19085 4.67527 4.125 4.83424 4.125 5Z" fill="#5446FF"/>
+                      <path d="M3 8.625H13C13.2321 8.625 13.4546 8.71719 13.6187 8.88128C13.7828 9.04538 13.875 9.26794 13.875 9.5V12.5C13.875 12.7321 13.7828 12.9546 13.6187 13.1187C13.4546 13.2828 13.2321 13.375 13 13.375H3C2.76794 13.375 2.54538 13.2828 2.38128 13.1187C2.21719 12.9546 2.125 12.7321 2.125 12.5V9.5C2.125 9.26794 2.21719 9.04538 2.38128 8.88128C2.54538 8.71719 2.76794 8.625 3 8.625ZM2.875 12.5C2.875 12.5332 2.88817 12.5649 2.91161 12.5884C2.93505 12.6118 2.96685 12.625 3 12.625H13C13.0332 12.625 13.0649 12.6118 13.0884 12.5884C13.1118 12.5649 13.125 12.5332 13.125 12.5V9.5C13.125 9.46685 13.1118 9.43505 13.0884 9.41161C13.0649 9.38817 13.0332 9.375 13 9.375H3C2.96685 9.375 2.93505 9.38817 2.91161 9.41161C2.88817 9.43505 2.875 9.46685 2.875 9.5V12.5ZM3 2.625H13C13.2321 2.625 13.4546 2.71719 13.6187 2.88128C13.7828 3.04538 13.875 3.26794 13.875 3.5V6.5C13.875 6.61491 13.8524 6.72869 13.8084 6.83485C13.7644 6.94101 13.7 7.03747 13.6187 7.11872C13.5375 7.19997 13.441 7.26442 13.3348 7.30839C13.2287 7.35237 13.1149 7.375 13 7.375H3C2.88509 7.375 2.77131 7.35237 2.66515 7.30839C2.55899 7.26442 2.46253 7.19997 2.38128 7.11872C2.30003 7.03747 2.23558 6.94101 2.19161 6.83485C2.14763 6.72869 2.125 6.61491 2.125 6.5V3.5C2.125 3.26794 2.21719 3.04538 2.38128 2.88128C2.54538 2.71719 2.76794 2.625 3 2.625ZM2.875 6.5C2.875 6.53315 2.88817 6.56495 2.91161 6.58839C2.93505 6.61183 2.96685 6.625 3 6.625H13C13.0332 6.625 13.0649 6.61183 13.0884 6.58839C13.1118 6.56495 13.125 6.53315 13.125 6.5V3.5C13.125 3.46685 13.1118 3.43505 13.0884 3.41161C13.0649 3.38817 13.0332 3.375 13 3.375H3C2.96685 3.375 2.93505 3.38817 2.91161 3.41161C2.88817 3.43505 2.875 3.46685 2.875 3.5V6.5Z" fill="black"/>
+                      <path d="M4.125 11C4.125 11.1236 4.16166 11.2445 4.23033 11.3472C4.29901 11.45 4.39662 11.5301 4.51082 11.5774C4.62503 11.6247 4.75069 11.6371 4.87193 11.613C4.99317 11.5889 5.10453 11.5294 5.19194 11.4419C5.27935 11.3545 5.33887 11.2432 5.36299 11.1219C5.38711 11.0007 5.37473 10.875 5.32742 10.7608C5.28012 10.6466 5.20001 10.549 5.09723 10.4803C4.99445 10.4117 4.87361 10.375 4.75 10.375C4.58424 10.375 4.42527 10.4408 4.30806 10.5581C4.19085 10.6753 4.125 10.8342 4.125 11Z" fill="#5446FF"/>
+                      </svg>
+                    )}
+                    {b.icon === "robot" && (
+                      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M8.375 3.125H12.5C12.9973 3.125 13.4742 3.32254 13.8258 3.67417C14.1775 4.02581 14.375 4.50272 14.375 5V12C14.375 12.4973 14.1775 12.9742 13.8258 13.3258C13.4742 13.6775 12.9973 13.875 12.5 13.875H3.5C3.00272 13.875 2.52581 13.6775 2.17417 13.3258C1.82254 12.9742 1.625 12.4973 1.625 12V5C1.625 4.50272 1.82254 4.02581 2.17417 3.67417C2.52581 3.32254 3.00272 3.125 3.5 3.125H7.625V1C7.625 0.900544 7.66451 0.805161 7.73484 0.734835C7.80516 0.664509 7.90054 0.625 8 0.625C8.09946 0.625 8.19484 0.664509 8.26517 0.734835C8.33549 0.805161 8.375 0.900544 8.375 1V3.125ZM13.2955 12.7955C13.5065 12.5845 13.625 12.2984 13.625 12V5C13.625 4.70163 13.5065 4.41548 13.2955 4.20451C13.0845 3.99353 12.7984 3.875 12.5 3.875H3.5C3.20163 3.875 2.91548 3.99353 2.7045 4.20451C2.49353 4.41548 2.375 4.70163 2.375 5V12C2.375 12.2984 2.49353 12.5845 2.7045 12.7955C2.91548 13.0065 3.20163 13.125 3.5 13.125H12.5C12.7984 13.125 13.0845 13.0065 13.2955 12.7955ZM4.73033 6.40277C4.66166 6.50555 4.625 6.62639 4.625 6.75C4.625 6.91576 4.69085 7.07473 4.80806 7.19194C4.92527 7.30915 5.08424 7.375 5.25 7.375C5.37361 7.375 5.49445 7.33834 5.59723 7.26967C5.70001 7.20099 5.78012 7.10338 5.82742 6.98918C5.87473 6.87497 5.88711 6.74931 5.86299 6.62807C5.83888 6.50683 5.77935 6.39547 5.69194 6.30806C5.60453 6.22065 5.49317 6.16113 5.37193 6.13701C5.25069 6.11289 5.12503 6.12527 5.01082 6.17258C4.89662 6.21988 4.79901 6.29999 4.73033 6.40277ZM10.2303 6.40277C10.1617 6.50555 10.125 6.62639 10.125 6.75C10.125 6.91576 10.1908 7.07473 10.3081 7.19194C10.4253 7.30915 10.5842 7.375 10.75 7.375C10.8736 7.375 10.9945 7.33834 11.0972 7.26967C11.2 7.20099 11.2801 7.10338 11.3274 6.98918C11.3747 6.87497 11.3871 6.74931 11.363 6.62807C11.3389 6.50683 11.2794 6.39547 11.1919 6.30806C11.1045 6.22065 10.9932 6.16113 10.8719 6.13701C10.7507 6.11289 10.625 6.12527 10.5108 6.17258C10.3966 6.21988 10.299 6.29999 10.2303 6.40277Z" fill="black"/>
+                      <path fill-rule="evenodd" clip-rule="evenodd" d="M10.25 8.625H5.75C5.31902 8.625 4.9057 8.7962 4.60095 9.10095C4.2962 9.4057 4.125 9.81902 4.125 10.25C4.125 10.681 4.2962 11.0943 4.60095 11.399C4.9057 11.7038 5.31902 11.875 5.75 11.875H10.25C10.681 11.875 11.0943 11.7038 11.399 11.399C11.7038 11.0943 11.875 10.681 11.875 10.25C11.875 9.81902 11.7038 9.4057 11.399 9.10095C11.0943 8.7962 10.681 8.625 10.25 8.625ZM8.875 11.125V9.375H7.125V11.125H8.875ZM5.13128 9.63128C4.96719 9.79538 4.875 10.0179 4.875 10.25C4.875 10.4821 4.96719 10.7046 5.13128 10.8687C5.29538 11.0328 5.51794 11.125 5.75 11.125H6.375V9.375H5.75C5.51794 9.375 5.29538 9.46719 5.13128 9.63128ZM9.625 11.125H10.25C10.4821 11.125 10.7046 11.0328 10.8687 10.8687C11.0328 10.7046 11.125 10.4821 11.125 10.25C11.125 10.0179 11.0328 9.79538 10.8687 9.63128C10.7046 9.46719 10.4821 9.375 10.25 9.375H9.625V11.125Z" fill="#5446FF"/>
+                      </svg>
+                    )}
+                    {b.icon === "headset" && (
+                      <svg width="13" height="14" viewBox="0 0 13 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M10.9044 1.87938C10.3179 1.28662 9.62009 0.81548 8.8511 0.492974C8.0821 0.170468 7.257 0.00294047 6.42313 0H6.375C4.68424 0 3.06274 0.67165 1.86719 1.86719C0.67165 3.06274 0 4.68424 0 6.375V9.875C0 10.2397 0.144866 10.5894 0.402728 10.8473C0.660591 11.1051 1.01033 11.25 1.375 11.25H2.375C2.73967 11.25 3.08941 11.1051 3.34727 10.8473C3.60513 10.5894 3.75 10.2397 3.75 9.875V7.375C3.75 7.01033 3.60513 6.66059 3.34727 6.40273C3.08941 6.14487 2.73967 6 2.375 6H0.7625C0.857629 4.57624 1.4903 3.24185 2.53238 2.26708C3.57447 1.2923 4.94807 0.749996 6.375 0.75H6.4175C7.83846 0.756307 9.20402 1.3019 10.2381 2.27647C11.2722 3.25105 11.8977 4.58191 11.9881 6H10.375C10.0103 6 9.66059 6.14487 9.40273 6.40273C9.14487 6.66059 9 7.01033 9 7.375V9.875C9 10.2397 9.14487 10.5894 9.40273 10.8473C9.66059 11.1051 10.0103 11.25 10.375 11.25H12V11.375C12 11.806 11.8288 12.2193 11.524 12.524C11.2193 12.8288 10.806 13 10.375 13H6.875C6.77554 13 6.68016 13.0395 6.60983 13.1098C6.53951 13.1802 6.5 13.2755 6.5 13.375C6.5 13.4745 6.53951 13.5698 6.60983 13.6402C6.68016 13.7105 6.77554 13.75 6.875 13.75H10.375C11.0049 13.75 11.609 13.4998 12.0544 13.0544C12.4998 12.609 12.75 12.0049 12.75 11.375V6.375C12.7531 5.54109 12.5917 4.71476 12.275 3.94333C11.9583 3.1719 11.4926 2.47052 10.9044 1.87938ZM2.375 6.75C2.54076 6.75 2.69973 6.81585 2.81694 6.93306C2.93415 7.05027 3 7.20924 3 7.375V9.875C3 10.0408 2.93415 10.1997 2.81694 10.3169C2.69973 10.4342 2.54076 10.5 2.375 10.5H1.375C1.20924 10.5 1.05027 10.4342 0.933058 10.3169C0.815848 10.1997 0.75 10.0408 0.75 9.875V6.75H2.375ZM9.75 9.875V7.375C9.75 7.20924 9.81585 7.05027 9.93306 6.93306C10.0503 6.81585 10.2092 6.75 10.375 6.75H12V10.5H10.375C10.2092 10.5 10.0503 10.4342 9.93306 10.3169C9.81585 10.1997 9.75 10.0408 9.75 9.875Z" fill="black"/>
+                      <path d="M9.75 9.875V7.375C9.75 7.20924 9.81585 7.05027 9.93306 6.93306C10.0503 6.81585 10.2092 6.75 10.375 6.75H12V10.5H10.375C10.2092 10.5 10.0503 10.4342 9.93306 10.3169C9.81585 10.1997 9.75 10.0408 9.75 9.875Z" fill="#5446FF"/>
+                      <path d="M2.375 6.75C2.54076 6.75 2.69973 6.81585 2.81694 6.93306C2.93415 7.05027 3 7.20924 3 7.375V9.875C3 10.0408 2.93415 10.1997 2.81694 10.3169C2.69973 10.4342 2.54076 10.5 2.375 10.5H1.375C1.20924 10.5 1.05027 10.4342 0.933058 10.3169C0.815848 10.1997 0.75 10.0408 0.75 9.875V6.75H2.375Z" fill="#5446FF"/>
+                      </svg>
+                    )}
+                  </span>
+                  {b.label}
+                </span>
+              ))
+            }
+          </div>
+        </div>
+      </div>
+
+      <!-- Opens the HubSpot modal from `DemoModal.astro`. The href is kept real
+           so the CTA still goes somewhere if that section is absent. -->
+      <a
+        href="https://www.cleartax.com/contact-us"
+        data-demo-open
+        class="inline-flex items-center justify-center gap-2 rounded-lg border border-nova-blue bg-nova-blue px-5 py-3.5 text-[length:var(--fs-label-lg)] leading-[length:var(--lh-label-lg)] font-medium text-nova-50 no-underline shadow-[0px_2px_3px_rgba(16,24,40,0.06)] transition-opacity duration-200 hover:opacity-90"
+      >
+        Book a demo
+      </a>
+    </div>
+  </div>
+</section>
+
+<style is:global>
+  /* The single Flux Lime instance on this screen. clone keeps the block intact
+     if the headline wraps between "finance" and "reality" on narrow viewports. */
+  .ih-hero-mark {
+    background-color: var(--color-flux-lime);
+    padding: 0 0.08em;
+    -webkit-box-decoration-break: clone;
+    box-decoration-break: clone;
+  }
+</style>
+
+<script is:inline>
+  /* Interactive stroke field — the one from `sections/global-invoicing/Hero.astro`,
+     which took it from `sections/blog-listing/Newsletter.astro`. That file carries
+     the full explanation of the geometry; the numbers here come off the section's
+     data-* attributes so there is a single source for each. */
+  document.addEventListener('DOMContentLoaded', () => {
+    const section = document.getElementById('ih-hero');
+    if (!section) return;
+    const canvas = document.getElementById('ih-hero-dots');
+    if (!canvas || !canvas.getContext) return;
+    const ctx = canvas.getContext('2d');
+
+    function num(name, fallback) {
+      const value = parseFloat(section.getAttribute(name));
+      return isNaN(value) ? fallback : value;
+    }
+
+    const config = {
+      lineWidth: num('data-line-width', 2),
+      gap: num('data-gap', 24),
+      maxLength: num('data-max-length', 6),
+      lengthRadius: num('data-length-radius', 260),
+      tilt: num('data-tilt', 1),
+      baseColor: section.getAttribute('data-base-color') || '#C8F006',
+      cursorRadius: num('data-cursor-radius', 320),
+      pull: num('data-pull', 14),
+      fadeRadius: num('data-fade-radius', 40),
+      fadeSpeed: 12,
+      followSpeed: 7,
+      engageSpeed: 4,
+      focusSpeed: 5,
+    };
+
+    const HALF_PI = Math.PI / 2; // straight down — the resting angle
+
+    let width = 0;
+    let height = 0;
+    let dots = [];
+    const mouse = { x: -9999, y: -9999, prevX: -9999, prevY: -9999 };
+    let hover = false;
+    let speed = 0; // smoothed cursor travel, px per frame
+    let engagement = 0; // 0–1, how awake the field is
+    let presence = 0; // 0–1, whether a pointer is over the section at all
+    let focusX = 0;
+    let focusY = 0;
+
+    function initGrid() {
+      const parent = canvas.parentElement;
+      width = parent.offsetWidth;
+      height = parent.offsetHeight;
+      if (!width || !height) return;
+
+      const dpr = window.devicePixelRatio || 1;
+      canvas.width = Math.round(width * dpr);
+      canvas.height = Math.round(height * dpr);
+      // setTransform, not scale: scale() multiplies the existing matrix, so
+      // every resize would compound the DPR and shrink the grid.
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+      dots = [];
+      const spacing = config.lineWidth + config.gap;
+      const cols = Math.floor(width / spacing);
+      const rows = Math.floor(height / spacing);
+      const startX = (width - cols * spacing) / 2 + config.lineWidth / 2;
+      const startY = (height - rows * spacing) / 2 + config.lineWidth / 2;
+
+      for (let y = 0; y <= rows; y++) {
+        for (let x = 0; x <= cols; x++) {
+          const cx = startX + x * spacing;
+          const cy = startY + y * spacing;
+          // ox/oy is the stroke's home and the point it is drawn centred on;
+          // x/y is where that centre is now; hx/hy is half its segment vector.
+          dots.push({ x: cx, y: cy, ox: cx, oy: cy, alpha: 1, hx: 0, hy: 0 });
+        }
+      }
+
+      if (!hover) {
+        focusX = width / 2;
+        focusY = height / 2;
+      }
+      aim();
+    }
+
+    // Length and angle, both straight off the focus. The focus and `presence`
+    // are already eased, so neither needs easing here.
+    function aim() {
+      const longest = config.maxLength / 2;
+      const turn = presence * config.tilt;
+
+      for (let i = 0; i < dots.length; i++) {
+        const dot = dots[i];
+        const dx = focusX - dot.ox;
+        const dy = focusY - dot.oy;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+
+        // 1 at the pointer, 0 by `lengthRadius`. Scaled by `presence`, so with
+        // no cursor on the section every stroke is a plain dot.
+        let t = dist / config.lengthRadius;
+        if (t > 1) t = 1;
+        const grow = 1 - t;
+        let reach = longest * grow * grow * (3 - 2 * grow) * presence;
+        // A canvas subpath of exactly zero length is not reliably painted, even
+        // with a round cap. A quarter pixel is a dot and is always drawn.
+        if (reach < 0.25) reach = 0.25;
+
+        let ux = 0;
+        let uy = 1;
+
+        if (turn > 0.001 && dist > 0.01) {
+          // Folded into a quarter turn either side: a segment drawn about its
+          // centre looks the same pointed either way, so this takes the short
+          // way round. Only seamless because `turn` reaches 1 — scaling the
+          // angle by any fraction makes strokes flip as the cursor crosses them.
+          let off = Math.atan2(dy, dx) - HALF_PI;
+          while (off > HALF_PI) off -= Math.PI;
+          while (off < -HALF_PI) off += Math.PI;
+
+          const angle = HALF_PI + off * turn;
+          ux = Math.cos(angle);
+          uy = Math.sin(angle);
+        }
+
+        dot.hx = ux * reach;
+        dot.hy = uy * reach;
+      }
+    }
+
+    function paint() {
+      ctx.clearRect(0, 0, width, height);
+      ctx.strokeStyle = config.baseColor;
+      ctx.lineWidth = config.lineWidth;
+      ctx.lineCap = 'round'; // so a stroke shrunk to nothing reads as a dot
+
+      // Two passes. Only the strokes the cursor is touching have an alpha of
+      // their own; the rest of the field goes down as one path in one stroke
+      // call. Setting globalAlpha per stroke across the whole grid stutters.
+      ctx.globalAlpha = 1;
+      ctx.beginPath();
+      for (let i = 0; i < dots.length; i++) {
+        const dot = dots[i];
+        if (dot.alpha < 0.995) continue;
+        ctx.moveTo(dot.x - dot.hx, dot.y - dot.hy);
+        ctx.lineTo(dot.x + dot.hx, dot.y + dot.hy);
+      }
+      ctx.stroke();
+
+      for (let j = 0; j < dots.length; j++) {
+        const fading = dots[j];
+        if (fading.alpha >= 0.995 || fading.alpha < 0.01) continue;
+        ctx.globalAlpha = fading.alpha;
+        ctx.beginPath();
+        ctx.moveTo(fading.x - fading.hx, fading.y - fading.hy);
+        ctx.lineTo(fading.x + fading.hx, fading.y + fading.hy);
+        ctx.stroke();
+      }
+
+      ctx.globalAlpha = 1;
+    }
+
+    const reduceMotion =
+      window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    if (reduceMotion) {
+      // Static dot grid. No animation loop, no cursor reaction.
+      initGrid();
+      paint();
+      window.addEventListener('resize', () => {
+        initGrid();
+        paint();
+      });
+      return;
+    }
+
+    let lastTime = performance.now();
+
+    function draw(time) {
+      let dt = (time - lastTime) / 1000;
+      if (dt > 0.05) dt = 0.05; // cap so a backgrounded tab can't jolt the grid
+      lastTime = time;
+
+      const fadeEase = Math.min(1, config.fadeSpeed * dt);
+      const followEase = Math.min(1, config.followSpeed * dt);
+      const engageEase = Math.min(1, config.engageSpeed * dt);
+      const focusEase = Math.min(1, config.focusSpeed * dt);
+
+      const travelX = mouse.x - mouse.prevX;
+      const travelY = mouse.y - mouse.prevY;
+      mouse.prevX = mouse.x;
+      mouse.prevY = mouse.y;
+      speed += (Math.sqrt(travelX * travelX + travelY * travelY) - speed) * 0.5;
+      if (speed < 0.01) speed = 0;
+
+      engagement += ((hover ? Math.min(speed / 6, 1) : 0) - engagement) * engageEase;
+      if (engagement < 0.001) engagement = 0;
+
+      // A parked cursor still holds the field open, just more gently.
+      const grip = hover ? 0.4 + 0.6 * engagement : 0;
+
+      const wantX = hover ? mouse.x : width / 2;
+      const wantY = hover ? mouse.y : height / 2;
+      const swungX = wantX - focusX;
+      const swungY = wantY - focusY;
+      let swung = swungX > 0.05 || swungX < -0.05 || swungY > 0.05 || swungY < -0.05;
+      if (swung) {
+        focusX += swungX * focusEase;
+        focusY += swungY * focusEase;
+      } else if (focusX !== wantX || focusY !== wantY) {
+        focusX = wantX;
+        focusY = wantY;
+        swung = true;
+      }
+
+      const wantPresence = hover ? 1 : 0;
+      const presenceDiff = wantPresence - presence;
+      if (presenceDiff > 0.002 || presenceDiff < -0.002) {
+        presence += presenceDiff * focusEase;
+        swung = true;
+      } else if (presence !== wantPresence) {
+        presence = wantPresence;
+        swung = true;
+      }
+
+      // Length and angle hang off those two, so they only need recomputing on
+      // the frames one of them actually moved.
+      if (swung) aim();
+
+      const crSq = config.cursorRadius * config.cursorRadius;
+      let moving = swung;
+
+      for (let i = 0; i < dots.length; i++) {
+        const dot = dots[i];
+
+        // Measured from the stroke's home, not its current position, or one
+        // that has moved toward the focus reads as closer and runs away into it.
+        const dx = focusX - dot.ox;
+        const dy = focusY - dot.oy;
+        const distSq = dx * dx + dy * dy;
+
+        let targetAlpha = 1;
+        let targetX = dot.ox;
+        let targetY = dot.oy;
+
+        if (distSq < crSq) {
+          const dist = Math.sqrt(distSq);
+
+          if (grip > 0.001) {
+            const t = 1 - dist / config.cursorRadius;
+            let push = t * t * config.pull * grip;
+            // A stroke must never reach the cursor: past it, it crosses to the
+            // far side and the field knots up around the pointer.
+            if (push > dist * 0.75) push = dist * 0.75;
+            const step = dist > 0.01 ? push / dist : 0;
+            targetX += dx * step;
+            targetY += dy * step;
+          }
+
+          if (dist < config.fadeRadius) {
+            const ft = dist / config.fadeRadius;
+            const hole = ft * ft * (3 - 2 * ft);
+            // Also the pointer's doing, so the resting grid keeps every dot.
+            targetAlpha = 1 - (1 - hole) * presence;
+          }
+        }
+
+        const offX = targetX - dot.x;
+        const offY = targetY - dot.y;
+        if (offX > 0.05 || offX < -0.05 || offY > 0.05 || offY < -0.05) {
+          dot.x += offX * followEase;
+          dot.y += offY * followEase;
+          moving = true;
+        } else if (dot.x !== targetX || dot.y !== targetY) {
+          dot.x = targetX;
+          dot.y = targetY;
+          moving = true;
+        }
+
+        const diff = targetAlpha - dot.alpha;
+        if (diff > 0.002 || diff < -0.002) {
+          dot.alpha += diff * fadeEase;
+          moving = true;
+        } else if (dot.alpha !== targetAlpha) {
+          dot.alpha = targetAlpha;
+          moving = true;
+        }
+      }
+
+      // A settled field is repainted zero times a second, not sixty.
+      if (moving) paint();
+      requestAnimationFrame(draw);
+    }
+
+    window.addEventListener('resize', initGrid);
+    initGrid();
+    requestAnimationFrame(draw);
+
+    section.addEventListener('mousemove', (e) => {
+      const rect = canvas.getBoundingClientRect();
+      const nx = e.clientX - rect.left;
+      const ny = e.clientY - rect.top;
+      if (!hover) {
+        // Re-entering: seed prev with the entry point, or the jump from the last
+        // position would register as a colossal cursor speed.
+        mouse.prevX = nx;
+        mouse.prevY = ny;
+      }
+      hover = true;
+      mouse.x = nx;
+      mouse.y = ny;
+    });
+
+    section.addEventListener('mouseleave', () => {
+      // Dropping `hover` is what matters: the focus starts its swing back to the
+      // centre, the strokes reel in and the pull lets go. Nothing reads the
+      // parked coordinates while `hover` is false, and re-entry reseeds them.
+      hover = false;
+      speed = 0;
+    });
+  });
+</script>

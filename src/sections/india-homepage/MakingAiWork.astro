@@ -1,0 +1,259 @@
+---
+/**
+ * "Clarity AI, by ClearTax: Making AI work for Finance" — Figma node
+ * 13275:28481.
+ *
+ * A three-tab control over a sticky card stack. The Figma only designs the
+ * "For CFO" panel — four agent cards — so that is the only panel with content;
+ * see the TODO on `tabs` below. The tab machinery is real either way, so
+ * filling the other two is a data-only change.
+ *
+ * STACK: pure CSS `position: sticky`, no scroll listener. Each wrapper sticks
+ * 12px below the one before it with a rising z-index, so every card leaves a
+ * sliver of the one behind visible — the same effect `WhyGenericAi.astro`
+ * builds on the Global homepage, without that section's scroll-driven scale
+ * (these cards are a single column and do not need the depth cue).
+ *
+ * IMPORTANT: no ancestor of `.ih-maiw-sticky` may set `overflow` to anything
+ * but `visible`, or sticky silently stops working.
+ *
+ * The active tab's label is Nova Blue. Figma reports `--vault-navy/600` at
+ * #1200FF there, which is an unresolved token in the export — the rendered
+ * design is the brand's Nova Blue (#5446FF), so that is what this uses.
+ */
+interface Card {
+  title: string;
+  /** The Nova Blue one-liner under the title. */
+  claim: string;
+  caption: string;
+}
+
+interface Tab {
+  id: string;
+  label: string;
+  cards: Card[];
+}
+
+const tabs: Tab[] = [
+  {
+    id: "cfo",
+    label: "For CFO",
+    cards: [
+      {
+        title: "CFO Dashboard Agent",
+        claim: "Walk into the monthly review with insights, not numbers.",
+        caption:
+          "Builds the CFO presentation from your data, in the format and narrative the tax team controls.",
+      },
+      {
+        title: "Tax Governance Agent",
+        claim: "An objective read on where you stand, not a self-assessment",
+        caption:
+          "Scores six dimensions: reconciliation health, ITC quality, notice exposure, invoice rejection rates, Table-4 accuracy and vendor compliance, with independent commentary on each, benchmarked against industry peers",
+      },
+      {
+        title: "Audit and Advisory Agent",
+        claim: "The monthly CA audit, on every entity, without adding headcount",
+        caption:
+          "Maps your GL, assess completeness, calculate an independent position and compare it to what you filed. Maps findings to known notice patterns to score risk.",
+      },
+      {
+        title: "Notice Dashboard Agent",
+        claim: "Notice tracking through your lens, not a generic dashboard",
+        caption:
+          "Combines ClearTax notice data with your own tracking rules. You define your own controls.",
+      },
+    ],
+  },
+  // TODO Copy pending. The Figma designs the "For CFO" panel only; these two
+  // render as empty panels until their cards are written. Add Card entries and
+  // nothing else has to change.
+  { id: "tax-teams", label: "For Tax Teams", cards: [] },
+  {
+    id: "controllers",
+    label: "For Finance Controllers and AP/AR",
+    cards: [],
+  },
+];
+---
+
+<section class="bg-generic-00 max-lg:py-12 lg:py-20" data-ih-maiw>
+  <div class="container mx-auto">
+    <div class="flex flex-col items-center gap-8">
+      <div class="flex flex-col items-center gap-6">
+        <div class="flex flex-col items-center gap-4 text-center">
+          <h2
+            class="m-0 font-heading font-medium text-vault-navy text-[length:var(--fs-h1)] leading-[length:var(--lh-h1)] tracking-[-0.5px]"
+          >
+            Clarity AI, by ClearTax: Making AI work for Finance
+          </h2>
+          <p
+            class="m-0 font-body text-neutral-500 text-[length:var(--fs-body-lg)] leading-[length:var(--lh-body-lg)] max-w-[597px]"
+          >
+            ClearTax gives you clean finance data and the business context AI
+            needs, so your finance team can build and use AI with confidence.
+          </p>
+        </div>
+
+        <div
+          class="ih-maiw-tablist flex flex-wrap items-center justify-center gap-1 rounded-xl bg-neutral-100 px-1 py-1.5"
+          role="tablist"
+          aria-label="Clarity AI agents by team"
+        >
+          {
+            tabs.map((tab, i) => (
+              <button
+                type="button"
+                role="tab"
+                id={`ih-maiw-tab-${tab.id}`}
+                class="ih-maiw-tab cursor-pointer rounded-lg border-0 bg-transparent px-6 py-2 text-center font-body text-[length:var(--fs-label)] leading-[length:var(--lh-label)] font-medium text-neutral-700"
+                aria-controls={`ih-maiw-panel-${tab.id}`}
+                aria-selected={i === 0 ? "true" : "false"}
+                tabindex={i === 0 ? "0" : "-1"}
+                data-ih-maiw-tab={tab.id}
+              >
+                {tab.label}
+              </button>
+            ))
+          }
+        </div>
+      </div>
+
+      <div class="w-full">
+        {
+          tabs.map((tab, i) => (
+            <div
+              id={`ih-maiw-panel-${tab.id}`}
+              class="ih-maiw-panel"
+              role="tabpanel"
+              aria-labelledby={`ih-maiw-tab-${tab.id}`}
+              hidden={i !== 0}
+              data-ih-maiw-panel={tab.id}
+            >
+              <div class="ih-maiw-stack mx-auto flex w-full max-w-[880px] flex-col gap-[30vh] md:gap-[45vh]">
+                {tab.cards.map((card, ci) => (
+                  <div
+                    class="ih-maiw-sticky sticky"
+                    style={`top:${96 + ci * 12}px;z-index:${ci};`}
+                  >
+                    <article class="flex w-full flex-col items-center gap-6 rounded-xl border border-[#DCDEE2] bg-generic-00 p-6">
+                      <div class="flex w-full flex-col items-center gap-2 text-center">
+                        <h3 class="m-0 font-heading font-medium text-vault-navy text-[length:var(--fs-h6)] leading-[length:var(--lh-h6)]">
+                          {card.title}
+                        </h3>
+                        <p class="m-0 font-body font-medium text-nova-blue text-[length:var(--fs-label)] leading-[length:var(--lh-body-sm)]">
+                          {card.claim}
+                        </p>
+                      </div>
+
+                      {/* Artwork slot. Figma ships it as the flat Visual
+                          Placeholder at 894x320; no image exists yet. */}
+                      <div class="ih-maiw-visual w-full rounded-lg bg-visual-placeholder" />
+
+                      <p class="m-0 w-full text-center font-body text-neutral-500 text-[length:var(--fs-label)] leading-[length:var(--lh-body-sm)]">
+                        {card.caption}
+                      </p>
+                    </article>
+                  </div>
+                ))}
+
+                {/* Tail room so the last card finishes sticking inside the
+                    section rather than under the one after it. */}
+                {tab.cards.length > 0 && <div class="h-20" />}
+              </div>
+            </div>
+          ))
+        }
+      </div>
+    </div>
+  </div>
+</section>
+
+<style is:global>
+  .ih-maiw-tab {
+    transition:
+      background-color 0.2s ease,
+      color 0.2s ease,
+      box-shadow 0.2s ease;
+  }
+
+  .ih-maiw-tab[aria-selected="true"] {
+    background-color: var(--color-generic-00);
+    color: var(--color-nova-blue);
+    box-shadow:
+      0 1px 2px 0 rgba(16, 24, 40, 0.04),
+      0 1px 2px 0 rgba(16, 24, 40, 0.04);
+  }
+
+  /* 894x320 in the design. An aspect ratio rather than a fixed height so the
+     slot keeps its proportions at every card width.
+
+     The cap is what keeps the stack inside the viewport — it is sticky, so
+     anything below the fold on the front card is unreachable. 340px is the
+     96px sticky top, the 36px of slivers behind, and the card's own padding,
+     title and caption. */
+  .ih-maiw-visual {
+    aspect-ratio: 894 / 320;
+    max-height: calc(100vh - 340px);
+  }
+
+  /* Sticky is an enhancement. Off, the cards read as a plain stack — so the
+     large scroll gaps, which exist only to give the stack travel, go too. */
+  @media (prefers-reduced-motion: reduce) {
+    .ih-maiw-stack {
+      gap: 2rem !important;
+    }
+    .ih-maiw-sticky {
+      position: static !important;
+    }
+  }
+</style>
+
+<script is:inline>
+  (function () {
+    const root = document.querySelector("[data-ih-maiw]");
+    if (!root) return;
+
+    const tabs = Array.from(root.querySelectorAll("[data-ih-maiw-tab]"));
+    const panels = Array.from(root.querySelectorAll("[data-ih-maiw-panel]"));
+    if (!tabs.length) return;
+
+    function select(id, focus) {
+      tabs.forEach((tab) => {
+        const on = tab.getAttribute("data-ih-maiw-tab") === id;
+        tab.setAttribute("aria-selected", on ? "true" : "false");
+        tab.setAttribute("tabindex", on ? "0" : "-1");
+        if (on && focus) tab.focus();
+      });
+      panels.forEach((panel) => {
+        panel.hidden = panel.getAttribute("data-ih-maiw-panel") !== id;
+      });
+    }
+
+    tabs.forEach((tab) => {
+      tab.addEventListener("click", () => {
+        select(tab.getAttribute("data-ih-maiw-tab"), false);
+      });
+    });
+
+    // Roving focus, per the WAI-ARIA tabs pattern: arrows move between tabs,
+    // Home/End jump to the ends. Without it the tablist is a keyboard trap of
+    // three separate stops that do not announce as one control.
+    root.querySelector(".ih-maiw-tablist").addEventListener("keydown", (e) => {
+      const current = tabs.findIndex(
+        (t) => t.getAttribute("aria-selected") === "true",
+      );
+      if (current < 0) return;
+
+      let next = -1;
+      if (e.key === "ArrowRight") next = (current + 1) % tabs.length;
+      else if (e.key === "ArrowLeft") next = (current - 1 + tabs.length) % tabs.length;
+      else if (e.key === "Home") next = 0;
+      else if (e.key === "End") next = tabs.length - 1;
+      if (next < 0) return;
+
+      e.preventDefault();
+      select(tabs[next].getAttribute("data-ih-maiw-tab"), true);
+    });
+  })();
+</script>

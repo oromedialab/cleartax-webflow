@@ -1,0 +1,152 @@
+---
+/**
+ * "Clarity AI produces outputs generic tools structurally cannot" — Figma node
+ * 13275:28484.
+ *
+ * A nine-row comparison: what Clarity AI does on the left, the artwork slot in
+ * the middle, what a general assistant does on the right.
+ *
+ * The Figma draws the column header as its own bordered box sitting on top of
+ * a separately-bordered row list. Here it is one bordered card with a header
+ * row inside it — identical rendering, one fewer element, and no seam to keep
+ * aligned between two boxes.
+ *
+ * The row divider is deliberately not a plain rule: it is two segments with a
+ * 240px gap, so the line passes behind the artwork column rather than through
+ * it.
+ *
+ * On narrow viewports the three columns stack, and each row repeats the two
+ * column headings above its own text — without them a stacked row is two
+ * sentences with nothing saying which side is which. The words are the header's
+ * own, so no new copy is introduced.
+ */
+interface Row {
+  title: string;
+  desc: string;
+  generic: string;
+}
+
+const rows: Row[] = [
+  {
+    title: "All finance data, in one place",
+    desc: "General Ledger. All filings and transactions, entity by entity",
+    generic: "Usually relies on your spreadsheets and connectors",
+  },
+  {
+    title: "Reads and Reconciles every record",
+    desc: "Millions of data points across your ERP, Data Lakes, GSTN, NIC and TRACES",
+    generic: 'Limited context window. Hallucinates based on a "sample data set"',
+  },
+  {
+    title: "Understands the law and applies it to your policy",
+    desc: "A computed position per document, from reversals to ITC eligibility",
+    generic: "It knows the law, but not how it applies to you",
+  },
+  {
+    title: "Knows how to classify the invoice",
+    desc: "Line items read against your ledger codes and vendor master",
+    generic: "Only reads the invoice",
+  },
+  {
+    title: "Sees your whole company",
+    desc: "Your position against peers, every GSTIN in one view",
+    generic: "Sees only the data you give it",
+  },
+  {
+    title: "Writes back to your systems",
+    desc: "Approved output posted to your ERP and the portal",
+    generic: "Gives you a spreadsheet, which you have to manually upload",
+  },
+  {
+    title: "Gives the same answer, always",
+    desc: "Deterministic output based on the same data",
+    generic: "Output varies by prompt",
+  },
+  {
+    title: "Runs automatically",
+    desc: "No need to prompt or ask",
+    generic: "Runs when asked",
+  },
+  {
+    title: "Maintains an audit trail",
+    desc: "Trail from every figure back to source",
+    generic: "None",
+  },
+];
+
+const OURS = "Clarity AI";
+const THEIRS = "General AI assistants";
+---
+
+<section class="bg-generic-00 max-lg:py-12 lg:py-20">
+  <div class="container mx-auto">
+    <div class="flex flex-col items-center gap-12">
+      <h2
+        class="m-0 max-w-[550px] text-center font-heading font-medium text-vault-navy text-[length:var(--fs-h1)] leading-[length:var(--lh-h1)] tracking-[-0.5px]"
+      >
+        Clarity AI produces outputs generic tools structurally cannot
+      </h2>
+
+      <div class="w-full overflow-hidden rounded-xl border border-[#CCCCCC]">
+        <div
+          class="flex items-center justify-between border-b border-[#CCCCCC] px-6 py-6"
+        >
+          <p
+            class="m-0 font-body font-medium text-nova-blue text-[length:var(--fs-body-lg)] leading-[length:var(--lh-body-lg)]"
+          >
+            {OURS}
+          </p>
+          <p
+            class="m-0 font-body font-medium text-vault-navy text-[length:var(--fs-body-lg)] leading-[length:var(--lh-body-lg)]"
+          >
+            {THEIRS}
+          </p>
+        </div>
+
+        {
+          rows.map((row, i) => (
+            <>
+              {i > 0 && (
+                <div
+                  class="flex items-center justify-between px-6 max-lg:px-0"
+                  aria-hidden="true"
+                >
+                  <span class="h-0.5 min-w-0 flex-1 rounded-full bg-[#F2F1F0]" />
+                  <span class="h-0.5 w-60 shrink-0 max-lg:hidden" />
+                  <span class="h-0.5 min-w-0 flex-1 rounded-full bg-[#F2F1F0] max-lg:hidden" />
+                </div>
+              )}
+
+              <div class="flex items-center gap-6 p-6 max-lg:flex-col max-lg:items-stretch">
+                <div class="flex min-w-0 flex-1 flex-col gap-2">
+                  <span class="font-body font-medium uppercase tracking-[1px] text-nova-blue text-[length:var(--fs-label-sm)] leading-[length:var(--lh-label-sm)] lg:hidden">
+                    {OURS}
+                  </span>
+                  <p class="m-0 font-heading font-medium text-vault-navy text-[length:var(--fs-h6)] leading-[length:var(--lh-h6)]">
+                    {row.title}
+                  </p>
+                  <p class="m-0 font-body text-neutral-500 text-[length:var(--fs-body)] leading-[length:var(--lh-body)]">
+                    {row.desc}
+                  </p>
+                </div>
+
+                {/* Artwork slot. Figma ships it as the flat Visual Placeholder
+                    at 160x160; no image exists for any row yet. */}
+                <div class="size-40 shrink-0 rounded-xl bg-visual-placeholder max-lg:size-24 max-lg:self-center" />
+
+                <div class="flex min-w-0 flex-1 flex-col gap-2">
+                  <span class="font-body font-medium uppercase tracking-[1px] text-neutral-500 text-[length:var(--fs-label-sm)] leading-[length:var(--lh-label-sm)] lg:hidden">
+                    {THEIRS}
+                  </span>
+                  <p class="m-0 font-body text-neutral-500 text-[length:var(--fs-body)] leading-[length:var(--lh-body)] lg:text-right">
+                    {row.generic}
+                  </p>
+                </div>
+              </div>
+            </>
+          ))
+        }
+      </div>
+    </div>
+  </div>
+</section>

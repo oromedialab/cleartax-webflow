@@ -1,0 +1,160 @@
+---
+/**
+ * Social proof strip — Figma node 13376:16967.
+ *
+ * Copy of `global-homepage/SocialProof.astro` — the two designs are identical.
+ * Copied, not shared: a page CSS entry only sources its own section folder.
+ *
+ * Two rows: a divided achievements line, then a marquee of logo tiles.
+ *
+ * Not built on `_shared/LogostripRb.astro` — that one ships its own H2
+ * ("Trusted by 5000+ Businesses Worldwide") and a gradient panel, neither of
+ * which this design has. The logo URLs are the Webflow-hosted set already used
+ * by `global-invoicing/Logostrip.astro`, not the Figma export URLs, which are
+ * temporary and expire in about a week.
+ */
+const achievements = [
+  { label: "100+ source systems", emphasis: false },
+  { label: "50+ countries", emphasis: false },
+  { label: "Trusted by 5000+ enterprises", emphasis: true },
+  { label: "2,000+ integrations", emphasis: false },
+  { label: "SOC 2 Type II", emphasis: false },
+];
+
+const logos: string[] = [
+  "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6a2fc5fd373e2872bd820152_brand-1-img.png",
+  "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6a2fc6046e7426adbd019ed6_brand-2-img.png",
+  "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6a2fc60a6c38dc1440e954cd_brand-3-img.png",
+  "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6a2fc6116c38dc1440e9643c_brand-4-img.png",
+  "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6a2fc61609b3bd73c0f39c81_brand-5-img.png",
+  "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6a2fc61c3ca1726d5e2aa651_brand-6-img.png",
+  "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6a2fc623c06d0a708d98acf5_brand-7-img.png",
+  "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6a2fc628ad92208b0c0d0bcf_brand-8-img.png",
+  "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6a2fc62fe6176c452e670d85_brand-9-img.png",
+  "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6a2fc63571c2777eb595fc0a_brand-10-img.png",
+  "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6a2fc63b994e6f0061916071_brand-11-img.png",
+  "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6a2fc6410183fdb4f4d5dc99_brand-12-img.png",
+  "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6a2fc646a365fcbc02c11af3_brand-13-img.png",
+  "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6a2fc64da365fcbc02c11de4_brand-14-img.png",
+  "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6a2fc654a4df647a7bb2f894_brand-15-img.png",
+  "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6a2fc65af3eec20e67f5cd1c_brand-16-img.png",
+  "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6a2fc661da8cceda23ec5615_brand-17-img.png",
+];
+
+const doubled = [...logos, ...logos];
+---
+
+<section class="bg-generic-00 py-6 overflow-hidden">
+  <div class="container mx-auto">
+    <div class="flex flex-col items-center gap-6">
+      <!-- Achievements -->
+      <div class="ih-sp-achievements relative w-full">
+        <ul
+          class="flex flex-wrap items-center justify-center gap-x-8 gap-y-2 list-none m-0 p-0 max-md:gap-x-5"
+        >
+          {
+            achievements.map((a, i) => (
+              <>
+                {i > 0 && (
+                  <li
+                    class="h-4 w-px shrink-0 rounded-full bg-[#CCCCCC] max-md:hidden"
+                    aria-hidden="true"
+                  />
+                )}
+                <li
+                  class:list={[
+                    "text-center font-body text-vault-navy",
+                    a.emphasis
+                      ? "text-[length:var(--fs-body-lg)] leading-[length:var(--lh-body-lg)] font-medium"
+                      : "text-[length:var(--fs-body)] leading-[length:var(--lh-body)]",
+                  ]}
+                >
+                  {a.label}
+                </li>
+              </>
+            ))
+          }
+        </ul>
+      </div>
+
+      <!-- Logo tiles -->
+      <div class="ih-sp-marquee relative w-full overflow-hidden">
+        <div class="ih-sp-track flex w-max items-center gap-2 motion-reduce:animate-none">
+          {
+            doubled.map((src, i) => (
+              <span class="flex h-12 w-[124px] shrink-0 items-center justify-center rounded-lg bg-[#F5F5F5]">
+                <img
+                  src={src}
+                  alt={i < logos.length ? "Customer logo" : ""}
+                  aria-hidden={i >= logos.length}
+                  class="h-[26px] w-[86px] object-contain mix-blend-multiply"
+                  loading="lazy"
+                  decoding="async"
+                />
+              </span>
+            ))
+          }
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style is:global>
+  /* Edge fade over the achievements line, matching the Figma "Gradient" layer. */
+  .ih-sp-achievements::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background: linear-gradient(
+      90deg,
+      #ffffff 0%,
+      rgba(255, 255, 255, 0) 5%,
+      rgba(255, 255, 255, 0) 95%,
+      #ffffff 100%
+    );
+  }
+
+  .ih-sp-marquee {
+    -webkit-mask-image: linear-gradient(
+      to right,
+      transparent 0%,
+      #000 6%,
+      #000 94%,
+      transparent 100%
+    );
+    mask-image: linear-gradient(
+      to right,
+      transparent 0%,
+      #000 6%,
+      #000 94%,
+      transparent 100%
+    );
+  }
+
+  .ih-sp-track {
+    animation: ih-sp-scroll 60s linear infinite;
+  }
+
+  .ih-sp-marquee:hover .ih-sp-track {
+    animation-play-state: paused;
+  }
+
+  /* The track holds the logo list twice, so translating by half its width
+     lands exactly on the duplicate and the loop is seamless. */
+  @keyframes ih-sp-scroll {
+    from {
+      transform: translateX(0);
+    }
+    to {
+      transform: translateX(-50%);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .ih-sp-track {
+      animation: none;
+    }
+  }
+</style>

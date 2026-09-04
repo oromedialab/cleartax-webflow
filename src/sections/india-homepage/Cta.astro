@@ -1,0 +1,483 @@
+---
+/**
+ * Closing CTA band — Figma node 13275:28538 ("Container - Partner program - WIP").
+ *
+ * Copy of `global-homepage/Cta.astro`; the heading and lede are identical in
+ * both designs and only the button label differs ("Book a tax AI assessment").
+ *
+ * Background is the same interactive stroke field as `Hero.astro`, not the
+ * static seven-column dot grid this section used to draw: a plain grid of dots
+ * until a pointer enters, at which point each dot draws out into a stroke aimed
+ * at the cursor, longest beside it and back to a dot by `lengthRadius`. Same
+ * four layers over it too — the page gradient on the section, a radial wash
+ * behind the copy, a mobile-only top fade, and a bottom fade.
+ *
+ * Two deliberate differences from the hero:
+ *   - `baseColor` stays this section's Nova Blue rather than the hero's Flux
+ *     Lime, so the band keeps the tint it was designed with. The geometry is
+ *     identical: lineWidth 2 + gap 24 is the same 26px pitch the old dot grid
+ *     used, so the field lands on the same lattice.
+ *   - The animation loop is gated on an IntersectionObserver. The hero's runs
+ *     unconditionally, and a second always-on 60fps loop on the same page is
+ *     worth not adding. Behaviour while the section is on screen is unchanged.
+ *
+ * Ids are `ih-cta-` prefixed: embeds share one namespace per page, and this
+ * canvas sits on the same page as the hero's.
+ */
+interface Props {
+  /** Stroke width, and so the diameter of the dot it becomes at rest. */
+  lineWidth?: number;
+  gap?: number;
+  /** Must stay under the grid pitch or the field knits into a mesh. */
+  maxLength?: number;
+  lengthRadius?: number;
+  /** Leave at 1 — a partial turn makes strokes flip as the cursor crosses them. */
+  tilt?: number;
+  baseColor?: string;
+  cursorRadius?: number;
+  pull?: number;
+  fadeRadius?: number;
+}
+
+const {
+  lineWidth = 2,
+  gap = 24,
+  maxLength = 6,
+  lengthRadius = 260,
+  tilt = 1,
+  baseColor = "rgba(84, 70, 255, 0.28)",
+  cursorRadius = 320,
+  pull = 14,
+  fadeRadius = 40,
+} = Astro.props;
+---
+
+<section
+  id="ih-cta"
+  class="ih-cta relative overflow-hidden bg-[linear-gradient(180deg,_#FFF_0%,_rgba(242,_241,_240,_0.25)_30.04%,_rgba(242,_241,_240,_0.25)_87.79%,_#FFF_100%)] max-lg:py-16 lg:py-[121px]"
+  data-line-width={String(lineWidth)}
+  data-gap={String(gap)}
+  data-max-length={String(maxLength)}
+  data-length-radius={String(lengthRadius)}
+  data-tilt={String(tilt)}
+  data-base-color={baseColor}
+  data-cursor-radius={String(cursorRadius)}
+  data-pull={String(pull)}
+  data-fade-radius={String(fadeRadius)}
+>
+  <!-- Interactive stroke field -->
+  <div class="absolute inset-0 z-0 w-full h-full pointer-events-none">
+    <canvas id="ih-cta-dots" class="absolute inset-0 w-full h-full"></canvas>
+  </div>
+
+  <!-- Radial wash, so the headline keeps its contrast over the field -->
+  <div
+    class="absolute inset-0 z-0 bg-[radial-gradient(circle_at_center,_rgba(255,255,255,1)_30%,_rgba(255,255,255,0.7)_40%,_rgba(255,255,255,0)_65%)] pointer-events-none"
+  >
+  </div>
+
+  <!-- Narrow viewports get a top fade instead, where the radial is too tight -->
+  <div
+    class="absolute inset-0 z-0 bg-gradient-to-b from-white/85 via-white/50 to-transparent hidden max-[630px]:block pointer-events-none"
+  >
+  </div>
+
+  <!-- Bottom fade, blending the field into the section below -->
+  <div
+    class="absolute bottom-0 inset-x-0 h-48 bg-gradient-to-t from-white via-white/50 to-transparent pointer-events-none z-0"
+  >
+  </div>
+
+  <div class="container mx-auto relative z-10">
+    <div class="mx-auto flex max-w-[791px] flex-col items-center gap-6 text-center">
+      <div class="flex flex-col items-center gap-4">
+        <h2
+          class="m-0 font-heading font-medium text-vault-navy text-[length:var(--fs-h2)] leading-[length:var(--lh-h2)] tracking-[-0.5px]"
+        >
+          Ready to put AI in the hands of your finance team?
+        </h2>
+        <p
+          class="m-0 font-body text-neutral-500 text-[length:var(--fs-body-lg)] leading-[length:var(--lh-body-lg)]"
+        >
+          No spam. A 30-minute call to help you unlock the first finance use-case you
+          can solve.
+        </p>
+      </div>
+
+      <!-- Opens the HubSpot modal from `DemoModal.astro`. The href is kept real
+           so the CTA still goes somewhere if that section is absent. -->
+      <a
+        href="https://www.cleartax.com/contact-us"
+        data-demo-open
+        class="inline-flex items-center justify-center gap-2 rounded-lg border border-nova-blue bg-nova-blue px-5 py-3.5 text-[length:var(--fs-label-lg)] leading-[length:var(--lh-label-lg)] font-medium text-nova-50 no-underline shadow-[0px_2px_3px_rgba(16,24,40,0.06)] transition-opacity duration-200 hover:opacity-90"
+      >
+        Book a tax AI assessment
+      </a>
+    </div>
+  </div>
+</section>
+
+<script is:inline>
+  /* Interactive stroke field — the same one as `global-homepage/Hero.astro`,
+     which took it from `sections/blog-listing/Newsletter.astro`. That file
+     carries the full explanation of the geometry; the numbers here come off the
+     section's data-* attributes so there is a single source for each.
+
+     The one change from the hero copy is the IntersectionObserver at the bottom:
+     this loop only runs while the band is on screen. */
+  document.addEventListener('DOMContentLoaded', () => {
+    const section = document.getElementById('ih-cta');
+    if (!section) return;
+    const canvas = document.getElementById('ih-cta-dots');
+    if (!canvas || !canvas.getContext) return;
+    const ctx = canvas.getContext('2d');
+
+    function num(name, fallback) {
+      const value = parseFloat(section.getAttribute(name));
+      return isNaN(value) ? fallback : value;
+    }
+
+    const config = {
+      lineWidth: num('data-line-width', 2),
+      gap: num('data-gap', 24),
+      maxLength: num('data-max-length', 6),
+      lengthRadius: num('data-length-radius', 260),
+      tilt: num('data-tilt', 1),
+      baseColor: section.getAttribute('data-base-color') || 'rgba(84, 70, 255, 0.28)',
+      cursorRadius: num('data-cursor-radius', 320),
+      pull: num('data-pull', 14),
+      fadeRadius: num('data-fade-radius', 40),
+      fadeSpeed: 12,
+      followSpeed: 7,
+      engageSpeed: 4,
+      focusSpeed: 5,
+    };
+
+    const HALF_PI = Math.PI / 2; // straight down — the resting angle
+
+    let width = 0;
+    let height = 0;
+    let dots = [];
+    const mouse = { x: -9999, y: -9999, prevX: -9999, prevY: -9999 };
+    let hover = false;
+    let speed = 0; // smoothed cursor travel, px per frame
+    let engagement = 0; // 0–1, how awake the field is
+    let presence = 0; // 0–1, whether a pointer is over the section at all
+    let focusX = 0;
+    let focusY = 0;
+
+    function initGrid() {
+      const parent = canvas.parentElement;
+      width = parent.offsetWidth;
+      height = parent.offsetHeight;
+      if (!width || !height) return;
+
+      const dpr = window.devicePixelRatio || 1;
+      canvas.width = Math.round(width * dpr);
+      canvas.height = Math.round(height * dpr);
+      // setTransform, not scale: scale() multiplies the existing matrix, so
+      // every resize would compound the DPR and shrink the grid.
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+      dots = [];
+      const spacing = config.lineWidth + config.gap;
+      const cols = Math.floor(width / spacing);
+      const rows = Math.floor(height / spacing);
+      const startX = (width - cols * spacing) / 2 + config.lineWidth / 2;
+      const startY = (height - rows * spacing) / 2 + config.lineWidth / 2;
+
+      for (let y = 0; y <= rows; y++) {
+        for (let x = 0; x <= cols; x++) {
+          const cx = startX + x * spacing;
+          const cy = startY + y * spacing;
+          // ox/oy is the stroke's home and the point it is drawn centred on;
+          // x/y is where that centre is now; hx/hy is half its segment vector.
+          dots.push({ x: cx, y: cy, ox: cx, oy: cy, alpha: 1, hx: 0, hy: 0 });
+        }
+      }
+
+      if (!hover) {
+        focusX = width / 2;
+        focusY = height / 2;
+      }
+      aim();
+    }
+
+    // Length and angle, both straight off the focus. The focus and `presence`
+    // are already eased, so neither needs easing here.
+    function aim() {
+      const longest = config.maxLength / 2;
+      const turn = presence * config.tilt;
+
+      for (let i = 0; i < dots.length; i++) {
+        const dot = dots[i];
+        const dx = focusX - dot.ox;
+        const dy = focusY - dot.oy;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+
+        // 1 at the pointer, 0 by `lengthRadius`. Scaled by `presence`, so with
+        // no cursor on the section every stroke is a plain dot.
+        let t = dist / config.lengthRadius;
+        if (t > 1) t = 1;
+        const grow = 1 - t;
+        let reach = longest * grow * grow * (3 - 2 * grow) * presence;
+        // A canvas subpath of exactly zero length is not reliably painted, even
+        // with a round cap. A quarter pixel is a dot and is always drawn.
+        if (reach < 0.25) reach = 0.25;
+
+        let ux = 0;
+        let uy = 1;
+
+        if (turn > 0.001 && dist > 0.01) {
+          // Folded into a quarter turn either side: a segment drawn about its
+          // centre looks the same pointed either way, so this takes the short
+          // way round. Only seamless because `turn` reaches 1 — scaling the
+          // angle by any fraction makes strokes flip as the cursor crosses them.
+          let off = Math.atan2(dy, dx) - HALF_PI;
+          while (off > HALF_PI) off -= Math.PI;
+          while (off < -HALF_PI) off += Math.PI;
+
+          const angle = HALF_PI + off * turn;
+          ux = Math.cos(angle);
+          uy = Math.sin(angle);
+        }
+
+        dot.hx = ux * reach;
+        dot.hy = uy * reach;
+      }
+    }
+
+    function paint() {
+      ctx.clearRect(0, 0, width, height);
+      ctx.strokeStyle = config.baseColor;
+      ctx.lineWidth = config.lineWidth;
+      ctx.lineCap = 'round'; // so a stroke shrunk to nothing reads as a dot
+
+      // Two passes. Only the strokes the cursor is touching have an alpha of
+      // their own; the rest of the field goes down as one path in one stroke
+      // call. Setting globalAlpha per stroke across the whole grid stutters.
+      ctx.globalAlpha = 1;
+      ctx.beginPath();
+      for (let i = 0; i < dots.length; i++) {
+        const dot = dots[i];
+        if (dot.alpha < 0.995) continue;
+        ctx.moveTo(dot.x - dot.hx, dot.y - dot.hy);
+        ctx.lineTo(dot.x + dot.hx, dot.y + dot.hy);
+      }
+      ctx.stroke();
+
+      for (let j = 0; j < dots.length; j++) {
+        const fading = dots[j];
+        if (fading.alpha >= 0.995 || fading.alpha < 0.01) continue;
+        ctx.globalAlpha = fading.alpha;
+        ctx.beginPath();
+        ctx.moveTo(fading.x - fading.hx, fading.y - fading.hy);
+        ctx.lineTo(fading.x + fading.hx, fading.y + fading.hy);
+        ctx.stroke();
+      }
+
+      ctx.globalAlpha = 1;
+    }
+
+    const reduceMotion =
+      window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    if (reduceMotion) {
+      // Static dot grid. No animation loop, no cursor reaction.
+      initGrid();
+      paint();
+      window.addEventListener('resize', () => {
+        initGrid();
+        paint();
+      });
+      return;
+    }
+
+    let lastTime = performance.now();
+    let running = false;
+
+    function draw(time) {
+      if (!running) return;
+
+      let dt = (time - lastTime) / 1000;
+      if (dt > 0.05) dt = 0.05; // cap so a backgrounded tab can't jolt the grid
+      lastTime = time;
+
+      const fadeEase = Math.min(1, config.fadeSpeed * dt);
+      const followEase = Math.min(1, config.followSpeed * dt);
+      const engageEase = Math.min(1, config.engageSpeed * dt);
+      const focusEase = Math.min(1, config.focusSpeed * dt);
+
+      const travelX = mouse.x - mouse.prevX;
+      const travelY = mouse.y - mouse.prevY;
+      mouse.prevX = mouse.x;
+      mouse.prevY = mouse.y;
+      speed += (Math.sqrt(travelX * travelX + travelY * travelY) - speed) * 0.5;
+      if (speed < 0.01) speed = 0;
+
+      engagement += ((hover ? Math.min(speed / 6, 1) : 0) - engagement) * engageEase;
+      if (engagement < 0.001) engagement = 0;
+
+      // A parked cursor still holds the field open, just more gently.
+      const grip = hover ? 0.4 + 0.6 * engagement : 0;
+
+      const wantX = hover ? mouse.x : width / 2;
+      const wantY = hover ? mouse.y : height / 2;
+      const swungX = wantX - focusX;
+      const swungY = wantY - focusY;
+      let swung = swungX > 0.05 || swungX < -0.05 || swungY > 0.05 || swungY < -0.05;
+      if (swung) {
+        focusX += swungX * focusEase;
+        focusY += swungY * focusEase;
+      } else if (focusX !== wantX || focusY !== wantY) {
+        focusX = wantX;
+        focusY = wantY;
+        swung = true;
+      }
+
+      const wantPresence = hover ? 1 : 0;
+      const presenceDiff = wantPresence - presence;
+      if (presenceDiff > 0.002 || presenceDiff < -0.002) {
+        presence += presenceDiff * focusEase;
+        swung = true;
+      } else if (presence !== wantPresence) {
+        presence = wantPresence;
+        swung = true;
+      }
+
+      // Length and angle hang off those two, so they only need recomputing on
+      // the frames one of them actually moved.
+      if (swung) aim();
+
+      const crSq = config.cursorRadius * config.cursorRadius;
+      let moving = swung;
+
+      for (let i = 0; i < dots.length; i++) {
+        const dot = dots[i];
+
+        // Measured from the stroke's home, not its current position, or one
+        // that has moved toward the focus reads as closer and runs away into it.
+        const dx = focusX - dot.ox;
+        const dy = focusY - dot.oy;
+        const distSq = dx * dx + dy * dy;
+
+        let targetAlpha = 1;
+        let targetX = dot.ox;
+        let targetY = dot.oy;
+
+        if (distSq < crSq) {
+          const dist = Math.sqrt(distSq);
+
+          if (grip > 0.001) {
+            const t = 1 - dist / config.cursorRadius;
+            let push = t * t * config.pull * grip;
+            // A stroke must never reach the cursor: past it, it crosses to the
+            // far side and the field knots up around the pointer.
+            if (push > dist * 0.75) push = dist * 0.75;
+            const step = dist > 0.01 ? push / dist : 0;
+            targetX += dx * step;
+            targetY += dy * step;
+          }
+
+          if (dist < config.fadeRadius) {
+            const ft = dist / config.fadeRadius;
+            const hole = ft * ft * (3 - 2 * ft);
+            // Also the pointer's doing, so the resting grid keeps every dot.
+            targetAlpha = 1 - (1 - hole) * presence;
+          }
+        }
+
+        const offX = targetX - dot.x;
+        const offY = targetY - dot.y;
+        if (offX > 0.05 || offX < -0.05 || offY > 0.05 || offY < -0.05) {
+          dot.x += offX * followEase;
+          dot.y += offY * followEase;
+          moving = true;
+        } else if (dot.x !== targetX || dot.y !== targetY) {
+          dot.x = targetX;
+          dot.y = targetY;
+          moving = true;
+        }
+
+        const diff = targetAlpha - dot.alpha;
+        if (diff > 0.002 || diff < -0.002) {
+          dot.alpha += diff * fadeEase;
+          moving = true;
+        } else if (dot.alpha !== targetAlpha) {
+          dot.alpha = targetAlpha;
+          moving = true;
+        }
+      }
+
+      // A settled field is repainted zero times a second, not sixty.
+      if (moving) paint();
+      requestAnimationFrame(draw);
+    }
+
+    function start() {
+      if (running) return;
+      running = true;
+      // Reseed, or the gap since the last visible frame lands as one huge dt.
+      lastTime = performance.now();
+      requestAnimationFrame(draw);
+    }
+
+    function stop() {
+      running = false;
+    }
+
+    // Paint once up front, and again after every resize. `draw` only repaints on
+    // frames where something actually moved, so without this the field stays
+    // blank until a pointer first enters the section — and on touch, where no
+    // mousemove ever fires, it would stay blank for good. The static dot grid
+    // this replaced was always visible; this keeps that. (`Hero.astro` has the
+    // same gap, and the same two lines would close it there.)
+    function rebuild() {
+      initGrid();
+      paint();
+    }
+
+    window.addEventListener('resize', rebuild);
+    rebuild();
+
+    // The gate. IntersectionObserver answers "is it on screen" and nothing else,
+    // which is exactly what starting and stopping the loop needs.
+    if ('IntersectionObserver' in window) {
+      const io = new IntersectionObserver(
+        (entries) => {
+          for (let i = 0; i < entries.length; i++) {
+            if (entries[i].isIntersecting) start();
+            else stop();
+          }
+        },
+        { rootMargin: '200px 0px' }
+      );
+      io.observe(section);
+    } else {
+      start();
+    }
+
+    section.addEventListener('mousemove', (e) => {
+      const rect = canvas.getBoundingClientRect();
+      const nx = e.clientX - rect.left;
+      const ny = e.clientY - rect.top;
+      if (!hover) {
+        // Re-entering: seed prev with the entry point, or the jump from the last
+        // position would register as a colossal cursor speed.
+        mouse.prevX = nx;
+        mouse.prevY = ny;
+      }
+      hover = true;
+      mouse.x = nx;
+      mouse.y = ny;
+    });
+
+    section.addEventListener('mouseleave', () => {
+      // Dropping `hover` is what matters: the focus starts its swing back to the
+      // centre, the strokes reel in and the pull lets go. Nothing reads the
+      // parked coordinates while `hover` is false, and re-entry reseeds them.
+      hover = false;
+      speed = 0;
+    });
+  });
+</script>
