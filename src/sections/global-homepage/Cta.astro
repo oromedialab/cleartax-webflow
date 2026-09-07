@@ -456,8 +456,21 @@ const {
 
     section.addEventListener('mousemove', (e) => {
       const rect = canvas.getBoundingClientRect();
-      const nx = e.clientX - rect.left;
-      const ny = e.clientY - rect.top;
+      // TWO SPACES, and `zoom` makes them different sizes.
+      // rect and clientX are RENDERED px. The grid lives in the canvas's own
+      // logical space, laid out by initGrid from parent.offsetWidth. shared.css
+      // zooms the body element between tablet and 1440px, so a pointer position
+      // carried straight across lands short by that factor — no error at the left
+      // edge, growing all the way across, which reads as the field ignoring the
+      // cursor on the right-hand side.
+      //
+      // The scale is derived from the two boxes rather than from the zoom value:
+      // that needs no knowledge of `zoom` and covers a CSS transform or any other
+      // sizing mismatch for free. Guarded because a hidden canvas measures 0.
+      const sx = rect.width ? width / rect.width : 1;
+      const sy = rect.height ? height / rect.height : 1;
+      const nx = (e.clientX - rect.left) * sx;
+      const ny = (e.clientY - rect.top) * sy;
       if (!hover) {
         // Re-entering: seed prev with the entry point, or the jump from the last
         // position would register as a colossal cursor speed.

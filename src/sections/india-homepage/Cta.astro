@@ -40,12 +40,12 @@ interface Props {
 }
 
 const {
-  lineWidth = 2,
+  lineWidth = 3,
   gap = 24,
   maxLength = 6,
   lengthRadius = 260,
   tilt = 1,
-  baseColor = "rgba(84, 70, 255, 0.28)",
+  baseColor = "rgba(84, 70, 255, 0.5)",
   cursorRadius = 320,
   pull = 14,
   fadeRadius = 40,
@@ -54,7 +54,7 @@ const {
 
 <section
   id="ih-cta"
-  class="ih-cta relative overflow-hidden bg-[linear-gradient(180deg,_#FFF_0%,_rgba(242,_241,_240,_0.25)_30.04%,_rgba(242,_241,_240,_0.25)_87.79%,_#FFF_100%)] max-lg:py-16 lg:py-[121px]"
+  class="ih-cta relative overflow-hidden bg-[linear-gradient(180deg,_#FFF_0%,_rgba(255,_255,_255,_0.00)_100%)] max-lg:py-16 lg:py-[121px] bg-generic-00"
   data-line-width={String(lineWidth)}
   data-gap={String(gap)}
   data-max-length={String(maxLength)}
@@ -72,19 +72,7 @@ const {
 
   <!-- Radial wash, so the headline keeps its contrast over the field -->
   <div
-    class="absolute inset-0 z-0 bg-[radial-gradient(circle_at_center,_rgba(255,255,255,1)_30%,_rgba(255,255,255,0.7)_40%,_rgba(255,255,255,0)_65%)] pointer-events-none"
-  >
-  </div>
-
-  <!-- Narrow viewports get a top fade instead, where the radial is too tight -->
-  <div
-    class="absolute inset-0 z-0 bg-gradient-to-b from-white/85 via-white/50 to-transparent hidden max-[630px]:block pointer-events-none"
-  >
-  </div>
-
-  <!-- Bottom fade, blending the field into the section below -->
-  <div
-    class="absolute bottom-0 inset-x-0 h-48 bg-gradient-to-t from-white via-white/50 to-transparent pointer-events-none z-0"
+    class="absolute inset-0 z-0 bg-[radial-gradient(circle_at_center,_#FFF_20%,_rgba(242,_241,_240,_0.25)_30.04%,_rgba(255,255,255,0)_65%)] pointer-events-none"
   >
   </div>
 
@@ -109,7 +97,7 @@ const {
       <a
         href="https://www.cleartax.com/contact-us"
         data-demo-open
-        class="inline-flex items-center justify-center gap-2 rounded-lg border border-nova-blue bg-nova-blue px-5 py-3.5 text-[length:var(--fs-label-lg)] leading-[length:var(--lh-label-lg)] font-medium text-nova-50 no-underline shadow-[0px_2px_3px_rgba(16,24,40,0.06)] transition-opacity duration-200 hover:opacity-90"
+        class="inline-flex items-center justify-center gap-2 rounded-lg border border-nova-blue bg-nova-blue px-5 py-3.5 text-[length:var(--fs-label-lg)] leading-[length:var(--lh-label-lg)] font-medium text-nova-50 no-underline shadow-[0px_2px_3px_rgba(16,24,40,0.06)] transition-all duration-200 hover:bg-nova-50 hover:text-nova-blue"
       >
         Book a tax AI assessment
       </a>
@@ -459,8 +447,21 @@ const {
 
     section.addEventListener('mousemove', (e) => {
       const rect = canvas.getBoundingClientRect();
-      const nx = e.clientX - rect.left;
-      const ny = e.clientY - rect.top;
+      // TWO SPACES, and `zoom` makes them different sizes.
+      // rect and clientX are RENDERED px. The grid lives in the canvas's own
+      // logical space, laid out by initGrid from parent.offsetWidth. shared.css
+      // zooms the body element between tablet and 1440px, so a pointer position
+      // carried straight across lands short by that factor — no error at the left
+      // edge, growing all the way across, which reads as the field ignoring the
+      // cursor on the right-hand side.
+      //
+      // The scale is derived from the two boxes rather than from the zoom value:
+      // that needs no knowledge of `zoom` and covers a CSS transform or any other
+      // sizing mismatch for free. Guarded because a hidden canvas measures 0.
+      const sx = rect.width ? width / rect.width : 1;
+      const sy = rect.height ? height / rect.height : 1;
+      const nx = (e.clientX - rect.left) * sx;
+      const ny = (e.clientY - rect.top) * sy;
       if (!hover) {
         // Re-entering: seed prev with the entry point, or the jump from the last
         // position would register as a colossal cursor speed.

@@ -60,7 +60,7 @@ const badges = [
 
 <section
   id="ih-hero"
-  class="ih-hero relative overflow-hidden bg-generic-00"
+  class="ih-hero relative overflow-hidden bg-generic-00 min-h-dvh"
   data-line-width={String(lineWidth)}
   data-gap={String(gap)}
   data-max-length={String(maxLength)}
@@ -78,19 +78,7 @@ const badges = [
 
   <!-- Radial wash, so the headline keeps its contrast over the field -->
   <div
-    class="absolute inset-0 z-0 bg-[radial-gradient(circle_at_center,_rgba(255,255,255,1)_30%,_rgba(255,255,255,0.7)_40%,_rgba(255,255,255,0)_65%)] pointer-events-none"
-  >
-  </div>
-
-  <!-- Narrow viewports get a top fade instead, where the radial is too tight -->
-  <div
-    class="absolute inset-0 z-0 bg-gradient-to-b from-white/85 via-white/50 to-transparent hidden max-[630px]:block pointer-events-none"
-  >
-  </div>
-
-  <!-- Bottom fade, blending the field into the section below -->
-  <div
-    class="absolute bottom-0 inset-x-0 h-48 bg-gradient-to-t from-white via-white/50 to-transparent pointer-events-none z-0"
+    class="absolute inset-0 z-0 bg-[radial-gradient(circle_at_center,_#FFF_0%,_rgba(242,_241,_240,_0.25)_30.04%,_rgba(255,255,255,0)_65%)] pointer-events-none"
   >
   </div>
 
@@ -190,7 +178,7 @@ const badges = [
     }
 
     const config = {
-      lineWidth: num('data-line-width', 2),
+      lineWidth: num('data-line-width', 3),
       gap: num('data-gap', 24),
       maxLength: num('data-max-length', 6),
       lengthRadius: num('data-length-radius', 260),
@@ -469,8 +457,21 @@ const badges = [
 
     section.addEventListener('mousemove', (e) => {
       const rect = canvas.getBoundingClientRect();
-      const nx = e.clientX - rect.left;
-      const ny = e.clientY - rect.top;
+      // TWO SPACES, and `zoom` makes them different sizes.
+      // rect and clientX are RENDERED px. The grid lives in the canvas's own
+      // logical space, laid out by initGrid from parent.offsetWidth. shared.css
+      // zooms the body element between tablet and 1440px, so a pointer position
+      // carried straight across lands short by that factor — no error at the left
+      // edge, growing all the way across, which reads as the field ignoring the
+      // cursor on the right-hand side.
+      //
+      // The scale is derived from the two boxes rather than from the zoom value:
+      // that needs no knowledge of `zoom` and covers a CSS transform or any other
+      // sizing mismatch for free. Guarded because a hidden canvas measures 0.
+      const sx = rect.width ? width / rect.width : 1;
+      const sy = rect.height ? height / rect.height : 1;
+      const nx = (e.clientX - rect.left) * sx;
+      const ny = (e.clientY - rect.top) * sy;
       if (!hover) {
         // Re-entering: seed prev with the entry point, or the jump from the last
         // position would register as a colossal cursor speed.

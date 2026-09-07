@@ -8,9 +8,14 @@
  * this as two variants, state "1" and state "3": in state 1 only the first card
  * is focused and the rail is part-filled in Nova Blue; in state 3 all three are
  * focused, the rail is full and turns Flux Lime, and the closing pill fades in.
- * Both are reproduced as one scroll-driven progression — a card latches on when
- * it reaches the middle of the viewport and stays latched, which is what makes
- * the end state equal state 3.
+ * Both are reproduced as one scroll-driven progression, with one deliberate
+ * departure: the CARD FOCUS TRACKS THE SCROLL BOTH WAYS rather than latching.
+ * A card takes the Nova Blue border while it is the one being read and gives it
+ * back on the way past, so exactly one card is focused at a time and scrolling
+ * up genuinely reverses. State 3's "all three focused at once" is therefore not
+ * reachable — that was the latch, and a latch left every border blue on the way
+ * back while the rail and pill (recomputed per frame) had already unwound.
+ * The rail filling and its flip to Flux Lime still reproduce state 3 exactly.
  *
  * Without JS every card renders in its resting border and the rail sits empty;
  * the content is unaffected.
@@ -308,13 +313,24 @@ const steps: Step[] = [
     }
 
     // ---- Cards -----------------------------------------------------------
-    // Latch-only: once a step is reached it stays active, so scrolling back up
-    // does not unwind it. That matches the Figma, where state 3 is an end
-    // state rather than a hover.
+    // Tracks BOTH ways: a step takes the Nova Blue border while it is the one
+    // being read and returns to its resting grey on the way back up.
+    //
+    // This used to latch on first crossing, on the reading that Figma's state 3
+    // is an end state. It was the only thing here that behaved that way — the
+    // rail and the closing pill are recomputed from the rect on every frame in
+    // draw(), so they already unwound while the borders stayed blue. Scrolling
+    // back therefore left every card focused at once, which is not a state the
+    // design has.
+    //
+    // The observation band is the middle 10% of the viewport, which on any
+    // normal window is taller than the 48px gap between cards — so at a handover
+    // both neighbours overlap the band briefly rather than leaving a frame with
+    // nothing focused at all.
     const stepObserver = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
-          if (entry.isIntersecting) entry.target.classList.add("is-active");
+          entry.target.classList.toggle("is-active", entry.isIntersecting);
         });
       },
       // Fires when the step crosses the vertical middle of the viewport.
