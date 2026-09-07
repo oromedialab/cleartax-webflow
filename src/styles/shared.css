@@ -44,6 +44,39 @@ body {
   overflow-x: hidden;
 }
 
+/* ==========================================================================
+   Page zoom — tablet up to the 1440px design width
+   ==========================================================================
+   The Figma frames are 1440px wide around 1280px of content, so a 1280px or
+   1366px laptop renders a layout with nothing to spare. Scaling the page to
+   --page-zoom gives that width back instead of reflowing a design that was
+   never drawn for it. Set --page-zoom to 1 in tokens.css to turn it off.
+
+   On `body`, not `html`: fixed and sticky positioning inside a zoomed subtree
+   scales with it, so the navbar and every pinned section keep their proportions
+   relative to each other. Zooming `html` instead puts the fixed navbar outside
+   the zoom and it would stay full size over shrunken content.
+
+   Bounds are literals because media query bounds cannot read custom properties.
+   The 1439.98 upper bound stops it colliding with a 1440px window; the 768px
+   floor is the tablet breakpoint, below which the layout is single-column and
+   already sized for the screen.
+
+   TWO CONSEQUENCES worth knowing, neither of them breakage:
+     - Media queries still evaluate against the TRUE viewport, so a 1280px
+       window matches `lg:` and the 1280px pin query in MakingAiWork exactly as
+       it did — but content now lays out in 1600px of zoomed space. Breakpoints
+       and layout width no longer agree.
+     - `100vh` inside the zoom renders at --page-zoom of the real viewport, so
+       the card budgets in MakingAiWork, WhyGenericAi and Invoice fill 80% of
+       the screen rather than all of it. They stay inside the viewport, which is
+       what they were protecting; they just leave some room spare. */
+@media (min-width: 768px) and (max-width: 1439.98px) {
+  body {
+    zoom: var(--page-zoom, 1);
+  }
+}
+
 h1, h2, h3, h4, h5, h6 {
   font-family: var(--font-heading);
   letter-spacing: var(--tracking-heading);

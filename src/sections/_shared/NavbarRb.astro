@@ -220,7 +220,7 @@ function toBlocks(items: NavChild[]): Block[] {
               href={ctaHref}
               data-nav-cta
               data-demo-open={demoOpenAttr}
-              class="hidden sm:inline-flex items-center justify-center gap-2 px-5 py-3.5 text-[length:var(--fs-label-lg)] leading-[length:var(--lh-label-lg)] font-medium text-nova-50 bg-nova-blue border border-nova-blue rounded-lg whitespace-nowrap no-underline shadow-[0px_2px_3px_rgba(16,24,40,0.06)] transition-opacity duration-200 hover:opacity-90"
+              class="hidden sm:inline-flex items-center justify-center gap-2 px-5 py-3.5 text-[length:var(--fs-label-lg)] leading-[length:var(--lh-label-lg)] font-medium text-nova-50 bg-nova-blue border border-nova-blue rounded-lg whitespace-nowrap no-underline shadow-[0px_2px_3px_rgba(16,24,40,0.06)] transition-all duration-200 hover:bg-nova-50 hover:text-nova-blue"
             >
               {ctaLabel}
             </a>
@@ -275,7 +275,7 @@ function toBlocks(items: NavChild[]): Block[] {
                             // apply between the button and the zero-height
                             // container while collapsed, leaving a phantom 12px
                             // under every closed group. The spacing lives on the
-                            // collapsible child (`pt-3`) so it collapses with it.
+                            // collapsible child (`py-3`) so it collapses with it.
                             <div class="group/sub flex flex-col" data-nav-sub>
                               <button
                                 type="button"
@@ -306,9 +306,20 @@ function toBlocks(items: NavChild[]): Block[] {
                                 <div class="overflow-hidden">
                                   {/* No indent — the design runs children flush with
                                       the parent, so the parent reads as a label over
-                                      its group rather than a branch. pt-3 rather than
-                                      a gap on the wrapper, so it collapses too. */}
-                                  <ul class="list-none m-0 p-0 pt-3 flex flex-col gap-3">
+                                      its group rather than a branch.
+
+                                      py-3 sets the open group off from the chevron
+                                      row above it and the next block below, so the
+                                      revealed children read as belonging to their
+                                      parent rather than continuing the column. It is
+                                      padding HERE rather than a gap on the collapse
+                                      wrapper because only this element is inside the
+                                      0fr/1fr grid row — on the wrapper it would apply
+                                      while collapsed too, leaving a phantom 24px under
+                                      every closed group. Kept on the panel's 12px step
+                                      so an open group still lands on the same rhythm
+                                      as everything around it. */}
+                                  <ul class="list-none m-0 p-0 py-3 flex flex-col gap-3">
                                     {block.item.children!.map((c) => (
                                       <li>
                                         <a href={c.href} class="block no-underline font-body text-neutral-500 text-[length:var(--fs-body-lg)] leading-[length:var(--lh-body-lg)] transition-colors hover:text-nova-blue">
@@ -349,7 +360,7 @@ function toBlocks(items: NavChild[]): Block[] {
               <a
                 href={ctaHref}
                 data-demo-open={demoOpenAttr}
-                class="sm:hidden inline-flex items-center justify-center w-full gap-2 mt-6 px-5 py-3.5 text-[length:var(--fs-label-lg)] leading-[length:var(--lh-label-lg)] font-medium text-nova-50 bg-nova-blue rounded-lg no-underline transition-opacity duration-200 hover:opacity-90"
+                class="sm:hidden inline-flex items-center justify-center w-full gap-2 mt-6 px-5 py-3.5 text-[length:var(--fs-label-lg)] leading-[length:var(--lh-label-lg)] font-medium text-nova-50 bg-nova-blue rounded-lg no-underline transition-all duration-200 hover:bg-nova-50 hover:text-nova-blue"
               >
                 {ctaLabel}
               </a>
@@ -445,26 +456,13 @@ function toBlocks(items: NavChild[]): Block[] {
     let closeTimer;
     const cancelClose = () => clearTimeout(closeTimer);
 
-    // Groups showing because the cursor is on them. Same pin rule as the two
-    // panels: hover-opened auto-closes on the way out, click-opened stays.
-    const hoverOpenedSubs = new Set();
-    const subCloseTimers = new Map();
-    const cancelSubClose = (item) => {
-      clearTimeout(subCloseTimers.get(item));
-      subCloseTimers.delete(item);
-    };
-
     // Collapse every submenu, so reopening the panel is always a clean slate
-    // rather than whatever the last visitor left expanded.
+    // rather than whatever the last visitor left expanded. No hover bookkeeping
+    // to clear — the groups are click-only, see the subItems loop below.
     const resetSubs = () => {
       subItems.forEach((item) => {
         item.classList.remove("open");
         item.querySelector("[data-sub-trigger]")?.setAttribute("aria-expanded", "false");
-        // Clear the hover bookkeeping too, or a group pinned in the last session
-        // would still count as pinned the next time the panel opens.
-        hoverOpenedSubs.delete(item);
-        clearTimeout(subCloseTimers.get(item));
-        subCloseTimers.delete(item);
       });
     };
 
@@ -553,44 +551,18 @@ function toBlocks(items: NavChild[]): Block[] {
         ?.setAttribute("aria-expanded", open ? "true" : "false");
     };
 
+    // CLICK ONLY, unlike the two panels above, which keep hover-to-open. A group
+    // sits inside an already open panel, so opening on hover meant reading down
+    // a column expanded every group the cursor crossed on the way — the panel
+    // rearranging itself under a pointer that was only passing through. The
+    // chevron already advertises a click; that is now the whole interaction.
+    //
+    // No pin bookkeeping either: with nothing opening on hover, a click can
+    // always just toggle.
     subItems.forEach((item) => {
-      const trigger = item.querySelector("[data-sub-trigger]");
-
-      trigger?.addEventListener("click", (e) => {
+      item.querySelector("[data-sub-trigger]")?.addEventListener("click", (e) => {
         e.preventDefault();
-        // Open by hover already — pin it rather than toggling it shut.
-        if (hoverOpenedSubs.has(item)) {
-          hoverOpenedSubs.delete(item);
-          return;
-        }
         setSubOpen(item, !item.classList.contains("open"));
-      });
-
-      if (!canHover) return;
-
-      item.addEventListener("mouseenter", () => {
-        cancelClose();
-        cancelSubClose(item);
-        if (item.classList.contains("open")) return;
-        hoverOpenedSubs.add(item);
-        setSubOpen(item, true);
-      });
-
-      // The children live inside this same element, so moving from the parent
-      // row down into them never fires mouseleave — only actually leaving the
-      // group does. The delay covers a cursor that clips the edge in transit,
-      // and re-entering cancels it.
-      item.addEventListener("mouseleave", () => {
-        if (!hoverOpenedSubs.has(item)) return;
-        cancelSubClose(item);
-        subCloseTimers.set(
-          item,
-          setTimeout(() => {
-            setSubOpen(item, false);
-            hoverOpenedSubs.delete(item);
-            subCloseTimers.delete(item);
-          }, 160),
-        );
       });
     });
 

@@ -98,7 +98,10 @@ const LEDE =
     >
       {
         cards.map((card, i) => (
-          <div class="gh-why-sticky sticky" style={`top:${100 + i * 16}px;z-index:${i};`}>
+          <div
+            class="gh-why-sticky sticky"
+            style={`top:calc(var(--nav-clear, 112px) + ${i * 16}px);z-index:${i};`}
+          >
             {i === 0 && (
               <div
                 id="gh-why-header"
@@ -187,20 +190,24 @@ const LEDE =
      captions at the bottom of the front card are unreachable — it is sticky, so
      you cannot scroll to them.
 
-       top offset (100px, clears the fixed navbar) + header + card
+       top offset (--nav-clear, clears the fixed navbar) + header + card
          + 16px sliver x 4 cards behind  <=  100vh
 
-     The stuck-header regime therefore subtracts 380px, not 300px: 100 top + ~212
-     header + 64 slivers. The old 300px under-counted by ~76px, which is why the
-     card overflowed the window at every height below ~940px. With the header
-     scrolled away there is no header to pay for, so 190px is enough. */
+     The top offset is subtracted as the token rather than folded into the
+     constant, so raising the site-wide clearance shrinks this budget by the
+     same amount instead of silently pushing the card past the fold.
+
+     The stuck-header regime therefore subtracts the clearance + 280px: ~212
+     header + 64 slivers. The old flat 300px under-counted by ~76px, which is
+     why the card overflowed the window at every height below ~940px. With the
+     header scrolled away there is no header to pay for, so 90px is enough. */
   .gh-why-card {
-    --gh-why-card-h: clamp(300px, calc(100vh - 190px), 560px);
+    --gh-why-card-h: clamp(300px, calc(100vh - var(--nav-clear, 112px) - 90px), 560px);
   }
 
   @media (min-height: 860px) {
     .gh-why-card {
-      --gh-why-card-h: clamp(380px, calc(100vh - 380px), 560px);
+      --gh-why-card-h: clamp(380px, calc(100vh - var(--nav-clear, 112px) - 280px), 560px);
     }
   }
 
@@ -239,30 +246,70 @@ const LEDE =
     const STACK_OFFSET = 16; // visible sliver of each card behind the next
     const REVEAL_DISTANCE = 260; // scroll px the shrink takes once the next card closes in
 
+    // Navbar clearance, from the shared token rather than a number of its own —
+    // every pinned section on the site reads the same one. The fallback matches
+    // the token so a missing shared.css degrades to the same offset.
+    const NAV_CLEAR =
+      parseFloat(
+        getComputedStyle(document.documentElement).getPropertyValue("--nav-clear"),
+      ) || 112;
+
     // Card 0 shrinks most, each subsequent one less; the last never shrinks.
     const targetScaleFor = (i) => 0.88 + i * 0.03;
 
+    // TWO UNITS, and they are not the same one under `zoom`.
+    // getBoundingClientRect() and window.innerHeight/innerWidth are RENDERED
+    // pixels — what is on the glass. getComputedStyle().top, NAV_CLEAR,
+    // STACK_OFFSET and anything written to `style.top` are CSS pixels.
+    // shared.css puts `zoom` on the `body` element between tablet and 1440px, so the two
+    // differ by that factor and this file mixes them in both directions: it
+    // compares a rect against a computed top, and it derives a style.top from
+    // rect measurements. Unconverted, the stack pinned at the wrong offsets and
+    // the shrink triggered at the wrong scroll position.
+    //
+    // Walked rather than read off the `body` element, because zoom multiplies down the tree.
+    const zoomFactor = () => {
+      let z = 1;
+      for (let n = stack; n && n.nodeType === 1; n = n.parentElement) {
+        const v = parseFloat(getComputedStyle(n).zoom);
+        // Unsupported -> NaN, unset -> 1. Both mean "no scaling here".
+        if (v && v !== 1) z *= v;
+      }
+      return z;
+    };
+
+    // Recomputed by handleLayoutShift, which covers crossing the 1440px bound
+    // where the zoom switches off.
+    let zoom = zoomFactor();
+
     const setTops = () => {
+      zoom = zoomFactor();
+
       // Clear the transform first, or the measured offset includes the scale.
       const originalTransform = inners[0].style.transform;
       inners[0].style.transform = "none";
 
       // Measure how far the card actually sits inside its wrapper, rather than
       // assuming — this absorbs a wrapped heading, late fonts, anything.
+      // Converted to CSS px at the point of measurement, so everything below
+      // this line is CSS px and matches what style.top expects.
       const outerTop = outers[0].getBoundingClientRect().top;
       const innerTop = inners[0].getBoundingClientRect().top;
-      const cardOffset = innerTop - outerTop;
+      const cardOffset = (innerTop - outerTop) / zoom;
 
       inners[0].style.transform = originalTransform;
 
-      let firstTop = 100;
+      let firstTop = NAV_CLEAR;
 
-      // Centre the whole stack vertically once there is room for it.
+      // Centre the whole stack vertically once there is room for it. The
+      // breakpoint test stays in RENDERED px — it is asking about the window,
+      // not the layout, the same question a media query asks.
       if (window.innerWidth >= 1280) {
-        const cardHeight = inners[0].getBoundingClientRect().height;
+        const cardHeight = inners[0].getBoundingClientRect().height / zoom;
         const totalStackHeight =
           cardOffset + cardHeight + (outers.length - 1) * STACK_OFFSET;
-        firstTop = Math.max(100, (window.innerHeight - totalStackHeight) / 2);
+        const viewportCss = window.innerHeight / zoom;
+        firstTop = Math.max(NAV_CLEAR, (viewportCss - totalStackHeight) / 2);
       }
 
       outers[0].style.top = firstTop + "px";
@@ -291,9 +338,13 @@ const LEDE =
         // sticky clamps rect.top at the element's own `top` once stuck and keeps
         // decreasing before that, so this distance falls to 0 and stays there
         // the moment card i+1 is fully stuck. No extra bookkeeping needed.
-        const nextStickyTopPx = parseFloat(getComputedStyle(outers[i + 1]).top) || 0;
+        // Scaled into RENDERED px to match `tops`, which came from rects.
+        const nextStickyTopPx =
+          (parseFloat(getComputedStyle(outers[i + 1]).top) || 0) * zoom;
         const distanceToStick = tops[i + 1] - nextStickyTopPx;
 
+        // REVEAL_DISTANCE is a scroll distance, and scrolling is in rendered px,
+        // so both sides of this ratio are already in the same unit.
         const progress = Math.min(1, Math.max(0, 1 - distanceToStick / REVEAL_DISTANCE));
         const scale = 1 - progress * (1 - targetScaleFor(i));
         inner.style.transform = `scale(${scale.toFixed(4)})`;

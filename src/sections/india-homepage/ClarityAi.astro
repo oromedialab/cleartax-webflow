@@ -332,6 +332,35 @@ const steps: Step[] = [
     // view, and the page carries no scroll listener at all.
     if (!rail || !fill) return;
 
+    // TWO UNITS, and they are not the same one under `zoom`.
+    // getBoundingClientRect() and window.innerHeight are RENDERED pixels — what
+    // is actually on the glass. A length written to `style` is a CSS pixel, and
+    // shared.css puts `zoom` on the `body` element between tablet and 1440px, so a CSS pixel
+    // renders smaller than one of those. Measuring in rendered px and writing
+    // the same number back as CSS px drew the rail short by exactly the zoom
+    // factor, which is why the line stopped tracking the scroll position.
+    //
+    // Walked rather than read off the `body` element, because zoom multiplies down the tree
+    // and this has to survive a zoomed ancestor anywhere above the rail.
+    const zoomFactor = () => {
+      let z = 1;
+      for (let n = rail; n && n.nodeType === 1; n = n.parentElement) {
+        const v = parseFloat(getComputedStyle(n).zoom);
+        // Unsupported -> NaN, unset -> 1. Both mean "no scaling here".
+        if (v && v !== 1) z *= v;
+      }
+      return z;
+    };
+
+    // Cached: the walk is a handful of getComputedStyle calls and this runs on
+    // every animation frame. Only a resize can change it — including crossing
+    // the 1440px bound where the zoom switches off.
+    let zoom = zoomFactor();
+    window.addEventListener("resize", () => {
+      zoom = zoomFactor();
+      last = -1; // force the next frame to rewrite at the new scale
+    });
+
     let running = false;
     let frame = 0;
     let last = -1;
@@ -341,15 +370,17 @@ const steps: Step[] = [
 
       // The progress marker is the middle of the viewport, so the rail is
       // filled to exactly the point being read — and it tracks scrolling up as
-      // well as down.
+      // well as down. Rendered px on both sides of the comparison.
       const filled = Math.min(r.height, Math.max(0, window.innerHeight / 2 - r.top));
 
       // Skip the write when the value has not moved, so an idle tab in view
       // costs a rect read and nothing else.
       if (filled !== last) {
         last = filled;
-        fill.style.height = filled + "px";
-        // 1px of slack so the flip to Flux Lime does not chatter at the end.
+        // Back into CSS px on the way out, so it RENDERS at `filled`.
+        fill.style.height = filled / zoom + "px";
+        // Both rendered px, so this one needs no conversion. 1px of slack so the
+        // flip to Flux Lime does not chatter at the end.
         root.classList.toggle("is-complete", r.height > 0 && filled >= r.height - 1);
       }
 

@@ -276,7 +276,33 @@
     /* ======================================================================
        LAYOUT
        ====================================================================== */
-    --navbar-height: 72px;
+    --navbar-height: 72px;     /* v1 NavbarGlobal only — not the brand v2 bar */
+
+    /* Offset a pinned element needs to clear the brand v2 navbar.
+       NavbarRb is `fixed top-4` around a 66px card (2px border + 8px padding +
+       a 46px control row, twice over), so its bottom edge lands at 82px. The
+       remaining 30px is breathing room.
+
+       Every sticky section reads this instead of carrying its own number.
+       They used to hardcode 88px (MakingAiWork, Outputs) and 100px (Invoice,
+       WhyGenericAi), which left 6px and 18px of air — visibly too tight. Change
+       it here and all four move together; each use site keeps a matching
+       fallback so a missing shared.css degrades to the same value rather than
+       to nothing. */
+    --nav-clear: 112px;
+
+    /* Page zoom for windows between tablet and the 1440px design width. The
+       mockups are drawn to 1280px of content inside a 1440px frame, so a 1280px
+       laptop has no room to spare; scaling the page down buys it back rather
+       than reflowing a layout that was never drawn for that width. 1 turns it
+       off, which is the way to disable it without touching the rule.
+
+       Only the VALUE lives here. The 768px–1440px bounds cannot: media query
+       bounds are evaluated before custom properties resolve, so `@media
+       (min-width: var(--x))` is invalid. They are literals in shared.css, which
+       is also where the rule that applies this belongs. */
+    --page-zoom: 0.85;
+
     --container-max: 1328px;   /* applied via @utility container in shared.css */
 
     /* ======================================================================

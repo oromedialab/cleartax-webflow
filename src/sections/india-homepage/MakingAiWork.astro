@@ -15,11 +15,35 @@
  * tab/tabpanel. There are no panels — there is one deck, and the pills report
  * position in it.
  *
- * SLIVER OFFSET is clamped at four (see `STACK_DEPTH`). Each card sits 12px
- * below the one behind so the stack has visible depth, but eleven cards at 12px
- * would push the front card 120px down the viewport and eat the height the card
- * needs. Past the fourth, cards pin at the same offset and cover each other
- * exactly; the deck reads as three slivers plus a front card the whole way.
+ * SLIVER OFFSET is a ROLLING WINDOW four deep (see `STACK_DEPTH`). Each card
+ * sits 12px below the one behind so the stack has visible depth, but eleven
+ * cards at 12px would push the front card 120px down the viewport and eat the
+ * height the card needs. So the window holds at four: the front card plus the
+ * three most recent behind it, and the fourth-oldest tucks in behind the last
+ * sliver where it cannot be seen.
+ *
+ * The window has to ROLL, which is why the depth index is the one piece of
+ * geometry the script owns rather than the stylesheet. `position: sticky` pins
+ * an element at a fixed `top`, so a card that pinned at the front offset would
+ * stay there forever; a card's distance from the front changes as the deck
+ * advances, so its offset has to change with it. On each change of front card
+ * the script rewrites every slide's `--ih-maiw-i` to `depth - (front - i)`,
+ * floored at 0 — the whole stack shifts up one step and the card that fell out
+ * of the window lands under the last sliver. CSS still owns what a step is
+ * worth and where the stack pins; JS only says how deep each card currently is.
+ *
+ * DEPTH ALSO READS AS SIZE, following `global-homepage/WhyGenericAi.astro`:
+ * each step back is 0.03 smaller (that file's interval), so the slivers sit
+ * progressively inset instead of being three identical white strips. It is the
+ * same `behind` count that sets the step, so the two cannot disagree. Only the
+ * inner `.ih-maiw-card` is transformed — the sticky wrapper is what the script
+ * measures, and a scaled element would feed its transform into the next
+ * measurement. That is the whole reason for the two layers, and it is why
+ * WhyGenericAi is built the same way.
+ *
+ * Without JS the inline `--ih-maiw-i` leaves the deck in the old fixed clamp,
+ * which is a correct still frame of the same design: three slivers and a front
+ * card, just not rolling.
  *
  * IMPORTANT: no ancestor of `.ih-maiw-sticky` may set `overflow` to anything
  * but `visible`, or sticky silently stops working. The pill bar's own
@@ -146,7 +170,11 @@ const groups: Group[] = [
   },
 ];
 
-/** Slivers stop accumulating after this many cards. See the note above. */
+/**
+ * How many slivers sit behind the front card — the depth of the rolling window.
+ * Published to CSS as `--ih-maiw-depth` on the section so the script reads it
+ * back rather than restating it, the same way `--ih-maiw-pin-intro` works.
+ */
 const STACK_DEPTH = 3;
 
 /* One flat deck. The group only survives as a tag on each slide — it is what
@@ -161,7 +189,11 @@ const slides = groups.flatMap((group) =>
 );
 ---
 
-<section class="ih-maiw bg-generic-00 max-lg:py-12 lg:py-20" data-ih-maiw>
+<section
+  class="ih-maiw bg-generic-00 max-lg:py-12 lg:py-20"
+  style={`--ih-maiw-depth:${STACK_DEPTH}`}
+  data-ih-maiw
+>
   <div class="container mx-auto">
     <!-- z-30 is inert until the media query below makes this sticky; z-index
          does nothing on a static box. Same for the background, which only has
@@ -175,7 +207,7 @@ const slides = groups.flatMap((group) =>
         Clarity AI, by ClearTax: Making AI work for Finance
       </h2>
       <p
-        class="m-0 font-body text-neutral-500 text-[length:var(--fs-body-lg)] leading-[length:var(--lh-body-lg)] max-w-[597px]"
+        class="m-0 font-body text-neutral-500 text-[length:var(--fs-body-lg)] leading-[length:var(--lh-body-lg)] max-w-[597px] pb-6"
       >
         ClearTax gives you clean finance data and the business context AI needs,
         so your finance team can build and use AI with confidence.
@@ -186,7 +218,7 @@ const slides = groups.flatMap((group) =>
          the background, so cards passing behind are covered; the bar inside it
          can scroll horizontally on narrow viewports without the wrapper needing
          an overflow of its own. -->
-    <div class="ih-maiw-bar sticky z-30 flex justify-center bg-generic-00 pb-8 lg:pb-12">
+    <div class="ih-maiw-bar sticky z-30 flex justify-center bg-generic-00 pb-6 lg:pb-8">
       <div
         class="ih-maiw-tablist relative flex max-w-full items-center gap-1 overflow-x-auto rounded-xl bg-neutral-100 px-1 py-1.5"
         role="group"
@@ -218,7 +250,7 @@ const slides = groups.flatMap((group) =>
             style={`--ih-maiw-i:${Math.min(i, STACK_DEPTH)};--ih-maiw-z:${i}`}
             data-ih-maiw-slide={slide.group}
           >
-            <article class="flex w-full flex-col items-center gap-6 rounded-xl border border-[#DCDEE2] bg-generic-00 p-6">
+            <article class="ih-maiw-card flex w-full flex-col items-center gap-6 rounded-xl border border-[#DCDEE2] bg-generic-00 p-6">
               <div class="flex w-full flex-col items-center gap-2 text-center">
                 <h3 class="m-0 font-heading font-medium text-vault-navy text-[length:var(--fs-h6)] leading-[length:var(--lh-h6)]">
                   {slide.card.title}
@@ -244,19 +276,32 @@ const slides = groups.flatMap((group) =>
 </section>
 
 <style is:global>
-  /* --ih-maiw-top  clears the fixed navbar (top-4 plus its ~62px height).
+  /* --ih-maiw-top  clears the fixed navbar, from the shared --nav-clear token
+                    so every pinned section on the site agrees on the offset.
      --ih-maiw-head is the pill bar's measured height; the fallback is close
      enough that the first paint is right before JS runs.
      --ih-maiw-step is the scroll travel per card — how long each one holds the
      front of the deck before the next arrives. */
   .ih-maiw {
-    --ih-maiw-top: 88px;
+    --ih-maiw-top: var(--nav-clear, 112px);
     --ih-maiw-head: 76px;
     --ih-maiw-step: 22vh;
     /* Height the pinned H2 + lede occupy above the pills. 0 unless the window
        is big enough to spare it; the script fills in the measured value. */
     --ih-maiw-intro: 0px;
     --ih-maiw-pin-intro: 0;
+
+    /* Lede to pills. Figma's header frame puts the text block at height 120 and
+       the tab group at y=144, so the gap is 24px — a spacing value, not the
+       navbar clearance, which is why it is separate from --ih-maiw-top. */
+    --ih-maiw-gap: 24px;
+
+    /* Where the pill bar pins. Kept as its own variable because the deck pins
+       under the bar and the card's height budget is measured from it, so all
+       three have to move together or they disagree about where the bar ends. */
+    --ih-maiw-bar-top: calc(
+      var(--ih-maiw-intro) + var(--ih-maiw-top) - var(--ih-maiw-gap)
+    );
   }
 
   @media (min-width: 1024px) {
@@ -280,6 +325,9 @@ const slides = groups.flatMap((group) =>
   @media (min-width: 1280px) and (min-height: 800px) {
     .ih-maiw {
       --ih-maiw-pin-intro: 1;
+      /* The pinned intro already carries the navbar clearance in its own
+         padding, so the bar pins directly under it and adds nothing. */
+      --ih-maiw-bar-top: var(--ih-maiw-intro);
     }
 
     .ih-maiw-intro {
@@ -291,20 +339,46 @@ const slides = groups.flatMap((group) =>
 
   }
 
-  /* Sits directly under the intro when that is pinned, and at the very top when
-     it is not — the offset is the same expression either way, because
-     --ih-maiw-intro is 0 in the second case.
+  /* Sits directly under the intro when that is pinned, and just below the
+     navbar when it is not — --ih-maiw-bar-top is the same expression either
+     way, because --ih-maiw-intro is 0 in the second case.
 
-     Whichever of the two lands at the top pays the navbar's clearance as its
-     own padding rather than pinning below it. Pinning at 88px left a strip that
-     the deck scrolled through in full view: the navbar is a floating pill with
-     a gap above it and open space either side, so it hides almost none of that
-     strip. As padding it sits inside this block's opaque background instead.
-     `pb-4` is a utility on the element; padding-top is only here, so the two
-     never race. */
+     THE CLEARANCE IS NOT PADDING. It used to be: padding-top:88px on this
+     element, so that whichever block landed at the top covered the strip the
+     deck would otherwise scroll through in full view — the navbar is a floating
+     pill with a gap above it and open space either side, so it hides almost
+     none of that strip. That worked when pinned and cost 88px of dead space in
+     normal flow, where the design asks for 24px between the lede and the pills.
+
+     So the gap is now just the gap, and the covering is done by ::before, which
+     is out of flow and therefore free. `pb-8` is a utility on the element;
+     padding-top is only here, so the two never race. */
   .ih-maiw-bar {
-    top: var(--ih-maiw-intro);
-    padding-top: var(--ih-maiw-top);
+    top: var(--ih-maiw-bar-top);
+    padding-top: var(--ih-maiw-gap);
+  }
+
+  /* The strip between the top of the viewport and the pinned bar. Absolutely
+     positioned, so it takes no space in flow and cannot reintroduce the gap it
+     replaced; `bottom: 100%` parks it directly above the bar and it travels
+     with it. Height is the clearance minus the gap the bar already pays as
+     padding, so the two together cover exactly --ih-maiw-top.
+
+     Only while stuck: at rest it would sit on top of the lede rather than on
+     cards. The script owns that class because CSS cannot ask "is this pinned". */
+  .ih-maiw-bar::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 100%;
+    height: calc(var(--ih-maiw-top) - var(--ih-maiw-gap));
+    background-color: var(--color-generic-00);
+    display: none;
+  }
+
+  .ih-maiw-bar.is-stuck::before {
+    display: block;
   }
 
   /* MUST follow the rule above, not sit inside the pin query further up: both
@@ -315,13 +389,20 @@ const slides = groups.flatMap((group) =>
     .ih-maiw-bar {
       padding-top: 0;
     }
+
+    /* The pinned intro is the cover here, and it is opaque and full width. */
+    .ih-maiw-bar.is-stuck::before {
+      display: none;
+    }
   }
 
-  /* No --ih-maiw-top term: whichever block is parked above already carries the
-     navbar clearance inside its own measured height. */
+  /* Bar's pinned top plus its height — i.e. the bar's bottom edge, which is
+     what the deck has to clear. Measuring from --ih-maiw-intro instead would
+     have been 64px short now that the clearance lives above the bar rather than
+     inside it, and the front card would pin behind the pills. */
   .ih-maiw-sticky {
     top: calc(
-      var(--ih-maiw-intro) + var(--ih-maiw-head) + var(--ih-maiw-i) * 12px
+      var(--ih-maiw-bar-top) + var(--ih-maiw-head) + var(--ih-maiw-i) * 12px
     );
     z-index: var(--ih-maiw-z);
     margin: 0 auto;
@@ -335,6 +416,44 @@ const slides = groups.flatMap((group) =>
     margin-top: var(--ih-maiw-step);
   }
 
+  /* Depth reads as distance, the same way `global-homepage/WhyGenericAi.astro`
+     does it: a card one step back is also a little smaller, so the slivers above
+     the front card sit progressively inset rather than being three identical
+     white strips. 0.03 per step is that file's interval.
+
+     Only the INNER card is ever transformed. The sticky wrapper around it is
+     what the script measures to decide which card is at the front, and a scaled
+     element would feed its own transform back into the next measurement — the
+     rule the two-layer structure exists to enforce.
+
+     transform-origin is top center so a card shrinks towards the edge that
+     stays visible; scaling about the middle would slide the sliver down out of
+     alignment with the step above it. */
+  .ih-maiw-card {
+    transform: scale(var(--ih-maiw-scale, 1));
+    transform-origin: top center;
+  }
+
+  /* The roll. When the front card changes, every card behind it moves up one
+     12px step and shrinks one interval at once; easing both turns that from a
+     jump into the deck visibly advancing. Only pinned cards are affected — for
+     a card still in flow `top` is just an unreached threshold.
+
+     Unlike WhyGenericAi, which rewrites transforms every scroll frame, these
+     change only when the front card changes — so this is a transition rather
+     than per-frame writes, and there is no need for `will-change` on 11 cards.
+
+     Gated on .is-rolling, which the script adds AFTER its first pass. The first
+     pass moves card 1 from the inline no-JS clamp to the front offset, and that
+     is a correction to the initial paint, not a movement anyone should see. */
+  .ih-maiw-stack.is-rolling .ih-maiw-sticky {
+    transition: top 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .ih-maiw-stack.is-rolling .ih-maiw-card {
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
   /* 894x320 in the design. An aspect ratio rather than a fixed height so the
      slot holds its proportions at every card width; the cap is what keeps the
      whole card inside the viewport, since a pinned card cannot be scrolled to
@@ -344,7 +463,7 @@ const slides = groups.flatMap((group) =>
     aspect-ratio: 894 / 320;
     max-height: max(
       140px,
-      calc(100vh - var(--ih-maiw-intro) - var(--ih-maiw-head) - 250px)
+      calc(100vh - var(--ih-maiw-bar-top) - var(--ih-maiw-head) - 250px)
     );
   }
 
@@ -400,6 +519,17 @@ const slides = groups.flatMap((group) =>
     .ih-maiw-sticky {
       position: static !important;
     }
+    /* Nothing is pinned, so there is no window to roll and nothing for `top` to
+       move — but the declaration goes too, rather than being left inert. The
+       recede goes with it: a plain list of cards should be full size, which is
+       the same call WhyGenericAi makes here. */
+    .ih-maiw-stack.is-rolling .ih-maiw-sticky,
+    .ih-maiw-stack.is-rolling .ih-maiw-card {
+      transition: none;
+    }
+    .ih-maiw-card {
+      transform: none !important;
+    }
     .ih-maiw-thumb {
       transition: opacity 0.2s ease;
     }
@@ -415,9 +545,15 @@ const slides = groups.flatMap((group) =>
     const bar = root.querySelector(".ih-maiw-bar");
     const tablist = root.querySelector(".ih-maiw-tablist");
     const thumb = root.querySelector(".ih-maiw-thumb");
+    const stack = root.querySelector(".ih-maiw-stack");
     const tabs = Array.from(root.querySelectorAll("[data-ih-maiw-tab]"));
     const slides = Array.from(root.querySelectorAll("[data-ih-maiw-slide]"));
     if (!bar || !tablist || !tabs.length || !slides.length) return;
+
+    // Depth of the rolling window, declared once on the section. Read back
+    // rather than restated, so there is one place to change it.
+    const depth =
+      parseInt(getComputedStyle(root).getPropertyValue("--ih-maiw-depth"), 10) || 3;
 
     const ids = tabs.map((t) => t.getAttribute("data-ih-maiw-tab"));
     const reduceMotion =
@@ -426,6 +562,33 @@ const slides = groups.flatMap((group) =>
     let current = -1;
     /** Group index a click is travelling to, or -1 when scroll owns the pill. */
     let locked = -1;
+    /** Front slide the depths were last written for. */
+    let lastFront = -1;
+
+    /** Scale lost per step back in the stack. WhyGenericAi's interval. */
+    const SCALE_STEP = 0.03;
+
+    /**
+     * Roll the window so the front card is at the deepest step and the three
+     * behind it climb back towards 0. Anything further back than the window
+     * floors at 0, where the last sliver covers it exactly — same offset, lower
+     * z-index. Cards ahead of the front sit at the front's own offset, so they
+     * pin there the moment they arrive rather than jumping on takeover.
+     *
+     * The same `behind` count drives the scale, so a card's step and its size
+     * can never disagree about how far back it is.
+     */
+    function applyDepths(front) {
+      for (let i = 0; i < slides.length; i++) {
+        const behind = front - i;
+        const steps = behind <= 0 ? 0 : Math.min(behind, depth);
+        slides[i].style.setProperty("--ih-maiw-i", depth - steps);
+        slides[i].style.setProperty(
+          "--ih-maiw-scale",
+          (1 - steps * SCALE_STEP).toFixed(3),
+        );
+      }
+    }
 
     function moveThumb(i) {
       if (!thumb) return;
@@ -455,9 +618,37 @@ const slides = groups.flatMap((group) =>
       }
     }
 
-    /** The px offset a slide pins at, read from the CSS rather than duplicated. */
+    // TWO UNITS, and they are not the same one under `zoom`.
+    // getBoundingClientRect() reports RENDERED pixels — what is on the glass.
+    // getComputedStyle().top reports CSS pixels. shared.css puts `zoom` on
+    // the `body` element between tablet and 1440px, so those differ by the zoom
+    // every comparison below puts a rect against a computed `top`. Left
+    // unconverted, a slide pinned at 112 CSS px reports a rect.top of 95, the
+    // "has it reached its offset" test fired a step early, and the deck picked
+    // the wrong front card — which is the pill jumping and the window rolling at
+    // the wrong moment.
+    //
+    // Walked rather than read off the `body` element, because zoom multiplies down the tree.
+    const zoomFactor = () => {
+      let z = 1;
+      for (let n = root; n && n.nodeType === 1; n = n.parentElement) {
+        const v = parseFloat(getComputedStyle(n).zoom);
+        // Unsupported -> NaN, unset -> 1. Both mean "no scaling here".
+        if (v && v !== 1) z *= v;
+      }
+      return z;
+    };
+
+    // Cached — this is read for every slide on every scroll frame. refresh()
+    // recomputes it, which covers crossing the 1440px bound where zoom ends.
+    let zoom = zoomFactor();
+
+    /**
+     * The offset a slide pins at, in RENDERED px so it can be compared against a
+     * getBoundingClientRect(). Read from the CSS rather than duplicated.
+     */
     function stickyTop(el) {
-      return parseFloat(getComputedStyle(el).top) || 0;
+      return (parseFloat(getComputedStyle(el).top) || 0) * zoom;
     }
 
     /**
@@ -491,6 +682,19 @@ const slides = groups.flatMap((group) =>
           front = i;
         }
       }
+      // Ahead of the `locked` check below: the pill can be owned by a click,
+      // but the deck itself must keep rolling while that scroll travels, or it
+      // would arrive with the window still built around the card we left.
+      if (front !== lastFront) {
+        lastFront = front;
+        applyDepths(front);
+      }
+
+      // CSS has no "is pinned" selector, so the bar's cover strip is gated on a
+      // class instead. Same test the deck uses: sticky clamps rect.top at the
+      // element's own offset, so reaching it means pinned.
+      bar.classList.toggle("is-stuck", bar.getBoundingClientRect().top <= stickyTop(bar) + 1);
+
       const next = ids.indexOf(slides[front].getAttribute("data-ih-maiw-slide"));
 
       // A click owns the pill until the deck actually gets there, so the
@@ -539,6 +743,11 @@ const slides = groups.flatMap((group) =>
         // front of the deck rather than somewhere near it. Works in both
         // directions because `flowTop` ignores where the slide is currently
         // pinned; see the note on that helper.
+        //
+        // Measured at the FRONT offset, not the target's current one. Now that
+        // the window rolls, a slide three back sits at a shallower step, and
+        // reading that offset would land the scroll short by the difference.
+        target.style.setProperty("--ih-maiw-i", depth);
         const pin = stickyTop(target);
         window.scrollTo({
           top: flowTop(target) - pin,
@@ -565,13 +774,29 @@ const slides = groups.flatMap((group) =>
 
       // Publish the real heights so the deck pins under whatever is actually
       // parked above it — however the heading wraps, however the pills wrap.
+      // First: a resize can cross the 1440px bound where the zoom switches off,
+      // and both the heights below and update() depend on the current factor.
+      zoom = zoomFactor();
+
+      // Measured off rects, not offsetHeight. These are published as CSS
+      // lengths and consumed by calc() in the stylesheet, so they must be CSS
+      // px — and a rect divided by the zoom is unambiguously that, whereas
+      // offsetHeight's behaviour inside a zoomed subtree is not consistent
+      // enough across browsers to rely on.
+      const cssHeight = (el) => el.getBoundingClientRect().height / zoom;
+
       root.style.setProperty(
         "--ih-maiw-intro",
-        (pinsIntro && intro ? intro.offsetHeight : 0) + "px",
+        (pinsIntro && intro ? cssHeight(intro) : 0) + "px",
       );
-      root.style.setProperty("--ih-maiw-head", bar.offsetHeight + "px");
+      root.style.setProperty("--ih-maiw-head", cssHeight(bar) + "px");
       if (current >= 0) moveThumb(current);
       update();
+
+      // Only now: the first update() replaces the inline no-JS clamp with the
+      // rolled window, and that correction should land in the first paint
+      // rather than easing into place while someone watches.
+      if (stack) stack.classList.add("is-rolling");
     }
 
     window.addEventListener("scroll", onScroll, { passive: true });
