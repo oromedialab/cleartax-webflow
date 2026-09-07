@@ -45,6 +45,7 @@ export const PAGE_TARGETS = [
   { name: 'delivery-page', input: 'src/styles/delivery-page.css', page: 'src/pages/delivery-page.astro' },
   { name: 'global-homepage', input: 'src/styles/global-homepage.css', page: 'src/pages/global-homepage.astro' },
   { name: 'india-homepage', input: 'src/styles/india-homepage.css', page: 'src/pages/india-homepage.astro' },
+  { name: 'integration-page', input: 'src/styles/integration-page.css', page: 'src/pages/integration-page.astro' },
 ];
 
 const SHARED_IMPORT_RE = /import\s+[A-Z][A-Za-z0-9]*\s+from\s+['"]\.\.\/sections\/_shared\/([A-Za-z0-9_-]+)\.astro['"]/g;
