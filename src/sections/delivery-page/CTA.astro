@@ -1,18 +1,33 @@
 ---
-const COLUMN_OFFSETS = ["-205px", "-153px", "-101px", "-49px", "-101px", "-153px", "-205px"];
+import Dotgrid from '../_shared/Dotgrid.astro';
+
+interface Props {
+    baseColor?: string;
+}
+
+const {
+    baseColor = "#C8F006",
+} = Astro.props;
 ---
 <section class="relative py-24 md:py-32 bg-generic-00 overflow-hidden w-full flex items-center justify-center min-h-[400px]" id="footprint">
-    <!-- 7-Column Dot Grid Background -->
-    <div class="absolute inset-0 pointer-events-none" aria-hidden="true">
-        {
-            COLUMN_OFFSETS.map((top, i) => (
-                <div
-                    class="footprint-col absolute top-0 bottom-0"
-                    style={`left:${(i * 100) / 7}%;width:${100 / 7}%;background-position-y:${top}`}
-                />
-            ))
-        }
-        <div class="footprint-wash absolute inset-0"></div>
+    <!-- Interactive Dot Grid Background -->
+    <Dotgrid
+        containerId="footprint"
+        baseColor={baseColor}
+        lineWidth={2}
+        gap={24}
+        maxLength={6}
+        lengthRadius={260}
+        tilt={1}
+        cursorRadius={320}
+        pull={14}
+        fadeRadius={40}
+    />
+
+    <!-- Center White Radial Gradient Wash -->
+    <div
+        class="absolute inset-0 z-0 bg-[radial-gradient(ellipse_20%_100%_at_50%_20%,_#FFFFFF_0%,_rgba(255,255,255,0.9)_30%,_transparent_60%)] pointer-events-none"
+    >
     </div>
 
     <div class="relative z-10 lg:container mx-auto px-4 md:px-6 flex flex-col items-center text-center">
@@ -31,24 +46,4 @@ const COLUMN_OFFSETS = ["-205px", "-153px", "-101px", "-49px", "-101px", "-153px
     </div>
 </section>
 
-<style is:global>
-    .footprint-col {
-        background-image: radial-gradient(
-            circle,
-            rgba(84, 70, 255, 0.28) 1.6px,
-            transparent 1.7px
-        );
-        background-size: 26px 26px;
-        background-repeat: repeat;
-    }
-
-    .footprint-wash {
-        background: radial-gradient(
-            ellipse 45% 65% at 50% 50%,
-            #ffffff 0%,
-            rgba(255, 255, 255, 0.9) 50%,
-            rgba(255, 255, 255, 0) 85%
-        );
-    }
-</style>
 
