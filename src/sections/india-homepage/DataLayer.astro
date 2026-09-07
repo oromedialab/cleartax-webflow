@@ -5,22 +5,32 @@
  * Three blocks: the source-systems / platform / tax-portals diagram, a
  * prevent-automate-detect row, and a secondary CTA.
  *
- * LOGOS, TODO: four tiles have no artwork on the Webflow CDN yet — Oracle,
- * GSTN, TRACES and the Income Tax Department emblem. Each renders its name as
- * text meanwhile, which is how the OMS and POS tiles are drawn in the design
- * anyway, so the column still reads correctly. To finish them, upload the four
- * images to Webflow assets and set `src` on the matching entry below. Nothing
- * else changes. (`oracle-retail-logo.png` is already on the CDN, but it is the
- * Oracle Retail wordmark, not the plain Oracle mark this design shows.)
+ * LOGOS, TODO: three tiles have no artwork on the Webflow CDN yet — GSTN,
+ * TRACES and the Income Tax Department emblem. Each renders its name as text
+ * meanwhile, which is how the OMS and POS tiles are drawn in the design anyway,
+ * so the column still reads correctly. To finish them, upload the files staged
+ * in `public/images/india-homepage/` to Webflow assets and set `src` on the
+ * matching entry below. Nothing else changes. (The emblem export is a 444 KB
+ * traced SVG — rasterise it to a ~30px-tall PNG before uploading.)
  *
- * HEXAGON: three nested regular hexagons, drawn as one inline SVG rather than
- * three exported vectors. Figma has them at 344 / 366 / 386px tall; the SVG
- * scales as a unit so the ring spacing survives at any width.
+ * Oracle is the exception: its mark is a single 1.1 KB path, so it is inlined
+ * as `mark: "oracle"` rather than parked on a CDN round trip. Anything heavier
+ * than that belongs in Webflow assets — see the Embed budget in CLAUDE.md.
+ * (`oracle-retail-logo.png` is already on the CDN, but it is the Oracle Retail
+ * wordmark, not the plain Oracle mark this design shows.)
+ *
+ * HEXAGON: three nested hexagons, drawn as one inline SVG rather than three
+ * exported vectors. The path data is Figma's own, so the rounded vertices and
+ * the slightly-wider-than-regular proportions survive; each ring is #999999 and
+ * separates by opacity and stroke weight (1.5/1 · 1/0.5 · 0.5/0.4), which is
+ * what makes the innermost read as the solid one. Nested at Figma's sizes via
+ * translate, so the SVG scales as a unit and the ring spacing holds.
  *
  * DOT COLUMNS: eight columns per side, 4px wide on a 26px pitch, in the same
  * #A6C705 the bridge dots in `Proven.astro` use. CSS gradients, not images —
  * the design's exported <img> per column would be sixteen requests for what is
- * two background-image declarations.
+ * two background-image declarations. Every height below is exactly n×26+4, so
+ * a top-aligned gradient lands a whole dot at both ends of every column.
  *
  * "Yours Taxes" is verbatim from the Figma. It reads like a typo for "Your
  * Taxes" but changing approved copy is not this file's call — flag it with the
@@ -30,6 +40,8 @@ interface Tile {
   name: string;
   /** Webflow asset URL. Absent → the tile renders `name` as text. */
   src?: string;
+  /** Inline mark, for logos small enough not to be worth a CDN round trip. */
+  mark?: "oracle";
 }
 
 const books: Tile[] = [
@@ -37,7 +49,7 @@ const books: Tile[] = [
     name: "SAP",
     src: "https://cdn.prod.website-files.com/63ede4a3da6dbd6b05c4612f/6a06bfe3956ddb4d4f844ba3_sap-logo.png",
   },
-  { name: "Oracle" },
+  { name: "Oracle", mark: "oracle" },
   {
     name: "Microsoft Dynamics",
     src: "https://cdn.prod.website-files.com/63ede4a3da6dbd6b05c4612f/6a06bfe11b9d1549ee39553a_microsoft-dynamics.png",
@@ -49,11 +61,17 @@ const books: Tile[] = [
 const portals: Tile[] = [
   {
     name: "NIC",
-    src: "https://cdn.prod.website-files.com/6093bce33d9b4bae841b04e3/69eb07be66482af8235e233a_nic.png",
+    src: "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6a9e5c40e26234b20c223960_NIC.png",
   },
-  { name: "GSTN" },
-  { name: "TRACES" },
-  { name: "Income Tax" },
+  { name: "GSTN",
+    src: "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6a9e5cf5da2e8ae853e88977_gstn.png"
+   },
+  { name: "TRACES",
+    src: "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6a9e5c40615cfd7b88152a8c_traces.png"
+   },
+  { name: "Income Tax",
+    src: "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6a9e5c40928141edd9f3050d_income-tax-department.svg"
+   },
 ];
 
 const platformPills = ["GL Data", "Govt Data & Notices", "Compliance Registers"];
@@ -80,7 +98,7 @@ const stages = [
 ];
 ---
 
-<section class="bg-generic-00 max-lg:py-12 lg:py-20">
+<section class="bg-generic-00 max-lg:py-12 lg:py-20" data-ih-datalayer>
   <div class="container mx-auto">
     <div class="flex flex-col items-center gap-12">
       <div class="flex flex-col items-center gap-4 text-center">
@@ -100,6 +118,7 @@ const stages = [
       <!-- Diagram -->
       <div
         class="flex w-full items-stretch gap-10 max-lg:flex-col max-lg:items-center max-lg:gap-8"
+        data-ih-lit
       >
         <div
           class="flex flex-1 flex-col items-center gap-6 rounded-xl border border-[#CCCCCC] bg-generic-00 p-6 max-lg:w-full max-lg:max-w-[420px] lg:min-w-0"
@@ -121,6 +140,23 @@ const stages = [
                       loading="lazy"
                       decoding="async"
                     />
+                  ) : tile.mark === "oracle" ? (
+                    /* Figma draws it 42.689 x 27 — kept exactly, so it sits the
+                       same 30px-cap height as the raster marks beside it. */
+                    <svg
+                      width="42.689"
+                      height="27"
+                      viewBox="0 0 42.6894 27"
+                      fill="none"
+                      xmlns="http://www.w3.org/2000/svg"
+                      role="img"
+                      aria-label={tile.name}
+                    >
+                      <path
+                        d="M13.8502 26.9955H29.5396C33.0582 26.9042 36.402 25.4423 38.8584 22.9213C41.3148 20.4004 42.6894 17.0198 42.6894 13.5C42.6894 9.98022 41.3148 6.59961 38.8584 4.07868C36.402 1.55774 33.0582 0.0958425 29.5396 0.00454269H13.8502C12.0485 -0.0422077 10.2556 0.272286 8.5774 0.929477C6.89918 1.58667 5.36953 2.57325 4.07868 3.83105C2.78782 5.08884 1.7619 6.59238 1.06139 8.25299C0.360892 9.91361 0 11.6977 0 13.5C0 15.3023 0.360892 17.0864 1.06139 18.747C1.7619 20.4076 2.78782 21.9112 4.07868 23.169C5.36953 24.4267 6.89918 25.4133 8.5774 26.0705C10.2556 26.7277 12.0485 27.0422 13.8502 26.9955ZM29.1853 22.2441H14.1954C11.9275 22.171 9.77693 21.2186 8.19851 19.5885C6.62009 17.9583 5.73757 15.7782 5.73757 13.5091C5.73757 11.24 6.62009 9.05985 8.19851 7.4297C9.77693 5.79955 11.9275 4.84721 14.1954 4.77406H29.1853C30.3561 4.7363 31.5226 4.93429 32.6153 5.35627C33.7081 5.77825 34.7049 6.4156 35.5464 7.23046C36.388 8.04531 37.0571 9.02103 37.5141 10.0996C37.9711 11.1782 38.2066 12.3377 38.2066 13.5091C38.2066 14.6805 37.9711 15.84 37.5141 16.9185C37.0571 17.9971 36.388 18.9729 35.5464 19.7877C34.7049 20.6026 33.7081 21.2399 32.6153 21.6619C31.5226 22.0839 30.3561 22.2819 29.1853 22.2441Z"
+                        fill="#C74634"
+                      />
+                    </svg>
                   ) : (
                     <span class="font-body font-medium text-vault-navy text-[length:var(--fs-body-lg)] leading-[length:var(--lh-body-lg)]">
                       {tile.name}
@@ -132,34 +168,46 @@ const stages = [
           </div>
         </div>
 
-        <div class="flex shrink-0 items-center gap-6 max-lg:hidden">
+        <!-- gap-[51px] is Figma's, and it is measured to the 280px content box,
+             not to the hexagon. The hexagon is 334px wide and centred in that
+             box, so it overhangs 27px each side and the dots clear its edge by
+             the 24px the rest of the diagram is spaced on. At gap-6 the fans
+             ran into the hexagon's side. -->
+        <div class="flex shrink-0 items-center gap-[51px] max-lg:hidden">
           <div class="ih-dl-dots flex items-center gap-6" aria-hidden="true">
             {dotColumns.map((h) => <span style={`height:${h}px`} />)}
           </div>
 
           <div class="relative flex w-[280px] shrink-0 items-center justify-center">
+            <!-- Figma's own path data, nested by translate rather than redrawn:
+                 334.283x382.284, 316.963x362.147 and 297.913x340.382, each
+                 centred in the outermost box. All three are unfilled — the
+                 innermost carried a white fill before, which read the same on
+                 this white section but would not on any other. -->
             <svg
-              class="absolute left-1/2 top-1/2 h-[386px] w-[334px] -translate-x-1/2 -translate-y-1/2"
-              viewBox="0 0 334 386"
+              class="ih-dl-hex absolute left-1/2 top-1/2 h-[382px] w-[334px] -translate-x-1/2 -translate-y-1/2"
+              viewBox="0 0 334.283 382.284"
               fill="none"
               aria-hidden="true"
             >
-              <polygon
-                points="167,0 334,96.5 334,289.5 167,386 0,289.5 0,96.5"
-                stroke="#EFEFEF"
-                stroke-width="1.5"></polygon>
-              <polygon
-                points="167,10 325.4,101.5 325.4,284.5 167,376 8.6,284.5 8.6,101.5"
-                stroke="#EFEFEF"
-                stroke-width="1.5"></polygon>
-              <polygon
-                points="167,21 315.9,107 315.9,279 167,365 18.1,279 18.1,107"
-                fill="#FFFFFF"
-                stroke="#D9DCE1"
-                stroke-width="1.5"></polygon>
+              <path
+                d="M161.266 1.82426C164.902 -0.274626 169.381 -0.27452 173.016 1.82426L328.158 91.3955C331.793 93.4945 334.033 97.3735 334.033 101.571V280.713C334.033 284.911 331.793 288.79 328.158 290.889L173.016 380.46C169.381 382.559 164.902 382.559 161.266 380.46L6.12456 290.889C2.48933 288.79 0.249557 284.911 0.249557 280.713V101.571C0.249557 97.3736 2.48937 93.4945 6.12456 91.3955L161.266 1.82426Z"
+                stroke="#999999"
+                stroke-width="0.5"
+                opacity="0.4"></path>
+              <path
+                transform="translate(8.66 10.069)"
+                d="M152.51 2.09966C156.205 -0.0335411 160.758 -0.0335416 164.453 2.09966L310.492 86.4161C314.186 88.5493 316.462 92.4915 316.462 96.7579V265.39C316.462 269.656 314.186 273.598 310.492 275.731L164.453 360.048C160.758 362.181 156.205 362.181 152.51 360.048L6.47115 275.731C2.77635 273.598 0.500465 269.656 0.500443 265.39V96.7579C0.500443 92.4915 2.77633 88.5493 6.47115 86.4161L152.51 2.09966Z"
+                stroke="#999999"
+                opacity="0.5"></path>
+              <path
+                transform="translate(18.185 20.951)"
+                d="M143.485 2.21632C146.871 0.261517 151.042 0.261518 154.428 2.21632L291.691 81.4644C295.077 83.4193 297.162 87.0329 297.162 90.9429V249.439C297.162 253.349 295.077 256.963 291.691 258.917L154.428 338.166C151.042 340.12 146.871 340.12 143.485 338.166L6.222 258.917C2.8359 256.963 0.75032 253.349 0.75032 249.439V90.9429C0.75032 87.0329 2.8359 83.4193 6.222 81.4644L143.485 2.21632Z"
+                stroke="#999999"
+                stroke-width="1.5"></path>
             </svg>
 
-            <div class="relative z-10 flex w-[166px] flex-col items-center gap-3">
+            <div class="relative z-10 flex flex-col items-center gap-3">
               <p
                 class="m-0 text-center font-body font-medium text-vault-navy text-[22px] leading-[34px]"
               >
@@ -168,7 +216,7 @@ const stages = [
               <div class="flex w-full flex-col gap-2.5">
                 {
                   platformPills.map((pill) => (
-                    <span class="flex h-7 items-center justify-center rounded-3xl border border-neutral-200 bg-generic-00 px-3 text-center font-body text-[length:var(--fs-label)] leading-[length:var(--lh-label)] font-medium text-nova-blue">
+                    <span class="flex items-center justify-center rounded-3xl border border-neutral-200 bg-generic-00 py-1.5 px-3 text-center font-body text-[length:var(--fs-label)] leading-[length:var(--lh-label)] font-medium text-nova-blue">
                       {pill}
                     </span>
                   ))
@@ -214,8 +262,11 @@ const stages = [
         </div>
       </div>
 
-      <!-- Prevent / Automate / Detect -->
-      <div class="flex w-full items-stretch max-lg:flex-col max-lg:gap-4">
+      <!-- Prevent / Automate / Detect. Its own data-ih-lit, so the overlines
+           light when THIS row centres rather than when the diagram above does —
+           sharing one section-wide state would drop them back to grey at the
+           exact moment you scrolled down to read them. -->
+      <div class="flex w-full items-stretch max-lg:flex-col max-lg:gap-4" data-ih-lit>
         {
           stages.map((stage, i) => (
             <>
@@ -228,7 +279,7 @@ const stages = [
               <div class="flex flex-1 flex-col items-center gap-6 rounded-xl border border-[#CCCCCC] p-6 lg:min-w-0">
                 <div class="flex w-full flex-col items-center gap-3 text-center">
                   <div class="flex w-full flex-col items-center gap-2">
-                    <p class="m-0 font-body font-semibold uppercase tracking-[1px] text-neutral-500 text-[length:var(--fs-label)] leading-[length:var(--lh-body-sm)]">
+                    <p class="ih-dl-overline m-0 font-body font-semibold uppercase tracking-[1px] text-neutral-500 text-[length:var(--fs-label)] leading-[length:var(--lh-body-sm)]">
                       {stage.overline}
                     </p>
                     <p class="m-0 font-heading font-medium text-vault-navy text-[length:var(--fs-h6)] leading-[length:var(--lh-h6)]">
@@ -258,13 +309,123 @@ const stages = [
 <style is:global>
   /* One dot every 26px down a 4px column — the design's 4px dot on a 24px gap.
      `height` comes off the inline style per column, which is what gives the
-     two fans their taper. */
+     two fans their taper.
+
+     The gradient centre is pinned to 2px 2px, not left at the tile's centre.
+     Figma's columns start with a whole dot at y=0 and every height is n×26+4,
+     so a top-aligned tile fills each column exactly; centring it instead pushed
+     every dot down 11px and dropped the last one off the bottom of each
+     column — eleven dots in the tallest fan where the design has twelve.
+
+     The dot colour is currentColor rather than a literal, so the fans can be
+     recoloured by transitioning one `color` on the parent. It has to work this
+     way: `color` is transitionable, a background-image is not, so a gradient
+     with a fixed colour stop would snap instead of easing. Same trick the
+     closing pill in `ClarityAi.astro` uses. */
+  .ih-dl-dots {
+    color: #a6c705;
+    transition: color 0.6s ease;
+  }
+
   .ih-dl-dots > span {
     display: block;
     width: 4px;
     flex: none;
-    background-image: radial-gradient(circle, #a6c705 2px, transparent 2px);
+    background-image: radial-gradient(circle at 2px 2px, currentColor 2px, transparent 2px);
     background-size: 4px 26px;
     background-repeat: repeat-y;
   }
+
+  /* `stroke` is a genuinely animatable property, so the rings do not need the
+     currentColor indirection the dots do — they ease from the resting grey
+     straight to Nova Blue. The per-path `opacity` and `stroke-width` are left
+     alone, which is what keeps the three rings reading as three depths in the
+     lit state as well as the resting one.
+
+     The `stroke="#999999"` presentation attributes stay on the paths: they are
+     the lowest-priority source, so this rule wins, and they keep the hexagon
+     drawn correctly if the section is ever rendered without its CSS. */
+  .ih-dl-hex path {
+    stroke: #999999;
+    transition: stroke 0.6s ease;
+  }
+
+  /* The stage overlines keep their resting grey from the `text-neutral-500`
+     utility rather than restating it here — only the transition is ours, which
+     is a different property so the two never fight. The lit rule below is
+     (0,3,0) against the utility's (0,1,0), so it wins on specificity and does
+     not depend on whether the embed or the page bundle is pasted first. */
+  .ih-dl-overline {
+    transition: color 0.6s ease;
+  }
+
+  /* Lit state — this block is in the middle of the viewport. Figma ships it as
+     a second variant: the lime fans, the grey rings and the stage overlines all
+     take Nova Blue, and nothing else moves. It is a state, not a one-way latch,
+     so the same transition runs in reverse on the way back out.
+
+     Scoped to [data-ih-lit] rather than the section, because the diagram and
+     the stage row each carry their own copy of this state and light on their
+     own crossing. */
+  [data-ih-lit].is-lit .ih-dl-dots {
+    color: var(--color-nova-blue);
+  }
+
+  [data-ih-lit].is-lit .ih-dl-hex path {
+    stroke: var(--color-nova-blue);
+  }
+
+  [data-ih-lit].is-lit .ih-dl-overline {
+    color: var(--color-nova-blue);
+  }
+
+  /* Someone who asked for less motion still gets both states, just without the
+     6/10ths of a second of colour travel between them. */
+  @media (prefers-reduced-motion: reduce) {
+    .ih-dl-dots,
+    .ih-dl-hex path,
+    .ih-dl-overline {
+      transition: none;
+    }
+  }
 </style>
+
+<script is:inline>
+  (function () {
+    const root = document.querySelector("[data-ih-datalayer]");
+    if (!root) return;
+
+    // Two blocks light independently: the diagram and the stage row.
+    const blocks = Array.from(root.querySelectorAll("[data-ih-lit]"));
+    if (!blocks.length) return;
+
+    // Without IntersectionObserver they land lit rather than stuck grey.
+    if (!("IntersectionObserver" in window)) {
+      blocks.forEach((block) => block.classList.add("is-lit"));
+      return;
+    }
+
+    // Deliberately NOT the latch the stepped rail in `ClarityAi.astro` uses:
+    // this one tracks both ways, so a block lights on the way in and returns to
+    // its resting colour on the way out, every pass. That means the observer
+    // stays connected for the life of the page — which is cheap, because an
+    // IntersectionObserver only wakes on a crossing and the page carries no
+    // scroll listener either way.
+    //
+    // One observer for both blocks: the state goes on entry.target, not on a
+    // shared root, so each lights on its own crossing.
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          entry.target.classList.toggle("is-lit", entry.isIntersecting);
+        });
+      },
+      // Crosses when a block reaches the middle half of the viewport, rather
+      // than the moment its top edge clips the bottom — the colour change is
+      // meant to be read, not caught in peripheral vision.
+      { rootMargin: "-25% 0px -25% 0px", threshold: 0 },
+    );
+
+    blocks.forEach((block) => observer.observe(block));
+  })();
+</script>

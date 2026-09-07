@@ -202,11 +202,13 @@ const steps: Step[] = [
         </div>
       </div>
 
-      <!-- Closing pill -->
+      <!-- Closing pill. Full-bleed across the container: the dot strips are the
+           flexible part, so the sentence stays its natural width in the middle
+           and each strip repeats out to whatever space is left. -->
       <div
-        class="ih-clarity-pill flex items-center justify-center gap-6 rounded-lg border-4 border-current p-6 max-md:flex-col max-md:gap-4"
+        class="ih-clarity-pill flex w-full items-center justify-center gap-6 rounded-lg border-4 border-current p-6 max-md:flex-col max-md:gap-4"
       >
-        <span class="ih-clarity-dots max-md:hidden" aria-hidden="true"></span>
+        <span class="ih-clarity-dots flex-1 max-md:hidden" aria-hidden="true"></span>
         <!-- Explicitly Vault Navy, so it does NOT inherit the pill's colour.
              The border and dots go #EFEFEF -> Flux Lime; the sentence stays
              black throughout and has to opt out of that. -->
@@ -215,7 +217,7 @@ const steps: Step[] = [
         >
           Give the model a foundation, and it stops guessing
         </p>
-        <span class="ih-clarity-dots max-md:hidden" aria-hidden="true"></span>
+        <span class="ih-clarity-dots flex-1 max-md:hidden" aria-hidden="true"></span>
       </div>
     </div>
   </div>
@@ -273,13 +275,17 @@ const steps: Step[] = [
     color: var(--color-flux-lime);
   }
 
-  /* The 158×29 dot block flanking the closing line. */
+  /* The dot strips flanking the closing line. No width: the spans are flex-1,
+     so each takes half the space the sentence leaves and the 25.2px pitch from
+     the Figma repeats to fill it — a wider pill means more dots, not stretched
+     ones. Centred so the partial dot lands at both ends of a strip rather than
+     all of the clipping piling up on one side. */
   .ih-clarity-dots {
     display: block;
-    width: 158px;
     height: 4px;
     background-image: radial-gradient(circle, currentColor 1.94px, transparent 2px);
     background-size: 25.2px 4px;
+    background-position: center;
     background-repeat: repeat-x;
   }
 </style>
