@@ -32,6 +32,19 @@
  * two background-image declarations. Every height below is exactly n×26+4, so
  * a top-aligned gradient lands a whole dot at both ends of every column.
  *
+ * They also carry the section's one piece of motion. While the diagram holds
+ * the middle of the viewport, two packets travel the strip continuously, half a
+ * strip apart: out of Your Books, through the platform — which breathes as each
+ * one passes — and on to Your Taxes. It is the diagram's own sentence animated,
+ * a stream of records read, computed on and filed, rather than decoration laid
+ * over it.
+ *
+ * Pure CSS: two keyframes, a cycle length on the strip, and a per-column delay
+ * computed in the frontmatter from where that column actually sits, so the
+ * packets move at ONE speed the whole way across instead of jumping the 382px
+ * platform in a single column-step. It runs on the same lit state as the Nova
+ * Blue, so everything wakes and settles together.
+ *
  * "Yours Taxes" is verbatim from the Figma. It reads like a typo for "Your
  * Taxes" but changing approved copy is not this file's call — flag it with the
  * designer.
@@ -78,6 +91,40 @@ const platformPills = ["GL Data", "Govt Data & Notices", "Compliance Registers"]
 
 /** Column heights, outermost first. Mirrored on the right-hand side. */
 const dotColumns = [290, 264, 238, 212, 186, 160, 108, 82];
+
+/* GEOMETRY OF THE RUN. The packets have to cross the diagram at a CONSTANT
+   speed, and that cannot come from the column index: index 7 and index 8 are
+   neighbours in the markup but 382px apart on screen, so an evenly-staggered
+   delay would fling the packet across the platform in one column-step. Phase
+   therefore comes off each column's real x position in the strip.
+
+   These five numbers are the Tailwind classes on the markup below, restated:
+   a 4px column, `gap-6` (24px) between them, `gap-[51px]` either side of the
+   280px platform box. Change one there and change it here. */
+const DOT_W = 4;
+const DOT_GAP = 24;
+const HEX_GUTTER = 51;
+const PLATFORM_W = 280;
+
+const FAN_W = dotColumns.length * DOT_W + (dotColumns.length - 1) * DOT_GAP;
+const STRIP_W = FAN_W * 2 + HEX_GUTTER * 2 + PLATFORM_W;
+/** Seconds for a packet to cross the whole strip — about 150px/s. */
+const CYCLE = 5.2;
+
+/** Centre of column `i` of the left (0) or right (1) fan, from the strip's left edge. */
+const colX = (side: number, i: number) =>
+  side * (FAN_W + HEX_GUTTER * 2 + PLATFORM_W) + i * (DOT_W + DOT_GAP) + DOT_W / 2;
+
+/* The keyframes below put a packet at 25% and another at 75%, so two are always
+   in flight half a strip apart. This returns the delay that lands the 25% crest
+   on the moment a packet reaches `x`.
+
+   It is NEGATIVE by a further whole cycle on purpose: a negative delay starts an
+   animation already part-way through, where the positive equivalent would leave
+   every column to the right of the crest sitting still until its turn came
+   round — up to five seconds of nothing after the block lights. */
+const packetDelay = (x: number) =>
+  ((x / STRIP_W) * CYCLE - CYCLE * 1.25).toFixed(3);
 
 const stages = [
   {
@@ -173,9 +220,20 @@ const stages = [
              box, so it overhangs 27px each side and the dots clear its edge by
              the 24px the rest of the diagram is spaced on. At gap-6 the fans
              ran into the hexagon's side. -->
-        <div class="flex shrink-0 items-center gap-[51px] max-lg:hidden">
+        <div
+          class="flex shrink-0 items-center gap-[51px] max-lg:hidden"
+          style={`--ih-dl-cycle:${CYCLE}s`}
+        >
+          <!-- Each column's delay is computed from where it actually sits in
+               the strip, so a packet moves at one speed the whole way across —
+               including the second and a half it spends inside the platform,
+               which is what the hexagon's own pulse is timed against. -->
           <div class="ih-dl-dots flex items-center gap-6" aria-hidden="true">
-            {dotColumns.map((h) => <span style={`height:${h}px`} />)}
+            {
+              dotColumns.map((h, i) => (
+                <span style={`height:${h}px;--ih-dl-d:${packetDelay(colX(0, i))}s`} />
+              ))
+            }
           </div>
 
           <div class="relative flex w-[280px] shrink-0 items-center justify-center">
@@ -184,7 +242,13 @@ const stages = [
                  centred in the outermost box. All three are unfilled — the
                  innermost carried a white fill before, which read the same on
                  this white section but would not on any other. -->
+            <!-- The platform's own delay puts its swell on the moment a packet
+                 is inside it. The strip is symmetric, so the platform's centre
+                 is the strip's centre and this works out to exactly one cycle —
+                 written through the same helper rather than as -5.2s, so it
+                 stays right if the fans ever change width. -->
             <svg
+              style={`--ih-dl-d:${packetDelay(STRIP_W / 2)}s`}
               class="ih-dl-hex absolute left-1/2 top-1/2 h-[382px] w-[334px] -translate-x-1/2 -translate-y-1/2"
               viewBox="0 0 334.283 382.284"
               fill="none"
@@ -226,7 +290,13 @@ const stages = [
           </div>
 
           <div class="ih-dl-dots flex items-center gap-6" aria-hidden="true">
-            {[...dotColumns].reverse().map((h) => <span style={`height:${h}px`} />)}
+            {
+              [...dotColumns]
+                .reverse()
+                .map((h, i) => (
+                  <span style={`height:${h}px;--ih-dl-d:${packetDelay(colX(1, i))}s`} />
+                ))
+            }
           </div>
         </div>
 
@@ -334,6 +404,116 @@ const stages = [
     background-image: radial-gradient(circle at 2px 2px, currentColor 2px, transparent 2px);
     background-size: 4px 26px;
     background-repeat: repeat-y;
+
+    /* PACKETS. Two swells travel the strip continuously, half a strip apart:
+       out of Your Books, into the platform, out to Your Taxes. Each one swells
+       the three or four columns it is passing and lights them to full strength,
+       and the platform breathes as it goes through. That is the diagram's own
+       sentence, animated — a stream of records being read, computed on, and
+       filed — rather than decoration laid over it.
+
+       Uniform `scale`, which grows the dots as well as the column, so a packet
+       reads as volume passing rather than a column stretching. Nothing is
+       DISPLACED, and that is deliberate: the columns are centred and their
+       heights step by 26 — one dot pitch — so centring lands every other column
+       half a pitch off its neighbour. The dots form a quincunx, not rows. With
+       no row to bend, a few px of travel gives the eye nothing to track and
+       reads as shimmer; past half a pitch each dot goes ambiguous with the one
+       above it and the fan crawls. A contour has neither problem.
+
+       Nothing here affects layout — `transform` is painted, so the swell
+       overhangs into the 51px gutter rather than pushing the platform, and the
+       tallest column tops out at 348px inside the hexagon's own 382px.
+
+       `transition` rather than a paused animation for the resting state: the
+       rules below declare the animation only while the block is lit, so when it
+       un-lights the animation is dropped, both properties fall back to the
+       design's own values and this eases them there over the same 0.6s as the
+       colour. A paused animation would instead freeze columns mid-swell. */
+    opacity: 1;
+    transition:
+      opacity 0.6s ease,
+      transform 0.6s ease;
+  }
+
+  .ih-dl-hex {
+    transition: transform 0.6s ease;
+  }
+
+  /* Each packet is a raised cosine sampled at sixths — 0, ¼, ¾, 1 and back. An
+     `ease` between two stops would dwell at both ends and read as a blink; this
+     reads as something passing. Twelve per cent of the cycle wide, which at
+     this speed is about 94px: three or four columns lit at once.
+
+     Written as grouped stops because the two packets are the same shape half a
+     cycle apart, so every value is shared by four keyframes. The resting line
+     (0.7) is the lit rule's own opacity, so a column between packets sits
+     exactly where that rule leaves it. */
+  @keyframes ih-dl-packet {
+    0%,
+    19%,
+    31%,
+    69%,
+    81%,
+    100% {
+      transform: scale(1);
+      opacity: 0.7;
+    }
+    21%,
+    29%,
+    71%,
+    79% {
+      transform: scale(1.05);
+      opacity: 0.775;
+    }
+    23%,
+    27%,
+    73%,
+    77% {
+      transform: scale(1.15);
+      opacity: 0.925;
+    }
+    25%,
+    75% {
+      transform: scale(1.2);
+      opacity: 1;
+    }
+  }
+
+  /* The platform's swell is the same shape, three times as wide, because a
+     packet is inside the 280px box for 36% of the cycle rather than 12%. Only
+     4.5% of scale: on a 334px hexagon that is a 15px breath, which is as much
+     as three concentric rings can take before they read as wobbling.
+
+     `transform` is safe to animate here even though the SVG is centred with
+     `-translate-x-1/2 -translate-y-1/2`: Tailwind v4 emits those as the
+     standalone `translate` property, not as a transform, so the two compose
+     instead of one replacing the other. */
+  @keyframes ih-dl-platform {
+    0%,
+    7%,
+    43%,
+    57%,
+    93%,
+    100% {
+      transform: scale(1);
+    }
+    13%,
+    37%,
+    63%,
+    87% {
+      transform: scale(1.011);
+    }
+    19%,
+    31%,
+    69%,
+    81% {
+      transform: scale(1.034);
+    }
+    25%,
+    75% {
+      transform: scale(1.045);
+    }
   }
 
   /* `stroke` is a genuinely animatable property, so the rings do not need the
@@ -371,6 +551,28 @@ const stages = [
     color: var(--color-nova-blue);
   }
 
+  /* The run is part of that same state, so it plays only while the block holds
+     the middle of the viewport and costs nothing the rest of the time.
+
+     The 0.7 here is the line the packets rise from, and it is the reason a lit
+     fan is not simply solid: a packet has to arrive somewhere, and full
+     strength everywhere leaves it nothing to arrive at. Unlit, the base rule
+     above still holds these at 1, so the design's own resting state is intact.
+
+     Duration and delay both come from the markup — one --ih-dl-cycle on the
+     strip, one --ih-dl-d per column computed from its real x — so the speed is
+     stated once and the phases cannot drift out of step with it. */
+  [data-ih-lit].is-lit .ih-dl-dots > span {
+    opacity: 0.7;
+    animation: ih-dl-packet var(--ih-dl-cycle, 5.2s) linear infinite;
+    animation-delay: var(--ih-dl-d, 0s);
+  }
+
+  [data-ih-lit].is-lit .ih-dl-hex {
+    animation: ih-dl-platform var(--ih-dl-cycle, 5.2s) linear infinite;
+    animation-delay: var(--ih-dl-d, 0s);
+  }
+
   [data-ih-lit].is-lit .ih-dl-hex path {
     stroke: var(--color-nova-blue);
   }
@@ -380,12 +582,28 @@ const stages = [
   }
 
   /* Someone who asked for less motion still gets both states, just without the
-     6/10ths of a second of colour travel between them. */
+     6/10ths of a second of colour travel between them — and without the wave,
+     which is motion for its own sake and the first thing that should go. */
   @media (prefers-reduced-motion: reduce) {
     .ih-dl-dots,
     .ih-dl-hex path,
     .ih-dl-overline {
       transition: none;
+    }
+
+    .ih-dl-dots > span,
+    [data-ih-lit].is-lit .ih-dl-dots > span,
+    .ih-dl-hex,
+    [data-ih-lit].is-lit .ih-dl-hex {
+      animation: none;
+      transition: none;
+    }
+
+    /* The lit fan goes back to solid too — the 0.7 only exists to give the
+       packets somewhere to arrive, and with no packets it is just a dimmer
+       diagram. */
+    [data-ih-lit].is-lit .ih-dl-dots > span {
+      opacity: 1;
     }
   }
 </style>
