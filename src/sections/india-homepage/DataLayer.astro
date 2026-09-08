@@ -26,24 +26,26 @@
  * what makes the innermost read as the solid one. Nested at Figma's sizes via
  * translate, so the SVG scales as a unit and the ring spacing holds.
  *
- * DOT COLUMNS: eight columns per side, 4px wide on a 26px pitch, in the same
- * #A6C705 the bridge dots in `Proven.astro` use. CSS gradients, not images —
- * the design's exported <img> per column would be sixteen requests for what is
- * two background-image declarations. Every height below is exactly n×26+4, so
- * a top-aligned gradient lands a whole dot at both ends of every column.
+ * DOT COLUMNS: eight columns per side, 4px dots on a 26px pitch, in the same
+ * #A6C705 the bridge dots in `Proven.astro` use. Drawn as one inline SVG per
+ * fan — not images, and no longer CSS boxes; the note beside the first <svg>
+ * explains why the body zoom rules boxes out. The heights below are all exactly
+ * n×26−22, so each one is a whole number of dots and the count is derived
+ * rather than stated twice.
  *
- * They also carry the section's one piece of motion. While the diagram holds
- * the middle of the viewport, two packets travel the strip continuously, half a
- * strip apart: out of Your Books, through the platform — which breathes as each
- * one passes — and on to Your Taxes. It is the diagram's own sentence animated,
- * a stream of records read, computed on and filed, rather than decoration laid
- * over it.
+ * The recolour to Nova Blue is a SWEEP, not one event, and it waits until the
+ * diagram's OWN CENTRE reaches the centre of the screen — see `.ih-dl-centre`
+ * for why that needs a probe rather than a tighter observer margin. Then both
+ * fans start at their outer edges at the same instant and close on the platform
+ * dot by dot, ordered by distance, so each front is an arc and the two meet
+ * where the diagram says they should. The platform turns a beat later.
+ * Scrolling back out unwinds it from the platform outward, the exact reverse.
  *
- * Pure CSS: two keyframes, a cycle length on the strip, and a per-column delay
- * computed in the frontmatter from where that column actually sits, so the
- * packets move at ONE speed the whole way across instead of jumping the 382px
- * platform in a single column-step. It runs on the same lit state as the Nova
- * Blue, so everything wakes and settles together.
+ * It is timed PER DOT rather than per column, which is what lets each dot
+ * change quickly and cleanly while the sweep as a whole stays continuous — the
+ * frontmatter explains why the column-level version could not. No animation and
+ * no script beyond the observer that was already here: one transition, one
+ * inline moment per dot.
  *
  * "Yours Taxes" is verbatim from the Figma. It reads like a typo for "Your
  * Taxes" but changing approved copy is not this file's call — flag it with the
@@ -92,39 +94,80 @@ const platformPills = ["GL Data", "Govt Data & Notices", "Compliance Registers"]
 /** Column heights, outermost first. Mirrored on the right-hand side. */
 const dotColumns = [290, 264, 238, 212, 186, 160, 108, 82];
 
-/* GEOMETRY OF THE RUN. The packets have to cross the diagram at a CONSTANT
-   speed, and that cannot come from the column index: index 7 and index 8 are
-   neighbours in the markup but 382px apart on screen, so an evenly-staggered
-   delay would fling the packet across the platform in one column-step. Phase
-   therefore comes off each column's real x position in the strip.
+/* THE SWEEP. The recolour is not one event — it starts at both outer edges at
+   once and closes on the platform, so what comes out of your books and what
+   comes back from the portals both arrive here, and here is where they become
+   one answer.
 
-   These five numbers are the Tailwind classes on the markup below, restated:
-   a 4px column, `gap-6` (24px) between them, `gap-[51px]` either side of the
-   280px platform box. Change one there and change it here. */
-const DOT_W = 4;
-const DOT_GAP = 24;
+   IT IS TIMED PER DOT, NOT PER COLUMN, and that is what makes it smooth without
+   smearing. Staggering whole columns gives eight steps a side: to stop that
+   reading as eight separate blinks the colour has to travel long enough that
+   most columns are part-changed at any moment, and a fan of half-changed dots
+   is a gradient — a muddy ramp between lime and blue spread across the artwork.
+   Timing each dot individually gives a hundred and thirty-two steps instead, so
+   each one can change quickly and cleanly and the sweep is still continuous.
+   Every dot is one colour or the other; only the handful on the edge itself are
+   ever in between.
+
+   The order is by straight-line DISTANCE to the platform, so the front is an
+   arc closing on it rather than a vertical bar sliding sideways. The dots at
+   the top and bottom of a tall column are further away than its middle ones and
+   go first, which is what curves the edge. The PACING is by rank rather than by
+   that distance — see the rings below for why. */
+const DOT = 4;
+/** Vertical: 4px dot on a 22px gap. Horizontal: 4px column on `gap-6`. */
+const DOT_PITCH = 26;
+const COL_PITCH = DOT + 24;
 const HEX_GUTTER = 51;
 const PLATFORM_W = 280;
 
-const FAN_W = dotColumns.length * DOT_W + (dotColumns.length - 1) * DOT_GAP;
-const STRIP_W = FAN_W * 2 + HEX_GUTTER * 2 + PLATFORM_W;
-/** Seconds for a packet to cross the whole strip — about 150px/s. */
-const CYCLE = 5.2;
+const LAST = dotColumns.length - 1;
+const FAN_W = dotColumns.length * DOT + LAST * (COL_PITCH - DOT);
+/** The fan's box is its tallest column; the rest are centred inside it. */
+const FAN_H = Math.max(...dotColumns);
+/** Platform centre, measured from a fan's OUTER edge. */
+const PLATFORM_X = FAN_W + HEX_GUTTER + PLATFORM_W / 2;
 
-/** Centre of column `i` of the left (0) or right (1) fan, from the strip's left edge. */
-const colX = (side: number, i: number) =>
-  side * (FAN_W + HEX_GUTTER * 2 + PLATFORM_W) + i * (DOT_W + DOT_GAP) + DOT_W / 2;
+/** Figma's heights are all exactly n×26−22, so the count falls out of the height. */
+const dotsIn = (h: number) => (h + DOT_PITCH - DOT) / DOT_PITCH;
 
-/* The keyframes below put a packet at 25% and another at 75%, so two are always
-   in flight half a strip apart. This returns the delay that lands the 25% crest
-   on the moment a packet reaches `x`.
+/** Centre of dot `k` in a column of height `h`, in the fan's own coordinates. */
+const dotY = (h: number, k: number) => (FAN_H - h) / 2 + DOT / 2 + k * DOT_PITCH;
 
-   It is NEGATIVE by a further whole cycle on purpose: a negative delay starts an
-   animation already part-way through, where the positive equivalent would leave
-   every column to the right of the crest sitting still until its turn came
-   round — up to five seconds of nothing after the block lights. */
-const packetDelay = (x: number) =>
-  ((x / STRIP_W) * CYCLE - CYCLE * 1.25).toFixed(3);
+/** `outer` counts from the fan's outer edge, so both fans share this. */
+const dotDist = (outer: number, h: number, k: number) =>
+  Math.hypot(
+    PLATFORM_X - (outer * COL_PITCH + DOT / 2),
+    k * DOT_PITCH + DOT / 2 - h / 2,
+  );
+
+const spread = dotColumns.flatMap((h, i) =>
+  Array.from({ length: dotsIn(h) }, (_, k) => dotDist(i, h, k)),
+);
+
+/* RINGS. Every distinct distance is one step of the closing arc — a dot and its
+   mirror below the axis are exactly equidistant, so they belong to the same
+   ring and change together, which is what keeps the fan symmetric.
+
+   Timing is by a ring's RANK, not by its distance, and that is the difference
+   between smooth and stuttering. The distances bunch and gap badly: a tall
+   outer column contributes a dozen rings within a few px of each other while
+   the short inner ones are far apart, so scaling time by distance left stalls
+   of nearly two tenths of a second — longer than a dot's own fade, which the
+   eye reads as the sweep catching. Ranking spaces every ring equally instead.
+   Order is preserved, so the front still closes outside-in; only the pacing
+   changes, from "constant px per second" to "constant rings per second", and it
+   is rings the eye is actually counting. */
+const rings = [...new Set(spread.map((d) => Math.round(d * 100)))].sort((a, b) => b - a);
+
+/** Seconds from the first ring to the last — the one dial for the pace. */
+const SWEEP = 1.7;
+const RING_STEP = SWEEP / (rings.length - 1);
+/** The platform turns a beat after the last ring. */
+const HEX_T = SWEEP + 0.15;
+
+const dotT = (outer: number, h: number, k: number) =>
+  (rings.indexOf(Math.round(dotDist(outer, h, k) * 100)) * RING_STEP).toFixed(3);
 
 const stages = [
   {
@@ -164,9 +207,10 @@ const stages = [
 
       <!-- Diagram -->
       <div
-        class="flex w-full items-stretch gap-10 max-lg:flex-col max-lg:items-center max-lg:gap-8"
+        class="relative flex w-full items-stretch gap-10 max-lg:flex-col max-lg:items-center max-lg:gap-8"
         data-ih-lit
       >
+        <span class="ih-dl-centre" aria-hidden="true"></span>
         <div
           class="flex flex-1 flex-col items-center gap-6 rounded-xl border border-[#CCCCCC] bg-generic-00 p-6 max-lg:w-full max-lg:max-w-[420px] lg:min-w-0"
         >
@@ -220,21 +264,53 @@ const stages = [
              box, so it overhangs 27px each side and the dots clear its edge by
              the 24px the rest of the diagram is spaced on. At gap-6 the fans
              ran into the hexagon's side. -->
+        <!-- --ih-dl-max is the last moment in the whole sweep, and it lives here
+             because both fans and the hexagon need it: the resting rules derive
+             each element's OUT delay as (max − its own), which is what makes
+             leaving the exact reverse of arriving without a second value per
+             dot. One number on the strip instead of a hundred and thirty-three. -->
         <div
           class="flex shrink-0 items-center gap-[51px] max-lg:hidden"
-          style={`--ih-dl-cycle:${CYCLE}s`}
+          style={`--ih-dl-max:${HEX_T.toFixed(3)}s`}
         >
-          <!-- Each column's delay is computed from where it actually sits in
-               the strip, so a packet moves at one speed the whole way across —
-               including the second and a half it spends inside the platform,
-               which is what the hexagon's own pulse is timed against. -->
-          <div class="ih-dl-dots flex items-center gap-6" aria-hidden="true">
+          <!-- Index 0 is the OUTERMOST column of this fan, so it is also first
+               in the sweep. The right fan is reversed, so its own outermost
+               column is the last in the array — see there.
+
+               ONE SVG PER FAN, not a hundred and thirty-two boxes. Each dot has
+               to be its own element to carry its own moment in the sweep, and as
+               CSS boxes that broke under the 0.85 body zoom: a box's paint rect
+               is snapped to whole device pixels and each is snapped on its own,
+               so 4px dots became 3.4px at sixteen different subpixel offsets and
+               rendered at visibly different sizes. SVG geometry is rasterised as
+               paths and is not snapped, so every dot antialiases identically.
+
+               At zoom 1 nothing changes: every cx and cy below lands on a whole
+               number, so the circles are as crisp as the boxes were.
+
+               The circles carry no class — with this many of them a class
+               attribute each would be kilobytes of the Embed budget for nothing
+               a descendant selector cannot already say. -->
+          <svg
+            class="ih-dl-dots block shrink-0"
+            width={FAN_W}
+            height={FAN_H}
+            viewBox={`0 0 ${FAN_W} ${FAN_H}`}
+            aria-hidden="true"
+          >
             {
-              dotColumns.map((h, i) => (
-                <span style={`height:${h}px;--ih-dl-d:${packetDelay(colX(0, i))}s`} />
-              ))
+              dotColumns.flatMap((h, i) =>
+                Array.from({ length: dotsIn(h) }, (_, k) => (
+                  <circle
+                    cx={i * COL_PITCH + DOT / 2}
+                    cy={dotY(h, k)}
+                    r={DOT / 2}
+                    style={`--ih-dl-t:${dotT(i, h, k)}s`}
+                  />
+                )),
+              )
             }
-          </div>
+          </svg>
 
           <div class="relative flex w-[280px] shrink-0 items-center justify-center">
             <!-- Figma's own path data, nested by translate rather than redrawn:
@@ -242,13 +318,12 @@ const stages = [
                  centred in the outermost box. All three are unfilled — the
                  innermost carried a white fill before, which read the same on
                  this white section but would not on any other. -->
-            <!-- The platform's own delay puts its swell on the moment a packet
-                 is inside it. The strip is symmetric, so the platform's centre
-                 is the strip's centre and this works out to exactly one cycle —
-                 written through the same helper rather than as -5.2s, so it
-                 stays right if the fans ever change width. -->
+            <!-- A beat past the last dot, so the rings turn just after the two
+                 fronts close on them — the platform is what the fans arrive at.
+                 It is also --ih-dl-max itself, which is what makes its OUT delay
+                 come out at exactly zero: last to arrive, first to let go. -->
             <svg
-              style={`--ih-dl-d:${packetDelay(STRIP_W / 2)}s`}
+              style={`--ih-dl-t:${HEX_T.toFixed(3)}s`}
               class="ih-dl-hex absolute left-1/2 top-1/2 h-[382px] w-[334px] -translate-x-1/2 -translate-y-1/2"
               viewBox="0 0 334.283 382.284"
               fill="none"
@@ -289,15 +364,32 @@ const stages = [
             </div>
           </div>
 
-          <div class="ih-dl-dots flex items-center gap-6" aria-hidden="true">
+          <!-- Reversed, so index 0 is the column nearest the platform and index
+               7 is this fan's outer edge. The sweep orders are therefore the
+               mirror of the left fan's, which is what makes the two run toward
+               each other rather than both left to right. -->
+          <svg
+            class="ih-dl-dots block shrink-0"
+            width={FAN_W}
+            height={FAN_H}
+            viewBox={`0 0 ${FAN_W} ${FAN_H}`}
+            aria-hidden="true"
+          >
             {
               [...dotColumns]
                 .reverse()
-                .map((h, i) => (
-                  <span style={`height:${h}px;--ih-dl-d:${packetDelay(colX(1, i))}s`} />
-                ))
+                .flatMap((h, i) =>
+                  Array.from({ length: dotsIn(h) }, (_, k) => (
+                    <circle
+                      cx={i * COL_PITCH + DOT / 2}
+                      cy={dotY(h, k)}
+                      r={DOT / 2}
+                      style={`--ih-dl-t:${dotT(LAST - i, h, k)}s`}
+                    />
+                  )),
+                )
             }
-          </div>
+          </svg>
         </div>
 
         <div
@@ -336,7 +428,8 @@ const stages = [
            light when THIS row centres rather than when the diagram above does —
            sharing one section-wide state would drop them back to grey at the
            exact moment you scrolled down to read them. -->
-      <div class="flex w-full items-stretch max-lg:flex-col max-lg:gap-4" data-ih-lit>
+      <div class="relative flex w-full items-stretch max-lg:flex-col max-lg:gap-4" data-ih-lit>
+        <span class="ih-dl-centre" aria-hidden="true"></span>
         {
           stages.map((stage, i) => (
             <>
@@ -377,143 +470,47 @@ const stages = [
 </section>
 
 <style is:global>
-  /* One dot every 26px down a 4px column — the design's 4px dot on a 24px gap.
-     `height` comes off the inline style per column, which is what gives the
-     two fans their taper.
+  /* One dot every 26px down a 4px column — the design's 4px dot on a 22px gap.
+     The count comes off each column's Figma height in the frontmatter, and it
+     is the counts that give the two fans their taper.
 
-     The gradient centre is pinned to 2px 2px, not left at the tile's centre.
-     Figma's columns start with a whole dot at y=0 and every height is n×26+4,
-     so a top-aligned tile fills each column exactly; centring it instead pushed
-     every dot down 11px and dropped the last one off the bottom of each
-     column — eleven dots in the tallest fan where the design has twelve.
+     THESE WERE ONE REPEATING radial-gradient PER COLUMN. The gradient was the
+     cheaper drawing by a mile — two declarations against a hundred and
+     thirty-two shapes — but it can only hold one colour at a time, and the
+     sweep needs every dot to change on its own schedule. A column's worth of
+     dots changing together is the coarse, smeary version of this; see the
+     frontmatter.
 
-     The dot colour is currentColor rather than a literal, so the fans can be
-     recoloured by transitioning one `color` on the parent. It has to work this
-     way: `color` is transitionable, a background-image is not, so a gradient
-     with a fixed colour stop would snap instead of easing. Same trick the
-     closing pill in `ClarityAi.astro` uses. */
-  .ih-dl-dots {
-    color: #a6c705;
-    transition: color 0.6s ease;
-  }
+     They are SVG circles rather than styled boxes because of the body zoom —
+     the reason is on the markup, next to the <svg>.
 
-  .ih-dl-dots > span {
-    display: block;
-    width: 4px;
-    flex: none;
-    background-image: radial-gradient(circle at 2px 2px, currentColor 2px, transparent 2px);
-    background-size: 4px 26px;
-    background-repeat: repeat-y;
+     Geometry is unchanged: 4px round dots on a 26px pitch, so every column
+     still occupies exactly the n×26−22 height Figma drew.
 
-    /* PACKETS. Two swells travel the strip continuously, half a strip apart:
-       out of Your Books, into the platform, out to Your Taxes. Each one swells
-       the three or four columns it is passing and lights them to full strength,
-       and the platform breathes as it goes through. That is the diagram's own
-       sentence, animated — a stream of records being read, computed on, and
-       filed — rather than decoration laid over it.
+     #A6C705 is NOT Flux Lime (#C8F006) and must not become it. The brand allows
+     one instance of Flux Lime per screen and this page already spends it on the
+     hero's headline mark. */
+  .ih-dl-dots circle {
+    fill: #a6c705;
 
-       Uniform `scale`, which grows the dots as well as the column, so a packet
-       reads as volume passing rather than a column stretching. Nothing is
-       DISPLACED, and that is deliberate: the columns are centred and their
-       heights step by 26 — one dot pitch — so centring lands every other column
-       half a pitch off its neighbour. The dots form a quincunx, not rows. With
-       no row to bend, a few px of travel gives the eye nothing to track and
-       reads as shimmer; past half a pitch each dot goes ambiguous with the one
-       above it and the fan crawls. A contour has neither problem.
+    /* EXACTLY TWICE THE RING STEP, which is not a coincidence and should not be
+       tuned without recomputing it. The rings are 0.05s apart, so at 0.1s a dot
+       finishes changing at the very moment the ring two behind it starts: the
+       front is continuous with no overlap to spare, which is the narrowest a
+       moving edge can be while still being an edge rather than a sequence of
+       blinks. Two rings deep is around a dozen dots of the hundred and
+       thirty-two — the other hundred and twenty are flatly one colour or the
+       other, which is what keeps this a sweep and not a gradient.
 
-       Nothing here affects layout — `transform` is painted, so the swell
-       overhangs into the 51px gutter rather than pushing the platform, and the
-       tallest column tops out at 348px inside the hexagon's own 382px.
+       Shorter and the front breaks apart; longer and the part-coloured band
+       widens into the ramp this is meant to avoid.
 
-       `transition` rather than a paused animation for the resting state: the
-       rules below declare the animation only while the block is lit, so when it
-       un-lights the animation is dropped, both properties fall back to the
-       design's own values and this eases them there over the same 0.6s as the
-       colour. A paused animation would instead freeze columns mid-swell. */
-    opacity: 1;
-    transition:
-      opacity 0.6s ease,
-      transform 0.6s ease;
-  }
-
-  .ih-dl-hex {
-    transition: transform 0.6s ease;
-  }
-
-  /* Each packet is a raised cosine sampled at sixths — 0, ¼, ¾, 1 and back. An
-     `ease` between two stops would dwell at both ends and read as a blink; this
-     reads as something passing. Twelve per cent of the cycle wide, which at
-     this speed is about 94px: three or four columns lit at once.
-
-     Written as grouped stops because the two packets are the same shape half a
-     cycle apart, so every value is shared by four keyframes. The resting line
-     (0.7) is the lit rule's own opacity, so a column between packets sits
-     exactly where that rule leaves it. */
-  @keyframes ih-dl-packet {
-    0%,
-    19%,
-    31%,
-    69%,
-    81%,
-    100% {
-      transform: scale(1);
-      opacity: 0.7;
-    }
-    21%,
-    29%,
-    71%,
-    79% {
-      transform: scale(1.05);
-      opacity: 0.775;
-    }
-    23%,
-    27%,
-    73%,
-    77% {
-      transform: scale(1.15);
-      opacity: 0.925;
-    }
-    25%,
-    75% {
-      transform: scale(1.2);
-      opacity: 1;
-    }
-  }
-
-  /* The platform's swell is the same shape, three times as wide, because a
-     packet is inside the 280px box for 36% of the cycle rather than 12%. Only
-     4.5% of scale: on a 334px hexagon that is a 15px breath, which is as much
-     as three concentric rings can take before they read as wobbling.
-
-     `transform` is safe to animate here even though the SVG is centred with
-     `-translate-x-1/2 -translate-y-1/2`: Tailwind v4 emits those as the
-     standalone `translate` property, not as a transform, so the two compose
-     instead of one replacing the other. */
-  @keyframes ih-dl-platform {
-    0%,
-    7%,
-    43%,
-    57%,
-    93%,
-    100% {
-      transform: scale(1);
-    }
-    13%,
-    37%,
-    63%,
-    87% {
-      transform: scale(1.011);
-    }
-    19%,
-    31%,
-    69%,
-    81% {
-      transform: scale(1.034);
-    }
-    25%,
-    75% {
-      transform: scale(1.045);
-    }
+       The OUT delay is derived, not stored — (the sweep's last moment − this
+       dot's own) is its mirror, so leaving unwinds from the platform back out
+       to the edges. It belongs on this rule and not the lit one because a
+       transition uses the delay declared on the state it is moving TO. */
+    transition: fill 0.1s ease;
+    transition-delay: calc(var(--ih-dl-max, 0s) - var(--ih-dl-t, 0s));
   }
 
   /* `stroke` is a genuinely animatable property, so the rings do not need the
@@ -524,10 +521,20 @@ const stages = [
 
      The `stroke="#999999"` presentation attributes stay on the paths: they are
      the lowest-priority source, so this rule wins, and they keep the hexagon
-     drawn correctly if the section is ever rendered without its CSS. */
+     drawn correctly if the section is ever rendered without its CSS.
+
+     --ih-dl-t is set on the <svg>, not here; custom properties inherit, so the
+     paths pick it up. It is set to --ih-dl-max itself, so this derived OUT
+     delay comes out at zero: the platform is the last thing to arrive and the
+     first to let go.
+
+     Longer than a dot's 0.15s because this is one element rather than a front
+     of many — nothing else is moving by the time it runs, so it is the sweep
+     settling rather than part of the edge. */
   .ih-dl-hex path {
     stroke: #999999;
-    transition: stroke 0.6s ease;
+    transition: stroke 0.45s ease;
+    transition-delay: calc(var(--ih-dl-max, 0s) - var(--ih-dl-t, 0s));
   }
 
   /* The stage overlines keep their resting grey from the `text-neutral-500`
@@ -547,63 +554,69 @@ const stages = [
      Scoped to [data-ih-lit] rather than the section, because the diagram and
      the stage row each carry their own copy of this state and light on their
      own crossing. */
-  [data-ih-lit].is-lit .ih-dl-dots {
-    color: var(--color-nova-blue);
-  }
+  /* THE SWEEP, and the IN order. Both fans start at their outer edges at the
+     same instant and close on the platform, dot by dot in order of how far each
+     one is from it — so the front is an arc, and the two arcs meet where the
+     diagram says they should.
 
-  /* The run is part of that same state, so it plays only while the block holds
-     the middle of the viewport and costs nothing the rest of the time.
-
-     The 0.7 here is the line the packets rise from, and it is the reason a lit
-     fan is not simply solid: a packet has to arrive somewhere, and full
-     strength everywhere leaves it nothing to arrive at. Unlit, the base rule
-     above still holds these at 1, so the design's own resting state is intact.
-
-     Duration and delay both come from the markup — one --ih-dl-cycle on the
-     strip, one --ih-dl-d per column computed from its real x — so the speed is
-     stated once and the phases cannot drift out of step with it. */
-  [data-ih-lit].is-lit .ih-dl-dots > span {
-    opacity: 0.7;
-    animation: ih-dl-packet var(--ih-dl-cycle, 5.2s) linear infinite;
-    animation-delay: var(--ih-dl-d, 0s);
-  }
-
-  [data-ih-lit].is-lit .ih-dl-hex {
-    animation: ih-dl-platform var(--ih-dl-cycle, 5.2s) linear infinite;
-    animation-delay: var(--ih-dl-d, 0s);
+     Every dot's own moment is inline as --ih-dl-t. Nothing here is a stagger
+     step: the spacing between dots comes out of the geometry, which is why the
+     front stays even where the columns get shorter. */
+  [data-ih-lit].is-lit .ih-dl-dots circle {
+    fill: var(--color-nova-blue);
+    transition-delay: var(--ih-dl-t, 0s);
   }
 
   [data-ih-lit].is-lit .ih-dl-hex path {
     stroke: var(--color-nova-blue);
+    transition-delay: var(--ih-dl-t, 0s);
   }
 
   [data-ih-lit].is-lit .ih-dl-overline {
     color: var(--color-nova-blue);
   }
 
+  /* THE TRIGGER. A 1px probe pinned to the block's own vertical centre, and the
+     only thing the observer watches.
+
+     Observing the block itself cannot express "centred". An IntersectionObserver
+     reports overlap, so a block taller than the root band lights the moment its
+     leading edge clips that band — with the old -25% margins the diagram was
+     still sitting low on the screen, half of it below the fold, when the sweep
+     had already run. Widening or narrowing the band does not fix it: for a tall
+     target, ANY band still triggers on the edge.
+
+     A zero-height probe has no edges to speak of, so "the probe is inside the
+     band" and "the block's centre is within half a band of the viewport's
+     centre" are the same statement. That is the trigger this needs.
+
+     It is `left: 0; width: 1px` rather than a full-width bar because the block
+     is a flex row: a stretched absolute child is still out of flow and cannot
+     disturb it, but a 1px box makes that obvious to the next reader. */
+  .ih-dl-centre {
+    position: absolute;
+    left: 0;
+    top: 50%;
+    width: 1px;
+    height: 1px;
+    pointer-events: none;
+  }
+
   /* Someone who asked for less motion still gets both states, just without the
-     6/10ths of a second of colour travel between them — and without the wave,
-     which is motion for its own sake and the first thing that should go. */
+     travel between them — and without the sweep, which becomes both states at
+     once and nothing in between.
+
+     The delays have to go as well as the transitions. Leave them and a reduced
+     motion user gets no fade but still waits well over a second for the last
+     column to snap, which is the same staggered effect delivered worse. */
   @media (prefers-reduced-motion: reduce) {
-    .ih-dl-dots,
+    .ih-dl-dots circle,
+    [data-ih-lit].is-lit .ih-dl-dots circle,
     .ih-dl-hex path,
+    [data-ih-lit].is-lit .ih-dl-hex path,
     .ih-dl-overline {
       transition: none;
-    }
-
-    .ih-dl-dots > span,
-    [data-ih-lit].is-lit .ih-dl-dots > span,
-    .ih-dl-hex,
-    [data-ih-lit].is-lit .ih-dl-hex {
-      animation: none;
-      transition: none;
-    }
-
-    /* The lit fan goes back to solid too — the 0.7 only exists to give the
-       packets somewhere to arrive, and with no packets it is just a dimmer
-       diagram. */
-    [data-ih-lit].is-lit .ih-dl-dots > span {
-      opacity: 1;
+      transition-delay: 0s;
     }
   }
 </style>
@@ -623,6 +636,19 @@ const stages = [
       return;
     }
 
+    // What is observed is the 1px probe at each block's CENTRE, not the block —
+    // see .ih-dl-centre. Against a band this narrow, a probe crossing it means
+    // the block's own middle is within 12% of the viewport's middle, which is
+    // the "properly centred" this is meant to wait for. Observing the block
+    // instead would fire on its leading edge however the band were tuned.
+    const probes = blocks
+      .map((block) => block.querySelector(".ih-dl-centre"))
+      .filter(Boolean);
+    if (!probes.length) {
+      blocks.forEach((block) => block.classList.add("is-lit"));
+      return;
+    }
+
     // Deliberately NOT the latch the stepped rail in `ClarityAi.astro` uses:
     // this one tracks both ways, so a block lights on the way in and returns to
     // its resting colour on the way out, every pass. That means the observer
@@ -630,20 +656,21 @@ const stages = [
     // IntersectionObserver only wakes on a crossing and the page carries no
     // scroll listener either way.
     //
-    // One observer for both blocks: the state goes on entry.target, not on a
-    // shared root, so each lights on its own crossing.
+    // One observer for both probes: the state goes on the probe's own block, so
+    // each lights on its own crossing.
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
-          entry.target.classList.toggle("is-lit", entry.isIntersecting);
+          const block = entry.target.closest("[data-ih-lit]");
+          if (block) block.classList.toggle("is-lit", entry.isIntersecting);
         });
       },
-      // Crosses when a block reaches the middle half of the viewport, rather
-      // than the moment its top edge clips the bottom — the colour change is
-      // meant to be read, not caught in peripheral vision.
-      { rootMargin: "-25% 0px -25% 0px", threshold: 0 },
+      // A band 24% of the viewport tall, centred: ±12% either side of the
+      // middle. Tight enough that the block really is centred, loose enough
+      // that stopping to read it lands inside rather than just past it.
+      { rootMargin: "-38% 0px -38% 0px", threshold: 0 },
     );
 
-    blocks.forEach((block) => observer.observe(block));
+    probes.forEach((probe) => observer.observe(probe));
   })();
 </script>

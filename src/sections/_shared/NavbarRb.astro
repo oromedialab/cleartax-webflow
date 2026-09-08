@@ -158,18 +158,29 @@ function toBlocks(items: NavChild[]): Block[] {
             >
 <!-- Two bars that quarter-turn on open: horizontal when closed, vertical
                    when the panel is out. That rotation is the Figma component's own
-                   `rotate-90` on the List glyph — not a hamburger-to-X morph. -->
-              <span
-                class="relative block w-6 h-6 shrink-0 transition-transform duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] group-[.open]/toggle:rotate-90"
+                   `rotate-90` on the List glyph — not a hamburger-to-X morph.
+
+                   SVG RECTS, NOT DIVS, and that is load-bearing. As CSS boxes these
+                   were two 2px bars at y=9 and y=14; `shared.css` zooms the body to
+                   0.85 between tablet and 1440px, which makes those 1.7px tall at
+                   7.65px and 11.9px. A box's paint rect is snapped to whole device
+                   pixels and each box is snapped on its own, so the two bars landed
+                   on different subpixel offsets and rendered at different weights —
+                   one visibly heavier than the other, in a glyph whose whole point is
+                   that they match. SVG geometry is rasterised as paths and is not
+                   snapped, so both bars antialias identically at any scale.
+
+                   The rotation moved onto the <svg> itself; the wrapper only existed
+                   to position the two absolute bars. -->
+              <svg
+                class="block w-6 h-6 shrink-0 text-vault-navy transition-transform duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] group-[.open]/toggle:rotate-90"
+                viewBox="0 0 24 24"
+                fill="none"
                 aria-hidden="true"
               >
-                <span
-                  class="block absolute left-0 top-[9px] w-6 h-0.5 bg-vault-navy rounded-sm"
-                ></span>
-                <span
-                  class="block absolute left-0 top-[14px] w-6 h-0.5 bg-vault-navy rounded-sm"
-                ></span>
-              </span>
+                <rect y="9" width="24" height="2" rx="1" fill="currentColor"></rect>
+                <rect y="14" width="24" height="2" rx="1" fill="currentColor"></rect>
+              </svg>
               <span
                 class="text-[length:var(--fs-label-lg)] leading-[length:var(--lh-label-lg)] font-semibold text-vault-navy font-body"
                 >Menu</span
@@ -275,8 +286,25 @@ function toBlocks(items: NavChild[]): Block[] {
                             // apply between the button and the zero-height
                             // container while collapsed, leaving a phantom 12px
                             // under every closed group. The spacing lives on the
-                            // collapsible child (`py-3`) so it collapses with it.
-                            <div class="group/sub flex flex-col" data-nav-sub>
+                            // collapsible child's own padding so it collapses with it.
+                            //
+                            // `[&.open]:pt-4` sets an OPEN group off from the entry
+                            // above it, so it reads as its own block rather than as
+                            // part of the column — 16px on top of the panel's 12px
+                            // step. Only while open, or every collapsed group would
+                            // carry the same gap and the panel would lose its rhythm.
+                            // It transitions on the collapse's own duration and easing
+                            // so the push and the reveal move as one gesture; left to
+                            // snap, the entries above would jump while the children
+                            // eased in beneath them.
+                            //
+                            // The variant is `[&.open]:` and not `group-[.open]/sub:`
+                            // because `.open` lands on THIS element — the same reason
+                            // the panel above uses `[&.open]:grid-rows-[1fr]`.
+                            <div
+                              class="group/sub flex flex-col [&.open]:pt-4 transition-[padding-top] duration-300 ease-[cubic-bezier(0.16,1,0.3,1)]"
+                              data-nav-sub
+                            >
                               <button
                                 type="button"
                                 data-sub-trigger
@@ -308,18 +336,23 @@ function toBlocks(items: NavChild[]): Block[] {
                                       the parent, so the parent reads as a label over
                                       its group rather than a branch.
 
-                                      py-3 sets the open group off from the chevron
-                                      row above it and the next block below, so the
-                                      revealed children read as belonging to their
+                                      This padding sets the open group off from the
+                                      chevron row above it and the next block below, so
+                                      the revealed children read as belonging to their
                                       parent rather than continuing the column. It is
                                       padding HERE rather than a gap on the collapse
                                       wrapper because only this element is inside the
                                       0fr/1fr grid row — on the wrapper it would apply
-                                      while collapsed too, leaving a phantom 24px under
-                                      every closed group. Kept on the panel's 12px step
-                                      so an open group still lands on the same rhythm
-                                      as everything around it. */}
-                                  <ul class="list-none m-0 p-0 py-3 flex flex-col gap-3">
+                                      while collapsed too, leaving a phantom gap under
+                                      every closed group.
+
+                                      Asymmetric on purpose: pt-4 against pb-3 buys the
+                                      first child a little more clearance from the
+                                      chevron row it belongs to, while the bottom stays
+                                      on the panel's 12px step so the NEXT block still
+                                      lands on the same rhythm as everything around
+                                      it. */}
+                                  <ul class="list-none m-0 p-0 pt-4 pb-3 flex flex-col gap-3">
                                     {block.item.children!.map((c) => (
                                       <li>
                                         <a href={c.href} class="block no-underline font-body text-neutral-500 text-[length:var(--fs-body-lg)] leading-[length:var(--lh-body-lg)] transition-colors hover:text-nova-blue">
