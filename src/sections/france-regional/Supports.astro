@@ -1,0 +1,144 @@
+---
+/**
+ * "How ClearTax supports e-invoicing & e-reporting" — Figma node 13600:29579.
+ *
+ * Six cards in a 2-column grid. The Figma card ships a `+` control and a hidden
+ * body frame beneath the heading, so each card is an accordion: the row is the
+ * button, the paragraph is the panel, and `+` becomes `−` while open.
+ *
+ * PLACEHOLDER COPY: only the first card carries body text in the Figma (the
+ * hidden frame on node 13400:19561). The other five bodies are written from
+ * facts already stated elsewhere on this page and should be reviewed before the
+ * page goes live.
+ *
+ * The icon squares are unfilled "Icon placeholder" frames in the Figma, so they
+ * render as `bg-visual-placeholder`. Swap each for a Webflow-hosted URL when the
+ * icons land — never a `data:` URI.
+ *
+ * Ids are `fr-supports-` prefixed: embeds share one namespace per page.
+ */
+interface SupportCard {
+  heading: string;
+  body: string;
+}
+
+const cards: SupportCard[] = [
+  {
+    heading: "PA-ready, Y-model compliant architecture for the French mandate",
+    body: "French Y-model with clear roles: managing routing via certified platforms. Full e-invoicing data lifecycle from submission to payment. Support for Chorus Pro and certified PDP connectivity.",
+  },
+  {
+    heading: "24×7 support & technical assistance",
+    body: "Dedicated implementation support to help your teams go live faster, then round-the-clock assistance once you are running. Failed invoices are detected, diagnosed and resubmitted automatically, so your team is alerted only when something needs a decision.",
+  },
+  {
+    heading: "Single global platform, unified APIs",
+    body: "One API covering 50+ countries. Country mandates sit on top of it as configuration, not separate builds — when a new mandate goes live you switch it on and your integration does not change.",
+  },
+  {
+    heading: "Strong integration track record and accelerators",
+    body: "2,000+ completed ERP integrations, with pre-built certified connectors for SAP ECC and S/4HANA, Oracle Fusion and EBS, Microsoft Dynamics 365 F&O and Business Central, NetSuite, and POS and OMS platforms.",
+  },
+  {
+    heading: "Enterprise-grade security, uptime and analytics",
+    body: "SOC 2 Type II and ISO 27001:2022 certified, with AES 256-bit encryption at rest and local data residency in every country you operate. 99.99% uptime, and your data is never used to train models.",
+  },
+  {
+    heading: "Compliance Assurance, Audit-Ready & Future-Proof",
+    body: "Every state transition is tracked and reported for audit and reconciliation, and regulatory changes are handled cloud-side with no ERP rework. Built for EU ViDA from 2030 with no additional setup.",
+  },
+];
+---
+
+<section class="bg-generic-00 py-16 lg:py-20">
+  <div class="container mx-auto">
+    <h2
+      class="m-0 mb-8 text-center font-heading font-medium text-vault-navy text-[length:var(--fs-h1)] leading-[length:var(--lh-h1)] tracking-[-0.5px] lg:mb-12"
+    >
+      How ClearTax supports e-invoicing &amp; e-reporting
+    </h2>
+
+    <div class="grid grid-cols-1 gap-6 lg:grid-cols-2 lg:gap-8">
+      {
+        cards.map((card, i) => (
+          <div
+            class="self-start rounded-xl border border-neutral-300 bg-generic-00 p-6"
+            data-fr-supports-card
+          >
+            <button
+              type="button"
+              class="flex w-full cursor-pointer items-start gap-6 border-0 bg-transparent p-0 text-left"
+              aria-expanded="false"
+              aria-controls={`fr-supports-panel-${i}`}
+              data-fr-supports-toggle
+            >
+              <span
+                class="block h-14 w-14 shrink-0 self-stretch rounded-lg bg-visual-placeholder"
+                aria-hidden="true"
+              />
+              <span class="min-w-0 flex-1 font-heading font-medium text-vault-navy text-[length:var(--fs-h6)] leading-[length:var(--lh-h6)]">
+                {card.heading}
+              </span>
+              <span
+                class="flex h-14 w-14 shrink-0 items-center justify-center rounded-lg p-2 text-vault-navy"
+                aria-hidden="true"
+              >
+                {/* The exported Figma glyph (Media / Icon / Unfilled / plus).
+                    The vertical bar is hidden while open, turning + into −. */}
+                <svg
+                  width="40"
+                  height="40"
+                  viewBox="0 0 40 40"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    d="M20 10V30"
+                    stroke="currentColor"
+                    stroke-width="1.5"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    data-fr-supports-bar
+                  />
+                  <path
+                    d="M30 20L10 20"
+                    stroke="currentColor"
+                    stroke-width="1.5"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  />
+                </svg>
+              </span>
+            </button>
+
+            <div id={`fr-supports-panel-${i}`} hidden data-fr-supports-panel>
+              <p class="m-0 pt-4 font-body font-normal text-neutral-500 text-[length:var(--fs-body)] leading-[length:var(--lh-body)]">
+                {card.body}
+              </p>
+            </div>
+          </div>
+        ))
+      }
+    </div>
+  </div>
+</section>
+
+<script is:inline>
+  /* Independent accordions — opening one does not close the others, matching the
+     Figma, which shows every card in its collapsed state with its own control. */
+  document.addEventListener("DOMContentLoaded", () => {
+    document.querySelectorAll("[data-fr-supports-card]").forEach((card) => {
+      const toggle = card.querySelector("[data-fr-supports-toggle]");
+      const panel = card.querySelector("[data-fr-supports-panel]");
+      const bar = card.querySelector("[data-fr-supports-bar]");
+      if (!toggle || !panel) return;
+
+      toggle.addEventListener("click", () => {
+        const open = toggle.getAttribute("aria-expanded") === "true";
+        toggle.setAttribute("aria-expanded", open ? "false" : "true");
+        panel.hidden = open;
+        if (bar) bar.style.opacity = open ? "1" : "0";
+      });
+    });
+  });
+</script>
