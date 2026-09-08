@@ -36,10 +36,10 @@
  * The recolour to Nova Blue is a SWEEP, not one event, and it waits until the
  * diagram's OWN CENTRE reaches the centre of the screen — see `.ih-dl-centre`
  * for why that needs a probe rather than a tighter observer margin. Then both
- * fans start at their outer edges at the same instant and close on the platform
- * dot by dot, ordered by distance, so each front is an arc and the two meet
- * where the diagram says they should. The platform turns a beat later.
- * Scrolling back out unwinds it from the platform outward, the exact reverse.
+ * platform turns first and both fans open outward from it, dot by dot, ordered
+ * by distance, so each front is an arc leaving the platform and the two outer
+ * edges are the last to change. Scrolling back out unwinds it from the edges
+ * inward, the exact reverse.
  *
  * It is timed PER DOT rather than per column, which is what lets each dot
  * change quickly and cleanly while the sweep as a whole stays continuous — the
@@ -94,10 +94,10 @@ const platformPills = ["GL Data", "Govt Data & Notices", "Compliance Registers"]
 /** Column heights, outermost first. Mirrored on the right-hand side. */
 const dotColumns = [290, 264, 238, 212, 186, 160, 108, 82];
 
-/* THE SWEEP. The recolour is not one event — it starts at both outer edges at
-   once and closes on the platform, so what comes out of your books and what
-   comes back from the portals both arrive here, and here is where they become
-   one answer.
+/* THE SWEEP. The recolour is not one event — the platform turns first and the
+   colour spreads OUTWARD from it, both fans at once, reaching the two outer
+   edges last. The platform is the source: it is what makes the data layer the
+   data layer, so it is what the colour comes from.
 
    IT IS TIMED PER DOT, NOT PER COLUMN, and that is what makes it smooth without
    smearing. Staggering whole columns gives eight steps a side: to stop that
@@ -109,11 +109,12 @@ const dotColumns = [290, 264, 238, 212, 186, 160, 108, 82];
    Every dot is one colour or the other; only the handful on the edge itself are
    ever in between.
 
-   The order is by straight-line DISTANCE to the platform, so the front is an
-   arc closing on it rather than a vertical bar sliding sideways. The dots at
-   the top and bottom of a tall column are further away than its middle ones and
-   go first, which is what curves the edge. The PACING is by rank rather than by
-   that distance — see the rings below for why. */
+   The order is by straight-line DISTANCE from the platform, nearest first, so
+   each front is an arc opening out of it rather than a vertical bar sliding
+   sideways. The dots at the top and bottom of a tall column are further from
+   the platform than its middle ones, so they trail — which is what curves the
+   edge. The PACING is by rank rather than by that distance — see the rings
+   below for why. */
 const DOT = 4;
 /** Vertical: 4px dot on a 22px gap. Horizontal: 4px column on `gap-6`. */
 const DOT_PITCH = 26;
@@ -145,9 +146,10 @@ const spread = dotColumns.flatMap((h, i) =>
   Array.from({ length: dotsIn(h) }, (_, k) => dotDist(i, h, k)),
 );
 
-/* RINGS. Every distinct distance is one step of the closing arc — a dot and its
-   mirror below the axis are exactly equidistant, so they belong to the same
-   ring and change together, which is what keeps the fan symmetric.
+/* RINGS. Every distinct distance is one step of the arc — a dot and its mirror
+   below the axis are exactly equidistant, so they belong to the same ring and
+   change together, which is what keeps each fan symmetric. NEAREST FIRST: ring
+   0 is the dot closest to the platform, so the rank is also the running order.
 
    Timing is by a ring's RANK, not by its distance, and that is the difference
    between smooth and stuttering. The distances bunch and gap badly: a tall
@@ -155,19 +157,29 @@ const spread = dotColumns.flatMap((h, i) =>
    the short inner ones are far apart, so scaling time by distance left stalls
    of nearly two tenths of a second — longer than a dot's own fade, which the
    eye reads as the sweep catching. Ranking spaces every ring equally instead.
-   Order is preserved, so the front still closes outside-in; only the pacing
+   Order is preserved, so the front still travels the same way; only the pacing
    changes, from "constant px per second" to "constant rings per second", and it
    is rings the eye is actually counting. */
-const rings = [...new Set(spread.map((d) => Math.round(d * 100)))].sort((a, b) => b - a);
+const rings = [...new Set(spread.map((d) => Math.round(d * 100)))].sort((a, b) => a - b);
+const ringOf = (outer: number, h: number, k: number) =>
+  rings.indexOf(Math.round(dotDist(outer, h, k) * 100));
 
 /** Seconds from the first ring to the last — the one dial for the pace. */
 const SWEEP = 1.7;
 const RING_STEP = SWEEP / (rings.length - 1);
-/** The platform turns a beat after the last ring. */
-const HEX_T = SWEEP + 0.15;
+/* The platform leads, and the fans leave it a beat later. Everything is
+   measured from the platform at zero rather than shifting it negative, because
+   a negative transition-delay does not wait — it starts the change already part
+   way through, which would make the rings turn up mid-fade on the first frame.
+
+   The fade in the styles is pinned at two ring steps; if SWEEP moves, it has to
+   move with it, and the reason is on the rule. */
+const HEX_T = 0;
+const BEAT = RING_STEP * 3;
+const MAX_T = BEAT + SWEEP;
 
 const dotT = (outer: number, h: number, k: number) =>
-  (rings.indexOf(Math.round(dotDist(outer, h, k) * 100)) * RING_STEP).toFixed(3);
+  (BEAT + ringOf(outer, h, k) * RING_STEP).toFixed(3);
 
 const stages = [
   {
@@ -268,14 +280,20 @@ const stages = [
              because both fans and the hexagon need it: the resting rules derive
              each element's OUT delay as (max − its own), which is what makes
              leaving the exact reverse of arriving without a second value per
-             dot. One number on the strip instead of a hundred and thirty-three. -->
+             dot. One number on the strip instead of a hundred and thirty-three.
+
+             Reversing the sweep reversed the unwind for free — the outer edges
+             now arrive last and so let go first, and the platform, which leads
+             going in, is the last thing to drop back to grey. -->
         <div
           class="flex shrink-0 items-center gap-[51px] max-lg:hidden"
-          style={`--ih-dl-max:${HEX_T.toFixed(3)}s`}
+          style={`--ih-dl-max:${MAX_T.toFixed(3)}s`}
         >
-          <!-- Index 0 is the OUTERMOST column of this fan, so it is also first
-               in the sweep. The right fan is reversed, so its own outermost
-               column is the last in the array — see there.
+          <!-- Index 0 is the OUTERMOST column of this fan, which makes it the
+               furthest from the platform and so the LAST to turn. The right fan
+               is reversed, so its own outermost column is the last in the array
+               — see there. Both fans read the same rings, so both open outward
+               at the same moment.
 
                ONE SVG PER FAN, not a hundred and thirty-two boxes. Each dot has
                to be its own element to carry its own moment in the sweep, and as
@@ -318,10 +336,11 @@ const stages = [
                  centred in the outermost box. All three are unfilled — the
                  innermost carried a white fill before, which read the same on
                  this white section but would not on any other. -->
-            <!-- A beat past the last dot, so the rings turn just after the two
-                 fronts close on them — the platform is what the fans arrive at.
-                 It is also --ih-dl-max itself, which is what makes its OUT delay
-                 come out at exactly zero: last to arrive, first to let go. -->
+            <!-- Zero: the platform turns FIRST and the fans leave it a beat
+                 later, because it is the source the colour spreads from. Its
+                 OUT delay derives to --ih-dl-max, the largest there is, so it is
+                 also the last thing to drop back — first to arrive, last to let
+                 go, which is the mirror of what the outer edges do. -->
             <svg
               style={`--ih-dl-t:${HEX_T.toFixed(3)}s`}
               class="ih-dl-hex absolute left-1/2 top-1/2 h-[382px] w-[334px] -translate-x-1/2 -translate-y-1/2"
@@ -424,12 +443,12 @@ const stages = [
         </div>
       </div>
 
-      <!-- Prevent / Automate / Detect. Its own data-ih-lit, so the overlines
-           light when THIS row centres rather than when the diagram above does —
-           sharing one section-wide state would drop them back to grey at the
-           exact moment you scrolled down to read them. -->
-      <div class="relative flex w-full items-stretch max-lg:flex-col max-lg:gap-4" data-ih-lit>
-        <span class="ih-dl-centre" aria-hidden="true"></span>
+      <!-- Prevent / Automate / Detect. Still its own data-ih-lit so the styles
+           can reach it, but it no longer carries a centre probe: the overlines
+           take Nova Blue on the DIAGRAM's crossing, at the same instant as the
+           dots, and hold it while this row is still on screen. The script has
+           the reason that hold exists. -->
+      <div class="flex w-full items-stretch max-lg:flex-col max-lg:gap-4" data-ih-lit>
         {
           stages.map((stage, i) => (
             <>
@@ -551,13 +570,13 @@ const stages = [
      take Nova Blue, and nothing else moves. It is a state, not a one-way latch,
      so the same transition runs in reverse on the way back out.
 
-     Scoped to [data-ih-lit] rather than the section, because the diagram and
-     the stage row each carry their own copy of this state and light on their
-     own crossing. */
-  /* THE SWEEP, and the IN order. Both fans start at their outer edges at the
-     same instant and close on the platform, dot by dot in order of how far each
-     one is from it — so the front is an arc, and the two arcs meet where the
-     diagram says they should.
+     Scoped to [data-ih-lit] rather than the section because the diagram and the
+     stage row hold the state separately — they are given it by the same
+     crossing, but the stage row keeps it a little longer. See the script. */
+  /* THE SWEEP, and the IN order. The platform turns first and both fans open
+     outward from it at the same instant, dot by dot in order of how far each one
+     is from it — so each front is an arc leaving the platform, and the two outer
+     edges are the last thing to change.
 
      Every dot's own moment is inline as --ih-dl-t. Nothing here is a stagger
      step: the spacing between dots comes out of the geometry, which is why the
@@ -576,8 +595,9 @@ const stages = [
     color: var(--color-nova-blue);
   }
 
-  /* THE TRIGGER. A 1px probe pinned to the block's own vertical centre, and the
-     only thing the observer watches.
+  /* THE TRIGGER. A 1px probe pinned to the diagram's own vertical centre, and
+     the only thing the centring observer watches. There is one of these in the
+     section, not one per block: the diagram's crossing lights everything.
 
      Observing the block itself cannot express "centred". An IntersectionObserver
      reports overlap, so a block taller than the root band lights the moment its
@@ -626,51 +646,83 @@ const stages = [
     const root = document.querySelector("[data-ih-datalayer]");
     if (!root) return;
 
-    // Two blocks light independently: the diagram and the stage row.
     const blocks = Array.from(root.querySelectorAll("[data-ih-lit]"));
-    if (!blocks.length) return;
+    const probe = root.querySelector(".ih-dl-centre");
 
     // Without IntersectionObserver they land lit rather than stuck grey.
-    if (!("IntersectionObserver" in window)) {
+    if (!blocks.length) return;
+    if (!("IntersectionObserver" in window) || !probe) {
       blocks.forEach((block) => block.classList.add("is-lit"));
       return;
     }
 
-    // What is observed is the 1px probe at each block's CENTRE, not the block —
+    // ONE crossing drives the whole section, and it is the diagram's. The
+    // overlines used to watch their own row, which meant they turned blue a
+    // screenful after the dots did — two versions of the same idea arriving
+    // separately instead of one thing happening.
+    const diagram = probe.closest("[data-ih-lit]");
+    const followers = blocks.filter((block) => block !== diagram);
+
+    // What is observed is the 1px probe at the diagram's CENTRE, not the block —
     // see .ih-dl-centre. Against a band this narrow, a probe crossing it means
-    // the block's own middle is within 12% of the viewport's middle, which is
+    // the diagram's own middle is within 12% of the viewport's middle, which is
     // the "properly centred" this is meant to wait for. Observing the block
     // instead would fire on its leading edge however the band were tuned.
-    const probes = blocks
-      .map((block) => block.querySelector(".ih-dl-centre"))
-      .filter(Boolean);
-    if (!probes.length) {
-      blocks.forEach((block) => block.classList.add("is-lit"));
-      return;
+    let centred = false;
+    // Whether the followers are still on screen, and whether they lit with the
+    // diagram and have not left since.
+    let inView = false;
+    let held = false;
+
+    // The HOLD is what makes one shared crossing safe. On its own, driving the
+    // overlines straight off the diagram would drop them back to grey at the
+    // exact moment you scrolled down to read them — the diagram leaves the
+    // centre long before the stage row reaches it. So they light with the dots
+    // and stay lit until their own row is gone.
+    //
+    // `held` can only ever be set by `centred`, never by visibility alone. That
+    // is what keeps the two in step coming UP the page as well: arriving from
+    // below, the stage row is on screen for a while before the diagram centres,
+    // and without that rule the overlines would light first.
+    function apply() {
+      if (centred) held = true;
+      if (!inView) held = false;
+      diagram.classList.toggle("is-lit", centred);
+      followers.forEach((block) => block.classList.toggle("is-lit", centred || held));
     }
 
     // Deliberately NOT the latch the stepped rail in `ClarityAi.astro` uses:
-    // this one tracks both ways, so a block lights on the way in and returns to
-    // its resting colour on the way out, every pass. That means the observer
-    // stays connected for the life of the page — which is cheap, because an
+    // this tracks both ways, so the section lights on the way in and returns to
+    // its resting colour on the way out, every pass. The observers stay
+    // connected for the life of the page — which is cheap, because an
     // IntersectionObserver only wakes on a crossing and the page carries no
     // scroll listener either way.
-    //
-    // One observer for both probes: the state goes on the probe's own block, so
-    // each lights on its own crossing.
-    const observer = new IntersectionObserver(
+    new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
-          const block = entry.target.closest("[data-ih-lit]");
-          if (block) block.classList.toggle("is-lit", entry.isIntersecting);
+          centred = entry.isIntersecting;
         });
+        apply();
       },
       // A band 24% of the viewport tall, centred: ±12% either side of the
-      // middle. Tight enough that the block really is centred, loose enough
+      // middle. Tight enough that the diagram really is centred, loose enough
       // that stopping to read it lands inside rather than just past it.
       { rootMargin: "-38% 0px -38% 0px", threshold: 0 },
-    );
+    ).observe(probe);
 
-    probes.forEach((probe) => observer.observe(probe));
+    if (followers.length) {
+      // No margin here on purpose: this is "still on screen at all", not
+      // "centred". It only ever extends a state the diagram already granted.
+      const seen = new Set();
+      const holder = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) seen.add(entry.target);
+          else seen.delete(entry.target);
+        });
+        inView = seen.size > 0;
+        apply();
+      }, { threshold: 0 });
+      followers.forEach((block) => holder.observe(block));
+    }
   })();
 </script>

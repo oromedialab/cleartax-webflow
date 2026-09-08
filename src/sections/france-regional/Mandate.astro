@@ -1,0 +1,99 @@
+---
+/**
+ * "France e-invoicing at a glance" — Figma node 13600:29559.
+ *
+ * Header row (heading + intro on the left, "Talk to an expert" on the right),
+ * a REQUIREMENTS overline, then three stacked cards. Each card is a text column
+ * beside a 16:9 visual.
+ *
+ * The visuals are unfilled "Image holder" frames in the Figma, so they render as
+ * `bg-visual-placeholder` blocks holding the exact aspect ratio. Swap each for a
+ * Webflow-hosted URL when the artwork lands — never a `data:` URI, which alone
+ * can exceed the whole Embed budget.
+ *
+ * The Figma stacks the three cards with ~390px of empty frame between them.
+ * That is scroll-choreography scaffolding in the mock, not layout: they ship as
+ * an evenly spaced stack.
+ */
+interface Requirement {
+  heading: string;
+  body: string;
+}
+
+const requirements: Requirement[] = [
+  {
+    heading: "Y-model infrastructure",
+    body: "A government-led “Y-model” system connects businesses through certified PDPs and the public Chorus Pro directory for routing, validation and lifecycle management.",
+  },
+  {
+    heading: "E-reporting & payment reporting",
+    body: "Tax-relevant B2B and B2C transaction data must be reported to the DGFiP. E-reporting covers domestic and cross-border flows for VAT pre-filling and fraud detection.",
+  },
+  {
+    heading: "14 status e-invoice lifecycle",
+    body: "Each e-invoice passes through up to 14 mandatory status stages from issuance to payment. From deposit to final settlement, every state transition is tracked and reported to the French tax authority for audit and reconciliation.",
+  },
+];
+---
+
+<section class="bg-generic-00 py-16 lg:py-20">
+  <div class="container mx-auto">
+    <!-- Header: copy left, CTA right, baselines aligned on desktop -->
+    <div
+      class="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between lg:gap-12"
+    >
+      <div class="flex flex-col gap-3 lg:max-w-[887px]">
+        <h2
+          class="m-0 font-heading font-medium text-vault-navy text-[length:var(--fs-h1)] leading-[length:var(--lh-h1)] tracking-[-0.5px]"
+        >
+          France e-invoicing at a glance
+        </h2>
+        <p
+          class="m-0 font-body font-normal text-neutral-500 text-[length:var(--fs-body)] lg:text-[length:var(--fs-body-lg)] leading-[length:var(--lh-body)] lg:leading-[length:var(--lh-body-lg)]"
+        >
+          From 2026, domestic B2B invoices in France must be issued and received
+          as structured e-invoices, routed via PAs and the public portal (PPF),
+          while cross-border and B2C flows are reported as structured data, not
+          PDFs.
+        </p>
+      </div>
+
+      <!-- Opens the HubSpot modal from `DemoModal.astro`. The href is kept real
+           so the CTA still goes somewhere if that section is absent. -->
+      <a
+        href="https://www.cleartax.com/contact-us"
+        data-demo-open
+        class="inline-flex shrink-0 items-center justify-center gap-2 self-start rounded-lg border border-nova-blue bg-nova-blue px-5 py-3.5 font-body text-[length:var(--fs-label-lg)] leading-[length:var(--lh-label-lg)] font-medium text-nova-50 no-underline shadow-[0px_2px_3px_rgba(16,24,40,0.06)] transition-opacity duration-200 hover:opacity-90 lg:self-auto"
+      >
+        Talk to an expert
+      </a>
+    </div>
+
+    <p
+      class="m-0 mt-8 mb-6 font-body text-[length:var(--fs-body-sm)] leading-[length:var(--lh-body-sm)] font-semibold uppercase tracking-[1px] text-nova-blue lg:mt-10"
+    >
+      Requirements
+    </p>
+
+    <div class="flex flex-col gap-6">
+      {
+        requirements.map((r) => (
+          <article class="flex flex-col items-stretch gap-6 rounded-xl border border-neutral-300 bg-generic-00 p-6 lg:flex-row lg:items-center lg:gap-12">
+            <div class="flex flex-col justify-between gap-6 lg:max-w-[400px] lg:flex-1">
+              <h3 class="m-0 font-heading font-medium text-vault-navy text-[length:var(--fs-h3)] leading-[length:var(--lh-h3)] lg:text-[length:var(--fs-h2)] lg:leading-[length:var(--lh-h2)]">
+                {r.heading}
+              </h3>
+              <p class="m-0 font-body font-normal text-neutral-500 text-[length:var(--fs-body)] leading-[length:var(--lh-body)]">
+                {r.body}
+              </p>
+            </div>
+            <div
+              class="aspect-[1280/720] w-full rounded-lg bg-visual-placeholder lg:flex-1"
+              aria-hidden="true"
+            />
+          </article>
+        ))
+      }
+    </div>
+  </div>
+</section>
