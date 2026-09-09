@@ -1,19 +1,30 @@
 ---
 /**
- * "How ClearTax supports e-invoicing & e-reporting" — Figma node 13600:29579.
+ * "How ClearTax supports e-invoicing & e-reporting" — Figma node 13600:29579,
+ * with the detail overlay from node 13692:38201 and the card copy from
+ * node 13692:28442.
  *
- * Six cards in a 2-column grid. The Figma card ships a `+` control and a hidden
- * body frame beneath the heading, so each card is an accordion: the row is the
- * button, the paragraph is the panel, and `+` becomes `−` while open.
+ * Six cards in a 2-column grid. A card is a button: clicking it opens ONE
+ * overlay dialog showing that card's heading, body and visual, with prev/next
+ * chevrons to walk the other five without closing.
  *
- * PLACEHOLDER COPY: only the first card carries body text in the Figma (the
- * hidden frame on node 13400:19561). The other five bodies are written from
- * facts already stated elsewhere on this page and should be reviewed before the
- * page goes live.
+ * The overlay renders the layout ONCE and swaps only the parts that differ per
+ * card — the six headings and six bodies sit in the DOM with `hidden` on all but
+ * the active one. Repeating the whole panel six times would ship six copies of
+ * the chevrons, the close control and the image frame for no gain, and every
+ * byte here is a Webflow Embed byte.
  *
- * The icon squares are unfilled "Icon placeholder" frames in the Figma, so they
- * render as `bg-visual-placeholder`. Swap each for a Webflow-hosted URL when the
- * icons land — never a `data:` URI.
+ * Modal mechanics follow `france-regional/DemoModal.astro`: display is swapped
+ * INLINE rather than by toggling a `hidden` class, because the utilities pasted
+ * into Webflow are unlayered and `flex` vs `hidden` on one element would race on
+ * source order. The per-card headings and bodies use the `hidden` ATTRIBUTE
+ * instead, which is safe there only because those elements carry no display
+ * utility of their own — don't add one.
+ *
+ * The icon squares and the overlay visual are unfilled "Icon placeholder" /
+ * "Image" frames in the Figma, so they render as `bg-visual-placeholder` — the
+ * token is #E8FFE1, exactly the fill the design uses. Swap each for a
+ * Webflow-hosted URL when the artwork lands — never a `data:` URI.
  *
  * Ids are `fr-supports-` prefixed: embeds share one namespace per page.
  */
@@ -25,27 +36,27 @@ interface SupportCard {
 const cards: SupportCard[] = [
   {
     heading: "PA-ready, Y-model compliant architecture for the French mandate",
-    body: "French Y-model with clear roles: managing routing via certified platforms. Full e-invoicing data lifecycle from submission to payment. Support for Chorus Pro and certified PDP connectivity.",
+    body: "French Y-model with clear roles managing routing, validation, status updates and tax reporting via certified platforms. Full 14-step invoice status lifecycle (from submission to payment).",
   },
   {
     heading: "24×7 support & technical assistance",
-    body: "Dedicated implementation support to help your teams go live faster, then round-the-clock assistance once you are running. Failed invoices are detected, diagnosed and resubmitted automatically, so your team is alerted only when something needs a decision.",
+    body: "Dedicated success managers, 24×7 technical and functional support, and in-house tax experts to interpret DGFiP changes and translate them into product updates.",
   },
   {
     heading: "Single global platform, unified APIs",
-    body: "One API covering 50+ countries. Country mandates sit on top of it as configuration, not separate builds — when a new mandate goes live you switch it on and your integration does not change.",
+    body: "One platform and unified API for 50+ geographies, so French entities can reuse the same integration. New mandate changes in France generally require only cloud-side updates rather than ERP rework, reducing long-term IT cost and risk.",
   },
   {
     heading: "Strong integration track record and accelerators",
-    body: "2,000+ completed ERP integrations, with pre-built certified connectors for SAP ECC and S/4HANA, Oracle Fusion and EBS, Microsoft Dynamics 365 F&O and Business Central, NetSuite, and POS and OMS platforms.",
+    body: "2,500+ integrations and 100+ ERP/source systems connected (SAP ECC/S4, Oracle, MS Dynamics, Netsuite, POS, retail, telecom, etc.). AI-driven integration agent, thin connectors and structured UAT checklists compress onboarding from weeks to days.",
   },
   {
     heading: "Enterprise-grade security, uptime and analytics",
-    body: "SOC 2 Type II and ISO 27001:2022 certified, with AES 256-bit encryption at rest and local data residency in every country you operate. 99.99% uptime, and your data is never used to train models.",
+    body: "ISO 27001, SOC-2, GDPR-aligned, regional hosting, VAPT and RBAC, with no security breaches reported. Near-real-time monitoring, >99.8% uptime benchmarks, and rich MIS dashboards for error tracking, notice prevention and VAT/e-invoice reconciliation.",
   },
   {
     heading: "Compliance Assurance, Audit-Ready & Future-Proof",
-    body: "Every state transition is tracked and reported for audit and reconciliation, and regulatory changes are handled cloud-side with no ERP rework. Built for EU ViDA from 2030 with no additional setup.",
+    body: "Assurance package covering reconciliation to prevent VAT gaps; incorporating future mandate changes, reducing risk of penalties and audit notices.",
   },
 ];
 ---
@@ -61,84 +72,319 @@ const cards: SupportCard[] = [
     <div class="grid grid-cols-1 gap-6 lg:grid-cols-2 lg:gap-8">
       {
         cards.map((card, i) => (
-          <div
-            class="self-start rounded-xl border border-neutral-300 bg-generic-00 p-6"
-            data-fr-supports-card
+          <button
+            type="button"
+            class="group m-0 flex w-full cursor-pointer items-start gap-6 self-start rounded-xl border border-neutral-300 bg-generic-00 p-6 text-left transition-all duration-150 ease-in-out hover:border-nova-blue"
+            aria-haspopup="dialog"
+            data-fr-supports-open
+            data-fr-supports-index={i}
           >
-            <button
-              type="button"
-              class="flex w-full cursor-pointer items-start gap-6 border-0 bg-transparent p-0 text-left"
-              aria-expanded="false"
-              aria-controls={`fr-supports-panel-${i}`}
-              data-fr-supports-toggle
+            <span
+              class="block h-14 w-14 shrink-0 self-stretch rounded-lg bg-visual-placeholder"
+              aria-hidden="true"
+            />
+            <span class="min-w-0 flex-1 font-heading font-medium text-vault-navy text-balance max-w-[414px] text-[length:var(--fs-h6)] leading-[length:var(--lh-h6)]">
+              {card.heading}
+            </span>
+            <span
+              class="flex h-14 w-14 shrink-0 items-center justify-center rounded-lg p-2 text-vault-navy transition-colors duration-150 ease-in-out group-hover:text-nova-blue"
+              aria-hidden="true"
             >
-              <span
-                class="block h-14 w-14 shrink-0 self-stretch rounded-lg bg-visual-placeholder"
-                aria-hidden="true"
-              />
-              <span class="min-w-0 flex-1 font-heading font-medium text-vault-navy text-[length:var(--fs-h6)] leading-[length:var(--lh-h6)]">
-                {card.heading}
-              </span>
-              <span
-                class="flex h-14 w-14 shrink-0 items-center justify-center rounded-lg p-2 text-vault-navy"
-                aria-hidden="true"
+              {/* The exported Figma glyph (Media / Icon / Unfilled / plus). */}
+              <svg
+                width="40"
+                height="40"
+                viewBox="0 0 40 40"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
               >
-                {/* The exported Figma glyph (Media / Icon / Unfilled / plus).
-                    The vertical bar is hidden while open, turning + into −. */}
-                <svg
-                  width="40"
-                  height="40"
-                  viewBox="0 0 40 40"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    d="M20 10V30"
-                    stroke="currentColor"
-                    stroke-width="1.5"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    data-fr-supports-bar
-                  />
-                  <path
-                    d="M30 20L10 20"
-                    stroke="currentColor"
-                    stroke-width="1.5"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                  />
-                </svg>
-              </span>
-            </button>
-
-            <div id={`fr-supports-panel-${i}`} hidden data-fr-supports-panel>
-              <p class="m-0 pt-4 font-body font-normal text-neutral-500 text-[length:var(--fs-body)] leading-[length:var(--lh-body)]">
-                {card.body}
-              </p>
-            </div>
-          </div>
+                <path
+                  d="M20 10V30"
+                  stroke="currentColor"
+                  stroke-width="1.5"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
+                <path
+                  d="M30 20L10 20"
+                  stroke="currentColor"
+                  stroke-width="1.5"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
+              </svg>
+            </span>
+          </button>
         ))
       }
     </div>
   </div>
 </section>
 
-<script is:inline>
-  /* Independent accordions — opening one does not close the others, matching the
-     Figma, which shows every card in its collapsed state with its own control. */
-  document.addEventListener("DOMContentLoaded", () => {
-    document.querySelectorAll("[data-fr-supports-card]").forEach((card) => {
-      const toggle = card.querySelector("[data-fr-supports-toggle]");
-      const panel = card.querySelector("[data-fr-supports-panel]");
-      const bar = card.querySelector("[data-fr-supports-bar]");
-      if (!toggle || !panel) return;
+<!-- Detail overlay. Lives outside the section's container so the scrim covers
+     the viewport rather than the 1280px column. -->
+<div
+  id="fr-supports-overlay"
+  role="dialog"
+  aria-modal="true"
+  aria-labelledby="fr-supports-overlay-title"
+  aria-hidden="true"
+  class="fixed inset-0 z-[2000] hidden items-center justify-center bg-generic-100/70 p-4 backdrop-blur-sm"
+>
+  <div
+    class="relative max-h-[90vh] w-full max-w-[1280px] overflow-y-auto rounded-xl border-2 border-[#CCCCCC] bg-generic-00 p-6"
+    data-fr-supports-panel
+  >
+    <!-- Anchored to the PANEL, not to the visual it sits over in the Figma:
+         24px panel padding + the design's 20px inset lands at the same 44px on
+         desktop, and it stays reachable once the visual moves below the copy on
+         mobile. The glyph is the plus above, turned 45°, which is how the Figma
+         draws it (the export is the same plus component). -->
+    <button
+      type="button"
+      aria-label="Close"
+      class="absolute right-6 top-6 z-10 inline-flex h-10 w-10 cursor-pointer items-center justify-center rounded-lg border-0 bg-transparent p-0 text-vault-navy transition-opacity duration-150 hover:opacity-70 lg:right-11 lg:top-11"
+      data-fr-supports-close
+    >
+      <svg
+        width="40"
+        height="40"
+        viewBox="0 0 40 40"
+        fill="none"
+        class="rotate-45"
+        aria-hidden="true"
+        focusable="false"
+      >
+        <path
+          d="M20 10V30"
+          stroke="currentColor"
+          stroke-width="1.5"
+          stroke-linecap="round"
+          stroke-linejoin="round"></path>
+        <path
+          d="M30 20L10 20"
+          stroke="currentColor"
+          stroke-width="1.5"
+          stroke-linecap="round"
+          stroke-linejoin="round"></path>
+      </svg>
+    </button>
 
-      toggle.addEventListener("click", () => {
-        const open = toggle.getAttribute("aria-expanded") === "true";
-        toggle.setAttribute("aria-expanded", open ? "false" : "true");
-        panel.hidden = open;
-        if (bar) bar.style.opacity = open ? "1" : "0";
-      });
+    <div class="flex flex-col items-start gap-6 lg:flex-row lg:gap-12">
+      <!-- 416px = 1280 panel − 48 padding − 48 gap − the 768px the 16:9 visual
+           takes at the design's 432px height. justify-between is what puts the
+           body and the chevrons on the visual's bottom edge. -->
+      <div
+        class="flex w-full flex-col justify-between gap-6 lg:w-[416px] lg:shrink-0 lg:self-stretch"
+      >
+        <div class="flex flex-col gap-6">
+          <span
+            class="block h-16 w-16 shrink-0 rounded-lg bg-visual-placeholder"
+            aria-hidden="true"
+          />
+          <div id="fr-supports-overlay-title">
+            {
+              cards.map((card, i) => (
+                <h3
+                  class="m-0 pr-12 font-heading font-medium text-vault-navy text-[length:var(--fs-h5)] leading-[length:var(--lh-h5)] tracking-[-0.5px] lg:pr-0"
+                  hidden={i !== 0}
+                  data-fr-supports-heading
+                >
+                  {card.heading}
+                </h3>
+              ))
+            }
+          </div>
+        </div>
+
+        <div class="flex flex-col gap-6">
+          <div>
+            {
+              cards.map((card, i) => (
+                <p
+                  class="m-0 font-body font-normal text-neutral-500 text-[length:var(--fs-body)] leading-[length:var(--lh-body)]"
+                  hidden={i !== 0}
+                  data-fr-supports-body
+                >
+                  {card.body}
+                </p>
+              ))
+            }
+          </div>
+
+          <div class="flex items-center gap-2">
+            <button
+              type="button"
+              aria-label="Previous"
+              aria-controls="fr-supports-overlay-title"
+              class="inline-flex cursor-pointer items-center justify-center rounded border border-neutral-300 bg-generic-00 p-2 text-vault-navy transition-colors duration-150 hover:border-nova-blue"
+              data-fr-supports-prev
+            >
+              <svg
+                width="20"
+                height="20"
+                viewBox="0 0 20 20"
+                fill="none"
+                aria-hidden="true"
+                focusable="false"
+              >
+                <path
+                  d="M12 15L7 10L12 5"
+                  stroke="currentColor"
+                  stroke-width="1.5"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"></path>
+              </svg>
+            </button>
+            <button
+              type="button"
+              aria-label="Next"
+              aria-controls="fr-supports-overlay-title"
+              class="inline-flex cursor-pointer items-center justify-center rounded border border-neutral-300 bg-generic-00 p-2 text-vault-navy transition-colors duration-150 hover:border-nova-blue"
+              data-fr-supports-next
+            >
+              <svg
+                width="20"
+                height="20"
+                viewBox="0 0 20 20"
+                fill="none"
+                aria-hidden="true"
+                focusable="false"
+              >
+                <path
+                  d="M7 5L12 10L7 15"
+                  stroke="currentColor"
+                  stroke-width="1.5"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"></path>
+              </svg>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div
+        class="aspect-[1280/720] w-full rounded-lg bg-visual-placeholder lg:w-auto lg:flex-1"
+        aria-hidden="true"
+      >
+      </div>
+    </div>
+  </div>
+</div>
+
+<script is:inline>
+  /* Card -> detail overlay, with the chevrons walking the six without closing. */
+  (function () {
+    var overlay = document.getElementById("fr-supports-overlay");
+    if (!overlay) return;
+
+    var panel = overlay.querySelector("[data-fr-supports-panel]");
+    var closeBtn = overlay.querySelector("[data-fr-supports-close]");
+    var prevBtn = overlay.querySelector("[data-fr-supports-prev]");
+    var nextBtn = overlay.querySelector("[data-fr-supports-next]");
+    var headings = overlay.querySelectorAll("[data-fr-supports-heading]");
+    var bodies = overlay.querySelectorAll("[data-fr-supports-body]");
+    if (!panel || !headings.length || headings.length !== bodies.length) return;
+
+    var count = headings.length;
+    var current = 0;
+    var lastFocused = null;
+
+    function show(index) {
+      // Wraps both ways, so neither chevron is ever a dead control.
+      current = ((index % count) + count) % count;
+      for (var i = 0; i < count; i++) {
+        headings[i].hidden = i !== current;
+        bodies[i].hidden = i !== current;
+      }
+      // The panel scrolls on short windows; a card further down the list would
+      // otherwise open mid-way through its own copy.
+      panel.scrollTop = 0;
+    }
+
+    // Inline display, not a class swap: the utilities pasted into Webflow are
+    // unlayered, so `flex` and `hidden` on one element would race on source
+    // order. Inline always wins.
+    function open(index, opener) {
+      lastFocused = opener || document.activeElement;
+      show(index);
+      overlay.style.display = "flex";
+      overlay.setAttribute("aria-hidden", "false");
+      document.body.style.overflow = "hidden";
+      if (closeBtn) closeBtn.focus();
+    }
+
+    function close() {
+      overlay.style.display = "none";
+      overlay.setAttribute("aria-hidden", "true");
+      document.body.style.overflow = "";
+      if (lastFocused && lastFocused.focus) lastFocused.focus();
+    }
+
+    function isOpen() {
+      return overlay.style.display === "flex";
+    }
+
+    // Delegated, so it does not matter which Embed mounts first or whether the
+    // cards existed when this ran.
+    document.addEventListener("click", function (e) {
+      if (!e.target.closest) return;
+      var opener = e.target.closest("[data-fr-supports-open]");
+      if (!opener) return;
+      open(parseInt(opener.getAttribute("data-fr-supports-index"), 10) || 0, opener);
     });
-  });
+
+    if (closeBtn) closeBtn.addEventListener("click", close);
+    if (prevBtn)
+      prevBtn.addEventListener("click", function () {
+        show(current - 1);
+      });
+    if (nextBtn)
+      nextBtn.addEventListener("click", function () {
+        show(current + 1);
+      });
+
+    overlay.addEventListener("click", function (e) {
+      if (e.target === overlay) close();
+    });
+
+    document.addEventListener("keydown", function (e) {
+      if (!isOpen()) return;
+
+      if (e.key === "Escape") {
+        close();
+        return;
+      }
+
+      // Arrow keys drive the same walk the chevrons do. Nothing inside the
+      // dialog is a native arrow-key control (no radio group, select or text
+      // field), so there is no default behaviour to steal here.
+      if (e.key === "ArrowLeft") {
+        show(current - 1);
+        return;
+      }
+      if (e.key === "ArrowRight") {
+        show(current + 1);
+        return;
+      }
+
+      // Keep Tab inside the dialog — `aria-modal` claims the rest is inert, so
+      // focus must not walk out into the page behind it.
+      if (e.key !== "Tab") return;
+      var focusable = panel.querySelectorAll(
+        'a[href], button:not([disabled]), input:not([disabled]):not([type="hidden"]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])',
+      );
+      if (!focusable.length) return;
+      var first = focusable[0];
+      var last = focusable[focusable.length - 1];
+
+      if (e.shiftKey && document.activeElement === first) {
+        e.preventDefault();
+        last.focus();
+      } else if (!e.shiftKey && document.activeElement === last) {
+        e.preventDefault();
+        first.focus();
+      }
+    });
+  })();
 </script>
