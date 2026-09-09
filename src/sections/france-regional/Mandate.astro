@@ -11,9 +11,39 @@
  * Webflow-hosted URL when the artwork lands — never a `data:` URI, which alone
  * can exceed the whole Embed budget.
  *
- * The Figma stacks the three cards with ~390px of empty frame between them.
- * That is scroll-choreography scaffolding in the mock, not layout: they ship as
- * an evenly spaced stack.
+ * The ~390px of empty frame the Figma leaves between the three cards is the
+ * scroll choreography: they pin and stack. Same implementation as
+ * `sections/global-homepage/WhyGenericAi.astro`:
+ *
+ *   - Two layers per card. The OUTER wrapper (`.fr-mandate-sticky`) is what
+ *     `position: sticky` acts on and is NEVER transformed, so measuring it with
+ *     getBoundingClientRect is always accurate. The INNER card
+ *     (`.fr-mandate-card`) is the only thing JS scales — measuring a transformed
+ *     element would feed its own transform back into the next frame.
+ *   - Each wrapper sticks 16px below the previous one, with a rising z-index, so
+ *     the stack leaves a visible sliver of every card behind it.
+ *   - A card shrinks as the next one closes in, 3% per card back from the front:
+ *     0.94 / 0.97 / 1.00 for these three. The ramp is derived from the card
+ *     count so it always ends at 1.0 — see targetScaleFor.
+ *
+ * THE HEADER IS IN THE MARKUP TWICE, as in WhyGenericAi. On a big enough window
+ * the heading, lede and CTA ride inside the first sticky wrapper and stay on
+ * screen for the whole stack; on anything smaller they scroll away above it,
+ * because pinned they would eat the height the cards need. One CSS rule picks
+ * the copy — see .fr-mandate-header-* in the style block — so exactly one is
+ * ever displayed and the duplicate <h2> and CTA never both reach the
+ * accessibility tree. Edit the copy through the consts below, not in the markup.
+ *
+ * The REQUIREMENTS overline is inside the sticky wrapper at EVERY size, not
+ * duplicated: it labels the cards underneath it, so it stays put while they move.
+ *
+ * No card-height clamp, unlike WhyGenericAi. A text column beside a 16:9 visual
+ * settles at ~489px on a 1280px-wide stack, and with the header pinned the whole
+ * thing needs ~861px of layout height — which is what the style block's
+ * min-height bound is derived from, rather than shrinking the card to fit.
+ *
+ * IMPORTANT: no ancestor of a `.fr-mandate-sticky` may set `overflow` to
+ * anything but `visible` — that silently kills `position: sticky`.
  */
 interface Requirement {
   heading: string;
@@ -34,66 +64,328 @@ const requirements: Requirement[] = [
     body: "Each e-invoice passes through up to 14 mandatory status stages from issuance to payment. From deposit to final settlement, every state transition is tracked and reported to the French tax authority for audit and reconciliation.",
   },
 ];
+
+/* Written once and rendered twice — see the header note above. Keeping the copy
+   in consts is what stops the two versions drifting apart. */
+const HEADING = "France e-invoicing at a glance";
+const LEDE =
+  "From 2026, domestic B2B invoices in France must be issued and received as structured e-invoices, routed via PAs and the public portal (PPF), while cross-border and B2C flows are reported as structured data, not PDFs.";
+const CTA_LABEL = "Talk to an expert";
+const CTA_HREF = "https://www.cleartax.com/contact-us";
+const OVERLINE = "Requirements";
 ---
 
 <section class="bg-generic-00 py-16 lg:py-20">
   <div class="container mx-auto">
-    <!-- Header: copy left, CTA right, baselines aligned on desktop -->
+    <!-- Scroll-away header — copy left, CTA right, baselines aligned. Shown on
+         mobile AND on any window too short to pin it; see .fr-mandate-header-*
+         in the style block. -->
     <div
-      class="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between lg:gap-12"
+      class="fr-mandate-header-flow flex flex-col gap-6 bg-generic-00 lg:flex-row lg:items-end lg:justify-between lg:gap-12"
     >
       <div class="flex flex-col gap-3 lg:max-w-[887px]">
         <h2
           class="m-0 font-heading font-medium text-vault-navy text-[length:var(--fs-h1)] leading-[length:var(--lh-h1)] tracking-[-0.5px]"
         >
-          France e-invoicing at a glance
+          {HEADING}
         </h2>
         <p
           class="m-0 font-body font-normal text-neutral-500 text-[length:var(--fs-body)] lg:text-[length:var(--fs-body-lg)] leading-[length:var(--lh-body)] lg:leading-[length:var(--lh-body-lg)]"
         >
-          From 2026, domestic B2B invoices in France must be issued and received
-          as structured e-invoices, routed via PAs and the public portal (PPF),
-          while cross-border and B2C flows are reported as structured data, not
-          PDFs.
+          {LEDE}
         </p>
       </div>
 
       <!-- Opens the HubSpot modal from `DemoModal.astro`. The href is kept real
            so the CTA still goes somewhere if that section is absent. -->
       <a
-        href="https://www.cleartax.com/contact-us"
+        href={CTA_HREF}
         data-demo-open
-        class="inline-flex shrink-0 items-center justify-center gap-2 self-start rounded-lg border border-nova-blue bg-nova-blue px-5 py-3.5 font-body text-[length:var(--fs-label-lg)] leading-[length:var(--lh-label-lg)] font-medium text-nova-50 no-underline shadow-[0px_2px_3px_rgba(16,24,40,0.06)] transition-opacity duration-200 hover:opacity-90 lg:self-auto"
+        class="inline-flex shrink-0 items-center justify-center gap-2 self-start rounded-lg border border-nova-blue bg-nova-blue px-5 py-3.5 font-body text-[length:var(--fs-label-lg)] leading-[length:var(--lh-label-lg)] font-medium text-nova-50 no-underline transition-all ease-in-out duration-200 hover:bg-nova-50 hover:text-nova-blue lg:self-auto"
       >
-        Talk to an expert
+        {CTA_LABEL}
       </a>
     </div>
 
-    <p
-      class="m-0 mt-8 mb-6 font-body text-[length:var(--fs-body-sm)] leading-[length:var(--lh-body-sm)] font-semibold uppercase tracking-[1px] text-nova-blue lg:mt-10"
+    <div
+      id="fr-mandate-stack"
+      class="fr-mandate-stack flex w-full flex-col gap-[30vh] lg:gap-[50vh]"
     >
-      Requirements
-    </p>
-
-    <div class="flex flex-col gap-6">
       {
-        requirements.map((r) => (
-          <article class="flex flex-col items-stretch gap-6 rounded-xl border border-neutral-300 bg-generic-00 p-6 lg:flex-row lg:items-center lg:gap-12">
-            <div class="flex flex-col justify-between gap-6 lg:max-w-[400px] lg:flex-1">
-              <h3 class="m-0 font-heading font-medium text-vault-navy text-[length:var(--fs-h3)] leading-[length:var(--lh-h3)] lg:text-[length:var(--fs-h2)] lg:leading-[length:var(--lh-h2)]">
-                {r.heading}
-              </h3>
-              <p class="m-0 font-body font-normal text-neutral-500 text-[length:var(--fs-body)] leading-[length:var(--lh-body)]">
-                {r.body}
-              </p>
-            </div>
-            <div
-              class="aspect-[1280/720] w-full rounded-lg bg-visual-placeholder lg:flex-1"
-              aria-hidden="true"
-            />
-          </article>
+        requirements.map((r, i) => (
+          <div
+            class="fr-mandate-sticky sticky"
+            style={`top:calc(var(--nav-clear, 112px) + ${i * 16}px);z-index:${i};`}
+          >
+            {i === 0 && (
+              <div id="fr-mandate-header" class="bg-generic-00">
+                <div class="fr-mandate-header-stuck flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between lg:gap-12">
+                  <div class="flex flex-col gap-3 lg:max-w-[887px]">
+                    <h2 class="m-0 font-heading font-medium text-vault-navy text-[length:var(--fs-h1)] leading-[length:var(--lh-h1)] tracking-[-0.5px]">
+                      {HEADING}
+                    </h2>
+                    <p class="m-0 font-body font-normal text-neutral-500 text-[length:var(--fs-body)] lg:text-[length:var(--fs-body-lg)] leading-[length:var(--lh-body)] lg:leading-[length:var(--lh-body-lg)]">
+                      {LEDE}
+                    </p>
+                  </div>
+
+                  <a
+                    href={CTA_HREF}
+                    data-demo-open
+                    class="inline-flex shrink-0 items-center justify-center gap-2 self-start rounded-lg border border-nova-blue bg-nova-blue px-5 py-3.5 font-body text-[length:var(--fs-label-lg)] leading-[length:var(--lh-label-lg)] font-medium text-nova-50 no-underline transition-all ease-in-out duration-200 hover:bg-nova-50 hover:text-nova-blue lg:self-auto"
+                  >
+                    {CTA_LABEL}
+                  </a>
+                </div>
+
+                {/* Rides with the stack at every size — the label for the cards
+                    underneath it, so it stays put while they move. */}
+                <p class="m-0 mt-8 mb-6 font-body text-[length:var(--fs-body-sm)] leading-[length:var(--lh-body-sm)] font-semibold uppercase tracking-[1px] text-nova-blue lg:mt-10">
+                  {OVERLINE}
+                </p>
+              </div>
+            )}
+
+            <article
+              class="fr-mandate-card flex flex-col items-stretch gap-6 rounded-xl border border-neutral-300 bg-generic-00 p-6 will-change-transform lg:flex-row lg:items-center lg:gap-12"
+              style="transform-origin: top center;"
+            >
+              <div class="flex flex-col justify-between gap-6 lg:max-w-[400px] lg:flex-1">
+                <h3 class="m-0 font-heading font-medium text-vault-navy text-[length:var(--fs-h3)] leading-[length:var(--lh-h3)] lg:text-[length:var(--fs-h2)] lg:leading-[length:var(--lh-h2)]">
+                  {r.heading}
+                </h3>
+                <p class="m-0 font-body font-normal text-neutral-500 text-[length:var(--fs-body)] leading-[length:var(--lh-body)]">
+                  {r.body}
+                </p>
+              </div>
+              <div
+                class="aspect-[1280/720] w-full rounded-lg bg-visual-placeholder lg:flex-1"
+                aria-hidden="true"
+              />
+            </article>
+          </div>
         ))
       }
+
+      <!-- Tail room so the last card can finish sticking before the next section -->
+      <div style="height: 80px;" />
     </div>
   </div>
 </section>
+
+<style is:global>
+  /* Which header copy shows is a question of available HEIGHT, not just width,
+     so it cannot be a plain Tailwind breakpoint. Driving both copies from one
+     rule here also means there is no specificity race between a `hidden` utility
+     in the head bundle and an override in this block, which is pasted later.
+
+     Above the bound the heading, lede and CTA ride inside the first sticky
+     wrapper and stay on screen for the whole stack. Below it they would eat the
+     height the cards need, so they revert to scrolling away above the stack.
+     Only ONE copy is ever displayed, so the duplicate <h2> and the duplicate
+     `data-demo-open` CTA are both out of the accessibility tree — `display:none`
+     removes them — and the delegated handler in DemoModal.astro works either way.
+
+     The bound: navbar clearance 112 + header ~228 + card ~489 + two 16px
+     slivers = ~861px of layout. Between 768 and 1440 shared.css zooms `body` to
+     0.85, so that costs only ~733 real pixels there and the query is
+     conservative; past 1440 there is no zoom and it is exactly the fit. 1024
+     rather than 768 because the card only goes side-by-side at `lg` — stacked,
+     it is far too tall to pin a header above. */
+  .fr-mandate-header-stuck {
+    display: none;
+  }
+
+  @media (min-width: 1024px) and (min-height: 860px) {
+    .fr-mandate-header-flow {
+      display: none;
+    }
+    .fr-mandate-header-stuck {
+      display: flex;
+    }
+  }
+
+  /* Sticky and the scroll-driven shrink are both enhancements. Switched off, the
+     cards read as the plain evenly spaced stack this section used to be — so the
+     huge scroll gaps that exist only to give the stack travel go with them. */
+  @media (prefers-reduced-motion: reduce) {
+    .fr-mandate-stack {
+      gap: 1.5rem !important;
+    }
+    .fr-mandate-sticky {
+      position: static !important;
+    }
+    .fr-mandate-card {
+      transform: none !important;
+    }
+  }
+</style>
+
+<script is:inline>
+  document.addEventListener("DOMContentLoaded", () => {
+    const stack = document.getElementById("fr-mandate-stack");
+    if (!stack) return;
+
+    const textEl = document.getElementById("fr-mandate-header");
+    // Outers are never transformed, so their rects are always safe to measure.
+    const outers = Array.from(stack.querySelectorAll(".fr-mandate-sticky"));
+    const inners = Array.from(stack.querySelectorAll(".fr-mandate-card"));
+    if (!outers.length || outers.length !== inners.length) return;
+
+    const reduceMotion =
+      window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (reduceMotion) return;
+
+    const STACK_OFFSET = 16; // visible sliver of each card behind the next
+    const REVEAL_DISTANCE = 260; // scroll px the shrink takes once the next card closes in
+
+    // Navbar clearance, from the shared token rather than a number of its own —
+    // every pinned section on the site reads the same one. The fallback matches
+    // the token so a missing shared.css degrades to the same offset.
+    const NAV_CLEAR =
+      parseFloat(
+        getComputedStyle(document.documentElement).getPropertyValue("--nav-clear"),
+      ) || 112;
+
+    // Depth ramp: 3% smaller per card back from the front, so the front card is
+    // 1.0 and the deepest is 1 - (n-1) x 0.03. Anchored at the FRONT and derived
+    // from the count, not a hardcoded base — a base tuned for a different number
+    // of cards misses 1.0 at the last index, and the last card is pinned to
+    // scale(1) below regardless, so the ramp would end in a visible jump.
+    //
+    //   3 cards (here):   0.94  0.97  1.00
+    //   5 cards (the same rule in WhyGenericAi): 0.88 0.91 0.94 0.97 1.00
+    //
+    // 0.03 is the step between ADJACENT cards, which is what the eye actually
+    // reads in a stack — it is what keeps this stack looking like that one
+    // despite being shorter. Holding total depth at 0.88 instead would double
+    // the per-card step to 0.06 and read as two very differently sized cards.
+    const SCALE_STEP = 0.03;
+    const targetScaleFor = (i) => 1 - (inners.length - 1 - i) * SCALE_STEP;
+
+    // TWO UNITS, and they are not the same one under `zoom`.
+    // getBoundingClientRect() and window.innerHeight/innerWidth are RENDERED
+    // pixels — what is on the glass. getComputedStyle().top, NAV_CLEAR,
+    // STACK_OFFSET and anything written to `style.top` are CSS pixels.
+    // shared.css puts `zoom` on the `body` element between tablet and 1440px, so
+    // the two differ by that factor and this file mixes them in both directions:
+    // it compares a rect against a computed top, and it derives a style.top from
+    // rect measurements. Unconverted, the stack pins at the wrong offsets and the
+    // shrink triggers at the wrong scroll position.
+    //
+    // Walked rather than read off `body`, because zoom multiplies down the tree.
+    const zoomFactor = () => {
+      let z = 1;
+      for (let n = stack; n && n.nodeType === 1; n = n.parentElement) {
+        const v = parseFloat(getComputedStyle(n).zoom);
+        // Unsupported -> NaN, unset -> 1. Both mean "no scaling here".
+        if (v && v !== 1) z *= v;
+      }
+      return z;
+    };
+
+    // Recomputed by handleLayoutShift, which covers crossing the 1440px bound
+    // where the zoom switches off.
+    let zoom = zoomFactor();
+
+    const setTops = () => {
+      zoom = zoomFactor();
+
+      // Clear the transform first, or the measured offset includes the scale.
+      const originalTransform = inners[0].style.transform;
+      inners[0].style.transform = "none";
+
+      // Measure how far the card actually sits inside its wrapper rather than
+      // assuming zero, so anything added above it later stays in alignment.
+      // Converted to CSS px at the point of measurement, so everything below this
+      // line is CSS px and matches what style.top expects.
+      const outerTop = outers[0].getBoundingClientRect().top;
+      const innerTop = inners[0].getBoundingClientRect().top;
+      const cardOffset = (innerTop - outerTop) / zoom;
+
+      inners[0].style.transform = originalTransform;
+
+      let firstTop = NAV_CLEAR;
+
+      // Centre the whole stack vertically once there is room for it. The
+      // breakpoint test stays in RENDERED px — it is asking about the window,
+      // not the layout, the same question a media query asks.
+      if (window.innerWidth >= 1280) {
+        const cardHeight = inners[0].getBoundingClientRect().height / zoom;
+        const totalStackHeight =
+          cardOffset + cardHeight + (outers.length - 1) * STACK_OFFSET;
+        const viewportCss = window.innerHeight / zoom;
+        firstTop = Math.max(NAV_CLEAR, (viewportCss - totalStackHeight) / 2);
+      }
+
+      outers[0].style.top = firstTop + "px";
+
+      // Wrapper 0 sticks at firstTop, so card 0's true visual top is firstTop
+      // plus whatever sits above it inside the wrapper.
+      const baseTop = firstTop + cardOffset;
+      for (let i = 1; i < outers.length; i++) {
+        outers[i].style.top = baseTop + i * STACK_OFFSET + "px";
+      }
+    };
+
+    let ticking = false;
+
+    const update = () => {
+      // Read every wrapper position BEFORE writing any transform, so a write
+      // can't invalidate a later read in the same frame.
+      const tops = outers.map((el) => el.getBoundingClientRect().top);
+
+      inners.forEach((inner, i) => {
+        // The front card never shrinks — targetScaleFor already returns 1 here,
+        // but it has no card in front of it to measure the approach of, so the
+        // branch is what keeps the outers[i + 1] read below in bounds.
+        if (i === inners.length - 1) {
+          inner.style.transform = "scale(1)";
+          return;
+        }
+
+        // sticky clamps rect.top at the element's own `top` once stuck and keeps
+        // decreasing before that, so this distance falls to 0 and stays there the
+        // moment card i+1 is fully stuck. No extra bookkeeping needed.
+        // Scaled into RENDERED px to match `tops`, which came from rects.
+        const nextStickyTopPx =
+          (parseFloat(getComputedStyle(outers[i + 1]).top) || 0) * zoom;
+        const distanceToStick = tops[i + 1] - nextStickyTopPx;
+
+        // REVEAL_DISTANCE is a scroll distance, and scrolling is in rendered px,
+        // so both sides of this ratio are already in the same unit.
+        const progress = Math.min(1, Math.max(0, 1 - distanceToStick / REVEAL_DISTANCE));
+        const scale = 1 - progress * (1 - targetScaleFor(i));
+        inner.style.transform = `scale(${scale.toFixed(4)})`;
+      });
+
+      ticking = false;
+    };
+
+    const onScroll = () => {
+      if (ticking) return;
+      ticking = true;
+      requestAnimationFrame(update);
+    };
+
+    const handleLayoutShift = () => {
+      setTops();
+      update();
+    };
+
+    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", handleLayoutShift);
+    window.addEventListener("load", handleLayoutShift, { once: true });
+
+    // The header now sits INSIDE wrapper 0, so its height is part of every top
+    // offset the stack uses. A reflow there — a wrapping heading, a late font,
+    // the media query swapping the two copies — has to re-run setTops or the
+    // cards behind pin to stale positions.
+    if (textEl && typeof ResizeObserver !== "undefined") {
+      new ResizeObserver(handleLayoutShift).observe(textEl);
+    }
+
+    setTops();
+    update();
+  });
+</script>
