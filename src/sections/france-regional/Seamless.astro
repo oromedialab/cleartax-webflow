@@ -3,14 +3,29 @@
  * Seamless integrations / compliance / support accordion — Figma node
  * 13600:29595 (".Container - How Cleartax helps").
  *
- * DUPLICATION, KNOWN: a byte-identical copy of `global-homepage/Seamless.astro`
- * (which is itself a copy of `global-invoicing/Seamless.astro` differing only in
- * the H2). Copied rather than promoted to a `_shared` primitive because a page
- * bundle only sources its own section folder, and because shipping this page
- * must not disturb the two live embeds. Folding all three onto one primitive is
- * a clean follow-up — it just costs a re-paste of those pages.
+ * DUPLICATION, KNOWN: started as a byte-identical copy of
+ * `global-homepage/Seamless.astro` (itself a copy of
+ * `global-invoicing/Seamless.astro` differing only in the H2). Copied rather
+ * than promoted to a `_shared` primitive because a page bundle only sources its
+ * own section folder, and because shipping this page must not disturb the two
+ * live embeds. The three have since diverged: the Service and Support panel here
+ * is the France design (node 12621:12608), a six-card grid, where the other two
+ * still carry the "360° Support" image panel. Folding them onto one primitive
+ * now means making that panel a prop, not just moving the file.
  * Accordion selects one of four panels (compliance / integrations / security /
  * service and support).
+ *
+ * SERVICE AND SUPPORT ICONS are the Figma exports inlined as <svg>, unlike every
+ * other icon in this section, which is a Webflow-hosted PNG. Inline is what makes
+ * them work the moment this is pasted — a Figma asset URL dies in 7 days — but
+ * six two-tone icons are ~16 KB of path data inside a 49 KB Embed budget, and
+ * this section is at ~46 KB. Coordinates are rounded to 2dp (0.02px on a 32px
+ * icon) which bought ~6 KB; there is no second trick like that available. The
+ * next thing that needs room here should move these six to Webflow-hosted SVGs,
+ * which drops the panel to ~1 KB. Until then, do not paste anything else in.
+ *
+ * Nothing below is dead-code tolerant either: an HTML comment ships to Webflow
+ * as bytes, so commented-out markup was removed rather than left in place.
  */
 
 const complianceCardsRow1 = [
@@ -272,7 +287,8 @@ const securityCards = [
             <p
               class="text-[length:var(--fs-body)]! font-medium! text-black/50! leading-[length:var(--lh-body)]! m-0!"
             >
-              End-to-end assistance for your business
+              End-to-end assistance from onboarding to ongoing optimisation for
+              your business.
             </p>
           </div>
         </div>
@@ -428,68 +444,231 @@ const securityCards = [
           </div>
         </div>
 
+        <!-- Service and Support — see the icon note in the frontmatter. -->
         <div
-          class="hidden animate-[ssrFadeIn_0.4s_ease] max-w-[858px] min-h-[340px] w-full [&.active]:flex [&.active]:items-stretch"
+          class="hidden animate-[ssrFadeIn_0.4s_ease] w-full [&.active]:flex [&.active]:items-stretch"
           data-ssr-graphic="support"
         >
-          <div
-            class="w-full rounded-[14px] border border-black/10 bg-[#FDFDF8] p-6 lg:p-0"
-          >
+          <div class="grid w-full grid-cols-1 gap-3 md:grid-cols-2">
             <div
-              class="grid grid-cols-1 lg:grid-cols-[320px_minmax(0,1fr)] h-auto lg:h-[342px] gap-6 lg:gap-[10px] items-end"
+              class="flex items-center gap-3 rounded-[12px] border border-neutral-300 bg-generic-00 p-6"
             >
-              <div
-                class="max-w-full lg:max-w-[327px] w-full p-4 lg:p-6 lg:pt-0 lg:pr-0 order-2 lg:order-1"
+              <svg
+                width="32"
+                height="32"
+                viewBox="0 0 32 32"
+                fill="none"
+                class="block shrink-0"
+                aria-hidden="true"
+                focusable="false"
               >
-                <h3 class="m-0 text-[length:var(--fs-body-lg)] font-semibold leading-[length:var(--lh-body-lg)] text-black">
-                  360° Support
-                </h3>
-                <p class="m-0 mt-3 text-[length:var(--fs-body)] leading-[length:var(--lh-body)] text-black">
-                  End-to-end assistance from onboarding to ongoing optimization
-                  for your business
+                <path
+                  d="M27.21 14.28L10.21 9.28C10.12 9.25 10.02 9.24 9.92 9.25C9.82 9.26 9.72 9.28 9.63 9.33C9.54 9.38 9.46 9.44 9.4 9.52C9.34 9.6 9.29 9.69 9.26 9.78C9.23 9.88 9.22 9.98 9.24 10.08C9.25 10.18 9.28 10.27 9.33 10.36C9.38 10.45 9.44 10.53 9.52 10.59C9.6 10.65 9.69 10.69 9.79 10.72L15.22 12.32L10.74 19.04L4.97 17.37C4.54 17.24 4.08 17.21 3.63 17.3C3.19 17.38 2.77 17.56 2.41 17.84C2.05 18.1 1.75 18.45 1.55 18.85C1.35 19.26 1.25 19.7 1.25 20.15C1.25 20.77 1.46 21.38 1.84 21.89C2.21 22.39 2.74 22.75 3.35 22.93L23.03 28.63C23.29 28.71 23.57 28.75 23.85 28.75C24.55 28.75 25.22 28.5 25.75 28.04C26.28 27.59 26.62 26.95 26.72 26.26C26.82 25.57 26.66 24.86 26.28 24.28C25.9 23.69 25.33 23.26 24.65 23.07L21.31 22.1L17.96 21.13L20.62 17.17C20.69 17.07 20.73 16.96 20.75 16.84C20.76 16.72 20.75 16.6 20.71 16.49C20.67 16.38 20.6 16.28 20.51 16.2C20.43 16.12 20.32 16.06 20.21 16.03L15.46 14.65L16.73 12.76L26.79 15.72C26.86 15.74 26.93 15.75 27 15.75C27.18 15.75 27.36 15.69 27.49 15.57C27.63 15.45 27.72 15.29 27.74 15.11C27.77 14.93 27.73 14.75 27.63 14.59C27.53 14.44 27.38 14.33 27.21 14.28ZM25.25 25.85C25.25 26.07 25.2 26.28 25.1 26.47C25.01 26.67 24.87 26.83 24.69 26.96C24.52 27.1 24.31 27.19 24.09 27.23C23.88 27.27 23.65 27.25 23.44 27.19L3.76 21.49C3.47 21.4 3.22 21.23 3.03 20.99C2.85 20.74 2.75 20.45 2.75 20.15C2.75 19.93 2.8 19.72 2.9 19.52C2.99 19.33 3.13 19.16 3.31 19.04C3.48 18.9 3.69 18.81 3.91 18.77C4.12 18.73 4.35 18.74 4.56 18.81L24.24 24.51C24.53 24.6 24.78 24.77 24.97 25.01C25.15 25.25 25.25 25.55 25.25 25.85ZM18.8 17.18L16.45 20.69L12.25 19.48L14.59 15.96L18.8 17.18Z"
+                  fill="black"></path>
+                <path
+                  fill-rule="evenodd"
+                  clip-rule="evenodd"
+                  d="M20.5 9.75C21.14 9.75 21.77 9.56 22.31 9.2C22.84 8.85 23.26 8.34 23.5 7.74C23.75 7.15 23.81 6.5 23.69 5.87C23.56 5.24 23.25 4.66 22.8 4.2C22.34 3.75 21.76 3.44 21.13 3.31C20.5 3.19 19.85 3.25 19.26 3.5C18.66 3.74 18.15 4.16 17.8 4.69C17.44 5.23 17.25 5.86 17.25 6.5C17.25 7.36 17.59 8.19 18.2 8.8C18.81 9.41 19.64 9.75 20.5 9.75ZM21.47 5.04C21.18 4.85 20.85 4.75 20.5 4.75C20.04 4.75 19.59 4.93 19.26 5.26C18.93 5.59 18.75 6.04 18.75 6.5C18.75 6.85 18.85 7.18 19.04 7.47C19.24 7.76 19.51 7.98 19.83 8.12C20.15 8.25 20.5 8.28 20.84 8.22C21.18 8.15 21.49 7.98 21.74 7.74C21.98 7.49 22.15 7.18 22.22 6.84C22.28 6.5 22.25 6.15 22.12 5.83C21.98 5.51 21.76 5.24 21.47 5.04Z"
+                  fill="#5446FF"></path>
+              </svg>
+              <div class="flex min-w-0 flex-1 flex-col gap-2">
+                <div
+                  class="text-[length:var(--fs-body)] leading-[length:var(--lh-body)] font-semibold text-vault-navy"
+                >
+                  Onboarding managers
+                </div>
+                <p
+                  class="m-0 text-[length:var(--fs-body-sm)] leading-[length:var(--lh-body-sm)] text-neutral-500"
+                >
+                  Dedicated onboarding team ensures smooth setup
                 </p>
               </div>
-              <div
-                class="relative max-w-full lg:max-w-[574px] w-full h-[250px] lg:h-full overflow-hidden order-1 lg:order-2"
+            </div>
+
+            <div
+              class="flex items-center gap-3 rounded-[12px] border border-neutral-300 bg-generic-00 p-6"
+            >
+              <svg
+                width="32"
+                height="32"
+                viewBox="0 0 32 32"
+                fill="none"
+                class="block shrink-0"
+                aria-hidden="true"
+                focusable="false"
               >
-                <img
-                  src="https://cdn.prod.website-files.com/63ede4a3da6dbd6b05c4612f/69f32b6d22f58630b6926564_mandate-logos-1.png"
-                  alt=""
-                  class="w-full h-full object-contain"
-                />
+                <path d="M19.18 15.27H12.81V16.73H19.18V15.27Z" fill="#5446FF"></path>
+                <path
+                  d="M2.52 15.27H1.3C1.11 15.27 0.92 15.34 0.78 15.48C0.64 15.62 0.56 15.81 0.56 16C0.56 16.19 0.64 16.38 0.78 16.52C0.92 16.66 1.11 16.73 1.3 16.73H2.52V15.27Z"
+                  fill="#5446FF"></path>
+                <path
+                  d="M30.7 15.27H29.48V16.73H30.7C30.89 16.73 31.08 16.66 31.22 16.52C31.36 16.38 31.43 16.19 31.43 16C31.43 15.81 31.36 15.62 31.22 15.48C31.08 15.34 30.89 15.27 30.7 15.27Z"
+                  fill="#5446FF"></path>
+                <path
+                  d="M29.48 11.1V15.27V16.73V20.9C29.48 21.35 29.29 21.79 28.97 22.11C28.65 22.43 28.21 22.61 27.76 22.61H25.55V23.84C25.55 24.29 25.37 24.73 25.05 25.05C24.73 25.37 24.29 25.55 23.84 25.55H20.9C20.45 25.55 20.01 25.37 19.69 25.05C19.37 24.73 19.18 24.29 19.18 23.84V16.73V15.27V8.16C19.18 7.71 19.37 7.27 19.69 6.95C20.01 6.63 20.45 6.45 20.9 6.45H23.84C24.29 6.45 24.73 6.63 25.05 6.95C25.37 7.27 25.55 7.71 25.55 8.16V9.38H27.76C28.21 9.38 28.65 9.57 28.97 9.89C29.29 10.21 29.48 10.65 29.48 11.1ZM12.81 15.27V8.16C12.81 7.71 12.63 7.27 12.31 6.95C11.99 6.63 11.55 6.45 11.1 6.45H8.16C7.71 6.45 7.27 6.63 6.95 6.95C6.63 7.27 6.45 7.71 6.45 8.16V9.38H4.24C3.79 9.38 3.35 9.57 3.03 9.89C2.71 10.21 2.52 10.65 2.52 11.1V15.27V16.73V20.9C2.52 21.35 2.71 21.79 3.03 22.11C3.35 22.43 3.79 22.61 4.24 22.61H6.45V23.84C6.45 24.29 6.63 24.73 6.95 25.05C7.27 25.37 7.71 25.55 8.16 25.55H11.1C11.55 25.55 11.99 25.37 12.31 25.05C12.63 24.73 12.81 24.29 12.81 23.84V16.73V15.27ZM24.01 24.01C24.06 23.97 24.09 23.91 24.09 23.84V8.16C24.09 8.1 24.06 8.03 24.01 7.99C23.97 7.94 23.91 7.92 23.84 7.92H20.9C20.84 7.92 20.77 7.94 20.73 7.99C20.68 8.03 20.66 8.1 20.66 8.16V23.84C20.66 23.91 20.68 23.97 20.73 24.01C20.77 24.06 20.84 24.09 20.9 24.09H23.84C23.91 24.09 23.97 24.06 24.01 24.01ZM27.93 21.07C27.98 21.03 28 20.96 28 20.9V11.1C28 11.04 27.98 10.97 27.93 10.93C27.89 10.88 27.82 10.86 27.76 10.86H25.55V21.14H27.76C27.82 21.14 27.89 21.12 27.93 21.07ZM11.35 23.84C11.35 23.91 11.32 23.97 11.27 24.01C11.23 24.06 11.16 24.09 11.1 24.09H8.16C8.1 24.09 8.03 24.06 7.99 24.01C7.94 23.97 7.92 23.91 7.92 23.84V8.16C7.92 8.1 7.94 8.03 7.99 7.99C8.03 7.94 8.1 7.92 8.16 7.92H11.1C11.16 7.92 11.23 7.94 11.27 7.99C11.32 8.03 11.35 8.1 11.35 8.16V23.84ZM4.07 21.07C4.11 21.12 4.18 21.14 4.24 21.14H6.45V10.86H4.24C4.18 10.86 4.11 10.88 4.07 10.93C4.02 10.97 4 11.04 4 11.1V20.9C4 20.96 4.02 21.03 4.07 21.07Z"
+                  fill="black"></path>
+                <path
+                  d="M4.24 21.14C4.18 21.14 4.11 21.12 4.07 21.07C4.02 21.03 4 20.96 4 20.9V11.1C4 11.04 4.02 10.97 4.07 10.93C4.11 10.88 4.18 10.86 4.24 10.86H6.45V21.14H4.24Z"
+                  fill="white"></path>
+              </svg>
+              <div class="flex min-w-0 flex-1 flex-col gap-2">
+                <div
+                  class="text-[length:var(--fs-body)] leading-[length:var(--lh-body)] font-semibold text-vault-navy"
+                >
+                  Training
+                </div>
+                <p
+                  class="m-0 text-[length:var(--fs-body-sm)] leading-[length:var(--lh-body-sm)] text-neutral-500"
+                >
+                  Comprehensive training programmes for your team
+                </p>
+              </div>
+            </div>
+
+            <div
+              class="flex items-center gap-3 rounded-[12px] border border-neutral-300 bg-generic-00 p-6"
+            >
+              <svg
+                width="32"
+                height="32"
+                viewBox="0 0 32 32"
+                fill="none"
+                class="block shrink-0"
+                aria-hidden="true"
+                focusable="false"
+              >
+                <path
+                  d="M27 13.61C27.11 13.45 27.29 13.34 27.48 13.31C27.67 13.28 27.87 13.32 28.03 13.44C28.18 13.55 28.29 13.72 28.32 13.91C28.67 15.96 28.5 18.05 27.83 20.02C27.16 21.98 26.02 23.74 24.5 25.15C24.41 25.41 24.29 25.58 24.21 25.41C22.62 26.79 20.71 27.76 18.65 28.2C16.59 28.65 14.45 28.57 12.43 27.97C10.41 27.37 8.58 26.26 7.1 24.76C5.62 23.26 4.54 21.41 3.97 19.38C3.4 17.35 3.35 15.21 3.83 13.16C4.3 11.11 5.29 9.21 6.7 7.64C8.11 6.07 9.89 4.89 11.88 4.19C13.87 3.5 16.01 3.32 18.08 3.67C18.18 3.69 18.27 3.72 18.36 3.77C18.44 3.82 18.51 3.89 18.57 3.97C18.63 4.05 18.67 4.14 18.69 4.23C18.71 4.33 18.72 4.43 18.7 4.52C18.68 4.62 18.65 4.71 18.6 4.79C18.54 4.88 18.48 4.95 18.4 5C18.32 5.06 18.22 5.1 18.13 5.12C18.03 5.14 17.93 5.14 17.84 5.12C17.23 5.02 16.62 4.97 16 4.97C13.85 4.97 11.74 5.6 9.95 6.78C8.15 7.96 6.74 9.64 5.88 11.62C5.03 13.6 4.77 15.78 5.15 17.9C5.52 20.02 6.5 21.98 7.98 23.55C9.13 21.75 10.86 20.4 12.88 19.7C11.87 19.03 11.11 18.05 10.7 16.92C10.29 15.78 10.26 14.54 10.61 13.38C10.96 12.22 11.67 11.21 12.64 10.49C13.62 9.77 14.79 9.38 16 9.38C17.21 9.38 18.39 9.77 19.36 10.49C20.33 11.21 21.05 12.22 21.4 13.38C21.75 14.54 21.71 15.78 21.31 16.92C20.9 18.05 20.13 19.03 19.13 19.7C21.15 20.4 22.87 21.75 24.03 23.55C25.95 21.5 27.03 18.8 27.03 15.99C27.03 15.38 26.98 14.76 26.87 14.16C26.84 13.96 26.89 13.77 27 13.61ZM12.54 12.7C12.08 13.39 11.84 14.19 11.84 15.02C11.84 16.12 12.28 17.18 13.06 17.96C13.84 18.74 14.9 19.18 16 19.18C16.83 19.18 17.63 18.94 18.32 18.48C19 18.02 19.53 17.37 19.85 16.61C20.16 15.85 20.25 15.01 20.09 14.2C19.93 13.39 19.53 12.65 18.95 12.07C18.36 11.49 17.62 11.09 16.81 10.93C16.01 10.77 15.17 10.85 14.41 11.17C13.65 11.48 13 12.02 12.54 12.7ZM12.02 21.7C10.81 22.39 9.79 23.37 9.07 24.57C11.03 26.16 13.48 27.03 16 27.03C18.52 27.03 20.97 26.16 22.93 24.57C22.21 23.37 21.2 22.39 19.98 21.7C18.77 21.01 17.4 20.65 16 20.65C14.61 20.65 13.24 21.01 12.02 21.7Z"
+                  fill="black"></path>
+                <path
+                  fill-rule="evenodd"
+                  clip-rule="evenodd"
+                  d="M28.16 8.25L27.43 7.84C27.54 7.4 27.54 6.95 27.43 6.51L28.16 6.1C28.33 6 28.45 5.84 28.5 5.65C28.55 5.46 28.53 5.26 28.43 5.09C28.33 4.92 28.17 4.8 27.98 4.75C27.79 4.7 27.59 4.73 27.42 4.82L26.7 5.24C26.38 4.93 25.99 4.71 25.56 4.58V3.74C25.56 3.55 25.48 3.36 25.34 3.23C25.2 3.09 25.02 3.01 24.82 3.01C24.63 3.01 24.44 3.09 24.3 3.23C24.16 3.36 24.09 3.55 24.09 3.74V4.58C23.66 4.71 23.26 4.93 22.94 5.24L22.22 4.82C22.05 4.73 21.85 4.7 21.66 4.75C21.47 4.8 21.31 4.92 21.21 5.09C21.12 5.26 21.09 5.46 21.14 5.65C21.19 5.84 21.31 6 21.48 6.1L22.21 6.51C22.1 6.95 22.1 7.4 22.21 7.84L21.48 8.25C21.31 8.35 21.19 8.51 21.14 8.7C21.09 8.89 21.12 9.09 21.21 9.26C21.31 9.43 21.47 9.55 21.66 9.6C21.85 9.65 22.05 9.62 22.22 9.53L22.94 9.11C23.26 9.42 23.66 9.64 24.09 9.77V10.61C24.09 10.8 24.16 10.99 24.3 11.12C24.44 11.26 24.63 11.34 24.82 11.34C25.02 11.34 25.2 11.26 25.34 11.12C25.48 10.99 25.56 10.8 25.56 10.61V9.77C25.99 9.64 26.38 9.42 26.7 9.11L27.42 9.53C27.59 9.62 27.79 9.65 27.98 9.6C28.17 9.55 28.33 9.43 28.43 9.26C28.53 9.09 28.55 8.89 28.5 8.7C28.45 8.51 28.33 8.35 28.16 8.25ZM24.14 8.19C24.34 8.33 24.58 8.4 24.82 8.4C25.15 8.4 25.46 8.27 25.69 8.04C25.92 7.81 26.05 7.5 26.05 7.17C26.05 6.93 25.97 6.7 25.84 6.49C25.71 6.29 25.51 6.14 25.29 6.04C25.07 5.95 24.82 5.93 24.58 5.97C24.34 6.02 24.13 6.14 23.96 6.31C23.78 6.48 23.67 6.7 23.62 6.94C23.57 7.17 23.6 7.42 23.69 7.64C23.78 7.87 23.94 8.06 24.14 8.19Z"
+                  fill="#5446FF"></path>
+              </svg>
+              <div class="flex min-w-0 flex-1 flex-col gap-2">
+                <div
+                  class="text-[length:var(--fs-body)] leading-[length:var(--lh-body)] font-semibold text-vault-navy"
+                >
+                  Dedicated KAMs
+                </div>
+                <p
+                  class="m-0 text-[length:var(--fs-body-sm)] leading-[length:var(--lh-body-sm)] text-neutral-500"
+                >
+                  Key account managers for personalised service
+                </p>
+              </div>
+            </div>
+
+            <div
+              class="flex items-center gap-3 rounded-[12px] border border-neutral-300 bg-generic-00 p-6"
+            >
+              <svg
+                width="32"
+                height="32"
+                viewBox="0 0 32 32"
+                fill="none"
+                class="block shrink-0"
+                aria-hidden="true"
+                focusable="false"
+              >
+                <path
+                  d="M12.27 6.2C12.64 6.78 12.83 7.46 12.84 8.16C12.83 9.01 12.54 9.83 12.01 10.48C11.47 11.14 10.72 11.59 9.9 11.76V20.24C10.79 20.42 11.58 20.93 12.12 21.66C12.66 22.39 12.91 23.3 12.82 24.21C12.72 25.11 12.3 25.95 11.62 26.56C10.95 27.18 10.07 27.51 9.16 27.51C8.25 27.51 7.37 27.18 6.7 26.56C6.02 25.95 5.6 25.11 5.5 24.21C5.41 23.3 5.66 22.39 6.2 21.66C6.74 20.93 7.53 20.42 8.43 20.24V11.76C7.74 11.62 7.12 11.29 6.61 10.81C6.11 10.33 5.76 9.71 5.59 9.04C5.43 8.36 5.45 7.66 5.67 7C5.89 6.34 6.3 5.75 6.84 5.31C7.37 4.87 8.03 4.6 8.72 4.51C9.41 4.43 10.11 4.54 10.73 4.84C11.36 5.14 11.89 5.61 12.27 6.2ZM7.33 6.93C7.08 7.3 6.96 7.72 6.96 8.16C6.96 8.74 7.19 9.3 7.6 9.72C8.01 10.13 8.58 10.36 9.16 10.36C9.6 10.36 10.02 10.23 10.38 9.99C10.75 9.75 11.03 9.41 11.2 9C11.36 8.6 11.41 8.16 11.32 7.73C11.24 7.3 11.03 6.91 10.72 6.6C10.41 6.29 10.02 6.08 9.59 6C9.16 5.91 8.72 5.96 8.32 6.12C7.91 6.29 7.57 6.57 7.33 6.93ZM10.99 25.06C11.24 24.7 11.37 24.28 11.37 23.84C11.37 23.25 11.13 22.69 10.72 22.28C10.31 21.87 9.74 21.63 9.16 21.63C8.72 21.63 8.3 21.76 7.93 22.01C7.57 22.25 7.29 22.59 7.12 23C6.96 23.4 6.91 23.84 7 24.27C7.08 24.7 7.29 25.09 7.6 25.4C7.91 25.71 8.3 25.92 8.73 26C9.16 26.09 9.6 26.04 10 25.88C10.41 25.71 10.75 25.43 10.99 25.06Z"
+                  fill="black"></path>
+                <path
+                  fill-rule="evenodd"
+                  clip-rule="evenodd"
+                  d="M25.57 20.24V13.87C25.58 13.51 25.51 13.16 25.37 12.84C25.24 12.51 25.04 12.21 24.79 11.96L19.75 6.93H23.86C24.05 6.93 24.24 6.86 24.38 6.72C24.52 6.58 24.59 6.39 24.59 6.2C24.59 6 24.52 5.82 24.38 5.68C24.24 5.54 24.05 5.46 23.86 5.46H17.98C17.79 5.46 17.6 5.54 17.46 5.68C17.32 5.82 17.25 6 17.25 6.2V12.08C17.25 12.27 17.32 12.46 17.46 12.6C17.6 12.74 17.79 12.81 17.98 12.81C18.17 12.81 18.36 12.74 18.5 12.6C18.64 12.46 18.71 12.27 18.71 12.08V7.97L23.75 13.01C23.86 13.12 23.95 13.25 24.01 13.4C24.07 13.55 24.11 13.71 24.11 13.87V20.24C23.21 20.42 22.42 20.93 21.88 21.66C21.34 22.4 21.09 23.31 21.18 24.21C21.28 25.12 21.7 25.96 22.38 26.57C23.05 27.18 23.93 27.52 24.84 27.52C25.75 27.52 26.63 27.18 27.3 26.57C27.98 25.96 28.4 25.12 28.5 24.21C28.59 23.31 28.34 22.4 27.8 21.66C27.26 20.93 26.47 20.42 25.57 20.24V20.24ZM23.61 25.67C23.98 25.91 24.4 26.04 24.84 26.04C25.42 26.04 25.99 25.81 26.4 25.4C26.81 24.98 27.05 24.42 27.05 23.84C27.05 23.4 26.92 22.98 26.67 22.61C26.43 22.25 26.09 21.97 25.68 21.8C25.28 21.64 24.84 21.59 24.41 21.68C23.98 21.76 23.59 21.97 23.28 22.28C22.97 22.59 22.76 22.98 22.68 23.41C22.59 23.84 22.64 24.28 22.8 24.68C22.97 25.09 23.25 25.43 23.61 25.67Z"
+                  fill="#5446FF"></path>
+              </svg>
+              <div class="flex min-w-0 flex-1 flex-col gap-2">
+                <div
+                  class="text-[length:var(--fs-body)] leading-[length:var(--lh-body)] font-semibold text-vault-navy"
+                >
+                  Feature requests
+                </div>
+                <p
+                  class="m-0 text-[length:var(--fs-body-sm)] leading-[length:var(--lh-body-sm)] text-neutral-500"
+                >
+                  We build what you need, when you need it
+                </p>
+              </div>
+            </div>
+
+            <div
+              class="flex items-center gap-3 rounded-[12px] border border-neutral-300 bg-generic-00 p-6"
+            >
+              <svg
+                width="32"
+                height="32"
+                viewBox="0 0 32 32"
+                fill="none"
+                class="block shrink-0"
+                aria-hidden="true"
+                focusable="false"
+              >
+                <path
+                  d="M27.15 14.29H30.7C30.89 14.29 31.08 14.36 31.22 14.5C31.36 14.64 31.43 14.83 31.43 15.02C31.43 15.22 31.36 15.4 31.22 15.54C31.08 15.68 30.89 15.76 30.7 15.76H1.3C1.11 15.76 0.92 15.68 0.78 15.54C0.64 15.4 0.56 15.22 0.56 15.02C0.56 14.83 0.64 14.64 0.78 14.5C0.92 14.36 1.11 14.29 1.3 14.29H4.85L10.73 6.17C10.89 5.96 11.09 5.79 11.32 5.66C11.55 5.54 11.81 5.47 12.07 5.47C12.34 5.46 12.6 5.51 12.84 5.62C13.08 5.73 13.29 5.89 13.45 6.1L15.03 7.93C15.03 7.93 15.04 7.94 15.05 7.95C15.16 8.09 15.31 8.2 15.47 8.28C15.64 8.36 15.82 8.4 16 8.4C16.18 8.4 16.36 8.36 16.53 8.28C16.69 8.2 16.84 8.09 16.95 7.95C16.96 7.94 16.97 7.93 16.97 7.93L18.55 6.1C18.72 5.9 18.93 5.73 19.17 5.62C19.41 5.51 19.67 5.46 19.93 5.47C20.19 5.48 20.45 5.54 20.68 5.67C20.91 5.79 21.11 5.96 21.27 6.17L27.15 14.29ZM12.01 6.97C11.98 6.98 11.95 7.01 11.93 7.04L6.66 14.29H25.35L20.08 7.04C20.06 7.01 20.03 6.98 20 6.97C19.96 6.95 19.93 6.94 19.89 6.94C19.85 6.94 19.81 6.95 19.78 6.96C19.75 6.98 19.72 7 19.69 7.03L19.68 7.05L18.09 8.88C17.84 9.19 17.52 9.44 17.16 9.61C16.8 9.79 16.4 9.88 16 9.88C15.6 9.88 15.2 9.79 14.84 9.61C14.48 9.44 14.16 9.19 13.91 8.88L12.33 7.05L12.31 7.03C12.29 7 12.26 6.98 12.23 6.96C12.19 6.95 12.15 6.94 12.12 6.94C12.08 6.94 12.04 6.95 12.01 6.97Z"
+                  fill="black"></path>
+                <path
+                  fill-rule="evenodd"
+                  clip-rule="evenodd"
+                  d="M22.37 18.21C21.31 18.21 20.29 18.61 19.51 19.34C18.74 20.07 18.27 21.07 18.21 22.13H13.79C13.73 21.09 13.28 20.11 12.53 19.39C11.79 18.66 10.8 18.24 9.76 18.21C8.72 18.18 7.7 18.54 6.91 19.22C6.12 19.89 5.62 20.84 5.49 21.88C5.37 22.91 5.64 23.95 6.24 24.8C6.85 25.64 7.75 26.23 8.77 26.45C9.78 26.66 10.85 26.49 11.74 25.96C12.64 25.43 13.31 24.59 13.61 23.6H18.39C18.62 24.33 19.04 24.99 19.62 25.5C20.2 26.01 20.91 26.35 21.67 26.48C22.43 26.61 23.21 26.52 23.93 26.23C24.64 25.95 25.26 25.47 25.72 24.85C26.18 24.23 26.45 23.49 26.52 22.72C26.58 21.95 26.44 21.18 26.09 20.5C25.74 19.81 25.21 19.23 24.55 18.82C23.9 18.42 23.14 18.21 22.37 18.21ZM8.13 24.61C8.58 24.91 9.1 25.07 9.63 25.07C9.98 25.07 10.33 25 10.66 24.86C10.99 24.73 11.29 24.53 11.54 24.28C11.79 24.03 11.98 23.73 12.12 23.4C12.26 23.08 12.32 22.73 12.32 22.37C12.32 21.84 12.17 21.32 11.87 20.87C11.57 20.43 11.15 20.09 10.66 19.88C10.17 19.68 9.63 19.62 9.1 19.73C8.58 19.83 8.1 20.09 7.72 20.47C7.35 20.84 7.09 21.32 6.99 21.85C6.88 22.37 6.94 22.91 7.14 23.4C7.34 23.9 7.69 24.32 8.13 24.61ZM20.87 24.61C21.32 24.91 21.84 25.07 22.37 25.07C23.08 25.07 23.77 24.78 24.28 24.28C24.78 23.77 25.07 23.09 25.07 22.37C25.07 21.84 24.91 21.32 24.61 20.87C24.31 20.43 23.89 20.09 23.4 19.88C22.91 19.68 22.37 19.62 21.84 19.73C21.32 19.83 20.84 20.09 20.46 20.47C20.09 20.84 19.83 21.32 19.73 21.85C19.62 22.37 19.68 22.91 19.88 23.4C20.08 23.9 20.43 24.32 20.87 24.61Z"
+                  fill="#5446FF"></path>
+              </svg>
+              <div class="flex min-w-0 flex-1 flex-col gap-2">
+                <div
+                  class="text-[length:var(--fs-body)] leading-[length:var(--lh-body)] font-semibold text-vault-navy"
+                >
+                  Onsite visits
+                </div>
+                <p
+                  class="m-0 text-[length:var(--fs-body-sm)] leading-[length:var(--lh-body-sm)] text-neutral-500"
+                >
+                  In-person support and consultation at your office
+                </p>
+              </div>
+            </div>
+
+            <div
+              class="flex items-center gap-3 rounded-[12px] border border-neutral-300 bg-generic-00 p-6"
+            >
+              <svg
+                width="32"
+                height="32"
+                viewBox="0 0 32 32"
+                fill="none"
+                class="block shrink-0"
+                aria-hidden="true"
+                focusable="false"
+              >
+                <path
+                  d="M17.76 10.84C19.54 11.31 20.68 12.46 21.16 14.24C21.2 14.4 21.29 14.53 21.42 14.63C21.55 14.73 21.71 14.78 21.87 14.78C21.93 14.78 22 14.78 22.06 14.76C22.15 14.73 22.24 14.69 22.32 14.63C22.39 14.57 22.46 14.5 22.51 14.42C22.56 14.33 22.59 14.24 22.6 14.15C22.61 14.05 22.61 13.95 22.58 13.86C21.97 11.57 20.43 10.03 18.14 9.42C18.05 9.39 17.95 9.39 17.85 9.4C17.76 9.41 17.67 9.44 17.58 9.49C17.5 9.54 17.43 9.61 17.37 9.68C17.31 9.76 17.26 9.85 17.24 9.94C17.21 10.03 17.21 10.13 17.22 10.23C17.23 10.32 17.27 10.41 17.31 10.5C17.36 10.58 17.43 10.65 17.5 10.71C17.58 10.77 17.67 10.81 17.76 10.84Z"
+                  fill="#5446FF"></path>
+                <path
+                  d="M27.49 22.72C27.28 24.32 26.5 25.79 25.28 26.86C24.07 27.92 22.51 28.51 20.89 28.5C11.3 28.5 3.5 20.7 3.5 11.11C3.49 9.49 4.08 7.93 5.14 6.72C6.2 5.5 7.67 4.72 9.27 4.51C9.64 4.46 10.01 4.54 10.34 4.72C10.66 4.91 10.91 5.19 11.06 5.54L13.64 11.3C13.76 11.57 13.8 11.85 13.78 12.14C13.76 12.42 13.66 12.69 13.5 12.93C13.49 12.96 13.47 12.98 13.45 13L10.87 16.07C10.86 16.1 10.85 16.14 10.85 16.17C10.85 16.21 10.86 16.24 10.87 16.28C11.81 18.2 13.82 20.2 15.77 21.13C15.8 21.15 15.84 21.16 15.88 21.15C15.91 21.15 15.95 21.14 15.98 21.13L19 18.55C19.02 18.53 19.05 18.52 19.07 18.5C19.31 18.34 19.58 18.25 19.87 18.22C20.15 18.2 20.44 18.24 20.7 18.35L26.48 20.95C26.82 21.09 27.1 21.35 27.28 21.67C27.46 21.99 27.54 22.36 27.49 22.73V22.72ZM26.04 22.54C26.04 22.49 26.03 22.44 26 22.39C25.97 22.35 25.93 22.32 25.89 22.3L20.1 19.7C20.07 19.69 20.03 19.68 20 19.69C19.97 19.69 19.93 19.7 19.9 19.71L16.88 22.29C16.86 22.31 16.83 22.32 16.81 22.34C16.56 22.5 16.28 22.6 15.98 22.62C15.69 22.64 15.39 22.59 15.12 22.46C12.87 21.37 10.63 19.15 9.55 16.93C9.42 16.66 9.36 16.36 9.38 16.07C9.4 15.78 9.5 15.49 9.66 15.24C9.67 15.22 9.69 15.2 9.71 15.17L12.29 12.1C12.3 12.07 12.31 12.03 12.31 12C12.31 11.96 12.3 11.93 12.29 11.9L9.71 6.12C9.69 6.08 9.66 6.04 9.62 6.01C9.58 5.98 9.53 5.96 9.49 5.96H9.46C8.21 6.13 7.07 6.74 6.24 7.69C5.41 8.64 4.96 9.85 4.97 11.11C4.97 19.89 12.11 27.03 20.89 27.03C22.15 27.04 23.36 26.58 24.31 25.76C25.26 24.93 25.87 23.79 26.04 22.54Z"
+                  fill="black"></path>
+                <path
+                  d="M18.22 6.02C18.24 5.93 18.29 5.84 18.35 5.76C18.4 5.68 18.48 5.62 18.56 5.57C18.65 5.52 18.74 5.49 18.83 5.48C18.93 5.47 19.03 5.47 19.12 5.5C20.9 5.96 22.51 6.89 23.81 8.19C25.11 9.48 26.04 11.1 26.5 12.88C26.53 12.97 26.53 13.07 26.52 13.17C26.51 13.26 26.48 13.35 26.43 13.44C26.38 13.52 26.31 13.59 26.24 13.65C26.16 13.71 26.07 13.75 25.98 13.78C25.92 13.8 25.85 13.8 25.79 13.8C25.63 13.8 25.47 13.75 25.34 13.65C25.21 13.55 25.12 13.42 25.08 13.26C24.68 11.73 23.88 10.34 22.77 9.23C21.66 8.11 20.27 7.32 18.74 6.92C18.65 6.89 18.56 6.85 18.48 6.79C18.41 6.73 18.34 6.66 18.29 6.58C18.24 6.49 18.21 6.4 18.2 6.31C18.19 6.21 18.19 6.11 18.22 6.02Z"
+                  fill="#5446FF"></path>
+              </svg>
+              <div class="flex min-w-0 flex-1 flex-col gap-2">
+                <div
+                  class="text-[length:var(--fs-body)] leading-[length:var(--lh-body)] font-semibold text-vault-navy"
+                >
+                  Always reachable
+                </div>
+                <p
+                  class="m-0 text-[length:var(--fs-body-sm)] leading-[length:var(--lh-body-sm)] text-neutral-500"
+                >
+                  Named contacts, not a ticket queue
+                </p>
               </div>
             </div>
           </div>
         </div>
       </div>
     </div>
-    <!-- <div class="mt-[48px] flex items-center justify-center">
-      <a href="#" class="flex items-center cursor-pointer no-underline group">
-        <div
-          class="flex items-center gap-2 items-center p-[14px_40px]! bg-gradient-to-r! from-[#110072]! to-[#7a5698]! text-white! rounded-[60px]! text-[16px]! font-medium! leading-[1.5]! border-none outline-none transition-transform group-hover:scale-105"
-        >
-          Learn more
-          <span
-            class="inline-flex items-center mt-[3px] justify-between text-white"
-          >
-            <svg
-              width="16"
-              height="16"
-              viewBox="0 0 16 16"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                d="M3 8H13M13 8L9 4M13 8L9 12"
-                stroke="currentColor"
-                stroke-width="2"
-                stroke-linecap="round"
-                stroke-linejoin="round"></path>
-            </svg>
-          </span>
-        </div>
-      </a>
-    </div> -->
   </div>
 </section>
 
@@ -505,36 +684,6 @@ const securityCards = [
     }
   }
 
-  .integrations-text-panel::before {
-    content: "";
-    position: absolute;
-    left: 0;
-    right: 0;
-    top: -64px;
-    height: 96px;
-    pointer-events: none;
-    z-index: 10;
-    background: linear-gradient(
-      to bottom,
-      rgba(253, 253, 251, 0) 0%,
-      rgba(253, 253, 251, 0.6) 50%,
-      var(--palette-ledger-50) 100%
-    );
-    backdrop-filter: blur(24px) saturate(120%);
-    -webkit-backdrop-filter: blur(24px) saturate(120%);
-    mask-image: linear-gradient(
-      to bottom,
-      transparent 0%,
-      black 50%,
-      black 100%
-    );
-    -webkit-mask-image: linear-gradient(
-      to bottom,
-      transparent 0%,
-      black 50%,
-      black 100%
-    );
-  }
 </style>
 
 <script is:inline>
