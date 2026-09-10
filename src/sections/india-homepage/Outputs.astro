@@ -205,9 +205,22 @@ const THEIRS = "General AI assistants";
          background, and the navbar (fixed, z-1000) floats over solid colour.
 
          The clearance itself comes from the shared --nav-clear token, so this
-         and every other pinned section move together. */
+         and every other pinned section move together.
+
+         THE NEGATIVE MARGIN IS WHAT KEEPS IT FREE. Padding is part of the box
+         in normal flow too, so on its own the 112px stacked on the section's
+         own 80px and the previous section's 80px — 272px of white before the
+         heading, where the rhythm is 160px. Pulling the box back up by exactly
+         the same amount cancels that: the block occupies its normal flow
+         position, and the padding strip is the only thing that sits higher.
+
+         Safe because this element is opaque `bg-generic-00` and everything it
+         now reaches over — its own section's top padding, then DataLayer's
+         bottom padding — is the same white. Give either a background and this
+         has to be reconsidered. */
       top: 0;
       padding-top: var(--nav-clear, 112px);
+      margin-top: calc(-1 * var(--nav-clear, 112px));
       z-index: 10;
     }
   }
