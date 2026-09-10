@@ -1,77 +1,52 @@
 ---
 /**
  * "Clarity AI, by ClearTax: Making AI work for Finance" — Figma node
- * 13275:28481, with the per-tab card sets from the component set at
- * 13091:18569 (Default / Variant2 / Variant3, one per tab).
+ * 13692:35487, with the card copy carried over from the sticky-deck version
+ * this replaces (13275:28481 / 13091:18569).
  *
- * ONE DECK, THREE TABS. All eleven cards are a single sticky stack pinning at
- * a single spot on the page — the three tabs are not three stacks in sequence,
- * they are labels for stretches of the same one. The pill bar rides along above
- * it and follows the front card: reach the first Tax Teams card and the
- * highlight slides to "For Tax Teams" on its own. Clicking a pill scrolls that
- * group's first card to the front of the deck.
+ * Structurally this is `france-regional/Supports.astro`: a grid of cards, each
+ * one a button that opens ONE detail overlay with prev/next chevrons. The
+ * difference is the pill bar above it — the cards are split by team and the
+ * pills switch which set the grid shows.
  *
- * That is also why the ARIA is `aria-current` on plain buttons rather than
- * tab/tabpanel. There are no panels — there is one deck, and the pills report
- * position in it.
+ * WHAT THE FIGMA SHOWS AND WHAT IT LEAVES OPEN. The frame draws one state: two
+ * pills, six cards, each card a title + icon square + plus. It does not draw
+ * the tab interaction or the overlay. Two readings were resolved here:
+ *   - The pills FILTER the grid. With the scrolling deck gone they cannot mean
+ *     "position in a stack" any more, and the frame's own card set spans both
+ *     teams, so it is a WIP layout rather than a filtered state.
+ *   - The plus opens the Supports overlay, carrying the claim and the caption.
+ *     The card itself only has room for the title, and that copy has to land
+ *     somewhere.
  *
- * SLIVER OFFSET is a ROLLING WINDOW four deep (see `STACK_DEPTH`). Each card
- * sits 12px below the one behind so the stack has visible depth, but eleven
- * cards at 12px would push the front card 120px down the viewport and eat the
- * height the card needs. So the window holds at four: the front card plus the
- * three most recent behind it, and the fourth-oldest tucks in behind the last
- * sliver where it cannot be seen.
+ * PANELS ARE HIDDEN BY INLINE `display`, not by a class or the `hidden`
+ * attribute. `hidden` is a UA-origin `display:none`, so an author `grid`
+ * utility beats it and the panel stays visible; a `hidden` CLASS would race the
+ * `grid` class on source order, which is unlayered once pasted into Webflow.
+ * The initial `display:none` is rendered server-side rather than applied by the
+ * script, so the page never paints every panel and then collapses to one.
  *
- * The window has to ROLL, which is why the depth index is the one piece of
- * geometry the script owns rather than the stylesheet. `position: sticky` pins
- * an element at a fixed `top`, so a card that pinned at the front offset would
- * stay there forever; a card's distance from the front changes as the deck
- * advances, so its offset has to change with it. On each change of front card
- * the script rewrites every slide's `--ih-maiw-i` to `depth - (front - i)`,
- * floored at 0 — the whole stack shifts up one step and the card that fell out
- * of the window lands under the last sliver. CSS still owns what a step is
- * worth and where the stack pins; JS only says how deep each card currently is.
- *
- * DEPTH ALSO READS AS SIZE, following `global-homepage/WhyGenericAi.astro`:
- * each step back is 0.03 smaller (that file's interval), so the slivers sit
- * progressively inset instead of being three identical white strips. It is the
- * same `behind` count that sets the step, so the two cannot disagree. Only the
- * inner `.ih-maiw-card` is transformed — the sticky wrapper is what the script
- * measures, and a scaled element would feed its transform into the next
- * measurement. That is the whole reason for the two layers, and it is why
- * WhyGenericAi is built the same way.
- *
- * Without JS the inline `--ih-maiw-i` leaves the deck in the old fixed clamp,
- * which is a correct still frame of the same design: three slivers and a front
- * card, just not rolling.
- *
- * IMPORTANT: no ancestor of `.ih-maiw-sticky` may set `overflow` to anything
- * but `visible`, or sticky silently stops working. The pill bar's own
- * `overflow-x` is safe — it is a sibling of the stack, not an ancestor.
- *
- * THE HEADING PINS ONLY WHERE IT FITS. The Figma sticks the whole header — H2,
- * lede and pills — which is right on a large window and wrong on a small one:
- * ~150px of permanently parked heading is height the card needs more than the
- * heading does, and a pinned card cannot be scrolled to reveal its own
- * overflow. So the H2 and lede pin above the pills only past
- * `--ih-maiw-pin-intro`'s breakpoint (see the media query below) and scroll away
- * otherwise. Available HEIGHT is half the question, so it cannot be a plain
- * Tailwind breakpoint.
- *
- * That breakpoint is declared once, in CSS, and read back by the script through
- * `--ih-maiw-pin-intro`. Restating it as a matchMedia string in JS would be two
- * sources of truth for one decision, and they would drift.
+ * Consequence, and it is deliberate: without JS only the first team's cards are
+ * reachable. The alternative — every card visible, then a jump — is worse, and
+ * the overlay this section is built around needs JS regardless.
  *
  * The active pill is Nova Blue. Figma reports `--vault-navy/600` at #1200FF
  * there, which is an unresolved token in the export — the rendered design is
  * the brand's Nova Blue (#5446FF), so that is what this uses.
  *
+ * The icon squares and the overlay visual are unfilled "Icon placeholder" /
+ * "Image" frames in the Figma, so they render as `bg-visual-placeholder` — the
+ * token is #E8FFE1, exactly the fill the design uses. Swap each for a
+ * Webflow-hosted URL when the artwork lands — never a `data:` URI.
+ *
  * "Audit and Advisory Agent" appearing under both For CFO and For Tax Teams is
  * the design's own repetition, not a copy-paste slip.
+ *
+ * Ids are `ih-maiw-` prefixed: embeds share one namespace per page.
  */
 interface Card {
   title: string;
-  /** The Nova Blue one-liner under the title. */
+  /** The Nova Blue one-liner under the title in the overlay. */
   claim: string;
   caption: string;
 }
@@ -138,100 +113,59 @@ const groups: Group[] = [
       },
     ],
   },
-  {
-    id: "controllers",
-    label: "For Finance Controllers and AP/AR",
-    cards: [
-      {
-        title: "180-Day Reversal and Reclaim Agent",
-        claim: "Section 16(2)(b), computed per document",
-        caption:
-          "Takes your Table-4 data and open payments report from SAP or your ERP, identifies documents needing reversal, eligible for reclaim and falling due next month, and calculates reversal and interest per document",
-      },
-      {
-        title: "ERP Writeback Agent",
-        claim: "Codify your transformation logic once, then it runs itself",
-        caption:
-          "Learns the transformation once from your writebacks and a sample ingestion file. Your team approves the logic; from then on it applies automatically every month.",
-      },
-      {
-        title: "RCM and Ineligible Classification Agent",
-        claim: "A prioritised review queue instead of a line-by-line scan",
-        caption:
-          "Auto-triages every line item using ledger codes, vendor master data and transaction commentary, assigning High or Medium confidence for RCM applicability and ITC ineligibility.",
-      },
-      {
-        title: "Advance Adjustment Agent",
-        claim: "Catches unmatched advances before they become a penalty",
-        caption:
-          "Tracks advances and matches them against invoices received, flags gaps before they become compliance issues, and generates the adjustment recommendations.",
-      },
-    ],
-  },
 ];
 
-/**
- * How many slivers sit behind the front card — the depth of the rolling window.
- * Published to CSS as `--ih-maiw-depth` on the section so the script reads it
- * back rather than restating it, the same way `--ih-maiw-pin-intro` works.
- */
-const STACK_DEPTH = 3;
-
-/* One flat deck. The group only survives as a tag on each slide — it is what
-   the pill bar reads to know which label the front card belongs to — plus an
-   id on each group's first slide, which is where its pill scrolls to. */
-const slides = groups.flatMap((group) =>
-  group.cards.map((card, ci) => ({
-    card,
-    group: group.id,
-    anchor: ci === 0 ? `ih-maiw-group-${group.id}` : undefined,
-  })),
+/* The overlay holds one copy of every card's text, addressed by a FLAT index
+   across every team — so the numbering has to be assigned once, here, and used
+   by both the grid and the overlay. Panels render from `panels`, the overlay
+   from `flat`, and the two agree by construction. */
+const flat = groups.flatMap((group) =>
+  group.cards.map((card) => ({ card, group: group.id })),
 );
+
+let seq = 0;
+const panels = groups.map((group) => ({
+  ...group,
+  cards: group.cards.map((card) => ({ card, index: seq++ })),
+}));
 ---
 
-<section
-  class="ih-maiw bg-generic-00 max-lg:py-12 lg:py-20"
-  style={`--ih-maiw-depth:${STACK_DEPTH}`}
-  data-ih-maiw
->
+<section class="bg-generic-00 py-16 lg:py-20">
   <div class="container mx-auto">
-    <!-- z-30 is inert until the media query below makes this sticky; z-index
-         does nothing on a static box. Same for the background, which only has
-         slides to cover once it is pinned. -->
-    <div
-      class="ih-maiw-intro z-30 flex flex-col items-center gap-4 bg-generic-00 text-center"
-    >
-      <h2
-        class="m-0 font-heading font-medium text-vault-navy text-[length:var(--fs-h1)] leading-[length:var(--lh-h1)] tracking-[-0.5px]"
-      >
-        Clarity AI, by ClearTax: Making AI work for Finance
-      </h2>
-      <p
-        class="m-0 font-body text-neutral-500 text-[length:var(--fs-body-lg)] leading-[length:var(--lh-body-lg)] max-w-[597px] pb-6"
-      >
-        ClearTax gives you clean finance data and the business context AI needs,
-        so your finance team can build and use AI with confidence.
-      </p>
-    </div>
+    <div class="mb-8 flex flex-col items-center gap-6 text-center lg:mb-12">
+      <div class="flex flex-col items-center gap-4">
+        <h2
+          class="m-0 font-heading font-medium text-vault-navy text-[length:var(--fs-h1)] leading-[length:var(--lh-h1)] tracking-[-0.5px]"
+        >
+          Clarity AI, by ClearTax: Making AI work for Finance
+        </h2>
+        <p
+          class="m-0 max-w-[597px] font-body text-neutral-500 text-[length:var(--fs-body-lg)] leading-[length:var(--lh-body-lg)]"
+        >
+          ClearTax gives you clean finance data and the business context AI
+          needs, so your finance team can build and use AI with confidence.
+        </p>
+      </div>
 
-    <!-- Rides along above the deck. The wrapper is what sticks and what carries
-         the background, so cards passing behind are covered; the bar inside it
-         can scroll horizontally on narrow viewports without the wrapper needing
-         an overflow of its own. -->
-    <div class="ih-maiw-bar sticky z-30 flex justify-center bg-generic-00 pb-6 lg:pb-8">
+      <!-- `overflow-x-auto` so the labels scroll rather than wrap on a narrow
+           viewport — the bar must stay one row, or the thumb's `top`/`bottom`
+           inset would stretch it across both. -->
       <div
         class="ih-maiw-tablist relative flex max-w-full items-center gap-1 overflow-x-auto rounded-xl bg-neutral-100 px-1 py-1.5"
-        role="group"
-        aria-label="Jump to Clarity AI agents by team"
+        role="tablist"
+        aria-label="Clarity AI agents by team"
       >
         <span class="ih-maiw-thumb" aria-hidden="true"></span>
         {
           groups.map((group, i) => (
             <button
               type="button"
+              role="tab"
+              id={`ih-maiw-tab-${group.id}`}
               class="ih-maiw-tab relative z-10 shrink-0 cursor-pointer whitespace-nowrap rounded-lg border-0 bg-transparent px-6 py-2 text-center font-body text-[length:var(--fs-label)] leading-[length:var(--lh-label)] font-medium text-neutral-700"
-              aria-current={i === 0 ? "true" : "false"}
-              aria-controls={`ih-maiw-group-${group.id}`}
+              aria-selected={i === 0 ? "true" : "false"}
+              aria-controls={`ih-maiw-panel-${group.id}`}
+              tabindex={i === 0 ? 0 : -1}
               data-ih-maiw-tab={group.id}
             >
               {group.label}
@@ -241,243 +175,239 @@ const slides = groups.flatMap((group) =>
       </div>
     </div>
 
-    <div class="ih-maiw-stack">
-      {
-        slides.map((slide, i) => (
-          <div
-            id={slide.anchor}
-            class="ih-maiw-sticky sticky"
-            style={`--ih-maiw-i:${Math.min(i, STACK_DEPTH)};--ih-maiw-z:${i}`}
-            data-ih-maiw-slide={slide.group}
-          >
-            <article class="ih-maiw-card flex w-full flex-col items-center gap-6 rounded-xl border border-[#DCDEE2] bg-generic-00 p-6">
-              <div class="flex w-full flex-col items-center gap-2 text-center">
-                <h3 class="m-0 font-heading font-medium text-vault-navy text-[length:var(--fs-h6)] leading-[length:var(--lh-h6)]">
-                  {slide.card.title}
-                </h3>
-                <p class="m-0 font-body font-medium text-nova-blue text-[length:var(--fs-label)] leading-[length:var(--lh-body-sm)]">
-                  {slide.card.claim}
-                </p>
-              </div>
-
-              {/* Artwork slot. Figma ships it as the flat Visual Placeholder at
-                  894x320; no image exists yet. */}
-              <div class="ih-maiw-visual w-full rounded-lg bg-visual-placeholder" />
-
-              <p class="m-0 w-full text-center font-body text-neutral-500 text-[length:var(--fs-label)] leading-[length:var(--lh-body-sm)]">
-                {slide.card.caption}
-              </p>
-            </article>
-          </div>
-        ))
-      }
-    </div>
+    {
+      panels.map((group, i) => (
+        <div
+          id={`ih-maiw-panel-${group.id}`}
+          role="tabpanel"
+          aria-labelledby={`ih-maiw-tab-${group.id}`}
+          class="grid grid-cols-1 gap-6 lg:grid-cols-2 lg:gap-8"
+          style={i === 0 ? undefined : "display:none"}
+          data-ih-maiw-panel={group.id}
+        >
+          {group.cards.map(({ card, index }) => (
+            <button
+              type="button"
+              class="group m-0 flex w-full cursor-pointer items-center gap-6 self-start rounded-xl border border-neutral-300 bg-generic-00 p-6 text-left transition-all duration-150 ease-in-out hover:border-nova-blue"
+              aria-haspopup="dialog"
+              data-ih-maiw-open
+              data-ih-maiw-index={index}
+            >
+              <span
+                class="block h-14 w-14 shrink-0 self-stretch rounded-lg bg-visual-placeholder"
+                aria-hidden="true"
+              />
+              <span class="min-w-0 flex-1 font-heading font-medium text-vault-navy text-[length:var(--fs-h6)] leading-[length:var(--lh-h6)]">
+                {card.title}
+              </span>
+              <span
+                class="flex h-14 w-14 shrink-0 items-center justify-center rounded-lg p-2 text-vault-navy transition-colors duration-150 ease-in-out group-hover:text-nova-blue"
+                aria-hidden="true"
+              >
+                {/* The exported Figma glyph (Media / Icon / Unfilled / plus). */}
+                <svg
+                  width="40"
+                  height="40"
+                  viewBox="0 0 40 40"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    d="M20 10V30"
+                    stroke="currentColor"
+                    stroke-width="1.5"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  />
+                  <path
+                    d="M30 20L10 20"
+                    stroke="currentColor"
+                    stroke-width="1.5"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  />
+                </svg>
+              </span>
+            </button>
+          ))}
+        </div>
+      ))
+    }
   </div>
 </section>
 
+<!-- Detail overlay. Lives outside the section's container so the scrim covers
+     the viewport rather than the 1280px column.
+
+     Rendered ONCE with every card's text inside it, `hidden` on all but the
+     active one, rather than one panel per card: eleven copies of the chevrons,
+     the close control and the image frame would be eleven copies of the same
+     bytes, and every byte here is a Webflow Embed byte.
+
+     The per-card blocks use the `hidden` ATTRIBUTE, which is safe only because
+     none of them carries a display utility of its own — don't add one, or it
+     will beat the UA rule and nothing will ever hide. That is also why the
+     heading block spaces itself with `mb-*` rather than `flex gap-*`. -->
+<div
+  id="ih-maiw-overlay"
+  role="dialog"
+  aria-modal="true"
+  aria-labelledby="ih-maiw-overlay-title"
+  aria-hidden="true"
+  class="fixed inset-0 z-[2000] hidden items-center justify-center bg-generic-100/70 p-4 backdrop-blur-sm"
+>
+  <div
+    class="relative max-h-[90vh] w-full max-w-[1280px] overflow-y-auto rounded-xl border-2 border-[#CCCCCC] bg-generic-00 p-6"
+    data-ih-maiw-panel-detail
+  >
+    <!-- Anchored to the PANEL, not to the visual it sits over in the Figma:
+         24px panel padding + the design's 20px inset lands at the same 44px on
+         desktop, and it stays reachable once the visual moves below the copy on
+         mobile. The glyph is the card's plus, turned 45°. -->
+    <button
+      type="button"
+      aria-label="Close"
+      class="absolute right-6 top-6 z-10 inline-flex h-10 w-10 cursor-pointer items-center justify-center rounded-lg border-0 bg-transparent p-0 text-vault-navy transition-opacity duration-150 hover:opacity-70 lg:right-11 lg:top-11"
+      data-ih-maiw-close
+    >
+      <svg
+        width="40"
+        height="40"
+        viewBox="0 0 40 40"
+        fill="none"
+        class="rotate-45"
+        aria-hidden="true"
+        focusable="false"
+      >
+        <path
+          d="M20 10V30"
+          stroke="currentColor"
+          stroke-width="1.5"
+          stroke-linecap="round"
+          stroke-linejoin="round"></path>
+        <path
+          d="M30 20L10 20"
+          stroke="currentColor"
+          stroke-width="1.5"
+          stroke-linecap="round"
+          stroke-linejoin="round"></path>
+      </svg>
+    </button>
+
+    <div class="flex flex-col items-start gap-6 lg:flex-row lg:gap-12">
+      <!-- 416px = 1280 panel − 48 padding − 48 gap − the 768px the 16:9 visual
+           takes at the design's 432px height. justify-between is what puts the
+           caption and the chevrons on the visual's bottom edge. -->
+      <div
+        class="flex w-full flex-col justify-between gap-6 lg:w-[416px] lg:shrink-0 lg:self-stretch"
+      >
+        <div class="flex flex-col gap-6">
+          <span
+            class="block h-16 w-16 shrink-0 rounded-lg bg-visual-placeholder"
+            aria-hidden="true"
+          />
+          <div id="ih-maiw-overlay-title">
+            {
+              flat.map(({ card, group }, i) => (
+                <div hidden={i !== 0} data-ih-maiw-head data-ih-maiw-group={group}>
+                  <h3 class="m-0 mb-2 pr-12 font-heading font-medium text-vault-navy text-[length:var(--fs-h5)] leading-[length:var(--lh-h5)] tracking-[-0.5px] lg:pr-0">
+                    {card.title}
+                  </h3>
+                  <p class="m-0 font-body font-medium text-nova-blue text-[length:var(--fs-body)] leading-[length:var(--lh-body)]">
+                    {card.claim}
+                  </p>
+                </div>
+              ))
+            }
+          </div>
+        </div>
+
+        <div class="flex flex-col gap-6">
+          <div>
+            {
+              flat.map(({ card }, i) => (
+                <p
+                  class="m-0 font-body font-normal text-neutral-500 text-[length:var(--fs-body)] leading-[length:var(--lh-body)]"
+                  hidden={i !== 0}
+                  data-ih-maiw-body
+                >
+                  {card.caption}
+                </p>
+              ))
+            }
+          </div>
+
+          <div class="flex items-center gap-2">
+            <button
+              type="button"
+              aria-label="Previous"
+              aria-controls="ih-maiw-overlay-title"
+              class="inline-flex cursor-pointer items-center justify-center rounded border border-neutral-300 bg-generic-00 p-2 text-vault-navy transition-colors duration-150 hover:border-nova-blue"
+              data-ih-maiw-prev
+            >
+              <svg
+                width="20"
+                height="20"
+                viewBox="0 0 20 20"
+                fill="none"
+                aria-hidden="true"
+                focusable="false"
+              >
+                <path
+                  d="M12 15L7 10L12 5"
+                  stroke="currentColor"
+                  stroke-width="1.5"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"></path>
+              </svg>
+            </button>
+            <button
+              type="button"
+              aria-label="Next"
+              aria-controls="ih-maiw-overlay-title"
+              class="inline-flex cursor-pointer items-center justify-center rounded border border-neutral-300 bg-generic-00 p-2 text-vault-navy transition-colors duration-150 hover:border-nova-blue"
+              data-ih-maiw-next
+            >
+              <svg
+                width="20"
+                height="20"
+                viewBox="0 0 20 20"
+                fill="none"
+                aria-hidden="true"
+                focusable="false"
+              >
+                <path
+                  d="M7 5L12 10L7 15"
+                  stroke="currentColor"
+                  stroke-width="1.5"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"></path>
+              </svg>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div
+        class="aspect-[1280/720] w-full rounded-lg bg-visual-placeholder lg:w-auto lg:flex-1"
+        aria-hidden="true"
+      >
+      </div>
+    </div>
+  </div>
+</div>
+
 <style is:global>
-  /* --ih-maiw-top  clears the fixed navbar, from the shared --nav-clear token
-                    so every pinned section on the site agrees on the offset.
-     --ih-maiw-head is the pill bar's measured height; the fallback is close
-     enough that the first paint is right before JS runs.
-     --ih-maiw-step is the scroll travel per card — how long each one holds the
-     front of the deck before the next arrives. */
-  .ih-maiw {
-    --ih-maiw-top: var(--nav-clear, 112px);
-    --ih-maiw-head: 76px;
-    --ih-maiw-step: 22vh;
-    /* Height the pinned H2 + lede occupy above the pills. 0 unless the window
-       is big enough to spare it; the script fills in the measured value. */
-    --ih-maiw-intro: 0px;
-    --ih-maiw-pin-intro: 0;
-
-    /* Lede to pills. Figma's header frame puts the text block at height 120 and
-       the tab group at y=144, so the gap is 24px — a spacing value, not the
-       navbar clearance, which is why it is separate from --ih-maiw-top. */
-    --ih-maiw-gap: 24px;
-
-    /* Where the pill bar pins. Kept as its own variable because the deck pins
-       under the bar and the card's height budget is measured from it, so all
-       three have to move together or they disagree about where the bar ends. */
-    --ih-maiw-bar-top: calc(
-      var(--ih-maiw-intro) + var(--ih-maiw-top) - var(--ih-maiw-gap)
-    );
-  }
-
-  @media (min-width: 1024px) {
-    .ih-maiw {
-      --ih-maiw-step: 30vh;
-    }
-  }
-
-  /* Wide enough that the H2 holds one line at 40px, and tall enough that the
-     card still clears the viewport underneath it. Both conditions matter — a
-     wide but short window is exactly where a parked heading hurts most. The
-     flag is what the script reads; changing this query changes both.
-
-     ON THE 800px: unlike the table in Outputs.astro, this one has a hard floor
-     rather than a comfort threshold. The card below is PINNED, so anything that
-     does not fit cannot be scrolled to — parking a heading on a short window
-     does not just crowd the card, it puts the caption permanently out of reach.
-     860px was over-cautious enough to miss a 1080p desktop's ~900px viewport by
-     a hair on some setups; 800px still leaves the card its room. It will not
-     match a 1366x768 laptop, and that is the correct answer there. */
-  @media (min-width: 1280px) and (min-height: 800px) {
-    .ih-maiw {
-      --ih-maiw-pin-intro: 1;
-      /* The pinned intro already carries the navbar clearance in its own
-         padding, so the bar pins directly under it and adds nothing. */
-      --ih-maiw-bar-top: var(--ih-maiw-intro);
-    }
-
-    .ih-maiw-intro {
-      position: sticky;
-      top: 0;
-      padding-top: var(--ih-maiw-top);
-      padding-bottom: 4px;
-    }
-
-  }
-
-  /* Sits directly under the intro when that is pinned, and just below the
-     navbar when it is not — --ih-maiw-bar-top is the same expression either
-     way, because --ih-maiw-intro is 0 in the second case.
-
-     THE CLEARANCE IS NOT PADDING. It used to be: padding-top:88px on this
-     element, so that whichever block landed at the top covered the strip the
-     deck would otherwise scroll through in full view — the navbar is a floating
-     pill with a gap above it and open space either side, so it hides almost
-     none of that strip. That worked when pinned and cost 88px of dead space in
-     normal flow, where the design asks for 24px between the lede and the pills.
-
-     So the gap is now just the gap, and the covering is done by ::before, which
-     is out of flow and therefore free. `pb-8` is a utility on the element;
-     padding-top is only here, so the two never race. */
-  .ih-maiw-bar {
-    top: var(--ih-maiw-bar-top);
-    padding-top: var(--ih-maiw-gap);
-  }
-
-  /* The strip between the top of the viewport and the pinned bar. Absolutely
-     positioned, so it takes no space in flow and cannot reintroduce the gap it
-     replaced; `bottom: 100%` parks it directly above the bar and it travels
-     with it. Height is the clearance minus the gap the bar already pays as
-     padding, so the two together cover exactly --ih-maiw-top.
-
-     Only while stuck: at rest it would sit on top of the lede rather than on
-     cards. The script owns that class because CSS cannot ask "is this pinned". */
-  .ih-maiw-bar::before {
-    content: "";
-    position: absolute;
-    left: 0;
-    right: 0;
-    bottom: 100%;
-    height: calc(var(--ih-maiw-top) - var(--ih-maiw-gap));
-    background-color: var(--color-generic-00);
-    display: none;
-  }
-
-  .ih-maiw-bar.is-stuck::before {
-    display: block;
-  }
-
-  /* MUST follow the rule above, not sit inside the pin query further up: both
-     selectors are one class, so source order is the only tie-breaker and a
-     media query buys no extra weight. Declared earlier, this loses and the
-     clearance gets paid twice — once by the pinned intro, once here. */
-  @media (min-width: 1280px) and (min-height: 800px) {
-    .ih-maiw-bar {
-      padding-top: 0;
-    }
-
-    /* The pinned intro is the cover here, and it is opaque and full width. */
-    .ih-maiw-bar.is-stuck::before {
-      display: none;
-    }
-  }
-
-  /* Bar's pinned top plus its height — i.e. the bar's bottom edge, which is
-     what the deck has to clear. Measuring from --ih-maiw-intro instead would
-     have been 64px short now that the clearance lives above the bar rather than
-     inside it, and the front card would pin behind the pills. */
-  .ih-maiw-sticky {
-    top: calc(
-      var(--ih-maiw-bar-top) + var(--ih-maiw-head) + var(--ih-maiw-i) * 12px
-    );
-    z-index: var(--ih-maiw-z);
-    margin: 0 auto;
-    width: 100%;
-    max-width: 880px;
-  }
-
-  /* The gap IS the travel: it is the distance the page scrolls between one card
-     reaching the front and the next one covering it. */
-  .ih-maiw-sticky + .ih-maiw-sticky {
-    margin-top: var(--ih-maiw-step);
-  }
-
-  /* Depth reads as distance, the same way `global-homepage/WhyGenericAi.astro`
-     does it: a card one step back is also a little smaller, so the slivers above
-     the front card sit progressively inset rather than being three identical
-     white strips. 0.03 per step is that file's interval.
-
-     Only the INNER card is ever transformed. The sticky wrapper around it is
-     what the script measures to decide which card is at the front, and a scaled
-     element would feed its own transform back into the next measurement — the
-     rule the two-layer structure exists to enforce.
-
-     transform-origin is top center so a card shrinks towards the edge that
-     stays visible; scaling about the middle would slide the sliver down out of
-     alignment with the step above it. */
-  .ih-maiw-card {
-    transform: scale(var(--ih-maiw-scale, 1));
-    transform-origin: top center;
-  }
-
-  /* The roll. When the front card changes, every card behind it moves up one
-     12px step and shrinks one interval at once; easing both turns that from a
-     jump into the deck visibly advancing. Only pinned cards are affected — for
-     a card still in flow `top` is just an unreached threshold.
-
-     Unlike WhyGenericAi, which rewrites transforms every scroll frame, these
-     change only when the front card changes — so this is a transition rather
-     than per-frame writes, and there is no need for `will-change` on 11 cards.
-
-     Gated on .is-rolling, which the script adds AFTER its first pass. The first
-     pass moves card 1 from the inline no-JS clamp to the front offset, and that
-     is a correction to the initial paint, not a movement anyone should see. */
-  .ih-maiw-stack.is-rolling .ih-maiw-sticky {
-    transition: top 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  }
-
-  .ih-maiw-stack.is-rolling .ih-maiw-card {
-    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  }
-
-  /* 894x320 in the design. An aspect ratio rather than a fixed height so the
-     slot holds its proportions at every card width; the cap is what keeps the
-     whole card inside the viewport, since a pinned card cannot be scrolled to
-     reveal its own overflow. The max() floor stops the calc going negative on
-     very short windows, which would collapse the slot to nothing. */
-  .ih-maiw-visual {
-    aspect-ratio: 894 / 320;
-    max-height: max(
-      140px,
-      calc(100vh - var(--ih-maiw-bar-top) - var(--ih-maiw-head) - 250px)
-    );
-  }
-
   .ih-maiw-tab {
     transition: color 0.2s ease;
   }
 
-  .ih-maiw-tab[aria-current="true"] {
+  .ih-maiw-tab[aria-selected="true"] {
     color: var(--color-nova-blue);
   }
 
   /* The moving pill. Sliding one element beats cross-fading three backgrounds:
-     the highlight reads as travelling to the next group, which is what the
-     scroll just did. */
+     the highlight reads as travelling to the team you picked. */
   .ih-maiw-thumb {
     position: absolute;
     top: 6px;
@@ -502,34 +432,14 @@ const slides = groups.flatMap((group) =>
 
   /* No JS, no thumb — so the current pill paints its own background instead.
      Suppressed the moment JS marks the bar ready, or the two would double up. */
-  .ih-maiw-tablist:not(.is-ready) .ih-maiw-tab[aria-current="true"] {
+  .ih-maiw-tablist:not(.is-ready) .ih-maiw-tab[aria-selected="true"] {
     background-color: var(--color-generic-00);
     box-shadow:
       0 1px 2px 0 rgba(16, 24, 40, 0.04),
       0 1px 2px 0 rgba(16, 24, 40, 0.04);
   }
 
-  /* Pinning and the travel that feeds it are an enhancement. Off, the deck
-     reads as a plain list, so the large gaps that exist only to give it travel
-     go too — and the thumb stops sliding. */
   @media (prefers-reduced-motion: reduce) {
-    .ih-maiw {
-      --ih-maiw-step: 2rem;
-    }
-    .ih-maiw-sticky {
-      position: static !important;
-    }
-    /* Nothing is pinned, so there is no window to roll and nothing for `top` to
-       move — but the declaration goes too, rather than being left inert. The
-       recede goes with it: a plain list of cards should be full size, which is
-       the same call WhyGenericAi makes here. */
-    .ih-maiw-stack.is-rolling .ih-maiw-sticky,
-    .ih-maiw-stack.is-rolling .ih-maiw-card {
-      transition: none;
-    }
-    .ih-maiw-card {
-      transform: none !important;
-    }
     .ih-maiw-thumb {
       transition: opacity 0.2s ease;
     }
@@ -537,272 +447,219 @@ const slides = groups.flatMap((group) =>
 </style>
 
 <script is:inline>
+  /* Pills filter the grid; a card opens the detail overlay, and the chevrons
+     walk that card's own team without closing. */
   (function () {
-    const root = document.querySelector("[data-ih-maiw]");
-    if (!root) return;
+    var tablist = document.querySelector(".ih-maiw-tablist");
+    var overlay = document.getElementById("ih-maiw-overlay");
+    if (!tablist || !overlay) return;
 
-    const intro = root.querySelector(".ih-maiw-intro");
-    const bar = root.querySelector(".ih-maiw-bar");
-    const tablist = root.querySelector(".ih-maiw-tablist");
-    const thumb = root.querySelector(".ih-maiw-thumb");
-    const stack = root.querySelector(".ih-maiw-stack");
-    const tabs = Array.from(root.querySelectorAll("[data-ih-maiw-tab]"));
-    const slides = Array.from(root.querySelectorAll("[data-ih-maiw-slide]"));
-    if (!bar || !tablist || !tabs.length || !slides.length) return;
+    var reduceMotion =
+      window.matchMedia &&
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-    // Depth of the rolling window, declared once on the section. Read back
-    // rather than restated, so there is one place to change it.
-    const depth =
-      parseInt(getComputedStyle(root).getPropertyValue("--ih-maiw-depth"), 10) || 3;
+    /* ---- pills ---- */
 
-    const ids = tabs.map((t) => t.getAttribute("data-ih-maiw-tab"));
-    const reduceMotion =
-      window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-
-    let current = -1;
-    /** Group index a click is travelling to, or -1 when scroll owns the pill. */
-    let locked = -1;
-    /** Front slide the depths were last written for. */
-    let lastFront = -1;
-
-    /** Scale lost per step back in the stack. WhyGenericAi's interval. */
-    const SCALE_STEP = 0.03;
-
-    /**
-     * Roll the window so the front card is at the deepest step and the three
-     * behind it climb back towards 0. Anything further back than the window
-     * floors at 0, where the last sliver covers it exactly — same offset, lower
-     * z-index. Cards ahead of the front sit at the front's own offset, so they
-     * pin there the moment they arrive rather than jumping on takeover.
-     *
-     * The same `behind` count drives the scale, so a card's step and its size
-     * can never disagree about how far back it is.
-     */
-    function applyDepths(front) {
-      for (let i = 0; i < slides.length; i++) {
-        const behind = front - i;
-        const steps = behind <= 0 ? 0 : Math.min(behind, depth);
-        slides[i].style.setProperty("--ih-maiw-i", depth - steps);
-        slides[i].style.setProperty(
-          "--ih-maiw-scale",
-          (1 - steps * SCALE_STEP).toFixed(3),
-        );
-      }
-    }
+    var tabs = Array.prototype.slice.call(
+      tablist.querySelectorAll("[data-ih-maiw-tab]"),
+    );
+    var thumb = tablist.querySelector(".ih-maiw-thumb");
+    var panels = tabs.map(function (tab) {
+      return document.getElementById(
+        "ih-maiw-panel-" + tab.getAttribute("data-ih-maiw-tab"),
+      );
+    });
+    var activeTab = 0;
 
     function moveThumb(i) {
       if (!thumb) return;
-      const tab = tabs[i];
-      thumb.style.width = tab.offsetWidth + "px";
-      thumb.style.transform = "translateX(" + tab.offsetLeft + "px)";
+      thumb.style.width = tabs[i].offsetWidth + "px";
+      thumb.style.transform = "translateX(" + tabs[i].offsetLeft + "px)";
       tablist.classList.add("is-ready");
     }
 
-    function setActive(i) {
-      if (i < 0 || i === current) return;
-      current = i;
-
-      tabs.forEach((tab, n) => {
-        tab.setAttribute("aria-current", n === i ? "true" : "false");
+    // Inline display, not a class swap: the utilities pasted into Webflow are
+    // unlayered, so `grid` and a hiding class on one element would race on
+    // source order. Inline always wins, and it is the same state the server
+    // rendered, so nothing shifts on hydration.
+    function selectTab(i) {
+      activeTab = i;
+      tabs.forEach(function (tab, n) {
+        tab.setAttribute("aria-selected", n === i ? "true" : "false");
+        tab.tabIndex = n === i ? 0 : -1;
+        if (panels[n]) panels[n].style.display = n === i ? "grid" : "none";
       });
       moveThumb(i);
 
-      // Narrow viewports scroll the bar rather than wrapping it, so an
-      // auto-advance off-screen would leave the highlight invisible.
+      // Narrow viewports scroll the bar rather than wrapping it, so a pill
+      // chosen by keyboard could otherwise sit off-screen.
       if (tablist.scrollWidth > tablist.clientWidth) {
-        const tab = tabs[i];
         tablist.scrollTo({
-          left: tab.offsetLeft - (tablist.clientWidth - tab.offsetWidth) / 2,
+          left: tabs[i].offsetLeft - (tablist.clientWidth - tabs[i].offsetWidth) / 2,
           behavior: reduceMotion ? "auto" : "smooth",
         });
       }
     }
 
-    // TWO UNITS, and they are not the same one under `zoom`.
-    // getBoundingClientRect() reports RENDERED pixels — what is on the glass.
-    // getComputedStyle().top reports CSS pixels. shared.css puts `zoom` on
-    // the `body` element between tablet and 1440px, so those differ by the zoom
-    // every comparison below puts a rect against a computed `top`. Left
-    // unconverted, a slide pinned at 112 CSS px reports a rect.top of 95, the
-    // "has it reached its offset" test fired a step early, and the deck picked
-    // the wrong front card — which is the pill jumping and the window rolling at
-    // the wrong moment.
-    //
-    // Walked rather than read off the `body` element, because zoom multiplies down the tree.
-    const zoomFactor = () => {
-      let z = 1;
-      for (let n = root; n && n.nodeType === 1; n = n.parentElement) {
-        const v = parseFloat(getComputedStyle(n).zoom);
-        // Unsupported -> NaN, unset -> 1. Both mean "no scaling here".
-        if (v && v !== 1) z *= v;
+    tabs.forEach(function (tab, i) {
+      tab.addEventListener("click", function () {
+        selectTab(i);
+      });
+    });
+
+    // Roving tabindex: `role="tablist"` promises arrow keys move between tabs
+    // and Tab leaves the group entirely.
+    tablist.addEventListener("keydown", function (e) {
+      var next;
+      if (e.key === "Home") next = 0;
+      else if (e.key === "End") next = tabs.length - 1;
+      else if (e.key === "ArrowRight") next = (activeTab + 1) % tabs.length;
+      else if (e.key === "ArrowLeft") next = (activeTab - 1 + tabs.length) % tabs.length;
+      else return;
+
+      e.preventDefault();
+      selectTab(next);
+      tabs[next].focus();
+    });
+
+    moveThumb(0);
+    // The bar can be laid out before its webfont arrives, which changes every
+    // pill's width — remeasure rather than leave the thumb on stale geometry.
+    if (document.fonts && document.fonts.ready) {
+      document.fonts.ready.then(function () {
+        moveThumb(activeTab);
+      });
+    }
+    window.addEventListener("resize", function () {
+      moveThumb(activeTab);
+    });
+
+    /* ---- detail overlay ---- */
+
+    var panel = overlay.querySelector("[data-ih-maiw-panel-detail]");
+    var closeBtn = overlay.querySelector("[data-ih-maiw-close]");
+    var prevBtn = overlay.querySelector("[data-ih-maiw-prev]");
+    var nextBtn = overlay.querySelector("[data-ih-maiw-next]");
+    var heads = overlay.querySelectorAll("[data-ih-maiw-head]");
+    var bodies = overlay.querySelectorAll("[data-ih-maiw-body]");
+    if (!panel || !heads.length || heads.length !== bodies.length) return;
+
+    var count = heads.length;
+    var current = 0;
+    var lastFocused = null;
+
+    // The chevrons walk the card's OWN team, not all eleven — the overlay was
+    // opened from a filtered grid, so stepping into a team whose pill is not
+    // lit would be a jump with nothing on screen to explain it.
+    function teamOf(index) {
+      var group = heads[index].getAttribute("data-ih-maiw-group");
+      var members = [];
+      for (var i = 0; i < count; i++) {
+        if (heads[i].getAttribute("data-ih-maiw-group") === group) members.push(i);
       }
-      return z;
-    };
-
-    // Cached — this is read for every slide on every scroll frame. refresh()
-    // recomputes it, which covers crossing the 1440px bound where zoom ends.
-    let zoom = zoomFactor();
-
-    /**
-     * The offset a slide pins at, in RENDERED px so it can be compared against a
-     * getBoundingClientRect(). Read from the CSS rather than duplicated.
-     */
-    function stickyTop(el) {
-      return (parseFloat(getComputedStyle(el).top) || 0) * zoom;
+      return members;
     }
 
-    /**
-     * Where a slide sits in the document with sticky taken out of the picture.
-     *
-     * This cannot be `getBoundingClientRect().top + pageYOffset`: once a slide
-     * is pinned, sticky clamps that rect to the pin offset, so the sum comes
-     * back as "wherever you already are". Scrolling to it was therefore a no-op
-     * for every slide behind the current one — clicking back to an earlier tab
-     * did nothing at all. Dropping the element to `static` for the measurement
-     * gives its real flow position; it is restored in the same tick, before the
-     * browser paints, so nothing moves on screen.
-     */
-    function flowTop(el) {
-      const prev = el.style.position;
-      el.style.position = "static";
-      const top = el.getBoundingClientRect().top + window.pageYOffset;
-      el.style.position = prev;
-      return top;
+    function show(index) {
+      current = index;
+      for (var i = 0; i < count; i++) {
+        heads[i].hidden = i !== current;
+        bodies[i].hidden = i !== current;
+      }
+      // The panel scrolls on short windows; a card further down the list would
+      // otherwise open mid-way through its own copy.
+      panel.scrollTop = 0;
     }
 
-    // Sticky clamps an element's rect.top at its own `top` once pinned and
-    // leaves it higher before that, so the LAST slide that has reached its
-    // offset is the one at the front of the deck. Its group owns the highlight,
-    // which is what makes the pill advance the moment a new group's first card
-    // arrives.
-    function update() {
-      let front = 0;
-      for (let i = 0; i < slides.length; i++) {
-        if (slides[i].getBoundingClientRect().top <= stickyTop(slides[i]) + 1) {
-          front = i;
-        }
-      }
-      // Ahead of the `locked` check below: the pill can be owned by a click,
-      // but the deck itself must keep rolling while that scroll travels, or it
-      // would arrive with the window still built around the card we left.
-      if (front !== lastFront) {
-        lastFront = front;
-        applyDepths(front);
-      }
+    // Wraps both ways within the team, so neither chevron is ever a dead
+    // control — including on the three-card team.
+    function step(delta) {
+      var members = teamOf(current);
+      var at = members.indexOf(current);
+      show(members[(at + delta + members.length) % members.length]);
+    }
 
-      // CSS has no "is pinned" selector, so the bar's cover strip is gated on a
-      // class instead. Same test the deck uses: sticky clamps rect.top at the
-      // element's own offset, so reaching it means pinned.
-      bar.classList.toggle("is-stuck", bar.getBoundingClientRect().top <= stickyTop(bar) + 1);
+    function open(index, opener) {
+      lastFocused = opener || document.activeElement;
+      show(index);
+      overlay.style.display = "flex";
+      overlay.setAttribute("aria-hidden", "false");
+      document.body.style.overflow = "hidden";
+      if (closeBtn) closeBtn.focus();
+    }
 
-      const next = ids.indexOf(slides[front].getAttribute("data-ih-maiw-slide"));
+    function close() {
+      overlay.style.display = "none";
+      overlay.setAttribute("aria-hidden", "true");
+      document.body.style.overflow = "";
+      if (lastFocused && lastFocused.focus) lastFocused.focus();
+    }
 
-      // A click owns the pill until the deck actually gets there, so the
-      // highlight does not run backwards through every group in between while
-      // the smooth scroll is still travelling.
-      if (locked >= 0) {
-        if (next === locked) locked = -1;
+    function isOpen() {
+      return overlay.style.display === "flex";
+    }
+
+    // Delegated, so it does not matter which Embed mounts first or whether the
+    // cards existed when this ran.
+    document.addEventListener("click", function (e) {
+      if (!e.target.closest) return;
+      var opener = e.target.closest("[data-ih-maiw-open]");
+      if (!opener) return;
+      open(parseInt(opener.getAttribute("data-ih-maiw-index"), 10) || 0, opener);
+    });
+
+    if (closeBtn) closeBtn.addEventListener("click", close);
+    if (prevBtn)
+      prevBtn.addEventListener("click", function () {
+        step(-1);
+      });
+    if (nextBtn)
+      nextBtn.addEventListener("click", function () {
+        step(1);
+      });
+
+    overlay.addEventListener("click", function (e) {
+      if (e.target === overlay) close();
+    });
+
+    document.addEventListener("keydown", function (e) {
+      if (!isOpen()) return;
+
+      if (e.key === "Escape") {
+        close();
         return;
       }
 
-      setActive(next);
-    }
+      // Arrow keys drive the same walk the chevrons do. Nothing inside the
+      // dialog is a native arrow-key control (no radio group, select or text
+      // field), so there is no default behaviour to steal here — and the pill
+      // bar's own arrow handling cannot fire, since focus is trapped below.
+      if (e.key === "ArrowLeft") {
+        step(-1);
+        return;
+      }
+      if (e.key === "ArrowRight") {
+        step(1);
+        return;
+      }
 
-    // Only measured while the section is on screen; scrolling the rest of the
-    // page costs nothing.
-    let running = false;
-    let ticking = false;
-
-    function onScroll() {
-      if (!running || ticking) return;
-      ticking = true;
-      requestAnimationFrame(() => {
-        ticking = false;
-        update();
-      });
-    }
-
-    if ("IntersectionObserver" in window) {
-      new IntersectionObserver(
-        (entries) => {
-          running = entries.some((e) => e.isIntersecting);
-          if (running) update();
-        },
-        { threshold: 0 },
-      ).observe(root);
-    } else {
-      running = true;
-    }
-
-    tabs.forEach((tab, i) => {
-      tab.addEventListener("click", () => {
-        const target = document.getElementById("ih-maiw-group-" + ids[i]);
-        if (!target) return;
-
-        // Scroll exactly far enough for that slide to pin — it lands at the
-        // front of the deck rather than somewhere near it. Works in both
-        // directions because `flowTop` ignores where the slide is currently
-        // pinned; see the note on that helper.
-        //
-        // Measured at the FRONT offset, not the target's current one. Now that
-        // the window rolls, a slide three back sits at a shallower step, and
-        // reading that offset would land the scroll short by the difference.
-        target.style.setProperty("--ih-maiw-i", depth);
-        const pin = stickyTop(target);
-        window.scrollTo({
-          top: flowTop(target) - pin,
-          behavior: reduceMotion ? "auto" : "smooth",
-        });
-
-        locked = i;
-        setActive(i);
-      });
-    });
-
-    // Any manual scroll input hands the pill straight back, so a click that is
-    // interrupted — or one whose target the browser cannot quite reach, such as
-    // the last group at the very bottom of the page — can never strand it.
-    ["wheel", "touchstart", "keydown"].forEach((evt) => {
-      window.addEventListener(evt, () => { locked = -1; }, { passive: true });
-    });
-
-    function refresh() {
-      // The breakpoint lives in the stylesheet; this only reads back its
-      // verdict, so there is one place to change it.
-      const pinsIntro =
-        getComputedStyle(root).getPropertyValue("--ih-maiw-pin-intro").trim() === "1";
-
-      // Publish the real heights so the deck pins under whatever is actually
-      // parked above it — however the heading wraps, however the pills wrap.
-      // First: a resize can cross the 1440px bound where the zoom switches off,
-      // and both the heights below and update() depend on the current factor.
-      zoom = zoomFactor();
-
-      // Measured off rects, not offsetHeight. These are published as CSS
-      // lengths and consumed by calc() in the stylesheet, so they must be CSS
-      // px — and a rect divided by the zoom is unambiguously that, whereas
-      // offsetHeight's behaviour inside a zoomed subtree is not consistent
-      // enough across browsers to rely on.
-      const cssHeight = (el) => el.getBoundingClientRect().height / zoom;
-
-      root.style.setProperty(
-        "--ih-maiw-intro",
-        (pinsIntro && intro ? cssHeight(intro) : 0) + "px",
+      // Keep Tab inside the dialog — `aria-modal` claims the rest is inert, so
+      // focus must not walk out into the page behind it.
+      if (e.key !== "Tab") return;
+      var focusable = panel.querySelectorAll(
+        'a[href], button:not([disabled]), input:not([disabled]):not([type="hidden"]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])',
       );
-      root.style.setProperty("--ih-maiw-head", cssHeight(bar) + "px");
-      if (current >= 0) moveThumb(current);
-      update();
+      if (!focusable.length) return;
+      var first = focusable[0];
+      var last = focusable[focusable.length - 1];
 
-      // Only now: the first update() replaces the inline no-JS clamp with the
-      // rolled window, and that correction should land in the first paint
-      // rather than easing into place while someone watches.
-      if (stack) stack.classList.add("is-rolling");
-    }
-
-    window.addEventListener("scroll", onScroll, { passive: true });
-    window.addEventListener("resize", refresh);
-    window.addEventListener("load", refresh, { once: true });
-
-    refresh();
+      if (e.shiftKey && document.activeElement === first) {
+        e.preventDefault();
+        last.focus();
+      } else if (!e.shiftKey && document.activeElement === last) {
+        e.preventDefault();
+        first.focus();
+      }
+    });
   })();
 </script>
