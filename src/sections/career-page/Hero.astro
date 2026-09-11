@@ -1,0 +1,355 @@
+---
+/**
+ * Careers hero — Figma node 14052:30126.
+ *
+ * Centred headline with a cluster of three photo cards bleeding off each edge.
+ * The two clusters are mirror images: sizes descend towards the centre of the
+ * page, so the largest card is the one being clipped by the viewport edge.
+ *
+ * The three card sizes are NOT a CSS `scale()` — Figma scales the border and
+ * padding along with the box (1px/8px/12px → 0.85px/6.8px/10.2px →
+ * 0.723px/5.78px/8.67px), so each step carries its own explicit geometry. A
+ * transform would also blur the 1px hairline border at the two smaller steps.
+ *
+ * MOTION. The cards are SHOWN by default — the Figma frame is the resting state
+ * and nothing animates on load. They slide INWARDS and pass under the centre
+ * copy as soon as the page starts moving, and back out to their slots on the way
+ * up.
+ *
+ * The trigger is a short scroll distance, not the hero leaving the viewport.
+ * Tied to the section exiting, the whole move happened above the top edge with
+ * nobody watching, so it read as the cards departing with the section rather
+ * than sliding in under the copy. Nothing about the travel changed; where you
+ * are standing when it runs did.
+ *
+ * That direction is deliberate and is what makes the section flash-proof. The
+ * extractor emits this section's <style> ahead of its markup, so the browser can
+ * lay the cards out and paint them before any script in this file runs. While
+ * the HIDDEN state was the default, that paint showed cards in the wrong place
+ * for a frame on every refresh, and no amount of moving the script fixed it.
+ * With the visible state as the default there is nothing to establish before
+ * first paint, and the problem cannot occur.
+ *
+ * HIDING IS OCCLUSION, NOT FADING. Cards stay fully opaque throughout; the only
+ * thing concealing them is the opaque background on `.cp-hero-copy`, which they
+ * pass under. Nothing animates opacity anywhere in this section, and the copy
+ * has no entrance of its own — see the note on `.cp-hero-copy`.
+ *
+ * Artwork is still the Figma "Visual Placeholder" tint — no photography exists
+ * for this page yet. Swap `.cp-hero-media` for an <img> once assets land; the
+ * boxes already carry the final dimensions.
+ *
+ * Clusters are hidden below 1280px: at 416px of centred copy they start
+ * colliding with the headline, and there is nothing to gain from a half-visible
+ * card sitting under the text.
+ */
+const HEADING_LINES = ["Make an Impact", "That Matters"];
+const LEDE =
+  "Join our team and contribute to shaping the future of millions of Indians and businesses worldwide.";
+const CTA_LABEL = "View current openings";
+const CTA_HREF = "https://clear.darwinbox.in/ms/candidatev2/main/careers/home";
+---
+
+<section
+  class="cp-hero relative overflow-hidden border-b border-[#CCCCCC] bg-generic-00"
+>
+  <!-- Left cluster. Bleeds 92px past the viewport edge, per Figma.
+       `--1/--2/--3` is depth: 1 is the largest and outermost. -->
+  <div
+    class="cp-hero-cluster cp-hero-cluster--left absolute left-[-92px] top-1/2 hidden -translate-y-1/2 items-center gap-8 xl:flex"
+    aria-hidden="true"
+  >
+    <div
+      class="cp-hero-card cp-hero-card--1 shrink-0 overflow-hidden rounded-[12px] border border-[#CCCCCC] bg-generic-00 p-2"
+    >
+      <div class="cp-hero-media h-[221px] w-[170px] rounded-lg bg-visual-placeholder"></div>
+    </div>
+    <div
+      class="cp-hero-card cp-hero-card--2 shrink-0 overflow-hidden rounded-[10.2px] border-[0.85px] border-[#CCCCCC] bg-generic-00 p-[6.8px]"
+    >
+      <div
+        class="cp-hero-media h-[187.85px] w-[144.5px] rounded-[6.8px] bg-visual-placeholder"
+      >
+      </div>
+    </div>
+    <div
+      class="cp-hero-card cp-hero-card--3 shrink-0 overflow-hidden rounded-[8.67px] border-[0.723px] border-[#CCCCCC] bg-generic-00 p-[5.78px]"
+    >
+      <div
+        class="cp-hero-media h-[159.673px] w-[122.825px] rounded-[5.78px] bg-visual-placeholder"
+      >
+      </div>
+    </div>
+  </div>
+
+  <!-- Right cluster — the mirror, so the order reverses: smallest nearest the copy. -->
+  <div
+    class="cp-hero-cluster cp-hero-cluster--right absolute right-[-119px] top-1/2 hidden -translate-y-1/2 items-center gap-8 xl:flex"
+    aria-hidden="true"
+  >
+    <div
+      class="cp-hero-card cp-hero-card--3 shrink-0 overflow-hidden rounded-[8.67px] border-[0.723px] border-[#CCCCCC] bg-generic-00 p-[5.78px]"
+    >
+      <div
+        class="cp-hero-media h-[159.673px] w-[122.825px] rounded-[5.78px] bg-visual-placeholder"
+      >
+      </div>
+    </div>
+    <div
+      class="cp-hero-card cp-hero-card--2 shrink-0 overflow-hidden rounded-[10.2px] border-[0.85px] border-[#CCCCCC] bg-generic-00 p-[6.8px]"
+    >
+      <div
+        class="cp-hero-media h-[187.85px] w-[144.5px] rounded-[6.8px] bg-visual-placeholder"
+      >
+      </div>
+    </div>
+    <div
+      class="cp-hero-card cp-hero-card--1 shrink-0 overflow-hidden rounded-[12px] border border-[#CCCCCC] bg-generic-00 p-2"
+    >
+      <div class="cp-hero-media h-[221px] w-[170px] rounded-lg bg-visual-placeholder"></div>
+    </div>
+  </div>
+
+  <div
+    class="container relative mx-auto flex min-h-[520px] flex-col items-center justify-center py-20 text-center xl:min-h-[720px]"
+  >
+    <div class="cp-hero-copy flex flex-col items-center gap-6">
+      <h1
+        class="m-0 font-heading font-semibold text-vault-navy text-[length:var(--fs-display-lg)] leading-[length:var(--lh-display-lg)] tracking-[-1px]"
+      >
+        {HEADING_LINES[0]}<br />{HEADING_LINES[1]}
+      </h1>
+
+      <div class="flex w-full flex-col items-center gap-4">
+        <p
+          class="m-0 font-body text-neutral-500 text-[length:var(--fs-body-lg)] leading-[length:var(--lh-body-lg)]"
+        >
+          {LEDE}
+        </p>
+        <a
+          href={CTA_HREF}
+          class="cp-btn inline-flex items-center justify-center gap-2 rounded-lg border border-nova-blue bg-nova-blue px-5 py-3.5 font-body font-medium text-nova-50 text-[length:var(--fs-label-lg)] leading-[length:var(--lh-label-lg)]"
+        >
+          {CTA_LABEL}
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style is:global>
+  /* Shared button treatment for this page. Defined once here rather than
+     re-declared in JoinUs.astro — both embeds land on the same page, so the
+     second copy would be dead bytes against the 50 KB cap. Prefixed `cp-`
+     because section CSS is one flat namespace per Webflow page. */
+  .cp-btn {
+    box-shadow: 0 2px 3px rgba(16, 24, 40, 0.06);
+    transition:
+      background-color var(--transition-base, 250ms ease),
+      border-color var(--transition-base, 250ms ease),
+      transform var(--transition-fast, 150ms ease);
+  }
+
+  .cp-btn:hover {
+    background-color: var(--color-nova-600, #5336f5);
+    border-color: var(--color-nova-600, #5336f5);
+    transform: translateY(-1px);
+  }
+
+  .cp-hero-copy {
+    /* THIS BOX IS THE ONLY THING HIDING THE CARDS, so it must never be
+       transparent or animated. It deliberately has NO entrance of its own: it
+       used to fade in, and an opacity below 1 here makes the whole subtree —
+       background included — see-through, so the parked cards showed straight
+       through the "mask". Anything added here must keep it opaque.
+
+       Invisible by design: white on a white section, exactly as the Figma frame
+       draws it. Nothing is rendered; it only occludes. */
+    background: var(--color-generic-00, #fff);
+    /* Sized to hide a card rather than to fit the text. Figma's 416px is the
+       CONTENT width and is preserved exactly — box-sizing is border-box
+       site-wide, so 640 − 2x112 = 416. Every extra pixel goes into the padding,
+       so the box grows outwards as a mask while the text wraps exactly where it
+       did at Figma's own width. Nothing here is visible: white on a white
+       section, so a wider box changes only what it covers.
+
+       It has to be here rather than as a `max-w-[416px]` utility in the markup:
+       the padding and the max-width have to move together — 416 is the invariant
+       — and splitting them across the two would let one be changed without the
+       other.
+
+       WHY SO MUCH COVER. The cards only converge to APPROXIMATELY the page
+       centre. `--cp-hero-travel` is built from `50vw`, and shared.css zooms the
+       body between 768px and 1440px while `vw` keeps resolving against the
+       unzoomed viewport, so through that band every card stops short — by ~106px
+       at the top of it, where the zoom is applied to the widest viewport. The
+       clusters only exist from 1280px up, so the overlap is 1280–1440px, and at
+       the far end of it the smallest card cleared a 480px box by 30px. Since the
+       cards never fade, that is a solid grey corner sitting beside the headline,
+       not a soft edge. 640 covers the whole band with room to spare. */
+    max-width: 640px;
+    padding-block: 36px;
+    padding-inline: 112px;
+  }
+
+  /* DEPTH. `--cp-o` is the resting opacity from the Figma frame, moved out of
+     the markup (it was `opacity-80`/`opacity-40`) so it is declared alongside
+     the rest of each card's depth. It is STATIC — nothing animates opacity in
+     this section.
+
+     `--cp-hero-travel` is how far the card moves to tuck in: enough to put its
+     own centre on the page centre, behind the copy. The numbers are each card's
+     resting centre offset from the viewport's left edge — 2px, 208px and 388px,
+     read off the Figma geometry above — subtracted from 50vw. Innermost is
+     nearest the middle already, so it has least distance to cover.
+
+     The delay runs innermost-first, so the group packs from the inside and
+     unpacks in the same order. */
+  .cp-hero-card--1 {
+    --cp-o: 1;
+    --cp-hero-travel: calc(50vw - 2px);
+    --cp-delay: 0.18s;
+  }
+
+  .cp-hero-card--2 {
+    --cp-o: 0.8;
+    --cp-hero-travel: calc(50vw - 208px);
+    --cp-delay: 0.09s;
+  }
+
+  .cp-hero-card--3 {
+    --cp-o: 0.4;
+    --cp-hero-travel: calc(50vw - 388px);
+    --cp-delay: 0s;
+  }
+
+  /* Which way in. Left cluster tucks to the RIGHT, towards the centre; the right
+     cluster mirrors it. */
+  .cp-hero-cluster--left .cp-hero-card {
+    --cp-hero-dir: 1;
+  }
+
+  .cp-hero-cluster--right .cp-hero-card {
+    --cp-hero-dir: -1;
+  }
+
+  /* SHOWN IS THE DEFAULT. No class, no transform — the cards render exactly
+     where Figma puts them, from the first frame, with no script involved. */
+  .cp-hero-card {
+    opacity: var(--cp-o, 1);
+    will-change: transform;
+  }
+
+  /* TUCKED BEHIND THE CENTRE BLOCK, AT FULL OPACITY AND FULL SIZE. Nothing
+     fades: the card is out of sight because `.cp-hero-copy`'s background covers
+     it, which is what "behind the content" means — so it stays completely solid
+     the whole way and simply goes under the edge of that box. Fading was the
+     wrong tool: with the block invisible (white on a white section) an opacity
+     change is the ONLY thing you can see, so the card read as dissolving in mid
+     air rather than sliding under something.
+
+     Sideways travel is the ONLY thing that changes, for the same reason. This
+     used to carry a `scale(0.94)`, and shrinking reads as receding — the card
+     looked like it was being put away into the distance instead of slipping
+     behind a nearer object. Anything that is not lateral movement turns a tuck
+     into a departure. */
+  .cp-hero.is-out .cp-hero-card {
+    transform: translateX(calc(var(--cp-hero-travel, 0px) * var(--cp-hero-dir, 1)));
+  }
+
+  /* TRANSITIONS ARE GATED BEHIND `.is-animated`, which the script adds a couple
+     of frames in, AFTER it has set the state the current scroll position calls
+     for. Nothing animates on arrival — a reload part-way down the page finds its
+     cards already tucked in rather than watching them slide.
+
+     The delay comes through a custom property because this is the `transition`
+     SHORTHAND, which resets transition-delay to 0 — a separate
+     `transition-delay` on the depth classes would be silently overwritten from
+     here, and the innermost-first stagger would vanish.
+
+     Only `transform` is listed, because only `transform` ever changes. A
+     transition is read from the style the element is moving TO, so `.is-out`
+     owns the way in and `:not(.is-out)` owns the way back out.
+
+     Going in gets a curve that leaves gently and holds its speed to the end.
+     It is deliberately NOT an ease-out: decelerating into the copy makes a card
+     look like it is parking next to the headline, when the whole point is that
+     it carries on and goes under. It should still be moving when it disappears.
+     Coming back out is the longer expo-out, which covers most of the distance
+     early and drifts the last few pixels into the Figma slot. */
+  .cp-hero.is-animated.is-out .cp-hero-card {
+    transition: transform 0.9s cubic-bezier(0.4, 0, 0.2, 1) var(--cp-delay, 0s);
+  }
+
+  .cp-hero.is-animated:not(.is-out) .cp-hero-card {
+    transition: transform 1.25s cubic-bezier(0.16, 1, 0.3, 1) var(--cp-delay, 0s);
+  }
+
+  /* DO NOT add a -50% Y offset to any transform here. `-translate-y-1/2` on the
+     clusters does NOT compile to a transform in Tailwind v4 — it compiles to the
+     separate `translate` property, which composes with `transform` rather than
+     being overridden by it. Restating the centring would double it. Vertical
+     centring belongs to `translate`; these rules touch X only. */
+
+  @media (prefers-reduced-motion: reduce) {
+    .cp-hero.is-out .cp-hero-card {
+      transform: none;
+    }
+  }
+</style>
+
+<script is:inline>
+  (function () {
+    var init = function () {
+      var hero = document.querySelector(".cp-hero");
+      if (!hero) return;
+
+      // How far the page has to move before the cards start sliding in. Short on
+      // purpose. This was an IntersectionObserver on the hero itself, which only
+      // fired once the section was all but gone — so the move ran above the top
+      // edge of the screen and the cards were simply missing when you scrolled
+      // back. A nudge is enough of a cue, and it keeps the whole travel inside
+      // the part of the hero you are still looking at.
+      var TRIGGER = 64;
+      var queued = false;
+
+      var sync = function () {
+        queued = false;
+        hero.classList.toggle(
+          "is-out",
+          hero.getBoundingClientRect().top <= -TRIGGER,
+        );
+      };
+
+      // Scroll fires far faster than the screen refreshes; one class write per
+      // frame is all that can matter.
+      var onScroll = function () {
+        if (queued) return;
+        queued = true;
+        requestAnimationFrame(sync);
+      };
+
+      // Settle the state for wherever the page already is BEFORE transitions are
+      // switched on, so a reload part-way down starts tucked instead of
+      // animating there from the resting position.
+      sync();
+
+      requestAnimationFrame(function () {
+        requestAnimationFrame(function () {
+          hero.classList.add("is-animated");
+        });
+      });
+
+      window.addEventListener("scroll", onScroll, { passive: true });
+      // `--cp-hero-travel` is built from `50vw`, so a resize moves the target;
+      // re-running the same check keeps a tucked card tucked across it.
+      window.addEventListener("resize", onScroll, { passive: true });
+    };
+
+    if (document.readyState === "loading") {
+      document.addEventListener("DOMContentLoaded", init);
+    } else {
+      init();
+    }
+  })();
+</script>
