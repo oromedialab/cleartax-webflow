@@ -1,0 +1,183 @@
+---
+/**
+ * The dot field is the one from `sections/blog-listing/Newsletter.astro`, in the
+ * hero's own lime. The long explanation of the geometry lives in that file; the
+ * short version is that the field is a plain grid of dots until a pointer
+ * enters, and each dot then draws out into a stroke aimed at the cursor, longest
+ * right beside it and back to a dot by `lengthRadius`.
+ *
+ * These are rendered onto the section as `data-*` and read back by the script.
+ * The old grid declared its numbers twice — as props here and again as a literal
+ * `config` in the script — so editing a prop changed nothing. One source now.
+ *
+ * The props that drove the old spring physics (`speedTrigger`, `shockRadius`,
+ * `maxSpeed`, `resistance`, `returnDuration`, `proximity`, `activeColor`) are
+ * gone with it. No page passed any of them.
+ */
+import Dotgrid from "../_shared/Dotgrid.astro";
+
+interface Props {
+    lineWidth?: number;
+    gap?: number;
+    maxLength?: number;
+    lengthRadius?: number;
+    tilt?: number;
+    baseColor?: string;
+    cursorRadius?: number;
+    pull?: number;
+    fadeRadius?: number;
+    titlePrefix?: string;
+    titleHighlight?: string;
+    titleSuffix?: string;
+    description?: string;
+}
+
+const {
+    /* lineWidth is the old dotSize: the width of a stroke, and so the diameter of
+     the dot that stroke becomes at rest. 2 + 24 holds the hero's 26px pitch,
+     with a finer dot than the 4px it used to draw. */
+    lineWidth = 3,
+    gap = 24,
+    /* Longest a stroke gets, in px. Must stay under the 26px pitch or the field
+     starts knitting into a mesh — the guarantee is spelt out in
+     Newsletter.astro. */
+    maxLength = 6,
+    lengthRadius = 260,
+    /* Leave at 1. A partial turn cannot be continuous, and strokes flip as the
+     cursor crosses them — see the note in Newsletter.astro. */
+    tilt = 1,
+    baseColor = "#C8F006",
+    cursorRadius = 320,
+    pull = 14,
+    fadeRadius = 40,
+    titlePrefix = "Infrastructure that",
+    titleHighlight = "scales",
+    titleSuffix = "Security that doesn't bend.",
+    description = "Built for enterprise compliance across 50+ countries, with sovereign cloud architecture, zero-trust access, and AES-256 encryption across every layer. ",
+} = Astro.props;
+
+const icons = [
+    {
+        id:1,
+        image: "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6aa240210b95e62dd7b6ab39_innovice-icon.png",
+        desc: "1B+ E-Invoices annually",
+    },
+    {
+        id:2,
+        image: "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6aa2394447fb2cc739a96af1_10k-peak-icon.png",
+        desc: "10K/s Peak invoice throughput ",
+    },
+    {
+        id:3,
+        image: "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6aa2401b2f1bebbb77f908e6_countries.png",
+        desc:"50+ Countries covered",
+    },
+    {
+        id:4,
+        image: "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6aa24029e1e6804b0a5eb993_rupees.png",
+        desc:"$500B+ Invoices processed",
+    },
+];
+---
+
+<section
+    class="de-hero-section relative bg-generic-00 overflow-hidden flex flex-col max-lg:pt-32 max-lg:pb-16 lg:pt-[257px] lg:pb-[161px]"
+    id="hero"
+>
+    <!-- Interactive Dot Grid Background -->
+    <Dotgrid
+        containerId="hero"
+        lineWidth={lineWidth}
+        gap={gap}
+        maxLength={maxLength}
+        lengthRadius={lengthRadius}
+        tilt={tilt}
+        baseColor={baseColor}
+        cursorRadius={cursorRadius}
+        pull={pull}
+        fadeRadius={fadeRadius}
+    />
+
+    <!-- Radial wash, so the headline keeps its contrast over the field -->
+    <div
+        class="absolute inset-0 z-0 bg-[radial-gradient(circle_at_center,_#FFF_0%,_rgba(242,_241,_240,_0.25)_30.04%,_rgba(255,255,255,0)_65%)] pointer-events-none"
+    >
+    </div>
+
+    <div
+        class="relative z-10 mx-auto lg:container w-full h-full flex flex-col px-4 md:px-6 pointer-events-auto"
+    >
+        <div class="flex justify-center w-full h-full">
+            <!-- Hero Content -->
+            <div
+                class="hero-content flex flex-col items-center mx-auto text-center w-full h-full"
+            >
+                <!-- Headline -->
+                <h2
+                    class="text-[length:var(--fs-h1)] lg:text-[length:var(--fs-display-sm)] xl:text-[length:var(--fs-display-xl)] leading-[length:var(--lh-h1)] lg:leading-[length:var(--lh-display-sm)] xl:leading-[length:var(--lh-display-xl)] text-generic-100 font-semibold font-heading max-w-[580px] lg:max-w-[850px] xl:max-w-281 mx-auto mb-4 m-0 text-center"
+                >
+                    {titlePrefix}
+                    {
+                        titleHighlight && (
+                            <span class="text-generic-100 bg-flux-lime px-1 rounded-lg">
+                                {titleHighlight}
+                            </span>
+                        )
+                    }
+                    {titleSuffix}
+                </h2>
+
+                <!-- Description -->
+                <p
+                    class="text-[length:var(--fs-body)] leading-[length:var(--lh-body)] sm:text-[length:var(--fs-body-lg)] sm:leading-[length:var(--lh-body-lg)] max-w-170 text-neutral-500 font-normal font-body mb-6 md:mb-8 lg:mb-12 text-center"
+                >
+                    {description}
+                </p>
+                <!-- Statistics -->
+                <!-- Grid Container -->
+<div class="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 lg:gap-6 mb-6 md:mb-8 lg:mb-12">
+{
+    icons.map((item) => (
+        <div class="flex items-center gap-2.5 sm:gap-3 border-2 border-neutral-300 rounded-lg px-2.5 sm:px-3 py-2.5 sm:py-3">
+            <div class="w-5 h-5 sm:w-6 sm:h-6 flex items-center justify-center shrink-0">
+                <img src={item.image} class="max-w-full max-h-full object-contain" />
+            </div>
+            <span class="font-body font-medium text-neutral-500 text-[length:var(--fs-body-sm)] leading-tight text-left md:text-[length:var(--fs-body)] md:leading-[length:var(--lh-body)]">
+                {item.desc}
+            </span>
+        </div>
+    ))
+}
+</div>
+
+                <!-- Call to Action buttons -->
+                <div class="flex items-center justify-center gap-4">
+                    <a
+                        href="javascript:void(0)"
+                        onclick="document.getElementById('contactForm').scrollIntoView({behavior:'smooth'})"
+                        class="inline-flex items-center justify-center gap-2 px-5 py-3.5 font-body rounded-lg font-medium text-white text-[length:var(--fs-body)] leading-[length:var(--lh-body)] cursor-pointer bg-nova-blue border border-nova-blue hover:bg-generic-00 hover:text-nova-blue transition-all duration-150 ease-in-out"
+                        style="outline: none;"
+                    >
+                        Book a Demo
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<script is:inline>
+    // Smooth scroll logic
+    window.scrollToContactForm = (e) => {
+        e.preventDefault();
+        const contactForm = document.getElementById("contact-form");
+        if (contactForm) {
+            contactForm.scrollIntoView({ behavior: "smooth" });
+            history.replaceState(
+                null,
+                "",
+                window.location.pathname + window.location.search,
+            );
+        }
+    };
+</script>

@@ -48,7 +48,8 @@ export const PAGE_TARGETS = [
   { name: 'integration-page', input: 'src/styles/integration-page.css', page: 'src/pages/integration-page.astro' },
   { name: 'france-regional', input: 'src/styles/france-regional.css', page: 'src/pages/france-regional.astro' },
   { name: 'contact-us', input: 'src/styles/contact-us.css', page: 'src/pages/contact-us.astro' },
-  { name: 'scale-and-security-page', input: 'src/styles/scale-and-security-page.css', page: 'src/pages/scale-and-security-page.astro'}
+  { name: 'scale-and-security-page', input: 'src/styles/scale-and-security-page.css', page: 'src/pages/scale-and-security-page.astro'},
+  { name: 'direct-tax-page', input: 'src/styles/direct-tax-page.css', page: 'src/pages/direct-tax-page.astro'}
 ];
 
 const SHARED_IMPORT_RE = /import\s+[A-Z][A-Za-z0-9]*\s+from\s+['"]\.\.\/sections\/_shared\/([A-Za-z0-9_-]+)\.astro['"]/g;
