@@ -113,7 +113,7 @@ const {
 
      The one change from the hero copy is the IntersectionObserver at the bottom:
      this loop only runs while the band is on screen. */
-  document.addEventListener('DOMContentLoaded', () => {
+  function initIhCtaGrid() {
     const section = document.getElementById('ih-cta');
     if (!section) return;
     const canvas = document.getElementById('ih-cta-dots');
@@ -189,6 +189,7 @@ const {
         focusY = height / 2;
       }
       aim();
+      paint();
     }
 
     // Length and angle, both straight off the focus. The focus and `presence`
@@ -283,9 +284,14 @@ const {
 
     let lastTime = performance.now();
     let running = false;
+    let isFirstFrame = true;
 
     function draw(time) {
       if (!running) return;
+
+      if (dots.length === 0) {
+        initGrid();
+      }
 
       let dt = (time - lastTime) / 1000;
       if (dt > 0.05) dt = 0.05; // cap so a backgrounded tab can't jolt the grid
@@ -398,7 +404,10 @@ const {
       }
 
       // A settled field is repainted zero times a second, not sixty.
-      if (moving) paint();
+      if (moving || isFirstFrame) {
+        paint();
+        isFirstFrame = false;
+      }
       requestAnimationFrame(draw);
     }
 
@@ -414,12 +423,6 @@ const {
       running = false;
     }
 
-    // Paint once up front, and again after every resize. `draw` only repaints on
-    // frames where something actually moved, so without this the field stays
-    // blank until a pointer first enters the section — and on touch, where no
-    // mousemove ever fires, it would stay blank for good. The static dot grid
-    // this replaced was always visible; this keeps that. (`Hero.astro` has the
-    // same gap, and the same two lines would close it there.)
     function rebuild() {
       initGrid();
       paint();
@@ -447,17 +450,6 @@ const {
 
     section.addEventListener('mousemove', (e) => {
       const rect = canvas.getBoundingClientRect();
-      // TWO SPACES, and `zoom` makes them different sizes.
-      // rect and clientX are RENDERED px. The grid lives in the canvas's own
-      // logical space, laid out by initGrid from parent.offsetWidth. shared.css
-      // zooms the body element between tablet and 1440px, so a pointer position
-      // carried straight across lands short by that factor — no error at the left
-      // edge, growing all the way across, which reads as the field ignoring the
-      // cursor on the right-hand side.
-      //
-      // The scale is derived from the two boxes rather than from the zoom value:
-      // that needs no knowledge of `zoom` and covers a CSS transform or any other
-      // sizing mismatch for free. Guarded because a hidden canvas measures 0.
       const sx = rect.width ? width / rect.width : 1;
       const sy = rect.height ? height / rect.height : 1;
       const nx = (e.clientX - rect.left) * sx;
@@ -480,5 +472,11 @@ const {
       hover = false;
       speed = 0;
     });
-  });
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initIhCtaGrid);
+  } else {
+    initIhCtaGrid();
+  }
 </script>

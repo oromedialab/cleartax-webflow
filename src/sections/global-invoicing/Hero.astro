@@ -50,7 +50,7 @@ const {
 ---
 
 <section
-    class="hero-section relative min-h-[700px] bg-generic-00 overflow-hidden flex items-center pt-28 pb-12 md:pt-30 md:pb-16 lg:pt-35 lg:pb-25"
+    class="hero-section relative bg-generic-00 overflow-hidden flex items-center max-lg:pt-32 max-lg:pb-16 lg:pt-[257px] lg:pb-[161px]"
     id="hero"
     data-video-id={videoId}
     data-line-width={String(lineWidth)}
@@ -212,11 +212,11 @@ const {
     }
   };
 
-  /* Interactive stroke field — the one from
-     `sections/blog-listing/Newsletter.astro`, which carries the full explanation
-     of the geometry. Here in the hero's lime. */
-  document.addEventListener('DOMContentLoaded', () => {
-    const section = document.getElementById('hero');
+  /* Interactive stroke field — the one from `sections/blog-listing/Newsletter.astro`,
+     which carries the full explanation of the geometry. Numbers come off data-*
+     attributes so there is a single source for each. */
+  function initGiHeroGrid() {
+    const section = document.getElementById('hero') || document.getElementById('gi-hero');
     if (!section) return;
     const canvas = document.getElementById('hero-dots-canvas');
     if (!canvas || !canvas.getContext) return;
@@ -230,7 +230,7 @@ const {
     const config = {
       lineWidth: num('data-line-width', 2),
       gap: num('data-gap', 24),
-      maxLength: num('data-max-length', 12),
+      maxLength: num('data-max-length', 6),
       lengthRadius: num('data-length-radius', 260),
       tilt: num('data-tilt', 1),
       baseColor: section.getAttribute('data-base-color') || '#C8F006',
@@ -265,8 +265,6 @@ const {
       const dpr = window.devicePixelRatio || 1;
       canvas.width = Math.round(width * dpr);
       canvas.height = Math.round(height * dpr);
-      // setTransform, not scale: scale() multiplies the existing matrix, so
-      // every resize would compound the DPR and shrink the grid.
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
 
       dots = [];
@@ -280,8 +278,6 @@ const {
         for (let x = 0; x <= cols; x++) {
           const cx = startX + x * spacing;
           const cy = startY + y * spacing;
-          // ox/oy is the stroke's home and the point it is drawn centred on;
-          // x/y is where that centre is now; hx/hy is half its segment vector.
           dots.push({ x: cx, y: cy, ox: cx, oy: cy, alpha: 1, hx: 0, hy: 0 });
         }
       }
@@ -291,10 +287,9 @@ const {
         focusY = height / 2;
       }
       aim();
+      paint();
     }
 
-    // Length and angle, both straight off the focus. The focus and `presence`
-    // are already eased, so neither needs easing here.
     function aim() {
       const longest = config.maxLength / 2;
       const turn = presence * config.tilt;
@@ -305,24 +300,16 @@ const {
         const dy = focusY - dot.oy;
         const dist = Math.sqrt(dx * dx + dy * dy);
 
-        // 1 at the pointer, 0 by `lengthRadius`. Scaled by `presence`, so with
-        // no cursor on the section every stroke is a plain dot.
         let t = dist / config.lengthRadius;
         if (t > 1) t = 1;
         const grow = 1 - t;
         let reach = longest * grow * grow * (3 - 2 * grow) * presence;
-        // A canvas subpath of exactly zero length is not reliably painted, even
-        // with a round cap. A quarter pixel is a dot and is always drawn.
         if (reach < 0.25) reach = 0.25;
 
         let ux = 0;
         let uy = 1;
 
         if (turn > 0.001 && dist > 0.01) {
-          // Folded into a quarter turn either side: a segment drawn about its
-          // centre looks the same pointed either way, so this takes the short
-          // way round. Only seamless because `turn` reaches 1 — scaling the
-          // angle by any fraction makes strokes flip as the cursor crosses them.
           let off = Math.atan2(dy, dx) - HALF_PI;
           while (off > HALF_PI) off -= Math.PI;
           while (off < -HALF_PI) off += Math.PI;
@@ -341,11 +328,8 @@ const {
       ctx.clearRect(0, 0, width, height);
       ctx.strokeStyle = config.baseColor;
       ctx.lineWidth = config.lineWidth;
-      ctx.lineCap = 'round'; // so a stroke shrunk to nothing reads as a dot
+      ctx.lineCap = 'round';
 
-      // Two passes. Only the strokes the cursor is touching have an alpha of
-      // their own; the rest of the field goes down as one path in one stroke
-      // call. Setting globalAlpha per stroke across the whole grid stutters.
       ctx.globalAlpha = 1;
       ctx.beginPath();
       for (let i = 0; i < dots.length; i++) {
@@ -373,7 +357,6 @@ const {
       window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
     if (reduceMotion) {
-      // Static dot grid. No animation loop, no cursor reaction.
       initGrid();
       paint();
       window.addEventListener('resize', () => {
@@ -384,10 +367,15 @@ const {
     }
 
     let lastTime = performance.now();
+    let isFirstFrame = true;
 
     function draw(time) {
+      if (dots.length === 0) {
+        initGrid();
+      }
+
       let dt = (time - lastTime) / 1000;
-      if (dt > 0.05) dt = 0.05; // cap so a backgrounded tab can't jolt the grid
+      if (dt > 0.05) dt = 0.05;
       lastTime = time;
 
       const fadeEase = Math.min(1, config.fadeSpeed * dt);
@@ -405,7 +393,6 @@ const {
       engagement += ((hover ? Math.min(speed / 6, 1) : 0) - engagement) * engageEase;
       if (engagement < 0.001) engagement = 0;
 
-      // A parked cursor still holds the field open, just more gently.
       const grip = hover ? 0.4 + 0.6 * engagement : 0;
 
       const wantX = hover ? mouse.x : width / 2;
@@ -432,8 +419,6 @@ const {
         swung = true;
       }
 
-      // Length and angle hang off those two, so they only need recomputing on
-      // the frames one of them actually moved.
       if (swung) aim();
 
       const crSq = config.cursorRadius * config.cursorRadius;
@@ -442,8 +427,6 @@ const {
       for (let i = 0; i < dots.length; i++) {
         const dot = dots[i];
 
-        // Measured from the stroke's home, not its current position, or one
-        // that has moved toward the focus reads as closer and runs away into it.
         const dx = focusX - dot.ox;
         const dy = focusY - dot.oy;
         const distSq = dx * dx + dy * dy;
@@ -458,8 +441,6 @@ const {
           if (grip > 0.001) {
             const t = 1 - dist / config.cursorRadius;
             let push = t * t * config.pull * grip;
-            // A stroke must never reach the cursor: past it, it crosses to the
-            // far side and the field knots up around the pointer.
             if (push > dist * 0.75) push = dist * 0.75;
             const step = dist > 0.01 ? push / dist : 0;
             targetX += dx * step;
@@ -469,7 +450,6 @@ const {
           if (dist < config.fadeRadius) {
             const ft = dist / config.fadeRadius;
             const hole = ft * ft * (3 - 2 * ft);
-            // Also the pointer's doing, so the resting grid keeps every dot.
             targetAlpha = 1 - (1 - hole) * presence;
           }
         }
@@ -496,8 +476,10 @@ const {
         }
       }
 
-      // A settled field is repainted zero times a second, not sixty.
-      if (moving) paint();
+      if (moving || isFirstFrame) {
+        paint();
+        isFirstFrame = false;
+      }
       requestAnimationFrame(draw);
     }
 
@@ -507,12 +489,6 @@ const {
 
     section.addEventListener('mousemove', (e) => {
       const rect = canvas.getBoundingClientRect();
-      // TWO SPACES, and `zoom` makes them different sizes.
-      // rect and clientX are RENDERED px. The grid lives in the canvas's own
-      // logical space, laid out by initGrid from parent.offsetWidth. shared.css
-      // zooms the body element between tablet and 1440px, so a pointer position
-      // carried straight across lands short by that factor — no error at the left
-      // edge, growing all the way across, which reads as the field ignoring the
       // cursor on the right-hand side.
       //
       // The scale is derived from the two boxes rather than from the zoom value:
@@ -534,12 +510,15 @@ const {
     });
 
     section.addEventListener('mouseleave', () => {
-      // Dropping `hover` is what matters: the focus starts its swing back to the
-      // centre, the strokes reel in and the pull lets go. Nothing reads the
-      // parked coordinates while `hover` is false, and re-entry reseeds them.
       hover = false;
       speed = 0;
     });
-  });
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initGiHeroGrid);
+  } else {
+    initGiHeroGrid();
+  }
 </script>
 

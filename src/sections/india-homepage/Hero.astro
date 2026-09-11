@@ -165,7 +165,7 @@ const badges = [
      which took it from `sections/blog-listing/Newsletter.astro`. That file carries
      the full explanation of the geometry; the numbers here come off the section's
      data-* attributes so there is a single source for each. */
-  document.addEventListener('DOMContentLoaded', () => {
+  function initIhHeroGrid() {
     const section = document.getElementById('ih-hero');
     if (!section) return;
     const canvas = document.getElementById('ih-hero-dots');
@@ -241,6 +241,7 @@ const badges = [
         focusY = height / 2;
       }
       aim();
+      paint();
     }
 
     // Length and angle, both straight off the focus. The focus and `presence`
@@ -334,8 +335,13 @@ const badges = [
     }
 
     let lastTime = performance.now();
+    let isFirstFrame = true;
 
     function draw(time) {
+      if (dots.length === 0) {
+        initGrid();
+      }
+
       let dt = (time - lastTime) / 1000;
       if (dt > 0.05) dt = 0.05; // cap so a backgrounded tab can't jolt the grid
       lastTime = time;
@@ -447,7 +453,10 @@ const badges = [
       }
 
       // A settled field is repainted zero times a second, not sixty.
-      if (moving) paint();
+      if (moving || isFirstFrame) {
+        paint();
+        isFirstFrame = false;
+      }
       requestAnimationFrame(draw);
     }
 
@@ -457,17 +466,6 @@ const badges = [
 
     section.addEventListener('mousemove', (e) => {
       const rect = canvas.getBoundingClientRect();
-      // TWO SPACES, and `zoom` makes them different sizes.
-      // rect and clientX are RENDERED px. The grid lives in the canvas's own
-      // logical space, laid out by initGrid from parent.offsetWidth. shared.css
-      // zooms the body element between tablet and 1440px, so a pointer position
-      // carried straight across lands short by that factor — no error at the left
-      // edge, growing all the way across, which reads as the field ignoring the
-      // cursor on the right-hand side.
-      //
-      // The scale is derived from the two boxes rather than from the zoom value:
-      // that needs no knowledge of `zoom` and covers a CSS transform or any other
-      // sizing mismatch for free. Guarded because a hidden canvas measures 0.
       const sx = rect.width ? width / rect.width : 1;
       const sy = rect.height ? height / rect.height : 1;
       const nx = (e.clientX - rect.left) * sx;
@@ -490,5 +488,11 @@ const badges = [
       hover = false;
       speed = 0;
     });
-  });
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initIhHeroGrid);
+  } else {
+    initIhHeroGrid();
+  }
 </script>
