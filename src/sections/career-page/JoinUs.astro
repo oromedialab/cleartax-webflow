@@ -1,0 +1,216 @@
+---
+/**
+ * "Come, join us" closing CTA — Figma nodes 14052:30177 / 14052:30056.
+ *
+ * Copy on the left, a band of photo tiles on the right. In the Figma frame that
+ * band is a static strip, deliberately wider than its column (4 x 200px + gaps
+ * in ~657px of space) so it runs off both edges and is masked back with a white
+ * fade. That overflow is the design, not a bug to fix by shrinking the tiles.
+ *
+ * Here the band SCROLLS: a Swiper on an infinite loop, autoplaying. The motion
+ * is a continuous linear drift rather than a slide-every-few-seconds step —
+ * the mock already fades out both edges, which is the visual language of a band
+ * that runs past them, and discrete stepping fights that by making the tiles
+ * arrive and stop. `delay: 0` plus a long `speed` and a linear timing function
+ * is Swiper's idiom for that.
+ *
+ * Swiper loads from the jsDelivr CDN with the `<link>` and `<script src>` INSIDE
+ * this section file — the house pattern, and the only one that works here: the
+ * embed is pasted into Webflow on its own and cannot rely on anything the page
+ * around it happens to load. The npm `swiper` dependency is no use for the same
+ * reason, since nothing bundles an embed.
+ *
+ * Tiles are the Figma "Visual Placeholder" tint; no photography exists yet.
+ *
+ * Button styling comes from `.cp-btn` in Hero.astro — both embeds land on the
+ * same Webflow page, so restating the rule here would be dead bytes against the
+ * 50 KB paste cap.
+ */
+const HEADING = "Come, join us";
+const LEDE = "If you share our mission, we would love to hear from you.";
+const CTA_LABEL = "View current openings";
+const CTA_HREF = "https://clear.darwinbox.in/ms/candidatev2/main/careers/home";
+
+/**
+ * Eight, not the four in the mock. Loop mode needs enough slides to more than
+ * fill the track, or Swiper cannot keep a seamless run of tiles either side of
+ * the visible window and the band visibly restarts. Four 200px tiles barely
+ * cover the column once. They are identical placeholders so the repetition is
+ * invisible; with real photography this is how many slots there are to fill.
+ */
+const TILE_COUNT = 8;
+---
+
+<link
+  rel="stylesheet"
+  href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css"
+/>
+
+<section class="bg-generic-00 py-16 md:py-20">
+  <div class="container mx-auto">
+    <div
+      class="flex flex-col items-center gap-8 rounded-xl border border-[#CCCCCC] px-6 py-8 md:flex-row md:gap-12 md:px-12 md:py-6"
+    >
+      <div class="flex w-full flex-col items-start gap-6 md:w-[479px] md:shrink-0">
+        <div class="flex w-full flex-col gap-3">
+          <h2
+            class="m-0 font-heading font-medium text-generic-100 text-[length:var(--fs-h1)] leading-[length:var(--lh-h1)] tracking-[-0.5px]"
+          >
+            {HEADING}
+          </h2>
+          <p
+            class="m-0 font-body text-neutral-500 text-[length:var(--fs-body-lg)] leading-[length:var(--lh-body-lg)]"
+          >
+            {LEDE}
+          </p>
+        </div>
+        <a
+          href={CTA_HREF}
+          class="cp-btn inline-flex items-center justify-center gap-2 rounded-lg border border-nova-blue bg-nova-blue px-5 py-3.5 font-body font-medium text-nova-50 text-[length:var(--fs-label-lg)] leading-[length:var(--lh-label-lg)]"
+        >
+          {CTA_LABEL}
+        </a>
+      </div>
+
+      <div
+        class="cp-join-strip relative w-full min-w-0 flex-1 overflow-hidden"
+        aria-hidden="true"
+      >
+        <div class="swiper cp-join-swiper">
+          <div class="swiper-wrapper">
+            {
+              Array.from({ length: TILE_COUNT }).map(() => (
+                <div class="swiper-slide cp-join-slide" />
+              ))
+            }
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style is:global>
+  .cp-join-strip {
+    --cp-tile-w: 200px;
+    --cp-tile-h: 240px;
+  }
+
+  /* EVERY TILE RULE HERE IS DELIBERATELY TWO CLASSES DEEP. Read before
+     simplifying it to `.cp-join-slide`.
+
+     extract-embeds.mjs emits this <style> block BEFORE the section body, and the
+     Swiper CDN <link> lives in that body — so the CDN stylesheet always loses
+     the race and lands AFTER these rules. Swiper's own `.swiper-slide` sets
+     `width: 100%; height: 100%`, which is the same 0-1-0 specificity as a bare
+     `.cp-join-slide`, so it wins on source order and every tile collapses to
+     100% of a wrapper that is 100% of an auto-height container — zero, and the
+     band disappears completely.
+
+     `.cp-join-swiper .cp-join-slide` is 0-2-0 and wins whatever the order.
+     `TrustedLeaders.astro` hit the same trap and reached for `!important`;
+     specificity does the job without starting that fight. */
+  .cp-join-swiper .cp-join-slide {
+    width: var(--cp-tile-w);
+    height: var(--cp-tile-h);
+    border-radius: 8px;
+    background: var(--color-visual-placeholder, #e8ffe1);
+  }
+
+  .cp-join-swiper {
+    /* Stated rather than left to the `height: 100%` chain through
+       .swiper-wrapper, which only reaches the tile height via a percentage
+       against an auto-height parent — true here, but fragile enough not to rely
+       on, and it is what made the collapse total rather than merely short. */
+    height: var(--cp-tile-h);
+    /* Swiper eases every transition by default, which on a `delay: 0` autoplay
+       reads as the band surging and stalling once a second instead of drifting.
+       Swiper 11 exposes the wrapper's timing function as a custom property, so
+       this one needs no specificity fight — nothing in the CDN sheet sets it. */
+    --swiper-wrapper-transition-timing-function: linear;
+  }
+
+  /* The white fade that turns the band's overflow into an intentional edge.
+     A pseudo-element rather than a masked wrapper so the tiles keep their own
+     stacking context and stay plain boxes for whoever swaps in the photos.
+     Sits on the outer strip, not the Swiper, so it stays put while the track
+     moves underneath it. */
+  .cp-join-strip::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    /* Above the track: `.swiper` is `position: relative`, so without this the
+       two are simply painted in DOM order and the mask still wins — but only by
+       accident. Stated, so re-ordering the markup cannot silently break it. */
+    z-index: 1;
+    pointer-events: none;
+    background: linear-gradient(
+      90deg,
+      var(--color-generic-00, #fff) 0%,
+      rgba(255, 255, 255, 0) 10%,
+      rgba(255, 255, 255, 0) 90%,
+      var(--color-generic-00, #fff) 100%
+    );
+  }
+
+  /* A band of placeholder tiles drifting sideways is decoration, and decoration
+     should hold still for anyone who asked motion to stop. Swiper's autoplay is
+     switched off in the script for the same reason; this is the belt to that
+     brace, covering the transition already in flight when the query flips. */
+  @media (prefers-reduced-motion: reduce) {
+    .cp-join-swiper .swiper-wrapper {
+      transform: none !important;
+      transition: none !important;
+    }
+  }
+</style>
+
+<script
+  is:inline
+  src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+<script is:inline>
+  (function () {
+    var boot = function () {
+      // The CDN script is a separate request; it can land after this one.
+      if (typeof Swiper === "undefined") {
+        setTimeout(boot, 50);
+        return;
+      }
+
+      var el = document.querySelector(".cp-join-swiper");
+      if (!el) return;
+
+      var still =
+        window.matchMedia &&
+        window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+      new Swiper(el, {
+        slidesPerView: "auto",
+        spaceBetween: 16,
+        loop: true,
+        // Long duration + `delay: 0` + the linear timing function set in CSS is
+        // Swiper's idiom for a continuous drift. Raise `speed` to slow it down.
+        speed: 6000,
+        autoplay: still
+          ? false
+          : {
+              delay: 0,
+              // Nothing here is interactive, but a tab-away pauses autoplay and
+              // this is what lets it resume.
+              disableOnInteraction: false,
+            },
+        // Decorative: no dragging, and nothing for a screen reader to land on.
+        // The strip already carries aria-hidden, so leaving Swiper's a11y module
+        // on would only inject live regions inside a hidden subtree.
+        allowTouchMove: false,
+        a11y: { enabled: false },
+      });
+    };
+
+    if (document.readyState === "loading") {
+      document.addEventListener("DOMContentLoaded", boot);
+    } else {
+      boot();
+    }
+  })();
+</script>

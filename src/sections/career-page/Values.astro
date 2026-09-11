@@ -1,0 +1,562 @@
+---
+/**
+ * "Our Values" — Figma nodes 14052:30160 / 14052:30162 / 14052:30168.
+ *
+ * THE SCROLL ANIMATION. Figma carries no prototype keyframes for this page
+ * (`get_motion_context` returns nothing), but the static frame encodes the
+ * motion two ways and both are reproduced here:
+ *
+ *   1. Every value row after the first is `position: sticky; top: 0` with a
+ *      rising offset — a pinned stack.
+ *   2. The headline word on each side of the card sits at `opacity: 0`. That is
+ *      a designer marking the START of a reveal, not a hidden layer: the words
+ *      are the only content in the row, and a value with no words says nothing.
+ *
+ * So: the card pins in the middle of the viewport and the two words fly in from
+ * the outside edges as it arrives, then hand over as the next value closes in.
+ *
+ * THE PILE. Cards do not land on top of each other — they fan out like a stack
+ * of photos dropped on a table. The card currently being read is always dead
+ * centre and upright; everything already seen is pushed alternately left and
+ * right, tilted, and dimmed slightly, so the pile grows outwards behind it.
+ *
+ * That is driven by DEPTH, not by a fixed per-card pose. A card's offset is a
+ * function of how many cards have since landed on top of it, so the top of the
+ * pile is always the centred one. A fixed pose would have been simpler but
+ * leaves whichever card happens to be last sitting off-centre at the end.
+ *
+ * THE TITLE rides pinned above the pile and is dragged out by hand when the
+ * section ends — see the note in `update()` for why sticky alone cannot do it.
+ *
+ * The maths lives in the script and only ever WRITES three custom properties
+ * per row: `--cp-in` (0→1 as the row approaches its pin, never goes back down),
+ * `--cp-v` (word visibility) and `--cp-depth` (cards landed on top). Every
+ * transform is expressed against those in CSS. Keeping JS to three numbers is
+ * what makes the reduced-motion and no-JS paths free — all three default to the
+ * finished state.
+ *
+ * IMPORTANT: no ancestor of `.cp-value-row` may set `overflow` to anything but
+ * `visible`, or `position: sticky` silently stops working.
+ *
+ * Below md the rows go static and stack vertically (words above the card), with
+ * no fan — a 480px card pinned under the navbar leaves no room for the words on
+ * a phone, and a fan in a plain vertical list just reads as broken alignment.
+ */
+interface Value {
+  /** Word(s) that fly in from the left. */
+  left: string;
+  /** Word(s) that fly in from the right. */
+  right: string;
+}
+
+const HEADING = "Our Values";
+
+const values: Value[] = [
+  { left: "Make the", right: "customer win" },
+  { left: "Deliver", right: "results" },
+  { left: "Play", right: "for the front of the jersey" },
+  { left: "Be", right: "open and curious" },
+  { left: "Make", right: "Velocity a habit" },
+];
+---
+
+<section class="cp-values bg-generic-00 py-16 md:py-20">
+  <div class="container mx-auto">
+    <h2
+      class="cp-values-title m-0 mb-10 text-center font-heading font-medium text-generic-100 text-[length:var(--fs-h1)] leading-[length:var(--lh-h1)] tracking-[-0.5px] md:mb-16"
+    >
+      {HEADING}
+    </h2>
+
+    <div id="cp-values-track" class="cp-values-track">
+      {
+        values.map((value, i) => (
+          <div class="cp-value-row" style={`z-index:${i + 1}`}>
+            <p class="cp-value-word cp-value-word--left">{value.left}</p>
+
+            <div class="cp-value-card">
+              <div class="cp-value-media" />
+            </div>
+
+            <p class="cp-value-word cp-value-word--right">{value.right}</p>
+          </div>
+        ))
+      }
+
+      <!-- Tail room so the last value finishes its reveal before the next section. -->
+      <div class="cp-values-tail" aria-hidden="true"></div>
+    </div>
+  </div>
+</section>
+
+<style is:global>
+  .cp-values-track {
+    /* NO-JS FALLBACK ONLY. The script overwrites --cp-card inline with a figure
+       derived from window.innerHeight and the measured zoom, because `100vh`
+       cannot express this correctly: shared.css zooms the body between 768px and
+       1440px, and vh resolves against the real viewport before that scaling is
+       applied, so a CSS budget silently under-counts by the zoom factor and
+       shrinks the card ~15% on exactly the laptop widths most people use.
+
+       The 210px covers the navbar clearance's companions: the sticky title
+       (~64px with padding), the 24px under it, and bottom breathing room.
+       Conservative on purpose — with no JS there is no pinning either, so a card
+       that is smaller than it needed to be costs nothing. */
+    --cp-card: clamp(
+      240px,
+      min(34vw, calc(100vh - var(--nav-clear, 112px) - 210px)),
+      480px
+    );
+    display: flex;
+    flex-direction: column;
+    gap: 4rem;
+  }
+
+  .cp-value-row {
+    display: grid;
+    grid-template-columns: 1fr;
+    justify-items: center;
+    align-items: center;
+    gap: 1.5rem;
+  }
+
+  .cp-value-word {
+    margin: 0;
+    font-family: var(--font-heading);
+    font-weight: var(--font-weight-medium, 500);
+    font-size: clamp(1.75rem, 3.4vw, 2.975rem); /* 28px → 47.6px per Figma */
+    line-height: 1.143; /* 54.4 / 47.6 */
+    letter-spacing: -0.425px;
+    color: var(--color-generic-100, #000);
+    text-align: center;
+    /* Reads a custom property that DEFAULTS to 1 — the finished state. With JS
+       off, or before the first frame runs, the words are already in place. */
+    opacity: var(--cp-v, 1);
+    will-change: opacity, transform;
+  }
+
+  .cp-value-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: var(--cp-card);
+    max-width: 100%;
+    padding: 16px;
+    border: 1px solid #cccccc;
+    border-radius: 12px;
+    background: var(--color-generic-00, #fff);
+    /* Not in the Figma frame, which draws a flat 1px border. A pile of tilted
+       cards with no shadow reads as flat overlapping rectangles rather than
+       photos, so the stack needs the separation. Kept soft enough that the
+       single centred card at the top of the pile still matches the mock. */
+    box-shadow: 0 8px 24px -10px rgba(5, 2, 42, 0.18);
+    transform-origin: center center;
+    will-change: transform, opacity;
+    /* Entrance only, on phones: rise and settle. The fan is desktop-only. */
+    transform: translateY(calc((1 - var(--cp-in, 1)) * 32px))
+      scale(calc(0.96 + 0.04 * var(--cp-in, 1)));
+    opacity: var(--cp-in, 1);
+    /* Short enough not to lag the scroll, long enough to smooth the steps
+       between rAF samples — a scroll wheel delivers coarse jumps, and without
+       this the pile re-poses in visible increments instead of gliding. */
+    transition:
+      transform 260ms cubic-bezier(0.22, 1, 0.36, 1),
+      opacity 260ms ease-out;
+  }
+
+  .cp-value-media {
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    border-radius: 8px;
+    background: var(--color-visual-placeholder, #e8ffe1);
+  }
+
+  .cp-values-tail {
+    height: 2rem;
+  }
+
+  /* ---- Pinned regime: the pile ------------------------------------------ */
+  @media (min-width: 768px) {
+    .cp-values-track {
+      /* Scroll travel between pins. Each value needs a beat fully visible
+         before the next starts crowding it. */
+      gap: 55vh;
+    }
+
+    /* The title rides above the pile instead of scrolling away with it. Only in
+       the pinned regime — below md the cards are a plain vertical list, and a
+       bar eating 60px of a phone screen for the whole section buys nothing.
+
+       Needs the opaque background AND the z-index: the rows below carry z-index
+       1–5 and `.cp-values-track` creates no stacking context of its own (no
+       transform, no opacity, no z-index), so without 10 here the last card
+       would slide over the type as it unsticks at the end of the section.
+
+       `top` is a floor only — the script overwrites it so the title and the
+       pile centre together as one block. */
+    .cp-values-title {
+      position: sticky;
+      top: var(--nav-clear, 112px);
+      z-index: 10;
+      background: var(--color-generic-00, #fff);
+      padding-block: 8px;
+    }
+
+    .cp-value-row {
+      position: sticky;
+      /* Floor only. The script centres the group in what is left of the
+         viewport under the navbar and writes the real offset to `style.top` —
+         it has to know that number anyway to work out how far a row still has
+         to travel, and measuring it is more reliable than parsing it back out
+         of getComputedStyle. */
+      top: var(--nav-clear, 112px);
+      grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+      gap: 0 80px;
+    }
+
+    /* Which way each card is pushed as it gets buried. Alternating by position
+       rather than by depth, so neighbours in the pile always fan opposite ways
+       and no two cards can end up stacked on the same side.
+
+       Named `--cp-fan`, not `--cp-dir`: the words below already use `--cp-dir`
+       for their slide offset, and that one is a LENGTH while this is a unitless
+       sign. They sit on sibling elements so nothing inherits across, but one
+       name meaning two types is a trap worth not setting. */
+    .cp-value-row:nth-child(odd) .cp-value-card {
+      --cp-fan: -1;
+    }
+
+    .cp-value-row:nth-child(even) .cp-value-card {
+      --cp-fan: 1;
+    }
+
+    /* THE PILE GEOMETRY. Four properties move together, and the ratios between
+       them are what makes this read as a deck rather than as clutter.
+
+       SCALE RECESSION IS THE LOAD-BEARING ONE. Without it every card is the
+       same size, so a tilted card's corners poke out above and below the one in
+       front and the top edge of the pile goes ragged. Shrinking 6% per level of
+       depth keeps every buried card INSIDE the top card vertically, so the
+       stack can only spread sideways. That is what a pile of photos does.
+
+       Half-extent from centre at the tightest geometry (480px card, 1280px
+       container), per level of depth:
+
+         depth      0     1     2     3     4
+         sideways 240   257   273   288   303 px
+         vertical 240   230   220   209   197 px
+
+       An even ~16px step sideways, so each card peeks by the same amount as the
+       one in front of it; the outermost still clears the 320px where the word
+       column starts. Every vertical figure is inside 240 — that is the tidiness.
+
+       Offsets are a fraction of --cp-card, never fixed px, so the fan holds its
+       proportions as the card clamps down on smaller screens. translateX is
+       applied BEFORE the scales, so offsets are not shrunk along with the card.
+       Raising 0.055, 1.2deg, or DEPTH_CAP in the script walks the pile under the
+       headline text — re-check the table above if you touch any of them. */
+    .cp-value-card {
+      transform: translateX(
+          calc(var(--cp-card) * 0.055 * var(--cp-depth, 0) * var(--cp-fan, 1))
+        )
+        translateY(calc((1 - var(--cp-in, 1)) * 64px))
+        rotate(calc(var(--cp-depth, 0) * var(--cp-fan, 1) * 1.2deg))
+        scale(calc(1 - 0.06 * var(--cp-depth, 0)))
+        scale(calc(0.94 + 0.06 * var(--cp-in, 1)));
+      /* Buried cards sit back a little so the live one reads as the subject. */
+      opacity: calc(var(--cp-in, 1) * (1 - 0.05 * var(--cp-depth, 0)));
+    }
+
+    .cp-value-word {
+      max-width: 340px;
+      transform: translate3d(calc((1 - var(--cp-v, 1)) * var(--cp-dir, 0px)), 0, 0);
+      /* Shorter than the card's: the words cross-fade against each other, and a
+         long tail here would put the outgoing and incoming phrase on screen
+         together, which is the ghosting the 1.8x handover exists to avoid. */
+      transition:
+        opacity 140ms linear,
+        transform 220ms cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    .cp-value-word--left {
+      --cp-dir: -48px;
+      justify-self: end;
+      text-align: right;
+    }
+
+    .cp-value-word--right {
+      --cp-dir: 48px;
+      justify-self: start;
+      text-align: left;
+    }
+
+    .cp-values-tail {
+      height: 30vh;
+    }
+  }
+
+  /* ---- Static regime: phones, and anyone who asked for less motion ------- */
+  @media (prefers-reduced-motion: reduce) {
+    .cp-values-track {
+      gap: 4rem !important;
+    }
+
+    .cp-value-row {
+      position: static !important;
+    }
+
+    .cp-value-word {
+      opacity: 1 !important;
+      transform: none !important;
+    }
+
+    .cp-value-card {
+      opacity: 1 !important;
+      transform: none !important;
+    }
+
+    .cp-values-tail {
+      height: 0 !important;
+    }
+  }
+</style>
+
+<script is:inline>
+  (function () {
+    var init = function () {
+      var track = document.getElementById("cp-values-track");
+      if (!track) return;
+
+      var rows = Array.prototype.slice.call(track.querySelectorAll(".cp-value-row"));
+      if (!rows.length) return;
+
+      // Sibling of the track, not inside it — it has to stick against the
+      // container, which spans the whole section, rather than against the track.
+      var title = track.parentElement
+        ? track.parentElement.querySelector(".cp-values-title")
+        : null;
+
+      if (
+        window.matchMedia &&
+        window.matchMedia("(prefers-reduced-motion: reduce)").matches
+      ) {
+        // CSS above already paints the finished state. Nothing to drive.
+        return;
+      }
+
+      // Scroll distance a reveal takes, in px.
+      var TRAVEL = 320;
+      // How far out of the pile a card can be pushed, in "cards landed on top".
+      // Past this the fan would reach under the words — see the CSS note.
+      //
+      // Must be >= rows.length - 1, or the deepest cards share a depth and land
+      // in identical poses, which is what made the pile look arbitrary rather
+      // than ordered. At 4 every one of the five gets its own step. Adding a
+      // sixth value means raising this AND re-checking the geometry table.
+      var DEPTH_CAP = 4;
+      // Clear space between the pinned title and the top of the card.
+      var TITLE_GAP = 24;
+      // Card size bounds, and the breathing room kept under the pile.
+      var MIN_CARD = 240;
+      var MAX_CARD = 480;
+      var BOTTOM_SLACK = 24;
+
+      // TWO UNITS. getBoundingClientRect() and window.innerHeight are RENDERED
+      // px — what is on the glass. Anything written to `style.top` is CSS px.
+      // shared.css puts `zoom` on the body element between 768px and 1440px, so
+      // between those widths the two differ by that factor, and this file
+      // crosses between them in both directions: setTops() derives a style.top
+      // from rect measurements, update() compares a rect against that value.
+      // Walked up the tree rather than read off one element, because zoom
+      // multiplies down it.
+      var zoomFactor = function () {
+        var z = 1;
+        for (var n = track; n && n.nodeType === 1; n = n.parentElement) {
+          var v = parseFloat(getComputedStyle(n).zoom);
+          // Unsupported → NaN, unset → 1. Both mean "no scaling here".
+          if (v && v !== 1) z *= v;
+        }
+        return z;
+      };
+
+      var zoom = zoomFactor();
+      var ticking = false;
+      // Offset the rows pin at, in CSS px. Owned here rather than in CSS so the
+      // scroll maths below has the exact number instead of a parsed string.
+      var pinTop = 0;
+
+      var setTops = function () {
+        zoom = zoomFactor();
+
+        // The shared navbar-clearance token, not a number of this section's own
+        // — every pinned section on the site reads the same one. The fallback
+        // matches the token so a missing shared.css degrades identically.
+        var navClear =
+          parseFloat(
+            getComputedStyle(document.documentElement).getPropertyValue("--nav-clear"),
+          ) || 112;
+
+        // Measured rather than assumed, so a title that wraps to two lines on a
+        // narrow window still pushes the pile down instead of having the cards
+        // slide under it. Read from the DOM, not from the media query, so the
+        // two can never disagree.
+        var pinnedTitle = title && getComputedStyle(title).position === "sticky";
+        var titleHeight = pinnedTitle ? title.getBoundingClientRect().height / zoom : 0;
+        var lead = titleHeight ? titleHeight + TITLE_GAP : 0;
+
+        // Everything below is CSS px. window.innerHeight is rendered px.
+        var viewportCss = window.innerHeight / zoom;
+        var trackWidthCss = track.getBoundingClientRect().width / zoom;
+
+        // CARD SIZE IS OWNED HERE, not by a vh clamp in CSS. `100vh` does not
+        // know about the body zoom shared.css applies between 768px and 1440px:
+        // it resolves against the real viewport, then the result is scaled down
+        // again when painted, so a CSS height budget under-counts by that factor
+        // and shrinks the card by ~15% on every laptop. window.innerHeight/zoom
+        // is the honest number. The clamp in the style block stays as the no-JS
+        // fallback, where being conservative is the right failure.
+        //
+        // box-sizing is border-box site-wide (shared.css), so the card is
+        // exactly --cp-card square — no need to measure it back.
+        var cardSize = Math.max(
+          MIN_CARD,
+          Math.min(
+            MAX_CARD,
+            viewportCss - navClear - lead - BOTTOM_SLACK,
+            // Keep the words a usable column: 0.375 of the track leaves ~320px
+            // a side at the 1280px container the mocks are drawn to.
+            trackWidthCss * 0.375,
+          ),
+        );
+        track.style.setProperty("--cp-card", cardSize + "px");
+
+        // Title and pile move as ONE block, centred in the space under the
+        // navbar and never riding above it. Centring the CARD alone — which is
+        // what this did before — opened a ~117px hole between the title and the
+        // card, because the card was being centred in the leftover space while
+        // the title stayed pinned to the top of it.
+        var groupTop = Math.max(navClear, (viewportCss - (lead + cardSize)) / 2);
+        if (pinnedTitle) title.style.top = groupTop + "px";
+
+        pinTop = groupTop + lead;
+
+        rows.forEach(function (row) {
+          // A no-op while the rows are static (phones), where there is no pin.
+          row.style.top = pinTop + "px";
+        });
+      };
+
+      var update = function () {
+        var viewport = window.innerHeight;
+        // Read the regime from the DOM rather than re-testing the media query,
+        // so the two can never disagree.
+        var pinned = getComputedStyle(rows[0]).position === "sticky";
+        // Back into RENDERED px to compare against rects.
+        var pinTopPx = pinTop * zoom;
+
+        // Read every row before writing anything, so a write cannot invalidate a
+        // later read in the same frame.
+        var rects = rows.map(function (row) {
+          return row.getBoundingClientRect();
+        });
+
+        // WHY THE TITLE HAS TO BE DRAGGED OUT BY HAND. Sticky ends when an
+        // element's bottom reaches its containing block's bottom. The rows are a
+        // whole card tall and the title is ~64px, so when the track runs out the
+        // ROWS unstick first and scroll up behind the title, which still has
+        // hundreds of px of sticky range left. That is the card sliding up
+        // through the heading. Rows are all the same height with the same pin,
+        // so they leave together; pulling the title up by however far they have
+        // escaped makes it leave with them.
+        if (title) {
+          var escaped = pinned
+            ? Math.max(0, pinTop - rects[rects.length - 1].top / zoom)
+            : 0;
+          title.style.transform = escaped > 0 ? "translateY(" + -escaped + "px)" : "";
+        }
+
+        var ins = rects.map(function (rect) {
+          if (pinned) {
+            // sticky clamps rect.top at the row's own `top` once stuck, and
+            // keeps decreasing before that — so this distance falls to 0 and
+            // stays there, with no extra bookkeeping.
+            var distance = rect.top - pinTopPx;
+            return Math.min(1, Math.max(0, 1 - distance / TRAVEL));
+          }
+
+          // Static: ramp on viewport entry instead of on approach to a pin.
+          return Math.min(1, Math.max(0, (viewport * 0.85 - rect.top) / TRAVEL));
+        });
+
+        // How many cards have landed on top of each one — a running sum from the
+        // bottom of the list up. Fractional while one is still in flight, which
+        // is what lets the pile spread continuously instead of snapping outwards
+        // the instant the next card pins.
+        var depths = new Array(rows.length);
+        var landedAbove = 0;
+        for (var j = rows.length - 1; j >= 0; j--) {
+          depths[j] = Math.min(DEPTH_CAP, landedAbove);
+          landedAbove += ins[j];
+        }
+
+        rows.forEach(function (row, i) {
+          var arriving = ins[i];
+          var nextArriving = i + 1 < ins.length ? ins[i + 1] : 0;
+
+          // The outgoing row clears out FASTER than the incoming one arrives
+          // (1.8x), so the two sets of words are never both half-visible on top
+          // of each other. A straight `1 - nextArriving` cross-fade put two
+          // different phrases at 50% in the same place, which just reads as
+          // ghosting. At 1.8 the old phrase is gone by the time the new one is
+          // ~55% in, and the handover reads as one replacing the other.
+          var leaving = Math.min(1, nextArriving * 1.8);
+
+          row.style.setProperty("--cp-in", arriving.toFixed(3));
+          row.style.setProperty("--cp-depth", depths[i].toFixed(3));
+          // Pinned: hand over to the row landing on top of this one. Static:
+          // rows sit side by side down the page, so nothing should fade back out.
+          row.style.setProperty(
+            "--cp-v",
+            (pinned ? arriving * (1 - leaving) : arriving).toFixed(3),
+          );
+        });
+
+        ticking = false;
+      };
+
+      var onScroll = function () {
+        if (ticking) return;
+        ticking = true;
+        requestAnimationFrame(update);
+      };
+
+      var handleLayoutShift = function () {
+        // Covers crossing 1440px, where the body zoom switches off, and any
+        // resize that changes the card size and so the centred pin.
+        setTops();
+        update();
+      };
+
+      window.addEventListener("scroll", onScroll, { passive: true });
+      window.addEventListener("resize", handleLayoutShift);
+      // Fonts and any late layout settle by `load`; re-measure once there.
+      window.addEventListener("load", handleLayoutShift, { once: true });
+
+      // The pin point is derived from the title's measured height, so anything
+      // that reflows it — a late font swap, a wrap to two lines — has to
+      // re-trigger that measurement or the pile sits at a stale offset.
+      if (title && typeof ResizeObserver !== "undefined") {
+        new ResizeObserver(handleLayoutShift).observe(title);
+      }
+
+      setTops();
+      update();
+    };
+
+    if (document.readyState === "loading") {
+      document.addEventListener("DOMContentLoaded", init);
+    } else {
+      init();
+    }
+  })();
+</script>
