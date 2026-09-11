@@ -1,0 +1,293 @@
+---
+/**
+ * "Create impact at scale" — Figma node 14052:30143.
+ *
+ * Three stats on one row, separated by 2px pill dividers that stretch to the
+ * height of the tallest column. Below md the dividers go horizontal and the
+ * stats stack, because three columns of 18px caption text at phone width wrap
+ * to four lines each.
+ *
+ * Heading colour is Figma's `Content/Primary Inverse` (#000), not Vault Navy —
+ * that is what the design specifies, and it is the same on the JoinUs card.
+ *
+ * THE COUNTERS. Each number counts up from 0 when the stats row reaches the
+ * middle of the viewport — not when it first clips the bottom edge, which fires
+ * while the row is still barely on screen and is over before anyone has looked
+ * at it. The trigger is an IntersectionObserver whose root is squeezed to a band
+ * across the centre of the screen (`rootMargin: -40% 0 -40% 0`).
+ *
+ * It REPLAYS: a second observer watching the ordinary viewport re-arms the
+ * counters once the row is fully off screen, so scrolling back to the section
+ * shows the reveal again. Re-arming is deliberately tied to leaving the VIEWPORT
+ * and not to leaving the centre band — the row is still perfectly visible above
+ * the band, and resetting it to 0 there would just look broken.
+ *
+ * A stat is therefore three separate boxes, not one string: `prefix` and
+ * `suffix` are static text that must never move, and only `value` animates. See
+ * the style block for why that split is what makes the count read as smooth.
+ */
+interface Stat {
+  /** Static text before the counter — currency mark. Never re-rendered. */
+  prefix?: string;
+  /** The number that counts up from 0. The only thing that animates. */
+  value: number;
+  /** Static text after the counter — unit and the "+". Never re-rendered. */
+  suffix: string;
+  caption: string;
+}
+
+const HEADING = "Create impact at scale";
+const LEDE = "We are on a challenging mission and we’d like your help.";
+
+const stats: Stat[] = [
+  { prefix: "$", value: 300, suffix: "B +", caption: "invoices processed annually" },
+  { prefix: "₹", value: 1000, suffix: "Cr +", caption: "annual savings delivered" },
+  { value: 10, suffix: "% +", caption: "share of India's B2B invoices, ITRs" },
+];
+---
+
+<section class="cp-impact bg-generic-00 py-16 md:py-20">
+  <div class="container mx-auto flex flex-col items-center justify-center gap-12">
+    <div class="flex flex-col items-center gap-3 text-center">
+      <h2
+        class="m-0 font-heading font-medium text-generic-100 text-[length:var(--fs-h1)] leading-[length:var(--lh-h1)] tracking-[-0.5px]"
+      >
+        {HEADING}
+      </h2>
+      <p
+        class="m-0 font-heading font-medium text-vault-navy text-[length:var(--fs-h6)] leading-[length:var(--lh-h6)]"
+      >
+        {LEDE}
+      </p>
+    </div>
+
+    <div
+      class="cp-stat-row flex w-full flex-col items-center justify-center gap-6 rounded-xl p-6 md:flex-row"
+    >
+      {
+        stats.map((stat, i) => (
+          <>
+            {i > 0 && (
+              <div
+                class="cp-impact-rule shrink-0 self-stretch rounded-full bg-[#F2F1F0] max-md:h-[2px] max-md:w-full md:w-[2px]"
+                aria-hidden="true"
+              />
+            )}
+            <div class="flex min-w-0 flex-1 flex-col items-center gap-3 text-center">
+              {/* Three boxes. `.cp-stat-value` is a flex row, which is also what
+                  makes this safe to format across lines: a flex container drops
+                  whitespace-only text nodes, so the gaps in this source cannot
+                  render as spaces inside "₹1000Cr +". */}
+              <p class="cp-stat-value m-0 font-heading font-medium text-generic-100 text-[length:var(--fs-h3)] leading-[length:var(--lh-h3)] tracking-[-0.5px]">
+                {stat.prefix && <span>{stat.prefix}</span>}
+                <span class="cp-stat-digits">
+                  {/* Kept on one line each: these two are sized against each
+                      other, so neither may pick up stray whitespace. */}
+                  <span class="cp-stat-ghost" aria-hidden="true">{stat.value}</span>
+                  <span class="cp-stat-num" data-cp-count={String(stat.value)}>{stat.value}</span>
+                </span>
+                <span>{stat.suffix}</span>
+              </p>
+              <p class="m-0 w-full font-body text-neutral-500 text-[length:var(--fs-body-lg)] leading-[length:var(--lh-body-lg)]">
+                {stat.caption}
+              </p>
+            </div>
+          </>
+        ))
+      }
+    </div>
+  </div>
+</section>
+
+<style is:global>
+  /* WHY THIS IS THREE BOXES AND NOT ONE STRING
+     -------------------------------------------------------------------------
+     Everything here exists to stop anything except the digits themselves from
+     moving during the count. Three separate sources of movement, three fixes:
+
+     1. Tabular figures, set as a real property here rather than leaned on from
+        the Tailwind numeric utility — which resolves through a chain of
+        `--tw-*` custom properties, and this is not worth making conditional on
+        those surviving the trip into a Webflow paste. Proportional digits have
+        different advances, so an un-fixed counter re-flows on EVERY frame —
+        a continuous sub-pixel wobble, and the single worst offender.
+
+        (Tailwind emits a dead `.tabular-nums` rule into the page bundle either
+        way — its scanner reads raw file text, so the value below is itself a
+        candidate. ~200 bytes, and not avoidable without giving up the
+        property; noted so nobody hunts for the class in the markup.)
+
+     2. The digits get their own fixed-width box, sized by a hidden twin holding
+        the final value. Without it the box grows as 0 → 1000 gains digits, and
+        because the stat is centred that dragged the currency mark and the unit
+        outwards with it. Now the prefix and suffix are nailed down and only the
+        digits breathe inside their own box.
+
+        Reserving `Nch` instead would only be an estimate: `ch` is defined from
+        the advance of "0", which tabular figures are not guaranteed to match,
+        and shared.css zooms the page between 768px and 1440px on top of that.
+        The twin measures the real glyphs in the real font at the real size. */
+  .cp-stat-value {
+    display: flex;
+    align-items: baseline;
+    justify-content: center;
+    font-variant-numeric: tabular-nums lining-nums;
+    font-feature-settings: "tnum" 1, "lnum" 1;
+  }
+
+  .cp-stat-digits {
+    display: grid;
+    grid-template-columns: max-content;
+  }
+
+  /* Twin and live number share one cell, so the cell is as wide as the twin
+     from first paint and the live number is centred inside it. */
+  .cp-stat-digits > * {
+    grid-area: 1 / 1;
+    text-align: center;
+  }
+
+  .cp-stat-ghost {
+    visibility: hidden;
+  }
+</style>
+
+<script is:inline>
+  (function () {
+    var init = function () {
+      var section = document.querySelector(".cp-impact");
+      if (!section) return;
+
+      var nums = Array.prototype.slice.call(section.querySelectorAll(".cp-stat-num"));
+      if (!nums.length) return;
+
+      // The finished numbers are already in the DOM. Someone who asked for less
+      // motion, or whose browser has no IntersectionObserver, simply keeps them.
+      if (
+        window.matchMedia &&
+        window.matchMedia("(prefers-reduced-motion: reduce)").matches
+      ) {
+        return;
+      }
+      if (!("IntersectionObserver" in window)) return;
+
+      // 3. Short enough that "10 % +" — which has only eleven distinct states it
+      //    can ever show — ticks about every 100ms instead of every 145ms. Below
+      //    roughly 120ms a sequence of steps stops reading as separate events
+      //    and starts reading as movement. The two large counters change every
+      //    frame at any duration, so this is tuned entirely for the small one.
+      var DURATION = 1200;
+
+      var row = section.querySelector(".cp-stat-row") || section;
+      var frame = null;
+      // Whether a fresh reveal is owed. Cleared when one starts, set again once
+      // the row has left the viewport entirely.
+      var armed = true;
+
+      var targets = nums.map(function (el) {
+        return parseFloat(el.getAttribute("data-cp-count")) || 0;
+      });
+      // Last value actually written, per counter. `10% +` would otherwise be
+      // rewritten ~70 times with the string it already holds; skipping those
+      // avoids pointless text repaints on most frames of its run.
+      var shown = nums.map(function () {
+        return null;
+      });
+
+      var render = function (i, n) {
+        if (shown[i] === n) return;
+        shown[i] = n;
+        nums[i].textContent = String(n);
+      };
+
+      var stop = function () {
+        if (frame !== null) {
+          cancelAnimationFrame(frame);
+          frame = null;
+        }
+      };
+
+      var reset = function () {
+        stop();
+        for (var i = 0; i < nums.length; i++) render(i, 0);
+        armed = true;
+      };
+
+      var run = function () {
+        stop();
+        armed = false;
+
+        var startTs = null;
+
+        var step = function (ts) {
+          if (startTs === null) startTs = ts;
+          var t = Math.min(1, (ts - startTs) / DURATION);
+
+          // easeInOutSine — gentle at both ends, very nearly linear through the
+          // middle. Deliberately NOT an easeOut* curve: those reach half their
+          // total in the first tenth of the run, which turns $300B into a blur
+          // followed by a crawl and makes the eleven states of "10 % +" arrive
+          // in a clump and then stall. An even rate of change is what reads as
+          // smooth; sine is the flattest-middled ease that still settles softly.
+          var eased = -(Math.cos(Math.PI * t) - 1) / 2;
+
+          for (var i = 0; i < targets.length; i++) {
+            render(i, Math.round(targets[i] * eased));
+          }
+
+          frame = t < 1 ? requestAnimationFrame(step) : null;
+        };
+
+        frame = requestAnimationFrame(step);
+      };
+
+      // Where the row sits right now decides the starting state, so that a
+      // reload part-way down the page never snaps a real figure back to 0.
+      var viewport = window.innerHeight;
+      var rect = row.getBoundingClientRect();
+
+      if (rect.top > viewport * 0.6) {
+        reset(); // Still below the band: park at 0 and wait for the scroll.
+      } else if (rect.bottom < viewport * 0.4) {
+        armed = false; // Already scrolled past: keep the finished figures.
+      } else {
+        run(); // Sitting in the band on load: count now.
+      }
+
+      // Trigger. Root squeezed to a band across the middle of the viewport, so
+      // the count starts when the row is actually being looked at.
+      new IntersectionObserver(
+        function (entries) {
+          for (var i = 0; i < entries.length; i++) {
+            if (entries[i].isIntersecting && armed) {
+              run();
+              return;
+            }
+          }
+        },
+        { rootMargin: "-40% 0px -40% 0px", threshold: 0 },
+      ).observe(row);
+
+      // Re-arm. Tied to leaving the VIEWPORT, not the band above: the row stays
+      // visible well past the band, and zeroing it there would be visible
+      // vandalism. Off screen, nobody sees the reset.
+      new IntersectionObserver(
+        function (entries) {
+          for (var i = 0; i < entries.length; i++) {
+            if (!entries[i].isIntersecting) {
+              reset();
+              return;
+            }
+          }
+        },
+        { threshold: 0 },
+      ).observe(row);
+    };
+
+    if (document.readyState === "loading") {
+      document.addEventListener("DOMContentLoaded", init);
+    } else {
+      init();
+    }
+  })();
+</script>
