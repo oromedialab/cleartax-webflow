@@ -65,67 +65,58 @@ const cardsData = [
 
 <section class="sc-invoice-stack-section py-12 md:py-16 bg-generic-00">
     <div class="min-[1400px]:container mx-auto w-full px-4 md:px-6">
-        <!-- Mobile Header (Scrolls away) -->
-        <div class="md:hidden text-center w-full mx-auto mb-8 bg-generic-00">
+        <!-- Section Header (Scrolls away naturally) -->
+        <div id="sc-invoice-header-text" class="text-center w-full mx-auto mb-8 md:mb-12 bg-generic-00">
             <h2 class="font-heading font-medium text-[length:var(--fs-h2)] leading-[length:var(--lh-h2)] lg:text-[length:var(--fs-h1)] lg:leading-[length:var(--lh-h1)] text-text-default max-w-250 mx-auto m-0 mb-3">
                 Infrastructure <span class="text-generic-100 bg-flux-lime px-1 rounded-lg">That Grows</span> With You</h2>
-            <p class="font-body text-[length:var(--fs-body)] md:text-[length:var(--fs-body-lg)] leading-[length:var(--lh-body)] md:leading-[length:var(--lh-body-lg)] text-neutral-500 max-w-140 mx-auto">
+            <p class="font-body text-[length:var(--fs-body)] md:text-[length:var(--fs-body-lg)] leading-[length:var(--lh-body)] md:leading-[length:var(--lh-body-lg)] text-neutral-500 max-w-140 font-normal mx-auto">
                 From the first return to millions of invoices across every jurisdiction — our platform handles it without blinking.</p>
         </div>
 
-        <div id="sc-invoice-stack-container" class="invoice-stack mx-auto w-full flex flex-col gap-[30vh] md:gap-[50vh]">
-            {cardsData.map((card, index) => (
-                <div
-                    class="invoice-stack-sticky sticky"
-                    style={`top: calc(var(--nav-clear, 112px) + ${index * 16}px); z-index: ${index};`}
-                >
-                    {index === 0 && (
-                        <!-- Desktop Header (Sticky) -->
-                        <div id="sc-invoice-header-text" class="hidden md:block text-center w-full mx-auto mb-6 bg-generic-00">
-                            <h2 class="font-heading font-medium text-[length:var(--fs-h2)] leading-[length:var(--lh-h2)] lg:text-[length:var(--fs-h1)] lg:leading-[length:var(--lh-h1)] text-text-default max-w-250 mx-auto mb-3">
-                                Infrastructure <span class="text-generic-100 bg-flux-lime px-1 rounded-lg">That Grows</span> With You</h2>
-                            <p class="font-body text-[length:var(--fs-body)] md:text-[length:var(--fs-body-lg)] leading-[length:var(--lh-body)] md:leading-[length:var(--lh-body-lg)] text-neutral-500 max-w-140 font-normal mx-auto">
-                                From the first return to millions of invoices across every jurisdiction — our platform handles it without blinking.</p>
-                        </div>
-                    )}
+        <!-- Main Stack Layout Grid -->
+        <div class="relative max-w-[1280px] mx-auto w-full flex flex-col md:flex-row gap-6 lg:gap-10 items-start">
+            <!-- Aside Menu (Sticky Left Sidebar) -->
+            <div
+                id="sc-aside-menu"
+                class="hidden md:flex flex-col gap-3 w-40 lg:w-48 shrink-0 sticky z-30 pt-2 pointer-events-auto"
+                style="top: calc(var(--nav-clear, 112px) + 8px);"
+            >
+                {asideMenu.map((item, btnIdx) => (
+                    <button
+                        type="button"
+                        class={`sc-aside-menu-item text-left border-l-2 pl-3.5 py-0.5 text-[length:var(--fs-body)] leading-[length:var(--lh-body)] font-body transition-colors duration-200 cursor-pointer bg-transparent border-t-0 border-r-0 border-b-0 outline-none ${
+                            btnIdx === 0
+                                ? 'active-aside border-[#655DFF] text-text-default font-medium'
+                                : 'border-transparent text-text-default/28 font-normal'
+                        }`}
+                        data-card-index={btnIdx}
+                    >
+                        {item.label}
+                    </button>
+                ))}
+            </div>
 
-                    <div class="flex flex-col md:flex-row gap-6 lg:gap-10 items-start max-w-[1280px] mx-auto w-full">
-                        {index === 0 ? (
-                            <!-- Aside Menu (Desktop) -->
-                            <div class="hidden md:flex flex-col gap-3 w-40 lg:w-48 shrink-0 pt-2">
-                                {asideMenu.map((item, btnIdx) => (
-                                    <button
-                                        type="button"
-                                        class={`sc-aside-menu-item text-left border-l-2 pl-3.5 py-0.5 text-[length:var(--fs-body)] leading-[length:var(--lh-body)] font-body transition-colors duration-200 cursor-pointer bg-transparent border-t-0 border-r-0 border-b-0 outline-none ${
-                                            btnIdx === 0
-                                                ? 'active-aside border-[#655DFF] text-text-default font-medium'
-                                                : 'border-transparent text-text-default/28 font-normal'
-                                        }`}
-                                        data-card-index={btnIdx}
-                                    >
-                                        {item.label}
-                                    </button>
-                                ))}
-                            </div>
-                        ) : (
-                            <!-- Spacer alignment for card 1..N -->
-                            <div class="hidden md:block w-40 lg:w-48 shrink-0"></div>
-                        )}
-
+            <!-- Cards Stack (Right Column) -->
+            <div id="sc-invoice-stack-container" class="invoice-stack flex-1 w-full flex flex-col gap-[30vh] md:gap-[50vh]">
+                {cardsData.map((card, index) => (
+                    <div
+                        class="invoice-stack-sticky sticky"
+                        style={`top: calc(var(--nav-clear, 112px) + ${index * 16}px); z-index: ${index};`}
+                    >
                         <div
-                            class="invoice-stack-card flex-1 flex flex-col md:flex-row w-full border-2 border-neutral-300 rounded-xl min-h-[372px] md:min-h-0 md:h-[clamp(380px,calc(100vh-var(--nav-clear,112px)-160px),480px)] bg-generic-00 will-change-transform"
+                            class="invoice-stack-card w-full border-2 border-neutral-300 rounded-xl min-h-[372px] md:min-h-0 md:h-[clamp(340px,calc(100vh-var(--nav-clear,112px)-64px),520px)] bg-generic-00 will-change-transform flex flex-col md:flex-row"
                             style="transform-origin: top center;"
                         >
                             <div class="flex-1 p-5 sm:p-6 flex flex-col justify-between items-start">
                                 <div class="w-full">
-                                    <h3 class="font-heading text-[length:var(--fs-h4)] md:text-[length:var(--fs-h3)] leading-[length:var(--lh-h4)] md:leading-[length:var(--lh-h3)] mb-2 md:mb-3 text-text-default font-medium">
+                                    <h3 class="font-heading text-[length:var(--fs-h4)] md:text-[length:var(--fs-h3)] leading-[length:var(--lh-h4)] md:leading-[length:var(--lh-h3)] mb-2 md:mb-3 text-text-default max-w-98 font-medium">
                                         {card.title}
                                     </h3>
-                                    <p class="font-body text-[length:var(--fs-body)] leading-[length:var(--lh-body)] text-[#6B7280CC] font-normal max-w-xl">
+                                    <p class="font-body text-[length:var(--fs-body)] leading-[length:var(--lh-body)] text-[#6B7280CC] font-normal max-w-98">
                                         {card.description}
                                     </p>
                                 </div>
-                                <div class="mt-4 md:mt-auto grid grid-cols-2 gap-3 xl:gap-x-8 xl:gap-y-6 w-full pt-2">
+                                <div class="mt-4 md:mt-auto grid grid-cols-2 gap-3 xl:gap-x-8 xl:gap-y-6 w-full">
                                     {
                                         card.points.map((point) => (
                                             <div class="flex items-center gap-2.5">
@@ -136,18 +127,17 @@ const cardsData = [
                                     }
                                 </div>
                             </div>
-                            <div class="w-full md:w-[40%] lg:w-[45%] p-4 md:p-5 lg:p-6 flex">
+                            <div class="w-full md:w-[40%] lg:w-[50%] p-4 md:p-5 lg:p-6 flex">
                                 <div class="w-full h-full min-h-[180px] md:min-h-0 rounded-xl md:rounded-2xl bg-visual-placeholder"></div>
                             </div>
                         </div>
                     </div>
-                </div>
-            ))}
+                ))}
 
-            <!-- Gap after the stack finishes -->
-            <div style="height: 80px;"></div>
+                <!-- Gap after the stack finishes -->
+                <div style="height: 80px;"></div>
+            </div>
         </div>
-
     </div>
 </section>
 
@@ -164,6 +154,38 @@ const cardsData = [
       height: auto !important;
     }
   }
+
+  @media (max-height: 800px) and (min-width: 768px) {
+    .sc-invoice-stack-section {
+      padding-top: 1.5rem !important;
+      padding-bottom: 1.5rem !important;
+    }
+    .invoice-stack-card {
+      height: clamp(300px, calc(100vh - var(--nav-clear, 112px) - 140px), 430px) !important;
+    }
+    .invoice-stack-card h3 {
+      font-size: clamp(1.25rem, 2.2vh, 1.75rem) !important;
+      line-height: 1.25 !important;
+      margin-bottom: 0.35rem !important;
+    }
+    .invoice-stack-card p {
+      font-size: clamp(0.875rem, 1.7vh, 1rem) !important;
+      line-height: 1.35 !important;
+    }
+    .invoice-stack-card .grid {
+      gap: 0.5rem !important;
+      padding-top: 0.25rem !important;
+    }
+  }
+
+  @media (max-height: 680px) and (min-width: 768px) {
+    .invoice-stack-card {
+      height: clamp(260px, calc(100vh - var(--nav-clear, 112px) - 100px), 350px) !important;
+    }
+    .invoice-stack-card > div {
+      padding: 0.875rem !important;
+    }
+  }
 </style>
 
 <script is:inline>
@@ -171,7 +193,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const stack = document.getElementById('sc-invoice-stack-container');
     if (!stack) return;
 
-    const textEl = document.getElementById('sc-invoice-header-text');
+    const asideMenuEl = document.getElementById('sc-aside-menu');
     const outers = Array.from(stack.querySelectorAll('.invoice-stack-sticky'));
     const inners = Array.from(stack.querySelectorAll('.invoice-stack-card'));
 
@@ -182,8 +204,6 @@ document.addEventListener('DOMContentLoaded', () => {
     if (reduceMotion) return;
 
     const STACK_OFFSET = 16;
-    const REVEAL_DISTANCE = 260;
-
     const NAV_CLEAR =
         parseFloat(
             getComputedStyle(document.documentElement).getPropertyValue('--nav-clear'),
@@ -201,34 +221,35 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     let zoom = zoomFactor();
+    let outersStickyTop = [];
+    let lastActiveIdx = -1;
+    const sidebarBtns = Array.from(document.querySelectorAll('.sc-aside-menu-item'));
 
     const setTops = () => {
         zoom = zoomFactor();
 
-        const originalTransform = inners[0].style.transform;
-        inners[0].style.transform = 'none';
-
-        const outerTop = outers[0].getBoundingClientRect().top;
-        const innerTop = inners[0].getBoundingClientRect().top;
-        const cardOffset = (innerTop - outerTop) / zoom;
-
-        inners[0].style.transform = originalTransform;
-
+        // Measure static height of card without mutating transform (eliminates layout thrashing)
+        const cardHeight = inners[0] ? (inners[0].offsetHeight / zoom) : 380;
         let firstTop = NAV_CLEAR;
 
-        if (window.innerWidth >= 1280) {
-            const cardHeight = inners[0].getBoundingClientRect().height / zoom;
-            const totalStackHeight =
-                cardOffset + cardHeight + (outers.length - 1) * STACK_OFFSET;
+        if (window.innerWidth >= 768) {
+            const totalStackHeight = cardHeight + (outers.length - 1) * STACK_OFFSET;
             const viewportCss = window.innerHeight / zoom;
             firstTop = Math.max(NAV_CLEAR, (viewportCss - totalStackHeight) / 2);
         }
 
-        outers[0].style.top = firstTop + 'px';
+        for (let i = 0; i < outers.length; i++) {
+            outers[i].style.top = (firstTop + i * STACK_OFFSET) + 'px';
+        }
 
-        const baseTop = firstTop + cardOffset;
-        for (let i = 1; i < outers.length; i++) {
-            outers[i].style.top = baseTop + i * STACK_OFFSET + 'px';
+        outersStickyTop = outers.map((el) => (parseFloat(el.style.top) || NAV_CLEAR) * zoom);
+
+        if (asideMenuEl) {
+            const asideTopOffset = 8;
+            const lastCardOffset = (outers.length - 1) * STACK_OFFSET;
+            const asideTargetHeight = cardHeight + (lastCardOffset - asideTopOffset);
+            asideMenuEl.style.top = (firstTop + asideTopOffset) + 'px';
+            asideMenuEl.style.minHeight = asideTargetHeight + 'px';
         }
     };
 
@@ -236,51 +257,68 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const update = () => {
         const tops = outers.map((el) => el.getBoundingClientRect().top);
+        const revealDistance = Math.max(260, (window.innerHeight / zoom) * 0.45);
 
         let activeIdx = 0;
         inners.forEach((inner, i) => {
             if (i === inners.length - 1) {
-                inner.style.transform = 'scale(1)';
+                inner.style.transform = 'scale(1) translateZ(0)';
                 return;
             }
 
-            const nextStickyTopPx =
-                (parseFloat(getComputedStyle(outers[i + 1]).top) || 0) * zoom;
+            const nextStickyTopPx = outersStickyTop[i + 1] || ((NAV_CLEAR + (i + 1) * STACK_OFFSET) * zoom);
             const distanceToStick = tops[i + 1] - nextStickyTopPx;
 
-            const progress = Math.min(1, Math.max(0, 1 - distanceToStick / REVEAL_DISTANCE));
+            const progress = Math.min(1, Math.max(0, 1 - distanceToStick / revealDistance));
             const scale = 1 - progress * (1 - targetScaleFor(i));
-            inner.style.transform = `scale(${scale.toFixed(4)})`;
+            inner.style.transform = `scale(${scale.toFixed(4)}) translateZ(0)`;
         });
 
-        tops.forEach((top, i) => {
-            const stickyTop = (parseFloat(getComputedStyle(outers[i]).top) || 0) * zoom;
-            if (top <= stickyTop + 60) {
+        for (let i = 0; i < tops.length; i++) {
+            const stickyTop = outersStickyTop[i] || (NAV_CLEAR * zoom);
+            if (tops[i] <= stickyTop + 60) {
                 activeIdx = i;
             }
-        });
+        }
 
-        const sidebarBtns = document.querySelectorAll('.sc-aside-menu-item');
-        sidebarBtns.forEach((btn, idx) => {
-            if (idx === activeIdx) {
-                btn.classList.add('border-[#655DFF]', 'text-text-default', 'font-medium');
-                btn.classList.remove('border-transparent', 'text-text-default/28', 'font-normal');
-            } else {
-                btn.classList.remove('border-[#655DFF]', 'text-text-default', 'font-medium');
-                btn.classList.add('border-transparent', 'text-text-default/28', 'font-normal');
-            }
-        });
+        if (activeIdx !== lastActiveIdx) {
+            lastActiveIdx = activeIdx;
+            sidebarBtns.forEach((btn, idx) => {
+                if (idx === activeIdx) {
+                    btn.classList.add('border-[#655DFF]', 'text-text-default', 'font-medium');
+                    btn.classList.remove('border-transparent', 'text-text-default/28', 'font-normal');
+                } else {
+                    btn.classList.remove('border-[#655DFF]', 'text-text-default', 'font-medium');
+                    btn.classList.add('border-transparent', 'text-text-default/28', 'font-normal');
+                }
+            });
+        }
 
         ticking = false;
     };
 
-    const sidebarBtns = document.querySelectorAll('.sc-aside-menu-item');
+    const getUnstuckTop = (el) => {
+        let top = 0;
+        let curr = el;
+        while (curr) {
+            top += curr.offsetTop;
+            curr = curr.offsetParent;
+        }
+        return top;
+    };
+
+    const getCardTargetY = (index) => {
+        const stickyTopPx = (parseFloat(outers[index].style.top) || NAV_CLEAR) * zoom;
+        return getUnstuckTop(outers[index]) - stickyTopPx;
+    };
+
     sidebarBtns.forEach((btn) => {
-        btn.addEventListener('click', () => {
+        btn.addEventListener('click', (e) => {
+            e.preventDefault();
             const index = parseInt(btn.getAttribute('data-card-index') || '0', 10);
             if (outers[index]) {
-                const topTarget = outers[index].getBoundingClientRect().top + window.scrollY - NAV_CLEAR - (index * STACK_OFFSET);
-                window.scrollTo({ top: topTarget, behavior: 'smooth' });
+                const targetY = getCardTargetY(index);
+                window.scrollTo({ top: targetY, behavior: 'smooth' });
             }
         });
     });
@@ -299,10 +337,6 @@ document.addEventListener('DOMContentLoaded', () => {
     window.addEventListener('scroll', onScroll, { passive: true });
     window.addEventListener('resize', handleLayoutShift);
     window.addEventListener('load', handleLayoutShift, { once: true });
-
-    if (textEl && typeof ResizeObserver !== 'undefined') {
-        new ResizeObserver(handleLayoutShift).observe(textEl);
-    }
 
     setTops();
     update();
