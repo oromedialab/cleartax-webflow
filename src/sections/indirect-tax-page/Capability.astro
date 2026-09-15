@@ -1,0 +1,548 @@
+---
+/**
+ * Indirect Tax Capability Section
+ * Clean 4-column comparison table:
+ * - Headline: "Not an ERP module. Not a desktop tool."
+ * - Subtitle: "The only platform that connects raw sales and purchase data to compliant GST filing — with AI validation at every step."
+ * - Solid #CCCCCC outer border and solid #CCCCCC vertical dividers.
+ * - Solid #CCCCCC bottom divider under the header row (never dashed).
+ * - Horizontal dashed #9CA3AF dividers only between the 6 rows inside the table (7th row has no bottom border).
+ * - Column 4: "OUR INDIRECT TAX PLATFORM" with #C8F006 yellow header.
+ * - Custom Grey circle 'x' and Purple circle 'check' SVGs.
+ * - Mobile: Fixed Capability column + smooth sliding carousel for the 3 comparative tools.
+ */
+
+interface Row {
+    capability: string;
+    erp?: string;
+    erpCross?: boolean;
+    desktop?: string;
+    desktopCross?: boolean;
+    clear?: string;
+    clearCheck?: boolean;
+}
+
+const rows: Row[] = [
+    {
+        capability: "Multi-GSTIN data aggregation",
+        erp: "Manual",
+        erpCross: true,
+        desktopCross: true,
+        clear: "Automated",
+        clearCheck: true,
+    },
+    {
+        capability: "Smart 2B vs PR Reconciliation",
+        erp: "Static",
+        desktop: "Manual Excel",
+        clear: "Best-Fit AI",
+        clearCheck: true,
+    },
+    {
+        capability: "Real-time E-invoicing + E-Way Bill",
+        erpCross: true,
+        desktop: "Crashes",
+        desktopCross: true,
+        clear: "Sub-200ms",
+        clearCheck: true,
+    },
+    {
+        capability: "Vendor payment locking & nudges",
+        erpCross: true,
+        desktopCross: true,
+        clear: "Automated",
+        clearCheck: true,
+    },
+    {
+        capability: "ASMT-10 Notice tracking & response",
+        erpCross: true,
+        desktopCross: true,
+        clear: "AI Assisted",
+        clearCheck: true,
+    },
+    {
+        capability: "Pan-India multi-entity dashboards",
+        erp: "Add-on",
+        desktopCross: true,
+        clear: "Unified Cloud",
+        clearCheck: true,
+    },
+    {
+        capability: "10M+ invoice processing uptime",
+        erp: "Limited",
+        desktopCross: true,
+        clear: "99.99% Cloud",
+        clearCheck: true,
+    },
+];
+
+const CrossSvg = `<svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" class="shrink-0">
+<path d="M20 9.93378C20 15.4201 15.5228 19.8676 10 19.8676C4.47716 19.8676 0 15.4201 0 9.93378C0 4.44751 4.47716 0 10 0C15.5228 0 20 4.44751 20 9.93378Z" fill="var(--palette-neutral-500, #6B7280)"/>
+<line x1="13.4844" y1="7.06066" x2="6.05975" y2="14.4853" stroke="var(--palette-generic-00, #FFFFFF)" stroke-width="1.5" stroke-linecap="round"/>
+<line x1="0.75" y1="-0.75" x2="11.25" y2="-0.75" transform="matrix(0.707107 0.707107 0.707107 -0.707107 6.48438 6)" stroke="var(--palette-generic-00, #FFFFFF)" stroke-width="1.5" stroke-linecap="round"/>
+</svg>`;
+
+const CheckSvg = `<svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" class="shrink-0">
+<path d="M20 9.93378C20 15.4201 15.5228 19.8676 10 19.8676C4.47716 19.8676 0 15.4201 0 9.93378C0 4.44751 4.47716 0 10 0C15.5228 0 20 4.44751 20 9.93378Z" fill="var(--palette-nova-500, #5446FF)"/>
+<path d="M14.198 7.1111L8.51264 12.7588L5.80615 10.0703" stroke="var(--palette-generic-00, #FFFFFF)" stroke-width="1.66667" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>`;
+---
+
+<section id="capability-comp" class="bg-generic-00 py-12 lg:py-20 w-full">
+    <div class="min-[1400px]:container mx-auto w-full px-4 md:px-6">
+        <!-- Centered Header -->
+        <div class="text-center mb-10 lg:mb-14">
+            <h2
+                id="capability-comp-title"
+                class="font-heading !font-semibold text-vault-navy tracking-[var(--tracking-heading,-0.5px)] leading-[1.15] max-md:text-[length:var(--fs-h4)] max-lg:text-[34px] text-[length:var(--fs-display-sm)] m-0"
+            >
+                Not an ERP module. Not a desktop tool.
+            </h2>
+            <p
+                class="font-body text-neutral-500 text-[length:var(--fs-body)] lg:text-[length:var(--fs-body-lg)] leading-[length:var(--lh-body)] lg:leading-[length:var(--lh-body-lg)] max-w-[660px] mx-auto mt-3.5 lg:mt-4"
+            >
+                The only platform that connects raw sales and purchase data to compliant GST filing — with AI validation at every step.
+            </p>
+        </div>
+
+        <!-- Desktop Comparison Table (Hidden on Mobile) -->
+        <div class="hidden lg:block">
+            <div class="dt-cap-table border border-[var(--color-border,#CCCCCC)] rounded-2xl overflow-hidden bg-generic-00">
+                <div class="grid grid-cols-[1.4fr_1fr_1fr_1.1fr] items-stretch">
+                    <!-- Left Section: Columns 1, 2, 3 -->
+                    <div class="col-span-3 flex flex-col mr-6">
+                        <!-- Header Row (Solid divider) -->
+                        <div class="grid grid-cols-[1.4fr_1fr_1fr] dt-cap-header items-stretch min-h-[107px]">
+                            <!-- Col 1 Header -->
+                            <div class="px-6 py-5 flex items-center dt-cap-col-border">
+                                <h3 class="font-heading text-[length:var(--fs-h6)] font-medium leading-none text-text-default uppercase m-0">
+                                    CAPABILITY
+                                </h3>
+                            </div>
+
+                            <!-- Col 2 Header: ERP Native -->
+                            <div class="px-5 py-5 flex flex-col items-center justify-center text-center dt-cap-col-border">
+                                <h3 class="font-heading text-[length:var(--fs-h6)] font-medium leading-none text-text-default uppercase m-0">
+                                    ERP NATIVE
+                                </h3>
+                                <span class="font-body text-[length:var(--fs-body-lg)] leading-[1.2] text-neutral-500 mt-1 font-normal">SAP / Oracle</span>
+                            </div>
+
+                            <!-- Col 3 Header: Desktop Tool -->
+                            <div class="px-5 py-5 flex flex-col items-center justify-center text-center">
+                                <h3 class="font-heading text-[length:var(--fs-h6)] font-medium leading-none text-text-default uppercase m-0">
+                                    DESKTOP TOOL
+                                </h3>
+                                <span class="font-body text-[length:var(--fs-body-lg)] leading-[1.2] text-neutral-500 mt-1 font-normal">Gen GST / Relyon</span>
+                            </div>
+                        </div>
+
+                        <!-- Table Rows 1 to 7 -->
+                        <div class="flex flex-col">
+                            {
+                                rows.map((row) => (
+                                    <div class="grid grid-cols-[1.4fr_1fr_1fr] dt-cap-row min-h-[107px] items-stretch">
+                                        <!-- Col 1: Capability -->
+                                        <div class="px-7 py-4 flex items-center dt-cap-col-border font-body text-[length:var(--fs-body)] font-normal leading-[length:var(--lh-body)] text-text-default">
+                                            {row.capability}
+                                        </div>
+
+                                        <!-- Col 2: ERP Native -->
+                                        <div class="px-4 py-4 flex flex-col items-center justify-center text-center dt-cap-col-border gap-3 font-body text-[length:var(--fs-body)] font-normal text-neutral-500">
+                                            {row.erpCross && (
+                                                <span class="inline-flex items-center justify-center" set:html={CrossSvg} />
+                                            )}
+                                            {row.erp && <span>{row.erp}</span>}
+                                        </div>
+
+                                        <!-- Col 3: Desktop Tool -->
+                                        <div class="px-4 py-4 flex flex-col items-center justify-center text-center gap-3 font-body text-[length:var(--fs-body)] font-normal text-neutral-500">
+                                            {row.desktopCross && (
+                                                <span class="inline-flex items-center justify-center" set:html={CrossSvg} />
+                                            )}
+                                            {row.desktop && <span>{row.desktop}</span>}
+                                        </div>
+                                    </div>
+                                ))
+                            }
+                        </div>
+                    </div>
+
+                    <!-- Right Column: Column 4 (Our Indirect Tax Platform) -->
+                    <div class="dt-cap-col-dt flex flex-col bg-generic-00 border-l border-[var(--color-border,#CCCCCC)] relative z-10">
+                        <!-- Col 4 Header (Yellow Flux Lime with rounded top-right) -->
+                        <div class="px-5 py-5 bg-flux-lime dt-cap-header min-h-[107px] flex items-center justify-center text-center">
+                            <h3 class="font-heading text-[length:var(--fs-h6)] font-medium leading-none text-text-default uppercase m-0">
+                                OUR IT PLATFORM
+                            </h3>
+                        </div>
+
+                        <!-- Col 4 Rows (with inset dashed dividers) -->
+                        <div class="flex flex-col flex-1">
+                            {
+                                rows.map((row) => (
+                                    <div class="dt-cap-dt-cell min-h-[107px] px-4 py-4 flex flex-col items-center justify-center text-center gap-1.5 font-body text-[length:var(--fs-body)] leading-[length:var(--lh-body)] font-normal text-neutral-500 relative flex-1">
+                                        {row.clearCheck && (
+                                            <span class="inline-flex items-center justify-center" set:html={CheckSvg} />
+                                        )}
+                                        {row.clear && <span>{row.clear}</span>}
+                                    </div>
+                                ))
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mobile View (Hidden on Desktop) with Smooth Sliding Carousel -->
+        <div
+            class="lg:hidden"
+            id="capability-mobile-container"
+            data-active-index="2"
+        >
+            <!-- Mobile Pill Tabs -->
+            <div class="mb-6 flex justify-center w-full max-w-full">
+                <div
+                    class="cap-tabs-nav inline-flex p-1 rounded-full border border-solid border-[var(--color-border,#CCCCCC)] bg-slate-50 gap-1 overflow-x-auto max-w-full shadow-sm"
+                >
+                    <button
+                        type="button"
+                        class="cap-tab-btn border-none bg-transparent py-2 px-3.5 rounded-full font-body text-[length:var(--fs-label-sm)] font-semibold text-slate-500 cursor-pointer transition-all duration-300 data-[active=true]:bg-nova-blue data-[active=true]:text-generic-00 data-[active=true]:shadow-sm uppercase"
+                        data-index="0"
+                    >
+                        ERP Native
+                    </button>
+                    <button
+                        type="button"
+                        class="cap-tab-btn border-none bg-transparent py-2 px-3.5 rounded-full font-body text-[length:var(--fs-label-sm)] font-semibold text-slate-500 cursor-pointer transition-all duration-300 data-[active=true]:bg-nova-blue data-[active=true]:text-generic-00 data-[active=true]:shadow-sm uppercase"
+                        data-index="1"
+                    >
+                        Desktop Tool
+                    </button>
+                    <button
+                        type="button"
+                        class="cap-tab-btn border-none bg-transparent py-2 px-3.5 rounded-full font-body text-[length:var(--fs-label-sm)] font-semibold text-slate-500 cursor-pointer transition-all duration-300 data-[active=true]:bg-nova-blue data-[active=true]:text-generic-00 data-[active=true]:shadow-sm uppercase"
+                        data-index="2"
+                        data-active="true"
+                    >
+                        OUR IT PLATFORM
+                    </button>
+                </div>
+            </div>
+
+            <!-- 2-Column Mobile Layout: Left Capability + Right Slider Card -->
+            <div class="dt-cap-table">
+                <div class="grid grid-cols-2 items-stretch">
+                    <!-- Column 1: Capability (Fixed on Left) -->
+                    <div class="flex flex-col dt-cap-col-border bg-generic-00">
+                        <!-- Col 1 Header (Solid divider) -->
+                        <div class="p-3.5 flex items-center dt-cap-header min-h-[72px]">
+                            <h3 class="font-heading text-[length:var(--fs-body)] sm:text-[length:var(--fs-body-lg)] font-medium tracking-wider text-text-default uppercase m-0">
+                                CAPABILITY
+                            </h3>
+                        </div>
+                        <!-- Col 1 Rows (Dashed line between rows 1-6, none on 7) -->
+                        <ul class="list-none m-0 p-0 flex flex-col">
+                            {
+                                rows.map((row) => (
+                                    <li class="cap-col1-item p-3.5 font-body text-[length:var(--fs-body-sm)] min-h-[76px] flex items-center dt-cap-mob-row text-vault-navy leading-snug">
+                                        {row.capability}
+                                    </li>
+                                ))
+                            }
+                        </ul>
+                    </div>
+
+                    <!-- Column 2: Sliding Carousel on Right -->
+                    <div class="cap-slider-viewport flex flex-col min-w-0 overflow-hidden w-full relative">
+                        <div
+                            id="cap-slider-track"
+                            class="cap-slider-track flex w-full transition-transform duration-300 ease-out"
+                            style="transform: translateX(-200%);"
+                        >
+                            <!-- Slide 0: ERP Native -->
+                            <div class="cap-slide w-full shrink-0 flex flex-col bg-generic-00" data-slide-index="0">
+                                <!-- Header (Solid divider) -->
+                                <div class="p-3.5 flex flex-col items-center justify-center text-center dt-cap-header min-h-[72px]">
+                                    <h3 class="font-heading text-[length:var(--fs-body)] font-medium tracking-wider text-text-default uppercase m-0">
+                                        ERP NATIVE
+                                    </h3>
+                                    <span class="font-body text-[length:var(--fs-body-sm)] text-neutral-500 font-normal">SAP / Oracle</span>
+                                </div>
+                                <!-- Rows -->
+                                <ul class="list-none m-0 p-0 flex flex-col">
+                                    {
+                                        rows.map((row) => (
+                                            <li class="cap-row-item min-h-[76px] p-3 dt-cap-mob-row flex flex-col items-center justify-center text-center gap-1.5 font-body text-[length:var(--fs-body-sm)] text-neutral-500">
+                                                {row.erpCross && (
+                                                    <span class="inline-flex items-center justify-center" set:html={CrossSvg} />
+                                                )}
+                                                {row.erp && <span>{row.erp}</span>}
+                                            </li>
+                                        ))
+                                    }
+                                </ul>
+                            </div>
+
+                            <!-- Slide 1: Desktop Tool -->
+                            <div class="cap-slide w-full shrink-0 flex flex-col bg-generic-00" data-slide-index="1">
+                                <!-- Header (Solid divider) -->
+                                <div class="p-3.5 flex flex-col items-center justify-center text-center dt-cap-header min-h-[73px]">
+                                    <h3 class="font-heading text-[length:var(--fs-body)] font-medium tracking-wider text-text-default uppercase m-0">
+                                        DESKTOP TOOL
+                                    </h3>
+                                    <span class="font-body text-[length:var(--fs-body-sm)] text-neutral-500 font-normal">Gen GST / Relyon</span>
+                                </div>
+                                <!-- Rows -->
+                                <ul class="list-none m-0 p-0 flex flex-col">
+                                    {
+                                        rows.map((row) => (
+                                            <li class="cap-row-item min-h-[72px] dt-cap-mob-row flex flex-col items-center justify-center text-center gap-1.5 font-body text-[length:var(--fs-body-sm)] text-neutral-500">
+                                                {row.desktopCross && (
+                                                    <span class="inline-flex items-center justify-center" set:html={CrossSvg} />
+                                                )}
+                                                {row.desktop && <span>{row.desktop}</span>}
+                                            </li>
+                                        ))
+                                    }
+                                </ul>
+                            </div>
+
+                            <!-- Slide 2: OUR IT PLATFORM (Flux Lime Header) -->
+                            <div class="cap-slide w-full shrink-0 flex flex-col bg-generic-00" data-slide-index="2">
+                                <!-- Header (Solid divider) -->
+                                <div class="p-3 bg-flux-lime flex items-center justify-center text-center dt-cap-header min-h-[72px]">
+                                    <h3 class="font-heading text-[length:var(--fs-body)] sm:text-[length:var(--fs-body-lg)] font-medium tracking-wider text-vault-navy uppercase m-0">
+                                        OUR IT PLATFORM
+                                    </h3>
+                                </div>
+                                <!-- Rows -->
+                                <ul class="list-none m-0 p-0 flex flex-col">
+                                    {
+                                        rows.map((row) => (
+                                            <li class="cap-row-item min-h-[76px] p-3 dt-cap-mob-row flex flex-col items-center justify-center text-center gap-1.5 font-body text-[length:var(--fs-body-sm)] font-normal text-neutral-500">
+                                                {row.clearCheck && (
+                                                    <span class="inline-flex items-center justify-center" set:html={CheckSvg} />
+                                                )}
+                                                {row.clear && <span>{row.clear}</span>}
+                                            </li>
+                                        ))
+                                    }
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<style>
+    /* Table container */
+    .dt-cap-table {
+        border: 1px solid var(--color-border, #CCCCCC);
+        border-radius: 16px;
+        background-color: var(--color-generic-00, #FFFFFF);
+        overflow: hidden;
+    }
+
+    /* 4th Column (Our Indirect Tax Platform) elevation & border */
+    .dt-cap-col-dt {
+        border-left: 1px solid var(--color-border, #CCCCCC);
+        box-shadow: -20px 0 40px 0 rgba(0, 0, 0, 0.08);
+        position: relative;
+        z-index: 10;
+    }
+
+    /* Inset horizontal dashed divider inside Column 4 */
+    .dt-cap-dt-cell:not(:last-child)::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 20px;
+        right: 20px;
+        border-bottom: 1px dashed var(--palette-neutral-400, #9CA3AF);
+    }
+
+    /* Solid header divider */
+    .dt-cap-header {
+        border-bottom: 1px solid var(--color-border, #CCCCCC);
+    }
+
+    /* Solid vertical column dividers */
+    .dt-cap-col-border {
+        border-right: 1px solid var(--color-border, #CCCCCC);
+    }
+
+    /* Horizontal dashed dividers ONLY between the first 6 data rows in cols 1-3 */
+    .dt-cap-row:not(:last-child) {
+        border-bottom: 1px dashed var(--palette-neutral-400, #9CA3AF);
+    }
+
+    /* Mobile row divider */
+    .dt-cap-mob-row:not(:last-child) {
+        border-bottom: 1px dashed var(--palette-neutral-400, #9CA3AF);
+    }
+</style>
+
+<script is:inline>
+    (function () {
+        function initCapabilityCarousel() {
+            const container = document.getElementById("capability-mobile-container");
+            if (!container) return;
+
+            const track = document.getElementById("cap-slider-track");
+            const tabBtns = container.querySelectorAll(".cap-tab-btn");
+            const col1Items = container.querySelectorAll(".cap-col1-item");
+            const slides = container.querySelectorAll(".cap-slide");
+
+            if (!track || !tabBtns.length) return;
+
+            let currentIndex = parseInt(container.getAttribute("data-active-index") || "2", 10);
+            const totalSlides = 3;
+
+            function updateSlide(index, animate = true) {
+                currentIndex = Math.max(0, Math.min(index, totalSlides - 1));
+                container.setAttribute("data-active-index", currentIndex.toString());
+
+                if (animate) {
+                    track.style.transition = "transform 350ms cubic-bezier(0.25, 1, 0.5, 1)";
+                } else {
+                    track.style.transition = "none";
+                }
+
+                track.style.transform = `translateX(-${currentIndex * 100}%)`;
+
+                tabBtns.forEach((btn, i) => {
+                    if (i === currentIndex) {
+                        btn.setAttribute("data-active", "true");
+                    } else {
+                        btn.removeAttribute("data-active");
+                    }
+                });
+            }
+
+            // Synchronize row heights between Column 1 and all slides
+            function syncHeights() {
+                if (window.innerWidth >= 1024) return;
+
+                col1Items.forEach((el) => (el.style.minHeight = ""));
+                slides.forEach((slide) => {
+                    slide.querySelectorAll(".cap-row-item").forEach((el) => (el.style.minHeight = ""));
+                });
+
+                const numRows = col1Items.length;
+                for (let r = 0; r < numRows; r++) {
+                    let maxH = col1Items[r].offsetHeight;
+                    slides.forEach((slide) => {
+                        const rowItem = slide.querySelectorAll(".cap-row-item")[r];
+                        if (rowItem) maxH = Math.max(maxH, rowItem.offsetHeight);
+                    });
+                    const finalH = Math.max(maxH, 72) + "px";
+                    col1Items[r].style.minHeight = finalH;
+                    slides.forEach((slide) => {
+                        const rowItem = slide.querySelectorAll(".cap-row-item")[r];
+                        if (rowItem) rowItem.style.minHeight = finalH;
+                    });
+                }
+            }
+
+            // Tab Button Clicks
+            tabBtns.forEach((btn) => {
+                if (btn.getAttribute("data-listener-attached")) return;
+                btn.setAttribute("data-listener-attached", "true");
+
+                btn.addEventListener("click", () => {
+                    const idx = parseInt(btn.getAttribute("data-index") || "0", 10);
+                    updateSlide(idx, true);
+                });
+            });
+
+            // Touch Swipe & Drag Handling
+            const viewport = container.querySelector(".cap-slider-viewport");
+            if (viewport && !viewport.getAttribute("data-swipe-attached")) {
+                viewport.setAttribute("data-swipe-attached", "true");
+
+                let startX = 0;
+                let startY = 0;
+                let currentX = 0;
+                let isDragging = false;
+                let isHorizontal = null;
+
+                viewport.addEventListener(
+                    "touchstart",
+                    (e) => {
+                        if (e.touches.length !== 1) return;
+                        startX = e.touches[0].clientX;
+                        startY = e.touches[0].clientY;
+                        currentX = startX;
+                        isDragging = true;
+                        isHorizontal = null;
+                        track.style.transition = "none";
+                    },
+                    { passive: true }
+                );
+
+                viewport.addEventListener(
+                    "touchmove",
+                    (e) => {
+                        if (!isDragging || e.touches.length !== 1) return;
+                        currentX = e.touches[0].clientX;
+                        const diffX = currentX - startX;
+                        const diffY = e.touches[0].clientY - startY;
+
+                        if (isHorizontal === null) {
+                            if (Math.abs(diffX) > 5 || Math.abs(diffY) > 5) {
+                                isHorizontal = Math.abs(diffX) > Math.abs(diffY);
+                            }
+                        }
+
+                        if (isHorizontal) {
+                            const viewportWidth = viewport.offsetWidth || 1;
+                            const percentOffset = (diffX / viewportWidth) * 100;
+                            const basePercent = -currentIndex * 100;
+                            track.style.transform = `translateX(${basePercent + percentOffset}%)`;
+                        }
+                    },
+                    { passive: true }
+                );
+
+                viewport.addEventListener(
+                    "touchend",
+                    () => {
+                        if (!isDragging) return;
+                        isDragging = false;
+
+                        if (isHorizontal) {
+                            const diffX = currentX - startX;
+                            if (diffX < -40 && currentIndex < totalSlides - 1) {
+                                updateSlide(currentIndex + 1, true);
+                            } else if (diffX > 40 && currentIndex > 0) {
+                                updateSlide(currentIndex - 1, true);
+                            } else {
+                                updateSlide(currentIndex, true);
+                            }
+                        } else {
+                            updateSlide(currentIndex, true);
+                        }
+                    },
+                    { passive: true }
+                );
+            }
+
+            syncHeights();
+            updateSlide(currentIndex, false);
+            window.addEventListener("resize", syncHeights);
+        }
+
+        if (document.readyState === "loading") {
+            document.addEventListener("DOMContentLoaded", initCapabilityCarousel);
+        } else {
+            initCapabilityCarousel();
+        }
+
+        document.addEventListener("astro:page-load", initCapabilityCarousel);
+    })();
+</script>

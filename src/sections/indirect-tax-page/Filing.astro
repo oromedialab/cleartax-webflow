@@ -1,0 +1,220 @@
+---
+/**
+ * Filing section for Indirect Tax page.
+ * Implements isolated sticky horizontal scroll container with 6 cards,
+ * top title, bottom description, and responsive handling.
+ */
+
+const cards = [
+    {
+        title: "GL & ERP Ingestion",
+        desc: "Direct bi-directional connector from your ERP extracts raw sales and purchase data. Supports SAP, Oracle, Dynamics 365, Tally, and custom ERPs across all GSTINs.",
+    },
+    {
+        title: "GSTR-1, 3B & 9/9C Filing",
+        desc: "Automate invoice-level validation, multi-rate tax calculations, and 1-click filing directly to the GSTN portal for 100+ GSTINs simultaneously.",
+    },
+    {
+        title: "Smart ITC & 2B Reconciliation",
+        desc: "Automated 2-way and 3-way matching between purchase register and GSTR-2B. Identifies mismatches, missing invoices, and non-compliant vendors in real-time.",
+    },
+    {
+        title: "E-Invoicing & E-Way Bill",
+        desc: "End-to-end integration for real-time IRN and E-Way bill generation with automated multi-IRP fallback, QR code printing, and ERP status sync.",
+    },
+    {
+        title: "Vendor Compliance & Payment Locking",
+        desc: "Automated vendor GST compliance tracking, WhatsApp/email filing reminders, and automated payment hold triggers for defaulting suppliers.",
+    },
+    {
+        title: "Notice Management & Audit Trail",
+        desc: "Centralized repository for departmental notices, automated ASMT-10 reconciliations, and immutable timestamped audit logs for tax reviews.",
+    },
+];
+---
+
+<div class="filing-sticky-container">
+    <section
+        class="sticky top-0 flex flex-col justify-center bg-generic-00 py-12 md:py-16 xl:py-20 overflow-hidden min-h-[calc(100vh-80px)]"
+    >
+        <div class="min-[1400px]:container mx-auto w-full px-4 md:px-6">
+            <!-- Header -->
+            <div
+                class="filing-header-wrapper text-center mx-auto mb-8 md:mb-12"
+            >
+                <h2
+                    class="filing-section-title font-heading font-medium text-[length:var(--fs-h2)] md:text-[length:var(--fs-h1)] leading-[length:var(--lh-h2)] md:leading-[length:var(--lh-h1)] text-text-default max-w-216 mx-auto mb-4"
+                >
+                    Full coverage, end to end.
+                </h2>
+                <p
+                    class="filing-section-desc font-body font-normal text-neutral-500 text-[length:var(--fs-body)] md:text-[length:var(--fs-body-lg)] leading-[length:var(--lh-body)] md:leading-[length:var(--lh-body-lg)] max-w-138.75 mx-auto"
+                >
+                    Every step from ERP data extraction to government GST filing and audit readiness — one platform.
+                </p>
+            </div>
+
+            <!-- Cards Track -->
+            <div class="w-full h-auto">
+                <div
+                    class="filing-scroll-track flex items-stretch gap-6 w-max transition-transform duration-[250ms] ease-out will-change-transform"
+                >
+                    {
+                        cards.map((item) => (
+                            <div class="filing-card-item bg-visual-placeholder rounded-xl p-6 sm:p-8 lg:p-10 w-[calc(100vw-32px)] sm:w-[420px] md:w-[460px] lg:w-[480px] h-[460px] sm:h-[500px] md:h-[560px] shrink-0 flex flex-col justify-between select-none">
+                                <h3 class="filing-card-title font-heading text-[length:var(--fs-h5)] sm:text-[length:var(--fs-h4)] lg:text-[length:var(--fs-h3)] leading-[length:var(--lh-h5)] sm:leading-[length:var(--lh-h4)] lg:leading-[length:var(--lh-h3)] font-medium text-text-default max-w-[400px] pointer-events-none">
+                                    {item.title}
+                                </h3>
+                                <p class="filing-card-desc font-body text-neutral-600 font-normal text-[length:var(--fs-body-sm)] lg:text-[length:var(--fs-body)] leading-[length:var(--lh-body-sm)] lg:leading-[length:var(--lh-body)] max-w-[420px] pointer-events-none">
+                                    {item.desc}
+                                </p>
+                            </div>
+                        ))
+                    }
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
+
+<style is:global>
+    @media (max-height: 750px) {
+        .filing-sticky-container section {
+            padding-top: var(--spacing-big, 1.25rem) !important;
+            padding-bottom: var(--spacing-big, 1.25rem) !important;
+        }
+        .filing-header-wrapper {
+            margin-bottom: var(--spacing-md, 1rem) !important;
+        }
+        .filing-card-item {
+            padding: var(--spacing-x-big, 1.5rem) !important;
+            height: 420px !important;
+            min-height: 420px !important;
+            max-width: calc(100vw - 32px) !important;
+        }
+        @media (min-width: 768px) {
+            .filing-card-item {
+                width: 400px !important;
+                height: 440px !important;
+                min-height: 440px !important;
+            }
+        }
+        .filing-card-title {
+            font-size: var(--fs-h5, 24px) !important;
+            line-height: var(--lh-h5, 32px) !important;
+            margin-bottom: var(--spacing-sm, 0.75rem) !important;
+        }
+        .filing-card-desc {
+            font-size: var(--fs-body-sm, 14px) !important;
+            line-height: var(--lh-body-sm, 20px) !important;
+        }
+    }
+</style>
+
+<script is:inline>
+    document.addEventListener("DOMContentLoaded", () => {
+        const containers = document.querySelectorAll(
+            ".filing-sticky-container",
+        );
+        if (!containers.length) return;
+
+        containers.forEach((container) => {
+            const track = container.querySelector(".filing-scroll-track");
+            const section = container.querySelector("section");
+            if (!container || !track || !section) return;
+
+            const getHeaderHeight = () => {
+                const header = document.querySelector(
+                    "header, .navbar, .w-nav",
+                );
+                return header ? header.offsetHeight : 80;
+            };
+
+            let maxTranslate = 0;
+            let totalScrollable = 0;
+            let stickyTop = 0;
+
+            const updateMeasurements = () => {
+                const sectionHeight = section.offsetHeight;
+                const windowHeight = window.innerHeight;
+                const headerHeight = getHeaderHeight();
+
+                const trackOffset =
+                    track.parentElement.getBoundingClientRect().top -
+                    section.getBoundingClientRect().top;
+                const trackHeight = track.offsetHeight;
+                const availableSpace = windowHeight - headerHeight;
+
+                const idealTrackTop =
+                    headerHeight +
+                    Math.max(40, (availableSpace - trackHeight) / 2);
+                let calculatedTop = idealTrackTop - trackOffset;
+
+                // Position section flush under header when sticky, avoiding gap on large screens
+                stickyTop = Math.min(headerHeight, calculatedTop);
+                section.style.top = `${stickyTop}px`;
+
+                const containerWidth =
+                    track.parentElement.getBoundingClientRect().width;
+                maxTranslate = Math.max(0, track.scrollWidth - containerWidth);
+                container.style.height = `${maxTranslate + windowHeight}px`;
+                totalScrollable =
+                    container.getBoundingClientRect().height - sectionHeight;
+            };
+
+            updateMeasurements();
+
+            if (window.ResizeObserver) {
+                const ro = new ResizeObserver(updateMeasurements);
+                ro.observe(section);
+                ro.observe(track);
+            }
+            window.addEventListener("resize", updateMeasurements);
+
+            let ticking = false;
+
+            const handleScroll = () => {
+                if (!ticking) {
+                    window.requestAnimationFrame(() => {
+                        const containerRect = container.getBoundingClientRect();
+                        const scrolledDistance = Math.max(
+                            0,
+                            stickyTop - containerRect.top,
+                        );
+
+                        let progress =
+                            totalScrollable > 0
+                                ? scrolledDistance / totalScrollable
+                                : 0;
+                        progress = Math.max(0, Math.min(1, progress));
+
+                        track.style.transform = `translate3d(-${progress * maxTranslate}px, 0, 0)`;
+
+                        ticking = false;
+                    });
+                    ticking = true;
+                }
+            };
+
+            const observer = new IntersectionObserver(
+                (entries) => {
+                    entries.forEach((entry) => {
+                        if (entry.isIntersecting) {
+                            window.addEventListener("scroll", handleScroll, {
+                                passive: true,
+                            });
+                            handleScroll();
+                        } else {
+                            window.removeEventListener("scroll", handleScroll);
+                        }
+                    });
+                },
+                {
+                    rootMargin: "100% 0px 100% 0px",
+                },
+            );
+
+            observer.observe(container);
+        });
+    });
+</script>
