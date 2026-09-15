@@ -51,7 +51,11 @@ export const PAGE_TARGETS = [
   { name: 'scale-and-security-page', input: 'src/styles/scale-and-security-page.css', page: 'src/pages/scale-and-security-page.astro'},
   { name: 'career-page', input: 'src/styles/career-page.css', page: 'src/pages/career-page.astro' },
   { name: 'direct-tax-page', input: 'src/styles/direct-tax-page.css', page: 'src/pages/direct-tax-page.astro'},
+<<<<<<< HEAD
   { name: 'about-us', input: 'src/styles/about-us.css', page: 'src/pages/about-us.astro' }
+=======
+  { name: 'indirect-tax-page', input: 'src/styles/indirect-tax-page.css', page: 'src/pages/indirect-tax-page.astro'}
+>>>>>>> fd17b78efa4c5e880412a83f63039c9a7a342ebb
 ];
 
 const SHARED_IMPORT_RE = /import\s+[A-Z][A-Za-z0-9]*\s+from\s+['"]\.\.\/sections\/_shared\/([A-Za-z0-9_-]+)\.astro['"]/g;
