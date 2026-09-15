@@ -1,0 +1,376 @@
+---
+/**
+ * Mission + story — Figma node 14140:56946 ("Container - Mission, story").
+ *
+ * Two bordered cards stacked. The first is a two-column split (label left,
+ * prose right); the second is a three-column timeline with hairline dividers
+ * between the columns.
+ *
+ * The dividers are real 2px elements in the mock rather than borders, and they
+ * stretch to the tallest column. They are kept as elements here for the same
+ * reason — a `border-l` would sit on the column box and the three columns are
+ * not equal height on their own. They collapse below `lg`, where the columns
+ * stack.
+ *
+ * TYPING EFFECT — "Our story" card only
+ * ---------------------------------------------------------------------------
+ * A port of React Bits' `TextType` to vanilla JS. It could not be dropped in as
+ * a component: these sections ship as plain HTML inside a Webflow Embed, so
+ * there is no React runtime on the page, and `client:*` is out per the
+ * portability rules. gsap went with it — the only thing it drove was the cursor
+ * blink, and the cursor itself is gone for the reason set out in the style block
+ * below. What survives of the component is `startOnVisible`, `typingSpeed`, and
+ * `prefers-reduced-motion` respected.
+ *
+ * It does NOT type into empty space. The prose is laid out in full from the
+ * start at 50% opacity, and typing promotes it to 100% character by character —
+ * so the effect reads as text being brought into focus rather than conjured.
+ * Mechanically that is worth more than the look: the paragraph never changes
+ * size, so nothing below it moves for the ~30s the animation runs. (The earlier
+ * blank-and-fill version had to measure every element and pin `min-height` to
+ * stop the card growing ~600px mid-run; none of that is needed now.)
+ *
+ * Each typed text node is split into a 100% span and a 50% remainder, and
+ * characters move from one to the other. Inline box boundaries create no soft
+ * wrap opportunity, so splitting mid-word does not change where lines break.
+ *
+ * The dimming is applied by the script, never in the markup. A reader with JS
+ * off, a crawler, and `prefers-reduced-motion` all get the story at full
+ * opacity — a statically dimmed paragraph would otherwise stay dimmed forever.
+ *
+ * Typing runs PAST → PRESENT → FUTURE, once, and stops. `[data-type]` marks an
+ * element to type; `[data-type-column]` groups them so a column finishes before
+ * the next starts. Nothing in the mission card is marked.
+ */
+
+interface TimelineColumn {
+    /** PAST / PRESENT / FUTURE — the Nova Blue overline. */
+    overline: string;
+    /** Optional bold line that leads the column. FUTURE has one, PAST does not. */
+    lead?: string;
+    paragraphs: string[];
+    /** Optional bold line that closes the column. PAST has one. */
+    tail?: string;
+    /** Trailing sentence whose last clause is emphasised. */
+    tailHighlight?: { before: string; strong: string };
+}
+
+const missionHeading = "Our mission";
+const missionSubheading = "Making finance smarter.";
+const missionParagraphs = [
+    "ClearTax stands for a new financial era, where compliance feels seamless, automation is intelligent, and innovation begins with AI.",
+    "What drives us is a belief that finance teams should spend less time reacting to complexity and more time shaping strategy.",
+];
+
+const storyHeading = "Our story";
+const timeline: TimelineColumn[] = [
+    {
+        overline: "PAST",
+        paragraphs: [
+            "ClearTax started with a simple idea: Make tax easier for everyone.",
+            "Born in the Y Combinator ecosystem, ClearTax set out to transform the way Indians filed their taxes. What began as a solution to a complex, often intimidating process quickly became a platform trusted by millions. Today, more than two million Indians use ClearTax every year to file their income tax returns.",
+        ],
+        tail: "But India was only the beginning.",
+    },
+    {
+        overline: "PRESENT",
+        lead: "As the economy evolved, so did we.",
+        paragraphs: [
+            "ClearTax evolved into a leading B2B tax compliance and finance platform, helping businesses automate critical financial workflows at scale.",
+            "Today, 6,000+ brands worldwide trust ClearTax to automate everything from e-invoicing to vendor payments.",
+            "In the past year alone, ClearTax solutions have helped businesses save more than $100 million; real value returned to the bottom line through intelligent automation and AI-driven insights.",
+        ],
+    },
+    {
+        overline: "FUTURE",
+        lead: "And we’re just getting started.",
+        paragraphs: [
+            "Backed by leading global investors including Sequoia Capital, SAIF Partners, Composite Capital, Kora Capital and Stripe, we continue to invest in product innovation, technology and global expansion.",
+        ],
+        tailHighlight: {
+            before: "Our ambition has grown from simplifying tax to ",
+            strong: "building the infrastructure for a world of AI in finance.",
+        },
+    },
+];
+---
+
+<section class="au-mission bg-generic-00 py-12 lg:py-20">
+    <div class="container">
+        <div class="flex flex-col gap-6">
+            <!-- Card 1 — mission -->
+            <div
+                class="flex flex-col gap-8 rounded-lg border border-neutral-300 p-6 lg:flex-row lg:items-start lg:gap-12"
+            >
+                <div class="flex shrink-0 flex-col gap-3 lg:w-[400px]">
+                    <h2
+                        class="m-0 font-heading font-medium text-generic-100 text-[length:var(--fs-h1)] leading-[length:var(--lh-h1)] tracking-[-0.5px]"
+                    >
+                        {missionHeading}
+                    </h2>
+                    <p
+                        class="m-0 font-heading font-medium text-vault-navy text-[length:var(--fs-h6)] leading-[length:var(--lh-h6)]"
+                    >
+                        {missionSubheading}
+                    </p>
+                </div>
+
+                <div class="flex flex-col gap-[18px] lg:w-[567px]">
+                    {
+                        missionParagraphs.map((text) => (
+                            <p class="m-0 font-body font-normal text-neutral-500 text-[length:var(--fs-body-lg)] leading-[length:var(--lh-body-lg)]">
+                                {text}
+                            </p>
+                        ))
+                    }
+                </div>
+            </div>
+
+            <!-- Card 2 — story timeline -->
+            <div
+                class="au-story flex flex-col gap-8 rounded-lg border border-neutral-300 p-6 lg:gap-12"
+            >
+                <h2
+                    class="m-0 font-heading font-medium text-generic-100 text-[length:var(--fs-h1)] leading-[length:var(--lh-h1)] tracking-[-0.5px]"
+                >
+                    {storyHeading}
+                </h2>
+
+                <div class="flex flex-col gap-10 lg:flex-row lg:items-stretch lg:gap-12">
+                    {
+                        timeline.map((column, i) => (
+                            <>
+                                {i > 0 && (
+                                    <div
+                                        aria-hidden="true"
+                                        class="hidden w-0.5 shrink-0 rounded-full bg-ledger-white lg:block"
+                                    />
+                                )}
+                                <div class="flex flex-1 flex-col gap-6" data-type-column>
+                                    {/* The overline is a label, not prose — it stays put and is
+                                        the one thing in the column that is not typed. */}
+                                    <p class="m-0 font-body font-semibold uppercase text-nova-blue text-[length:var(--fs-body-sm)] leading-[length:var(--lh-body-sm)] tracking-[1px]">
+                                        {column.overline}
+                                    </p>
+
+                                    {column.lead && (
+                                        <p
+                                            data-type
+                                            class="m-0 font-body font-bold text-neutral-500 text-[length:var(--fs-body-lg)] leading-[length:var(--lh-body-lg)]"
+                                        >
+                                            {column.lead}
+                                        </p>
+                                    )}
+
+                                    <div class="flex flex-col gap-[18px]">
+                                        {column.paragraphs.map((text) => (
+                                            <p
+                                                data-type
+                                                class="m-0 font-body font-normal text-neutral-500 text-[length:var(--fs-body-lg)] leading-[length:var(--lh-body-lg)]"
+                                            >
+                                                {text}
+                                            </p>
+                                        ))}
+
+                                        {/* Types straight through the <strong>: the script walks
+                                            text nodes, so the emphasis fills in as it is reached
+                                            and the markup is never rebuilt. */}
+                                        {column.tailHighlight && (
+                                            <p
+                                                data-type
+                                                class="m-0 font-body font-normal text-neutral-500 text-[length:var(--fs-body-lg)] leading-[length:var(--lh-body-lg)]"
+                                            >
+                                                {column.tailHighlight.before}
+                                                <strong class="font-bold">
+                                                    {column.tailHighlight.strong}
+                                                </strong>
+                                            </p>
+                                        )}
+                                    </div>
+
+                                    {column.tail && (
+                                        <p
+                                            data-type
+                                            class="m-0 font-body font-bold text-neutral-500 text-[length:var(--fs-body-lg)] leading-[length:var(--lh-body-lg)]"
+                                        >
+                                            {column.tail}
+                                        </p>
+                                    )}
+                                </div>
+                            </>
+                        ))
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<style is:global>
+    /* The not-yet-typed remainder. Set on a span the script creates, so the
+       prose is only ever dimmed on a browser that will undim it again. */
+    .au-type-rest {
+        opacity: 0.5;
+    }
+
+    /* NO CURSOR, deliberately. The component's blinking caret was dropped when
+       the effect became an opacity reveal, and it is not an oversight.
+       A caret has to sit between the promoted and dimmed text, and any element
+       able to render a visible glyph there is an atomic inline — `inline-block`
+       for a zero-width one, an inline-level box otherwise. Atomic inlines carry
+       a soft wrap opportunity on both sides, so the browser becomes free to
+       break the line at the caret, mid-word: "…often intimidating pr" / "ocess
+       quickly became…". Zero width does not prevent it; the break opportunity is
+       about box type, not size. `white-space: nowrap` would suppress it and also
+       stop the paragraph wrapping at all, and the only correct fix left is an
+       absolutely positioned caret measured per character.
+       The moving 50% → 100% boundary already marks the insertion point, so the
+       caret was bought at the price of a visible layout bug. */
+</style>
+
+<script is:inline>
+    /* Typing effect for the "Our story" columns — see the note at the top of this
+       section for why this is hand-rolled rather than the React component. */
+    (function () {
+        var SPEED = 25; /* ms per character */
+        var ELEMENT_PAUSE = 260; /* between paragraphs in a column */
+        var COLUMN_PAUSE = 420; /* between PAST / PRESENT / FUTURE */
+
+        function initStoryTyping() {
+            var root = document.querySelector(".au-story");
+            if (!root || root.dataset.typeReady) return;
+            root.dataset.typeReady = "true";
+
+            /* Reduced motion: leave the prose exactly as it was served. Nothing is
+               blanked, so there is nothing to restore. */
+            if (
+                window.matchMedia &&
+                window.matchMedia("(prefers-reduced-motion: reduce)").matches
+            ) {
+                return;
+            }
+
+            var columns = root.querySelectorAll("[data-type-column]");
+            if (!columns.length) return;
+
+            /* groups[column][element] = { el, nodes: [{ text, typed, rest }] }.
+               Text nodes rather than innerHTML, so <strong> survives: the element
+               is never rebuilt, its characters are just promoted in place. */
+            var groups = [];
+            Array.prototype.forEach.call(columns, function (column) {
+                var items = [];
+                Array.prototype.forEach.call(
+                    column.querySelectorAll("[data-type]"),
+                    function (el) {
+                        var found = [];
+                        var walker = document.createTreeWalker(
+                            el,
+                            NodeFilter.SHOW_TEXT,
+                            null,
+                        );
+                        var node;
+                        while ((node = walker.nextNode())) {
+                            /* Whitespace-only nodes are the template's own indentation.
+                               Typing them would burn time rendering nothing, and they
+                               are already correct, so they are left alone. */
+                            if (node.nodeValue && node.nodeValue.trim().length) {
+                                found.push(node);
+                            }
+                        }
+                        if (!found.length) return;
+
+                        /* Swap each text node for a full-opacity span (empty) and a
+                           dimmed span holding the text. Done after the walk, because
+                           a TreeWalker must not have the tree changed under it. */
+                        var nodes = found.map(function (original) {
+                            var text = original.nodeValue;
+                            var typed = document.createElement("span");
+                            var rest = document.createElement("span");
+                            rest.className = "au-type-rest";
+                            rest.textContent = text;
+
+                            var parent = original.parentNode;
+                            parent.insertBefore(typed, original);
+                            parent.insertBefore(rest, original);
+                            parent.removeChild(original);
+
+                            return { text: text, typed: typed, rest: rest };
+                        });
+
+                        items.push({ el: el, nodes: nodes });
+                    },
+                );
+                if (items.length) groups.push(items);
+            });
+
+            if (!groups.length) return;
+
+            var ci = 0; /* column */
+            var ii = 0; /* element within the column */
+            var ni = 0; /* text node within the element */
+            var pos = 0; /* character within the text node */
+
+            function step() {
+                var items = groups[ci];
+                var item = items[ii];
+                var entry = item.nodes[ni];
+
+                pos++;
+                entry.typed.textContent = entry.text.slice(0, pos);
+                entry.rest.textContent = entry.text.slice(pos);
+
+                if (pos < entry.text.length) {
+                    setTimeout(step, SPEED);
+                    return;
+                }
+
+                pos = 0;
+                ni++;
+                if (ni < item.nodes.length) {
+                    setTimeout(step, SPEED);
+                    return;
+                }
+
+                ni = 0;
+                ii++;
+                if (ii < items.length) {
+                    setTimeout(step, ELEMENT_PAUSE);
+                    return;
+                }
+
+                ii = 0;
+                ci++;
+                if (ci < groups.length) {
+                    setTimeout(step, COLUMN_PAUSE);
+                    return;
+                }
+            }
+
+            if (!("IntersectionObserver" in window)) {
+                step();
+                return;
+            }
+
+            var observer = new IntersectionObserver(
+                function (entries) {
+                    for (var i = 0; i < entries.length; i++) {
+                        if (!entries[i].isIntersecting) continue;
+                        /* Types once and stays. Disconnecting here is what stops a
+                           scroll back up from re-dimming and retyping the story. */
+                        observer.disconnect();
+                        step();
+                        return;
+                    }
+                },
+                { threshold: 0.1 },
+            );
+            observer.observe(root);
+        }
+
+        if (document.readyState === "loading") {
+            document.addEventListener("DOMContentLoaded", initStoryTyping);
+        } else {
+            initStoryTyping();
+        }
+    })();
+</script>

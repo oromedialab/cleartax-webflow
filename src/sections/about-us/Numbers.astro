@@ -1,0 +1,229 @@
+---
+/**
+ * ClearTax by numbers — Figma node 14140:57054.
+ *
+ * Three stats on one bordered row with 2px dividers between them, and a
+ * footnote underneath.
+ *
+ * The row is narrower than the page container in the mock (1142px of the
+ * 1280px content width), so it is capped and centred inside `container` rather
+ * than being given a container of its own.
+ *
+ * Dividers are elements, not borders, because the mock fixes them at 72px tall
+ * and vertically centred — shorter than the cells they sit between.
+ *
+ * COUNT-UP
+ * ---------------------------------------------------------------------------
+ * A port of React Bits' `CountUp`, vanilla for the same reason `Mission.astro`
+ * hand-rolls its typing effect: these sections ship as plain HTML into a
+ * Webflow Embed, so there is no React runtime and `motion` cannot come along.
+ *
+ * The numbers are NOT configured as `from`/`to` props. Each stat's final string
+ * stays in `stats[]` exactly as the mock writes it and ships in the HTML; the
+ * script reads the rendered text and derives the target from it. That keeps the
+ * real figures in the markup for crawlers and for JS-off readers, and it means
+ * "1000+" and "5,000+" each keep their own thousands convention — the mock
+ * groups one and not the other, and a single `separator` prop could not express
+ * that. The parser splits leading symbols, digits, and trailing units, so a
+ * future "$500B+" animates the 500 and leaves "$" and "B+" alone.
+ *
+ * ONE DELIBERATE DIFFERENCE: the component's spring is replaced by an
+ * ease-out over a real duration. Its `damping = 20 + 40/duration` and
+ * `stiffness = 100/duration` give a heavily overdamped spring — at the default
+ * `duration: 2` it needs ~7s to close the last of a 5,000 count, so the final
+ * digits visibly creep for seconds after the animation is nominally over. The
+ * easing keeps the same read (fast start, smooth settle, no overshoot) and
+ * makes `DURATION` mean what it says. The last frame writes back the original
+ * string, so what lands is byte-identical to what shipped.
+ */
+
+interface Stat {
+    value: string;
+    label: string;
+}
+
+const heading = "ClearTax by numbers";
+const footnote = "Serving Governments & Businesses since 2011";
+
+const stats: Stat[] = [
+    { value: "5,000+", label: "Enterprise customers worldwide" },
+    { value: "50+", label: "Countries powered by ClearTax" },
+    { value: "1000+", label: "Engineers & compliance experts" },
+];
+---
+
+<section class="au-numbers bg-generic-00 py-12 lg:py-20">
+    <div class="container">
+        <div class="mx-auto flex max-w-[1142px] flex-col gap-8 lg:gap-12">
+            <h2
+                class="m-0 text-center font-heading font-medium text-vault-navy text-[length:var(--fs-h1)] leading-[length:var(--lh-h1)] tracking-[-0.5px]"
+            >
+                {heading}
+            </h2>
+
+            <div class="flex flex-col gap-6">
+                <div
+                    class="flex flex-col items-stretch justify-between gap-8 rounded-xl border border-neutral-300 px-6 py-8 sm:flex-row sm:items-center sm:gap-0 lg:py-10"
+                >
+                    {
+                        stats.map((stat, i) => (
+                            <>
+                                {i > 0 && (
+                                    <div
+                                        aria-hidden="true"
+                                        class="hidden h-[72px] w-0.5 shrink-0 rounded-lg bg-ledger-white sm:block"
+                                    />
+                                )}
+                                <div class="flex flex-1 flex-col items-center justify-center gap-2 text-center">
+                                    {/* `tabular-nums` so the digits hold a fixed advance
+                                        width while counting — without it the number
+                                        jitters as glyphs swap on every frame. */}
+                                    <p
+                                        data-countup
+                                        class="m-0 font-heading font-medium tabular-nums text-vault-navy text-[length:var(--fs-h2)] leading-[length:var(--lh-h2)]"
+                                    >
+                                        {stat.value}
+                                    </p>
+                                    <p class="m-0 font-body font-normal text-neutral-500 text-[length:var(--fs-body-lg)] leading-[length:var(--lh-body-lg)]">
+                                        {stat.label}
+                                    </p>
+                                </div>
+                            </>
+                        ))
+                    }
+                </div>
+
+                <p
+                    class="m-0 text-center font-body font-normal text-vault-navy text-[length:var(--fs-body-lg)] leading-[length:var(--lh-body-lg)]"
+                >
+                    {footnote}
+                </p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<script is:inline>
+    /* Count-up for the stat row — see the note at the top of this section for
+       why this is hand-rolled rather than the React component. */
+    (function () {
+        var DURATION = 2000; /* ms, start to finish */
+
+        function initNumbersCountUp() {
+            var root = document.querySelector(".au-numbers");
+            if (!root || root.dataset.countupReady) return;
+            root.dataset.countupReady = "true";
+
+            /* Reduced motion: leave the figures exactly as they were served.
+               Nothing has been rewritten yet, so there is nothing to restore. */
+            if (
+                window.matchMedia &&
+                window.matchMedia("(prefers-reduced-motion: reduce)").matches
+            ) {
+                return;
+            }
+
+            var els = root.querySelectorAll("[data-countup]");
+            if (!els.length) return;
+
+            var stats = [];
+            Array.prototype.forEach.call(els, function (el) {
+                var raw = (el.textContent || "").trim();
+                /* prefix (currency etc.) | digits with optional grouping | unit + "+" */
+                var parts = /^([^0-9]*)([0-9][0-9.,]*)(.*)$/.exec(raw);
+                if (!parts) return;
+
+                var digits = parts[2];
+                var plain = digits.replace(/,/g, "");
+                var target = parseFloat(plain);
+                if (!isFinite(target)) return;
+
+                var dot = plain.indexOf(".");
+                var decimals = dot === -1 ? 0 : plain.length - dot - 1;
+
+                stats.push({
+                    el: el,
+                    raw: raw,
+                    prefix: parts[1],
+                    suffix: parts[3],
+                    target: target,
+                    /* Grouping is taken from how this stat is actually written, not
+                       from a shared prop: the mock has "5,000+" but "1000+". */
+                    format: new Intl.NumberFormat("en-US", {
+                        useGrouping: digits.indexOf(",") !== -1,
+                        minimumFractionDigits: decimals,
+                        maximumFractionDigits: decimals,
+                    }),
+                });
+            });
+
+            if (!stats.length) return;
+
+            function render(stat, value) {
+                stat.el.textContent =
+                    stat.prefix + stat.format.format(value) + stat.suffix;
+            }
+
+            function start() {
+                var begin = 0;
+
+                function frame(now) {
+                    if (!begin) begin = now;
+                    var t = (now - begin) / DURATION;
+                    if (t > 1) t = 1;
+
+                    /* easeOutExpo — the spring's fast-start/slow-settle shape, but
+                       it actually arrives, and never overshoots past the figure. */
+                    var eased = t === 1 ? 1 : 1 - Math.pow(2, -10 * t);
+
+                    for (var i = 0; i < stats.length; i++) {
+                        render(stats[i], stats[i].target * eased);
+                    }
+
+                    if (t < 1) {
+                        requestAnimationFrame(frame);
+                        return;
+                    }
+
+                    /* Write the original strings back, so the resting state is the
+                       markup that shipped rather than a reformat of it. */
+                    for (var j = 0; j < stats.length; j++) {
+                        stats[j].el.textContent = stats[j].raw;
+                    }
+                }
+
+                requestAnimationFrame(frame);
+            }
+
+            /* Zero them only once we know the animation will run, so the real
+               figures are never blanked on a browser that cannot observe. */
+            if (!("IntersectionObserver" in window)) {
+                start();
+                return;
+            }
+
+            for (var i = 0; i < stats.length; i++) render(stats[i], 0);
+
+            var observer = new IntersectionObserver(
+                function (entries) {
+                    for (var i = 0; i < entries.length; i++) {
+                        if (!entries[i].isIntersecting) continue;
+                        /* Counts once — disconnecting is what stops a scroll back up
+                           from resetting the row to zero. */
+                        observer.disconnect();
+                        start();
+                        return;
+                    }
+                },
+                { threshold: 0.3 },
+            );
+            observer.observe(root);
+        }
+
+        if (document.readyState === "loading") {
+            document.addEventListener("DOMContentLoaded", initNumbersCountUp);
+        } else {
+            initNumbersCountUp();
+        }
+    })();
+</script>
