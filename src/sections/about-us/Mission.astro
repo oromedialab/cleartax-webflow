@@ -235,6 +235,15 @@ const timeline: TimelineColumn[] = [
         var SPEED = 25; /* ms per character */
         var ELEMENT_PAUSE = 260; /* between paragraphs in a column */
         var COLUMN_PAUSE = 420; /* between PAST / PRESENT / FUTURE */
+        var START_DELAY = 300; /* settle after the card reaches the top band */
+
+        /* Shrink the observer root to its top third. The card only counts as
+           "intersecting" once its top edge has scrolled up into that band — i.e.
+           once the reader has actually arrived at the section. Observing the
+           whole viewport fired the moment the card's first pixels cleared the
+           bottom of the screen, so PAST was already part-typed by the time the
+           heading was readable. */
+        var TRIGGER_BAND = "0px 0px -68% 0px";
 
         function initStoryTyping() {
             var root = document.querySelector(".au-story");
@@ -346,6 +355,20 @@ const timeline: TimelineColumn[] = [
                 }
             }
 
+            /* Promote everything at once. Used when the reader has jumped past the
+               card entirely, where waiting for a trigger that can no longer fire
+               would strand the prose at 50% for good. */
+            function finishAll() {
+                groups.forEach(function (items) {
+                    items.forEach(function (item) {
+                        item.nodes.forEach(function (entry) {
+                            entry.typed.textContent = entry.text;
+                            entry.rest.textContent = "";
+                        });
+                    });
+                });
+            }
+
             if (!("IntersectionObserver" in window)) {
                 step();
                 return;
@@ -354,15 +377,27 @@ const timeline: TimelineColumn[] = [
             var observer = new IntersectionObserver(
                 function (entries) {
                     for (var i = 0; i < entries.length; i++) {
-                        if (!entries[i].isIntersecting) continue;
-                        /* Types once and stays. Disconnecting here is what stops a
-                           scroll back up from re-dimming and retyping the story. */
-                        observer.disconnect();
-                        step();
-                        return;
+                        var entry = entries[i];
+
+                        if (entry.isIntersecting) {
+                            /* Types once and stays. Disconnecting here is what stops
+                               a scroll back up from re-dimming and retyping. */
+                            observer.disconnect();
+                            setTimeout(step, START_DELAY);
+                            return;
+                        }
+
+                        /* Already above the band — an anchor jump or a restored
+                           scroll position skipped the section. It can never
+                           intersect again, so settle it rather than leave it dim. */
+                        if (entry.boundingClientRect.bottom <= 0) {
+                            observer.disconnect();
+                            finishAll();
+                            return;
+                        }
                     }
                 },
-                { threshold: 0.1 },
+                { rootMargin: TRIGGER_BAND, threshold: 0 },
             );
             observer.observe(root);
         }
