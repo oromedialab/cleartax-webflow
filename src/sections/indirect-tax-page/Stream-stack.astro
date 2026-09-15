@@ -135,7 +135,7 @@ const tabsData: TabItem[] = [
         <!-- Tabs Navigation -->
         <div class="flex justify-center mb-6 md:mb-8">
             <div
-                class="inline-flex flex-wrap items-center justify-center p-1.5 bg-neutral-100 rounded-xl border border-neutral-200/80 gap-1 max-w-full"
+                class="inline-flex flex-wrap items-center justify-center p-1.5 bg-neutral-100 rounded-xl gap-1 max-w-full"
                 role="tablist"
                 aria-label="GST Workflows"
             >
@@ -149,10 +149,10 @@ const tabsData: TabItem[] = [
                             aria-controls={`panel-${tab.id}`}
                             data-tab-index={index}
                             class:list={[
-                                "gst-tab-btn px-4 sm:px-5 py-2 text-xs sm:text-sm rounded-full font-body transition-all duration-200 cursor-pointer outline-none select-none",
+                                "gst-tab-btn py-2 px-6 text-sm font-medium rounded-lg font-body transition-all duration-200 cursor-pointer outline-none select-none border-0",
                                 index === 0
-                                    ? "active bg-generic-00 text-nova-blue font-medium shadow-[0_1px_3px_rgba(0,0,0,0.08)]"
-                                    : "text-neutral-600 font-normal hover:text-text-default hover:bg-generic-00/50",
+                                    ? "active bg-generic-00 text-[#1200FF]"
+                                    : "text-[#374151]",
                             ]}
                         >
                             {tab.tabLabel}
@@ -162,82 +162,89 @@ const tabsData: TabItem[] = [
             </div>
         </div>
 
-        <!-- Tab Panels Slider Container (Isolated viewport) -->
-        <div class="max-w-[1280px] mx-auto overflow-hidden p-1 -m-1">
-            <div
-                id="gst-tab-slider-track"
-                class="flex items-start gap-8 transition-transform duration-600 ease-[cubic-bezier(0.22,1,0.36,1)] will-change-transform w-full"
-                style="transform: translate3d(calc(-0 * (100% + 2rem)), 0, 0);"
-            >
-                {
-                    tabsData.map((tab, index) => (
-                        <div
-                            id={`panel-${tab.id}`}
-                            role="tabpanel"
-                            aria-labelledby={`tab-btn-${tab.id}`}
-                            class="w-full min-w-full max-w-full shrink-0 flex-none box-border"
-                        >
-                            <div class="bg-generic-00 border border-neutral-200 rounded-2xl md:rounded-3xl p-6 sm:p-8 lg:p-10 shadow-[0_2px_12px_rgba(0,0,0,0.03)]">
-                                <!-- Card Header -->
-                                <div class="flex flex-col sm:flex-row sm:items-start justify-between gap-4 pb-6 md:pb-8">
-                                    <div class="max-w-2xl">
-                                        <h3 class="font-heading font-medium text-[24px] sm:text-[28px] md:text-[32px] leading-tight text-text-default">
-                                            {tab.title}
-                                            <br />
-                                            <span>{tab.subtitle}</span>
-                                        </h3>
-                                        <p class="font-body font-normal text-neutral-500 text-sm sm:text-base leading-relaxed mt-3 max-w-xl">
-                                            {tab.desc}
-                                        </p>
-                                    </div>
-                                    <div class="shrink-0 self-start">
-                                        <span class="inline-flex items-center bg-nova-50 text-nova-blue px-3.5 py-1.5 rounded-lg text-xs sm:text-sm font-medium font-body border border-nova-100/60">
-                                            {tab.badge}
-                                        </span>
-                                    </div>
-                                </div>
-
-                                <!-- Card Body Grid -->
-                                <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-stretch">
-                                    <!-- Left Column: Visual Area -->
-                                    <div class="lg:col-span-7 bg-visual-placeholder rounded-2xl min-h-[260px] sm:min-h-[320px] lg:min-h-[380px] w-full flex items-center justify-center p-6 relative overflow-hidden">
-                                        <div class="w-full h-full min-h-[220px] rounded-xl bg-visual-placeholder/80 border border-neutral-300/30 flex items-center justify-center">
-                                            <!-- Visual placeholder box matching brand v2 standards -->
+        <!-- Tab Panels Swiper Container -->
+        <div class="max-w-[1280px] mx-auto p-1 -m-1">
+            <div class="swiper gst-tabs-swiper w-full overflow-hidden">
+                <div class="swiper-wrapper items-start">
+                    {
+                        tabsData.map((tab) => (
+                            <div
+                                id={`panel-${tab.id}`}
+                                role="tabpanel"
+                                aria-labelledby={`tab-btn-${tab.id}`}
+                                class="swiper-slide w-full shrink-0 box-border"
+                            >
+                                <div class="bg-generic-00 border border-neutral-200 rounded-2xl md:rounded-3xl p-6 sm:p-8 lg:p-10 shadow-[0_2px_12px_rgba(0,0,0,0.03)]">
+                                    <!-- Card Header -->
+                                    <div class="flex flex-col sm:flex-row sm:items-start justify-between gap-4 pb-6 md:pb-8">
+                                        <div class="max-w-2xl">
+                                            <h3 class="font-heading font-medium text-[24px] sm:text-[28px] md:text-[32px] leading-tight text-text-default">
+                                                {tab.title}
+                                                <br />
+                                                <span>{tab.subtitle}</span>
+                                            </h3>
+                                            <p class="font-body font-normal text-neutral-500 text-sm sm:text-base leading-relaxed mt-3 max-w-xl">
+                                                {tab.desc}
+                                            </p>
+                                        </div>
+                                        <div class="shrink-0 self-start">
+                                            <span class="inline-flex items-center bg-nova-50 text-nova-blue px-3.5 py-1.5 rounded-lg text-xs sm:text-sm font-medium font-body border border-nova-100/60">
+                                                {tab.badge}
+                                            </span>
                                         </div>
                                     </div>
 
-                                    <!-- Right Column: Checklist & Feature Tags -->
-                                    <div class="lg:col-span-5 border border-neutral-200 rounded-xl p-6 sm:p-7 flex flex-col justify-between bg-generic-00">
-                                        <!-- Checklist items -->
-                                        <div class="flex flex-col divide-y divide-neutral-100">
-                                            {tab.checklist.map((item) => (
-                                                <div class="py-3.5 first:pt-0 last:pb-0 text-sm sm:text-[15px] font-body text-neutral-700 font-normal">
-                                                    {item}
-                                                </div>
-                                            ))}
+                                    <!-- Card Body Grid -->
+                                    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-stretch">
+                                        <!-- Left Column: Visual Area -->
+                                        <div class="lg:col-span-7 bg-visual-placeholder rounded-2xl min-h-[260px] sm:min-h-[320px] lg:min-h-[380px] w-full flex items-center justify-center p-6 relative overflow-hidden">
+                                            <div class="w-full h-full min-h-[220px] rounded-xl bg-visual-placeholder/80 border border-neutral-300/30 flex items-center justify-center">
+                                                <!-- Visual placeholder box matching brand v2 standards -->
+                                            </div>
                                         </div>
 
-                                        <!-- Bottom 2x2 Feature Tags -->
-                                        <div class="grid grid-cols-2 gap-x-4 gap-y-3 pt-6 mt-6 border-t border-neutral-100">
-                                            {tab.tags.map((tag) => (
-                                                <div class="flex items-center gap-2.5">
-                                                    <div class="w-3.5 h-3.5 rounded-[3px] bg-visual-placeholder shrink-0 border border-neutral-300/60"></div>
-                                                    <span class="font-body text-xs sm:text-sm text-neutral-600 font-normal">
-                                                        {tag}
-                                                    </span>
-                                                </div>
-                                            ))}
+                                        <!-- Right Column: Checklist & Feature Tags -->
+                                        <div class="lg:col-span-5 border border-neutral-200 rounded-xl p-6 sm:p-7 flex flex-col justify-between bg-generic-00">
+                                            <!-- Checklist items -->
+                                            <div class="flex flex-col divide-y divide-neutral-100">
+                                                {tab.checklist.map((item) => (
+                                                     <div class="py-3.5 first:pt-0 last:pb-0 text-sm sm:text-[15px] font-body text-neutral-700 font-normal">
+                                                         {item}
+                                                     </div>
+                                                ))}
+                                            </div>
+
+                                            <!-- Bottom 2x2 Feature Tags -->
+                                            <div class="grid grid-cols-2 gap-x-4 gap-y-3 pt-6 mt-6 border-t border-neutral-100">
+                                                {tab.tags.map((tag) => (
+                                                    <div class="flex items-center gap-2.5">
+                                                        <div class="w-3.5 h-3.5 rounded-[3px] bg-visual-placeholder shrink-0 border border-neutral-300/60"></div>
+                                                        <span class="font-body text-xs sm:text-sm text-neutral-600 font-normal">
+                                                            {tag}
+                                                        </span>
+                                                    </div>
+                                                ))}
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                    ))
-                }
+                        ))
+                    }
+                </div>
             </div>
         </div>
     </div>
 </section>
+
+<link
+    rel="stylesheet"
+    href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css"
+/>
+<script
+    is:inline
+    src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"
+></script>
 
 <script is:inline>
     document.addEventListener("DOMContentLoaded", () => {
@@ -245,97 +252,49 @@ const tabsData: TabItem[] = [
         if (!section) return;
 
         const tabBtns = section.querySelectorAll(".gst-tab-btn");
-        const track = document.getElementById("gst-tab-slider-track");
-        if (!track || !tabBtns.length) return;
+        const swiperEl = section.querySelector(".gst-tabs-swiper");
+        if (!swiperEl || !tabBtns.length) return;
 
-        let currentIndex = 0;
-
-        const switchTab = (index) => {
-            if (index < 0 || index >= tabBtns.length) return;
-            currentIndex = index;
-
-            // Slide track smoothly with explicit gap offset preventing edge peaking
-            track.style.transform = `translate3d(calc(-${index} * (100% + 2rem)), 0, 0)`;
-
-            // Update active tab buttons
+        function updateActiveTab(index) {
             tabBtns.forEach((btn, i) => {
                 const isActive = i === index;
                 btn.setAttribute("aria-selected", isActive ? "true" : "false");
                 if (isActive) {
-                    btn.classList.add(
-                        "active",
-                        "bg-generic-00",
-                        "text-nova-blue",
-                        "font-medium",
-                        "shadow-[0_1px_3px_rgba(0,0,0,0.08)]"
-                    );
-                    btn.classList.remove(
-                        "text-neutral-600",
-                        "font-normal",
-                        "hover:bg-generic-00/50"
-                    );
+                    btn.classList.add("active", "bg-generic-00", "text-[#1200FF]");
+                    btn.classList.remove("text-[#374151]");
                 } else {
-                    btn.classList.remove(
-                        "active",
-                        "bg-generic-00",
-                        "text-nova-blue",
-                        "font-medium",
-                        "shadow-[0_1px_3px_rgba(0,0,0,0.08)]"
-                    );
-                    btn.classList.add(
-                        "text-neutral-600",
-                        "font-normal",
-                        "hover:bg-generic-00/50"
-                    );
+                    btn.classList.remove("active", "bg-generic-00", "text-[#1200FF]");
+                    btn.classList.add("text-[#374151]");
                 }
             });
-        };
+        }
 
-        tabBtns.forEach((btn, index) => {
-            btn.addEventListener("click", () => {
-                switchTab(index);
-            });
-        });
-
-        // Keyboard arrow navigation
-        section.addEventListener("keydown", (e) => {
-            if (e.key === "ArrowRight") {
-                const nextIndex = (currentIndex + 1) % tabBtns.length;
-                tabBtns[nextIndex]?.focus();
-                switchTab(nextIndex);
-            } else if (e.key === "ArrowLeft") {
-                const prevIndex = (currentIndex - 1 + tabBtns.length) % tabBtns.length;
-                tabBtns[prevIndex]?.focus();
-                switchTab(prevIndex);
+        function initSwiper() {
+            if (typeof Swiper === "undefined") {
+                setTimeout(initSwiper, 50);
+                return;
             }
-        });
 
-        // Touch swipe support for mobile/tablets
-        let touchStartX = 0;
-        let touchEndX = 0;
+            const swiper = new Swiper(swiperEl, {
+                slidesPerView: 1,
+                spaceBetween: 32,
+                speed: 500,
+                grabCursor: true,
+                autoHeight: false,
+                on: {
+                    slideChange: function () {
+                        updateActiveTab(this.activeIndex);
+                    },
+                },
+            });
 
-        track.addEventListener(
-            "touchstart",
-            (e) => {
-                touchStartX = e.changedTouches[0].screenX;
-            },
-            { passive: true }
-        );
+            tabBtns.forEach((btn, index) => {
+                btn.addEventListener("click", () => {
+                    swiper.slideTo(index);
+                });
+            });
+        }
 
-        track.addEventListener(
-            "touchend",
-            (e) => {
-                touchEndX = e.changedTouches[0].screenX;
-                const swipeDistance = touchStartX - touchEndX;
-                if (Math.abs(swipeDistance) > 50) {
-                    if (swipeDistance > 0 && currentIndex < tabBtns.length - 1) {
-                        switchTab(currentIndex + 1);
-                    } else if (swipeDistance < 0 && currentIndex > 0) {
-                        switchTab(currentIndex - 1);
-                    }
-                }
-            },
-            { passive: true }
-        );
+        initSwiper();
     });
 </script>
