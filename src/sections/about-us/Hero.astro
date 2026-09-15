@@ -1,0 +1,90 @@
+---
+/**
+ * About us hero — Figma node 14140:56076 ("Container - Hero").
+ *
+ * Two columns on one baseline: the display headline left (735px in the mock,
+ * with a Flux Lime highlight behind the last two words) and the lede right.
+ *
+ * The background is the shared interactive stroke field, not a static pattern.
+ * It is confined to the right 56.7% of the band because that is where the mock
+ * draws it (the Figma "BG" frame starts at x=624 of 1440) — the headline sits
+ * on clean ground. A left-to-right mask fades it in so the boundary between
+ * "field" and "no field" is never a visible edge.
+ *
+ * `containerId` points at this section, so the field reacts to the pointer
+ * anywhere in the hero, not only over the right-hand strip it is painted in.
+ */
+import Dotgrid from "../_shared/Dotgrid.astro";
+
+interface Props {
+    titlePrefix?: string;
+    titleHighlight?: string;
+    description?: string;
+}
+
+const {
+    titlePrefix = "Building the infrastructure for a world of continuous ",
+    titleHighlight = "compliance.",
+    description = "Tax and finance are entering a new era. They need infrastructure built for what’s next. ClearTax builds that infrastructure.",
+} = Astro.props;
+---
+
+<section
+    id="au-hero"
+    class="au-hero relative overflow-hidden bg-generic-00 border-b border-neutral-200 max-lg:pt-32 max-lg:pb-16 lg:pt-56 lg:pb-[146px]"
+>
+    <!-- Stroke field, right-hand strip only -->
+    <div class="au-hero-field absolute inset-y-0 right-0 w-[56.7%] pointer-events-none">
+        <Dotgrid
+            containerId="au-hero"
+            canvasId="au-hero-dots"
+            lineWidth={3}
+            gap={24}
+            maxLength={6}
+            lengthRadius={260}
+            tilt={1}
+            baseColor="#C8F006"
+            cursorRadius={320}
+            pull={14}
+            fadeRadius={40}
+        />
+    </div>
+
+    <!-- Vertical wash, so the band lifts off white at the top and bottom edges -->
+    <div
+        class="absolute inset-0 z-0 pointer-events-none bg-[linear-gradient(180deg,_rgba(242,241,240,0.55)_0%,_rgba(255,255,255,0)_38%,_rgba(255,255,255,0)_62%,_rgba(242,241,240,0.55)_100%)]"
+    >
+    </div>
+
+    <div class="container relative z-10">
+        <div class="flex flex-col gap-8 lg:flex-row lg:items-end lg:justify-between lg:gap-12">
+            <!-- 780px, not the mock's 735px: the mock sizes the text box to the
+                 glyphs exactly, leaving no room for the highlight's own
+                 horizontal padding, and at 735px "compliance." drops to a third
+                 line. The extra 45px keeps the designed two-line break. -->
+            <h1
+                class="m-0 max-w-[780px] font-heading font-semibold text-generic-100 text-[length:var(--fs-h1)] leading-[length:var(--lh-h1)] lg:text-[length:var(--fs-display-lg)] lg:leading-[length:var(--lh-display-lg)] tracking-[-1px]"
+            >
+                {titlePrefix}<span
+                    class="rounded-xl bg-flux-lime px-2 box-decoration-clone">{titleHighlight}</span
+                >
+            </h1>
+
+            <p
+                class="m-0 lg:max-w-[353px] font-body font-normal text-neutral-500 text-[length:var(--fs-body-lg)] leading-[length:var(--lh-body-lg)]"
+            >
+                {description}
+            </p>
+        </div>
+    </div>
+</section>
+
+<style is:global>
+    /* The field has no edge of its own — it is drawn edge to edge in its strip
+       and faded in from the left, so the headline column stays clean without a
+       hard seam down the middle of the band. */
+    .au-hero-field {
+        mask-image: linear-gradient(to right, transparent 0%, black 22%, black 100%);
+        -webkit-mask-image: linear-gradient(to right, transparent 0%, black 22%, black 100%);
+    }
+</style>

@@ -1,0 +1,121 @@
+---
+/**
+ * Global presence — Figma node 14140:56976 ("Container: Our Presence").
+ *
+ * One bordered card: copy plus a wrapped row of country chips on the left, the
+ * dotted globe on the right.
+ *
+ * COUNTRIES are the same list, in the same order, that `_shared/NavbarRb.astro`
+ * ships as its country selector, and the flag URLs are lifted from there rather
+ * than re-exported from Figma — those are already on the Webflow CDN, so the
+ * embed works the moment it is pasted. Keep the two in step: if a country is
+ * added to the navbar selector it belongs here too.
+ *
+ * ── ASSET TO UPLOAD ───────────────────────────────────────────────────────────
+ * GLOBE_SRC is the only image on this page with no Webflow-hosted original. The
+ * file is committed at `public/images/about-us/globe.png` (exported from the
+ * Figma node) so the dev server and `dist/preview` render it, but a repo path
+ * resolves to nothing once the embed is pasted. Upload that file to Webflow
+ * assets and replace this ONE line with the CDN URL before pasting the section.
+ * ──────────────────────────────────────────────────────────────────────────────
+ */
+const GLOBE_SRC = "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6aa916426f59ce0239f6282f_globe.png";
+
+interface Country {
+    name: string;
+    flag?: string;
+}
+
+const heading = "Compliance doesn’t stop at borders.";
+const leadBefore =
+    "Today, ClearTax powers assured compliance for enterprises across 50+ countries, spanning ";
+const leadStrong = "EMEA and APAC.";
+const subLead = "Wherever business goes, compliance can follow.";
+
+const countries: Country[] = [
+    { name: "Bahrain", flag: "https://cdn.prod.website-files.com/6141e3720a248d2024615d96/63e29d6c2e1ddc75a632d00f_Group%201000003292.svg" },
+    { name: "France", flag: "https://cdn.prod.website-files.com/6141e3720a248d2024615d96/64999768870655432964457d_france_flag.png" },
+    { name: "India", flag: "https://cdn.prod.website-files.com/6141e3720a248d2024615d96/649999dbc3faf054134a1e01_India_flag.png" },
+    { name: "Malaysia", flag: "https://cdn.prod.website-files.com/6141e3720a248d2024615d96/649a7b4653733f5dbda826ea_malaysia%20v1.png" },
+    { name: "Oman", flag: "https://cdn.prod.website-files.com/6141e3720a248d2024615d96/63e29d499e782b5935404547_Group%201000003291.svg" },
+    { name: "Singapore", flag: "https://cdn.prod.website-files.com/6141e3720a248d2024615d96/66716d4c6753fb52078bec02_singapore%20flag%203.png" },
+    { name: "Spain", flag: "https://cdn.prod.website-files.com/6141e3720a248d2024615d96/64999a546cfce1e0515f0f60_spain%20flag.png" },
+    { name: "Belgium", flag: "https://cdn.prod.website-files.com/6141e3720a248d2024615d96/67e3e6ae1e19488131f26dfd_belgium_flag.png" },
+    { name: "Germany", flag: "https://assets.clear.in/cleartax/images/1771829770_flagforflaggermanysvgrepocom1.svg" },
+    { name: "KSA", flag: "https://cdn.prod.website-files.com/6141e3720a248d2024615d96/63e28756aeabe12df79ff5d5_Rectangle%202515530.svg" },
+    { name: "Norway", flag: "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6a7999a2fdf9fde123422a1b_Flag_of_Norway.svg.webp" },
+    { name: "Philippines", flag: "https://cdn.prod.website-files.com/6141e3720a248d2024615d96/6a2935c197e9e718191d8d34_Flag_of_the_Philippines.svg" },
+    { name: "Slovakia", flag: "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6a7c4a36ac18ccf3dcb998be_slovakia-flag.png" },
+    { name: "UAE", flag: "https://cdn.prod.website-files.com/6141e3720a248d2024615d96/63e29d24f310792735ab4bba_Mask%20group%20(3).svg" },
+    /* No flag — renders as a plain chip, which is what the mock draws. */
+    { name: "+ more" },
+];
+---
+
+<section class="au-presence bg-generic-00 py-12 lg:py-20">
+    <div class="container">
+        <div
+            class="flex flex-col gap-8 rounded-xl border border-neutral-300 p-6 lg:flex-row lg:items-center lg:gap-12 lg:p-12"
+        >
+            <div class="flex flex-col gap-6 lg:w-[628px] lg:shrink-0">
+                <div class="flex flex-col gap-6">
+                    <h2
+                        class="m-0 font-heading font-medium text-vault-navy text-[length:var(--fs-h1)] leading-[length:var(--lh-h1)] tracking-[-0.5px]"
+                    >
+                        {heading}
+                    </h2>
+
+                    <div class="flex flex-col gap-4">
+                        <p
+                            class="m-0 font-body font-normal text-neutral-500 text-[length:var(--fs-body-lg)] leading-[length:var(--lh-body-lg)] lg:max-w-[481px]"
+                        >
+                            {leadBefore}<strong class="font-bold">{leadStrong}</strong>
+                        </p>
+                        <p
+                            class="m-0 font-body font-normal text-neutral-500 text-[length:var(--fs-body-lg)] leading-[length:var(--lh-body-lg)]"
+                        >
+                            {subLead}
+                        </p>
+                    </div>
+                </div>
+
+                <ul class="au-country-list m-0 flex list-none flex-wrap gap-2 p-0">
+                    {
+                        countries.map((country) => (
+                            <li class="flex items-center gap-2 overflow-hidden rounded-lg border-[0.8px] border-[#B8B7B6] bg-generic-00 px-3 py-2">
+                                {country.flag && (
+                                    <img
+                                        src={country.flag}
+                                        alt=""
+                                        loading="lazy"
+                                        decoding="async"
+                                        width="24"
+                                        height="18"
+                                        class="h-[18px] w-6 shrink-0 rounded-[2px] object-cover"
+                                    />
+                                )}
+                                <span class="whitespace-nowrap font-body font-medium text-vault-navy text-[length:var(--fs-body)] leading-[length:var(--lh-body)]">
+                                    {country.name}
+                                </span>
+                            </li>
+                        ))
+                    }
+                </ul>
+            </div>
+
+            <!-- Globe. The mock oversizes and crops it inside the box rather than
+                 fitting it, so the percentages below are the designed geometry. -->
+            <div
+                class="relative h-[260px] w-full overflow-hidden rounded-xl lg:h-[337px] lg:min-w-0 lg:flex-1"
+            >
+                <img
+                    src={GLOBE_SRC}
+                    alt="Dotted globe marking the countries ClearTax operates in"
+                    loading="lazy"
+                    decoding="async"
+                    class="absolute left-[7.88%] top-[-6.59%] h-[113.18%] w-[84.24%] max-w-none object-contain"
+                />
+            </div>
+        </div>
+    </div>
+</section>

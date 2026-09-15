@@ -1,0 +1,222 @@
+---
+/**
+ * What our customers say — Figma node 14140:57074 ("Container - Testimonial").
+ *
+ * DUPLICATION, KNOWN: the five testimonials and their logo URLs are the same
+ * set `global-invoicing/Testimonials.astro` passes to `_shared/TestimonialsRb`.
+ * The card is NOT the same card — this one adds a rule between the quote and
+ * the attribution, and the carousel is arrow-driven rather than a continuous
+ * autoplay marquee — so reusing the primitive would have meant changing it for
+ * every page that already ships it. Built page-local instead; folding both onto
+ * one primitive is a clean follow-up that costs a re-paste of those pages.
+ *
+ * Ids and classes are `au-` prefixed: embeds share one namespace per page.
+ */
+
+interface Testimonial {
+    logo: string;
+    quote: string;
+    name: string;
+    role: string;
+    place: string;
+}
+
+const heading = "What our customers say";
+
+const testimonials: Testimonial[] = [
+    {
+        logo: "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6a8c38e1ba10b568d7349d1c_Logo-1.png",
+        quote: "ClearTax has transformed the way we handle GST compliance. Real-time creation of e-Invoices and e-Way bills plays a significant role in providing us with critical insight into our business.",
+        name: "Pratush Kumar",
+        role: "DGM-IT, JK Tyre",
+        place: "India",
+    },
+    {
+        logo: "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6a8c38e8493b8aa05903e536_Logo-2.png",
+        quote: "ClearTax is simplifying e-Invoicing. They enabled us to implement the e-Invoicing system in time and handled all our business complexities with ease. Thank you for the effort and good job!",
+        name: "Raj Kiran",
+        role: "Head, Taxation & Retail Finance, Puma",
+        place: "India",
+    },
+    {
+        logo: "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6a8c38eeb29d8c48e4fac8f1_Logo-3.png",
+        quote: "We appreciate ClearTax for successfully completing the complex ZATCA E-Invoicing Phase II Integration project. Their platform enabled seamless management of multiple business units. Kudos to the team for their timely delivery.",
+        name: "Abdulbary Atassi",
+        role: "Director of IT, Zamil Industrial",
+        place: "Saudi Arabia",
+    },
+    {
+        logo: "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6a8d25ef944ad3a1f9ed2d7f_Logo-4.png",
+        quote: "Collaborating with ClearTax was an exceptional experience. They streamlined the entire process, even under tight deadlines, worked closely to address the unique challenges of e-invoice integration with our diverse ERP systems.",
+        name: "V Bharathy",
+        role: "Manager, Finance Applications, Gamuda Land",
+        place: "Malaysia",
+    },
+    {
+        logo: "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6a8d25ef2309578fd6d29736_Logo-5.png",
+        quote: "Salam's search for a reliable partner ended with ClearTax. Their tailored solutions ensured a smooth transition for all 8 of our systems in just 3 months.",
+        name: "Arslan Choudhary",
+        role: "Director of Enterprise Enablement, Salam Telco",
+        place: "Saudi Arabia",
+    },
+];
+---
+
+<section class="au-testimonials bg-generic-00 py-12 lg:py-20">
+    <div class="container">
+        <h2
+            class="m-0 mb-8 text-center font-heading font-medium text-vault-navy text-[length:var(--fs-h2)] leading-[length:var(--lh-h2)] lg:mb-12"
+        >
+            {heading}
+        </h2>
+
+        <div class="relative">
+            <div class="swiper au-testimonial-swiper">
+                <div class="swiper-wrapper !items-stretch">
+                    {
+                        testimonials.map((t) => (
+                            <div class="swiper-slide !flex !h-auto">
+                                <figure class="m-0 flex h-full w-full flex-col gap-6 rounded-xl border-2 border-neutral-300 bg-generic-00 p-6">
+                                    <img
+                                        src={t.logo}
+                                        alt={t.role}
+                                        loading="lazy"
+                                        decoding="async"
+                                        width="80"
+                                        height="80"
+                                        class="h-20 w-20 shrink-0 rounded-lg bg-visual-placeholder object-cover"
+                                    />
+
+                                    <div class="flex flex-1 flex-col gap-4">
+                                        <blockquote class="m-0 flex-1 font-body font-normal text-neutral-500 text-[length:var(--fs-body)] leading-[length:var(--lh-body)] border-l-0 p-0">
+                                            {t.quote}
+                                        </blockquote>
+
+                                        <div
+                                            aria-hidden="true"
+                                            class="h-px w-full shrink-0 rounded-full bg-ledger-white"
+                                        />
+
+                                        <figcaption class="flex flex-col gap-1 text-left mt-0">
+                                            <span class="font-body font-medium text-vault-navy text-[length:var(--fs-body-sm)] leading-[length:var(--lh-body-sm)]">
+                                                {t.name}
+                                            </span>
+                                            <span class="font-body font-normal text-neutral-500 text-[length:var(--fs-body-xs)] leading-[length:var(--lh-body-xs)]">
+                                                {t.role}
+                                            </span>
+                                            <span class="font-body font-normal text-neutral-500 text-[length:var(--fs-body-xs)] leading-[length:var(--lh-body-xs)]">
+                                                {t.place}
+                                            </span>
+                                        </figcaption>
+                                    </div>
+                                </figure>
+                            </div>
+                        ))
+                    }
+                </div>
+            </div>
+
+            <button
+                type="button"
+                class="au-testimonial-prev absolute left-2 top-1/2 z-10 flex h-9 w-9 -translate-y-1/2 cursor-pointer items-center justify-center rounded-lg border border-neutral-300 bg-generic-00 text-vault-navy shadow-[0px_1px_2px_rgba(16,24,40,0.06)] transition-colors duration-150 hover:bg-neutral-50 lg:left-6"
+                aria-label="Previous testimonial"
+            >
+                <svg
+                    width="16"
+                    height="16"
+                    viewBox="0 0 16 16"
+                    fill="none"
+                    aria-hidden="true"
+                >
+                    <path
+                        d="M10 3L5 8l5 5"
+                        stroke="currentColor"
+                        stroke-width="1.5"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"></path>
+                </svg>
+            </button>
+
+            <button
+                type="button"
+                class="au-testimonial-next absolute right-2 top-1/2 z-10 flex h-9 w-9 -translate-y-1/2 cursor-pointer items-center justify-center rounded-lg border border-neutral-300 bg-generic-00 text-vault-navy shadow-[0px_1px_2px_rgba(16,24,40,0.06)] transition-colors duration-150 hover:bg-neutral-50 lg:right-6"
+                aria-label="Next testimonial"
+            >
+                <svg
+                    width="16"
+                    height="16"
+                    viewBox="0 0 16 16"
+                    fill="none"
+                    aria-hidden="true"
+                >
+                    <path
+                        d="M6 3l5 5-5 5"
+                        stroke="currentColor"
+                        stroke-width="1.5"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"></path>
+                </svg>
+            </button>
+        </div>
+    </div>
+</section>
+
+<link
+    rel="stylesheet"
+    href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css"
+/>
+<script is:inline src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"
+></script>
+
+<style is:global>
+    /* The rail runs past both edges of the container in the mock — cards are cut
+       off rather than ending flush — so the track is masked instead of clipped. */
+    .au-testimonial-swiper {
+        mask-image: linear-gradient(
+            to right,
+            transparent 0%,
+            black 7%,
+            black 93%,
+            transparent 100%
+        );
+        -webkit-mask-image: linear-gradient(
+            to right,
+            transparent 0%,
+            black 7%,
+            black 93%,
+            transparent 100%
+        );
+    }
+</style>
+
+<script is:inline>
+    (function () {
+        function initAboutTestimonials() {
+            if (typeof Swiper === "undefined") return;
+            var root = document.querySelector(".au-testimonials");
+            if (!root || root.dataset.swiperReady) return;
+            root.dataset.swiperReady = "true";
+
+            new Swiper(".au-testimonial-swiper", {
+                slidesPerView: 1.1,
+                spaceBetween: 16,
+                loop: true,
+                grabCursor: true,
+                navigation: {
+                    prevEl: ".au-testimonial-prev",
+                    nextEl: ".au-testimonial-next",
+                },
+                breakpoints: {
+                    640: { slidesPerView: 2.1, spaceBetween: 24 },
+                    1024: { slidesPerView: 3, spaceBetween: 32 },
+                },
+            });
+        }
+
+        if (document.readyState === "loading") {
+            document.addEventListener("DOMContentLoaded", initAboutTestimonials);
+        } else {
+            initAboutTestimonials();
+        }
+    })();
+</script>
