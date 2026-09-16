@@ -1,0 +1,119 @@
+---
+/**
+ * Leadership perspectives — Figma node 14413:23388
+ * ("Container: Create impact at scale" / "Card - Resources" x6).
+ *
+ * Same card as the hero's index panel minus the badge — the badge is what tells
+ * a hero card which tab it came from, and here every card is the same kind. The
+ * markup is written out again rather than lifted into a `_shared` primitive:
+ * one page uses it, and a primitive would add a file that no second page will
+ * ever call while still shipping its CSS into both embeds.
+ *
+ * Cards are `self-start` so a short one does not stretch to its row's height —
+ * the mock draws them ragged-bottom, not equal-height.
+ */
+
+interface Perspective {
+  date: string;
+  source: string;
+  title: string;
+  excerpt: string;
+  href?: string;
+}
+
+/* Straight from the mock. Cards 4-6 repeat card 3 there; they are kept as drawn
+   so the grid matches, and are one-line swaps once the real pieces are picked. */
+const perspectives: Perspective[] = [
+  {
+    date: "18 April, 2023",
+    source: "The Economic Times",
+    title: "Rising complications for corporates in ITC claims under GST",
+    excerpt:
+      "The changes in ITC rules have added responsibilities on businesses to reconcile and communicate with vendors more often...",
+  },
+  {
+    date: "16 April, 2023",
+    source: "The Economic Times",
+    title: "Crypto taxation in India: What NRIs needs to know",
+    excerpt:
+      "India has clarified the tax implications of Virtual Digital Assets (VDAs), including cryptocurrencies and non-fungible tokens, brought under...",
+  },
+  {
+    date: "15 April, 2023",
+    source: "ET CIO",
+    title: "Clear takes an ambitious leap to build a connected finance ecosystem",
+    excerpt:
+      "Clear's founder-CEO, Archit Gupta, outlines how clear is attempting to create a connected finance ecosystem that will help organizations...",
+  },
+  {
+    date: "15 April, 2023",
+    source: "ET CIO",
+    title: "Clear takes an ambitious leap to build a connected finance ecosystem",
+    excerpt:
+      "Clear's founder-CEO, Archit Gupta, outlines how clear is attempting to create a connected finance ecosystem that will help organizations...",
+  },
+  {
+    date: "15 April, 2023",
+    source: "ET CIO",
+    title: "Clear takes an ambitious leap to build a connected finance ecosystem",
+    excerpt:
+      "Clear's founder-CEO, Archit Gupta, outlines how clear is attempting to create a connected finance ecosystem that will help organizations...",
+  },
+  {
+    date: "15 April, 2023",
+    source: "ET CIO",
+    title: "Clear takes an ambitious leap to build a connected finance ecosystem",
+    excerpt:
+      "Clear's founder-CEO, Archit Gupta, outlines how clear is attempting to create a connected finance ecosystem that will help organizations...",
+  },
+];
+---
+
+<section id="press-leadership" class="bg-generic-00 py-12 lg:py-20">
+  <div class="container">
+    <div class="flex flex-col items-center gap-12">
+      <h2
+        class="m-0 text-center font-heading font-medium text-vault-navy text-[length:var(--fs-h1)] leading-[var(--lh-h1)] tracking-[var(--tracking-heading)]"
+      >
+        Leadership perspectives
+      </h2>
+
+      <div class="grid w-full grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
+        {
+          perspectives.map((item) => (
+            <a
+              href={item.href || undefined}
+              class="flex flex-col gap-4 self-start rounded-xl border border-neutral-300 bg-generic-00 p-6 no-underline hover:border-nova-blue transition-all ease-in-out duration-150 cursor-pointer"
+            >
+              <span class="font-body font-normal text-neutral-500 text-[length:var(--fs-body)] leading-[var(--lh-body)]">
+                {item.date}
+              </span>
+              <div class="flex flex-col gap-2.5">
+                <span class="font-body font-semibold uppercase text-nova-blue text-[length:var(--fs-body-sm)] leading-[var(--lh-body-sm)] tracking-[var(--tracking-overline)]">
+                  {item.source}
+                </span>
+                <span class="font-body font-semibold text-vault-navy text-[length:var(--fs-body-lg)] leading-[var(--lh-body-lg)]">
+                  {item.title}
+                </span>
+                {/* Clamped so a long excerpt can't leave one card in the row
+                    taller than its neighbours. `line-clamp-*` sets
+                    `display: -webkit-box`, which is what lets it work on a
+                    span. */}
+                <span class="line-clamp-3 font-body font-normal text-neutral-500 text-[length:var(--fs-body)] leading-[var(--lh-body)]">
+                  {item.excerpt}
+                </span>
+              </div>
+            </a>
+          ))
+        }
+      </div>
+
+      <a
+        href="https://www.cleartax.com/electronic-invoicing#country-select"
+        class="inline-flex h-10 items-center justify-center gap-2 rounded-lg border border-neutral-200 bg-generic-00 px-4 py-2.5 font-body font-medium text-neutral-700 text-[length:var(--fs-label)] leading-[var(--lh-label)] no-underline shadow-[0px_1px_2px_0px_rgba(16,24,40,0.04)] transition-all ease-in-out duration-150 hover:border-neutral-400 hover:bg-neutral-50"
+      >
+        Learn more
+      </a>
+    </div>
+  </div>
+</section>

@@ -1,0 +1,102 @@
+---
+/**
+ * Press kit band — Figma node 14413:23400 ("Container - CTA").
+ *
+ * Left-aligned overline + heading, right-aligned download button with the
+ * queries address under it. Unlike the about-us closing band this one is not
+ * centred: the mock puts the copy hard left and the action hard right, and the
+ * band is short enough (232px) that centring would leave it looking empty.
+ *
+ * The stroke field behind it is the shared `_shared/Dotgrid.astro` primitive in
+ * Nova Blue, matching the mock's BG stacks. The white wash over it is the
+ * exported gradient PNG reproduced in CSS — it runs left-to-right so the dots
+ * thin out under the button rather than under the headline.
+ */
+import Dotgrid from "../_shared/Dotgrid.astro";
+
+const overline = "Press kit";
+const heading = "Access our media related kit and brand assets";
+const ctaLabel = "Download now";
+const ctaHref = "https://www.cleartax.com/contact-us";
+const queriesEmail = "press@cleartax.in";
+---
+
+<section id="press-cta" class="press-cta relative overflow-hidden bg-generic-00 py-12 lg:py-20">
+  <!-- Interactive stroke field -->
+  <div class="press-cta-field absolute inset-0 pointer-events-none">
+    <Dotgrid
+      containerId="press-cta"
+      canvasId="press-cta-dots"
+      lineWidth={3}
+      gap={24}
+      maxLength={6}
+      lengthRadius={260}
+      tilt={1}
+      baseColor="rgba(84, 70, 255, 0.5)"
+      cursorRadius={320}
+      pull={14}
+      fadeRadius={40}
+    />
+  </div>
+
+  <!-- Horizontal wash, so the copy keeps its contrast over the field. -->
+  <div
+    class="absolute inset-0 z-0 pointer-events-none bg-[linear-gradient(90deg,_rgba(255,255,255,0.8)_0%,_rgba(255,255,255,0)_73.5%,_#FFF_95%)]"
+  >
+  </div>
+
+  <div class="container relative z-10">
+    <div class="flex flex-col items-start justify-between gap-8 lg:flex-row lg:items-center">
+      <div class="flex flex-col gap-2">
+        <p
+          class="m-0 font-body font-semibold uppercase text-nova-blue text-[length:var(--fs-body-sm)] leading-[var(--lh-body-sm)] tracking-[var(--tracking-overline)]"
+        >
+          {overline}
+        </p>
+        <h2
+          class="m-0 font-heading font-medium text-vault-navy text-[length:var(--fs-h2)] leading-[var(--lh-h2)]"
+        >
+          {heading}
+        </h2>
+      </div>
+
+      <div class="flex shrink-0 flex-col items-start gap-2 lg:items-center">
+        <a
+          href={ctaHref}
+          class="inline-flex h-10 w-full items-center justify-center gap-1.5 rounded-lg border border-nova-blue bg-nova-blue px-4 py-2.5 font-body font-medium text-nova-50 text-[length:var(--fs-label)] leading-[var(--lh-label)] no-underline transition-colors duration-200 hover:bg-generic-00 hover:text-nova-blue"
+        >
+          {ctaLabel}
+        </a>
+        <p
+          class="m-0 font-body font-medium text-neutral-500 text-[length:var(--fs-label-sm)] leading-[var(--lh-label-sm)]"
+        >
+          Queries? <a
+            href={`mailto:${queriesEmail}`}
+            class="text-neutral-500 transition-all duration-150 hover:text-nova-blue cursor-pointer no-underline">{queriesEmail}</a
+          >
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style is:global>
+  /* The field runs edge to edge but dies out top and bottom, so the band does
+     not butt hard against the grid above it or the footer below. */
+  .press-cta-field {
+    mask-image: linear-gradient(
+      to bottom,
+      transparent 0%,
+      black 25%,
+      black 75%,
+      transparent 100%
+    );
+    -webkit-mask-image: linear-gradient(
+      to bottom,
+      transparent 0%,
+      black 25%,
+      black 75%,
+      transparent 100%
+    );
+  }
+</style>

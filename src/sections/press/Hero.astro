@@ -1,0 +1,472 @@
+---
+/**
+ * Press hero — Figma node 14413:22502 ("Container - Hero").
+ *
+ * One white card, split down the middle. Left half is the page's editorial
+ * opener: "Newsroom", the lede, a placeholder visual marquee, then the
+ * testimonial under a rule. Right half is the live index: the two-tab switch
+ * over "In the Press" / "Press releases".
+ *
+ * The tab switch is a Swiper THUMBS pair — the pill is the thumbs swiper and
+ * the two card lists are its main swiper, so a tab click and a horizontal drag
+ * on the list are the same gesture and the active pill can never drift out of
+ * sync with what is on screen. Each list owns its own scroll region, so the
+ * card keeps the mock's fixed 722px height instead of pushing the fold down by
+ * however many items are on file.
+ *
+ * SCROLLING is plain page scroll — no pin, no wheel interception, no inner
+ * scrollbar. The left column is `lg:sticky` and holds its place while the
+ * right column's list scrolls past it; once the list runs out at the "Learn
+ * more" button the sticky column releases and the page carries on to the
+ * section below. That means the card is AUTO-HEIGHT, not the mock's fixed
+ * 722px — the mock's number assumed an inner scroller the design does not want.
+ * Consequence to respect: nothing between the section and either sticky element
+ * may carry a non-visible `overflow`, or sticky silently stops working.
+ *
+ * Swiper comes off the CDN, the same way `_shared/TestimonialsRb.astro` and
+ * `about-us/Testimonials.astro` already load it. Slide sizing uses `!`
+ * variants because the CDN stylesheet lands inside the Embed — i.e. AFTER the
+ * page bundle in the <head> — so an unprefixed `h-full` would lose to Swiper's
+ * own `.swiper-slide` rules on source order alone.
+ *
+ * The Figma background is an exported PNG wash. It is reproduced here as a CSS
+ * gradient rather than uploaded: a raster that size would eat a real slice of
+ * the 50 KB Embed cap for decoration, and `data:` URIs are banned outright.
+ *
+ * The marquee tiles are the Figma "Visual Placeholder" tint (#E8FFE1 ->
+ * `bg-visual-placeholder`) because the mock ships no artwork for them. Set
+ * `image` on a tile and it renders the picture instead — same fallback the
+ * blog cards use.
+ */
+
+/** A press item. `href` is optional: with one the card becomes a link, without
+ *  one it stays inert markup, so an entry can be added before its URL exists. */
+interface PressItem {
+  date: string;
+  source: string;
+  title: string;
+  excerpt: string;
+  href?: string;
+}
+
+/* "In the Press" — third-party coverage. Straight from the mock. */
+const coverage: PressItem[] = [
+  {
+    date: "13 January, 2022",
+    source: "The Economic Times",
+    title: "Robinhood, Coinbase product leaders invest in Stripe-backed Clear",
+    excerpt:
+      "The follow-on funding comes at a time when the company is looking to aggressively expand its presence across Saudi Arabia, the UAE and western Europe including the UK.",
+  },
+  {
+    date: "11 November, 2021",
+    source: "The Economic Times",
+    title: "Clear onboards Gowri Shankar as EVP - Enterprise Business",
+    excerpt:
+      "Currently, Clear processes about 10% of India's B2B invoices with over $300 billion in trade value every year and more than 10% of India's overall income tax returns.",
+  },
+  {
+    date: "6 October, 2021",
+    source: "TechCrunch",
+    title: "Stripe backs India's Clear in $75 million funding",
+    excerpt:
+      "One of the world's most valuable startups has backed Bangalore-based SaaS fintech firm Clear, the two said Sunday evening.",
+  },
+  {
+    date: "6 October, 2021",
+    source: "The Economic Times",
+    title: "Impact of digitisation on Indian tax ecosystem",
+    excerpt:
+      "Digitisation comes with massive advantages to businesses. Digitising invoices (e-invoicing) being the first of them. With digital tools businesses are able....",
+  },
+];
+
+/* "Press releases" — company-issued announcements. PLACEHOLDER SET: the Figma
+   only populates the coverage tab, so these are the same public milestones
+   restated from ClearTax's side. Swap in the real release list (and its links)
+   before this goes live; nothing else in the section needs to change. */
+const releases: PressItem[] = [
+  {
+    date: "13 January, 2022",
+    source: "ClearTax",
+    title: "Clear closes follow-on funding from Robinhood and Coinbase product leaders",
+    excerpt:
+      "The round supports Clear's expansion across Saudi Arabia, the UAE and western Europe, including the UK.",
+  },
+  {
+    date: "11 November, 2021",
+    source: "ClearTax",
+    title: "Clear appoints Gowri Shankar as EVP, Enterprise Business",
+    excerpt:
+      "The appointment deepens Clear's enterprise leadership as the platform scales across B2B invoicing and tax compliance.",
+  },
+  {
+    date: "6 October, 2021",
+    source: "ClearTax",
+    title: "Clear raises $75 million in Series C led by Kora Capital, Stripe and Think Investments",
+    excerpt:
+      "The capital goes toward building connected finance infrastructure for enterprises across India and international markets.",
+  },
+];
+
+const panels = [
+  { key: "coverage", tab: "In the Press", badge: "In the press", items: coverage },
+  { key: "releases", tab: "Press releases", badge: "Press release", items: releases },
+];
+
+const learnMoreHref = "https://www.cleartax.com/electronic-invoicing#country-select";
+
+/* Marquee tiles. `image: ''` falls through to the placeholder tint, which is
+   what the mock draws. Duplicated once in the markup for a seamless loop. */
+const visuals = [
+  { image: "", alt: "" },
+  { image: "", alt: "" },
+  { image: "", alt: "" },
+  { image: "", alt: "" },
+];
+
+/* The mock pairs this quote with "Pratush Kumar, DGM-IT, JK Tyre, India", but
+   in `about-us/Testimonials.astro` — the repo's source for the same five
+   customer quotes — the ZATCA line belongs to Zamil Industrial. Following the
+   repo, not the mock. */
+const testimonial = {
+  quote:
+    "We appreciate ClearTax for successfully completing the complex ZATCA E-Invoicing Phase II Integration project. Their platform enabled seamless management of multiple business units. Kudos to the team for their timely delivery.",
+  name: "Abdulbary Atassi",
+  role: "Director of IT, Zamil Industrial",
+  place: "Saudi Arabia",
+};
+---
+
+<!-- No `overflow-hidden` anywhere on the way down to the sticky elements: an
+     ancestor with a non-visible overflow becomes the scroll container and
+     `position: sticky` silently stops working. The wash below is `inset-0`, so
+     there is nothing to clip anyway.
+
+     Top padding: the fixed navbar's bottom edge lands at 82px (`--nav-clear` is
+     112px, which includes its breathing room), so 128px left the card almost
+     touching the bar. 160px is the gap the mock reads as; the mock's own 200px
+     was measured in a frame that draws no navbar at all. -->
+<section
+  id="press-hero"
+  class="press-hero relative bg-generic-00 pt-28 pb-12 md:pt-40 md:pb-16"
+>
+  <!-- Vertical wash standing in for the exported BG gradient. -->
+  <div
+    class="absolute inset-0 z-0 pointer-events-none bg-[linear-gradient(180deg,_rgba(242,241,240,0.6)_0%,_rgba(255,255,255,0)_45%,_rgba(255,255,255,0)_100%)]"
+  >
+  </div>
+
+  <div class="container relative z-10">
+    <!-- Auto-height, NOT the mock's fixed 722px. The card is as tall as the
+         longer list, the page scrolls through it normally, and the left column
+         sticks so it stays alongside the whole way down. Nothing intercepts
+         the wheel and there is no inner scrollbar. -->
+    <div
+      class="grid grid-cols-1 rounded-xl border border-neutral-200 bg-generic-00 lg:grid-cols-2 lg:gap-8"
+    >
+      <!-- Each half runs flush to the 32px gutter between them — that is where
+           the marquee fade and the rule under it are meant to die out, so the
+           inner padding is dropped on the facing edge. -->
+      <!-- ============ Left: opener, marquee, testimonial (sticky) ========= -->
+      <div class="p-6 md:pt-8 lg:pr-0">
+        <div class="flex flex-col gap-6 lg:sticky lg:top-28">
+          <div class="flex flex-col gap-6">
+            <h1
+              class="m-0 font-heading font-semibold text-vault-navy text-[length:var(--fs-h1)] leading-[var(--lh-h1)] lg:text-[length:var(--fs-display-lg)] lg:leading-[var(--lh-display-lg)] tracking-[var(--tracking-heading)]"
+            >
+              Newsroom
+            </h1>
+            <p
+              class="m-0 max-w-[498px] font-heading font-normal text-neutral-500 text-[length:var(--fs-body-lg)] leading-[var(--lh-body-lg)] lg:text-[length:var(--fs-h5)] lg:leading-[var(--lh-h5)]"
+            >
+              The latest stories, press coverage, and media resources from the fastest-growing
+              financial technology platform.
+            </p>
+          </div>
+
+          <!-- Fixed height at every width: the column is sticky, so there is no
+               card height left over for the strip to absorb. -->
+          <div class="press-marquee relative h-[218px] w-full overflow-hidden">
+            <div class="press-marquee-track">
+              {
+                [...visuals, ...visuals].map((visual, index) => (
+                  <div
+                    class="press-marquee-item h-full w-[200px] shrink-0 overflow-hidden rounded-lg bg-visual-placeholder"
+                    aria-hidden={index >= visuals.length ? "true" : undefined}
+                  >
+                    {visual.image && (
+                      <img
+                        src={visual.image}
+                        alt={visual.alt}
+                        width="200"
+                        height="218"
+                        loading="lazy"
+                        decoding="async"
+                        class="h-full w-full object-cover"
+                      />
+                    )}
+                  </div>
+                ))
+              }
+            </div>
+          </div>
+
+          <div class="flex flex-col gap-6">
+            <div aria-hidden="true" class="h-0.5 w-full rounded-full bg-ledger-200"></div>
+            <div class="flex flex-col gap-4">
+              <p
+                class="m-0 font-body font-normal text-neutral-500 text-[length:var(--fs-body)] leading-[var(--lh-body)]"
+              >
+                {testimonial.quote}
+              </p>
+              <div class="flex flex-col gap-1">
+                <span
+                  class="font-body font-medium text-vault-navy text-[length:var(--fs-body-sm)] leading-[var(--lh-body-sm)]"
+                  >{testimonial.name}</span
+                >
+                <span
+                  class="font-body font-normal text-neutral-500 text-[length:var(--fs-body-xs)] leading-[var(--lh-body-xs)]"
+                  >{testimonial.role}</span
+                >
+                <span
+                  class="font-body font-normal text-neutral-500 text-[length:var(--fs-body-xs)] leading-[var(--lh-body-xs)]"
+                  >{testimonial.place}</span
+                >
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ============ Right: tabbed index (thumbs -> panels) ============ -->
+      <div class="flex flex-col gap-6 p-6 lg:pl-0">
+        <!-- Sticky dock for the pill. The white backdrop is the point: with a
+             bare sticky pill, cards scrolled through the band between the
+             floating navbar's bottom edge and the top of the pill, in plain
+             sight.
+
+             `pt-6 -mt-6` is what makes the backdrop safe. The padding grows the
+             white box upward by exactly the column's own 24px top padding, and
+             the negative margin pulls the box up by the same 24px — so the pill
+             stays put, and the backdrop's top edge lands exactly on the card's
+             padding box. Not a pixel higher, so at rest it covers only the
+             card's own white and never paints over the section wash above it.
+
+             It sticks at 82px, the navbar's bottom edge (`--nav-clear` is that
+             82 plus 30px of breathing room). Anything larger reopens the band
+             the backdrop exists to close. -->
+        <div class="press-tabs-dock sticky top-[82px] z-10 -mt-6 bg-generic-00 pt-6">
+        <div
+          class="swiper press-tabs-swiper w-full shrink-0 rounded-xl bg-neutral-100 !px-1 !py-1.5"
+          role="tablist"
+          aria-label="Newsroom categories"
+        >
+          <div class="swiper-wrapper">
+            {
+              panels.map((panel, index) => (
+                <div class="swiper-slide">
+                  <button
+                    type="button"
+                    role="tab"
+                    id={`press-tab-${panel.key}`}
+                    aria-controls={`press-panel-${panel.key}`}
+                    aria-selected={index === 0 ? "true" : "false"}
+                    data-press-tab={panel.key}
+                    class="press-tab w-full cursor-pointer rounded-lg border-0 bg-transparent px-6 py-2 font-body font-medium text-neutral-700 text-[length:var(--fs-label)] leading-[var(--lh-label)] transition-colors duration-150"
+                  >
+                    {panel.tab}
+                  </button>
+                </div>
+              ))
+            }
+          </div>
+        </div>
+        </div>
+
+        <!-- Main swiper: one slide per list, at its natural full height. No
+             inner scrollbar — the page scroll IS the list's scroll, and the
+             "Learn more" button is the last thing in it. -->
+        <div class="swiper press-panels-swiper w-full">
+          <div class="swiper-wrapper">
+            {
+              panels.map((panel) => (
+                <div
+                  class="swiper-slide !h-auto"
+                  id={`press-panel-${panel.key}`}
+                  role="tabpanel"
+                  aria-labelledby={`press-tab-${panel.key}`}
+                >
+                  <div class="flex flex-col gap-6">
+                    {/* An <a> with no href is valid, inert markup — so an item
+                        can be listed before its URL exists. */}
+                    {panel.items.map((item) => (
+                      <a
+                        href={item.href || undefined}
+                        class="flex flex-col gap-4 rounded-xl border border-neutral-300 bg-generic-00 p-6 no-underline"
+                      >
+                        <div class="flex items-center justify-between gap-4">
+                          <span class="font-body font-normal text-neutral-500 text-[length:var(--fs-body)] leading-[var(--lh-body)]">
+                            {item.date}
+                          </span>
+                          <span class="shrink-0 rounded-lg bg-nova-blue px-3 py-1.5 font-body font-medium text-generic-00 text-[length:var(--fs-label)] leading-[var(--lh-label)]">
+                            {panel.badge}
+                          </span>
+                        </div>
+                        <div class="flex flex-col gap-2.5">
+                          <span class="font-body font-semibold uppercase text-nova-blue text-[length:var(--fs-body-sm)] leading-[var(--lh-body-sm)] tracking-[var(--tracking-overline)]">
+                            {item.source}
+                          </span>
+                          <span class="font-body font-semibold text-vault-navy text-[length:var(--fs-body-lg)] leading-[var(--lh-body-lg)]">
+                            {item.title}
+                          </span>
+                          <span class="font-body font-normal text-neutral-500 text-[length:var(--fs-body)] leading-[var(--lh-body)]">
+                            {item.excerpt}
+                          </span>
+                        </div>
+                      </a>
+                    ))}
+
+                    <a
+                      href={learnMoreHref}
+                      class="mx-auto inline-flex h-10 shrink-0 items-center justify-center gap-2 rounded-lg border border-neutral-200 bg-generic-00 px-4 py-2.5 font-body font-medium text-neutral-700 text-[length:var(--fs-label)] leading-[var(--lh-label)] no-underline shadow-[0px_1px_2px_0px_rgba(16,24,40,0.04)] transition-all ease-in-out duration-150 hover:border-neutral-400 hover:bg-neutral-50"
+                    >
+                      Learn more
+                    </a>
+                  </div>
+                </div>
+              ))
+            }
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
+<script is:inline src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+
+<style is:global>
+  /* Marquee. The gap lives on each tile as a right margin rather than on the
+     track, so the duplicated half is exactly 50% of the track width and
+     translateX(-50%) loops seamlessly with no gap arithmetic. */
+  .press-marquee-track {
+    display: flex;
+    width: max-content;
+    height: 100%;
+    animation: press-marquee-scroll 32s linear infinite;
+  }
+
+  .press-marquee-item {
+    margin-right: 16px;
+  }
+
+  .press-marquee:hover .press-marquee-track {
+    animation-play-state: paused;
+  }
+
+  @keyframes press-marquee-scroll {
+    to {
+      transform: translateX(-50%);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .press-marquee-track {
+      animation: none;
+    }
+  }
+
+  /* Edge fade — the rotated white overlay in the mock. */
+  .press-marquee {
+    mask-image: linear-gradient(90deg, transparent 0%, black 10%, black 90%, transparent 100%);
+    -webkit-mask-image: linear-gradient(
+      90deg,
+      transparent 0%,
+      black 10%,
+      black 90%,
+      transparent 100%
+    );
+  }
+
+  /* Selected tab. Three classes (0,3,0) so it outranks both the unlayered
+     Tailwind utilities on the element and anything the Swiper stylesheet sets
+     from inside the Embed. */
+  .press-tabs-swiper .swiper-slide-thumb-active .press-tab {
+    background-color: var(--color-generic-00);
+    color: var(--palette-navy-600);
+    box-shadow:
+      0 1px 2px 0 rgba(16, 24, 40, 0.04),
+      0 1px 2px 0 rgba(16, 24, 40, 0.04);
+  }
+
+  /* Swiper sets `height: 100%` on `.swiper-slide`, which would collapse a
+     natural-height list to nothing. `autoHeight` in the init sizes the wrapper
+     to the active slide; this lets the slide size to its own content first.
+     One class each, so it wins on source order — the section's <style> ships
+     inside the Embed, i.e. after both the page bundle in the <head> and the
+     Swiper CDN stylesheet above. */
+  .press-panels-swiper .swiper-slide {
+    height: auto;
+    align-self: flex-start;
+  }
+</style>
+
+<script is:inline>
+  (function () {
+    function initPressHero() {
+      if (typeof Swiper === "undefined") return;
+      var root = document.getElementById("press-hero");
+      if (!root || root.dataset.pressReady) return;
+      root.dataset.pressReady = "true";
+
+      // Thumbs first — the panels swiper takes the instance as a prop.
+      var tabs = new Swiper(".press-tabs-swiper", {
+        slidesPerView: 2,
+        spaceBetween: 4,
+        allowTouchMove: false, // a control, not a rail
+        slideToClickedSlide: true,
+        watchSlidesProgress: true, // required by the thumbs module
+      });
+
+      var panels = new Swiper(".press-panels-swiper", {
+        slidesPerView: 1,
+        spaceBetween: 24,
+        // The two lists are different lengths; without this the wrapper would
+        // size to the taller one and the shorter tab would end in dead space.
+        autoHeight: true,
+        grabCursor: true,
+        thumbs: { swiper: tabs },
+      });
+
+      // Swiper owns the tab's visual state; this only mirrors it onto the ARIA
+      // attributes. Switching to a shorter list while scrolled deep would drop
+      // you into the section below, so pull back to the top of the list — but
+      // only when the switch happened from past that point.
+      panels.on("slideChange", function () {
+        var buttons = root.querySelectorAll("[data-press-tab]");
+        for (var i = 0; i < buttons.length; i++) {
+          buttons[i].setAttribute("aria-selected", i === panels.activeIndex ? "true" : "false");
+        }
+
+        var navClear =
+          parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--nav-clear")) ||
+          112;
+        var top = panels.el.getBoundingClientRect().top;
+        if (top < navClear) {
+          window.scrollTo({
+            top: window.pageYOffset + top - navClear,
+            behavior: "smooth",
+          });
+        }
+      });
+    }
+
+    if (document.readyState === "loading") {
+      document.addEventListener("DOMContentLoaded", initPressHero);
+    } else {
+      initPressHero();
+    }
+  })();
+</script>
