@@ -50,6 +50,14 @@ export interface Props {
    * just navigates.
    */
   ctaOpensModal?: boolean;
+  /**
+   * Id of a section on the same page for both CTAs to scroll to, e.g.
+   * `"contactForm"` for a page whose `ContactFormRb` section is the destination.
+   * Opt-in, and mutually exclusive with `ctaOpensModal` — a page either has a
+   * modal or has the form in the page. When set it overrides `ctaHref`, since
+   * there is nowhere else for the button to go.
+   */
+  ctaScrollTo?: string;
   /** Label on the globe control. Shows the active region, updates on selection. */
   countryLabel?: string;
   /** Prefixes every generated id so two navbars on one page cannot collide. */
@@ -89,13 +97,23 @@ const {
   ctaLabel = "Book a demo",
   ctaHref = "https://www.cleartax.com/contact-us",
   ctaOpensModal = false,
+  ctaScrollTo,
   countryLabel = "Global",
   idPrefix = "ctnav",
 } = Astro.props;
 
-/* Astro drops an attribute set to `undefined`, so this emits `data-demo-open`
-   only when opted in — no empty attribute left behind on the other pages. */
+/* Astro drops an attribute set to `undefined`, so these emit `data-demo-open` /
+   `onclick` only when opted in — no empty attribute left behind on the other
+   pages, which keeps their markup byte-identical and saves a re-paste. */
 const demoOpenAttr = ctaOpensModal ? "" : undefined;
+
+/* Inline `onclick` rather than a listener in the script below: an Embed's script
+   may not have run when a visitor clicks, and the same pattern is already used
+   by the hero and closing-band CTAs that scroll to the same section. */
+const ctaClickAttr = ctaScrollTo
+  ? `event.preventDefault(); document.getElementById('${ctaScrollTo}')?.scrollIntoView({ behavior: 'smooth' });`
+  : undefined;
+const resolvedCtaHref = ctaScrollTo ? "javascript:void(0)" : ctaHref;
 
 const panelId = `${idPrefix}-panel`;
 const countryId = `${idPrefix}-country`;
@@ -228,7 +246,8 @@ function toBlocks(items: NavChild[]): Block[] {
             </button>
 
             <a
-              href={ctaHref}
+              href={resolvedCtaHref}
+              onclick={ctaClickAttr}
               data-nav-cta
               data-demo-open={demoOpenAttr}
               class="hidden sm:inline-flex items-center justify-center gap-2 px-5 py-3.5 text-[length:var(--fs-label-lg)] leading-[length:var(--lh-label-lg)] font-medium text-nova-50 bg-nova-blue border border-nova-blue rounded-lg whitespace-nowrap no-underline transition-all duration-200 hover:bg-generic-00 hover:text-nova-blue"
@@ -391,7 +410,8 @@ function toBlocks(items: NavChild[]): Block[] {
               </div>
 
               <a
-                href={ctaHref}
+                href={resolvedCtaHref}
+                onclick={ctaClickAttr}
                 data-demo-open={demoOpenAttr}
                 class="sm:hidden inline-flex items-center justify-center w-full gap-2 mt-6 px-5 py-3.5 text-[length:var(--fs-label-lg)] leading-[length:var(--lh-label-lg)] font-medium text-nova-50 bg-nova-blue rounded-lg no-underline transition-all duration-200 hover:bg-generic-00 hover:text-nova-blue ease-in-out"
               >
