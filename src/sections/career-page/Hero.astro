@@ -2,127 +2,157 @@
 /**
  * Careers hero — Figma node 14052:30126.
  *
- * Centred headline with a cluster of three photo cards bleeding off each edge.
- * The two clusters are mirror images: sizes descend towards the centre of the
- * page, so the largest card is the one being clipped by the viewport edge.
+ * Centred headline with a rail of photo cards bleeding off each edge.
  *
- * The three card sizes are NOT a CSS `scale()` — Figma scales the border and
- * padding along with the box (1px/8px/12px → 0.85px/6.8px/10.2px →
- * 0.723px/5.78px/8.67px), so each step carries its own explicit geometry. A
- * transform would also blur the 1px hairline border at the two smaller steps.
+ * SIZE BELONGS TO THE POSITION, NOT TO THE CARD. The slot nearest the copy is
+ * always the smallest, the next one out is bigger, the one at the viewport edge
+ * is biggest — whichever photo happens to be passing through. So the rail always
+ * reads as the static Figma composition even though everything in it is moving:
+ * a card enters at the edge full size and shrinks the whole way in, and the
+ * shape of the group never changes.
  *
- * MOTION. The cards are SHOWN by default — the Figma frame is the resting state
- * and nothing animates on load. They hold there for two seconds, then slide
- * INWARDS, pass under the centre copy, and stay there.
+ * That is the one thing a plain marquee cannot do. Give each card a fixed size
+ * and the sizes travel WITH the cards, so the composition churns and the rail
+ * pulses on the repeat. Here every card is the same box and the shrinking is a
+ * separate animation keyed to where the card is.
  *
- * IT PLAYS ITSELF, ON A TIMER, AND IS NOT CONNECTED TO SCROLLING. This is the
- * hero: it is on screen the moment the page opens and needs no cue to say so.
- * Earlier versions hung the move on a scroll threshold — first on the hero
- * leaving the viewport, which ran the whole thing above the top edge with nobody
- * watching, then on a short scroll distance, which still meant a reader who
- * never scrolled never saw the artwork move, and left the animation answering to
- * the wheel long after it had made its point.
+ * HOW THE TWO ANIMATIONS STAY IN LOCK STEP, WITH NO SCRIPT. `.cp-hero-track`
+ * slides the whole strip; `.cp-hero-card` scales each card. They are different
+ * elements, so the transforms compose instead of fighting.
  *
- * IT RUNS ONCE PER VISIT AND DOES NOT REVERSE. Once the cards are behind the
- * copy they stay there for the rest of the page view — see the script. So the
- * resting layout above is what someone sees for the first two seconds and never
- * again, and the section afterwards is the copy on its own. That is the intended
- * end state.
+ * Both run for exactly `--cp-rail-duration`, in which the strip advances one
+ * six-card set — 6 × 220px = 1320px. So one turn of the scale animation is worth
+ * 1320px of travel, and a card's scale can be read as a function of DISTANCE
+ * from the lane's outer edge rather than of time. Each card is started part-way
+ * through that turn, by exactly as far as it already sits down the strip:
  *
- * The pacing is slow — a two second hold, then a little over 1.7s of travel,
- * staggered by depth. These cards are the only artwork on the section, so the
- * move exists to show them, not to clear them out of the way, and it gets a
- * single chance to do it.
+ *     animation-delay = −(slot ÷ 6) × duration        slot = --cp-i, 0…5
  *
- * That direction is deliberate and is what makes the section flash-proof. The
- * extractor emits this section's <style> ahead of its markup, so the browser can
- * lay the cards out and paint them before any script in this file runs. While
- * the HIDDEN state was the default, that paint showed cards in the wrong place
- * for a frame on every refresh, and no amount of moving the script fixed it.
- * With the visible state as the default there is nothing to establish before
- * first paint, and the problem cannot occur.
+ * Every card then traces the same scale-versus-position curve, one after
+ * another, which is what makes the size stick to the place rather than to the
+ * card. `--cp-i` repeats every 6 because the strip is the same 6 cards twice.
  *
- * HIDING IS OCCLUSION, NOT FADING. Cards stay fully opaque throughout; the only
- * thing concealing them is the opaque background on `.cp-hero-copy`, which they
- * pass under. Nothing animates opacity anywhere in this section, and the copy
- * has no entrance of its own — see the note on `.cp-hero-copy`.
+ * THE SCALE STEPS ARE THE FIGMA SIZES, EXACTLY. 1 → 0.85 → 0.7225 applied to the
+ * 221px card gives 221 / 187.85 / 159.673 — the three heights in the Figma frame,
+ * which are themselves a 0.85 step. Better still, `scale()` takes the border and
+ * padding with it (1px → 0.85px → 0.723px), and those are precisely the values
+ * Figma draws at each step. The static frame needed three hand-written
+ * geometries to express that; here one geometry plus a scale reproduces all
+ * three and every position in between.
+ *
+ * The cost is that a scaled 1px border is a sub-pixel border, so the hairline
+ * softens slightly at the small end. Figma's own smaller steps are sub-pixel too
+ * (0.85px, 0.723px), so this is the design's own trade, not a new one.
+ *
+ * CARDS DISSOLVE INTO THE COPY, THEY ARE NOT CUT OFF. Each lane carries a mask
+ * that fades to nothing just before the headline — see `.cp-hero-rail--left`.
+ * Without it a card meets the copy box and is sliced by a hard vertical edge,
+ * which is the one thing that gives the whole effect away.
+ *
+ * Figma steps opacity down with size as well (1 / 0.8 / 0.4). That is the same
+ * fade, drawn per card because a still frame has no other way to say it. Here it
+ * is a property of the POSITION, like the size: whichever card is nearest the
+ * copy is the one dissolving, and it can be half dissolved, which a per-card
+ * opacity could never show.
  *
  * Artwork is still the Figma "Visual Placeholder" tint — no photography exists
- * for this page yet. Swap `.cp-hero-media` for an <img> once assets land; the
- * boxes already carry the final dimensions.
+ * for this page yet. Put Webflow asset URLs in `LEFT_RAIL` / `RIGHT_RAIL` below
+ * and each card renders an <img>; the boxes already carry the final dimensions.
+ * Never a `data:` URI — one base64 photo can exceed the whole 50 KB Embed budget
+ * on its own, and there are twelve slots here.
  *
- * Clusters are hidden below 1280px: at 416px of centred copy they start
- * colliding with the headline, and there is nothing to gain from a half-visible
- * card sitting under the text.
+ * Rails are hidden below 1280px: at 416px of centred copy they start colliding
+ * with the headline, and there is nothing to gain from a half-visible card
+ * sitting under the text.
  */
 const HEADING_LINES = ["Make an Impact", "That Matters"];
 const LEDE =
   "Join our team and contribute to shaping the future of millions of Indians and businesses worldwide.";
 const CTA_LABEL = "View current openings";
 const CTA_HREF = "https://clear.darwinbox.in/ms/candidatev2/main/careers/home";
+
+/* Six images a side. Slots only — put a Webflow asset URL in one and that card
+   renders an <img>; an empty string leaves the Figma placeholder tint.
+ *
+ * Six is not decorative. The strip is this set twice over, and the loop
+ * translates by exactly one set, so changing the COUNT means recomputing the
+ * keyframe stops in `@keyframes cp-card-depth` and the `÷ 6` in the card's
+ * animation-delay. Changing the IMAGES costs nothing. */
+const LEFT_RAIL: string[] = ["", "", "", "", "", ""];
+const RIGHT_RAIL: string[] = ["", "", "", "", "", ""];
+
+/* Doubled, so translating the strip by one set puts the clone exactly where the
+   original was. Six is the editable set; twelve is what renders. */
+const LEFT_TRACK: string[] = [...LEFT_RAIL, ...LEFT_RAIL];
+const RIGHT_TRACK: string[] = [...RIGHT_RAIL, ...RIGHT_RAIL];
+
+/* One geometry for every card — the largest Figma step. The other two steps are
+   produced by `transform: scale()` as the card travels; see the note above. */
+const CARD_CLASS =
+  "cp-hero-card shrink-0 overflow-hidden rounded-[12px] border border-[#CCCCCC] bg-generic-00 p-2";
+const MEDIA_CLASS =
+  "cp-hero-media h-[221px] w-[170px] overflow-hidden rounded-lg bg-visual-placeholder";
 ---
 
 <section
   class="cp-hero relative overflow-hidden border-b border-[#CCCCCC] bg-generic-00"
 >
-  <!-- Left cluster. Bleeds 92px past the viewport edge, per Figma — but that
-       offset is set in CSS, not here, because the travel distance is built from
-       it. See `--cp-hero-edge`.
-       `--1/--2/--3` is depth: 1 is the largest and outermost. -->
+  <!-- Left rail. Travels RIGHT, towards the centre, shrinking as it goes.
+       `--cp-i` is the card's slot in the six-card set, counted from the lane's
+       OUTER edge — it is the card's head start through the scale curve, and it
+       is the only thing that differs between the twelve cards here. -->
   <div
-    class="cp-hero-cluster cp-hero-cluster--left absolute top-1/2 hidden -translate-y-1/2 items-center gap-8 xl:flex"
+    class="cp-hero-rail cp-hero-rail--left absolute top-1/2 hidden -translate-y-1/2 xl:block"
     aria-hidden="true"
   >
-    <div
-      class="cp-hero-card cp-hero-card--1 shrink-0 overflow-hidden rounded-[12px] border border-[#CCCCCC] bg-generic-00 p-2"
-    >
-      <div class="cp-hero-media h-[221px] w-[170px] rounded-lg bg-visual-placeholder"></div>
-    </div>
-    <div
-      class="cp-hero-card cp-hero-card--2 shrink-0 overflow-hidden rounded-[10.2px] border-[0.85px] border-[#CCCCCC] bg-generic-00 p-[6.8px]"
-    >
-      <div
-        class="cp-hero-media h-[187.85px] w-[144.5px] rounded-[6.8px] bg-visual-placeholder"
-      >
-      </div>
-    </div>
-    <div
-      class="cp-hero-card cp-hero-card--3 shrink-0 overflow-hidden rounded-[8.67px] border-[0.723px] border-[#CCCCCC] bg-generic-00 p-[5.78px]"
-    >
-      <div
-        class="cp-hero-media h-[159.673px] w-[122.825px] rounded-[5.78px] bg-visual-placeholder"
-      >
-      </div>
+    <div class="cp-hero-track">
+      {
+        LEFT_TRACK.map((image, i) => (
+          <div class={`${CARD_CLASS} mr-8`} style={`--cp-i:${i % 6}`}>
+            <div class={MEDIA_CLASS}>
+              {image && (
+                <img
+                  src={image}
+                  alt=""
+                  loading="lazy"
+                  decoding="async"
+                  class="h-full w-full object-cover"
+                />
+              )}
+            </div>
+          </div>
+        ))
+      }
     </div>
   </div>
 
-  <!-- Right cluster — the mirror, so the order reverses: smallest nearest the
-       copy. It bleeds 119px, NOT 92: the two clusters are not symmetric, which
-       is why the edge offset has to be a variable the travel can read. -->
+  <!-- Right rail — the mirror, so it travels LEFT. The strip is pinned to the
+       lane's right edge and the slot index counts back from the last card, so
+       `--cp-i` still measures outward-edge-first and both rails can share one
+       curve. The margin flips to the left for the same reason: it has to trail
+       each card on the side it came from. -->
   <div
-    class="cp-hero-cluster cp-hero-cluster--right absolute top-1/2 hidden -translate-y-1/2 items-center gap-8 xl:flex"
+    class="cp-hero-rail cp-hero-rail--right absolute top-1/2 hidden -translate-y-1/2 xl:block"
     aria-hidden="true"
   >
-    <div
-      class="cp-hero-card cp-hero-card--3 shrink-0 overflow-hidden rounded-[8.67px] border-[0.723px] border-[#CCCCCC] bg-generic-00 p-[5.78px]"
-    >
-      <div
-        class="cp-hero-media h-[159.673px] w-[122.825px] rounded-[5.78px] bg-visual-placeholder"
-      >
-      </div>
-    </div>
-    <div
-      class="cp-hero-card cp-hero-card--2 shrink-0 overflow-hidden rounded-[10.2px] border-[0.85px] border-[#CCCCCC] bg-generic-00 p-[6.8px]"
-    >
-      <div
-        class="cp-hero-media h-[187.85px] w-[144.5px] rounded-[6.8px] bg-visual-placeholder"
-      >
-      </div>
-    </div>
-    <div
-      class="cp-hero-card cp-hero-card--1 shrink-0 overflow-hidden rounded-[12px] border border-[#CCCCCC] bg-generic-00 p-2"
-    >
-      <div class="cp-hero-media h-[221px] w-[170px] rounded-lg bg-visual-placeholder"></div>
+    <div class="cp-hero-track">
+      {
+        RIGHT_TRACK.map((image, i) => (
+          <div class={`${CARD_CLASS} ml-8`} style={`--cp-i:${(11 - i) % 6}`}>
+            <div class={MEDIA_CLASS}>
+              {image && (
+                <img
+                  src={image}
+                  alt=""
+                  loading="lazy"
+                  decoding="async"
+                  class="h-full w-full object-cover"
+                />
+              )}
+            </div>
+          </div>
+        ))
+      }
     </div>
   </div>
 
@@ -144,7 +174,7 @@ const CTA_HREF = "https://clear.darwinbox.in/ms/candidatev2/main/careers/home";
         </p>
         <a
           href={CTA_HREF}
-          class="cp-btn inline-flex items-center justify-center gap-2 rounded-lg border border-nova-blue bg-nova-blue px-5 py-3.5 font-body font-medium text-nova-50 text-[length:var(--fs-label-lg)] leading-[length:var(--lh-label-lg)]"
+          class="cp-btn inline-flex items-center justify-center gap-2 rounded-lg border border-nova-blue bg-nova-blue px-5 py-3.5 font-body font-medium text-nova-50 text-[length:var(--fs-label-lg)] leading-[length:var(--lh-label-lg)] hover:bg-generic-00 hover:text-nova-blue transition-all ease-in-out duration-150"
         >
           {CTA_LABEL}
         </a>
@@ -154,315 +184,327 @@ const CTA_HREF = "https://clear.darwinbox.in/ms/candidatev2/main/careers/home";
 </section>
 
 <style is:global>
-  /* Shared button treatment for this page. Defined once here rather than
-     re-declared in JoinUs.astro — both embeds land on the same page, so the
-     second copy would be dead bytes against the 50 KB cap. Prefixed `cp-`
-     because section CSS is one flat namespace per Webflow page. */
-  .cp-btn {
-    box-shadow: 0 2px 3px rgba(16, 24, 40, 0.06);
-    transition:
-      background-color var(--transition-base, 250ms ease),
-      border-color var(--transition-base, 250ms ease),
-      transform var(--transition-fast, 150ms ease);
-  }
-
-  .cp-btn:hover {
-    background-color: var(--color-nova-600, #5336f5);
-    border-color: var(--color-nova-600, #5336f5);
-    transform: translateY(-1px);
-  }
 
   .cp-hero-copy {
-    /* THIS BOX IS THE ONLY THING HIDING THE CARDS, so it must never be
-       transparent or animated. It deliberately has NO entrance of its own: it
-       used to fade in, and an opacity below 1 here makes the whole subtree —
-       background included — see-through, so the parked cards showed straight
-       through the "mask". Anything added here must keep it opaque.
+    /* THE BACKSTOP BEHIND THE CARDS, so it must never be transparent or
+       animated. The lane masks now do the visible work — cards have already
+       dissolved by the time they reach this box — but it is what the section
+       falls back to wherever `mask-image` is unsupported, and it still covers
+       the lane clip and the card transform reset. Keep it opaque.
+
+       It deliberately has NO entrance of its own: it used to fade in, and an
+       opacity below 1 here makes the whole subtree — background included —
+       see-through, so the rails showed straight through the "mask". Anything
+       added here must keep it opaque.
 
        Invisible by design: white on a white section, exactly as the Figma frame
        draws it. Nothing is rendered; it only occludes. */
     background: var(--color-generic-00, #fff);
-    /* Sized to hide a card rather than to fit the text. Figma's 416px is the
-       CONTENT width and is preserved exactly — box-sizing is border-box
-       site-wide, so 640 − 2x112 = 416. Every extra pixel goes into the padding,
-       so the box grows outwards as a mask while the text wraps exactly where it
-       did at Figma's own width. Nothing here is visible: white on a white
-       section, so a wider box changes only what it covers.
+    /* Figma's 416px is the CONTENT width and is preserved exactly — box-sizing
+       is border-box site-wide, so 480 − 2×32 = 416. The padding and the
+       max-width have to move together, 416 being the invariant, which is why
+       both live here rather than as a `max-w-[416px]` utility in the markup.
 
-       It has to be here rather than as a `max-w-[416px]` utility in the markup:
-       the padding and the max-width have to move together — 416 is the invariant
-       — and splitting them across the two would let one be changed without the
-       other.
+       HALF THIS WIDTH IS `--cp-rail-fade`. The rails dissolve exactly where this
+       box begins, so the two are one measurement: 480 wide and centred puts its
+       edge 240px back from the page centre, and 240px is what the lane masks
+       fade out over. Change this and change that, or the rails will either
+       vanish early into blank space or still be visible when this box starts
+       covering them — and covering a half-visible card is the hard edge the
+       fade exists to remove.
 
-       WHY SO MUCH COVER. The widest card is 188px, so its centre landing on the
-       page centre leaves 226px of clearance either side — far more than a mask
-       needs. That margin is deliberate slack, not a fit. Since the cards never
-       fade, anything they fail to clear is a solid grey corner sitting beside
-       the headline rather than a soft edge, and the cost of the slack is zero:
-       the box is white on a white section, so widening it changes only what it
-       covers. It absorbs the half-scrollbar the `vw` in --cp-hero-half
-       overshoots by, and leaves room for the card geometry to be revised — for
-       real photography, say — without this having to be revisited.
-
-       Do NOT narrow this back towards the card width to "tighten" it. It is the
-       only thing hiding the cards, and it is invisible either way. */
-    max-width: 640px;
+       This used to be 640px, from when it was the only thing hiding the cards
+       and needed slack on every side. The masks do that job now, so it is back
+       to the width the text actually wants — which is also what lets the rails
+       run as close to the headline as the Figma frame draws them. */
+    max-width: 480px;
     padding-block: 36px;
-    padding-inline: 112px;
+    padding-inline: 32px;
   }
 
-  /* HALF THE PAGE, IN THE CARDS' OWN COORDINATES. Every card has to end up with
-     its centre on the page centre, so the travel is built from this.
+  /* THE LANE. A window on the moving strip, anchored to one viewport edge.
 
-     It is NOT simply `50vw`. shared.css zooms `body` to --page-zoom between
-     768px and 1439.98px, and `vw` keeps resolving against the UNZOOMED viewport
-     while `translateX` moves the card through zoomed layout space. At 1280px —
-     the width at which these clusters first appear — the page is 1505px wide in
-     the coordinates the transform uses, so an uncorrected 50vw is 640px against
-     a real half of 752px and every card stopped ~112px short, in plain sight
-     beside the headline. Dividing by the zoom converts the one into the other.
+     `--cp-rail-bleed` is how far it extends PAST that edge. Cards enter here at
+     full size, so it has to clear a full-size card (188px) or they would pop in
+     at the edge rather than slide in from outside it.
 
-     The bounds are the same literals as the rule in shared.css and have to stay
-     in step with them; they cannot read --page-zoom because media query bounds
-     are evaluated before custom properties resolve. The `, 1` fallback is what
-     makes this safe to paste anywhere: --page-zoom ships in tokens.css, which is
-     imported by the same shared.css that applies the zoom, so a page without it
-     has no zoom to correct for and the divisor is 1.
+     `--cp-rail-span` is one set of six slots: 6 × (188px card + 32px margin).
+     It is the distance the strip covers in one `--cp-rail-duration`, which makes
+     it the conversion factor between the scale keyframes and real position — see
+     `@keyframes cp-card-depth`. Change the card size, the margin or the count
+     and this and those stops all move together.
 
-     `vw` also counts the scrollbar, which the layout width does not, so this
-     overshoots by half a scrollbar (~9px zoomed). Overshoot is free — the card
-     is under an opaque box with 226px of clearance either side — whereas
-     undershoot is the bug. */
-  .cp-hero {
-    --cp-hero-half: 50vw;
+     THE INNER EDGE IS THE PAGE CENTRE, and that is load-bearing. `overflow:
+     hidden` is required — without it the 2640px strip would run straight out the
+     far side of the headline — but a hard clip is only invisible while something
+     opaque covers it. `.cp-hero-copy` is 640px wide and centred, so the page
+     centre is 320px inside it AT EVERY VIEWPORT WIDTH. Pinning the lane's inner
+     edge to 50% is what makes that true everywhere rather than at one width.
+
+     The `min()` caps the lane at one span. Past roughly 2160px of layout the
+     page centre is further out than a card travels in one turn, and without the
+     cap the scale reset — which is meant to happen past the clip — would drift
+     back into view. The cap keeps the clip at or inside the reset point.
+
+     It is a PERCENTAGE, not `50vw`, and that is not cosmetic. shared.css zooms
+     `body` to --page-zoom between 768px and 1439.98px; `vw` keeps resolving
+     against the unzoomed viewport while layout happens in zoomed space, so the
+     old travel maths here needed an explicit `/ var(--page-zoom)` correction and
+     a media query duplicating shared.css's own bounds. A percentage of the
+     section is already in the same coordinate space as the element it sizes, so
+     the zoom cancels and both are gone. */
+  .cp-hero-rail {
+    --cp-rail-bleed: 240px;
+    --cp-rail-span: 1320px;
+
+    /* One full pass of a six-card set — 1320px, so about 47px/s. Slow enough to
+       read as a standing composition that drifts, not as a ticker. These cards
+       are the only artwork on the section; the rail exists to show them, not to
+       move things along. */
+    --cp-rail-duration: 28s;
+
+    /* How long the dissolve into the copy runs, and where it ends. HALF THE
+       WIDTH OF `.cp-hero-copy` — the lane's inner edge is the page centre and
+       that box is 480px wide and centred, so it begins 240px back from that
+       edge, which is `100% - 240px` in the lane's own terms at every viewport
+       width. The fade has to be finished by then: past that point the copy box
+       is opaque, and an opaque box landing on a half-faded card is the hard edge
+       this whole mechanism exists to remove. */
+    --cp-rail-fade: 240px;
+
+    /* The card's border-box height: 221 media + 2×8 padding + 2×1 border. Set
+       explicitly because the strip inside is absolutely positioned and so
+       contributes nothing to the lane's height. */
+    height: 239px;
+    width: min(calc(50% + var(--cp-rail-bleed)), var(--cp-rail-span));
+    overflow: hidden;
   }
 
-  @media (min-width: 768px) and (max-width: 1439.98px) {
-    .cp-hero {
-      --cp-hero-half: calc(50vw / var(--page-zoom, 1));
+  /* THE DISSOLVE. Without this a card meets the copy and is simply cut off — a
+     straight vertical edge slicing it in half beside the headline, which is the
+     one thing that gives the whole illusion away. Figma fades the innermost card
+     out instead, and this is that fade expressed as a position rather than as a
+     per-card opacity: whichever card is there dissolves, exactly as its size is
+     whatever the position says.
+
+     It also retires two other hazards. The lane's hard `overflow` clip and the
+     point where each card's transform snaps back for its next pass both sit
+     inboard of here, and the mask is already fully transparent by then — so
+     neither can surface even if the copy box above were narrowed.
+
+     Masking rather than animating opacity is deliberate. Opacity would have to
+     live on the card, which would make it a property of the CARD again — the
+     exact thing this section is built to avoid — and a card is only ever partly
+     across the fade, so a whole-card opacity could not render the half-dissolved
+     edge the design shows.
+
+     If `mask-image` is unsupported the section degrades to the old behaviour:
+     the opaque copy box still covers the cards, just with a hard edge instead of
+     a soft one. Nothing breaks, it is only less pretty. */
+  .cp-hero-rail--left {
+    -webkit-mask-image: linear-gradient(
+      to right,
+      #000 calc(100% - var(--cp-rail-fade) * 2),
+      transparent calc(100% - var(--cp-rail-fade))
+    );
+    mask-image: linear-gradient(
+      to right,
+      #000 calc(100% - var(--cp-rail-fade) * 2),
+      transparent calc(100% - var(--cp-rail-fade))
+    );
+  }
+
+  /* The mirror: `to left` makes 100% the lane's LEFT edge, which is the inner
+     one on this side, so both rails reuse the same two stops. */
+  .cp-hero-rail--right {
+    -webkit-mask-image: linear-gradient(
+      to left,
+      #000 calc(100% - var(--cp-rail-fade) * 2),
+      transparent calc(100% - var(--cp-rail-fade))
+    );
+    mask-image: linear-gradient(
+      to left,
+      #000 calc(100% - var(--cp-rail-fade) * 2),
+      transparent calc(100% - var(--cp-rail-fade))
+    );
+  }
+
+  /* `--cp-dir` is which way "outwards" points for this rail, and it is what lets
+     both sides share one depth curve: the gap correction in `cp-card-depth`
+     always pulls a card back towards its own viewport edge, which is leftwards
+     on the left and rightwards on the right. */
+  .cp-hero-rail--left {
+    --cp-dir: 1;
+    left: calc(var(--cp-rail-bleed) * -1);
+  }
+
+  .cp-hero-rail--right {
+    --cp-dir: -1;
+    right: calc(var(--cp-rail-bleed) * -1);
+  }
+
+  /* THE STRIP. Two identical sets of six — 12 × (188 + 32) = 2640px — so one set
+     is 1320px and translating by exactly that puts the clone where the original
+     was, making the wrap a no-op.
+
+     PINNED TO THE LANE'S OUTER EDGE, which is why it is positioned rather than
+     in flow. Every card's `--cp-i` is its distance down the strip FROM THAT EDGE
+     in slots, and the scale curve is written in those terms, so the right rail
+     has to measure from its right edge or the two sides would shrink out of step
+     with each other by however wide the viewport happens to be.
+
+     -50% resolves against the strip's own rendered width, so it is exactly one
+     set however the cards measure. What it does NOT survive is a missing
+     trailing margin: `gap` puts space BETWEEN items and not after the last one,
+     so a 12-item gapped strip is two sets minus one gap and -50% lands half a
+     gap out — a 16px jump, once every cycle, forever. Hence `mr-8` / `ml-8` on
+     every card instead.
+
+     `max-content` because the lane is narrower than the strip and a flex row
+     would otherwise be squeezed to fit. `shrink-0` on the cards covers the same
+     ground, but only one of the two has to fail for the loop length to change
+     and the wrap to show. */
+  .cp-hero-track {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    display: flex;
+    align-items: center;
+    width: max-content;
+    will-change: transform;
+    animation: cp-rail-right var(--cp-rail-duration) linear infinite;
+  }
+
+  .cp-hero-rail--left .cp-hero-track {
+    left: 0;
+  }
+
+  /* Both rails run INWARDS, so the two sides need opposite signs. The left lane
+     pushes its strip right until the clone has taken the original's place; the
+     right lane pulls its strip left. Linear, with no ease at either end — an
+     eased loop has a visible pulse once per cycle, which is exactly the thing a
+     seamless rail is trying not to have. */
+  .cp-hero-rail--right .cp-hero-track {
+    right: 0;
+    animation-name: cp-rail-left;
+  }
+
+  @keyframes cp-rail-right {
+    from {
+      transform: translateX(-50%);
+    }
+    to {
+      transform: translateX(0);
     }
   }
 
-  /* HOW FAR EACH CLUSTER BLEEDS. Declared here rather than as a `left-[-92px]`
-     utility in the markup because the travel distance is measured from this
-     edge — the two have to move together, exactly as --cp-hero-copy's padding
-     and max-width do. Split across markup and CSS, changing the offset would
-     silently leave the cards stopping short of centre again.
+  /* BOTH RANGES END AT 0, AND THAT IS WHAT KEEPS THE LANE FULL. A strip only
+     extends AWAY from the edge it is pinned to, so each one has to START one set
+     outside its lane and slide in — never start flush and slide off. The left
+     strip hangs off to the left (`-50%`), the right strip off to the right
+     (`50%`); either way the lane is covered for the whole turn, and landing on 0
+     is the same phase one set along, so the wrap is still a no-op.
 
-     THE CLUSTERS ARE NOT MIRRORS. 92 and 119 are what Figma draws, and the
-     27px difference is real. Both clusters used to share one set of travel
-     constants derived from the left one, so every right-hand card undershot by
-     that 27px on top of the zoom error above. */
-  .cp-hero-cluster--left {
-    --cp-hero-edge: 92px;
-    left: calc(var(--cp-hero-edge) * -1);
+     Writing this side as `0 → -50%` is the mirror of the SIGN but not of the
+     GEOMETRY: pinned right, it walks the strip's outer end 1320px inwards and
+     empties the lane from the viewport edge in, until the last card is sitting
+     by the headline with nothing behind it. Then it snaps back full. */
+  @keyframes cp-rail-left {
+    from {
+      transform: translateX(50%);
+    }
+    to {
+      transform: translateX(0);
+    }
   }
 
-  .cp-hero-cluster--right {
-    --cp-hero-edge: 119px;
-    right: calc(var(--cp-hero-edge) * -1);
-  }
+  /* THE DEPTH CURVE. One turn of this is one `--cp-rail-span` of travel, so the
+     stops below are positions, not moments — each one is a distance from the
+     lane's outer edge divided by the 1320px span:
 
-  /* Which way in. Left cluster tucks to the RIGHT, towards the centre; the right
-     cluster mirrors it. */
-  .cp-hero-cluster--left .cp-hero-card {
-    --cp-hero-dir: 1;
-  }
+       0 … 240px   scale 1        the bleed: outside the viewport, full size
+       240px       scale 1        18.18%  the card reaches the viewport edge
+       460px       scale 0.85     34.85%  one slot in
+       680px       scale 0.7225   51.52%  two slots in, fully shrunk
+       680 … end   scale 0.7225   holds, then snaps back to 1 for the next pass
 
-  .cp-hero-cluster--right .cp-hero-card {
-    --cp-hero-dir: -1;
-  }
+     240 / 460 / 680 are the bleed plus zero, one and two 220px slots, so the
+     three Figma sizes land exactly one slot apart — which is the Figma
+     composition, rebuilt as a function of position.
 
-  /* DEPTH. `--cp-o` is the resting opacity from the Figma frame, moved out of
-     the markup (it was `opacity-80`/`opacity-40`) so it is declared alongside
-     the rest of each card's depth. It is STATIC — nothing animates opacity in
-     this section.
+     THE SNAP FROM 100% BACK TO 0% IS DELIBERATE and is the only discontinuity in
+     this section. It happens at 1320px from the outer edge, which the `min()` on
+     the lane guarantees is at or beyond the clip, and the clip is under
+     `.cp-hero-copy`. So the card is already twice hidden when it resizes.
 
-     `--cp-hero-depth` is how far this card's centre sits from the OUTER end of
-     its own cluster: half its own width, plus every larger card and 32px gap
-     outboard of it. Being measured from the cluster rather than from the
-     viewport is the whole point — it is the one part of the geometry that is
-     identical in both clusters and at every viewport width, so it composes with
-     --cp-hero-edge to give a correct distance on both sides.
+     A card that reaches full shrink before the copy simply holds there, which is
+     why the curve flattens rather than continuing. On a narrow desktop the
+     visible band is shorter than 680px and cards slip under the copy a little
+     above 0.7225; that is a graceful loss of the last few percent, not a break.
 
-       card 1   188 / 2                                    =  94
-       card 2   188 + 32 + 159.8 / 2                       = 299.9
-       card 3   188 + 32 + 159.8 + 32 + 135.831 / 2        = 479.716
+     THE translateX IS NOT DECORATION — IT CLOSES THE GAPS. `scale()` shrinks
+     what a card paints but not the 220px of layout it occupies, so a shrinking
+     card leaves its slot half empty and the rail visibly spreads apart exactly
+     where it should be tightening. Left alone, a 32px gap opens to 72px by the
+     third slot and the small end reads as scattered rather than distant.
 
-     The widths are border-box totals of the three geometries in the markup
-     (170+16+2, 144.5+13.6+1.7, 122.825+11.56+1.446) and 32px is `gap-8`. Change
-     a card's size, padding, border or the gap and these move with it.
+     The correction is the running shortfall: how far behind a card's painted
+     width has fallen against its slot, accumulated from the viewport edge. In
+     other words its visual position advances at the LOCAL SCALE rather than at
+     a flat 220px a slot, which falls out as
 
-     The delay runs innermost-first, so the group packs from the inside — the
-     smallest card leaves first and the largest, outermost one last, which keeps
-     the cluster reading as a cluster the whole way rather than as three cards
-     that happen to move together. There is no unpacking; the move never
-     reverses. */
-  .cp-hero-card--1 {
-    --cp-o: 1;
-    --cp-hero-depth: 94px;
-    --cp-delay: 0.28s;
-  }
+         gap = 32px × (local scale)
 
-  .cp-hero-card--2 {
-    --cp-o: 0.8;
-    --cp-hero-depth: 299.9px;
-    --cp-delay: 0.14s;
-  }
+     so cards and the spaces between them shrink by the same factor. That is what
+     distance actually looks like, and it is a better answer than Figma's flat
+     32px, which only has to hold for three cards that never move.
 
-  .cp-hero-card--3 {
-    --cp-o: 0.4;
-    --cp-hero-depth: 479.716px;
-    --cp-delay: 0s;
-  }
-
-  /* SHOWN IS THE DEFAULT. No class, no transform — the cards render exactly
-     where Figma puts them, from the first frame, with no script involved.
-
-     The card's resting centre is `edge` outboard of the viewport edge and
-     `depth` back inboard from there, so the distance from that centre to the
-     page centre is half the page, plus the bleed, minus the depth. One
-     expression covers all six cards; nothing here is per-card except the two
-     variables it reads. */
+     The numbers are that running total at each stop: 0 at the edge, then 16.5,
+     63.5 and 241.1px. They are integrals of the scale curve above — change a
+     scale or a stop and every one of them moves. */
   .cp-hero-card {
-    --cp-hero-travel: calc(
-      var(--cp-hero-half, 50vw) + var(--cp-hero-edge, 0px) - var(--cp-hero-depth, 0px)
-    );
-    opacity: var(--cp-o, 1);
-    will-change: transform;
+    animation: cp-card-depth var(--cp-rail-duration) linear infinite;
+    /* The head start: this card is already `--cp-i` slots down the strip, and
+       there are 6 slots to a turn. Without it every card would shrink in unison
+       and the whole strip would throb instead of the sizes staying put. */
+    animation-delay: calc(var(--cp-rail-duration) * var(--cp-i, 0) / -6);
   }
 
-  /* TUCKED BEHIND THE CENTRE BLOCK, AT FULL OPACITY AND FULL SIZE. Nothing
-     fades: the card is out of sight because `.cp-hero-copy`'s background covers
-     it, which is what "behind the content" means — so it stays completely solid
-     the whole way and simply goes under the edge of that box. Fading was the
-     wrong tool: with the block invisible (white on a white section) an opacity
-     change is the ONLY thing you can see, so the card read as dissolving in mid
-     air rather than sliding under something.
-
-     Sideways travel is the ONLY thing that changes, for the same reason. This
-     used to carry a `scale(0.94)`, and shrinking reads as receding — the card
-     looked like it was being put away into the distance instead of slipping
-     behind a nearer object. Anything that is not lateral movement turns a tuck
-     into a departure. */
-  .cp-hero.is-out .cp-hero-card {
-    transform: translateX(calc(var(--cp-hero-travel, 0px) * var(--cp-hero-dir, 1)));
+  /* `translateX` before `scale` is deliberate: a CSS transform list applies
+     left to right, so this scales the card about its own centre and THEN shifts
+     it by an unscaled amount. Reversed, the shift would itself be scaled and the
+     correction would come up short by exactly the factor it is correcting for. */
+  @keyframes cp-card-depth {
+    0%,
+    18.18% {
+      transform: translateX(0) scale(1);
+    }
+    34.85% {
+      transform: translateX(calc(-16.5px * var(--cp-dir, 1))) scale(0.85);
+    }
+    51.52% {
+      transform: translateX(calc(-63.5px * var(--cp-dir, 1))) scale(0.7225);
+    }
+    100% {
+      transform: translateX(calc(-241.1px * var(--cp-dir, 1))) scale(0.7225);
+    }
   }
 
-  /* TRANSITIONS ARE GATED BEHIND `.is-animated`, which the script adds a couple
-     of frames in, AFTER it has settled whether this page view gets the entrance
-     at all. Nothing animates on arrival — a reload that lands below the hero
-     finds its cards already tucked rather than playing a two-second entrance to
-     an empty screen and finishing it mid-flight.
-
-     The delay comes through a custom property because this is the `transition`
-     SHORTHAND, which resets transition-delay to 0 — a separate
-     `transition-delay` on the depth classes would be silently overwritten from
-     here, and the innermost-first stagger would vanish.
-
-     Only `transform` is listed, because only `transform` ever changes.
-
-     THERE IS ONE TRANSITION, NOT TWO, because the move only ever runs one way.
-     A transition is read from the style the element is moving TO, so this rule
-     being on `.is-out` is what makes it the way IN. There used to be a matching
-     `:not(.is-out)` rule owning the way back out; `.is-out` is now never removed
-     (see the script), so that rule could never have applied and was deleted
-     rather than left to look like live code.
-
-     The curve leaves gently and holds its speed to the end. It is deliberately
-     NOT an ease-out: decelerating into the copy makes a card look like it is
-     parking next to the headline, when the whole point is that it carries on
-     and goes under. It should still be moving when it disappears.
-
-     THE DURATION IS DELIBERATELY UNHURRIED — this artwork is the only visual on
-     the section, the move is the only thing that shows it off, and it now gets
-     exactly one chance to do so. Together with the 0.14s step between depths a
-     full pass runs a little over 1.7s, and the three cards read one at a time
-     instead of as a single block sliding.
-
-     Do not trim this to feel "snappier". A tuck that is over before the eye
-     lands on it is the same as no artwork at all, which is what the section
-     looked like when the cards were stopping short of the mask. */
-  .cp-hero.is-animated.is-out .cp-hero-card {
-    transition: transform 1.45s cubic-bezier(0.4, 0, 0.2, 1) var(--cp-delay, 0s);
-  }
-
-  /* DO NOT add a -50% Y offset to any transform here. `-translate-y-1/2` on the
-     clusters does NOT compile to a transform in Tailwind v4 — it compiles to the
+  /* DO NOT move either animation onto `.cp-hero-rail`. `-translate-y-1/2` on the
+     lane does NOT compile to a transform in Tailwind v4 — it compiles to the
      separate `translate` property, which composes with `transform` rather than
-     being overridden by it. Restating the centring would double it. Vertical
-     centring belongs to `translate`; these rules touch X only. */
+     being overridden by it. The three survive together only because they are on
+     three different elements: the lane owns the vertical centring, the strip
+     owns the horizontal loop, the card owns its scale. */
 
+  /* Reduced motion PAUSES rather than cancelling. `animation: none` would drop
+     every card back to scale 1 and leave a row of identical boxes; pausing
+     freezes each card at the phase its delay already puts it in, so the rail
+     stops on a stepped big-to-small composition — the Figma frame, held still. */
   @media (prefers-reduced-motion: reduce) {
-    .cp-hero.is-out .cp-hero-card {
-      transform: none;
+    .cp-hero-track,
+    .cp-hero-card {
+      animation-play-state: paused;
     }
   }
 </style>
-
-<script is:inline>
-  (function () {
-    var init = function () {
-      var hero = document.querySelector(".cp-hero");
-      if (!hero) return;
-
-      // ON A TIMER, NOT ON SCROLL. This is the hero: it is already on screen
-      // when the page opens, so the entrance plays itself. The cards hold in
-      // their Figma positions for HOLD, then tuck away once and stay away.
-      //
-      // It used to be driven by a scroll threshold, and the two things a scroll
-      // trigger cannot do are exactly what this section needs. It could not run
-      // for someone who read the hero without scrolling — the artwork simply
-      // never moved — and because scroll position is a LIVE value rather than an
-      // event, every later scroll re-asked the question, so the move stayed
-      // coupled to the wheel long after it had served its purpose. A timer is
-      // the honest expression of "play once, on arrival": it has no input to
-      // re-read and nothing to re-trigger it.
-      //
-      // HOLD is the beat before the move. It is not a delay to be tuned away —
-      // it is the only time the cards are ever seen in the composition Figma
-      // draws, so it has to be long enough to register as a layout rather than
-      // as a frame that flickered past on the way to something else.
-      var HOLD = 2000;
-
-      // ARRIVING ALREADY PAST THE HERO. A reload part-way down the page, a
-      // restored scroll position or a deep link all land with this section off
-      // screen, and playing a two-second entrance to nobody would just mean the
-      // cards are still mid-flight if the reader scrolls back up. In that case
-      // jump straight to the end state, BEFORE transitions are armed below, so
-      // it is a layout rather than an animation.
-      var rect = hero.getBoundingClientRect();
-      var onScreen = rect.bottom > 0 && rect.top < (window.innerHeight || 0);
-
-      if (!onScreen) hero.classList.add("is-out");
-
-      // Transitions stay off until the state above has been settled — adding
-      // `is-animated` after `is-out` means the skipped case lands silently,
-      // because the transform is already at its final value by the time there is
-      // anything to transition.
-      requestAnimationFrame(function () {
-        requestAnimationFrame(function () {
-          hero.classList.add("is-animated");
-
-          if (onScreen) {
-            window.setTimeout(function () {
-              hero.classList.add("is-out");
-            }, HOLD);
-          }
-        });
-      });
-
-      // NOTHING IS LISTENED TO — no scroll, no resize, no observer. `is-out` is
-      // written at most once per page view and never removed, so after the move
-      // there is no state left to maintain. The travel distance still tracks a
-      // resize on its own: `--cp-hero-travel` is resolved by CSS on every
-      // layout, not cached by this script.
-    };
-
-    if (document.readyState === "loading") {
-      document.addEventListener("DOMContentLoaded", init);
-    } else {
-      init();
-    }
-  })();
-</script>
