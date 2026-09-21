@@ -53,7 +53,8 @@ export const PAGE_TARGETS = [
   { name: 'direct-tax-page', input: 'src/styles/direct-tax-page.css', page: 'src/pages/direct-tax-page.astro'},
   { name: 'about-us', input: 'src/styles/about-us.css', page: 'src/pages/about-us.astro' },
   { name: 'indirect-tax-page', input: 'src/styles/indirect-tax-page.css', page: 'src/pages/indirect-tax-page.astro'},
-  { name: 'press', input: 'src/styles/press.css', page: 'src/pages/press.astro' }
+  { name: 'press', input: 'src/styles/press.css', page: 'src/pages/press.astro' },
+  { name: 'events', input: 'src/styles/events.css', page: 'src/pages/events.astro' }
 ];
 
 const SHARED_IMPORT_RE = /import\s+[A-Z][A-Za-z0-9]*\s+from\s+['"]\.\.\/sections\/_shared\/([A-Za-z0-9_-]+)\.astro['"]/g;

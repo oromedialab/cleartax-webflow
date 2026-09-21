@@ -1,0 +1,612 @@
+---
+/**
+ * "Watch our past Webinars & Events here" head + the Search / Type / Country /
+ * Sort by bar — Figma node 14777:27059.
+ *
+ * The head is the title for the GRID BELOW, not for this bar, which is why the
+ * two live in the same section: the bar pins to the top of the screen while the
+ * grid scrolls past, and the head has to stay behind with the content it names.
+ * It sits outside `[data-ev-filter-bar]` for that reason — only the bar travels.
+ *
+ * Otherwise markup only. The filtering and sorting logic lives in
+ * `Events.astro`, which owns the card grid, and reaches these controls through
+ * the `data-ev-*` hooks below using document-level delegation — so it does not
+ * matter which Embed element Webflow renders first.
+ *
+ * The Type and Country option lists must stay in sync with the `type` /
+ * `country` values in `src/data/events.ts`. They are duplicated rather than
+ * imported because this section is pasted into Webflow as an independent Embed
+ * and a stale option is harmless (it just matches nothing) while a stale
+ * *value* would make an event unreachable.
+ *
+ * Type, Country and Sort by are custom listboxes, not bare `<select>`s: a
+ * native select paints its open list through the OS, so `appearance: none`
+ * styles the closed control and nothing else — the list itself lands as Windows
+ * chrome in the middle of the brand. The real `<select>` is still in the DOM,
+ * screen-reader hidden, as the value store. Choosing an option writes to it and
+ * fires a bubbling `change`, which is exactly what `Events.astro` already
+ * listens for, so none of the grid logic knows this UI exists.
+ */
+const heading = 'Watch our past Webinars & Events here';
+const subheading =
+  'Revisit high-impact sessions covering critical trends, regulatory shifts, and transformation strategies';
+
+/* Exactly the two values `EventItem.type` allows. This is a closed set, unlike
+   Country — a third option here would be unreachable by construction. */
+const types: string[] = ['Online', 'In person'];
+
+const countries: string[] = [
+  'Global',
+  'India',
+  'UAE',
+  'Saudi Arabia',
+  'Malaysia',
+  'France',
+  'Germany',
+  'Singapore',
+];
+
+const fieldClass =
+  'h-10 w-full rounded-lg border border-neutral-200 bg-generic-00 px-3 py-2 font-body font-normal text-[length:var(--fs-label)] leading-[var(--lh-label)] text-neutral-900 shadow-[0px_1px_2px_0px_rgba(16,24,40,0.04)] outline-none transition-colors duration-150 placeholder:text-neutral-400 focus:border-nova-blue';
+
+const labelClass =
+  'font-body font-medium text-[length:var(--fs-label)] leading-[var(--lh-label)] text-neutral-900';
+
+/* The trigger has to line up with the search input to the pixel, so it starts
+   from the same `fieldClass` and only adds what a button needs. */
+const triggerClass = `${fieldClass} group flex cursor-pointer items-center justify-between gap-2 text-left aria-expanded:border-nova-blue data-[placeholder]:text-neutral-400`;
+
+const panelClass =
+  'absolute left-0 right-0 top-[calc(100%+6px)] z-20 hidden max-h-64 overflow-y-auto rounded-lg border border-neutral-200 bg-generic-00 p-1 shadow-[0px_12px_24px_-6px_rgba(16,24,40,0.12)]';
+
+const optionClass =
+  'group flex cursor-pointer items-center justify-between gap-2 rounded-md px-3 py-2 font-body font-normal text-[length:var(--fs-label)] leading-[var(--lh-label)] text-neutral-900 outline-none transition-colors duration-100 hover:bg-ledger-100 focus:bg-ledger-100 aria-selected:bg-nova-50 aria-selected:font-medium aria-selected:text-nova-blue';
+
+/* One shape, rendered three times. `hook` carries the `data-ev-*` attribute the
+   grid queries by, spread onto the native select.
+ *
+ * Topic and Country lead with an empty "Select" option — no choice means no
+ * filter. Sort by has no empty state: the grid is always in one order or the
+ * other, so its first option is also its default and the trigger never renders
+ * in placeholder grey. */
+type SelectOption = { value: string; label: string };
+
+const selects: Array<{
+  id: string;
+  name: string;
+  label: string;
+  hook: Record<string, string>;
+  options: SelectOption[];
+  value: string;
+  width: string;
+}> = [
+  {
+    id: 'ev-filter-type',
+    name: 'type',
+    label: 'Type',
+    hook: { 'data-ev-type': '' },
+    options: [{ value: '', label: 'Select' }, ...types.map((t) => ({ value: t, label: t }))],
+    value: '',
+    width: 'md:flex-1 md:min-w-0',
+  },
+  {
+    id: 'ev-filter-country',
+    name: 'country',
+    label: 'Country',
+    hook: { 'data-ev-country': '' },
+    options: [{ value: '', label: 'Select' }, ...countries.map((c) => ({ value: c, label: c }))],
+    value: '',
+    width: 'md:flex-1 md:min-w-0',
+  },
+  {
+    id: 'ev-filter-sort',
+    name: 'sort',
+    label: 'Sort by',
+    hook: { 'data-ev-sort': '' },
+    options: [
+      { value: 'new', label: 'New to old' },
+      { value: 'old', label: 'Old to new' },
+    ],
+    value: 'new',
+    width: 'md:flex-1 md:min-w-0',
+  },
+];
+---
+
+<!--
+  The Figma band's vertical space is split between the section and the bar
+  (section pt-[144px] + bar pt-4 = the original 160px, and 32 + 16 = the
+  original 48px) so that the BAR'S OWN HEIGHT NEVER CHANGES between pinned and
+  unpinned.
+
+  That is the whole trick. The section keeps the band's spacing and stands in as
+  the spacer while the bar is fixed, so the document height is identical in both
+  states and nothing below ever moves. It also means the pin threshold — the
+  bar's own resting position — is the exact point where fixed and static render
+  the bar in the same place, so the swap is a visual no-op and jitter around the
+  threshold cannot flicker.
+-->
+<section
+  data-ev-filter-root
+  class="bg-generic-00 border-b border-ledger-200 pt-8 pb-4 md:pt-20 md:pb-8 data-[pinned]:border-transparent"
+>
+  <!-- Head for the grid below. Deliberately NOT inside `[data-ev-filter-bar]`:
+       that element goes `position: fixed` when it pins, and a title that flew
+       up to the top of the screen with the controls would be naming a grid it
+       had left behind.
+
+       THE GAP DOWN TO THE BAR IS THIS ELEMENT'S `mb`, NOT THE BAR'S `mt`, and
+       that is not a stylistic preference. A fixed element is positioned by its
+       MARGIN box, so `top: 0` plus a margin-top parks the bar that far down the
+       screen — leaving a strip of grid scrolling past above it. Every pixel of
+       space around the bar has to live on its neighbours or inside its own
+       padding; nothing may sit on the bar's outside. -->
+  <div class="container mb-6 md:mb-8">
+    <div
+      class="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between lg:gap-8"
+    >
+      <h2
+        class="font-heading font-medium text-vault-navy text-[length:var(--fs-h1)] leading-[var(--lh-h1)] tracking-[var(--tracking-heading)] m-0 lg:max-w-[672px]"
+      >
+        {heading}
+      </h2>
+      <p
+        class="font-body font-normal text-neutral-500 text-[length:var(--fs-body-lg)] leading-[var(--lh-body-lg)] m-0 lg:max-w-[427px]"
+      >
+        {subheading}
+      </p>
+    </div>
+  </div>
+
+  <div
+    data-ev-filter-bar
+    class="py-4 transition-shadow duration-200 data-[pinned]:bg-generic-00 data-[pinned]:shadow-[0px_2px_6px_0px_rgba(16,24,40,0.06)]"
+  >
+    <div class="container">
+      <form
+        data-ev-filter
+        role="search"
+        aria-label="Filter events"
+        class="flex flex-col items-stretch justify-center gap-6 md:flex-row md:flex-wrap md:items-end md:gap-8"
+      >
+        <!-- Search -->
+        <div class="flex w-full flex-col gap-2 md:w-[405px] md:shrink-0">
+          <label class={labelClass} for="ev-filter-search">Search</label>
+          <input
+            id="ev-filter-search"
+            name="search"
+            type="search"
+            autocomplete="off"
+            placeholder="Enter"
+            data-ev-search
+            class={fieldClass}
+          />
+        </div>
+
+        {
+          selects.map((field) => (
+            <div class={`flex w-full flex-col gap-2 ${field.width}`}>
+              {/* A span, not a <label for>: the control it would point at is the
+                  hidden select. The trigger names itself through aria-labelledby. */}
+              <span class={labelClass} id={`${field.id}-label`}>
+                {field.label}
+              </span>
+
+              <div class="relative" data-ev-select>
+                <select
+                  {...field.hook}
+                  id={field.id}
+                  name={field.name}
+                  class="sr-only"
+                  tabindex="-1"
+                  aria-hidden="true"
+                >
+                  {field.options.map((option) => (
+                    <option value={option.value} selected={option.value === field.value}>
+                      {option.label}
+                    </option>
+                  ))}
+                </select>
+
+                <button
+                  type="button"
+                  data-select-trigger
+                  data-placeholder={field.value === '' ? '' : undefined}
+                  id={`${field.id}-button`}
+                  role="combobox"
+                  aria-haspopup="listbox"
+                  aria-expanded="false"
+                  aria-controls={`${field.id}-list`}
+                  aria-labelledby={`${field.id}-label ${field.id}-button`}
+                  class={triggerClass}
+                >
+                  <span data-select-value class="truncate">
+                    {field.options.filter((o) => o.value === field.value)[0].label}
+                  </span>
+                  <svg
+                    class="shrink-0 text-neutral-500 transition-transform duration-150 group-aria-expanded:rotate-180"
+                    width="20"
+                    height="20"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    aria-hidden="true"
+                    focusable="false"
+                  >
+                    <path d="m6 9 6 6 6-6" />
+                  </svg>
+                </button>
+
+                <div
+                  data-select-panel
+                  id={`${field.id}-list`}
+                  role="listbox"
+                  tabindex="-1"
+                  aria-labelledby={`${field.id}-label`}
+                  class={panelClass}
+                >
+                  {field.options.map((option) => (
+                    <div
+                      data-select-option
+                      data-value={option.value}
+                      role="option"
+                      aria-selected={option.value === field.value ? 'true' : 'false'}
+                      tabindex="-1"
+                      class={optionClass}
+                    >
+                      <span class="truncate">{option.label}</span>
+                      <svg
+                        class="shrink-0 opacity-0 group-aria-selected:opacity-100"
+                        width="16"
+                        height="16"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2.5"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        aria-hidden="true"
+                        focusable="false"
+                      >
+                        <path d="M20 6 9 17l-5-5" />
+                      </svg>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          ))
+        }
+      </form>
+    </div>
+  </div>
+</section>
+
+<script is:inline>
+  /* Custom listbox behaviour for Topic, Country and Sort by.
+
+     The visible control is a button plus a panel of `role="option"` rows; the
+     real `<select>` next to them stays the value store. Selecting writes to it
+     and fires a bubbling `change`, so `Events.astro` filters and sorts exactly
+     as it would have with native selects. */
+  (function () {
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', init);
+    } else {
+      init();
+    }
+
+    function init() {
+      var roots = document.querySelectorAll('[data-ev-select]');
+      for (var i = 0; i < roots.length; i++) setup(roots[i]);
+    }
+
+    function setup(root) {
+      var select = root.querySelector('select');
+      var trigger = root.querySelector('[data-select-trigger]');
+      var panel = root.querySelector('[data-select-panel]');
+      var valueEl = root.querySelector('[data-select-value]');
+      if (!select || !trigger || !panel || !valueEl) return;
+
+      var options = panel.querySelectorAll('[data-select-option]');
+      if (!options.length) return;
+
+      // Inline display, not a class swap: the utilities pasted into Webflow are
+      // unlayered, so `hidden` and `block` on one element would race on source
+      // order. Inline always wins.
+      function isOpen() {
+        return trigger.getAttribute('aria-expanded') === 'true';
+      }
+
+      function open() {
+        panel.style.display = 'block';
+        trigger.setAttribute('aria-expanded', 'true');
+        var current = panel.querySelector('[aria-selected="true"]') || options[0];
+        if (current) {
+          current.focus();
+          // The selected row can be well down a scrolling panel.
+          if (current.scrollIntoView) current.scrollIntoView({ block: 'nearest' });
+        }
+      }
+
+      function close(returnFocus) {
+        panel.style.display = 'none';
+        trigger.setAttribute('aria-expanded', 'false');
+        if (returnFocus) trigger.focus();
+      }
+
+      function choose(option) {
+        var value = option.getAttribute('data-value');
+
+        for (var i = 0; i < options.length; i++) {
+          options[i].setAttribute('aria-selected', options[i] === option ? 'true' : 'false');
+        }
+
+        valueEl.textContent = option.textContent.trim();
+        if (value) trigger.removeAttribute('data-placeholder');
+        else trigger.setAttribute('data-placeholder', '');
+
+        select.value = value;
+        // Dispatched from the select, not the button, so the grid's delegated
+        // listener sees the same event shape a native select would have sent.
+        select.dispatchEvent(new Event('change', { bubbles: true }));
+
+        close(true);
+      }
+
+      function step(from, delta) {
+        var index = -1;
+        for (var i = 0; i < options.length; i++) {
+          if (options[i] === from) index = i;
+        }
+        var next = index + delta;
+        if (next < 0) next = options.length - 1;
+        if (next > options.length - 1) next = 0;
+        options[next].focus();
+        if (options[next].scrollIntoView) options[next].scrollIntoView({ block: 'nearest' });
+      }
+
+      trigger.addEventListener('click', function () {
+        if (isOpen()) close(false);
+        else open();
+      });
+
+      trigger.addEventListener('keydown', function (e) {
+        if (e.key === 'ArrowDown' || e.key === 'ArrowUp' || e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault(); // or Space scrolls the page and Enter submits the form
+          open();
+        } else if (e.key === 'Escape') {
+          close(false);
+        }
+      });
+
+      panel.addEventListener('click', function (e) {
+        if (!e.target.closest) return;
+        var option = e.target.closest('[data-select-option]');
+        if (option) choose(option);
+      });
+
+      panel.addEventListener('keydown', function (e) {
+        if (!e.target.closest) return;
+        var option = e.target.closest('[data-select-option]');
+        if (!option) return;
+
+        if (e.key === 'ArrowDown') {
+          e.preventDefault();
+          step(option, 1);
+        } else if (e.key === 'ArrowUp') {
+          e.preventDefault();
+          step(option, -1);
+        } else if (e.key === 'Home') {
+          e.preventDefault();
+          options[0].focus();
+        } else if (e.key === 'End') {
+          e.preventDefault();
+          options[options.length - 1].focus();
+        } else if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          choose(option);
+        } else if (e.key === 'Escape') {
+          e.preventDefault();
+          close(true);
+        } else if (e.key === 'Tab') {
+          // Let focus go where it was heading, just don't leave the panel open
+          // behind it.
+          close(false);
+        }
+      });
+
+      document.addEventListener('click', function (e) {
+        if (!isOpen()) return;
+        if (root.contains(e.target)) return;
+        close(false);
+      });
+    }
+  })();
+</script>
+
+<script is:inline>
+  /* Pin the filter bar to the top of the screen for the length of the event
+     grid, then release it and let the navbar have the top back.
+
+     Everything is queried from `document` and null-checked, because the navbar,
+     the bar and the grid are three separate Webflow Embeds and none of them can
+     assume another is present or has mounted first. */
+  (function () {
+    // Deferred to DOM-ready on purpose. This Embed is pasted above the grid, so
+    // at parse time `[data-ev-grid-root]` does not exist yet and setup would
+    // bail every time.
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', init);
+    } else {
+      init();
+    }
+
+    function init() {
+      var root = document.querySelector('[data-ev-filter-root]');
+      if (!root) return;
+      var bar = root.querySelector('[data-ev-filter-bar]');
+      var grid = document.querySelector('[data-ev-grid-root]');
+      // No grid to scroll through means nothing to pin against — leave the bar
+      // in flow rather than sticking it to the top forever.
+      if (!bar || !grid) return;
+
+      var navRoot = document.querySelector('[data-giwip-nav-root]');
+      var navBar = navRoot ? navRoot.firstElementChild : null;
+
+      // Stacked on a phone the form is several hundred pixels tall; pinning it
+      // would eat the screen. Desktop layout only.
+      var wideEnough = window.matchMedia('(min-width: 768px)');
+
+      var EASE = 'cubic-bezier(0.4, 0, 0.2, 1)';
+      var EXIT = 260;
+      var NAV_FADE = 220;
+      // Dead band for the navbar only. The bar swap is invisible at the
+      // threshold, but a fade retriggering on every jitter pixel is not.
+      var NAV_HIDE_AT = 40;
+      var NAV_SHOW_AT = 8;
+
+      var reduceMotion =
+        window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+      var pinned = false;
+      var navHidden = false;
+      var releasedBelow = false; // left downwards, so re-entry must animate in
+      var sectionHeight = 0;
+      var barTop = 0; // the bar's resting position in the document
+      var releaseTimer = null;
+      var ticking = false;
+
+      function measure() {
+        // Meaningless while the bar is out of flow.
+        if (pinned) return;
+        sectionHeight = root.offsetHeight;
+        barTop = bar.getBoundingClientRect().top + window.pageYOffset;
+      }
+
+      function setNav(hidden) {
+        if (!navBar || hidden === navHidden) return;
+        navHidden = hidden;
+        // Opacity and a 6px lift, nothing more. The pinned bar sits on top of
+        // the navbar anyway, so a long slide is motion nobody can see and only
+        // adds to the churn at the handover.
+        navBar.style.transition = reduceMotion
+          ? 'none'
+          : 'opacity ' + NAV_FADE + 'ms ' + EASE + ', transform ' + NAV_FADE + 'ms ' + EASE;
+        navBar.style.transform = hidden ? 'translateY(-6px)' : '';
+        navBar.style.opacity = hidden ? '0' : '';
+        navBar.style.pointerEvents = hidden ? 'none' : '';
+      }
+
+      function pin(animateIn) {
+        if (pinned) return;
+        if (releaseTimer) {
+          clearTimeout(releaseTimer);
+          releaseTimer = null;
+        }
+        pinned = true;
+        releasedBelow = false;
+
+        root.style.height = sectionHeight + 'px';
+        root.setAttribute('data-pinned', '');
+        bar.setAttribute('data-pinned', '');
+        bar.style.position = 'fixed';
+        bar.style.top = '0';
+        bar.style.left = '0';
+        bar.style.right = '0';
+        bar.style.zIndex = '1200';
+
+        // Entering from above, fixed and static put the bar in the same place,
+        // so there is nothing to animate — animating would invent motion the
+        // scroll did not ask for. Only a re-entry from below needs to travel.
+        if (!animateIn || reduceMotion) {
+          bar.style.transition = '';
+          bar.style.transform = '';
+          return;
+        }
+
+        bar.style.transition = 'none';
+        bar.style.transform = 'translateY(-100%)';
+        void bar.offsetHeight; // flush, or both assignments collapse into one paint
+        bar.style.transition = 'transform ' + EXIT + 'ms ' + EASE;
+        bar.style.transform = 'translateY(0)';
+      }
+
+      function reset() {
+        root.removeAttribute('data-pinned');
+        bar.removeAttribute('data-pinned');
+        bar.style.position = '';
+        bar.style.top = '';
+        bar.style.left = '';
+        bar.style.right = '';
+        bar.style.zIndex = '';
+        bar.style.transition = '';
+        bar.style.transform = '';
+        root.style.height = '';
+        measure();
+      }
+
+      // Releasing upwards is a straight swap: the bar's fixed and resting
+      // positions coincide at the threshold, so there is nothing to animate.
+      // Releasing downwards it has to leave the screen, so it slides.
+      function unpin(animateOut) {
+        if (!pinned) return;
+        pinned = false;
+        releasedBelow = !!animateOut;
+
+        if (!animateOut || reduceMotion) {
+          reset();
+          return;
+        }
+
+        bar.style.transition = 'transform ' + EXIT + 'ms ' + EASE;
+        bar.style.transform = 'translateY(-100%)';
+        releaseTimer = setTimeout(function () {
+          releaseTimer = null;
+          if (pinned) return; // re-pinned mid-flight; leave it alone
+          reset();
+        }, EXIT);
+      }
+
+      function update() {
+        ticking = false;
+
+        if (!wideEnough.matches) {
+          if (pinned) unpin(false);
+          setNav(false);
+          return;
+        }
+
+        var scrollY = window.pageYOffset;
+        var past = scrollY - barTop; // how far the bar's resting slot is above us
+        var gridBottom = grid.getBoundingClientRect().bottom + scrollY;
+        var stillOverGrid = gridBottom - scrollY > bar.offsetHeight;
+
+        if (past >= 0 && stillOverGrid) pin(releasedBelow);
+        else if (pinned) unpin(past >= 0); // past the grid → slide out
+
+        // Hysteresis: hide late, show early, so the two thresholds never meet.
+        if (pinned && past > NAV_HIDE_AT) setNav(true);
+        else if (!pinned || past < NAV_SHOW_AT) setNav(false);
+      }
+
+      function onScroll() {
+        if (ticking) return;
+        ticking = true;
+        requestAnimationFrame(update);
+      }
+
+      window.addEventListener('scroll', onScroll, { passive: true });
+      window.addEventListener('resize', function () {
+        measure();
+        onScroll();
+      });
+
+      measure();
+      update();
+    }
+  })();
+</script>
