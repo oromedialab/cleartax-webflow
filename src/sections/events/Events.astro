@@ -13,7 +13,11 @@
  *
  * `image: ''` falls back to the Figma "Visual Placeholder" tint.
  */
-import { pastEvents } from '../../data/events';
+/* Cards link to the detail route, NOT to `event.href`. `href` is still the
+   recording link — the detail page's CTA is what uses it now. Going through
+   `eventPath` means a card can only ever point at a slug
+   `events/[slug].astro` has generated a page for. */
+import { pastEvents, eventPath } from '../../data/events';
 
 const chipClass =
   'inline-flex items-center gap-2 rounded-lg bg-neutral-100 px-3 py-1.5 font-body font-medium text-neutral-700 text-[length:var(--fs-label)] leading-[var(--lh-label)]';
@@ -64,7 +68,7 @@ const metaClass =
         {
           pastEvents.map((event, index) => (
             <a
-              href={event.href}
+              href={eventPath(event.slug)}
               data-ev-card
               data-type={event.type}
               data-country={event.country}

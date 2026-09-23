@@ -23,7 +23,11 @@
  * what the mockup shows. Drop in a Webflow asset URL to replace it — never a
  * `data:` URI, that alone can blow the 50 KB Embed budget.
  */
-import { upcomingEvents } from '../../data/events';
+/* Cards link to the detail route, NOT to `event.href`. `href` is still the
+   registration / recording link — the detail page's "Register now" button is
+   what uses it now. Going through `eventPath` means a card can only ever point
+   at a slug `events/[slug].astro` has generated a page for. */
+import { upcomingEvents, eventPath } from '../../data/events';
 
 const heading = 'Our upcoming webinars & events';
 const subheading = 'Stay ahead with expert-led sessions designed for enterprise leaders';
@@ -33,9 +37,12 @@ const ctaHref = 'https://www.cleartax.com/contact-us';
 const lead = upcomingEvents[0];
 const rail = upcomingEvents.slice(1);
 
-/* Figma badges three speakers over the lead image and rolls the rest into a
-   "+N" chip — three is the widest set that still fits one line. */
-const SPEAKERS_SHOWN = 3;
+/* Two speaker chips over the lead image; everyone else rolls into the "+N"
+   chip beside them. Names here run long ("Vivek Menon, Solutions Architect"),
+   and at three chips a row of them wraps onto a second line that then collides
+   with the image's bottom edge. The count is the knob — `extraSpeakers` follows
+   it, so changing this number is the only edit needed. */
+const SPEAKERS_SHOWN = 2;
 const leadSpeakers = lead.speakers.slice(0, SPEAKERS_SHOWN);
 const extraSpeakers = lead.speakers.length - leadSpeakers.length;
 
@@ -111,7 +118,7 @@ const metaClass =
         </div>
         <a
           href={ctaHref} target="_blank"
-          class="shrink-0 self-start rounded-lg border border-nova-blue bg-nova-blue px-5 py-3.5 text-center font-body font-medium text-nova-50 text-[length:var(--fs-label-lg)] leading-[var(--lh-label-lg)] no-underline transition-colors duration-150 hover:bg-generic-00 hover:text-nova-blue lg:self-auto"
+          class="shrink-0 self-start rounded-lg border border-nova-blue bg-nova-blue px-5 py-3.5 text-center font-body font-medium text-nova-50 text-[length:var(--fs-label-lg)] leading-[var(--lh-label-lg)] no-underline transition-all ease-in-out duration-150 hover:bg-generic-00 hover:text-nova-blue lg:self-auto"
         >
           {ctaLabel}
         </a>
@@ -121,7 +128,7 @@ const metaClass =
            is as tall as its own title, so neither should stretch to the other. -->
       <div class="mt-8 grid grid-cols-1 items-start gap-8 lg:grid-cols-[689fr_507fr]">
         <!-- Lead event -->
-        <a href={lead.href} class="group flex flex-col gap-6 no-underline">
+        <a href={eventPath(lead.slug)} class="group flex flex-col gap-6 no-underline">
           <div
             class="relative aspect-video w-full overflow-hidden rounded-xl border border-ledger-300 bg-visual-placeholder"
           >
@@ -210,10 +217,13 @@ const metaClass =
         <!-- Rail. The wrapper is the positioning context for the two fades; the
              scroller inside owns the overflow so they never move with it. -->
         <div class="relative">
-          <div class="ev-rail flex max-h-[535px] flex-col gap-12 overflow-y-auto pr-4">
+          <div
+            class="ev-rail flex max-h-[535px] flex-col gap-6 overflow-y-auto py-8 pr-4"
+            data-ev-rail
+          >
             {
               rail.map((event) => (
-                <a href={event.href} class="group flex items-center gap-6 no-underline">
+                <a href={eventPath(event.slug)} class="group flex items-center gap-6 no-underline">
                   <span class="relative block h-[116px] w-[140px] shrink-0 overflow-hidden rounded-lg border border-ledger-300 bg-visual-placeholder sm:w-[206px]">
                     {event.image && (
                       <img
@@ -326,6 +336,14 @@ const metaClass =
   .ev-rail {
     scrollbar-width: thin;
     scrollbar-color: var(--color-ledger-300, #d7d0d1) transparent;
+
+    /* The scroll hint below writes `scrollTop` every frame, and a smooth
+       scroll box animates each of those writes on its own — the two schedules
+       fight and the peek stutters. `shared.css` only sets `smooth` on `html`
+       and the property does not inherit, so this changes nothing today; it is
+       here because Webflow's page settings can turn on smooth scrolling
+       site-wide, and that would land as a bug with no obvious cause. */
+    scroll-behavior: auto;
   }
 
   .ev-rail::-webkit-scrollbar {
@@ -341,3 +359,149 @@ const metaClass =
     border-radius: 999px;
   }
 </style>
+
+<script is:inline>
+  /* Scroll hint — plays ONCE, the first time the rail is on screen.
+     The rail is a plain overflow region (see the note at the top of this file),
+     so nothing but the scrollbar says there are more sessions below. On a
+     trackpad that bar is hidden until you already scroll, which is exactly the
+     reader who needs telling. So the list glides down a fraction of a row —
+     the rows move, which no static affordance can fake.
+
+     ONE WAY. It drifts down and stays there; it does not spring back. Coming
+     back up would undo the only thing the move proves, and a there-and-back
+     reads as a glitch on a list a reader did not ask to move.
+
+     Deliberately not a CSS animation — `transform` would slide the rows past
+     the fades without moving the scrollbar thumb, and the thumb moving is half
+     the message. This drives `scrollTop`, so it is the real scroll position.
+
+     Rules it holds to:
+     - once per page load, and only if the content actually overflows;
+     - never against the reader — any wheel/touch/key/pointer input during the
+       hint stops it where it is and hands the scroller straight back;
+     - silent under `prefers-reduced-motion`;
+     - starts when the rail enters the viewport, not at DOMContentLoaded, so a
+       reader who lands further down the page has not already missed it. */
+  (function () {
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', init);
+    } else {
+      init();
+    }
+
+    function init() {
+      var rails = document.querySelectorAll('[data-ev-rail]');
+      for (var i = 0; i < rails.length; i++) setup(rails[i]);
+    }
+
+    function setup(rail) {
+      // Roughly half a row: enough that the row below rises into view and the
+      // thumb visibly leaves the top, not so far that row one leaves the frame.
+      var PEEK = 72;
+
+      /* Slow on purpose. Smoothness here is per-frame distance, not easing
+         cleverness: 72px over 1400ms is ~0.85px a frame at 60Hz, small enough
+         that the rows read as drifting rather than stepping. Halve the duration
+         and each frame doubles its jump — the same curve starts to judder on
+         low-refresh panels. */
+      var DOWN = 1400;
+
+      /* A beat before it starts. The observer can fire while the reader is
+         still flicking the page down, and a rail that moves inside a moving
+         viewport reads as a rendering fault rather than an invitation. */
+      var DELAY = 320;
+
+      var reduce =
+        window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      if (reduce) return;
+
+      // Nothing to hint at if everything already fits, or if the browser
+      // restored a scroll position on reload — then the reader is mid-list and
+      // an animation would fight them.
+      if (rail.scrollHeight - rail.clientHeight < PEEK + 8) return;
+      if (rail.scrollTop > 0) return;
+
+      if (!('IntersectionObserver' in window)) {
+        play();
+        return;
+      }
+
+      var observer = new IntersectionObserver(
+        function (entries) {
+          for (var i = 0; i < entries.length; i++) {
+            if (!entries[i].isIntersecting) continue;
+            observer.disconnect();
+            play();
+          }
+        },
+        // A third of the rail showing — below that the peek happens off screen.
+        { threshold: 0.33 }
+      );
+      observer.observe(rail);
+
+      function play() {
+        animate(rail, PEEK, DOWN, DELAY);
+      }
+    }
+
+    function animate(rail, PEEK, DOWN, DELAY) {
+      var start = null;
+      var frame = 0;
+      var cancelled = false;
+
+      var events = ['wheel', 'touchstart', 'pointerdown', 'keydown'];
+
+      function stop() {
+        if (cancelled) return;
+        cancelled = true;
+        if (frame) cancelAnimationFrame(frame);
+        for (var i = 0; i < events.length; i++) {
+          rail.removeEventListener(events[i], stop);
+        }
+      }
+
+      for (var i = 0; i < events.length; i++) {
+        // Passive: none of these handlers prevent anything, and a non-passive
+        // `wheel`/`touchstart` listener on a scroller costs scroll performance.
+        rail.addEventListener(events[i], stop, { passive: true });
+      }
+
+      // Note there is no `scroll` listener here — this animation writes
+      // `scrollTop` every frame and would cancel itself on the first one.
+
+      /* easeInOutSine. Velocity is zero at both ends AND its rate of change is
+         a half-cosine with no corners anywhere — the gentlest of the standard
+         curves, which is the whole brief for this move. Cubic is snappier at
+         the midpoint; snappy is what a hint should not be. */
+      function ease(t) {
+        return 0.5 * (1 - Math.cos(Math.PI * t));
+      }
+
+      function step(now) {
+        if (cancelled) return;
+        if (start === null) start = now;
+
+        var elapsed = now - start - DELAY;
+        if (elapsed < 0) {
+          frame = requestAnimationFrame(step);
+          return;
+        }
+
+        if (elapsed >= DOWN) {
+          rail.scrollTop = PEEK;
+          stop();
+          return;
+        }
+
+        // Fractional scrollTop is kept, not rounded — browsers render
+        // sub-pixel scroll offsets, and rounding here would quantise the drift
+        // back into the 1px steps the long duration exists to avoid.
+        rail.scrollTop = PEEK * ease(elapsed / DOWN);
+        frame = requestAnimationFrame(step);
+      }
+
+      frame = requestAnimationFrame(step);
+    }
+  })();
+</script>

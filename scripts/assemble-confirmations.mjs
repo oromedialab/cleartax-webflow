@@ -94,6 +94,140 @@ function buildCssStyleBlocks(cssImports) {
   return blocks.join('\n');
 }
 
+/**
+ * DETAIL ROUTES — `src/pages/<folder>/[slug].astro`.
+ *
+ * These need their own assembly path and would otherwise get no preview at
+ * all, which is exactly the trap they were: every other page in the repo
+ * produces `dist/preview/<page>.html`, these two quietly did not, and nothing
+ * in the build said so.
+ *
+ * Two reasons the section-based loop above cannot reach them:
+ *   1. it only reads top-level `.astro` files in `src/pages/`, and these sit a
+ *      directory down;
+ *   2. they have no sections. The body is authored in the page itself, so
+ *      there are no embeds to stitch back together.
+ *
+ * So the source here is the BUILT page rather than `dist/_embeds/*`. That is
+ * also the honest source: for a detail route the rendered page IS the paste
+ * unit, the same way a section's embed is.
+ *
+ * `sample` is the slug the preview is rendered from — the markup is identical
+ * across every item in the collection and only the content differs. Each one
+ * below is chosen to exercise the most of the design: the event sample is an
+ * upcoming session with five speakers, so the Swiper carousel, the lime
+ * Upcoming badge and the live Register button all appear. Pick a past
+ * single-speaker event instead and the preview silently stops covering them.
+ */
+const DETAIL_ROUTES = [
+  {
+    name: 'event-detail',
+    page: 'src/pages/events/[slug].astro',
+    builtDir: 'events',
+    sample: 'confidence-vs-control-ai-led-tax-compliance',
+  },
+  {
+    name: 'blog-detail',
+    page: 'src/pages/blog-listing/[slug].astro',
+    builtDir: 'blog-listing',
+    sample: 'uae-invoicing-readiness-list',
+  },
+];
+
+function assembleDetailRoute(route) {
+  const pagePath = join(ROOT, route.page);
+  if (!existsSync(pagePath)) {
+    console.warn(`[assemble-preview] detail route page missing: ${route.page}`);
+    return false;
+  }
+
+  const builtRoot = join(DIST, route.builtDir);
+  if (!existsSync(builtRoot)) {
+    console.warn(`[assemble-preview] ${route.name}: nothing built at dist/${route.builtDir}`);
+    return false;
+  }
+
+  // Fall back to whatever was built rather than failing, so renaming a slug
+  // degrades the preview instead of removing it — but say so, because a
+  // fallback may not exercise the same states as the chosen sample.
+  let slug = route.sample;
+  if (!existsSync(join(builtRoot, slug, 'index.html'))) {
+    const dirs = readdirSync(builtRoot, { withFileTypes: true })
+      .filter((d) => d.isDirectory())
+      .map((d) => d.name);
+    if (!dirs.length) {
+      console.warn(`[assemble-preview] ${route.name}: no built pages under dist/${route.builtDir}`);
+      return false;
+    }
+    console.warn(
+      `[assemble-preview] ${route.name}: sample slug '${route.sample}' was not built — ` +
+        `falling back to '${dirs[0]}'. Update DETAIL_ROUTES in this file.`
+    );
+    slug = dirs[0];
+  }
+
+  const html = readFileSync(join(builtRoot, slug, 'index.html'), 'utf8');
+  const root = parseHtml(html);
+  const head = root.querySelector('head');
+  const body = root.querySelector('body');
+  if (!head || !body) {
+    console.warn(`[assemble-preview] ${route.name}: built page has no <head>/<body>`);
+    return false;
+  }
+
+  /* THE WHOLE POINT OF THIS STEP. Astro inlines its own Vite-processed copy of
+     the page's CSS imports into the built <head>. That is NOT what gets pasted
+     into Webflow — the paste bundles are the Tailwind-CLI output in
+     `public/css/`, built by a separate command with different `@source`
+     resolution. Leaving Astro's version in would make the preview agree with
+     `astro build` and disagree with Webflow, which is the one thing preview
+     exists to catch. Strip it and inline the real bundles below.
+
+     Only LOCAL stylesheets go: the Google Fonts <link> is also
+     `rel="stylesheet"` and has to survive. */
+  head.querySelectorAll('style').forEach((el) => el.remove());
+  head.querySelectorAll('link[rel="stylesheet"]').forEach((el) => {
+    if (!/^https?:/i.test(el.getAttribute('href') || '')) el.remove();
+  });
+
+  const frontmatter = readFileSync(pagePath, 'utf8').split('---')[1] ?? '';
+  const cssImports = [];
+  // One `..` deeper than a top-level page, hence `(?:\.\.\/)+`.
+  const detailCssRegex = /import\s+['"](?:\.\.\/)+styles\/(?:\.build\/)?([a-z0-9-]+\.css)['"]/g;
+  let m;
+  while ((m = detailCssRegex.exec(frontmatter)) !== null) cssImports.push(m[1]);
+
+  // The built head is minified onto one line; one node per line reads better
+  // and is safer than splitting on '><', which would also cut inside any
+  // attribute value that happens to contain it.
+  const headBody = head.childNodes
+    .map((n) => n.toString().trim())
+    .filter(Boolean)
+    .map((s) => `  ${s}`)
+    .join('\n');
+
+  // Preserved, not dropped: this page sets `bg-generic-00` on <body> to
+  // override the Ledger White that shared.css gives every page. Without it the
+  // preview renders on the wrong background.
+  const bodyClass = body.getAttribute('class');
+
+  const finalHtml = `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <!-- Preview of ${route.page} rendered from /${route.builtDir}/${slug}/ -->
+${headBody}
+${buildCssStyleBlocks(cssImports)}
+</head>
+<${bodyClass ? `body class="${bodyClass}"` : 'body'}>
+${body.innerHTML}
+</body>
+</html>`;
+
+  writeFileSync(join(OUT_DIR, `${route.name}.html`), finalHtml, 'utf8');
+  console.log(`[assemble-preview] Adding ${route.name} (detail route, from ${route.builtDir}/${slug})`);
+  return true;
+}
+
 // index.astro is the local dev navigation page, not a Webflow page — it has no
 // sections to assemble, so skip it rather than emitting an empty preview.
 const SKIP_PAGES = new Set(['index.astro']);
@@ -221,4 +355,12 @@ ${assembledHtml}
   writeFileSync(outPath, finalHtml, 'utf8');
 }
 
-console.log(`[assemble-preview] Done. wrote ${pages.length} page(s) to ${OUT_DIR}`);
+let detailCount = 0;
+for (const route of DETAIL_ROUTES) {
+  if (assembleDetailRoute(route)) detailCount++;
+}
+
+console.log(
+  `[assemble-preview] Done. wrote ${pages.length + detailCount} page(s) to ${OUT_DIR} ` +
+    `(${pages.length} section-assembled, ${detailCount} detail route(s))`
+);

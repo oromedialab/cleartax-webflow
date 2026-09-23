@@ -3,10 +3,14 @@
  * "Watch our past Webinars & Events here" head + the Search / Type / Country /
  * Sort by bar — Figma node 14777:27059.
  *
- * The head is the title for the GRID BELOW, not for this bar, which is why the
- * two live in the same section: the bar pins to the top of the screen while the
- * grid scrolls past, and the head has to stay behind with the content it names.
- * It sits outside `[data-ev-filter-bar]` for that reason — only the bar travels.
+ * THE HEAD AND THE BAR PIN TOGETHER, as one block, parked directly under the
+ * navbar while the grid scrolls beneath them. The head is the title for that
+ * grid, so it stays on screen for exactly as long as the grid it names — which
+ * is also why both live in one section and inside one `[data-ev-filter-bar]`.
+ *
+ * The navbar is NOT hidden while this is pinned. It keeps `z-[1000]` and the
+ * top of the screen; the block measures the navbar's bottom edge and parks
+ * below it. Two fixed bars stacked, not one handing off to the other.
  *
  * Otherwise markup only. The filtering and sorting logic lives in
  * `Events.astro`, which owns the card grid, and reaches these controls through
@@ -114,54 +118,52 @@ const selects: Array<{
 ---
 
 <!--
-  The Figma band's vertical space is split between the section and the bar
-  (section pt-[144px] + bar pt-4 = the original 160px, and 32 + 16 = the
-  original 48px) so that the BAR'S OWN HEIGHT NEVER CHANGES between pinned and
-  unpinned.
+  THE SECTION IS A PURE SPACER; EVERY PIXEL OF THE BAND'S SPACING IS ON THE
+  BLOCK INSIDE IT. The band's padding used to be split across the two (section
+  pt-8/md:pt-20 + bar py-4) so the bar's height stayed constant while the head
+  stayed behind.
 
-  That is the whole trick. The section keeps the band's spacing and stands in as
-  the spacer while the bar is fixed, so the document height is identical in both
-  states and nothing below ever moves. It also means the pin threshold — the
-  bar's own resting position — is the exact point where fixed and static render
-  the bar in the same place, so the swap is a visual no-op and jitter around the
-  threshold cannot flicker.
+  Now the head travels too, so the rule gets simpler and stricter: the
+  block's box must be IDENTICAL pinned and unpinned, which means no
+  `data-[pinned]:` padding, margin or border-width on it, ever. The section
+  takes an explicit height the moment the block goes fixed, so the document
+  height never changes and nothing below moves.
+
+  It also means the pin threshold — the block's resting position, offset by the
+  navbar's height — is the exact point where fixed and static render the block
+  in the same place. The swap is a visual no-op, so jitter around the threshold
+  cannot flicker. Shadow is the one thing that may change on pin: it paints
+  outside the box and costs no layout.
 -->
-<section
-  data-ev-filter-root
-  class="bg-generic-00 border-b border-ledger-200 pt-8 pb-4 md:pt-20 md:pb-8 data-[pinned]:border-transparent"
->
-  <!-- Head for the grid below. Deliberately NOT inside `[data-ev-filter-bar]`:
-       that element goes `position: fixed` when it pins, and a title that flew
-       up to the top of the screen with the controls would be naming a grid it
-       had left behind.
+<section data-ev-filter-root class="bg-generic-00">
+  <!-- The travelling block: head + controls, pinned as one unit.
 
-       THE GAP DOWN TO THE BAR IS THIS ELEMENT'S `mb`, NOT THE BAR'S `mt`, and
-       that is not a stylistic preference. A fixed element is positioned by its
-       MARGIN box, so `top: 0` plus a margin-top parks the bar that far down the
-       screen — leaving a strip of grid scrolling past above it. Every pixel of
-       space around the bar has to live on its neighbours or inside its own
-       padding; nothing may sit on the bar's outside. -->
-  <div class="container mb-6 md:mb-8">
-    <div
-      class="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between lg:gap-8"
-    >
-      <h2
-        class="font-heading font-medium text-vault-navy text-[length:var(--fs-h1)] leading-[var(--lh-h1)] tracking-[var(--tracking-heading)] m-0 lg:max-w-[672px]"
-      >
-        {heading}
-      </h2>
-      <p
-        class="font-body font-normal text-neutral-500 text-[length:var(--fs-body-lg)] leading-[var(--lh-body-lg)] m-0 lg:max-w-[427px]"
-      >
-        {subheading}
-      </p>
-    </div>
-  </div>
-
+       NOTHING MAY SIT ON THIS ELEMENT'S OUTSIDE — no `mt`, no `mb`. A fixed
+       element is positioned by its MARGIN box, so a margin-top would park it
+       that far below the navbar and leave a strip of grid scrolling through the
+       gap. Spacing goes in the padding above, or on a child. -->
   <div
     data-ev-filter-bar
-    class="py-4 transition-shadow duration-200 data-[pinned]:bg-generic-00 data-[pinned]:shadow-[0px_2px_6px_0px_rgba(16,24,40,0.06)]"
+    class="bg-generic-00 border-b border-ledger-200 pt-12 pb-8 md:pt-20 md:pb-12 transition-shadow duration-200 data-[pinned]:shadow-[0px_2px_6px_0px_rgba(16,24,40,0.06)]"
   >
+    <!-- The gap down to the controls is this element's `mb` — it is a child of
+         the fixed block, not the block itself, so the margin-box rule above
+         does not apply to it. -->
+    <div class="container mb-6 md:mb-8">
+      <div class="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between lg:gap-8">
+        <h2
+          class="font-heading font-medium text-vault-navy text-[length:var(--fs-h1)] leading-[var(--lh-h1)] tracking-[var(--tracking-heading)] m-0 lg:max-w-[672px]"
+        >
+          {heading}
+        </h2>
+        <p
+          class="font-body font-normal text-neutral-500 text-[length:var(--fs-body-lg)] leading-[var(--lh-body-lg)] m-0 lg:max-w-[427px]"
+        >
+          {subheading}
+        </p>
+      </div>
+    </div>
+
     <div class="container">
       <form
         data-ev-filter
@@ -284,6 +286,35 @@ const selects: Array<{
     </div>
   </div>
 </section>
+
+<style is:global>
+  /* THE STRIP ABOVE THE NAVBAR. `NavbarRb` is a floating card — `fixed top-4`
+     — so there is a 16px gutter above it that the page scrolls through. On a
+     normal page that gutter shows the page background and nobody notices. With
+     this block pinned underneath, what slides through it is event cards, above
+     the navbar, which reads as a rendering fault.
+
+     So the block's white is extended upward to the top of the screen. The cap
+     is `absolute` inside the `fixed` block, which is why it is safe: absolutely
+     positioned boxes take no part in layout, so the block's own box stays
+     byte-identical pinned and unpinned and the swap at the threshold is still a
+     visual no-op. It exists only while `[data-pinned]` is set, and it paints
+     under the navbar because the block carries z-index 900 to the navbar's
+     1000.
+
+     `50vh` rather than the measured navbar height: the excess simply extends
+     off the top of the screen, and a fixed-element child cannot add scroll. No
+     JS has to keep it in sync with a navbar it does not own. */
+  [data-ev-filter-bar][data-pinned]::before {
+    content: '';
+    position: absolute;
+    bottom: 100%;
+    left: 0;
+    right: 0;
+    height: 50vh;
+    background: var(--color-generic-00, #fff);
+  }
+</style>
 
 <script is:inline>
   /* Custom listbox behaviour for Topic, Country and Sort by.
@@ -429,12 +460,17 @@ const selects: Array<{
 </script>
 
 <script is:inline>
-  /* Pin the filter bar to the top of the screen for the length of the event
-     grid, then release it and let the navbar have the top back.
+  /* Pin the head + filter block directly under the navbar for the length of the
+     event grid, then release it.
+
+     `position: sticky` would be the obvious tool and is not available: Webflow
+     wraps each pasted Embed in its own div, so a sticky section would be
+     confined to a parent exactly its own height and never move at all. Hence
+     the explicit fixed/static swap.
 
      Everything is queried from `document` and null-checked, because the navbar,
-     the bar and the grid are three separate Webflow Embeds and none of them can
-     assume another is present or has mounted first. */
+     this block and the grid are three separate Webflow Embeds and none of them
+     can assume another is present or has mounted first. */
   (function () {
     // Deferred to DOM-ready on purpose. This Embed is pasted above the grid, so
     // at parse time `[data-ev-grid-root]` does not exist yet and setup would
@@ -448,57 +484,82 @@ const selects: Array<{
     function init() {
       var root = document.querySelector('[data-ev-filter-root]');
       if (!root) return;
-      var bar = root.querySelector('[data-ev-filter-bar]');
+      var block = root.querySelector('[data-ev-filter-bar]');
       var grid = document.querySelector('[data-ev-grid-root]');
-      // No grid to scroll through means nothing to pin against — leave the bar
-      // in flow rather than sticking it to the top forever.
-      if (!bar || !grid) return;
+      // No grid to scroll through means nothing to pin against — leave the
+      // block in flow rather than sticking it to the top forever.
+      if (!block || !grid) return;
 
       var navRoot = document.querySelector('[data-giwip-nav-root]');
-      var navBar = navRoot ? navRoot.firstElementChild : null;
+      var navCard = navRoot ? navRoot.querySelector('[data-nav-card]') : null;
 
-      // Stacked on a phone the form is several hundred pixels tall; pinning it
-      // would eat the screen. Desktop layout only.
+      // Stacked on a phone the head plus the form is most of a screen; pinning
+      // it would leave no room for the grid it filters. Desktop layout only.
       var wideEnough = window.matchMedia('(min-width: 768px)');
 
-      var EASE = 'cubic-bezier(0.4, 0, 0.2, 1)';
-      var EXIT = 260;
-      var NAV_FADE = 220;
-      // Dead band for the navbar only. The bar swap is invisible at the
-      // threshold, but a fade retriggering on every jitter pixel is not.
-      var NAV_HIDE_AT = 40;
-      var NAV_SHOW_AT = 8;
+      // Decelerating curve, not the symmetric material ease. The block enters
+      // and leaves at the top of the screen where there is nothing to ease
+      // against, so a slow finish reads as settling rather than stopping.
+      var EASE = 'cubic-bezier(0.16, 1, 0.3, 1)';
+      var EXIT = 420;
 
       var reduceMotion =
         window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
+      /* TWO COORDINATE SPACES, AND MIXING THEM IS THE BUG THIS SECTION EXISTS
+         TO AVOID. `shared.css` puts `zoom` on the body element between 768px and
+         1439.98px — about 0.851 — and the two families of measurement do not
+         agree about what a pixel is:
+
+           getBoundingClientRect(), pageYOffset   VISUAL px (zoom applied)
+           offsetHeight, style.top, translateY()  LAYOUT px (zoom applied after)
+
+         So a value read from a rect and written straight into `style.top`
+         lands at `value * zoom` — 15% too high, which put this block on top of
+         the navbar instead of under it. Suffixes below are not decoration:
+         `*Px` is visual, `*Css` is layout, and they are never interchanged. */
       var pinned = false;
-      var navHidden = false;
       var releasedBelow = false; // left downwards, so re-entry must animate in
-      var sectionHeight = 0;
-      var barTop = 0; // the bar's resting position in the document
+      var zoom = 1;
+      var sectionHeight = 0; // layout px -> root.style.height
+      var blockTop = 0; // visual px — the block's resting position in the document
+      var blockHeightPx = 0; // visual px, cached — see update()
+      var blockHeightCss = 0; // layout px -> translateY()
+      var navBottomPx = 0; // visual px — threshold maths
+      var pinTopCss = 0; // layout px -> block.style.top
       var releaseTimer = null;
       var ticking = false;
 
       function measure() {
-        // Meaningless while the bar is out of flow.
+        // Meaningless while the block is out of flow.
         if (pinned) return;
+
+        // The block's own two heights give the zoom factor directly, with no
+        // media query to keep in sync and no assumption about the breakpoint.
+        blockHeightCss = block.offsetHeight;
+        var rect = block.getBoundingClientRect();
+        blockHeightPx = rect.height;
+        zoom = blockHeightCss ? blockHeightPx / blockHeightCss : 1;
+
         sectionHeight = root.offsetHeight;
-        barTop = bar.getBoundingClientRect().top + window.pageYOffset;
+        blockTop = rect.top + window.pageYOffset;
+
+        // The navbar is `fixed`, so its bottom edge is a constant in viewport
+        // coordinates — read it rather than hard-coding, because the card is
+        // `top-4` plus its own content height and that changes with the
+        // breakpoint. No navbar on the page (a lone Embed in isolation) and the
+        // block simply parks at the top of the screen.
+        navBottomPx = navCard ? Math.max(0, navCard.getBoundingClientRect().bottom) : 0;
+        pinTopCss = navBottomPx / zoom;
       }
 
-      function setNav(hidden) {
-        if (!navBar || hidden === navHidden) return;
-        navHidden = hidden;
-        // Opacity and a 6px lift, nothing more. The pinned bar sits on top of
-        // the navbar anyway, so a long slide is motion nobody can see and only
-        // adds to the churn at the handover.
-        navBar.style.transition = reduceMotion
-          ? 'none'
-          : 'opacity ' + NAV_FADE + 'ms ' + EASE + ', transform ' + NAV_FADE + 'ms ' + EASE;
-        navBar.style.transform = hidden ? 'translateY(-6px)' : '';
-        navBar.style.opacity = hidden ? '0' : '';
-        navBar.style.pointerEvents = hidden ? 'none' : '';
+      // Far enough up that the block's bottom edge clears the top of the
+      // screen. `-100%` alone would leave the navbar's height showing, and the
+      // navbar cannot hide it — it is a rounded card with gutters either side,
+      // not a full-width bar. Layout px, because transforms scale with zoom
+      // exactly as `top` does.
+      function offscreen() {
+        return 'translateY(-' + (blockHeightCss + pinTopCss) + 'px)';
       }
 
       function pin(animateIn) {
@@ -512,44 +573,53 @@ const selects: Array<{
 
         root.style.height = sectionHeight + 'px';
         root.setAttribute('data-pinned', '');
-        bar.setAttribute('data-pinned', '');
-        bar.style.position = 'fixed';
-        bar.style.top = '0';
-        bar.style.left = '0';
-        bar.style.right = '0';
-        bar.style.zIndex = '1200';
+        block.setAttribute('data-pinned', '');
+        block.style.position = 'fixed';
+        block.style.top = pinTopCss + 'px';
+        block.style.left = '0';
+        block.style.right = '0';
+        // BELOW the navbar's z-[1000], never over it. The navbar keeps the top
+        // of the screen; this block parks under it and slides away behind it.
+        block.style.zIndex = '900';
+        // Promoted for the whole pinned stretch, not just while a transition is
+        // running. Setting `will-change` at the moment the slide starts is too
+        // late — the layer is created in the same frame that has to paint the
+        // first step, which is exactly where the hitch shows.
+        block.style.willChange = 'transform';
 
-        // Entering from above, fixed and static put the bar in the same place,
-        // so there is nothing to animate — animating would invent motion the
-        // scroll did not ask for. Only a re-entry from below needs to travel.
+        // Entering from above, fixed and static put the block in the same
+        // place, so there is nothing to animate — animating would invent motion
+        // the scroll did not ask for. Only a re-entry from below needs to
+        // travel.
         if (!animateIn || reduceMotion) {
-          bar.style.transition = '';
-          bar.style.transform = '';
+          block.style.transition = '';
+          block.style.transform = '';
           return;
         }
 
-        bar.style.transition = 'none';
-        bar.style.transform = 'translateY(-100%)';
-        void bar.offsetHeight; // flush, or both assignments collapse into one paint
-        bar.style.transition = 'transform ' + EXIT + 'ms ' + EASE;
-        bar.style.transform = 'translateY(0)';
+        block.style.transition = 'none';
+        block.style.transform = offscreen();
+        void block.offsetHeight; // flush, or both assignments collapse into one paint
+        block.style.transition = 'transform ' + EXIT + 'ms ' + EASE;
+        block.style.transform = 'translateY(0)';
       }
 
       function reset() {
         root.removeAttribute('data-pinned');
-        bar.removeAttribute('data-pinned');
-        bar.style.position = '';
-        bar.style.top = '';
-        bar.style.left = '';
-        bar.style.right = '';
-        bar.style.zIndex = '';
-        bar.style.transition = '';
-        bar.style.transform = '';
+        block.removeAttribute('data-pinned');
+        block.style.position = '';
+        block.style.top = '';
+        block.style.left = '';
+        block.style.right = '';
+        block.style.zIndex = '';
+        block.style.transition = '';
+        block.style.transform = '';
+        block.style.willChange = ''; // a permanent layer on a static element is waste
         root.style.height = '';
         measure();
       }
 
-      // Releasing upwards is a straight swap: the bar's fixed and resting
+      // Releasing upwards is a straight swap: the block's fixed and resting
       // positions coincide at the threshold, so there is nothing to animate.
       // Releasing downwards it has to leave the screen, so it slides.
       function unpin(animateOut) {
@@ -562,8 +632,8 @@ const selects: Array<{
           return;
         }
 
-        bar.style.transition = 'transform ' + EXIT + 'ms ' + EASE;
-        bar.style.transform = 'translateY(-100%)';
+        block.style.transition = 'transform ' + EXIT + 'ms ' + EASE;
+        block.style.transform = offscreen();
         releaseTimer = setTimeout(function () {
           releaseTimer = null;
           if (pinned) return; // re-pinned mid-flight; leave it alone
@@ -576,21 +646,27 @@ const selects: Array<{
 
         if (!wideEnough.matches) {
           if (pinned) unpin(false);
-          setNav(false);
           return;
         }
 
         var scrollY = window.pageYOffset;
-        var past = scrollY - barTop; // how far the bar's resting slot is above us
+        // The threshold is the block's resting slot MINUS the navbar height,
+        // because that is where pinned and static coincide. Drop the offset and
+        // the block would jump the navbar's height at the swap. All visual px:
+        // `scrollY` and `blockTop` are, so `navBottomPx` must be too.
+        var past = scrollY - (blockTop - navBottomPx);
         var gridBottom = grid.getBoundingClientRect().bottom + scrollY;
-        var stillOverGrid = gridBottom - scrollY > bar.offsetHeight;
+        // Release once the grid can no longer fill the space under the block —
+        // otherwise it hangs over the footer filtering nothing.
+        //
+        // `blockHeightPx` is the cached measurement, deliberately. Reading
+        // `offsetHeight` here would force a synchronous layout inside the
+        // scroll frame, every frame, and that stutter is the one thing the
+        // rAF throttle above cannot absorb.
+        var stillOverGrid = gridBottom - scrollY > navBottomPx + blockHeightPx;
 
         if (past >= 0 && stillOverGrid) pin(releasedBelow);
         else if (pinned) unpin(past >= 0); // past the grid → slide out
-
-        // Hysteresis: hide late, show early, so the two thresholds never meet.
-        if (pinned && past > NAV_HIDE_AT) setNav(true);
-        else if (!pinned || past < NAV_SHOW_AT) setNav(false);
       }
 
       function onScroll() {

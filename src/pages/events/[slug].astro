@@ -1,0 +1,539 @@
+---
+/**
+ * Event / webinar detail — one page per entry in `src/data/events.ts`.
+ * Figma node 14851:46962 ("Events / Webinar — Content page").
+ *
+ * THE SIBLING OF `blog-listing/[slug].astro`, AND BUILT THE SAME WAY.
+ * NO CLASSES IN THE MARKUP except three region hooks — `ct-event`,
+ * `ct-event-speakers`, `ct-event-related` — plus `container`, which carries
+ * page width so the 1328px identity stays defined once in theme.css.
+ * Everything else is styled by tag from `src/styles/event-detail.css`.
+ *
+ * That is deliberate. In Webflow an event is a CMS collection item whose
+ * description and agenda are Rich Text fields, and a Rich Text field emits
+ * classless `<h2>`/`<p>`/`<ul>`. Only element selectors can reach those, so an
+ * editor can add a webinar and have it come out designed without touching a
+ * single class.
+ *
+ * THE STRUCTURE IS THE API. The stylesheet reads this DOM shape:
+ *
+ *   .ct-event > header    breadcrumb, badges, h1, speakers, date/time/place
+ *   .ct-event > aside     the registration card — thumbnail, CTA, share row
+ *   .ct-event > article   the description and agenda — the WYSIWYG zone
+ *
+ * Three grid children, not two: splitting the copy into <header> and <article>
+ * is what lets the <aside> land BETWEEN them on mobile — title, then the card
+ * you register from, then the detail — while sitting beside both on desktop.
+ * Reordering or nesting these will silently unstyle things.
+ *
+ * Navbar and Footer are the listing page's own wrappers, imported rather than
+ * copied. This route lives *inside* /events/, so the two pages are one family
+ * and their chrome should never drift; `discoverSharedSources` follows the
+ * relative import chain (page -> events/Navbar -> _shared/NavbarRb), so both
+ * primitives still get their `@source` line and their utilities.
+ */
+import '../../styles/shared.css';
+import '../../styles/.build/event-detail.css';
+
+import Navbar from '../../sections/events/Navbar.astro';
+import Footer from '../../sections/events/Footer.astro';
+import {
+  allEvents,
+  upcomingEvents,
+  eventPath,
+  isUpcoming,
+  resolveSpeakers,
+} from '../../data/events';
+import type { EventItem } from '../../data/events';
+
+export function getStaticPaths() {
+  return allEvents.map((event) => ({
+    params: { slug: event.slug },
+    props: { event },
+  }));
+}
+
+interface Props {
+  event: EventItem;
+}
+
+const { event } = Astro.props;
+
+const upcoming = isUpcoming(event);
+const speakers = resolveSpeakers(event);
+
+/* A carousel only earns its keep — and its 150 KB of CDN JavaScript — when
+   there is more than one speaker to move between. One speaker renders as a
+   plain block with no Swiper classes, no nav buttons and no library request. */
+const useSwiper = speakers.length > 1;
+
+/* Initials stand in for a missing avatar, the same way the placeholder tint
+   stands in for a missing thumbnail on the listing cards. */
+function initialsOf(name: string): string {
+  return name
+    .split(' ')
+    .map((part) => part.charAt(0))
+    .join('')
+    .slice(0, 2)
+    .toUpperCase();
+}
+
+/* Six other upcoming sessions, wrapping round the end so the last event still
+   gets a full grid instead of a short row. `filter` first, so an event never
+   appears in its own "up next" rail. */
+const pool = upcomingEvents.filter((e) => e.slug !== event.slug);
+const related = pool.length
+  ? Array.from({ length: Math.min(6, pool.length) }, (_, i) => pool[i % pool.length])
+  : [];
+
+/* The canonical URL the share links point at. Webflow serves this collection
+   under /resources/events/, which is NOT the dev route (`/events/<slug>`) —
+   the two differ on purpose and only this constant knows about it. */
+const shareUrl = `https://www.cleartax.com/resources/events/${event.slug}`;
+const encodedUrl = encodeURIComponent(shareUrl);
+const encodedTitle = encodeURIComponent(event.title);
+
+const shareLinks = [
+  { label: 'WhatsApp', icon: 'https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6ab249b08dadf09d6cf24ccf_whatsapp-icon.png', href: `https://wa.me/?text=${encodedTitle}%20${encodedUrl}` },
+  { label: 'Facebook', icon: 'https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6ab249b09a873b15d2a4dfef_facebook-icon.png', href: `https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}` },
+  { label: 'X', icon: 'https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6ab249b02ed6fb96143a0f85_x-icon.png', href: `https://x.com/intent/tweet?url=${encodedUrl}&text=${encodedTitle}` },
+  { label: 'LinkedIn', icon: 'https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6ab249b196c5fb62e0af7c11_linkedin-icon.png', href: `https://www.linkedin.com/sharing/share-offsite/?url=${encodedUrl}` },
+];
+
+/* ONE LABEL, ALWAYS. A past session keeps the same button and renders it
+   disabled — registration has closed — rather than swapping in different copy.
+   The recording is reached from the play control drawn over the thumbnail
+   instead, which is the only affordance that changes between the two states. */
+const ctaLabel = 'Register now';
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{event.title} — ClearTax Events</title>
+    <meta name="description" content={event.summary ?? `${event.title} — ${event.date}, ${event.time}.`} />
+    <meta content="noindex, nofollow" name="robots" />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="32x32"
+      href="https://cdn.prod.website-files.com/63ede4a3da6dbd6b05c4612f/63ede4a3da6dbd7162c46439_32by32.png"
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400..700&family=Google+Sans:opsz,wght@17..18,400..700&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body class="bg-generic-00">
+    <Navbar />
+
+    <!-- Icon sprite: defined once, referenced by the header, the share row and
+         every related card. The globe path alone is ~700 characters and this
+         page draws it up to seven times. -->
+    <svg width="0" height="0" aria-hidden="true" focusable="false" style="position:absolute">
+      <symbol id="ct-evd-user" viewBox="0 0 256 256">
+        <path
+          d="M230.92,212c-15.23-26.33-38.7-45.21-66.09-54.16a72,72,0,1,0-73.66,0C63.78,166.78,40.31,185.66,25.08,212a8,8,0,1,0,13.85,8c18.84-32.56,52.14-52,89.07-52s70.23,19.44,89.07,52a8,8,0,1,0,13.85-8ZM72,96a56,56,0,1,1,56,56A56.06,56.06,0,0,1,72,96Z"
+          fill="currentColor"></path>
+      </symbol>
+      <symbol id="ct-evd-user-circle" viewBox="0 0 256 256">
+        <path
+          d="M128,24A104,104,0,1,0,232,128,104.11,104.11,0,0,0,128,24ZM74.08,197.5a64,64,0,0,1,107.84,0,87.83,87.83,0,0,1-107.84,0ZM96,120a32,32,0,1,1,32,32A32,32,0,0,1,96,120Zm97.76,66.41a79.66,79.66,0,0,0-36.06-28.75,48,48,0,1,0-59.4,0,79.66,79.66,0,0,0-36.06,28.75,88,88,0,1,1,131.52,0Z"
+          fill="currentColor"></path>
+      </symbol>
+      <symbol id="ct-evd-globe" viewBox="0 0 256 256">
+        <path
+          d="M128,24a104,104,0,1,0,104,104A104.11,104.11,0,0,0,128,24Zm88,104a87.61,87.61,0,0,1-3.33,24H174.16a157.44,157.44,0,0,0,0-48h38.51A87.61,87.61,0,0,1,216,128ZM102,168H154a115.11,115.11,0,0,1-26,45A115.27,115.27,0,0,1,102,168Zm-3.9-16a140.84,140.84,0,0,1,0-48h59.88a140.84,140.84,0,0,1,0,48ZM40,128a87.61,87.61,0,0,1,3.33-24H81.84a157.44,157.44,0,0,0,0,48H43.33A87.61,87.61,0,0,1,40,128ZM154,88H102a115.11,115.11,0,0,1,26-45A115.27,115.27,0,0,1,154,88Zm52.33,0H170.71a135.28,135.28,0,0,0-22.3-45.6A88.29,88.29,0,0,1,206.37,88ZM107.59,42.4A135.28,135.28,0,0,0,85.29,88H49.63A88.29,88.29,0,0,1,107.59,42.4ZM49.63,168H85.29a135.28,135.28,0,0,0,22.3,45.6A88.29,88.29,0,0,1,49.63,168Zm98.78,45.6a135.28,135.28,0,0,0,22.3-45.6h35.66A88.29,88.29,0,0,1,148.41,213.6Z"
+          fill="currentColor"></path>
+      </symbol>
+      <symbol id="ct-evd-calendar" viewBox="0 0 20 20">
+        <path
+          d="M16.25 2.5H14.375V1.875C14.375 1.70924 14.3092 1.55027 14.1919 1.43306C14.0747 1.31585 13.9158 1.25 13.75 1.25C13.5842 1.25 13.4253 1.31585 13.3081 1.43306C13.1908 1.55027 13.125 1.70924 13.125 1.875V2.5H6.875V1.875C6.875 1.70924 6.80915 1.55027 6.69194 1.43306C6.57473 1.31585 6.41576 1.25 6.25 1.25C6.08424 1.25 5.92527 1.31585 5.80806 1.43306C5.69085 1.55027 5.625 1.70924 5.625 1.875V2.5H3.75C3.41848 2.5 3.10054 2.6317 2.86612 2.86612C2.6317 3.10054 2.5 3.41848 2.5 3.75V16.25C2.5 16.5815 2.6317 16.8995 2.86612 17.1339C3.10054 17.3683 3.41848 17.5 3.75 17.5H16.25C16.5815 17.5 16.8995 17.3683 17.1339 17.1339C17.3683 16.8995 17.5 16.5815 17.5 16.25V3.75C17.5 3.41848 17.3683 3.10054 17.1339 2.86612C16.8995 2.6317 16.5815 2.5 16.25 2.5ZM5.625 3.75V4.375C5.625 4.54076 5.69085 4.69973 5.80806 4.81694C5.92527 4.93415 6.08424 5 6.25 5C6.41576 5 6.57473 4.93415 6.69194 4.81694C6.80915 4.69973 6.875 4.54076 6.875 4.375V3.75H13.125V4.375C13.125 4.54076 13.1908 4.69973 13.3081 4.81694C13.4253 4.93415 13.5842 5 13.75 5C13.9158 5 14.0747 4.93415 14.1919 4.81694C14.3092 4.69973 14.375 4.54076 14.375 4.375V3.75H16.25V6.25H3.75V3.75H5.625ZM16.25 16.25H3.75V7.5H16.25V16.25Z"
+          fill="currentColor"></path>
+      </symbol>
+      <symbol id="ct-evd-clock" viewBox="0 0 20 20">
+        <path
+          d="M10 1.875C8.39303 1.875 6.82214 2.35152 5.486 3.24431C4.14985 4.1371 3.10844 5.40605 2.49348 6.8907C1.87852 8.37535 1.71762 10.009 2.03112 11.5851C2.34463 13.1612 3.11846 14.6089 4.25476 15.7452C5.39106 16.8815 6.8388 17.6554 8.41489 17.9689C9.99099 18.2824 11.6247 18.1215 13.1093 17.5065C14.594 16.8916 15.8629 15.8502 16.7557 14.514C17.6485 13.1779 18.125 11.607 18.125 10C18.1227 7.84581 17.266 5.78051 15.7427 4.25727C14.2195 2.73403 12.1542 1.87727 10 1.875ZM10 16.875C8.64026 16.875 7.31105 16.4718 6.18046 15.7164C5.04987 14.9609 4.16868 13.8872 3.64833 12.6309C3.12798 11.3747 2.99183 9.99237 3.2571 8.65875C3.52238 7.32513 4.17716 6.10013 5.13864 5.13864C6.10013 4.17715 7.32514 3.52237 8.65876 3.2571C9.99238 2.99183 11.3747 3.12798 12.631 3.64833C13.8872 4.16868 14.9609 5.04987 15.7164 6.18045C16.4718 7.31104 16.875 8.64025 16.875 10C16.8729 11.8227 16.1479 13.5702 14.8591 14.8591C13.5702 16.1479 11.8227 16.8729 10 16.875ZM15 10C15 10.1658 14.9342 10.3247 14.8169 10.4419C14.6997 10.5592 14.5408 10.625 14.375 10.625H10C9.83424 10.625 9.67527 10.5592 9.55806 10.4419C9.44085 10.3247 9.375 10.1658 9.375 10V5.625C9.375 5.45924 9.44085 5.30027 9.55806 5.18306C9.67527 5.06585 9.83424 5 10 5C10.1658 5 10.3247 5.06585 10.4419 5.18306C10.5592 5.30027 10.625 5.45924 10.625 5.625V9.375H14.375C14.5408 9.375 14.6997 9.44085 14.8169 9.55806C14.9342 9.67527 15 9.83424 15 10Z"
+          fill="currentColor"></path>
+      </symbol>
+      <symbol id="ct-evd-pin" viewBox="0 0 256 256">
+        <path
+          d="M128,64a40,40,0,1,0,40,40A40,40,0,0,0,128,64Zm0,64a24,24,0,1,1,24-24A24,24,0,0,1,128,128Zm0-112a88.1,88.1,0,0,0-88,88c0,31.4,14.51,64.68,42,96.25a254.19,254.19,0,0,0,41.45,38.3,8,8,0,0,0,9.18,0A254.19,254.19,0,0,0,174,200.25c27.45-31.57,42-64.85,42-96.25A88.1,88.1,0,0,0,128,16Zm0,206c-16.53-13-72-60.75-72-118a72,72,0,0,1,144,0C200,161.23,144.53,209,128,222Z"
+          fill="currentColor"></path>
+      </symbol>
+      <symbol id="ct-evd-arrow" viewBox="0 0 24 24">
+        <path
+          fill-rule="evenodd"
+          clip-rule="evenodd"
+          d="M8.25 3.75L19.5 3.75C19.6989 3.75 19.8897 3.82902 20.0303 3.96967C20.171 4.11032 20.25 4.30109 20.25 4.5V15.75C20.25 16.1642 19.9142 16.5 19.5 16.5C19.0858 16.5 18.75 16.1642 18.75 15.75V6.31066L5.03033 20.0303C4.73744 20.3232 4.26256 20.3232 3.96967 20.0303C3.67678 19.7374 3.67678 19.2626 3.96967 18.9697L17.6893 5.25L8.25 5.25C7.83579 5.25 7.5 4.91421 7.5 4.5C7.5 4.08579 7.83579 3.75 8.25 3.75Z"
+          fill="currentColor"></path>
+      </symbol>
+      <symbol id="ct-evd-chevron-left" viewBox="0 0 20 20">
+        <path
+          d="M12.5 15L7.5 10L12.5 5"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.5"
+          stroke-linecap="round"
+          stroke-linejoin="round"></path>
+      </symbol>
+      <symbol id="ct-evd-chevron-right" viewBox="0 0 20 20">
+        <path
+          d="M7.5 5L12.5 10L7.5 15"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.5"
+          stroke-linecap="round"
+          stroke-linejoin="round"></path>
+      </symbol>
+      <symbol id="ct-evd-linkedin" viewBox="0 0 24 24">
+        <path
+          d="M20.45 20.45h-3.56v-5.57c0-1.33-.02-3.04-1.85-3.04-1.85 0-2.14 1.45-2.14 2.94v5.67H9.35V9h3.41v1.56h.05a3.74 3.74 0 0 1 3.37-1.85c3.6 0 4.27 2.37 4.27 5.46zM5.34 7.43a2.07 2.07 0 1 1 0-4.13 2.07 2.07 0 0 1 0 4.13M7.12 20.45H3.55V9h3.57zM22.22 0H1.77C.79 0 0 .77 0 1.72v20.56C0 23.23.79 24 1.77 24h20.45c.98 0 1.78-.77 1.78-1.72V1.72C24 .77 23.2 0 22.22 0"
+          fill="currentColor"></path>
+      </symbol>
+      <symbol id="ct-evd-x" viewBox="0 0 24 24">
+        <path
+          d="M18.9 1.15h3.68l-8.04 9.19L24 22.85h-7.41l-5.8-7.58-6.64 7.58H.46l8.6-9.83L0 1.15h7.59l5.24 6.93zm-1.29 19.5h2.04L6.48 3.24H4.29z"
+          fill="currentColor"></path>
+      </symbol>
+      <symbol id="ct-evd-facebook" viewBox="0 0 24 24">
+        <path
+          d="M24 12.07C24 5.41 18.63 0 12 0S0 5.4 0 12.07C0 18.1 4.39 23.1 10.12 24v-8.44H7.08v-3.49h3.04V9.41c-.01-3.02 1.79-4.69 4.53-4.69 1.31 0 2.68.24 2.68.24v2.97h-1.51c-1.49 0-1.96.93-1.96 1.89v2.25h3.33l-.53 3.5h-2.8V24C19.61 23.1 24 18.1 24 12.07"
+          fill="currentColor"></path>
+      </symbol>
+      <symbol id="ct-evd-whatsapp" viewBox="0 0 24 24">
+        <path
+          d="M12.04 2c-5.5 0-9.96 4.46-9.96 9.96 0 1.76.46 3.45 1.32 4.95L2 22l5.25-1.37a9.9 9.9 0 0 0 4.79 1.22h.01c5.5 0 9.96-4.46 9.96-9.96A9.9 9.9 0 0 0 19.1 4.9 9.9 9.9 0 0 0 12.04 2m0 18.15h-.01a8.2 8.2 0 0 1-4.19-1.15l-.3-.18-3.11.82.83-3.04-.2-.31a8.2 8.2 0 0 1-1.27-4.38c0-4.57 3.72-8.28 8.29-8.28a8.2 8.2 0 0 1 5.85 2.43 8.2 8.2 0 0 1 2.42 5.86c0 4.57-3.72 8.28-8.3 8.28m4.55-6.2c-.25-.13-1.47-.73-1.7-.81-.23-.09-.4-.13-.56.12s-.64.81-.79.98c-.14.16-.29.18-.54.06-.25-.12-1.05-.39-2-1.23a7.5 7.5 0 0 1-1.38-1.72c-.15-.25-.02-.38.11-.51.11-.11.25-.29.37-.44.13-.14.17-.25.25-.41.09-.17.04-.31-.02-.44-.06-.12-.56-1.35-.77-1.85-.2-.48-.4-.42-.55-.42l-.48-.01c-.16 0-.43.06-.66.31s-.87.85-.87 2.07.89 2.4 1.02 2.57c.12.16 1.75 2.67 4.24 3.74.59.26 1.05.41 1.41.52.6.19 1.14.16 1.57.1.48-.07 1.47-.6 1.68-1.18s.21-1.08.15-1.18c-.07-.11-.23-.17-.48-.29"
+          fill="currentColor"></path>
+      </symbol>
+    </svg>
+
+    <div class="container ct-event">
+      <header>
+        <nav aria-label="Breadcrumb">
+          <ol>
+            <li><a href="/events">Webinars</a></li>
+            <li aria-current="page">{event.title}</li>
+          </ol>
+        </nav>
+
+        <p>
+          <mark>{upcoming ? 'Upcoming' : 'Past'}</mark>
+          <span>
+            <svg aria-hidden="true" focusable="false"
+              ><use href={event.type === 'Online' ? '#ct-evd-globe' : '#ct-evd-user'}></use></svg
+            >
+            {event.type}
+          </span>
+        </p>
+
+        <h1>{event.title}</h1>
+
+        {
+          /* One <span> per speaker rather than a comma-joined string, because
+             each one is an outlined chip. At five speakers — which this event
+             has — a run-on "Name, Role, Name, Role, …" is unreadable anyway:
+             the role half already contains the comma the eye is looking for.
+
+             The icon is a sibling of the chips, not a child of the first one.
+             Figma draws one user icon for the whole row, and nesting it inside
+             a bordered chip would box it up with a single speaker's name and
+             make that chip visibly wider than the rest. */
+        }
+        <p>
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M12 2.4375C10.1087 2.4375 8.25992 2.99833 6.68736 4.04908C5.11482 5.09981 3.88917 6.59327 3.16541 8.34059C2.44164 10.0879 2.25227 12.0106 2.62125 13.8655C2.99022 15.7205 3.90096 17.4244 5.2383 18.7618C6.57564 20.099 8.27951 21.0098 10.1345 21.3787C11.9894 21.7477 13.9121 21.5584 15.6594 20.8346C17.4067 20.1108 18.9002 18.8852 19.951 17.3126C21.0017 15.74 21.5626 13.8913 21.5626 12C21.5596 9.46478 20.5511 7.03426 18.7584 5.24158C16.9657 3.44891 14.5352 2.44048 12 2.4375ZM6.6975 18.5626C7.24762 17.6478 8.02503 16.8908 8.95418 16.3655C9.88331 15.84 10.9326 15.5639 12 15.5639C13.0674 15.5639 14.1167 15.84 15.0458 16.3655C15.975 16.8908 16.7524 17.6478 17.3026 18.5626C15.8028 19.7785 13.9308 20.4422 12 20.4422C10.0693 20.4422 8.19717 19.7785 6.6975 18.5626ZM8.8125 11.25C8.8125 10.6196 8.99945 10.0033 9.3497 9.47912C9.69994 8.95494 10.1978 8.54639 10.7802 8.30514C11.3626 8.06388 12.0036 8.00076 12.6218 8.12375C13.2402 8.24674 13.8082 8.55031 14.254 8.9961C14.6996 9.44188 15.0032 10.0098 15.1262 10.6281C15.2492 11.2465 15.1861 11.8874 14.9449 12.4698C14.7036 13.0523 14.2951 13.55 13.7708 13.9003C13.2467 14.2506 12.6305 14.4374 12 14.4374C11.1546 14.4374 10.3439 14.1017 9.7461 13.504C9.14834 12.9061 8.8125 12.0954 8.8125 11.25ZM18.1416 17.7787C17.2578 16.4045 15.9367 15.3682 14.3916 14.8369C15.162 14.3237 15.7469 13.5762 16.0597 12.705C16.3726 11.8337 16.3967 10.8849 16.1287 9.99882C15.8606 9.11276 15.3145 8.33648 14.5711 7.78476C13.8278 7.23304 12.9266 6.93515 12.001 6.93515C11.0752 6.93515 10.1741 7.23304 9.43072 7.78476C8.68737 8.33648 8.1413 9.11276 7.87322 9.99882C7.60515 10.8849 7.62932 11.8337 7.94214 12.705C8.25497 13.5762 8.83985 14.3237 9.61032 14.8369C8.06519 15.3682 6.74414 16.4045 5.86032 17.7787C4.73048 16.5798 3.97635 15.0762 3.69099 13.4537C3.40563 11.8311 3.60152 10.1605 4.25448 8.64799C4.90745 7.13546 5.98894 5.84718 7.36551 4.94209C8.74206 4.037 10.3535 3.5547 12.001 3.5547C13.6484 3.5547 15.2598 4.037 16.6364 4.94209C18.013 5.84718 19.0944 7.13546 19.7474 8.64799C20.4004 10.1605 20.5963 11.8311 20.311 13.4537C20.0256 15.0762 19.2714 16.5798 18.1416 17.7787Z" fill="#05022A"/>
+          </svg>
+          {event.speakers.map((speaker) => <span>{speaker}</span>)}
+        </p>
+
+        <p>
+          <time datetime={event.datetime}>
+            <svg aria-hidden="true" focusable="false"><use href="#ct-evd-calendar"></use></svg>
+            {event.date}
+          </time>
+          <span></span>
+          <span>
+            <svg aria-hidden="true" focusable="false"><use href="#ct-evd-clock"></use></svg>
+            {event.time}
+          </span>
+          <span></span>
+          <span>
+            <svg aria-hidden="true" focusable="false"><use href="#ct-evd-pin"></use></svg>
+            {event.location}
+          </span>
+        </p>
+
+        <hr />
+      </header>
+
+      {
+        /* An empty <figure> renders the Figma "Visual Placeholder" tint at
+           16:9 — the stylesheet handles it. Set `event.image` to a Webflow
+           asset URL to fill it; never a `data:` URI, that alone can blow the
+           50 KB Embed budget. */
+      }
+      <aside>
+        <figure>
+          {event.image && <img src={event.image} alt={event.title} width="1280" height="720" />}
+          {
+            /* Play control, past sessions only. The event is over, so the
+               thumbnail IS the action — this is what `event.href` points at
+               once the button beside it has gone dead. */
+            !upcoming && (
+              <a
+                href={event.href}
+                target="_blank"
+                rel="noopener"
+                aria-label={`Play the recording of ${event.title}`}
+              >
+                <img
+                  src="https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6ab246685e37e413aa90378a_play-button.png"
+                  alt=""
+                  width="72"
+                  height="72"
+                  loading="lazy"
+                />
+              </a>
+            )
+          }
+        </figure>
+
+        {
+          /* A real <button disabled>, not a link styled to look dead. Only the
+             disabled attribute takes the element out of the tab order and has
+             a screen reader announce it as unavailable; `pointer-events: none`
+             on an <a> does neither, and the link would still be followed by
+             anyone navigating with a keyboard. */
+          upcoming ? (
+            <p><a href={event.href} target="_blank" rel="noopener">{ctaLabel}</a></p>
+          ) : (
+            <p><button type="button" disabled>{ctaLabel}</button></p>
+          )
+        }
+
+        <hr />
+
+        <p>Share</p>
+        <ul>
+          {
+            shareLinks.map((link) => (
+              <li>
+                <a href={link.href} target="_blank" rel="noopener" aria-label={`Share on ${link.label}`}>
+                    <img src={link.icon} alt="icon" />
+                </a>
+              </li>
+            ))
+          }
+        </ul>
+      </aside>
+
+      <article>
+        <h2>{upcoming ? 'About the Webinar' : 'About the session'}</h2>
+        <p>{event.summary ?? `${event.title}. ${event.date}, ${event.time} — ${event.location}.`}</p>
+
+        {
+          event.agenda && event.agenda.length > 0 && (
+            <>
+              <h2>Things we will discuss</h2>
+              <ul>{event.agenda.map((item) => <li>{item}</li>)}</ul>
+            </>
+          )
+        }
+
+      </article>
+
+      {
+        /* SPEAKERS ARE A FOURTH GRID CHILD, NOT PART OF <article>.
+           They used to live inside it and that was a real bug, not just an
+           organisational preference: `.ct-event > article ol` scores (0,1,2)
+           while `.ct-event-speakers > ol` scores only (0,1,1) — a child
+           combinator adds nothing to specificity — so the agenda list's
+           `flex-direction: column` beat the carousel's `row` and every speaker
+           stacked vertically no matter what order the rules were written in.
+           Out here, the WYSIWYG rules cannot reach this block at all.
+
+           It also belongs out here on the merits: <article> is the Rich Text
+           zone, and in Webflow the speakers are a multi-reference field
+           rendered by a Collection List, not prose an editor types. That is
+           why this is the one region allowed to carry Swiper's classes. */
+        speakers.length > 0 && (
+          <section class="ct-event-speakers">
+            {/* Figma 14851:47046 — the agenda and the speaker block are
+                separated by the same 2px rule that closes the header. */}
+            <hr />
+
+            {/* <header>, not <p> — the heading row holds an <h2>, and an
+                <h2> inside a <p> is parse-error markup: the browser closes
+                the paragraph before it, which would strand the pager outside
+                the row it is supposed to sit in. */}
+            <header>
+              <h2>{useSwiper ? 'About the Speakers' : 'About the Speaker'}</h2>
+              {/* Only rendered when there is somewhere to page to — two dead
+                  buttons read as a broken control. Swiper binds to these by
+                  class and adds `swiper-button-disabled` at either end. */}
+              {useSwiper && (
+                <span>
+                  <button type="button" class="ct-speaker-prev" aria-label="Previous speaker">
+                    <svg aria-hidden="true" focusable="false">
+                      <use href="#ct-evd-chevron-left" />
+                    </svg>
+                  </button>
+                  <button type="button" class="ct-speaker-next" aria-label="Next speaker">
+                    <svg aria-hidden="true" focusable="false">
+                      <use href="#ct-evd-chevron-right" />
+                    </svg>
+                  </button>
+                </span>
+              )}
+            </header>
+
+            {/* Swiper's classes appear ONLY when there is more than one
+                speaker. A single speaker is a plain block — no carousel, and
+                no reason to pull 150 KB of library down to slide between one
+                thing. The DOM shape is identical either way, so the styling
+                below is written against the tags, not the classes. */}
+            <div class={useSwiper ? 'swiper ct-speaker-swiper' : undefined}>
+              <div class={useSwiper ? 'swiper-wrapper' : undefined}>
+                {speakers.map((speaker) => (
+                  <article class={useSwiper ? 'swiper-slide' : undefined}>
+                    <p>{speaker.bio}</p>
+                    <div>
+                      <address>
+                        <span>
+                          {speaker.image ? (
+                            <img src={speaker.image} alt={speaker.name} width="48" height="48" />
+                          ) : (
+                            initialsOf(speaker.name)
+                          )}
+                        </span>
+                        <span>
+                          <strong>{speaker.name}</strong>
+                          <span>{speaker.role}</span>
+                        </span>
+                      </address>
+                      {speaker.profile && (
+                        <a href={speaker.profile} target="_blank" rel="noopener">
+                          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                          <path fill-rule="evenodd" clip-rule="evenodd" d="M1.16721 0H14.8334C15.4778 0.00033738 16 0.522818 16 1.16721V14.8334C15.9997 15.4778 15.4772 16 14.8328 16H1.16721C0.52258 16 0 15.4774 0 14.8328V1.16721C0 0.52258 0.52258 0 1.16721 0ZM2.33321 13.6668H4.66641V5.99985H2.33321V13.6668ZM5.00008 3.49981C5.00008 2.67123 4.32838 1.99954 3.49981 1.99954C2.67123 1.99954 1.99954 2.67123 1.99954 3.49981C1.99954 4.32838 2.67123 5.00008 3.49981 5.00008C4.32838 5.00008 5.00008 4.32838 5.00008 3.49981ZM6.33351 5.99985V13.6668H8.66672V9.9531C8.66672 8.70827 9.12505 7.91689 10.2269 7.91689C11.0213 7.91689 11.333 8.65083 11.333 9.9531V13.6668H13.6668V9.43182C13.6668 7.14628 13.1199 5.89963 10.8148 5.89963C9.61271 5.89963 8.81216 6.46246 8.49989 7.08884V5.99985H6.33351Z" fill="#05022A"/>
+                          </svg>
+                          View Profile
+                        </a>
+                      )}
+                    </div>
+                  </article>
+                ))}
+              </div>
+            </div>
+          </section>
+        )
+      }
+    </div>
+
+    {
+      /* Swiper from the CDN, loaded next to the markup that needs it rather
+         than in <head> — the same arrangement `about-us/Testimonials.astro`
+         and `press/Hero.astro` use, and the one that survives being pasted
+         into a Webflow Embed, which has no access to the page head.
+         Only emitted when a carousel is actually on the page.
+
+         THE INIT SCRIPT LIVES HERE TOO, not at the end of <body>. Everything
+         a Webflow Embed needs has to be one contiguous block — down there it
+         would be separated from the markup by the footer, and whoever pastes
+         this would have to know to go and fetch it. */
+      useSwiper && (
+        <>
+          <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
+          <script is:inline src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+          <script is:inline>
+            {/* One slide at a time, drag or buttons. `autoHeight` because the
+                bios differ in length by several lines and a fixed track height
+                would either clip the longest or leave a gap under the shortest.
+                Guarded on `typeof Swiper` and on a ready flag: the CDN script is
+                a separate request that may not have landed yet, and in a Webflow
+                Embed this whole block can be evaluated more than once. */}
+            (function () {
+              function initSpeakers() {
+                if (typeof Swiper === 'undefined') return;
+                var root = document.querySelector('.ct-speaker-swiper');
+                if (!root || root.dataset.swiperReady) return;
+                root.dataset.swiperReady = 'true';
+
+                new Swiper('.ct-speaker-swiper', {
+                  slidesPerView: 1,
+                  spaceBetween: 24,
+                  autoHeight: true,
+                  grabCursor: true,
+                  navigation: { prevEl: '.ct-speaker-prev', nextEl: '.ct-speaker-next' },
+                  keyboard: { enabled: true },
+                });
+              }
+
+              if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', initSpeakers);
+              } else {
+                initSpeakers();
+              }
+            })();
+          </script>
+        </>
+      )
+    }
+
+    {
+      related.length > 0 && (
+        <section class="container ct-event-related">
+          <h2>Upcoming Events &amp; Webinars</h2>
+          <p>Learn from the people building compliance every day.</p>
+          <ul>
+            {related.map((item) => (
+              <li>
+                <a href={eventPath(item.slug)}>
+                  <figure>
+                    {item.image && (
+                      <img src={item.image} alt={item.title} width="1280" height="720" loading="lazy" />
+                    )}
+                    <span>
+                      <svg aria-hidden="true" focusable="false">
+                        <use href={item.type === 'Online' ? '#ct-evd-globe' : '#ct-evd-user'} />
+                      </svg>
+                      {item.type}
+                    </span>
+                    <span>
+                      <svg aria-hidden="true" focusable="false">
+                        <use href="#ct-evd-arrow" />
+                      </svg>
+                    </span>
+                    <span>{item.speakers[0]}</span>
+                  </figure>
+                  <h3>{item.title}</h3>
+                  <p>
+                    <time datetime={item.datetime}>
+                      <svg aria-hidden="true" focusable="false">
+                        <use href="#ct-evd-calendar" />
+                      </svg>
+                      {item.date}
+                    </time>
+                    <span />
+                    <span>
+                      <svg aria-hidden="true" focusable="false">
+                        <use href="#ct-evd-clock" />
+                      </svg>
+                      {item.time}
+                    </span>
+                  </p>
+                </a>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )
+    }
+
+    <Footer />
+  </body>
+</html>

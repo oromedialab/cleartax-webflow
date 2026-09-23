@@ -1,0 +1,218 @@
+---
+/**
+ * Certification grid — Figma node 15026:11697.
+ *
+ * Eight cards, two per row. Each card: the accrediting body's mark in an 80px
+ * ring, the jurisdictions it covers on the right, a rule, then name and
+ * explanation. Cards stretch to the tallest in their row, which is why the
+ * copy block is pushed apart from the header with `justify-between` rather than
+ * the fixed 24px gap the mock shows — the mock sizes every row by hand.
+ *
+ * `scope` is a list because two cards cover more than one jurisdiction (GDPR is
+ * EU + UAE). "Global" is the one entry with no flag; it gets the globe glyph,
+ * inlined rather than fetched so the embed carries no extra asset.
+ *
+ * ── ASSETS TO UPLOAD ─────────────────────────────────────────────────────────
+ * Every `logo` below, plus EU_FLAG, points at `public/images/trust-centre/`.
+ * Those render in `npm run dev` and `dist/preview` but resolve to nothing once
+ * pasted into Webflow — upload the files to Webflow assets and swap each path
+ * for its CDN URL first. The remaining flag URLs are already Webflow-hosted
+ * (lifted from `_shared/NavbarRb.astro`).
+ * ─────────────────────────────────────────────────────────────────────────────
+ */
+const EU_FLAG = "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6ab26e69f1cc7421388afc1b_europe-flag.png";
+const UAE_FLAG =
+  "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6ab26e68ec63561a84363114_uae-flag.png";
+const KSA_FLAG =
+  "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6ab26e68709f44a0fbdd626c_saudi-arabia-flag.png";
+const MY_FLAG =
+  "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6ab26e68cbb96cfd20c17875_malaysia-flag.png";
+const OM_FLAG =
+  "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6ab26e68465dd97b085f1a9e_oman-flag.png";
+
+interface Scope {
+  label: string;
+  /** Omitted for "Global", which renders the globe glyph instead. */
+  flag?: string;
+}
+
+interface Certification {
+  logo: string;
+  name: string;
+  desc: string;
+  scope: Scope[];
+}
+
+const certifications: Certification[] = [
+  {
+    logo: "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6ab26e69f1cc7421388afc32_iso-27001-2022.png",
+    name: "ISO 27001:2022",
+    desc: "The international standard for information security management. The 2022 edition is the most current version.",
+    scope: [{ label: "Global" }],
+  },
+  {
+    logo: "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6ab26e686aa6b8ff0ae9e25a_soc-2-type-ii.png",
+    name: "SOC 2 Type II",
+    desc: "Independent audit standard that tests how well a company’s security, availability, and confidentiality controls actually operate over a period of time.",
+    scope: [{ label: "Global" }],
+  },
+  {
+    logo: "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6ab26e6867fdba1a1e8fb42a_iso-22301-2019.png",
+    name: "ISO 22301:2019",
+    desc: "Global standard that defines how an organisation prepares for, responds to, and recovers from disruptions such as cyber incidents, system outages, or supply chain failures.",
+    scope: [{ label: "UAE", flag: UAE_FLAG }],
+  },
+  {
+    logo: "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6ab26e68d381ea6d28ca4089_gdpr.png",
+    name: "GDPR",
+    desc: "EU data protection law that sets strict rules for how personal data is collected, processed, stored, and shared, regardless of where the company is based. It emphasises privacy by design, user consent, transparency, and strong rights for data subjects.",
+    scope: [
+      { label: "EU", flag: EU_FLAG },
+      { label: "UAE", flag: UAE_FLAG },
+    ],
+  },
+  {
+    logo: "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6ab26e6821c84cb5d85986cc_fta-uae.png",
+    name: "FTA (Federal Tax Authority)",
+    desc: "The UAE Federal Tax Authority, FTA compliance means our platform meets the standards for how tax data is submitted, stored, and protected in the UAE context. If you are a business operating in the UAE, FTA compliance is a baseline requirement for any platform handling your VAT data.",
+    scope: [{ label: "UAE", flag: UAE_FLAG }],
+  },
+  {
+    logo: "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6ab26e68ec63561a843630c9_sama.png",
+    name: "SAMA (Saudi Arabian Monetary Authority)",
+    desc: "SAMA sets cybersecurity and technology risk requirements for financial institutions and technology service providers operating in the Kingdom of Saudi Arabia. The SAMA Cybersecurity Framework covers governance, risk identification, protective controls, and incident response.",
+    scope: [{ label: "Saudi Arabia", flag: KSA_FLAG }],
+  },
+  {
+    logo: "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6ab26e6918f23f0db68542a4_rmit.png",
+    name: "RMiT (Risk Management in Technology)",
+    desc: "Bank Negara Malaysia's Risk Management in Technology framework is mandatory for financial institutions and their technology service providers. It covers cloud adoption, cyber resilience, IT service management, and third-party risk. If your regulator asks, we can provide documentation.",
+    scope: [{ label: "Malaysia", flag: MY_FLAG }],
+  },
+  {
+    logo: "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6ab26e68b81b106927f9fac0_ota-oman.png",
+    name: "OTA (Oman Tax Authority)",
+    desc: "It helps enterprises prepare, validate, exchange, and report VAT and e-invoice data in line with Oman’s Fawtara framework. Accurate tax calculations, traceable records, and streamlined workflows help finance teams stay compliance-ready as the framework evolves.",
+    scope: [{ label: "Oman", flag: OM_FLAG }],
+  },
+];
+---
+
+<section class="bg-generic-00 py-12 lg:py-20">
+  <div class="container mx-auto">
+    <h2
+      class="m-0 mx-auto max-w-[852px] text-center font-heading font-medium text-vault-navy text-[length:var(--fs-h2)] leading-[length:var(--lh-h2)] lg:text-[length:var(--fs-h1)] lg:leading-[length:var(--lh-h1)] tracking-[-0.5px]"
+    >
+      Every certification listed here was issued by an independent auditing or
+      accreditation body.
+    </h2>
+
+    <ul class="m-0 mt-8 grid list-none grid-cols-1 gap-6 p-0 lg:mt-12 lg:grid-cols-2">
+      {
+        certifications.map((cert) => (
+          <li
+            class="flex h-full flex-col justify-between gap-6 rounded-xl border border-[#DCDEE2] bg-generic-00 px-[22px] py-6"
+          >
+            <div class="flex flex-col gap-6">
+              <div class="flex items-center justify-between gap-4">
+                <span
+                  class="flex size-20 shrink-0 items-center justify-center overflow-hidden rounded-full border border-[#ECECF4] bg-generic-00"
+                >
+                  <img
+                    src={cert.logo}
+                    alt={cert.name}
+                    class="size-[58px] object-contain"
+                    loading="lazy"
+                    decoding="async"
+                  />
+                </span>
+
+                <span class="flex flex-wrap items-center justify-end gap-3">
+                  {cert.scope.map((s) => (
+                    <span class="flex items-center gap-3">
+                      {s.flag ? (
+                        <img
+                          src={s.flag}
+                          alt=""
+                          class="size-6 shrink-0 rounded-full border-[0.667px] border-[rgba(0,0,0,0.08)] object-cover"
+                          loading="lazy"
+                          decoding="async"
+                        />
+                      ) : (
+                        <svg
+                          width="20"
+                          height="20"
+                          viewBox="0 0 20 20"
+                          fill="none"
+                          class="shrink-0"
+                          aria-hidden="true"
+                        >
+                          <path
+                            d="M19.4141 10C19.4141 4.80074 15.1993 0.585937 10 0.585937C4.80074 0.585937 0.585937 4.80074 0.585937 10C0.585937 15.1993 4.80074 19.4141 10 19.4141C15.1993 19.4141 19.4141 15.1993 19.4141 10Z"
+                            stroke="#5446FF"
+                            stroke-width="1.17188"
+                            stroke-miterlimit="10"
+                          />
+                          <path
+                            d="M10 0.585937C7.4004 0.585937 5.29298 4.80074 5.29298 10C5.29298 15.1993 7.4004 19.4141 10 19.4141"
+                            stroke="#5446FF"
+                            stroke-width="1.17188"
+                            stroke-miterlimit="10"
+                          />
+                          <path
+                            d="M14.7071 10C14.7071 15.1993 12.5996 19.4141 10 19.4141V0.585937C12.5996 0.585937 14.7071 4.80074 14.7071 10Z"
+                            stroke="#5446FF"
+                            stroke-width="1.17188"
+                            stroke-miterlimit="10"
+                          />
+                          <path
+                            d="M0.585937 10H19.4141"
+                            stroke="#5446FF"
+                            stroke-width="1.17188"
+                            stroke-miterlimit="10"
+                          />
+                          <path
+                            d="M17.3483 15.8851C15.623 14.8094 12.9724 14.1207 10 14.1207C7.02769 14.1207 4.3771 14.8094 2.65183 15.8851"
+                            stroke="#5446FF"
+                            stroke-width="1.17188"
+                            stroke-miterlimit="10"
+                          />
+                          <path
+                            d="M2.65183 4.11485C4.3771 5.19055 7.02773 5.8793 10.0001 5.8793C12.9724 5.8793 15.623 5.19055 17.3483 4.11485"
+                            stroke="#5446FF"
+                            stroke-width="1.17188"
+                            stroke-miterlimit="10"
+                          />
+                        </svg>
+                      )}
+                      <span
+                        class="whitespace-nowrap font-heading font-medium text-vault-navy text-[length:var(--fs-h6)] leading-[length:var(--lh-h6)]"
+                      >
+                        {s.label}
+                      </span>
+                    </span>
+                  ))}
+                </span>
+              </div>
+
+              <span class="block h-px w-full bg-[#DCDEE2]" aria-hidden="true" />
+            </div>
+
+            <div class="flex flex-col gap-4">
+              <h3
+                class="m-0 font-heading font-medium text-vault-navy text-[length:var(--fs-h6)] leading-[length:var(--lh-h6)]"
+              >
+                {cert.name}
+              </h3>
+              <p
+                class="m-0 font-body font-normal text-neutral-500 text-[length:var(--fs-body)] leading-[length:var(--lh-body)]"
+              >
+                {cert.desc}
+              </p>
+            </div>
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+</section>

@@ -1,0 +1,59 @@
+---
+/**
+ * Stats strip — Figma node 15026:11541 ("Container - Social Proof").
+ *
+ * Five figures on one line, separated by 2px rules. The rules are drawn as list
+ * items rather than borders so they can disappear on mobile, where the row wraps
+ * to a 2-up grid and a vertical rule between wrapped cells reads as noise.
+ */
+interface Stat {
+  value: string;
+  label: string;
+}
+
+const stats: Stat[] = [
+  { value: "1B+", label: "transactions processed" },
+  { value: "99.9%", label: "Uptime SLA" },
+  { value: "6000+", label: "enterprise clients globally" },
+  { value: "50+", label: "countries covered" },
+  { value: "7", label: "global office locations" },
+];
+---
+
+<section class="border-b border-[rgba(0,0,0,0.2)] bg-generic-00 pt-6 pb-8 lg:pb-12">
+  <div class="container mx-auto">
+    <ul
+      class="m-0 grid list-none grid-cols-2 gap-x-2 gap-y-4 p-0 md:grid-cols-3 lg:flex lg:items-center lg:justify-between lg:gap-0"
+    >
+      {
+        stats.map((stat, i) => (
+          <>
+            {i > 0 && (
+              <li
+                class="hidden h-20 w-0.5 shrink-0 rounded-lg bg-[#F2F1F0] lg:block"
+                aria-hidden="true"
+              />
+            )}
+            <!-- Narrower side padding than the mock's flat 24px: the longest
+                 label ("enterprise clients globally") is drawn `nowrap` there
+                 and only just clears 24px at the design's own 1280px content
+                 width, so any font fallback wraps it. Vertical padding is the
+                 mock's. -->
+            <li class="flex min-w-0 flex-1 flex-col items-center justify-center gap-2 px-4 py-4 text-center lg:px-2 lg:py-6">
+              <span
+                class="font-heading font-medium text-vault-navy text-[length:var(--fs-h3)] leading-[length:var(--lh-h3)] lg:text-[length:var(--fs-h2)] lg:leading-[length:var(--lh-h2)]"
+              >
+                {stat.value}
+              </span>
+              <span
+                class="font-body font-medium text-neutral-500 text-[length:var(--fs-body)] leading-[length:var(--lh-body)] lg:text-[length:var(--fs-body-lg)] lg:leading-[length:var(--lh-body-lg)]"
+              >
+                {stat.label}
+              </span>
+            </li>
+          </>
+        ))
+      }
+    </ul>
+  </div>
+</section>

@@ -54,7 +54,14 @@ export const PAGE_TARGETS = [
   { name: 'about-us', input: 'src/styles/about-us.css', page: 'src/pages/about-us.astro' },
   { name: 'indirect-tax-page', input: 'src/styles/indirect-tax-page.css', page: 'src/pages/indirect-tax-page.astro'},
   { name: 'press', input: 'src/styles/press.css', page: 'src/pages/press.astro' },
-  { name: 'events', input: 'src/styles/events.css', page: 'src/pages/events.astro' }
+  { name: 'events', input: 'src/styles/events.css', page: 'src/pages/events.astro' },
+  // Detail route, the events twin of `blog-detail` above. It uses no utilities
+  // beyond `container` — the design is element selectors in event-detail.css
+  // so a Webflow Rich Text description styles itself — but it still goes
+  // through the pipeline so the paste-ready bundle lands in public/css/ like
+  // every other page.
+  { name: 'event-detail', input: 'src/styles/event-detail.css', page: 'src/pages/events/[slug].astro' },
+  { name: 'trust-centre', input: 'src/styles/trust-centre.css', page: 'src/pages/trust-centre.astro' }
 ];
 
 const SHARED_IMPORT_RE = /import\s+[A-Z][A-Za-z0-9]*\s+from\s+['"]\.\.\/sections\/_shared\/([A-Za-z0-9_-]+)\.astro['"]/g;
