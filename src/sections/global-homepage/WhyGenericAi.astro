@@ -103,7 +103,7 @@ const LEDE =
         cards.map((card, i) => (
           <div
             class="gh-why-sticky sticky"
-            style={`top:calc(var(--nav-clear, 112px) + ${i * 16}px);z-index:${i};`}
+            style={`top:calc(var(--nav-clear, 112px) + ${i === 0 ? "0px" : `var(--gh-why-header-offset, 0px) + ${i * 16}px`});z-index:${i};`}
           >
             {i === 0 && (
               <div
@@ -120,10 +120,10 @@ const LEDE =
             )}
 
             <article
-              class="gh-why-card flex w-full flex-col gap-6 rounded-xl border-2 border-[#CCCCCC] bg-generic-00 p-6 will-change-transform md:h-[var(--gh-why-card-h)]"
+              class="gh-why-card flex w-full flex-col rounded-xl border-2 border-[#CCCCCC] bg-generic-00 p-4 md:py-4.5 md:px-6 will-change-transform md:h-[var(--gh-why-card-h)]"
               style="transform-origin: top center;"
             >
-              <h3 class="m-0 text-center font-heading font-medium text-vault-navy text-[length:var(--fs-h6)] leading-[length:var(--lh-h6)]">
+              <h3 class="m-0 mb-3 md:mb-4 font-heading font-medium text-vault-navy text-[length:var(--fs-h6)] leading-[length:var(--lh-h6)]">
                 {card.title}
               </h3>
 
@@ -135,11 +135,21 @@ const LEDE =
                   taller caption, so the captions share a baseline too.
                   minmax(0,1fr) + min-h-0 is what lets the image row absorb the
                   card's height clamp instead of overflowing it. */}
-              <div class="grid w-full flex-1 grid-cols-1 gap-y-6 md:min-h-0 md:grid-cols-2 md:grid-rows-[minmax(0,1fr)_auto] md:gap-x-8">
+              <div class="gh-why-card-grid w-full flex-1 md:min-h-0">
+                <!-- Top Badge: GENERIC AI (Row 1 Col 1) -->
+                <div class="flex items-center justify-start md:col-start-1 md:row-start-1 mb-3 md:mb-2">
+                  <span class="inline-flex items-center gap-1.5 border border-neutral-200 rounded-xl bg-generic-00 px-3 py-1.5 font-body text-[14px] font-medium uppercase text-neutral-700 select-none">
+                    <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M11.0482 11.0482L9.17549 16.1986C9.13177 16.3164 9.05304 16.418 8.94988 16.4898C8.84673 16.5615 8.72409 16.6 8.59844 16.6C8.47279 16.6 8.35014 16.5615 8.24699 16.4898C8.14383 16.418 8.06511 16.3164 8.02138 16.1986L6.15172 11.0482L1.00131 9.17549C0.88351 9.13177 0.781916 9.05304 0.710173 8.94988C0.63843 8.84673 0.599976 8.72409 0.599976 8.59844C0.599976 8.47279 0.63843 8.35015 0.710173 8.24699C0.781916 8.14383 0.88351 8.06511 1.00131 8.02138L6.15172 6.15172L8.02446 1.00131C8.06818 0.88351 8.14691 0.781916 8.25007 0.710173C8.35322 0.63843 8.47586 0.599976 8.60151 0.599976C8.72716 0.599976 8.84981 0.63843 8.95296 0.710173C9.05612 0.781916 9.13485 0.88351 9.17857 1.00131L11.0513 6.15172L16.2017 8.02446C16.3195 8.06818 16.4211 8.14691 16.4929 8.25007C16.5646 8.35322 16.6031 8.47586 16.6031 8.60151C16.6031 8.72717 16.5646 8.84981 16.4929 8.95296C16.4211 9.05612 16.3195 9.13485 16.2017 9.17857L11.0482 11.0482Z" stroke="#374151" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                    GENERIC AI
+                  </span>
+                </div>
+
                 {i === 0 ? (
                   <div
-                    class="gh-why-generic-card-0 relative flex w-full flex-col justify-between overflow-hidden rounded-xl border border-[#111827] p-5 md:p-6 aspect-[600/400] md:col-start-1 md:row-start-1 md:min-h-0 select-none"
-                    style="background-image:url('https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6ab12682919b2e325a9f0db0_background-dots.png'); background-size: auto; background-position: center; background-repeat: no-repeat;"
+                    class="gh-why-generic-card-0 relative flex w-full flex-col bg-generic-00 justify-between overflow-hidden rounded-xl border border-[#111827] p-4 md:p-5 max-md:aspect-[600/400] md:col-start-1 md:row-start-2 md:h-full md:min-h-0 select-none bg-cover bg-center bg-no-repeat"
+                    style="background-image:url('https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6ab399f1e2c6a1e38c91700f_dots-bg.png');"
                     data-card-index="0"
                   >
                     <!-- Ambient Center Glow for Frame 1 -->
@@ -164,14 +174,14 @@ const LEDE =
                     <!-- Top Stage Area: Frame 3 & 4 Chat Bubble, Frame 5 Chart Header -->
                     <div class="gh-card0-top-stage relative z-10 w-full shrink-0 min-h-[42px] flex items-start">
                       <!-- Frame 3 & 4: User query bubble at top-right -->
-                      <div class="gh-card0-bubble absolute right-0 top-0 self-end max-w-fit rounded-2xl border border-[#1118271F] bg-[#EDEDED] px-3.5 py-1.5 md:px-4 md:py-2 opacity-0 pointer-events-none shadow-xs">
+                      <div class="gh-card0-bubble hidden absolute right-0 top-0 self-end max-w-fit rounded-2xl border border-[#1118271F] bg-[#EDEDED] px-3.5 py-1.5 md:px-4 md:py-2 opacity-0 pointer-events-none shadow-xs">
                         <p class="m-0 font-body text-base font-normal leading-[1.4] text-[#111827]">
                           Which invoices cross 180 days this month?
                         </p>
                       </div>
 
                       <!-- Frame 5: Chart Header at top-left -->
-                      <div class="gh-card0-chart-header absolute left-0 top-0 -mt-1 md:-mt-1.5 flex flex-col w-full opacity-0 pointer-events-none">
+                      <div class="gh-card0-chart-header hidden absolute left-0 top-0 flex flex-col w-full opacity-0 pointer-events-none">
                         <h3 class="text-base font-medium text-[#111827] leading-[1.4] m-0">
                           Open unpaid invoices by age. ITC ₹Cr
                         </h3>
@@ -184,7 +194,7 @@ const LEDE =
                     <!-- Middle Stage Area: Frame 3 Skeleton, Frame 4 Process Checklist, Frame 5 Chart -->
                     <div class="gh-card0-middle-stage relative z-10 w-full min-h-0 flex-1 flex flex-col items-start justify-start py-1">
                       <!-- Frame 3: Skeleton shimmer bars aligned to top -->
-                      <div class="gh-card0-skeleton absolute inset-x-0 top-1.5 mt-5.5 md:top-0 flex flex-col justify-start gap-3 opacity-0 pointer-events-none">
+                      <div class="gh-card0-skeleton hidden absolute inset-x-0 top-1.5 mt-5.5 md:top-0 flex flex-col justify-start gap-3 opacity-0 pointer-events-none">
                         <div class="flex items-center gap-3 animate-pulse">
                           <div class="h-3 w-6/12 rounded-full bg-[#E5E7EB]"></div>
                           <div class="h-3 w-4/12 rounded-full bg-[#E5E7EB]"></div>
@@ -196,7 +206,7 @@ const LEDE =
                       </div>
 
                       <!-- Frame 4: 2x2 Process Checklist grid aligned to top -->
-                      <div class="gh-card0-checklist absolute inset-x-0 top-1.5 md:mt-5.5 flex items-start justify-start opacity-0 pointer-events-none">
+                      <div class="gh-card0-checklist hidden absolute inset-x-0 top-1.5 md:mt-5.5 flex items-start justify-start opacity-0 pointer-events-none">
                         <div class="grid w-fit grid-cols-[max-content_max-content] gap-x-5 md:gap-x-7 gap-y-2 md:gap-y-2.5">
                           <div class="gh-card0-check-item flex items-center gap-2 opacity-0">
                             <svg
@@ -468,7 +478,7 @@ const LEDE =
                       </div>
 
                       <!-- Frame 5: Final Chart Image -->
-                      <div class="gh-card0-chart absolute inset-0 flex items-center justify-center opacity-0 pointer-events-none">
+                      <div class="gh-card0-chart hidden absolute inset-0 flex items-center justify-center opacity-0 pointer-events-none">
                         <img
                           src="https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6ab225ddc46a254d92448aea_charts.png"
                           alt="Open unpaid invoices by age chart"
@@ -559,7 +569,7 @@ const LEDE =
 
                         <button
                           type="button"
-                          class="gh-card0-submit-btn flex h-8 w-8 shrink-0 cursor-pointer items-center justify-center rounded-full border-0 bg-[#4F46E5] transition-transform hover:bg-[#4338CA]"
+                          class="gh-card0-submit-btn flex h-8 w-8 shrink-0 cursor-pointer items-center justify-center rounded-full border-0 bg-[#4F46E5] transition-transform"
                         >
                           <svg
                             width="11"
@@ -587,10 +597,11 @@ const LEDE =
                   </div>
                 ) : i === 1 ? (
                   <div
-                    class="gh-why-generic-card-1 relative flex w-full flex-col items-center justify-center gap-5 overflow-hidden rounded-xl border border-neutral-200 p-8 max-md:aspect-[600/400] md:col-start-1 md:row-start-1 md:min-h-0 bg-cover bg-center bg-no-repeat"
-                    style="background-image:url('https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6ab12682919b2e325a9f0db0_background-dots.png');"
+                    class="gh-why-generic-card-1 relative flex w-full flex-col bg-generic-00 items-center justify-center gap-5 overflow-hidden rounded-xl border border-neutral-200 p-8 max-md:aspect-[600/400] md:col-start-1 md:row-start-2 md:h-full md:min-h-0 bg-cover bg-center bg-no-repeat"
+                    style="background-image:url('https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6ab399f1e2c6a1e38c91700f_dots-bg.png');"
                     data-card-index="1"
                   >
+
                     {/* Card 1: Fraud Prevention generic AI container */}
                     <div class="relative z-10 flex w-full flex-col items-center justify-center gap-5">
                       <h3 class="m-0 text-center font-heading font-medium text-vault-navy text-[length:var(--fs-h6)] leading-[length:var(--lh-h6)]">
@@ -653,10 +664,11 @@ const LEDE =
                   </div>
                 ) : i === 2 ? (
                   <div
-                    class="gh-why-generic-card-2 relative flex w-full flex-col items-center justify-center gap-5 overflow-hidden rounded-xl border border-neutral-200 p-8 max-md:aspect-[600/400] md:col-start-1 md:row-start-1 md:min-h-0 bg-cover bg-center bg-no-repeat"
-                    style="background-image:url('https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6ab12682919b2e325a9f0db0_background-dots.png');"
+                    class="gh-why-generic-card-2 relative flex w-full flex-col items-center justify-center gap-5 overflow-hidden rounded-xl border border-neutral-200 p-8 max-md:aspect-[600/400] md:col-start-1 md:row-start-2 md:min-h-0 bg-cover bg-center bg-no-repeat"
+                    style="background-image:url('https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6ab399f1e2c6a1e38c91700f_dots-bg.png');"
                     data-card-index="2"
                   >
+
                     {/* Card 2: CFO Insights generic AI container */}
                     <div class="relative z-10 flex w-full flex-col items-center justify-center gap-5">
                       <h3 class="m-0 text-center font-heading font-medium text-vault-navy text-[length:var(--fs-h6)] leading-[length:var(--lh-h6)]">
@@ -719,10 +731,11 @@ const LEDE =
                   </div>
                 ) : i === 3 ? (
                   <div
-                    class="gh-why-generic-card-3 relative flex w-full flex-col items-center justify-center gap-5 overflow-hidden rounded-xl border border-neutral-200 p-8 max-md:aspect-[600/400] md:col-start-1 md:row-start-1 md:min-h-0 bg-cover bg-center bg-no-repeat"
-                    style="background-image:url('https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6ab12682919b2e325a9f0db0_background-dots.png');"
+                    class="gh-why-generic-card-3 relative flex w-full flex-col items-center justify-center gap-5 overflow-hidden rounded-xl border border-neutral-200 p-8 max-md:aspect-[600/400] md:col-start-1 md:row-start-2 md:min-h-0 bg-cover bg-center bg-no-repeat"
+                    style="background-image:url('https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6ab399f1e2c6a1e38c91700f_dots-bg.png');"
                     data-card-index="3"
                   >
+
                     {/* Card 3: Tax Automation generic AI container */}
                     <div class="relative z-10 flex w-full flex-col items-center justify-center gap-5">
                       <h3 class="m-0 text-center font-heading font-medium text-vault-navy text-[length:var(--fs-h6)] leading-[length:var(--lh-h6)]">
@@ -785,10 +798,11 @@ const LEDE =
                   </div>
                 ) : (
                   <div
-                    class="gh-why-generic-card-4 relative flex w-full flex-col items-center justify-center gap-5 overflow-hidden rounded-xl border border-neutral-200 p-8 max-md:aspect-[600/400] md:col-start-1 md:row-start-1 md:min-h-0 bg-cover bg-center bg-no-repeat"
-                    style="background-image:url('https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6ab12682919b2e325a9f0db0_background-dots.png');"
+                    class="gh-why-generic-card-4 relative flex w-full flex-col items-center justify-center gap-5 overflow-hidden rounded-xl border border-neutral-200 p-8 max-md:aspect-[600/400] md:col-start-1 md:row-start-2 md:min-h-0 bg-cover bg-center bg-no-repeat"
+                    style="background-image:url('https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6ab399f1e2c6a1e38c91700f_dots-bg.png');"
                     data-card-index="4"
                   >
+
                     {/* Card 4: Accounts Payable generic AI container */}
                     <div class="relative z-10 flex w-full flex-col items-center justify-center gap-5">
                       <h3 class="m-0 text-center font-heading font-medium text-vault-navy text-[length:var(--fs-h6)] leading-[length:var(--lh-h6)]">
@@ -851,161 +865,244 @@ const LEDE =
                   </div>
                 )}
 
-                <div class="mt-5">
-                  <p class="m-0 font-body text-neutral-500 text-[length:var(--fs-body)] leading-[length:var(--lh-body)] md:col-start-1 md:row-start-2">
+                <div class="md:col-start-1 md:row-start-3 mt-3 md:mt-2">
+                  <p class="m-0 font-body text-neutral-500 text-[length:var(--fs-body)] leading-[length:var(--lh-body)]">
                     {card.genericCaption}
                   </p>
                 </div>
 
+                <!-- Top Badge: CLEARTAX AI (Row 1 Col 2) -->
+                <div class="flex items-center justify-start max-md:mt-4 md:col-start-2 md:row-start-1 mb-3 md:mb-2">
+                  <span class="inline-flex items-center gap-1.5 rounded-xl bg-nova-blue px-3 py-1.5 font-body text-[14px] font-medium uppercase text-generic-00 select-none">
+                    <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M5.06429 12.1356L0.983496 10.6319C0.870974 10.5904 0.773886 10.5153 0.705312 10.4169C0.636739 10.3185 0.599976 10.2015 0.599976 10.0815C0.599976 9.96158 0.636739 9.84452 0.705312 9.74611C0.773886 9.6477 0.870974 9.57268 0.983496 9.53114L5.06429 8.02742L6.56801 3.94663C6.60954 3.83411 6.68457 3.73702 6.78297 3.66845C6.88138 3.59987 6.99844 3.56311 7.11839 3.56311C7.23833 3.56311 7.35539 3.59987 7.4538 3.66845C7.5522 3.73702 7.62723 3.83411 7.66876 3.94663L9.17248 8.02742L13.2533 9.53114C13.3658 9.57268 13.4629 9.6477 13.5315 9.74611C13.6 9.84452 13.6368 9.96158 13.6368 10.0815C13.6368 10.2015 13.6 10.3185 13.5315 10.4169C13.4629 10.5153 13.3658 10.5904 13.2533 10.6319L9.17248 12.1356L7.66876 16.2164C7.62723 16.3289 7.5522 16.426 7.4538 16.4946C7.35539 16.5632 7.23833 16.5999 7.11839 16.5999C6.99844 16.5999 6.88138 16.5632 6.78297 16.4946C6.68457 16.426 6.60954 16.3289 6.56801 16.2164L5.06429 12.1356Z" stroke="white" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+                      <path d="M11.8591 0.599976V4.15557" stroke="white" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+                      <path d="M15.4147 4.74817V7.11857" stroke="white" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+                      <path d="M10.0813 2.37781H13.6369" stroke="white" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+                      <path d="M14.2295 5.93335H16.5999" stroke="white" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                    CLEARTAX AI
+                  </span>
+                </div>
+
                 {i === 0 ? (
                   <div
-                    class="gh-why-animation-card-0 relative flex w-full flex-col bg-[#F6F6F6] justify-end overflow-hidden rounded-xl border border-[#111827] p-5 md:p-6 aspect-[600/400] md:col-start-2 md:row-start-1 md:min-h-0 bg-cover bg-center bg-no-repeat select-none"
+                    class="gh-why-animation-card-0 relative flex w-full flex-col bg-[#F6F6F6] justify-between overflow-hidden rounded-xl border border-[#111827] p-4 md:p-5 max-md:aspect-[600/400] md:col-start-2 md:row-start-2 md:h-full md:min-h-0 bg-cover bg-center bg-no-repeat select-none"
                     data-card-index="0"
                   >
-                    <div class="gh-ct-card0-input-box relative flex w-full flex-col gap-3.5 rounded-2xl md:rounded-[22px] border border-[#11182726] bg-generic-00 p-3 md:p-3.5 shadow-xs">
-                      <!-- File attachment chip at top -->
-                      <div class="gh-ct-card0-file-chip inline-flex items-center gap-2.5 rounded-xl border border-[#1118271F] px-2.5 py-1.5 shadow-2xs max-w-fit">
-                        <div class="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-generic-00 ">
-                          <svg width="12" height="13" viewBox="0 0 12 13" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M8 4.5H11.5" stroke="#05022A" stroke-linecap="round" stroke-linejoin="round"/>
-                            <path d="M8 8.5H11.5" stroke="#05022A" stroke-linecap="round" stroke-linejoin="round"/>
-                            <path d="M2.5 3V1C2.5 0.867392 2.55268 0.740215 2.64645 0.646447C2.74021 0.552679 2.86739 0.5 3 0.5H11C11.1326 0.5 11.2598 0.552679 11.3536 0.646447C11.4473 0.740215 11.5 0.867392 11.5 1V12C11.5 12.1326 11.4473 12.2598 11.3536 12.3536C11.2598 12.4473 11.1326 12.5 11 12.5H3C2.86739 12.5 2.74021 12.4473 2.64645 12.3536C2.55268 12.2598 2.5 12.1326 2.5 12V10" stroke="#05022A" stroke-linecap="round" stroke-linejoin="round"/>
-                            <path d="M7 10V12.5" stroke="#05022A" stroke-linecap="round" stroke-linejoin="round"/>
-                            <path d="M7 0.5V3" stroke="#05022A" stroke-linecap="round" stroke-linejoin="round"/>
-                            <path d="M7.5 3H1C0.723858 3 0.5 3.22386 0.5 3.5V9.5C0.5 9.77614 0.723858 10 1 10H7.5C7.77614 10 8 9.77614 8 9.5V3.5C8 3.22386 7.77614 3 7.5 3Z" stroke="#05022A" stroke-linecap="round" stroke-linejoin="round"/>
-                            <path d="M3 5L5.5 8" stroke="#5446FF" stroke-linecap="round" stroke-linejoin="round"/>
-                            <path d="M5.5 5L3 8" stroke="#5446FF" stroke-linecap="round" stroke-linejoin="round"/>
-                        </svg>
-
+                    <!-- Top Stage Area -->
+                    <div class="gh-ct-card0-top-stage relative z-10 w-full min-h-[42px]">
+                      <!-- Frame 4: Analysis completed result (default hidden, revealed in Frame 4) -->
+                      <div class="gh-ct-card0-result-group hidden flex-col w-full opacity-0 pointer-events-none">
+                        <div class="gh-ct-card0-result-header flex items-center gap-2.5 opacity-0">
+                          <svg width="20" height="14" viewBox="0 0 20 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M0.699951 0.699951H17.2" stroke="#6D717A" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M0.699951 6.69995H7.44995" stroke="#6D717A" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M0.699951 12.7H8.94995" stroke="#6D717A" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M14.2 11.2C15.8568 11.2 17.2 9.85681 17.2 8.19995C17.2 6.5431 15.8568 5.19995 14.2 5.19995C12.5431 5.19995 11.2 6.5431 11.2 8.19995C11.2 9.85681 12.5431 11.2 14.2 11.2Z" stroke="#6D717A" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M16.321 10.3214L18.6995 12.6998" stroke="#6D717A" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+                          </svg>
+                          <span class="font-body text-neutral-500 text-[length:var(--fs-body)] leading-[length:var(--lh-body)]">Analysis completed</span>
+                          <svg width="4" height="7" viewBox="0 0 4 7" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M0.5 0.5L3.5 3.5L0.5 6.5" stroke="#6D717A" stroke-linecap="round" stroke-linejoin="round"/>
+                          </svg>
                         </div>
-                        <div class="flex flex-col min-w-0 pr-1">
-                          <span class="truncate text-xs font-medium leading-tight text-[#111827]">
-                            Open-Invoices-This-Mon...
-                          </span>
-                          <span class="text-[10px] font-normal leading-tight text-neutral-400 mt-0.5">
-                            Spreadsheet
-                          </span>
+
+                        <div class="gh-ct-card0-result-body relative z-10 mt-2.5">
+                          <p class="gh-ct-card0-result-p opacity-0 m-0 font-body font-medium text-[#111827] text-xs md:text-[length:var(--fs-body)] leading-[length:var(--lh-body)]">I found ₹6.8 Cr in invoices aged 180+ days.</p>
+                          <p class="gh-ct-card0-result-p opacity-0 m-0 font-body font-normal text-[#111827] mt-2 text-xs md:text-[length:var(--fs-body)] leading-[length:var(--lh-body)]">The next oldest bucket, <span class="text-[#111827] font-medium">151–180 days, totals ₹2.2 Cr.</span></p>
+                          <p class="gh-ct-card0-result-p opacity-0 m-0 font-body font-normal text-[#111827] mt-2 text-xs md:text-[length:var(--fs-body)] leading-[length:var(--lh-body)]">Based on the uploaded spreadsheet, these are the invoices that currently require the most attention. I can also list the individual invoices or break them down by vendor.</p>
                         </div>
                       </div>
 
-                      <!-- Bottom input row with plus, text, and submit arrow -->
-                      <div class="flex w-full items-center gap-3">
-                        <svg
-                          class="shrink-0 text-vault-navy"
-                          width="18"
-                          height="18"
-                          viewBox="0 0 18 18"
-                          fill="none"
-                          xmlns="http://www.w3.org/2000/svg"
-                          aria-hidden="true"
-                        >
-                          <path
-                            d="M0.800003 8.80005H16.8"
-                            stroke="currentColor"
-                            stroke-width="1.6"
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                          />
-                          <path
-                            d="M8.8 0.800049V16.8"
-                            stroke="currentColor"
-                            stroke-width="1.6"
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                          />
-                        </svg>
-
-                        <!-- Dynamic text container -->
-                        <div class="min-w-0 flex-1 relative h-6 flex items-center overflow-hidden">
-                          <!-- Frame 1 & 5: Placeholder "+ Ask anything..." -->
-                          <span class="gh-ct-card0-pill-placeholder absolute inset-y-0 left-0 flex items-center font-body text-xs md:text-[length:var(--fs-body)] text-neutral-400 opacity-100 pointer-events-none">
-                            Ask anything...
-                          </span>
-                          <!-- Frame 2: Typed text -->
-                          <span class="gh-ct-card0-pill-typed absolute inset-y-0 left-0 flex items-center font-body text-xs md:text-[length:var(--fs-body)] text-vault-navy opacity-0 pointer-events-none truncate font-medium">
-                            Using the attached invoice aging report, which invoices cross 180 days this month?
-                          </span>
+                      <!-- Frame 3: Sent query group (at top right) -->
+                      <div class="gh-ct-card0-sent-group hidden absolute top-0 right-0 flex w-full flex-col items-end gap-2.5 opacity-0 pointer-events-none">
+                        <div class="gh-ct-card0-sent-file-chip inline-flex items-center gap-2.5 rounded-2xl border border-[#1118271F] px-2.5 py-1.5 shadow-2xs max-w-fit">
+                          <div class="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-generic-00 shadow-2xs">
+                            <svg width="12" height="13" viewBox="0 0 12 13" fill="none" xmlns="http://www.w3.org/2000/svg">
+                              <path d="M8 4.5H11.5" stroke="#05022A" stroke-linecap="round" stroke-linejoin="round"/>
+                              <path d="M8 8.5H11.5" stroke="#05022A" stroke-linecap="round" stroke-linejoin="round"/>
+                              <path d="M2.5 3V1C2.5 0.867392 2.55268 0.740215 2.64645 0.646447C2.74021 0.552679 2.86739 0.5 3 0.5H11C11.1326 0.5 11.2598 0.552679 11.3536 0.646447C11.4473 0.740215 11.5 0.867392 11.5 1V12C11.5 12.1326 11.4473 12.2598 11.3536 12.3536C11.2598 12.4473 11.1326 12.5 11 12.5H3C2.86739 12.5 2.74021 12.4473 2.64645 12.3536C2.55268 12.2598 2.5 12.1326 2.5 12V10" stroke="#05022A" stroke-linecap="round" stroke-linejoin="round"/>
+                              <path d="M7 10V12.5" stroke="#05022A" stroke-linecap="round" stroke-linejoin="round"/>
+                              <path d="M7 0.5V3" stroke="#05022A" stroke-linecap="round" stroke-linejoin="round"/>
+                              <path d="M7.5 3H1C0.723858 3 0.5 3.22386 0.5 3.5V9.5C0.5 9.77614 0.723858 10 1 10H7.5C7.77614 10 8 9.77614 8 9.5V3.5C8 3.22386 7.77614 3 7.5 3Z" stroke="#05022A" stroke-linecap="round" stroke-linejoin="round"/>
+                              <path d="M3 5L5.5 8" stroke="#5446FF" stroke-linecap="round" stroke-linejoin="round"/>
+                              <path d="M5.5 5L3 8" stroke="#5446FF" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                          </div>
+                          <div class="flex flex-col min-w-0 pr-1">
+                            <span class="text-xs font-medium text-[#111827]">
+                              Open-Invoices-This-Mon...
+                            </span>
+                            <span class="text-[8px] font-normal text-[#11182766]">
+                              Spreadsheet
+                            </span>
+                          </div>
                         </div>
 
-                        <button
-                          type="button"
-                          class="gh-ct-card0-submit-btn flex h-8 w-8 shrink-0 cursor-pointer items-center justify-center rounded-full border-0 bg-[#111827] transition-transform"
-                        >
+                        <div class="gh-ct-card0-sent-bubble max-w-[416px] rounded-2xl border border-dashed border-[#11182726] bg-[#EDEDED] px-4 py-3 md:px-5 md:py-3.5">
+                          <p class="m-0 font-body text-base font-normal leading-[1.4] text-[#111827]">
+                            Using the attached invoice aging report, which invoices cross 180 days this month?
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- Bottom Stage Area -->
+                    <div class="gh-ct-card0-bottom-stage relative z-20 flex w-full flex-col">
+                      <!-- Frame 3: Spinner Analyzing uploaded file -->
+                      <div class="gh-ct-card0-spinner hidden flex items-center gap-2.5 mb-3 opacity-0 pointer-events-none">
+                        <svg class="gh-ct-card0-spinner-icon shrink-0 animate-spin" width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                          <path d="M9.70007 0.699951V3.69998" stroke="#111827" stroke-opacity="0.6" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+                          <path d="M18.7 9.70007H15.7" stroke="#111827" stroke-opacity="0.6" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+                          <path d="M16.0637 16.0638L13.9421 13.9423" stroke="#111827" stroke-opacity="0.6" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+                          <path d="M9.70007 18.7V15.7" stroke="#111827" stroke-opacity="0.6" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+                          <path d="M3.33667 16.0637L5.45825 13.9421" stroke="#111827" stroke-opacity="0.6" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+                          <path d="M0.699951 9.70007H3.69998" stroke="#111827" stroke-opacity="0.6" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+                          <path d="M3.33667 3.3363L5.45825 5.45788" stroke="#111827" stroke-opacity="0.6" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                        <span class="font-body text-neutral-500 text-xs md:text-[length:var(--fs-body)] leading-[length:var(--lh-body)]">Analyzing uploaded file…</span>
+                      </div>
+
+                      <!-- Input Box Container -->
+                      <div class="gh-ct-card0-input-box relative flex w-full flex-col gap-2 rounded-2xl border border-[#11182726] bg-generic-00 px-4 py-2.5 md:py-3 shadow-xs overflow-hidden transition-all duration-300 ease-in-out">
+                        <!-- Frame 1 & 2: File attachment chip container (starts collapsed so input starts compact) -->
+                        <div class="gh-ct-card0-chip-wrapper hidden overflow-hidden h-0">
+                          <div class="gh-ct-card0-input-chip opacity-0 inline-flex items-center gap-2.5 rounded-2xl border border-[#1118271F] px-2 py-1 shadow-2xs max-w-fit">
+                            <div class="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-generic-00 shadow-2xs">
+                              <svg width="12" height="13" viewBox="0 0 12 13" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M8 4.5H11.5" stroke="#05022A" stroke-linecap="round" stroke-linejoin="round"/>
+                                <path d="M8 8.5H11.5" stroke="#05022A" stroke-linecap="round" stroke-linejoin="round"/>
+                                <path d="M2.5 3V1C2.5 0.867392 2.55268 0.740215 2.64645 0.646447C2.74021 0.552679 2.86739 0.5 3 0.5H11C11.1326 0.5 11.2598 0.552679 11.3536 0.646447C11.4473 0.740215 11.5 0.867392 11.5 1V12C11.5 12.1326 11.4473 12.2598 11.3536 12.3536C11.2598 12.4473 11.1326 12.5 11 12.5H3C2.86739 12.5 2.74021 12.4473 2.64645 12.3536C2.55268 12.2598 2.5 12.1326 2.5 12V10" stroke="#05022A" stroke-linecap="round" stroke-linejoin="round"/>
+                                <path d="M7 10V12.5" stroke="#05022A" stroke-linecap="round" stroke-linejoin="round"/>
+                                <path d="M7 0.5V3" stroke="#05022A" stroke-linecap="round" stroke-linejoin="round"/>
+                                <path d="M7.5 3H1C0.723858 3 0.5 3.22386 0.5 3.5V9.5C0.5 9.77614 0.723858 10 1 10H7.5C7.77614 10 8 9.77614 8 9.5V3.5C8 3.22386 7.77614 3 7.5 3Z" stroke="#05022A" stroke-linecap="round" stroke-linejoin="round"/>
+                                <path d="M3 5L5.5 8" stroke="#5446FF" stroke-linecap="round" stroke-linejoin="round"/>
+                                <path d="M5.5 5L3 8" stroke="#5446FF" stroke-linecap="round" stroke-linejoin="round"/>
+                              </svg>
+                            </div>
+                            <div class="flex flex-col min-w-0 pr-1">
+                              <span class="text-xs font-medium text-[#111827]">
+                                Open-Invoices-This-Mon...
+                              </span>
+                              <span class="text-[8px] font-normal text-[#11182766]">
+                                Spreadsheet
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+
+                        <!-- Frame 2: Typed query inside input box (below chip, above row) -->
+                        <div class="gh-ct-card0-input-typed hidden overflow-hidden opacity-0 h-0">
+                          <p class="gh-ct-card0-typed-text m-0 font-body text-base font-normal text-[#111827] leading-[1.4] inline-block">
+                            Using the attached invoice aging report, which invoices cross 180 days this month?
+                          </p>
+                        </div>
+
+                        <!-- Bottom input row with plus, text, and submit arrow -->
+                        <div class="flex w-full items-center gap-3">
                           <svg
-                            width="11"
-                            height="14"
-                            viewBox="0 0 11 14"
+                            class="shrink-0 text-vault-navy"
+                            width="18"
+                            height="18"
+                            viewBox="0 0 18 18"
                             fill="none"
                             xmlns="http://www.w3.org/2000/svg"
                             aria-hidden="true"
                           >
                             <path
-                              d="M5.22425 0.600025L5.22426 13.4M0.424255 5.40002L5.22425 0.600025L10.0243 5.40002"
-                              stroke="white"
-                              stroke-width="1.2"
+                              d="M0.800003 8.80005H16.8"
+                              stroke="currentColor"
+                              stroke-width="1.6"
+                              stroke-linecap="round"
+                              stroke-linejoin="round"
+                            />
+                            <path
+                              d="M8.8 0.800049V16.8"
+                              stroke="currentColor"
+                              stroke-width="1.6"
+                              stroke-linecap="round"
                               stroke-linejoin="round"
                             />
                           </svg>
-                        </button>
+
+                          <!-- Dynamic text container -->
+                          <div class="min-w-0 flex-1 relative h-6 flex items-center overflow-hidden">
+                            <!-- Frame 1 & 4: Placeholder "Ask anything..." -->
+                            <span class="gh-ct-card0-pill-placeholder absolute inset-y-0 left-0 flex items-center font-body text-xs md:text-[length:var(--fs-body)] text-neutral-400 opacity-100 pointer-events-none">
+                              Ask anything...
+                            </span>
+                            <!-- Frame 3: Placeholder "Thinking..." -->
+                            <span class="gh-ct-card0-pill-thinking absolute opacity-0 inset-y-0 left-0 flex items-center font-body text-xs md:text-[length:var(--fs-body)] text-neutral-400 pointer-events-none">
+                              Thinking...
+                            </span>
+                          </div>
+
+                          <button
+                            type="button"
+                            class="gh-ct-card0-submit-btn flex h-8 w-8 shrink-0 cursor-pointer items-center justify-center rounded-full border-0 bg-[#111827] transition-transform"
+                          >
+                            <svg
+                              width="11"
+                              height="14"
+                              viewBox="0 0 11 14"
+                              fill="none"
+                              xmlns="http://www.w3.org/2000/svg"
+                              aria-hidden="true"
+                            >
+                              <path
+                                d="M5.22425 0.600025L5.22426 13.4M0.424255 5.40002L5.22425 0.600025L10.0243 5.40002"
+                                stroke="white"
+                                stroke-width="1.2"
+                                stroke-linejoin="round"
+                              />
+                            </svg>
+                          </button>
+                        </div>
                       </div>
+                    </div>
+
+                    <!-- Virtual Mouse Cursor Pointer for Card 0 Button Click -->
+                    <div class="gh-ct-card0-cursor pointer-events-none absolute z-30 opacity-0 top-0 left-0">
+                      <img src="https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6ab26584bc5572adf499e114_marker.png" alt="" class="w-6 h-6 object-contain">
                     </div>
                   </div>
                 ) : i === 1 ? (
                   <div
-                    class="gh-why-animation-card-1 relative flex w-full flex-col items-center justify-center gap-4 overflow-hidden rounded-xl border border-neutral-200 p-6 max-md:aspect-[600/400] md:col-start-2 md:row-start-1 md:min-h-0 bg-cover bg-center bg-no-repeat"
-                    style="background-color:#eaf0fb;background-image:url('https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6ab12682919b2e325a9f0db0_background-dots.png');"
+                    class="gh-why-animation-card-1 relative flex w-full flex-col items-center justify-center gap-4 overflow-hidden rounded-xl border border-neutral-200 p-6 max-md:aspect-[600/400] md:col-start-2 md:row-start-2 md:min-h-0 bg-cover bg-center bg-no-repeat"
+                    style="background-color:#eaf0fb;background-image:url('https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6ab399f1e2c6a1e38c91700f_dots-bg.png');"
                     data-card-index="1"
                   >
-                    {/* Card 1: Fraud Prevention animation container */}
-                    <span class="absolute left-4 top-4 inline-flex items-center gap-1.5 rounded-lg bg-nova-blue px-3 py-1.5 text-[length:var(--fs-label)] leading-[length:var(--lh-label)] font-medium text-generic-00 font-body">
-                      <span class="block h-3.5 w-3.5 shrink-0 rounded-[3px] bg-generic-00 opacity-30" />
-                      CLEARTAX AI
-                    </span>
                     {/* Animation / visual elements for Card 1 go here */}
                   </div>
                 ) : i === 2 ? (
                   <div
-                    class="gh-why-animation-card-2 relative flex w-full flex-col items-center justify-center gap-4 overflow-hidden rounded-xl border border-neutral-200 p-6 max-md:aspect-[600/400] md:col-start-2 md:row-start-1 md:min-h-0 bg-cover bg-center bg-no-repeat"
-                    style="background-color:#eaf0fb;background-image:url('https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6ab12682919b2e325a9f0db0_background-dots.png');"
+                    class="gh-why-animation-card-2 relative flex w-full flex-col items-center justify-center gap-4 overflow-hidden rounded-xl border border-neutral-200 p-6 max-md:aspect-[600/400] md:col-start-2 md:row-start-2 md:min-h-0 bg-cover bg-center bg-no-repeat"
+                    style="background-color:#eaf0fb;background-image:url('https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6ab399f1e2c6a1e38c91700f_dots-bg.png');"
                     data-card-index="2"
                   >
                     {/* Card 2: CFO Insights animation container */}
-                    <span class="absolute left-4 top-4 inline-flex items-center gap-1.5 rounded-lg bg-nova-blue px-3 py-1.5 text-[length:var(--fs-label)] leading-[length:var(--lh-label)] font-medium text-generic-00 font-body">
-                      <span class="block h-3.5 w-3.5 shrink-0 rounded-[3px] bg-generic-00 opacity-30" />
-                      CLEARTAX AI
-                    </span>
-                    {/* Animation / visual elements for Card 2 go here */}
                   </div>
                 ) : i === 3 ? (
                   <div
-                    class="gh-why-animation-card-3 relative flex w-full flex-col items-center justify-center gap-4 overflow-hidden rounded-xl border border-neutral-200 p-6 max-md:aspect-[600/400] md:col-start-2 md:row-start-1 md:min-h-0 bg-cover bg-center bg-no-repeat"
-                    style="background-color:#eaf0fb;background-image:url('https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6ab12682919b2e325a9f0db0_background-dots.png');"
+                    class="gh-why-animation-card-3 relative flex w-full flex-col items-center justify-center gap-4 overflow-hidden rounded-xl border border-neutral-200 p-6 max-md:aspect-[600/400] md:col-start-2 md:row-start-2 md:min-h-0 bg-cover bg-center bg-no-repeat"
+                    style="background-color:#eaf0fb;background-image:url('https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6ab399f1e2c6a1e38c91700f_dots-bg.png');"
                     data-card-index="3"
                   >
                     {/* Card 3: Tax Automation animation container */}
-                    <span class="absolute left-4 top-4 inline-flex items-center gap-1.5 rounded-lg bg-nova-blue px-3 py-1.5 text-[length:var(--fs-label)] leading-[length:var(--lh-label)] font-medium text-generic-00 font-body">
-                      <span class="block h-3.5 w-3.5 shrink-0 rounded-[3px] bg-generic-00 opacity-30" />
-                      CLEARTAX AI
-                    </span>
-                    {/* Animation / visual elements for Card 3 go here */}
                   </div>
                 ) : (
                   <div
-                    class="gh-why-animation-card-4 relative flex w-full flex-col items-center justify-center gap-4 overflow-hidden rounded-xl border border-neutral-200 p-6 max-md:aspect-[600/400] md:col-start-2 md:row-start-1 md:min-h-0 bg-cover bg-center bg-no-repeat"
-                    style="background-color:#eaf0fb;background-image:url('https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6ab12682919b2e325a9f0db0_background-dots.png');"
+                    class="gh-why-animation-card-4 relative flex w-full flex-col items-center justify-center gap-4 overflow-hidden rounded-xl border border-neutral-200 p-6 max-md:aspect-[600/400] md:col-start-2 md:row-start-2 md:min-h-0 bg-cover bg-center bg-no-repeat"
+                    style="background-color:#eaf0fb;background-image:url('https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6ab399f1e2c6a1e38c91700f_dots-bg.png');"
                     data-card-index="4"
                   >
                     {/* Card 4: Accounts Payable animation container */}
-                    <span class="absolute left-4 top-4 inline-flex items-center gap-1.5 rounded-lg bg-nova-blue px-3 py-1.5 text-[length:var(--fs-label)] leading-[length:var(--lh-label)] font-medium text-generic-00 font-body">
-                      <span class="block h-3.5 w-3.5 shrink-0 rounded-[3px] bg-generic-00 opacity-30" />
-                      CLEARTAX AI
-                    </span>
-                    {/* Animation / visual elements for Card 4 go here */}
                   </div>
                 )}
 
-                <div class="mt-3">
-                  <p class="m-0 font-body text-neutral-500 text-[length:var(--fs-body)] leading-[length:var(--lh-body)] md:col-start-2 md:row-start-2">
+                <div class="md:col-start-2 md:row-start-3 mt-3 md:mt-2">
+                  <p class="m-0 font-body text-neutral-500 text-[length:var(--fs-body)] leading-[length:var(--lh-body)]">
                     {card.cleartaxCaption}
                   </p>
                 </div>
@@ -1033,6 +1130,9 @@ const LEDE =
   .gh-why-header-stuck {
     display: none;
   }
+  .gh-why-sticky {
+    --gh-why-header-offset: 0px;
+  }
 
   @media (min-width: 768px) and (min-height: 860px) {
     .gh-why-header-flow {
@@ -1040,6 +1140,9 @@ const LEDE =
     }
     .gh-why-header-stuck {
       display: block;
+    }
+    .gh-why-sticky {
+      --gh-why-header-offset: 180px;
     }
   }
 
@@ -1058,20 +1161,33 @@ const LEDE =
      header + 64 slivers. The old flat 300px under-counted by ~76px, which is
      why the card overflowed the window at every height below ~940px. With the
      header scrolled away there is no header to pay for, so 90px is enough. */
+  .gh-why-card-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+
+  @media (min-width: 768px) {
+    .gh-why-card-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      grid-template-rows: auto minmax(0, 1fr) auto;
+      column-gap: 2rem;
+    }
+  }
+
   .gh-why-card {
     --gh-why-card-h: clamp(
-      480px,
-      calc(100vh - var(--nav-clear, 112px) - 90px),
-      580px
+      510px,
+      calc(100vh - var(--nav-clear, 112px) - 70px),
+      610px
     );
   }
 
   @media (min-height: 860px) {
     .gh-why-card {
       --gh-why-card-h: clamp(
-        500px,
-        calc(100vh - var(--nav-clear, 112px) - 280px),
-        580px
+        530px,
+        calc(100vh - var(--nav-clear, 112px) - 240px),
+        620px
       );
     }
   }
@@ -1096,7 +1212,9 @@ const LEDE =
 <script is:inline>
   (() => {
     function initWhyGenericSection() {
+      let genericCard0Complete = false;
       initCard0Flow();
+      initClearTaxCard0Flow();
 
       const stack = document.getElementById("gh-why-stack");
       if (!stack) return;
@@ -1279,8 +1397,16 @@ const LEDE =
 
       // Accessible static fallback for users preferring reduced motion
       if (reduceMotion) {
-        if (chartHeader) chartHeader.style.opacity = "1";
-        if (chart) chart.style.opacity = "1";
+        if (chartHeader) {
+          chartHeader.classList.remove("hidden");
+          chartHeader.style.display = "flex";
+          chartHeader.style.opacity = "1";
+        }
+        if (chart) {
+          chart.classList.remove("hidden");
+          chart.style.display = "flex";
+          chart.style.opacity = "1";
+        }
         if (centerTitle) centerTitle.style.opacity = "0";
         if (glow) glow.style.opacity = "0";
         if (glowBottom) glowBottom.style.opacity = "1";
@@ -1359,6 +1485,7 @@ const LEDE =
         });
 
         // Frame 1: Initial state
+        tl.set([chartHeader, chart, bubble, skeleton, checklist], { display: "none" });
         tl.set(chartHeader, { opacity: 0, y: 8, pointerEvents: "none" });
         tl.set(chart, { opacity: 0, y: 10, pointerEvents: "none" });
         tl.set(bubble, { opacity: 0, scale: 0.9, y: 8, pointerEvents: "none" });
@@ -1448,43 +1575,41 @@ const LEDE =
         tl.addLabel("borderStart");
         tl.to(borderPath, {
           strokeDashoffset: 0,
-          duration: 2.2,
+          duration: 1.4,
           ease: "power1.inOut",
         }, "borderStart");
+        tl.to(borderPath, { opacity: 0, duration: 0.2 }, "borderStart+=1.4");
 
-        // While in between border loading: reveal message bubble, skeleton, and switch pill to Thinking
-        tl.to(pillTyped, { opacity: 0, duration: 0.2 }, "borderStart+=0.65");
-        tl.to(pillThinking, { opacity: 1, duration: 0.2 }, "<");
+        // Immediately reveal message bubble, skeleton, and switch pill to Thinking
+        tl.set(bubble, { display: "block" }, "borderStart+=0.1");
+        tl.set(skeleton, { display: "flex" }, "borderStart+=0.1");
+        tl.to(pillTyped, { opacity: 0, duration: 0.12 }, "borderStart+=0.1");
+        tl.to(pillThinking, { opacity: 1, duration: 0.12 }, "<");
         tl.to(
           bubble,
-          { opacity: 1, y: 0, scale: 1, duration: 0.4, ease: "back.out(1.5)" },
+          { opacity: 1, y: 0, scale: 1, duration: 0.28, ease: "back.out(1.5)" },
           "<"
         );
         tl.to(
           skeleton,
-          { opacity: 1, y: 0, duration: 0.35, ease: "power2.out" },
-          "<+=0.1"
+          { opacity: 1, y: 0, duration: 0.18, ease: "power2.out" },
+          "<"
         );
 
-        // When border completes its 1 round: fade stroke
-        tl.to(borderPath, { opacity: 0, duration: 0.25 }, "borderStart+=2.2");
-
-        // Hold on skeleton (0.9s)
-        tl.to({}, { duration: 0.9 });
-
-        // Frame 4: Skeleton fades out, 4 checklist items stagger in
-        tl.to(skeleton, { opacity: 0, duration: 0.25 });
-        tl.set(checklist, { opacity: 1 });
+        // Frame 4: Skeleton fades out quickly (after ~0.8s) and checklist appears in seconds
+        tl.to(skeleton, { opacity: 0, duration: 0.18 }, "borderStart+=0.9");
+        tl.set(skeleton, { display: "none" });
+        tl.set(checklist, { display: "flex", opacity: 1 });
         tl.to(
           checkItems,
           {
             opacity: 1,
             x: 0,
-            duration: 0.32,
-            stagger: 0.26,
+            duration: 0.22,
+            stagger: 0.15,
             ease: "power2.out",
           },
-          "-=0.1"
+          "-=0.05"
         );
 
         // Hold on checklist (1.3s)
@@ -1492,6 +1617,9 @@ const LEDE =
 
         // Frame 5: Bubble & checklist exit, Chart header & chart image fade/slide in
         tl.to([bubble, checklist], { opacity: 0, y: -10, duration: 0.35, ease: "power2.in" });
+        tl.set([bubble, checklist], { display: "none" });
+        tl.set(chartHeader, { display: "flex" });
+        tl.set(chart, { display: "flex" });
         tl.to(pillThinking, { opacity: 0, duration: 0.2 }, "<");
         tl.to(pillPlaceholder, { opacity: 1, duration: 0.25 }, "<+=0.1");
 
@@ -1502,13 +1630,24 @@ const LEDE =
         );
         tl.to(
           chart,
-          { opacity: 1, y: 0, duration: 0.55, ease: "power2.out", pointerEvents: "auto" },
+          {
+            opacity: 1,
+            y: 0,
+            duration: 0.55,
+            ease: "power2.out",
+            pointerEvents: "auto",
+            onComplete: () => {
+              genericCard0Complete = true;
+              window.dispatchEvent(new CustomEvent("gh-card0-generic-complete"));
+            },
+          },
           "<+=0.1"
         );
 
         // Animation completes and stays on final result (Frame 5)
 
         // Viewport IntersectionObserver: Trigger once when entering viewport
+        const triggerEl = card.closest(".grid") || card;
         if (typeof IntersectionObserver !== "undefined") {
           let hasPlayed = false;
           const observer = new IntersectionObserver(
@@ -1523,7 +1662,370 @@ const LEDE =
             },
             { threshold: 0.25 }
           );
-          observer.observe(card);
+          observer.observe(triggerEl);
+        } else {
+          tl.play();
+        }
+      };
+
+      if (typeof window.gsap === "undefined") {
+        const s = document.createElement("script");
+        s.src = "https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js";
+        s.onload = startGsap;
+        document.head.appendChild(s);
+      } else {
+        startGsap();
+      }
+    }
+
+    // --- CARD 0 GSAP ANIMATION SEQUENCE ---
+    function initClearTaxCard0Flow() {
+      const card = document.querySelector(".gh-why-animation-card-0");
+      if (!card) return;
+
+      const resultGroup = card.querySelector(".gh-ct-card0-result-group");
+      const resultHeader = card.querySelector(".gh-ct-card0-result-header");
+      const resultParagraphs = card.querySelectorAll(".gh-ct-card0-result-p");
+      const sentGroup = card.querySelector(".gh-ct-card0-sent-group");
+      const spinner = card.querySelector(".gh-ct-card0-spinner");
+      const inputBox = card.querySelector(".gh-ct-card0-input-box");
+      const chipWrapper = card.querySelector(".gh-ct-card0-chip-wrapper");
+      const inputChip = card.querySelector(".gh-ct-card0-input-chip");
+      const inputTyped = card.querySelector(".gh-ct-card0-input-typed");
+      const typedText = card.querySelector(".gh-ct-card0-typed-text");
+      const pillPlaceholder = card.querySelector(".gh-ct-card0-pill-placeholder");
+      const pillThinking = card.querySelector(".gh-ct-card0-pill-thinking");
+      const submitBtn = card.querySelector(".gh-ct-card0-submit-btn");
+      const cursor = card.querySelector(".gh-ct-card0-cursor");
+
+      if (!submitBtn || !cursor || !sentGroup) return;
+
+      const queryText = typedText
+        ? typedText.textContent.trim().replace(/\s+/g, " ")
+        : "Using the attached invoice aging report, which invoices cross 180 days this month?";
+
+      const reduceMotion =
+        window.matchMedia &&
+        window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+      // Accessible static fallback for users preferring reduced motion
+      if (reduceMotion) {
+        if (resultGroup) {
+          resultGroup.style.display = "flex";
+          resultGroup.style.opacity = "1";
+          resultGroup.style.pointerEvents = "auto";
+        }
+        if (resultHeader) resultHeader.style.opacity = "1";
+        resultParagraphs.forEach((p) => {
+          p.style.opacity = "1";
+          p.style.transform = "none";
+        });
+        if (typedText) typedText.textContent = queryText;
+        if (inputBox) {
+          inputBox.classList.remove("rounded-2xl");
+          inputBox.classList.add("rounded-full");
+        }
+        if (chipWrapper) chipWrapper.style.display = "none";
+        if (inputChip) inputChip.style.display = "none";
+        return;
+      }
+
+      const getSubmitBtnPos = () => {
+        const cRect = card.getBoundingClientRect();
+        const bRect = submitBtn.getBoundingClientRect();
+        return {
+          x: bRect.left - cRect.left + bRect.width * 0.45,
+          y: bRect.top - cRect.top + bRect.height * 0.45,
+        };
+      };
+
+      const getInputAreaPos = () => {
+        const cRect = card.getBoundingClientRect();
+        const bRect = submitBtn.getBoundingClientRect();
+        return {
+          x: cRect.width * 0.35,
+          y: bRect.top - cRect.top + bRect.height * 0.5,
+        };
+      };
+
+      const startGsap = () => {
+        const gsap = window.gsap;
+        if (!gsap) {
+          setTimeout(startGsap, 60);
+          return;
+        }
+
+        const tl = gsap.timeline({
+          paused: true,
+          defaults: { ease: "power2.inOut" },
+        });
+
+        // Frame 1: Initial state
+        tl.set([resultGroup, sentGroup, spinner], { display: "none" });
+        tl.set(resultGroup, { opacity: 0, pointerEvents: "none" });
+        tl.set(resultHeader, { opacity: 0, y: 6 });
+        tl.set(resultParagraphs, { opacity: 0, y: 8 });
+        tl.set(sentGroup, { opacity: 0, y: 15, scale: 0.95, pointerEvents: "none" });
+        tl.set(spinner, { opacity: 0, y: 8, pointerEvents: "none" });
+        if (inputBox) {
+          inputBox.classList.remove("rounded-full");
+          inputBox.classList.add("rounded-2xl");
+          inputBox.style.borderRadius = "";
+        }
+        tl.add(() => {
+          if (inputBox) {
+            inputBox.classList.remove("rounded-full");
+            inputBox.classList.add("rounded-2xl");
+            inputBox.style.borderRadius = "";
+          }
+        }, 0);
+        tl.set(chipWrapper, { display: "none", height: 0, marginBottom: 0 });
+        tl.set(inputChip, {
+          opacity: 0,
+          scale: 0.85,
+          y: -6,
+          transformOrigin: "left center",
+          height: "auto",
+          minHeight: "auto",
+          paddingTop: "",
+          paddingBottom: "",
+          marginTop: "",
+          marginBottom: "",
+          display: "inline-flex",
+        });
+        tl.set(inputTyped, { opacity: 0, height: 0, display: "none" });
+        if (typedText) {
+          typedText.textContent = "";
+        }
+        tl.set(pillPlaceholder, { opacity: 1 });
+        tl.set(pillThinking, { opacity: 0 });
+        tl.set(cursor, {
+          opacity: 0,
+          x: () => card.offsetWidth * 0.65,
+          y: () => card.offsetHeight * 0.65,
+          scale: 1,
+        });
+
+        // Frame 1: Input gets bigger (box smoothly expands to accommodate incoming attachment)
+        tl.set(chipWrapper, { display: "block", height: 0, marginBottom: -8 });
+        tl.to(
+          chipWrapper,
+          {
+            height: 42,
+            marginBottom: 0,
+            duration: 0.35,
+            ease: "power2.out",
+          },
+          "+=0.2"
+        );
+        if (inputBox) {
+          tl.add(() => {
+            inputBox.classList.remove("rounded-full");
+            inputBox.classList.add("rounded-2xl");
+          }, "<");
+        }
+        tl.set(chipWrapper, { height: "auto" });
+
+        // Frame 1: Then PDF / spreadsheet chip comes in
+        tl.to(
+          inputChip,
+          {
+            opacity: 1,
+            scale: 1,
+            y: 0,
+            duration: 0.35,
+            ease: "back.out(1.5)",
+          },
+          "+=0.04"
+        );
+
+        // Frame 1 -> Frame 2: Marker cursor appears & glides to input box
+        tl.to(cursor, { opacity: 1, duration: 0.35 }, "+=0.25");
+        tl.to(
+          cursor,
+          {
+            x: () => getInputAreaPos().x,
+            y: () => getInputAreaPos().y,
+            duration: 0.75,
+            ease: "power2.out",
+          },
+          "-=0.1"
+        );
+
+        // Frame 2: Cursor clicks input box, placeholder fades, prompt types out character by character ("one by one")
+        const typingObj = { charIndex: 0 };
+        tl.to(cursor, { scale: 0.85, duration: 0.12, yoyo: true, repeat: 1 });
+        tl.to(pillPlaceholder, { opacity: 0, duration: 0.15 }, "<+=0.05");
+        tl.set(inputTyped, { display: "block", height: "auto", minHeight: "40px", opacity: 1 }, "<");
+        tl.to(
+          typingObj,
+          {
+            charIndex: queryText.length,
+            duration: 0.95,
+            ease: "none",
+            onUpdate: () => {
+              if (typedText) {
+                typedText.textContent = queryText.slice(0, Math.round(typingObj.charIndex));
+              }
+            },
+          },
+          "<+=0.1"
+        );
+
+        // Cursor glides to submit button (MATCHES CARD 1 EXACTLY: +=0.35, duration: 1.35)
+        tl.to(
+          cursor,
+          {
+            x: () => getSubmitBtnPos().x,
+            y: () => getSubmitBtnPos().y,
+            duration: 1.35,
+            ease: "power2.inOut",
+          },
+          "+=0.35"
+        );
+
+        // Click submit button (MATCHES CARD 1 EXACTLY: +=0.2, scale 0.85 & 0.88, fade cursor +=0.2, duration: 0.25)
+        tl.to(cursor, { scale: 0.85, duration: 0.12, yoyo: true, repeat: 1 }, "+=0.2");
+        tl.to(submitBtn, { scale: 0.88, duration: 0.12, yoyo: true, repeat: 1 }, "<");
+        tl.to(cursor, { opacity: 0, duration: 0.25 }, "+=0.2");
+
+        // Frame 2 -> Frame 3: Input box collapses chip & typed text, switches to "Thinking..."
+        // Step 1: Promptly fade out chip and typed text so neither end looks cluttered during rounding
+        tl.to(
+          [inputChip, inputTyped],
+          {
+            opacity: 0,
+            duration: 0.18,
+            ease: "power2.out",
+          },
+          "-=0.1"
+        );
+
+        // Step 2: Smoothly collapse the wrappers down to compact pill height
+        tl.to(
+          [chipWrapper, inputTyped],
+          {
+            height: 0,
+            minHeight: 0,
+            paddingTop: 0,
+            paddingBottom: 0,
+            marginTop: 0,
+            marginBottom: 0,
+            duration: 0.35,
+            ease: "power2.inOut",
+          },
+          "<+=0.04"
+        );
+
+        // Step 3: As the box settles into compact pill height, both ends morph to rounded-full together at the same pace
+        if (inputBox) {
+          tl.add(() => {
+            inputBox.classList.remove("rounded-2xl");
+            inputBox.classList.add("rounded-full");
+          }, "-=0.15");
+        }
+
+        tl.set([chipWrapper, inputChip, inputTyped], { display: "none" });
+        tl.to(pillThinking, { opacity: 1, duration: 0.25, ease: "power2.out" }, "<");
+
+        // Top-right sent group (chip + dashed bubble) springs into view
+        tl.set(sentGroup, { display: "flex" });
+        tl.to(
+          sentGroup,
+          {
+            opacity: 1,
+            y: 0,
+            scale: 1,
+            duration: 0.45,
+            ease: "back.out(1.4)",
+            pointerEvents: "auto",
+          },
+          "<+=0.05"
+        );
+
+        // Spinner ("Analyzing uploaded file…") fades in
+        tl.set(spinner, { display: "flex" });
+        tl.to(
+          spinner,
+          {
+            opacity: 1,
+            y: 0,
+            duration: 0.35,
+            ease: "power2.out",
+            pointerEvents: "auto",
+          },
+          "<+=0.1"
+        );
+
+        // Hold on Frame 3 (Analyzing uploaded file) and wait until 1st animation overall displayed!
+        tl.add(() => {
+          if (!genericCard0Complete) {
+            tl.pause();
+            let safetyTimeout;
+            const onGenericComplete = () => {
+              window.removeEventListener("gh-card0-generic-complete", onGenericComplete);
+              clearTimeout(safetyTimeout);
+              tl.play();
+            };
+            window.addEventListener("gh-card0-generic-complete", onGenericComplete);
+            safetyTimeout = setTimeout(() => {
+              window.removeEventListener("gh-card0-generic-complete", onGenericComplete);
+              tl.play();
+            }, 12000);
+          }
+        });
+
+        // Breathing room (0.2s) once 1st animation overall displayed
+        tl.to({}, { duration: 0.2 });
+
+        // Frame 3 -> Frame 4: Sent group and spinner exit
+        tl.to(
+          [sentGroup, spinner],
+          { opacity: 0, y: -10, duration: 0.35, ease: "power2.in" }
+        );
+        tl.set([sentGroup, spinner], { display: "none" });
+
+        // Frame 4: Result group ("Analysis completed" + 3 insight paragraphs) animates in
+        tl.set(resultGroup, { display: "flex", opacity: 1, pointerEvents: "auto" });
+        tl.to(
+          resultHeader,
+          { opacity: 1, y: 0, duration: 0.35, ease: "power2.out" },
+          "-=0.05"
+        );
+        // Stagger paragraphs one by one like transcript on 1st card
+        tl.to(
+          resultParagraphs,
+          {
+            opacity: 1,
+            y: 0,
+            duration: 0.35,
+            stagger: 0.28,
+            ease: "power2.out",
+          },
+          "+=0.1"
+        );
+
+        // In input box: "Thinking..." fades out, "Ask anything..." returns
+        tl.to(pillThinking, { opacity: 0, duration: 0.2 }, "<");
+        tl.to(pillPlaceholder, { opacity: 1, duration: 0.25 }, "<+=0.1");
+
+        // Viewport IntersectionObserver: Trigger once when entering viewport
+        const triggerEl = card.closest(".grid") || card;
+        if (typeof IntersectionObserver !== "undefined") {
+          let hasPlayed = false;
+          const observer = new IntersectionObserver(
+            (entries) => {
+              entries.forEach((entry) => {
+                if (entry.isIntersecting && !hasPlayed) {
+                  hasPlayed = true;
+                  tl.play();
+                  observer.disconnect();
+                }
+              });
+            },
+            { threshold: 0.25 }
+          );
+          observer.observe(triggerEl);
         } else {
           tl.play();
         }
@@ -1540,10 +2042,11 @@ const LEDE =
     }
   }
 
+  initWhyGenericSection();
   if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", initWhyGenericSection);
-  } else {
-    initWhyGenericSection();
+    document.addEventListener("DOMContentLoaded", () => {
+      window.dispatchEvent(new Event("resize"));
+    }, { once: true });
   }
 })();
 </script>
