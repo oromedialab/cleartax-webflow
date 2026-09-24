@@ -1,0 +1,1021 @@
+/**
+ * Experience Centre — paste into the Experience Centre Webflow page's <head>
+ * AFTER shared.css. Emits Tailwind utilities for
+ * src/sections/experience-centre/** plus the _shared components
+ * src/pages/experience-centre.astro reaches (auto-injected by
+ * scripts/build-css.mjs, transitively through the Navbar/Footer wrappers).
+ *
+ * Do NOT add @source lines for _shared components here — see docs/adding-a-new-page.md.
+ *
+ * WHY THE SECTION'S CSS LIVES HERE AND NOT IN A <style is:global>
+ * ---------------------------------------------------------------------------
+ * Normally a section owns its CSS and ships it inside its own Embed. This page
+ * can't afford that. `Experience.astro` carries SIX tools' worth of calculator,
+ * how-to-use, article and FAQ markup in one DOM tree — the tabs swap panels
+ * client-side, so every panel has to be present. Written as Tailwind utility
+ * strings that markup blew past Webflow's ~50 KB per-Embed cap and split into
+ * two permanent pastes.
+ *
+ * Collapsing the repeated utility strings into the `.exc-*` component classes
+ * below moves those bytes from the Embed (capped, pasted per section, per
+ * change) into this bundle (capped separately, pasted once in the page head).
+ * That is the trade this file exists to make. Everything here is page-scoped by
+ * the `exc-` prefix and used by exactly one section.
+ *
+ * Unlayered on purpose — see docs/adding-a-new-page.md on why `@layer` loses to
+ * Webflow's element defaults.
+ */
+@import 'tailwindcss/theme.css' layer(theme);
+@import 'tailwindcss/utilities.css' source(none);
+
+@source '../pages/experience-centre.astro';
+@source '../sections/experience-centre/**/*.astro';
+
+@config '../../tailwind.config.js';
+
+/* ==========================================================================
+   BACKGROUND
+   4px Flux Lime dots on a 26px pitch — the Figma BG layer measured (4px dot +
+   22px gap). This is the page's one permitted Flux Lime instance; nothing
+   else on the page uses it.
+   ========================================================================== */
+
+/* Spans the whole section and is the sticky layer's containing block, so the
+   field stops at the section's foot rather than running under the footer.
+
+   No `overflow: hidden` here, ever. It would make this a scrollport, and the
+   sticky child resolves its offsets against the nearest scrollport — one that
+   never scrolls. Nothing needs clipping anyway: a sticky box cannot leave its
+   containing block. */
+.exc-bg {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+}
+
+/* `min(100vh, 100%)`, and the `100%` is load-bearing: a sticky box taller than
+   its containing block can never satisfy its own offset, so it gives up
+   sticking and simply overflows — dropping the dot field straight over the
+   footer. Capping it at the section's own height makes that impossible however
+   short the section gets.
+
+   Plain `vh`, not `lvh`/`dvh`. `vh` already resolves against the LARGE viewport
+   on mobile, so a hidden toolbar cannot open a gap at the foot, and unlike
+   `dvh` it does not resize on every toolbar nudge. It also survives
+   minification — a `100vh` / `100lvh` pair gets collapsed to the second
+   declaration, which would leave older browsers with no height at all. */
+.exc-bg-inner {
+    position: sticky;
+    top: 0;
+    height: min(115vh, 100%);
+    overflow: hidden;
+}
+
+/* No bottom fade. There was one briefly, carried over from the Figma band, and
+   it ate the dots for the last 320px of the section — the field is meant to
+   run the full height. The height cap above is what keeps it off the footer. */
+
+/* The dots themselves are a canvas drawn by `_shared/Dotgrid.astro`, which
+   owns its own sizing and its own reduced-motion handling. Nothing to style
+   here beyond the wash over it.
+
+   Washes the centre so headings and cards keep contrast over the field, while
+   the dots stay visible out at the margins. */
+.exc-bg-wash {
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(
+        circle at center,
+        #fff 0%,
+        rgba(255, 255, 255, 0.86) 38%,
+        rgba(255, 255, 255, 0) 72%
+    );
+    min-height: 100vh;
+}
+
+/* ==========================================================================
+   SHELL
+   ========================================================================== */
+
+.exc-rail {
+    min-width: 0;
+    border: 1px solid var(--palette-neutral-300);
+    border-radius: 12px;
+    background: var(--palette-generic-00);
+}
+
+.exc-rail-head {
+    padding: 24px;
+    border-bottom: 1px solid var(--palette-neutral-300);
+}
+
+.exc-rail-title {
+    margin: 0;
+    font-family: var(--font-heading);
+    font-weight: 600;
+    font-size: var(--fs-h1-lg);
+    line-height: var(--lh-h1-lg);
+    letter-spacing: -0.5px;
+    color: var(--color-vault-navy);
+}
+
+/* White bordered card — the tool sub-cards, the How-to-use card, FAQ rows. */
+.exc-card {
+    border: 1px solid var(--palette-neutral-300);
+    border-radius: 12px;
+    background: var(--palette-neutral-50);
+}
+
+/* The grey tool frame. Figma says #F2F2F2; Ledger White (#F2F1F0) is the
+   tokenised equivalent and visually identical. */
+.exc-panel {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    padding: 24px;
+    border: 1px solid var(--palette-neutral-300);
+    border-radius: 12px;
+    background: linear-gradient(155deg, #ffffff, #F2F1F0);
+}
+
+@media (width >= 64rem) {
+    .exc-panel {
+        min-height: 585px;
+    }
+}
+
+/* Vertical rhythm inside a panel: 48px tool → how-to-use, 80px between
+   article blocks. Both come straight off the Figma frame. */
+.exc-stack {
+    display: flex;
+    flex-direction: column;
+    gap: 48px;
+}
+
+.exc-stack-lg {
+    display: flex;
+    flex-direction: column;
+    gap: 80px;
+}
+
+/* One article + FAQ block per country on the VAT tool, one per tool elsewhere.
+   `:not()` rather than a bare `.exc-doc` so this outranks the `display: flex`
+   that `.exc-stack-lg` sets on the same element, whatever the source order. */
+.exc-doc:not(.exc-is-active) {
+    display: none;
+}
+
+.exc-h2 {
+    margin: 0;
+    font-family: var(--font-heading);
+    font-weight: 500;
+    font-size: var(--fs-h2);
+    line-height: var(--lh-h2);
+    color: var(--color-vault-navy);
+}
+
+.exc-h3 {
+    margin: 0;
+    font-family: var(--font-heading);
+    font-weight: 500;
+    font-size: var(--fs-h3);
+    line-height: var(--lh-h3);
+    letter-spacing: -0.5px;
+    color: var(--color-vault-navy);
+}
+
+/* ==========================================================================
+   TAB RAIL + PANELS
+   ========================================================================== */
+
+.exc-panels {
+    min-width: 0;
+}
+
+/* Only the selected panel is in flow. This is also the no-JS state, so a cold
+   load — or a script that never runs — shows one clean panel rather than six
+   stacked ones. */
+.exc-panel-slide {
+    display: none;
+}
+
+/* Going `display: none` → `block` restarts an animation from the beginning,
+   which is what makes this the whole transition: the script toggles one class
+   and the browser replays the enter. A `transition` could not do that, because
+   a display change gives it no interpolable start.
+
+   Rising 8px and fading reads as "this panel replaced that one". Sliding
+   sideways — what Swiper did here before — reads as a carousel, which is the
+   wrong idea for a tab. */
+.exc-panel-slide.exc-is-active {
+    display: block;
+    animation: exc-panel-in 260ms cubic-bezier(0.22, 0.61, 0.36, 1) both;
+}
+
+@keyframes exc-panel-in {
+    from {
+        opacity: 0;
+        transform: translateY(8px);
+    }
+    to {
+        opacity: 1;
+        transform: none;
+    }
+}
+
+/* The rail is a plain list, not a second Swiper — see the note at its markup.
+   Horizontal scrolling strip on mobile, static stack on desktop where all six
+   items fit. */
+.exc-rail-list {
+    display: flex;
+    overflow-x: auto;
+    scrollbar-width: none;
+}
+
+.exc-rail-list::-webkit-scrollbar {
+    display: none;
+}
+
+@media (width >= 64rem) {
+    .exc-rail-list {
+        flex-direction: column;
+        overflow-x: visible;
+        padding-block: 24px;
+    }
+}
+
+.exc-tab {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    width: 100%;
+    padding: 16px 24px 16px 0;
+    border: 0;
+    background: transparent;
+    cursor: pointer;
+    text-align: left;
+    white-space: nowrap;
+    font-family: var(--font-body);
+    font-weight: 500;
+    font-size: var(--fs-body-lg);
+    line-height: var(--lh-body-lg);
+    color: var(--palette-neutral-500);
+    transition: color 200ms ease;
+}
+
+.exc-tab:hover {
+    color: var(--color-vault-navy);
+}
+
+.exc-tab[aria-selected='true'] {
+    color: var(--color-vault-navy);
+}
+
+/* The active marker is a 4px Nova Blue bar down the left edge on desktop and a
+   3px underline on the mobile tab strip — one element, two shapes, because two
+   elements would be two things to keep in sync.
+
+   It grows out of its own centre rather than fading in. Six bars cross-fading
+   in place looks like a blink; one drawing itself along the axis it sits on
+   reads as the selection moving, which is what it is. The axis differs per
+   breakpoint, hence scaleY on the vertical rail and scaleX on the strip. */
+.exc-tab-ind {
+    background-color: var(--color-nova-blue);
+    border-radius: 2px;
+    opacity: 0;
+    transition:
+        transform 260ms cubic-bezier(0.22, 0.61, 0.36, 1),
+        opacity 160ms ease;
+}
+
+.exc-tab[aria-selected='true'] .exc-tab-ind {
+    opacity: 1;
+}
+
+@media (width >= 64rem) {
+    .exc-tab-ind {
+        width: 4px;
+        align-self: stretch;
+        transform: scaleY(0);
+    }
+
+    .exc-tab[aria-selected='true'] .exc-tab-ind {
+        transform: scaleY(1);
+    }
+}
+
+@media (width < 64rem) {
+    .exc-tab {
+        position: relative;
+        flex: none;
+        width: auto;
+        padding: 16px 20px;
+    }
+
+    .exc-tab-ind {
+        position: absolute;
+        inset-inline: 12px;
+        bottom: 0;
+        height: 3px;
+        transform: scaleX(0);
+    }
+
+    .exc-tab[aria-selected='true'] .exc-tab-ind {
+        transform: scaleX(1);
+    }
+}
+
+/* Both motions above are decoration on a state change that is already carried
+   by colour and by `aria-selected`, so removing them costs nothing. */
+@media (prefers-reduced-motion: reduce) {
+    /* Dotgrid checks the same query itself and paints a still field, so the
+       canvas needs nothing here. */
+    .exc-panel-slide.exc-is-active {
+        animation: none;
+    }
+
+    .exc-tab-ind {
+        transition: opacity 160ms ease;
+        transform: none;
+    }
+
+    .exc-tab[aria-selected='true'] .exc-tab-ind {
+        transform: none;
+    }
+}
+
+/* ==========================================================================
+   CALCULATORS
+   ========================================================================== */
+
+.exc-calc {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 24px;
+    flex: 1;
+}
+
+@media (width >= 64rem) {
+    .exc-calc {
+        grid-template-columns: minmax(0, 1fr) 300px;
+    }
+}
+
+/* ROI takes five inputs, so it gets a wider result rail and a two-up field
+   grid rather than the label-beside-field rows the tax calculators use. */
+@media (width >= 64rem) {
+    .exc-calc-roi {
+        grid-template-columns: minmax(0, 1fr) 340px;
+    }
+}
+
+.exc-controls,
+.exc-result {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 24px;
+    padding: 24px;
+    border: 1px solid var(--palette-neutral-300);
+    border-radius: 12px;
+    background: var(--palette-generic-00);
+}
+
+.exc-controls {
+    gap: 28px;
+}
+
+.exc-row {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.exc-row-inline {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.exc-label {
+    font-family: var(--font-body);
+    font-weight: 500;
+    font-size: var(--fs-body);
+    line-height: var(--lh-body);
+    color: var(--color-vault-navy);
+}
+
+.exc-field {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    border: 1px solid var(--palette-neutral-200);
+    border-radius: 8px;
+    background: var(--palette-generic-00);
+}
+
+.exc-field:focus-within {
+    border-color: var(--color-nova-blue);
+}
+
+.exc-affix {
+    font-family: var(--font-body);
+    font-weight: 500;
+    font-size: var(--fs-body-sm);
+    line-height: var(--lh-body-sm);
+    color: var(--palette-neutral-500);
+}
+
+.exc-num {
+    width: 112px;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    outline: none;
+    text-align: right;
+    font-family: var(--font-body);
+    font-weight: 500;
+    font-size: var(--fs-body);
+    line-height: var(--lh-body);
+    color: var(--color-vault-navy);
+    appearance: textfield;
+    -moz-appearance: textfield;
+}
+
+.exc-num-sm {
+    width: 64px;
+}
+
+.exc-num::-webkit-outer-spin-button,
+.exc-num::-webkit-inner-spin-button {
+    appearance: none;
+    margin: 0;
+}
+
+.exc-select {
+    padding: 8px 12px;
+    border: 1px solid var(--palette-neutral-200);
+    border-radius: 8px;
+    background: var(--palette-generic-00);
+    cursor: pointer;
+    font-family: var(--font-body);
+    font-weight: 500;
+    font-size: var(--fs-body);
+    line-height: var(--lh-body);
+    color: var(--color-vault-navy);
+}
+
+.exc-select:focus-visible {
+    outline: 2px solid var(--color-nova-blue);
+    outline-offset: 2px;
+}
+
+/* --exc-fill is written by the script on every input so the filled part of the
+   track matches the thumb. A range input has no ::before to colour, so the
+   track gradient is the only cross-browser way to do this. */
+.exc-slider {
+    appearance: none;
+    -webkit-appearance: none;
+    width: 100%;
+    height: 6px;
+    border-radius: 999px;
+    outline: none;
+    cursor: pointer;
+    background: linear-gradient(
+        to right,
+        var(--color-nova-blue) 0%,
+        var(--color-nova-blue) var(--exc-fill, 0%),
+        var(--palette-neutral-200) var(--exc-fill, 0%),
+        var(--palette-neutral-200) 100%
+    );
+}
+
+.exc-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: var(--palette-generic-00);
+    border: 2px solid var(--color-nova-blue);
+    box-shadow: 0 2px 6px rgba(16, 24, 40, 0.16);
+    cursor: pointer;
+}
+
+.exc-slider::-moz-range-thumb {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: var(--palette-generic-00);
+    border: 2px solid var(--color-nova-blue);
+    box-shadow: 0 2px 6px rgba(16, 24, 40, 0.16);
+    cursor: pointer;
+}
+
+.exc-slider::-moz-range-track {
+    height: 6px;
+    border-radius: 999px;
+    background: transparent;
+}
+
+.exc-slider:focus-visible {
+    outline: 2px solid var(--color-nova-blue);
+    outline-offset: 4px;
+}
+
+.exc-segment {
+    display: inline-flex;
+    padding: 4px;
+    border: 1px solid var(--palette-neutral-200);
+    border-radius: 8px;
+    background: var(--palette-neutral-50);
+}
+
+.exc-segment-btn {
+    appearance: none;
+    border: 0;
+    border-radius: 6px;
+    background: transparent;
+    padding: 6px 18px;
+    cursor: pointer;
+    font-family: var(--font-body);
+    font-weight: 500;
+    font-size: var(--fs-body-sm);
+    line-height: var(--lh-body-sm);
+    color: var(--palette-neutral-500);
+    transition:
+        background-color 180ms ease,
+        color 180ms ease;
+}
+
+.exc-segment-btn-on {
+    background: var(--color-nova-blue);
+    color: var(--palette-generic-00);
+}
+
+.exc-out {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.exc-out-label {
+    font-family: var(--font-body);
+    font-size: var(--fs-body-sm);
+    line-height: var(--lh-body-sm);
+    color: var(--palette-neutral-500);
+}
+
+.exc-out-value {
+    font-family: var(--font-heading);
+    font-weight: 500;
+    font-size: var(--fs-h5);
+    line-height: var(--lh-h5);
+    color: var(--color-vault-navy);
+}
+
+.exc-out-total .exc-out-value {
+    font-weight: 600;
+    font-size: var(--fs-h4);
+    line-height: var(--lh-h4);
+    color: var(--color-nova-blue);
+}
+
+.exc-rule {
+    height: 1px;
+    width: 100%;
+    background: var(--palette-neutral-200);
+}
+
+.exc-note {
+    margin: 0;
+    font-family: var(--font-body);
+    font-size: var(--fs-body-xs);
+    line-height: var(--lh-body-xs);
+    color: var(--palette-neutral-400);
+}
+
+.exc-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 12px 20px;
+    border: 0;
+    border-radius: 8px;
+    background: var(--color-nova-blue);
+    color: var(--palette-generic-00);
+    cursor: pointer;
+    text-decoration: none;
+    font-family: var(--font-body);
+    font-weight: 500;
+    font-size: var(--fs-body);
+    line-height: var(--lh-body);
+    transition: opacity 200ms ease;
+}
+
+.exc-btn:hover {
+    opacity: 0.88;
+}
+
+/* ROI takes five numbers, so they sit in a two-up grid of stacked
+   label-over-field pairs instead of the tax calculators' inline rows. */
+.exc-roi-fields {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 16px;
+}
+
+@media (width >= 40rem) {
+    .exc-roi-fields {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+.exc-roi-field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.exc-roi-field .exc-num {
+    width: 100%;
+    text-align: left;
+}
+
+.exc-roi-field .exc-label {
+    font-size: var(--fs-body-sm);
+    line-height: var(--lh-body-sm);
+    color: var(--palette-neutral-500);
+}
+
+.exc-hsn-form {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.exc-hsn-form .exc-field {
+    flex: 1 1 220px;
+}
+
+.exc-hsn-form .exc-num {
+    width: 100%;
+    text-align: left;
+}
+
+.exc-hsn-results {
+    overflow: hidden;
+    border: 1px solid var(--palette-neutral-300);
+    border-radius: 12px;
+    background: var(--palette-generic-00);
+}
+
+.exc-hsn-list {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.exc-hsn-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+    padding: 12px 20px;
+    border-bottom: 1px solid var(--palette-neutral-200);
+}
+
+.exc-hsn-row:last-child {
+    border-bottom: 0;
+}
+
+/* `[hidden]` sets `display: none` at UA-stylesheet strength, which any
+   `display: flex` beats. The filter script sets `hidden`, so this pairing has
+   to outrank the row's own display or every row stays visible. */
+.exc-hsn-row[hidden] {
+    display: none;
+}
+
+.exc-hsn-chapters {
+    flex: none;
+    width: 64px;
+    font-family: var(--font-body);
+    font-weight: 500;
+    font-size: var(--fs-body-sm);
+    line-height: var(--lh-body-sm);
+    color: var(--palette-neutral-500);
+}
+
+.exc-hsn-empty {
+    padding: 12px 20px;
+}
+
+/* ==========================================================================
+   COUNTRY PILL — VAT tool only
+   ========================================================================== */
+
+.exc-country {
+    position: relative;
+}
+
+.exc-country-trigger {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 14px 16px;
+    border: 1px solid var(--palette-neutral-300);
+    border-radius: 8px;
+    background: var(--palette-generic-00);
+    box-shadow: 0 2px 6px 0 rgba(16, 24, 40, 0.06);
+    cursor: pointer;
+    font-family: var(--font-body);
+    font-weight: 500;
+    font-size: var(--fs-label-lg);
+    line-height: var(--lh-label-lg);
+    color: var(--color-vault-navy);
+    transition: border-color 200ms ease;
+}
+
+.exc-country-trigger:hover {
+    border-color: var(--color-nova-blue);
+}
+
+.exc-country-caret {
+    width: 12px;
+    height: 8px;
+    flex: none;
+    color: var(--palette-neutral-400);
+    transition: transform 200ms ease;
+}
+
+.exc-country-trigger[aria-expanded='true'] .exc-country-caret {
+    transform: rotate(180deg);
+}
+
+.exc-country-menu {
+    position: absolute;
+    right: 0;
+    top: calc(100% + 8px);
+    z-index: 20;
+    display: none;
+    margin: 0;
+    padding: 4px;
+    width: 256px;
+    max-height: 288px;
+    overflow-y: auto;
+    list-style: none;
+    border: 1px solid var(--palette-neutral-300);
+    border-radius: 12px;
+    background: var(--palette-generic-00);
+    box-shadow: 0 12px 32px 0 rgba(16, 24, 40, 0.12);
+}
+
+.exc-country-menu.exc-is-open {
+    display: block;
+}
+
+.exc-country-option {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+    padding: 10px 12px;
+    border: 0;
+    border-radius: 8px;
+    background: transparent;
+    cursor: pointer;
+    text-align: left;
+    font-family: var(--font-body);
+    font-size: var(--fs-body-sm);
+    line-height: var(--lh-body-sm);
+    color: var(--color-vault-navy);
+    transition: background-color 150ms ease;
+}
+
+.exc-country-option:hover {
+    background: var(--palette-neutral-100);
+}
+
+.exc-country-option span:first-of-type {
+    flex: 1;
+}
+
+.exc-country-rate {
+    color: var(--palette-neutral-500);
+}
+
+.exc-flag {
+    width: 24px;
+    height: 18px;
+    flex: none;
+    border-radius: 2px;
+    object-fit: cover;
+}
+
+/* ==========================================================================
+   HOW TO USE
+   ========================================================================== */
+
+.exc-steps {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.exc-step {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    font-family: var(--font-body);
+    font-size: var(--fs-body-lg);
+    line-height: var(--lh-body-lg);
+    color: var(--palette-neutral-500);
+}
+
+/* Drawn in CSS, not shipped as an inline SVG. There are two dozen of these
+   across the six panels and the SVG cost ~230 bytes each inside the Embed. */
+.exc-check {
+    position: relative;
+    flex: none;
+    width: 20px;
+    height: 20px;
+    margin-top: 4px;
+    border-radius: 50%;
+    background: var(--color-nova-blue);
+}
+
+.exc-check::after {
+    content: '';
+    position: absolute;
+    left: 7px;
+    top: 4px;
+    width: 5px;
+    height: 9px;
+    border: solid var(--palette-generic-00);
+    border-width: 0 1.8px 1.8px 0;
+    transform: rotate(45deg);
+}
+
+/* ==========================================================================
+   ARTICLE
+   ========================================================================== */
+
+.exc-prose {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    word-break: break-word;
+}
+
+.exc-prose p {
+    margin: 0;
+    font-family: var(--font-body);
+    font-size: var(--fs-body-lg);
+    line-height: var(--lh-body-lg);
+    color: var(--palette-neutral-500);
+}
+
+.exc-prose a {
+    color: var(--color-nova-blue);
+    text-decoration: none;
+}
+
+.exc-prose a:hover {
+    text-decoration: underline;
+}
+
+.exc-prose strong {
+    color: var(--color-vault-navy);
+    font-weight: 700;
+}
+
+.exc-list {
+    margin: 0;
+    padding-inline-start: 27px;
+    list-style: disc;
+    display: flex;
+    flex-direction: column;
+    gap: 48px;
+}
+
+.exc-list > li::marker,
+.exc-list-tight > li::marker {
+    color: var(--palette-neutral-500);
+}
+
+.exc-list > li > p {
+    margin-top: 18px;
+}
+
+.exc-list-tight {
+    margin: 0;
+    padding-inline-start: 27px;
+    list-style: disc;
+    font-family: var(--font-body);
+    font-size: var(--fs-body-lg);
+    line-height: var(--lh-body-lg);
+    color: var(--palette-neutral-500);
+}
+
+.exc-list-tight > li + li {
+    margin-top: 16px;
+}
+
+/* ==========================================================================
+   FAQ
+   ========================================================================== */
+
+.exc-faq {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.exc-faq-item {
+    border: 1px solid var(--palette-neutral-300);
+    border-radius: 12px;
+    background: var(--palette-generic-00);
+}
+
+.exc-faq-trigger {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+    width: 100%;
+    padding: 24px;
+    border: 0;
+    background: transparent;
+    cursor: pointer;
+    text-align: left;
+    appearance: none;
+}
+
+.exc-faq-q {
+    min-width: 0;
+    flex: 1;
+    font-family: var(--font-body);
+    font-weight: 500;
+    font-size: var(--fs-body);
+    line-height: var(--lh-body);
+    color: var(--palette-neutral-900);
+}
+
+/* Plus that becomes a minus. Two pseudo-element bars instead of an inline SVG
+   — same reason as .exc-check, times thirty-odd rows. */
+.exc-faq-icon {
+    position: relative;
+    flex: none;
+    width: 24px;
+    height: 24px;
+}
+
+.exc-faq-icon::before,
+.exc-faq-icon::after {
+    content: '';
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    border-radius: 1px;
+    background: var(--palette-neutral-900);
+    transform: translate(-50%, -50%);
+}
+
+.exc-faq-icon::before {
+    width: 14px;
+    height: 1.5px;
+}
+
+.exc-faq-icon::after {
+    width: 1.5px;
+    height: 14px;
+    transition: transform 250ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.exc-faq-item.exc-is-open .exc-faq-icon::after {
+    transform: translate(-50%, -50%) scaleY(0);
+}
+
+/* Height is animated from a JS-measured pixel value, then released to auto so
+   a resize or a font swap can't leave the panel clipped. */
+.exc-faq-panel {
+    height: 0;
+    overflow: hidden;
+    transition: height 320ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.exc-faq-panel p {
+    margin: 0;
+    padding: 0 24px 24px;
+    font-family: var(--font-body);
+    font-size: var(--fs-body-sm);
+    line-height: var(--lh-body-sm);
+    color: var(--palette-neutral-500);
+}

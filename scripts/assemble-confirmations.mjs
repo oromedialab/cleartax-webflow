@@ -34,17 +34,41 @@ function kebab(s) {
  * and concatenates the parts in order instead — this mirrors what the page
  * looks like once all part-Embeds are pasted in sequence in Webflow.
  * Returns null if neither the single file nor any parts exist.
+ *
+ * A split section is wrapped in HTML comment markers naming the part file and
+ * its char count. Concatenated output renders identically either way (comments
+ * are inert), but the preview then shows exactly where one Webflow Embed ends
+ * and the next begins — otherwise the boundaries are invisible here and the
+ * only way to find them is to open dist/_embeds/ and count.
  */
+function partBanner(text) {
+  return `<!-- ${'='.repeat(6)} ${text} ${'='.repeat(6)} -->`;
+}
+
 function readEmbedContent(basePath) {
   if (existsSync(basePath)) return readFileSync(basePath, 'utf8');
   const base = basePath.replace(/\.html$/, '');
+  const name = basePath.slice(basePath.replace(/\\/g, '/').lastIndexOf('/') + 1).replace(/\.html$/, '');
   const parts = [];
   let idx = 1;
   while (existsSync(`${base}-${idx}.html`)) {
     parts.push(readFileSync(`${base}-${idx}.html`, 'utf8'));
     idx++;
   }
-  return parts.length ? parts.join('') : null;
+  if (!parts.length) return null;
+
+  const total = parts.length;
+  return parts
+    .map((part, i) => {
+      const n = i + 1;
+      const label = `WEBFLOW EMBED ${n} OF ${total} — ${name}-${n}.html — ${part.length.toLocaleString('en-US')} chars`;
+      return [
+        partBanner(`${label} — PASTE START`),
+        part.replace(/\n$/, ''),
+        partBanner(`END EMBED ${n} OF ${total}`),
+      ].join('\n');
+    })
+    .join('\n');
 }
 
 /**

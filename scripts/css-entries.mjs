@@ -61,8 +61,27 @@ export const PAGE_TARGETS = [
   // through the pipeline so the paste-ready bundle lands in public/css/ like
   // every other page.
   { name: 'event-detail', input: 'src/styles/event-detail.css', page: 'src/pages/events/[slug].astro' },
-  { name: 'trust-centre', input: 'src/styles/trust-centre.css', page: 'src/pages/trust-centre.astro' }
+  { name: 'trust-centre', input: 'src/styles/trust-centre.css', page: 'src/pages/trust-centre.astro' },
+  { name: 'experience-centre', input: 'src/styles/experience-centre.css', page: 'src/pages/experience-centre.astro' },
+  { name: 'podcast', input: 'src/styles/podcast.css', page: 'src/pages/podcast.astro' }
 ];
+
+/**
+ * The frontmatter block, matched on its real `---` fences.
+ *
+ * This used to be `src.split('---')[1]`, which silently truncates at the first
+ * `---` ANYWHERE in the file — including inside a frontmatter comment. A
+ * section whose docblock draws a `------` rule (most of them do) therefore had
+ * every import below that rule go undiscovered, so Tailwind never saw the
+ * `_shared` primitive it pulled in and dropped every utility used only inside
+ * it. That failure is invisible at build time; it shows up as a component
+ * rendering unstyled, which is the exact trap the comment on
+ * `discoverSharedSources` warns about.
+ */
+function frontmatterOf(src) {
+  const m = /^---\r?\n([\s\S]*?)\r?\n---/.exec(src);
+  return m ? m[1] : '';
+}
 
 const SHARED_IMPORT_RE = /import\s+[A-Z][A-Za-z0-9]*\s+from\s+['"]\.\.\/sections\/_shared\/([A-Za-z0-9_-]+)\.astro['"]/g;
 
@@ -90,7 +109,7 @@ export function sectionBundleMap(root) {
   for (const target of PAGE_TARGETS) {
     let src;
     try { src = readFileSync(resolve(root, target.page), 'utf8'); } catch { continue; }
-    const frontmatter = src.split('---')[1] ?? '';
+    const frontmatter = frontmatterOf(src);
 
     ANY_SECTION_IMPORT_RE.lastIndex = 0;
     let m;
@@ -141,8 +160,7 @@ export function discoverSharedSources(pagePath, root, seen = new Set(), depth = 
 
   let src;
   try { src = readFileSync(abs, 'utf8'); } catch { return []; }
-  const parts = src.split('---');
-  const frontmatter = parts.length > 2 ? parts[1] : '';
+  const frontmatter = frontmatterOf(src);
 
   const names = new Set();
 
