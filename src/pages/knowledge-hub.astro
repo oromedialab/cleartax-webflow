@@ -1,0 +1,90 @@
+---
+/**
+ * Knowledge Hub — brand v2. Figma node 15070:48189
+ * (https://www.cleartax.com/resources/knowledge-hub).
+ *
+ * Structural twin of `src/pages/events.astro`: Navbar and Footer are thin
+ * wrappers over the `_shared/*Rb` primitives; Hero, Featured, Filters and
+ * Resources are page-local, each a Webflow Embed paste unit supplying its own
+ * content, because the embed route renders sections with no props.
+ *
+ * THE PAGE IS TWO HALVES, same split as Events. `Featured` is the bordered
+ * panel of highlighted resources; `Filters` + `Resources` is the filterable
+ * archive, and the heading for that half lives in `Filters` because it has to
+ * stay put while the filter bar pins. They read `featuredResources` and
+ * `resources` respectively from `src/data/knowledge-hub.ts`, so a resource
+ * can never show up in both.
+ *
+ * NO DETAIL PAGE. Unlike Events there is no `knowledge-hub/[slug].astro` —
+ * every card links straight to its own `href` and opens in a new tab. Do not
+ * add one without being asked.
+ *
+ * No fonts.css import — that bundle self-hosts the v1 faces. Brand v2 loads
+ * Inter Tight + Google Sans from Google Fonts via the <link> in the head.
+ */
+import "../styles/shared.css";
+import "../styles/.build/knowledge-hub.css";
+
+import Navbar from "../sections/knowledge-hub/Navbar.astro";
+import Hero from "../sections/knowledge-hub/Hero.astro";
+import Featured from "../sections/knowledge-hub/Featured.astro";
+import Filters from "../sections/knowledge-hub/Filters.astro";
+import Resources from "../sections/knowledge-hub/Resources.astro";
+import Footer from "../sections/knowledge-hub/Footer.astro";
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ClearTax — Knowledge Hub</title>
+    <meta
+      name="description"
+      content="Case studies, whitepapers, reports and blogs from ClearTax — e-invoicing mandates, ERP integration and tax compliance, explained by the experts who ship it. Filter by category and country."
+    />
+    <meta content="noindex, nofollow" name="robots" />
+    <link
+      rel="shortcut icon"
+      type="image/png"
+      href="https://cdn.prod.website-files.com/63ede4a3da6dbd6b05c4612f/63ede4a3da6dbd7162c46439_32by32.png"
+    />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="32x32"
+      href="https://cdn.prod.website-files.com/63ede4a3da6dbd6b05c4612f/63ede4a3da6dbd7162c46439_32by32.png"
+    />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="256x256"
+      href="https://cdn.prod.website-files.com/63ede4a3da6dbd6b05c4612f/63ede4a3da6dbd8997c46450_256by256.png"
+    />
+    <link
+      rel="apple-touch-icon"
+      href="https://cdn.prod.website-files.com/63ede4a3da6dbd6b05c4612f/63ede4a3da6dbd8997c46450_256by256.png"
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400..700&family=Google+Sans:opsz,wght@17..18,400..700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="preload"
+      href="https://cdn.prod.website-files.com/6093bce33d9b4bae841b04e3/69dfcff6071b983201f5f097_logo-cleartax.svg"
+      as="image"
+      type="image/svg+xml"
+      fetchpriority="high"
+    />
+  </head>
+  <body class="bg-generic-00">
+    <Navbar />
+    <Hero />
+    <Featured />
+    <Filters />
+    <Resources />
+    <Footer />
+  </body>
+</html>

@@ -1,0 +1,72 @@
+---
+/**
+ * "Why Choose ClearTax?" — Figma node 15121:20972 ("Fold 4").
+ *
+ * A heading list on the left — one row expanded with a body line, four muted
+ * rows below it — beside a full-height visual placeholder. The Figma defines
+ * copy for a single expanded state only (no alternate panel content per row,
+ * unlike the accordion in `Seamless.astro`), so this renders as a static list
+ * rather than an interactive tab switcher.
+ */
+interface Row {
+  heading: string;
+  body?: string;
+}
+
+const rows: Row[] = [
+  {
+    heading: "Fast Implementation",
+    body: "Seamlessly integrate with any ERP or POS Systems in just 7 days",
+  },
+  { heading: "Local Compliance Expertise" },
+  { heading: "Scalable Global Platform" },
+  { heading: "Seamless Integration" },
+  { heading: "AI-Powered Accuracy" },
+];
+---
+
+<section class="bg-generic-00 py-12 lg:py-20">
+  <div class="max-w-[var(--container-max)] mx-auto px-6 w-full">
+    <div class="flex flex-col items-center gap-12">
+      <h2
+        class="m-0 text-center font-heading font-medium text-vault-navy text-[length:var(--fs-h1)] leading-[length:var(--lh-h1)] tracking-[-0.5px] max-w-[737px]"
+      >
+        Why Choose ClearTax?
+      </h2>
+
+      <div class="grid w-full grid-cols-1 items-center gap-8 lg:grid-cols-[540px_1fr] lg:gap-[120px]">
+        <div class="flex flex-col gap-8">
+          {
+            rows.map((row, i) => (
+              <div
+                class:list={[
+                  "flex flex-col gap-4",
+                  i < rows.length - 1 && "border-b border-[#ccc] pb-8",
+                ]}
+              >
+                <p
+                  class:list={[
+                    "m-0 font-heading font-medium text-[length:var(--fs-h5)] leading-[length:var(--lh-h5)]",
+                    i === 0 ? "text-vault-navy" : "text-neutral-500",
+                  ]}
+                >
+                  {row.heading}
+                </p>
+                {row.body && (
+                  <p class="m-0 font-body text-neutral-500 text-[length:var(--fs-body-sm)] leading-[length:var(--lh-body-sm)] max-w-[480px]">
+                    {row.body}
+                  </p>
+                )}
+              </div>
+            ))
+          }
+        </div>
+
+        <div
+          class="h-[300px] w-full rounded-lg bg-visual-placeholder lg:h-full lg:min-h-[460px]"
+          aria-hidden="true"
+        />
+      </div>
+    </div>
+  </div>
+</section>
