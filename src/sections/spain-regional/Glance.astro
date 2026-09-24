@@ -1,0 +1,491 @@
+---
+/**
+ * "Spain e-Invoicing at a glance" — Figma node 15121:30206 ("Fold 6").
+ *
+ * Header row (heading left, "Book a demo" button right — no lede paragraph on
+ * this page, unlike `france-regional/Mandate.astro`), then five stacked mandate
+ * cards. Each card is a heading, a three-row accordion (Authority / Status and
+ * Timeline / Core requirement) and a 608:420 visual.
+ *
+ * The visual is an unfilled "Image holder" frame in the Figma, so it renders as
+ * a `bg-visual-placeholder` block holding the exact aspect ratio. Swap for a
+ * Webflow-hosted URL when the artwork lands — never a `data:` URI.
+ *
+ * The ~390-410px of empty frame the Figma leaves between cards is the scroll
+ * choreography: they pin and stack. Same implementation as
+ * `france-regional/Mandate.astro` (itself from `global-homepage/WhyGenericAi.astro`):
+ *
+ *   - Two layers per card. The OUTER wrapper (`.sp-glance-sticky`) is what
+ *     `position: sticky` acts on and is NEVER transformed, so measuring it with
+ *     getBoundingClientRect is always accurate. The INNER card
+ *     (`.sp-glance-card`) is the only thing JS scales.
+ *   - Each wrapper sticks 16px below the previous one, with a rising z-index.
+ *   - A card shrinks as the next one closes in, 3% per card back from the
+ *     front: 0.88 / 0.91 / 0.94 / 0.97 / 1.00 for these five cards.
+ *
+ * THE HEADER IS IN THE MARKUP TWICE, as in `france-regional/Mandate.astro`. On
+ * a big enough window it rides inside the first sticky wrapper and stays on
+ * screen for the whole stack; on anything smaller it scrolls away above it.
+ * Edit the copy through the consts below, not in the markup.
+ *
+ * The Authority / Status and Timeline / Core requirement rows are collapsed
+ * chevron rows in the base Fold 6 frame, but the Figma carries a full set of
+ * per-row "expanded" variant frames beside the page (`Fold 2 Card 1 b/c/d`
+ * etc., one variant per row per card — Figma node ids 15121:32285 through
+ * 15121:33005) that show each row's real answer. The content below is
+ * transcribed from those variants:
+ *   - "Authority" renders as a row of chips (the Figma shows the answer as
+ *     `#ECEFFF` pills, not prose) — some cards split one authority's name
+ *     across two adjacent chips (SII/RRSIF: "AEAT" + "Ministry of Finance";
+ *     Crea y Crece: "Ministry of Economy" + "Commerce and Enterprise" as one
+ *     ministry name, then "Ministry of Finance" and "AEAT" separately;
+ *     TicketBAI: "Provincial Treasuries of Bizkaia" + "Gipuzkoa and Álava" +
+ *     "together with the Basque Government" reads as one sentence broken
+ *     across three chips).
+ *   - "Status and Timeline" and "Core requirement" render as prose, except
+ *     Crea y Crece's Core requirement, which the Figma shows as a bulleted
+ *     list.
+ *
+ * IMPORTANT: no ancestor of a `.sp-glance-sticky` may set `overflow` to
+ * anything but `visible` — that silently kills `position: sticky`.
+ */
+interface Row {
+  label: string;
+  chips?: string[];
+  text?: string;
+  items?: string[];
+}
+
+interface Mandate {
+  heading: string;
+  rows: Row[];
+}
+
+const mandates: Mandate[] = [
+  {
+    heading: "SII (Immediate Supply of Information)",
+    rows: [
+      {
+        label: "Authority",
+        chips: ["AEAT", "Ministry of Finance"],
+      },
+      {
+        label: "Status and Timeline",
+        text: "In force since 1 July 2017. Applies primarily to monthly VAT taxpayers, including large businesses, IVA groups and REDEME taxpayers, as well as voluntary participants.",
+      },
+      {
+        label: "Core requirement",
+        text: "Submit electronic VAT ledger records generally within four days of the transaction. SII does not require transmission of the complete invoice.",
+      },
+    ],
+  },
+  {
+    heading: "Crea y Crece B2B e-invoicing",
+    rows: [
+      {
+        label: "Authority",
+        chips: ["Ministry of Economy", "Commerce and Enterprise", "Ministry of Finance", "AEAT"],
+      },
+      {
+        label: "Status and Timeline",
+        text: "Real Decreto 238/2026 entered into force on 20 April 2026. Obligations apply 12 months after the final Ministerial Order for businesses with turnover above €8 million, and 24 months after for other covered businesses and professionals.",
+      },
+      {
+        label: "Core requirement",
+        items: [
+          "Exchange structured electronic invoices for domestic B2B transactions",
+          "Support platform interoperability",
+          "Transmit invoice-status and payment information",
+          "Send a faithful electronic copy to the AEAT public solution",
+        ],
+      },
+    ],
+  },
+  {
+    heading: "SIF / RRSIF — VERI*FACTU",
+    rows: [
+      {
+        label: "Authority",
+        chips: ["AEAT", "Ministry of Finance"],
+      },
+      {
+        label: "Status and Timeline",
+        text: "Mandatory from 1 January 2027 for corporate income-tax taxpayers in scope and 1 July 2027 for other covered taxpayers. SII taxpayers are generally outside the RRSIF scope for covered invoicing activities.",
+      },
+      {
+        label: "Core requirement",
+        text: "Invoicing software must generate secure, traceable and unalterable billing records. VERIFACTU is the mode that sends these records to AEAT when invoices are issued.",
+      },
+    ],
+  },
+  {
+    heading: "B2G e-invoicing — Facturae / FACe",
+    rows: [
+      {
+        label: "Authority",
+        chips: ["Public administrations", "FACe is operated for the General State Administration"],
+      },
+      {
+        label: "Status and Timeline",
+        text: "Mandatory for specified categories of public-sector suppliers since 15 January 2015.",
+      },
+      {
+        label: "Core requirement",
+        text: "Submit structured electronic invoices to the relevant public-sector entry point. Facturae is the established Spanish B2G format, while FACe is the General State Administration's invoice-entry platform.",
+      },
+    ],
+  },
+  {
+    heading: "TicketBAI and Batuz",
+    rows: [
+      {
+        label: "Authority",
+        chips: ["Provincial Treasuries of Bizkaia", "Gipuzkoa and Álava", "together with the Basque Government"],
+      },
+      {
+        label: "Status and Timeline",
+        text: "Already implemented under separate foral legislation and territory-specific rules. In Bizkaia, TicketBAI forms part of Batuz.",
+      },
+      {
+        label: "Core requirement",
+        text: "Use compliant invoicing software to create, sign and transmit prescribed invoice records.",
+      },
+    ],
+  },
+];
+
+const HEADING = "Spain e-Invoicing at a glance";
+const CTA_LABEL = "Book a demo";
+const CTA_HREF = "https://www.cleartax.com/contact-us";
+---
+
+<section class="bg-generic-00 py-16 lg:py-20">
+  <div class="container mx-auto">
+    <!-- Scroll-away header — shown on mobile AND on any window too short to pin
+         it; see .sp-glance-header-* in the style block. -->
+    <div
+      class="sp-glance-header-flow flex flex-col gap-6 bg-generic-00 lg:flex-row lg:items-end lg:justify-between lg:gap-12 mb-12"
+    >
+      <h2
+        class="m-0 font-heading font-medium text-vault-navy text-[length:var(--fs-h1)] leading-[length:var(--lh-h1)] tracking-[-0.5px]"
+      >
+        {HEADING}
+      </h2>
+
+      <a
+        href={CTA_HREF}
+        data-demo-open
+        class="inline-flex shrink-0 items-center justify-center gap-2 self-start rounded-lg border border-nova-blue bg-nova-blue px-5 py-3.5 font-body text-[length:var(--fs-label-lg)] leading-[length:var(--lh-label-lg)] font-medium text-nova-50 no-underline transition-all ease-in-out duration-200 hover:bg-generic-00 hover:text-nova-blue lg:self-auto"
+      >
+        {CTA_LABEL}
+      </a>
+    </div>
+
+    <div
+      id="sp-glance-stack"
+      class="sp-glance-stack flex w-full flex-col gap-[30vh] lg:gap-[45vh]"
+    >
+      {
+        mandates.map((m, i) => (
+          <div
+            class="sp-glance-sticky sticky"
+            style={`top:calc(var(--nav-clear, 112px) + ${i * 16}px);z-index:${i};`}
+          >
+            {i === 0 && (
+              <div id="sp-glance-header" class="bg-generic-00">
+                <div class="sp-glance-header-stuck flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between lg:gap-12 mb-12">
+                  <h2 class="m-0 font-heading font-medium text-vault-navy text-[length:var(--fs-h1)] leading-[length:var(--lh-h1)] tracking-[-0.5px]">
+                    {HEADING}
+                  </h2>
+
+                  <a
+                    href={CTA_HREF}
+                    data-demo-open
+                    class="inline-flex shrink-0 items-center justify-center gap-2 self-start rounded-lg border border-nova-blue bg-nova-blue px-5 py-3.5 font-body text-[length:var(--fs-label-lg)] leading-[length:var(--lh-label-lg)] font-medium text-nova-50 no-underline transition-all ease-in-out duration-200 hover:bg-generic-00 hover:text-nova-blue lg:self-auto"
+                  >
+                    {CTA_LABEL}
+                  </a>
+                </div>
+              </div>
+            )}
+
+            <div
+              class="sp-glance-card flex flex-col items-stretch gap-6 rounded-xl border border-neutral-300 bg-generic-00 p-6 will-change-transform lg:flex-row lg:gap-8"
+              style="transform-origin: top center;"
+            >
+              <div class="flex flex-col gap-6 lg:max-w-[576px] lg:flex-1">
+                <h3 class="m-0 font-heading font-medium text-vault-navy text-[length:var(--fs-h3)] leading-[length:var(--lh-h3)] lg:text-[length:var(--fs-h2)] lg:leading-[length:var(--lh-h2)]">
+                  {m.heading}
+                </h3>
+
+                <div class="flex flex-col lg:mt-auto">
+                  {m.rows.map((row, ri) => (
+                    <div
+                      class:list={[
+                        "sp-glance-row",
+                        ri < m.rows.length - 1 && "border-b border-[var(--border-divider,#f2f1f0)]",
+                      ]}
+                    >
+                      <button
+                        type="button"
+                        class="sp-glance-row-trigger flex w-full cursor-pointer items-center justify-between gap-3 border-0 bg-transparent p-0 py-3 text-left"
+                        aria-expanded="false"
+                      >
+                        <span class="font-body text-neutral-700 text-[length:var(--fs-body-sm)] leading-[length:var(--lh-body-sm)]">
+                          {row.label}
+                        </span>
+                        <svg
+                          class="sp-glance-row-icon shrink-0 transition-transform duration-200 ease-in-out"
+                          width="20"
+                          height="20"
+                          viewBox="0 0 20 20"
+                          fill="none"
+                          aria-hidden="true"
+                          focusable="false"
+                        >
+                          <path
+                            d="M5 7.5L10 12.5L15 7.5"
+                            stroke="currentColor"
+                            stroke-width="1.5"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                          />
+                        </svg>
+                      </button>
+                      <div class="sp-glance-row-panel h-0 overflow-hidden">
+                        <div class="pb-3">
+                          {row.chips && (
+                            <ul class="m-0 flex list-none flex-wrap gap-2 p-0">
+                              {row.chips.map((chip) => (
+                                <li class="rounded bg-[#ecefff] px-3 py-1.5 font-body text-[14px] leading-[20px] text-nova-blue">
+                                  {chip}
+                                </li>
+                              ))}
+                            </ul>
+                          )}
+                          {row.text && (
+                            <p class="m-0 font-body text-neutral-500 text-[length:var(--fs-body-sm)] leading-[length:var(--lh-body-sm)]">
+                              {row.text}
+                            </p>
+                          )}
+                          {row.items && (
+                            <ul class="m-0 list-disc pl-5 font-body text-neutral-500 text-[length:var(--fs-body-sm)] leading-[length:var(--lh-body-sm)]">
+                              {row.items.map((item) => (
+                                <li class="mb-2 last:mb-0">{item}</li>
+                              ))}
+                            </ul>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+              <div
+                class="aspect-[608/420] w-full rounded-lg bg-visual-placeholder lg:flex-1"
+                aria-hidden="true"
+              />
+            </div>
+          </div>
+        ))
+      }
+
+      <!-- Tail room so the last card can finish sticking before the next section -->
+      <div style="height: 80px;" />
+    </div>
+  </div>
+</section>
+
+<style is:global>
+  /* Which header copy shows is a question of available HEIGHT, not just width,
+     so it cannot be a plain Tailwind breakpoint — see `france-regional/Mandate.astro`
+     for the full derivation of the bound. */
+  .sp-glance-header-stuck {
+    display: none;
+  }
+
+  @media (min-width: 1024px) and (min-height: 860px) {
+    .sp-glance-header-flow {
+      display: none;
+    }
+    .sp-glance-header-stuck {
+      display: flex;
+    }
+  }
+
+  /* Sticky and the scroll-driven shrink are both enhancements. Switched off,
+     the cards read as a plain evenly spaced stack. */
+  @media (prefers-reduced-motion: reduce) {
+    .sp-glance-stack {
+      gap: 1.5rem !important;
+    }
+    .sp-glance-sticky {
+      position: static !important;
+    }
+    .sp-glance-card {
+      transform: none !important;
+    }
+  }
+
+  .sp-glance-row[aria-expanded="true"] .sp-glance-row-icon,
+  .sp-glance-row-trigger[aria-expanded="true"] .sp-glance-row-icon {
+    transform: rotate(180deg);
+  }
+
+  .sp-glance-row-panel {
+    transition: height 280ms cubic-bezier(0.4, 0, 0.2, 1);
+  }
+</style>
+
+<script is:inline>
+  /* Accordion rows inside each card — independent open/close, no scroll
+     interaction of their own. */
+  (function () {
+    document.querySelectorAll(".sp-glance-row").forEach(function (row) {
+      var trigger = row.querySelector(".sp-glance-row-trigger");
+      var panel = row.querySelector(".sp-glance-row-panel");
+      if (!trigger || !panel) return;
+
+      trigger.addEventListener("click", function () {
+        var isOpen = trigger.getAttribute("aria-expanded") === "true";
+        if (isOpen) {
+          panel.style.height = panel.scrollHeight + "px";
+          requestAnimationFrame(function () {
+            panel.style.height = "0px";
+          });
+          trigger.setAttribute("aria-expanded", "false");
+          return;
+        }
+
+        panel.style.height = panel.scrollHeight + "px";
+        trigger.setAttribute("aria-expanded", "true");
+        panel.addEventListener("transitionend", function handler(e) {
+          if (e.propertyName !== "height") return;
+          panel.removeEventListener("transitionend", handler);
+          if (trigger.getAttribute("aria-expanded") === "true") {
+            panel.style.height = "auto";
+          }
+        });
+      });
+
+      window.addEventListener("resize", function () {
+        if (trigger.getAttribute("aria-expanded") === "true") {
+          panel.style.height = "auto";
+        }
+      });
+    });
+  })();
+
+  /* Sticky stack scroll choreography — identical to `france-regional/Mandate.astro`;
+     see that file for the full derivation. */
+  document.addEventListener("DOMContentLoaded", () => {
+    const stack = document.getElementById("sp-glance-stack");
+    if (!stack) return;
+
+    const textEl = document.getElementById("sp-glance-header");
+    const outers = Array.from(stack.querySelectorAll(".sp-glance-sticky"));
+    const inners = Array.from(stack.querySelectorAll(".sp-glance-card"));
+    if (!outers.length || outers.length !== inners.length) return;
+
+    const reduceMotion =
+      window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (reduceMotion) return;
+
+    const STACK_OFFSET = 16;
+    const REVEAL_DISTANCE = 260;
+
+    const NAV_CLEAR =
+      parseFloat(
+        getComputedStyle(document.documentElement).getPropertyValue("--nav-clear"),
+      ) || 112;
+
+    const SCALE_STEP = 0.03;
+    const targetScaleFor = (i) => 1 - (inners.length - 1 - i) * SCALE_STEP;
+
+    const zoomFactor = () => {
+      let z = 1;
+      for (let n = stack; n && n.nodeType === 1; n = n.parentElement) {
+        const v = parseFloat(getComputedStyle(n).zoom);
+        if (v && v !== 1) z *= v;
+      }
+      return z;
+    };
+
+    let zoom = zoomFactor();
+
+    const setTops = () => {
+      zoom = zoomFactor();
+
+      const originalTransform = inners[0].style.transform;
+      inners[0].style.transform = "none";
+
+      const outerTop = outers[0].getBoundingClientRect().top;
+      const innerTop = inners[0].getBoundingClientRect().top;
+      const cardOffset = (innerTop - outerTop) / zoom;
+
+      inners[0].style.transform = originalTransform;
+
+      let firstTop = NAV_CLEAR;
+
+      if (window.innerWidth >= 1280) {
+        const cardHeight = inners[0].getBoundingClientRect().height / zoom;
+        const totalStackHeight =
+          cardOffset + cardHeight + (outers.length - 1) * STACK_OFFSET;
+        const viewportCss = window.innerHeight / zoom;
+        firstTop = Math.max(NAV_CLEAR, (viewportCss - totalStackHeight) / 2);
+      }
+
+      outers[0].style.top = firstTop + "px";
+
+      const baseTop = firstTop + cardOffset;
+      for (let i = 1; i < outers.length; i++) {
+        outers[i].style.top = baseTop + i * STACK_OFFSET + "px";
+      }
+    };
+
+    let ticking = false;
+
+    const update = () => {
+      const tops = outers.map((el) => el.getBoundingClientRect().top);
+
+      inners.forEach((inner, i) => {
+        if (i === inners.length - 1) {
+          inner.style.transform = "scale(1)";
+          return;
+        }
+
+        const nextStickyTopPx =
+          (parseFloat(getComputedStyle(outers[i + 1]).top) || 0) * zoom;
+        const distanceToStick = tops[i + 1] - nextStickyTopPx;
+
+        const progress = Math.min(1, Math.max(0, 1 - distanceToStick / REVEAL_DISTANCE));
+        const scale = 1 - progress * (1 - targetScaleFor(i));
+        inner.style.transform = `scale(${scale.toFixed(4)})`;
+      });
+
+      ticking = false;
+    };
+
+    const onScroll = () => {
+      if (ticking) return;
+      ticking = true;
+      requestAnimationFrame(update);
+    };
+
+    const handleLayoutShift = () => {
+      setTops();
+      update();
+    };
+
+    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", handleLayoutShift);
+    window.addEventListener("load", handleLayoutShift, { once: true });
+
+    if (textEl && typeof ResizeObserver !== "undefined") {
+      new ResizeObserver(handleLayoutShift).observe(textEl);
+    }
+
+    setTops();
+    update();
+  });
+</script>
