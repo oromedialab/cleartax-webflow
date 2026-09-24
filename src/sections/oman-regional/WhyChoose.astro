@@ -1,16 +1,26 @@
 ---
 /**
- * "Why Choose ClearTax?" — Figma node 15121:20972 ("Fold 4").
+ * "Why Choose ClearTax?" — Figma node 15121:20972 ("Fold 4" in the main page
+ * flow). Interactive behaviour confirmed against the sibling variant frames
+ * parked beside the page artboard — "Fold 4 - 2" (15121:24146) through
+ * "Fold 4 - 5" (15121:24236) — which are the same section with each accordion
+ * row shown active in turn. Each row's body copy only exists in its own
+ * "active" variant, so all five are pulled from there rather than guessed.
  *
- * A heading list on the left — one row expanded with a body line, four muted
- * rows below it — beside a full-height visual placeholder. The Figma defines
- * copy for a single expanded state only (no alternate panel content per row,
- * unlike the accordion in `Seamless.astro`), so this renders as a static list
- * rather than an interactive tab switcher.
+ * Left: five-row accordion, one active at a time — clicking a row reveals its
+ * body line and dims the others, same interaction as the compliance accordion
+ * in `Seamless.astro` (`group-[.active]:` + a JS click handler scoped to
+ * `data-why-item`). Right: a stack of visual panels synced to the same active
+ * index — the "thumb swiper" the design calls for, implemented as a plain
+ * absolute-stacked crossfade rather than the `swiper` package. Every panel is
+ * still an unfilled placeholder in the Figma (`bg-visual-placeholder` for all
+ * five states), so there is no per-slide imagery yet to justify shipping a
+ * carousel library into a Webflow Embed — swap to real Swiper markup here if
+ * distinct per-row visuals land later.
  */
 interface Row {
   heading: string;
-  body?: string;
+  body: string;
 }
 
 const rows: Row[] = [
@@ -18,14 +28,26 @@ const rows: Row[] = [
     heading: "Fast Implementation",
     body: "Seamlessly integrate with any ERP or POS Systems in just 7 days",
   },
-  { heading: "Local Compliance Expertise" },
-  { heading: "Scalable Global Platform" },
-  { heading: "Seamless Integration" },
-  { heading: "AI-Powered Accuracy" },
+  {
+    heading: "Local Compliance Expertise",
+    body: "Stay aligned with Oman Tax Authority requirements with real-time alerts.",
+  },
+  {
+    heading: "Scalable Global Platform",
+    body: "Manage Oman and 50+ countries' mandates on a single unified platform.",
+  },
+  {
+    heading: "Seamless Integration",
+    body: "One-time integration with all govt updates incorporated in the platform.",
+  },
+  {
+    heading: "AI-Powered Accuracy",
+    body: "Prevent errors and ensure smooth invoice processing with smart error correction & VAT reconciliation.",
+  },
 ];
 ---
 
-<section class="bg-generic-00 py-12 lg:py-20">
+<section class="om-why bg-generic-00 py-12 lg:py-20">
   <div class="max-w-[var(--container-max)] mx-auto px-6 w-full">
     <div class="flex flex-col items-center gap-12">
       <h2
@@ -35,38 +57,71 @@ const rows: Row[] = [
       </h2>
 
       <div class="grid w-full grid-cols-1 items-center gap-8 lg:grid-cols-[540px_1fr] lg:gap-[120px]">
-        <div class="flex flex-col gap-8">
+        <div class="flex flex-col" data-why-root>
           {
             rows.map((row, i) => (
               <div
                 class:list={[
-                  "flex flex-col gap-4",
-                  i < rows.length - 1 && "border-b border-[#ccc] pb-8",
+                  "group border-b border-[#ccc] py-8 first:pt-0 last:border-b-0 last:pb-0 cursor-pointer",
+                  i === 0 && "active",
                 ]}
+                data-why-item
+                data-why-index={i}
               >
-                <p
-                  class:list={[
-                    "m-0 font-heading font-medium text-[length:var(--fs-h5)] leading-[length:var(--lh-h5)]",
-                    i === 0 ? "text-vault-navy" : "text-neutral-500",
-                  ]}
-                >
+                <p class="m-0 font-heading font-medium text-[length:var(--fs-h5)] leading-[length:var(--lh-h5)] text-neutral-500 transition-colors duration-300 group-[.active]:text-vault-navy">
                   {row.heading}
                 </p>
-                {row.body && (
-                  <p class="m-0 font-body text-neutral-500 text-[length:var(--fs-body-sm)] leading-[length:var(--lh-body-sm)] max-w-[480px]">
-                    {row.body}
-                  </p>
-                )}
+                <p class="m-0 max-h-0 overflow-hidden font-body text-neutral-500 text-[length:var(--fs-body-sm)] leading-[length:var(--lh-body-sm)] max-w-[480px] transition-[max-height,margin-top] duration-300 group-[.active]:mt-4 group-[.active]:max-h-[120px]">
+                  {row.body}
+                </p>
               </div>
             ))
           }
         </div>
 
-        <div
-          class="h-[300px] w-full rounded-lg bg-visual-placeholder lg:h-full lg:min-h-[460px]"
-          aria-hidden="true"
-        />
+        <div class="om-why-thumbs relative min-h-[300px] w-full self-stretch lg:min-h-[460px]" data-why-thumbs>
+          {
+            rows.map((_, i) => (
+              <div
+                class:list={[
+                  "absolute inset-0 rounded-lg bg-visual-placeholder transition-opacity duration-300",
+                  i === 0 ? "opacity-100" : "opacity-0",
+                ]}
+                data-why-panel
+                data-why-index={i}
+                aria-hidden={i !== 0}
+              />
+            ))
+          }
+        </div>
       </div>
     </div>
   </div>
 </section>
+
+<script is:inline>
+  (function () {
+    const root = document.currentScript.previousElementSibling;
+    if (!root) return;
+    const items = root.querySelectorAll("[data-why-item]");
+    const panels = root.querySelectorAll("[data-why-panel]");
+    if (!items.length || items.length !== panels.length) return;
+
+    items.forEach((item) => {
+      item.addEventListener("click", () => {
+        if (item.classList.contains("active")) return;
+        const key = item.getAttribute("data-why-index");
+
+        items.forEach((i) => i.classList.remove("active"));
+        item.classList.add("active");
+
+        panels.forEach((p) => {
+          const active = p.getAttribute("data-why-index") === key;
+          p.classList.toggle("opacity-0", !active);
+          p.classList.toggle("opacity-100", active);
+          p.setAttribute("aria-hidden", active ? "false" : "true");
+        });
+      });
+    });
+  })();
+</script>
