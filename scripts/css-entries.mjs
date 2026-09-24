@@ -48,11 +48,11 @@ export const PAGE_TARGETS = [
   { name: 'integration-page', input: 'src/styles/integration-page.css', page: 'src/pages/integration-page.astro' },
   { name: 'france-regional', input: 'src/styles/france-regional.css', page: 'src/pages/france-regional.astro' },
   { name: 'contact-us', input: 'src/styles/contact-us.css', page: 'src/pages/contact-us.astro' },
-  { name: 'scale-and-security-page', input: 'src/styles/scale-and-security-page.css', page: 'src/pages/scale-and-security-page.astro'},
+  { name: 'scale-and-security-page', input: 'src/styles/scale-and-security-page.css', page: 'src/pages/scale-and-security-page.astro' },
   { name: 'career-page', input: 'src/styles/career-page.css', page: 'src/pages/career-page.astro' },
-  { name: 'direct-tax-page', input: 'src/styles/direct-tax-page.css', page: 'src/pages/direct-tax-page.astro'},
+  { name: 'direct-tax-page', input: 'src/styles/direct-tax-page.css', page: 'src/pages/direct-tax-page.astro' },
   { name: 'about-us', input: 'src/styles/about-us.css', page: 'src/pages/about-us.astro' },
-  { name: 'indirect-tax-page', input: 'src/styles/indirect-tax-page.css', page: 'src/pages/indirect-tax-page.astro'},
+  { name: 'indirect-tax-page', input: 'src/styles/indirect-tax-page.css', page: 'src/pages/indirect-tax-page.astro' },
   { name: 'press', input: 'src/styles/press.css', page: 'src/pages/press.astro' },
   { name: 'events', input: 'src/styles/events.css', page: 'src/pages/events.astro' },
   // Detail route, the events twin of `blog-detail` above. It uses no utilities
@@ -62,8 +62,10 @@ export const PAGE_TARGETS = [
   // every other page.
   { name: 'event-detail', input: 'src/styles/event-detail.css', page: 'src/pages/events/[slug].astro' },
   { name: 'trust-centre', input: 'src/styles/trust-centre.css', page: 'src/pages/trust-centre.astro' },
+<<<<<<< HEAD
   { name: 'experience-centre', input: 'src/styles/experience-centre.css', page: 'src/pages/experience-centre.astro' },
-  { name: 'podcast', input: 'src/styles/podcast.css', page: 'src/pages/podcast.astro' }
+  { name: 'podcast', input: 'src/styles/podcast.css', page: 'src/pages/podcast.astro' },
+  { name: 'uae-regional', input: 'src/styles/uae-regional.css', page: 'src/pages/uae-regional.astro' }
 ];
 
 /**
