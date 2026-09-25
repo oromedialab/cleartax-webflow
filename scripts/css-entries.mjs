@@ -69,7 +69,8 @@ export const PAGE_TARGETS = [
   { name: 'podcast', input: 'src/styles/podcast.css', page: 'src/pages/podcast.astro' },
   { name: 'uae-regional', input: 'src/styles/uae-regional.css', page: 'src/pages/uae-regional.astro' },
   { name: 'oman-regional', input: 'src/styles/oman-regional.css', page: 'src/pages/oman-regional.astro' },
-  { name: 'spain-regional', input: 'src/styles/spain-regional.css', page: 'src/pages/spain-regional.astro' }
+  { name: 'spain-regional', input: 'src/styles/spain-regional.css', page: 'src/pages/spain-regional.astro' },
+  { name: 'retail-consumer', input: 'src/styles/retail-consumer.css', page: 'src/pages/retail-consumer.astro' }
 ];
 
 /**

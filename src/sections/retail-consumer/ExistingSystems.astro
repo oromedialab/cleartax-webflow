@@ -1,0 +1,96 @@
+---
+/**
+ * "We speak the language of your existing systems." Figma node 15389:33361.
+ *
+ * Three category cards (Enterprise ERPs / Retail POS & engines /
+ * E-commerce & middleware), each a wrap of small logo badges. Badges without
+ * an already-hosted Webflow asset render a neutral monogram swatch instead of
+ * a fabricated logo image — same fallback pattern NavbarRb uses for a country
+ * with no flag asset yet.
+ */
+interface Logo {
+  name: string;
+  src?: string;
+}
+
+interface Category {
+  title: string;
+  desc: string;
+  logos: Logo[];
+}
+
+const categories: Category[] = [
+  {
+    title: "Enterprise ERPs",
+    desc: "Where your transactions originate.",
+    logos: [
+      { name: "SAP S/4HANA & ECC", src: "https://cdn.prod.website-files.com/63ede4a3da6dbd6b05c4612f/6a06bfe3956ddb4d4f844ba3_sap-logo.png" },
+      { name: "Oracle Fusion & EBS", src: "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6ab647c1dc559df74d6ab41d_oracle-logo.png" },
+      { name: "Microsoft D365", src: "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6a8d790081c75dc61c33ce75_integration-logo-1.png" },
+    ],
+  },
+  {
+    title: "Retail POS & engines",
+    desc: "Where the customer sees the receipt.",
+    logos: [
+      { name: "LS Retail" },
+      { name: "Sentinel POS" },
+      { name: "TC POS" },
+      { name: "POS Malaysia" },
+      { name: "Mirnah", src: "https://cdn.prod.website-files.com/63ede4a3da6dbd6b05c4612f/6a06bfe33fae32c5e4a5d5b0_mirnah-logo.png" },
+    ],
+  },
+  {
+    title: "E-commerce & middleware",
+    desc: "Where the online order reaches you.",
+    logos: [
+      { name: "Shopify", src: "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6a8d791276f0e1022c853905_integration-logo-4.png" },
+      { name: "Magento" },
+      { name: "Salesforce Commerce" },
+      { name: "Hybris" },
+      { name: "TIBCO" },
+    ],
+  },
+];
+---
+
+<section class="bg-generic-00 border-t border-neutral-200 py-16 lg:py-20">
+  <div class="container">
+    <div class="flex flex-col gap-12">
+      <h2 class="m-0 font-heading font-medium text-vault-navy text-center text-[length:var(--fs-h1)] leading-[length:var(--lh-h1)] tracking-[-0.5px]">
+        We speak the language of your existing systems.
+      </h2>
+
+      <div class="grid grid-cols-1 lg:grid-cols-3 rounded-xl border border-neutral-200 divide-y divide-neutral-200 lg:divide-y-0 lg:divide-x">
+        {
+          categories.map((cat) => (
+            <div class="flex flex-col gap-12 p-6">
+              <div class="flex flex-col gap-2">
+                <p class="m-0 font-body font-semibold text-vault-navy text-[length:var(--fs-body-lg)] leading-[length:var(--lh-body-lg)]">
+                  {cat.title}
+                </p>
+                <p class="m-0 font-body text-neutral-500 text-[length:var(--fs-body)] leading-[length:var(--lh-body)]">
+                  {cat.desc}
+                </p>
+              </div>
+              <div class="flex flex-wrap gap-2">
+                {cat.logos.map((logo) => (
+                  <span class="inline-flex items-center gap-x-3 gap-y-2 rounded-lg border border-neutral-200 px-3 py-1.5">
+                    {logo.src ? (
+                      <img src={logo.src} alt="" class="max-h-6 w-full object-contain" loading="lazy" decoding="async" />
+                    ) : (
+                      <span class="h-6 w-6 shrink-0 rounded-md bg-neutral-200" aria-hidden="true" />
+                    )}
+                    <span class="font-body font-medium text-neutral-700 text-[length:var(--fs-label)] leading-[length:var(--lh-label)] whitespace-nowrap">
+                      {logo.name}
+                    </span>
+                  </span>
+                ))}
+              </div>
+            </div>
+          ))
+        }
+      </div>
+    </div>
+  </div>
+</section>
