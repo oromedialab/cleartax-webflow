@@ -1,0 +1,221 @@
+---
+const loadContent = [
+    {
+        title: "We've done this before — at scale.",
+        desc: "Every connector, every schema, every clearance flow — engineered in-house, then paid for again in upkeep.",
+    },
+    {
+        title: "Regulatory changes, handled.",
+        desc: "ClearTax absorbs mandate updates on the platform, so your IT team doesn’t have to rebuild integrations.",
+    },
+    {
+        title: "We’re your compliance lawyer.",
+        desc: "From invoice issuance and EIS reporting to reconciliation and audit support, ClearTax acts as your complete compliance layer.",
+    },
+    {
+        title: "We go live faster, and we stay live.",
+        desc: "AI-powered integration enables 4× faster go-live, backed by 1,600+ integrations across leading ERPs and 95+ custom systems.",
+    },
+];
+---
+
+<section class="py-16 md:py-20 bg-generic-00">
+    <div class="min-[1400px]:container mx-auto px-4 md:px-6">
+        <div class="text-center mb-10 md:mb-14">
+            <h2
+                class="font-heading text-[length:var(--fs-h2)] md:text-[length:var(--fs-h1)] leading-[length:var(--lh-h2)] md:leading-[length:var(--lh-h1)] font-medium max-w-[800px] mx-auto m-0 text-text-default tracking-[-0.5px]"
+            >
+                And building your way out costs more than the mandate ever did.
+            </h2>
+        </div>
+
+        <div
+            class="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-center mx-auto"
+        >
+            <!-- Left Side: Tabs with Border Play -->
+            <div
+                class="lg:col-span-5 flex flex-col space-y-1 relative"
+                id="assurance-tabs"
+            >
+                {
+                    loadContent.map((item, i) => (
+                        <div
+                            class="assurance-item flex flex-col cursor-pointer group"
+                            data-index={i}
+                        >
+                            <h3
+                                class={`assurance-title font-heading text-[20px] lg:text-[24px] leading-[1.3] font-medium py-3.5 transition-colors duration-300 ${
+                                    i === 0
+                                        ? "text-vault-navy"
+                                        : "text-neutral-400 group-hover:text-neutral-600"
+                                }`}
+                            >
+                                {item.title}
+                            </h3>
+
+                            <div
+                                class="assurance-desc overflow-hidden transition-all duration-500 ease-in-out"
+                                style={
+                                    i === 0
+                                        ? ""
+                                        : "max-height: 0px; opacity: 0;"
+                                }
+                            >
+                                <p class="font-body text-[length:var(--fs-body)] leading-[length:var(--lh-body)] text-neutral-500 font-normal pb-4 m-0 max-w-[480px]">
+                                    {item.desc}
+                                </p>
+                            </div>
+
+                            <!-- Animated Border / Progress Line -->
+                            <div class="relative w-full h-[2px] my-2">
+                                <!-- Base gray line -->
+                                <div class="absolute inset-0 w-full h-[1px] bg-neutral-200" />
+                                <!-- Active blue line (fills up with border play) -->
+                                <div
+                                    class="assurance-progress absolute left-0 top-0 h-[2px] bg-nova-blue rounded-full transition-none"
+                                    style="width: 0%;"
+                                />
+                            </div>
+                        </div>
+                    ))
+                }
+            </div>
+
+            <!-- Right Side: Sliding Visuals -->
+            <div class="lg:col-span-7 w-full flex justify-center lg:justify-end">
+                <div
+                    class="relative w-full max-w-[600px] min-h-[360px] rounded-2xl overflow-hidden aspect-video md:aspect-[4/3] lg:aspect-auto lg:h-[480px] border border-neutral-200 bg-generic-00"
+                >
+                    <div
+                        id="assurance-slider"
+                        class="flex w-full h-full gap-4 transition-transform duration-700 ease-in-out"
+                    >
+                        {
+                            loadContent.map((item, i) => (
+                                <div class="w-full max-w-[600px] shrink-0 h-full bg-visual-placeholder flex items-center justify-center rounded-xl" />
+                            ))
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<script is:inline>
+    document.addEventListener("DOMContentLoaded", () => {
+        const items = document.querySelectorAll(".assurance-item");
+        const slider = document.getElementById("assurance-slider");
+        if (!items.length) return;
+
+        let currentIndex = 0;
+        let timer = null;
+        const duration = 5000; // 5 seconds per tab
+
+        const reduceMotion =
+            window.matchMedia &&
+            window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+        const activateTab = (index, animateProgress = true) => {
+            currentIndex = index;
+
+            // Slide right panel
+            if (slider) {
+                slider.style.transform = `translateX(calc(-${index * 100}% - ${index * 16}px))`;
+            }
+
+            items.forEach((item, i) => {
+                const desc = item.querySelector(".assurance-desc");
+                const progress = item.querySelector(".assurance-progress");
+                const title = item.querySelector(".assurance-title");
+
+                if (i === index) {
+                    // Active state
+                    if (desc) {
+                        desc.style.maxHeight = desc.scrollHeight + "px";
+                        desc.style.opacity = "1";
+                    }
+
+                    if (title) {
+                        title.classList.remove(
+                            "text-neutral-400",
+                            "group-hover:text-neutral-600",
+                        );
+                        title.classList.add("text-vault-navy");
+                    }
+
+                    if (progress) {
+                        // Reset progress line to 0, then animate to 100%
+                        progress.style.transition = "none";
+                        progress.style.width = "0%";
+
+                        // Force reflow so transition restarts
+                        void progress.offsetWidth;
+
+                        if (animateProgress && !reduceMotion) {
+                            progress.style.transition = `width ${duration}ms linear`;
+                            progress.style.width = "100%";
+                        } else {
+                            progress.style.width = "100%";
+                        }
+                    }
+                } else {
+                    // Inactive state
+                    if (desc) {
+                        desc.style.maxHeight = "0px";
+                        desc.style.opacity = "0";
+                    }
+
+                    if (title) {
+                        title.classList.remove("text-vault-navy");
+                        title.classList.add(
+                            "text-neutral-400",
+                            "group-hover:text-neutral-600",
+                        );
+                    }
+
+                    if (progress) {
+                        progress.style.transition = "none";
+                        progress.style.width = "0%";
+                    }
+                }
+            });
+        };
+
+        const nextTab = () => {
+            const next = (currentIndex + 1) % items.length;
+            activateTab(next, true);
+        };
+
+        const startTimer = () => {
+            clearInterval(timer);
+            activateTab(currentIndex, true);
+            if (!reduceMotion) {
+                timer = setInterval(nextTab, duration);
+            }
+        };
+
+        // User clicks to switch tab
+        items.forEach((item, i) => {
+            item.addEventListener("click", () => {
+                clearInterval(timer);
+                activateTab(i, true);
+                if (!reduceMotion) {
+                    timer = setInterval(nextTab, duration);
+                }
+            });
+        });
+
+        // Pause/resume when tab loses visibility
+        document.addEventListener("visibilitychange", () => {
+            if (document.hidden) {
+                clearInterval(timer);
+            } else {
+                startTimer();
+            }
+        });
+
+        // Start auto-play
+        startTimer();
+    });
+</script>
