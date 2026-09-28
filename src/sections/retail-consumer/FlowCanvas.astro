@@ -123,11 +123,13 @@ const straightLines: { flow: Flow; stage: Stage; x1: number; y1: number; x2: num
   { flow: "purple", stage: "src-entry", x1: 286, y1: 458, x2: 308, y2: 458 },
   { flow: "purple", stage: "src-exit", x1: 308, y1: 294, x2: 335, y2: 294 },
 
-  // Trunk 2 (x=643): both billing cards merge here, one exit into ERP GL. Green.
-  { flow: "green", stage: "bill-trunk", x1: 643, y1: 290, x2: 643, y2: 459 },
-  { flow: "green", stage: "bill-entry", x1: 619, y1: 290, x2: 643, y2: 290 },
-  { flow: "green", stage: "bill-entry", x1: 619, y1: 458, x2: 643, y2: 458 },
-  { flow: "green", stage: "bill-exit", x1: 643, y1: 372, x2: 669, y2: 372 },
+  // Trunk 2 (x=643): both billing cards merge here, one exit into ERP GL.
+  // Nova blue (not the billing cards' own green) since this is the hand-off
+  // into ERP GL itself, not a per-channel billing flow.
+  { flow: "purple", stage: "bill-trunk", x1: 643, y1: 290, x2: 643, y2: 459 },
+  { flow: "purple", stage: "bill-entry", x1: 619, y1: 290, x2: 643, y2: 290 },
+  { flow: "purple", stage: "bill-entry", x1: 619, y1: 458, x2: 643, y2: 458 },
+  { flow: "purple", stage: "bill-exit", x1: 643, y1: 372, x2: 669, y2: 372 },
 
   // ERP GL -> the three RECEIVES rows on the cleartax card.
   { flow: "purple", stage: "final", x1: 943, y1: 348, x2: 991, y2: 348 },
@@ -325,23 +327,10 @@ function roundedPolyline(points: Point[], r: number): string {
 
   <!-- cleartax engine card -->
   <div class="absolute flex flex-col gap-6 justify-between rounded-lg border-2 border-neutral-400 bg-generic-00 p-6" style="left:991px;top:52px;width:248px;height:648px;">
-    <div class="flex flex-col gap-6">
-      <div class="flex flex-col gap-3">
-        <p class="m-0 font-heading font-semibold text-vault-navy text-[length:var(--fs-h6)] leading-[length:var(--lh-h6)]">cleartax</p>
-        <p class="m-0 font-body font-semibold text-nova-blue text-[length:var(--fs-body-lg)] leading-[length:var(--lh-body-lg)]">multi-mandate engine</p>
-        <div class="h-px w-full bg-neutral-200" />
-      </div>
-      <div class="flex flex-col gap-4">
-        <p class="m-0 font-body font-semibold text-vault-navy text-[length:var(--fs-body-sm)] leading-[length:var(--lh-body-sm)] tracking-[1px] uppercase">Receives</p>
-        <ul class="m-0 flex flex-col gap-3 list-none p-0">
-          {receives.map((r) => (
-            <li class="flex items-center gap-2 font-body text-neutral-500 text-[length:var(--fs-label)] leading-[length:var(--lh-body-sm)]">
-              <span class={`h-4 w-4 shrink-0 rounded-xs ${FLOW_COLOR[r.tag]}`} />
-              {r.label}
-            </li>
-          ))}
-        </ul>
-      </div>
+    <div class="flex flex-col gap-3">
+      <p class="m-0 font-heading font-semibold text-vault-navy text-[length:var(--fs-h6)] leading-[length:var(--lh-h6)]">cleartax</p>
+      <p class="m-0 font-body font-semibold text-nova-blue text-[length:var(--fs-body-lg)] leading-[length:var(--lh-body-lg)]">multi-mandate engine</p>
+      <div class="h-px w-full bg-neutral-200" />
     </div>
     <div class="flex flex-col gap-4">
       <div class="h-px w-full bg-neutral-200" />
@@ -351,6 +340,28 @@ function roundedPolyline(points: Point[], r: number): string {
           - Audit-proof<br />- Reconciled<br />- Archived
         </p>
       </div>
+    </div>
+    <!-- Positioned absolutely (not in the title/footer flex flow) so the
+         middle row lands on the middle "final" connector stub in
+         `straightLines` above (y=372, the card's true vertical center) —
+         a flex `justify-between` with only 2 siblings above/below doesn't
+         reproduce that whenever their heights differ (the footer block
+         here runs taller than the title block, so naive centering lands
+         this block ~45px too high). top is tuned empirically against the
+         rendered row pitch (~32px), which runs a little looser than the
+         24px pitch `straightLines` assumes, so the top/bottom rows land
+         ~8px off their stubs while the middle row (and the lines' visual
+         center of mass) lines up exactly. -->
+    <div class="absolute flex flex-col gap-4" style="left:24px;top:240px;width:200px;">
+      <p class="m-0 font-body font-semibold text-vault-navy text-[length:var(--fs-body-sm)] leading-[length:var(--lh-body-sm)] tracking-[1px] uppercase">Receives</p>
+      <ul class="m-0 flex flex-col gap-3 list-none p-0">
+        {receives.map((r) => (
+          <li class="flex items-center gap-2 font-body text-neutral-500 text-[length:var(--fs-label)] leading-[length:var(--lh-body-sm)]">
+            <span class={`h-4 w-4 shrink-0 rounded-xs ${FLOW_COLOR[r.tag]}`} />
+            {r.label}
+          </li>
+        ))}
+      </ul>
     </div>
   </div>
 </div>
