@@ -1,0 +1,255 @@
+---
+const Compliance = [
+    {
+        title: "Regulatory Assurance",
+        img: "bg-visual-placeholder",
+        desc: "Our in-house team of tax experts tracks every BIR update — new fields, amended schemas, regulatory circulars — and deploys changes to the platform. Your ERP connector doesn't change. Your IT team doesn't get a ticket.",
+    },
+    {
+        title: "Performance at Scale",
+        img: "bg-visual-placeholder",
+        desc: "Auto-scaling infrastructure that grows with your transaction volume. When government APIs go down, our platform keeps your invoices queued and retries automatically — with 99.88% uptime.",
+    },
+    {
+        title: "AI-Powered Failure Prevention",
+        img: "bg-visual-placeholder",
+        desc: "ClearTax detects duplicate invoices, abnormal values, timing gaps, and vendor anomalies before transmission. No auto-healing means failed invoices pile up and create penalty risk. Ours don't.",
+    },
+    {
+        title: "Smart Reconciliation Dashboard ",
+        img: "bg-visual-placeholder",
+        desc: "A central MIS dashboard tracks every invoice, generated, pending, failed, with one-click filters and exportable reports. AI surfaces only the critical mismatches that need action, so your tax team isn't manually reconciling thousands of rows.",
+    },
+    {
+        title: "Unified Global API ",
+        img: "bg-visual-placeholder",
+        desc: "One ERP integration unlocks every country ClearTax operates in. Adding Malaysia, Saudi Arabia, France, or Singapore as your compliance footprint grows? Configure, don't rebuild.",
+    },
+    {
+        title: "Enterprise Security",
+        img: "bg-visual-placeholder",
+        desc: "SOC 2 Type II certified. ISO 27001:2022 and ISO 22301:2019 compliant. AES-256 encryption at rest, SSL in transit. Role-based access controls. Hosted on AWS with multi-AZ architecture and local Philippine data residency. Privacy-by-design controls aligned with the Philippine Data Privacy Act.",
+    },
+];
+
+const title = "Built for compliance. Engineered to last.";
+---
+
+<div class="sticky-scroll-container">
+    <section
+        class="sticky top-0 flex flex-col justify-center bg-generic-00 py-12 md:py-16 xl:py-20 overflow-hidden min-h-[calc(100vh-80px)]"
+    >
+        <div class="mx-auto min-[1400px]:container w-full px-4 lg:px-6">
+            <div class="header-wrapper text-center mx-auto mb-8 md:mb-12">
+                <h2
+                    class="section-title text-[length:var(--fs-h2)] md:text-[length:var(--fs-h1)] leading-[length:var(--lh-h2)] md:leading-[length:var(--lh-h1)] font-medium text-text-default max-w-216 mx-auto m-0 mb-4 font-heading"
+                >
+                    {title}
+                </h2>
+            </div>
+
+            <div class="w-full h-auto">
+                <div
+                    class="compliance-scroll-track flex items-stretch gap-6 w-max transition-transform duration-[250ms] ease-out will-change-transform"
+                >
+                    {
+                        Compliance.map((item) => (
+                            <div class="card-item bg-generic-00 rounded-xl p-6 sm:p-8 xl:p-8 w-[calc(100vw-32px)] md:w-[48vw] lg:w-[45vw] max-w-[628px] border-2 border-neutral-300 flex flex-col select-none">
+                                <h3 class="card-title text-[24px] leading-[1.3] font-medium max-w-[564px] text-vault-navy font-heading mb-4 md:mb-6 pointer-events-none">
+                                    {item.title}
+                                </h3>
+                                {item.img &&
+                                (item.img.startsWith("http") ||
+                                    item.img.startsWith("/") ||
+                                    item.img.startsWith("./")) ? (
+                                    <img
+                                        src={item.img}
+                                        alt={item.title}
+                                        class="card-img w-full max-w-[564px] object-contain rounded-lg pointer-events-none min-h-[280px] max-h-[400px]"
+                                        loading="lazy"
+                                        decoding="async"
+                                    />
+                                ) : (
+                                    <div
+                                        class={`card-img w-full max-w-[564px] h-[280px] min-h-[280px] max-h-[400px] rounded-lg pointer-events-none ${item.img}`}
+                                    />
+                                )}
+                                {item.desc && (
+                                    <p class="card-desc text-neutral-500 font-normal text-[length:var(--fs-body)] leading-[length:var(--lh-body)] font-body mt-6 pointer-events-none">
+                                        {item.desc}
+                                    </p>
+                                )}
+                            </div>
+                        ))
+                    }
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
+
+<style is:global>
+    @media (max-height: 750px) {
+        .sticky-scroll-container section {
+            padding-top: 1.25rem !important;
+            padding-bottom: 1.25rem !important;
+        }
+        .header-wrapper {
+            margin-bottom: 1rem !important;
+        }
+        .card-item {
+            padding: 1.25rem !important;
+            max-width: calc(100vw - 32px) !important;
+            width: calc(100vw - 32px) !important;
+        }
+        @media (min-width: 768px) {
+            .card-item {
+                max-width: 480px !important;
+                width: 38vw !important;
+            }
+        }
+        .card-title {
+            font-size: 1.35rem !important;
+            margin-bottom: 0.75rem !important;
+        }
+        .card-img {
+            min-height: 180px !important;
+            height: 25vh !important;
+            max-height: 280px !important;
+            object-position: center !important;
+        }
+        .card-desc {
+            margin-top: 0.75rem !important;
+            font-size: 0.875rem !important;
+            line-height: 1.35 !important;
+        }
+    }
+</style>
+
+<script is:inline>
+    (function () {
+        const initStickyScroll = () => {
+            const containers = document.querySelectorAll(
+                ".sticky-scroll-container",
+            );
+            if (!containers.length) return;
+
+            containers.forEach((container) => {
+                const track = container.querySelector(
+                    ".compliance-scroll-track",
+                );
+                const section = container.querySelector("section");
+                if (!container || !track || !section) return;
+
+                const getHeaderHeight = () => {
+                    const header = document.querySelector(
+                        "header, .navbar, .w-nav",
+                    );
+                    return header ? header.offsetHeight : 80;
+                };
+
+                let maxTranslate = 0;
+                let totalScrollable = 0;
+                let stickyTop = 0;
+
+                const updateMeasurements = () => {
+                    const sectionHeight = section.offsetHeight;
+                    const windowHeight = window.innerHeight;
+                    const headerHeight = getHeaderHeight();
+
+                    const trackOffset =
+                        track.parentElement.getBoundingClientRect().top -
+                        section.getBoundingClientRect().top;
+                    const trackHeight = track.offsetHeight;
+                    const availableSpace = windowHeight - headerHeight;
+
+                    const idealTrackTop =
+                        headerHeight +
+                        Math.max(40, (availableSpace - trackHeight) / 2);
+                    let calculatedTop = idealTrackTop - trackOffset;
+
+                    // Position section flush under header when sticky, avoiding gap on large screens
+                    stickyTop = Math.min(headerHeight, calculatedTop);
+                    section.style.top = `${stickyTop}px`;
+
+                    const containerWidth =
+                        track.parentElement.getBoundingClientRect().width;
+                    maxTranslate = Math.max(
+                        0,
+                        track.scrollWidth - containerWidth,
+                    );
+                    container.style.height = `${maxTranslate + windowHeight}px`;
+                    totalScrollable =
+                        container.getBoundingClientRect().height -
+                        sectionHeight;
+                };
+
+                updateMeasurements();
+
+                if (window.ResizeObserver) {
+                    const ro = new ResizeObserver(updateMeasurements);
+                    ro.observe(section);
+                    ro.observe(track);
+                }
+                window.addEventListener("resize", updateMeasurements);
+
+                let ticking = false;
+
+                const handleScroll = () => {
+                    if (!ticking) {
+                        window.requestAnimationFrame(() => {
+                            const containerRect =
+                                container.getBoundingClientRect();
+                            const scrolledDistance = Math.max(
+                                0,
+                                stickyTop - containerRect.top,
+                            );
+
+                            let progress =
+                                totalScrollable > 0
+                                    ? scrolledDistance / totalScrollable
+                                    : 0;
+                            progress = Math.max(0, Math.min(1, progress));
+
+                            track.style.transform = `translate3d(-${progress * maxTranslate}px, 0, 0)`;
+
+                            ticking = false;
+                        });
+                        ticking = true;
+                    }
+                };
+
+                const observer = new IntersectionObserver(
+                    (entries) => {
+                        entries.forEach((entry) => {
+                            if (entry.isIntersecting) {
+                                window.addEventListener(
+                                    "scroll",
+                                    handleScroll,
+                                    { passive: true },
+                                );
+                                handleScroll();
+                            } else {
+                                window.removeEventListener(
+                                    "scroll",
+                                    handleScroll,
+                                );
+                            }
+                        });
+                    },
+                    {
+                        rootMargin: "100% 0px 100% 0px",
+                    },
+                );
+
+                observer.observe(container);
+            });
+        };
+
+        if (document.readyState === "loading") {
+            document.addEventListener("DOMContentLoaded", initStickyScroll);
+        } else {
+            initStickyScroll();
+        }
+    })();
+</script>
