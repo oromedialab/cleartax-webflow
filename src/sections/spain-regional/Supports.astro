@@ -1,0 +1,377 @@
+---
+/**
+ * "How ClearTax Supports the Spain e-Invoicing Mandate" — Figma node
+ * 15121:30432 ("Fold 4 Container - Mandate").
+ *
+ * Eight cards in a 2-column grid. A card is a button: clicking it opens ONE
+ * overlay dialog showing that card's heading, body and visual, with prev/next
+ * chevrons to walk the other seven without closing. Pattern and mechanics
+ * copied from `france-regional/Supports.astro`.
+ *
+ * The overlay renders the layout ONCE and swaps only the parts that differ per
+ * card — the eight headings and eight bodies sit in the DOM with `hidden` on
+ * all but the active one, so the chevrons, close control and image frame ship
+ * once, not eight times.
+ *
+ * PLACEHOLDER BODY COPY: the Figma shows only a heading + plus icon per card
+ * (an "expand for detail" button), with no body text captured in the design —
+ * same collapsed-only pattern as the mandate cards in `Glance.astro`. The eight
+ * headings below are verbatim from the Figma; the bodies are drafted marketing
+ * copy consistent with the mandates named elsewhere on this page (SII, Crea y
+ * Crece, VERI*FACTU, Facturae, TicketBAI) and should be reviewed by content
+ * before staging.
+ *
+ * The icon squares and the overlay visual are unfilled "Icon placeholder" /
+ * "Image" frames in the Figma, so they render as `bg-visual-placeholder` —
+ * #E8FFE1, exactly the fill the design uses. Swap each for a Webflow-hosted URL
+ * when the artwork lands — never a `data:` URI.
+ *
+ * Ids are `sp-supports-` prefixed: embeds share one namespace per page.
+ */
+interface SupportCard {
+  heading: string;
+  body: string;
+}
+
+const cards: SupportCard[] = [
+  {
+    heading: "One Platform for Every e-Invoicing Requirement",
+    body: "One ClearTax integration covers SII reporting, Crea y Crece B2B e-invoicing, VERI*FACTU-compliant billing software, Facturae B2G, and TicketBAI — no separate vendor or workflow per mandate.",
+  },
+  {
+    heading: "Full Mandate Coverage",
+    body: "From SII's four-day ledger reporting to the phased Crea y Crece rollout, ClearTax tracks every applicable Spanish e-invoicing and e-reporting requirement so nothing is missed as new phases go live.",
+  },
+  {
+    heading: "ERP Integration without disruption",
+    body: "Pre-built connectors for SAP, Oracle, Microsoft Dynamics and 60+ other ERP and accounting systems mean SII, TicketBAI and Facturae reporting run cloud-side, with no rework to existing finance workflows.",
+  },
+  {
+    heading: "Automated Compliance Updates",
+    body: "When AEAT, the Basque provincial authorities or the Crea y Crece regulation change a requirement, the update ships in the platform — no manual patching or waiting on an ERP release cycle.",
+  },
+  {
+    heading: "VAT Reporting Done Right",
+    body: "Continuous reconciliation between issued invoices, received invoices and SII ledger submissions surfaces mismatches before AEAT does, reducing audit exposure.",
+  },
+  {
+    heading: "B2B Invoice Real-Time Status",
+    body: "Track every outgoing and incoming invoice's status — submitted, accepted, rejected or pending — in one live dashboard, across SII, Crea y Crece and TicketBAI flows alike.",
+  },
+  {
+    heading: "Penalty-Risk Prevention",
+    body: "Automated validation catches formatting and data errors before submission, cutting the rejected-invoice and late-filing risk that drives SII and TicketBAI penalties.",
+  },
+  {
+    heading: "Dedicated Regional Support",
+    body: "A Spain-based success team and in-house tax experts interpret AEAT and Basque provincial guidance as it changes, and translate it directly into product updates.",
+  },
+];
+---
+
+<section class="bg-generic-00 py-16 lg:py-20">
+  <div class="container mx-auto">
+    <h2
+      class="m-0 mb-8 text-center font-heading font-medium text-vault-navy text-[length:var(--fs-h1)] leading-[length:var(--lh-h1)] tracking-[-0.5px] lg:mb-12"
+    >
+      How ClearTax Supports the Spain e-Invoicing Mandate
+    </h2>
+
+    <div class="grid grid-cols-1 gap-6 lg:grid-cols-2 lg:gap-8">
+      {
+        cards.map((card, i) => (
+          <button
+            type="button"
+            class="group m-0 flex w-full cursor-pointer items-start gap-6 self-start rounded-xl border border-neutral-300 bg-generic-00 p-6 text-left transition-all duration-150 ease-in-out hover:border-nova-blue"
+            aria-haspopup="dialog"
+            data-sp-supports-open
+            data-sp-supports-index={i}
+          >
+            <span
+              class="block h-14 w-14 shrink-0 self-stretch rounded-lg bg-visual-placeholder"
+              aria-hidden="true"
+            />
+            <span class="min-w-0 flex-1 font-heading font-medium text-vault-navy text-balance max-w-[414px] text-[length:var(--fs-h6)] leading-[length:var(--lh-h6)]">
+              {card.heading}
+            </span>
+            <span
+              class="flex h-14 w-14 shrink-0 items-center justify-center rounded-lg p-2 text-vault-navy transition-colors duration-150 ease-in-out group-hover:text-nova-blue"
+              aria-hidden="true"
+            >
+              {/* The exported Figma glyph (Media / Icon / Unfilled / plus). */}
+              <svg
+                width="40"
+                height="40"
+                viewBox="0 0 40 40"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M20 10V30"
+                  stroke="currentColor"
+                  stroke-width="1.5"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
+                <path
+                  d="M30 20L10 20"
+                  stroke="currentColor"
+                  stroke-width="1.5"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
+              </svg>
+            </span>
+          </button>
+        ))
+      }
+    </div>
+  </div>
+</section>
+
+<!-- Detail overlay. Lives outside the section's container so the scrim covers
+     the viewport rather than the 1280px column. -->
+<div
+  id="sp-supports-overlay"
+  role="dialog"
+  aria-modal="true"
+  aria-labelledby="sp-supports-overlay-title"
+  aria-hidden="true"
+  class="fixed inset-0 z-[2000] hidden items-center justify-center bg-generic-100/70 p-4 backdrop-blur-sm"
+>
+  <div
+    class="relative max-h-[90vh] w-full max-w-[1280px] overflow-y-auto rounded-xl border-2 border-[#CCCCCC] bg-generic-00 p-6"
+    data-sp-supports-panel
+  >
+    <button
+      type="button"
+      aria-label="Close"
+      class="absolute right-6 top-6 z-10 inline-flex h-10 w-10 cursor-pointer items-center justify-center rounded-lg border-0 bg-transparent p-0 text-vault-navy transition-opacity duration-150 hover:opacity-70 lg:right-11 lg:top-11"
+      data-sp-supports-close
+    >
+      <svg
+        width="40"
+        height="40"
+        viewBox="0 0 40 40"
+        fill="none"
+        class="rotate-45"
+        aria-hidden="true"
+        focusable="false"
+      >
+        <path
+          d="M20 10V30"
+          stroke="currentColor"
+          stroke-width="1.5"
+          stroke-linecap="round"
+          stroke-linejoin="round"></path>
+        <path
+          d="M30 20L10 20"
+          stroke="currentColor"
+          stroke-width="1.5"
+          stroke-linecap="round"
+          stroke-linejoin="round"></path>
+      </svg>
+    </button>
+
+    <div class="flex flex-col items-start gap-6 lg:flex-row lg:gap-12">
+      <div
+        class="flex w-full flex-col justify-between gap-6 lg:w-[416px] lg:shrink-0 lg:self-stretch"
+      >
+        <div class="flex flex-col gap-6">
+          <span
+            class="block h-16 w-16 shrink-0 rounded-lg bg-visual-placeholder"
+            aria-hidden="true"
+          />
+          <div id="sp-supports-overlay-title">
+            {
+              cards.map((card, i) => (
+                <h3
+                  class="m-0 pr-12 font-heading font-medium text-vault-navy text-[length:var(--fs-h5)] leading-[length:var(--lh-h5)] tracking-[-0.5px] lg:pr-0"
+                  hidden={i !== 0}
+                  data-sp-supports-heading
+                >
+                  {card.heading}
+                </h3>
+              ))
+            }
+          </div>
+        </div>
+
+        <div class="flex flex-col gap-6">
+          <div>
+            {
+              cards.map((card, i) => (
+                <p
+                  class="m-0 font-body font-normal text-neutral-500 text-[length:var(--fs-body)] leading-[length:var(--lh-body)]"
+                  hidden={i !== 0}
+                  data-sp-supports-body
+                >
+                  {card.body}
+                </p>
+              ))
+            }
+          </div>
+
+          <div class="flex items-center gap-2">
+            <button
+              type="button"
+              aria-label="Previous"
+              aria-controls="sp-supports-overlay-title"
+              class="inline-flex cursor-pointer items-center justify-center rounded border border-neutral-300 bg-generic-00 p-2 text-vault-navy transition-colors duration-150 hover:border-nova-blue"
+              data-sp-supports-prev
+            >
+              <svg
+                width="20"
+                height="20"
+                viewBox="0 0 20 20"
+                fill="none"
+                aria-hidden="true"
+                focusable="false"
+              >
+                <path
+                  d="M12 15L7 10L12 5"
+                  stroke="currentColor"
+                  stroke-width="1.5"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"></path>
+              </svg>
+            </button>
+            <button
+              type="button"
+              aria-label="Next"
+              aria-controls="sp-supports-overlay-title"
+              class="inline-flex cursor-pointer items-center justify-center rounded border border-neutral-300 bg-generic-00 p-2 text-vault-navy transition-colors duration-150 hover:border-nova-blue"
+              data-sp-supports-next
+            >
+              <svg
+                width="20"
+                height="20"
+                viewBox="0 0 20 20"
+                fill="none"
+                aria-hidden="true"
+                focusable="false"
+              >
+                <path
+                  d="M7 5L12 10L7 15"
+                  stroke="currentColor"
+                  stroke-width="1.5"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"></path>
+              </svg>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div
+        class="aspect-[1280/720] w-full rounded-lg bg-visual-placeholder lg:w-auto lg:flex-1"
+        aria-hidden="true"
+      >
+      </div>
+    </div>
+  </div>
+</div>
+
+<script is:inline>
+  /* Card -> detail overlay, with the chevrons walking the eight without closing. */
+  (function () {
+    var overlay = document.getElementById("sp-supports-overlay");
+    if (!overlay) return;
+
+    var panel = overlay.querySelector("[data-sp-supports-panel]");
+    var closeBtn = overlay.querySelector("[data-sp-supports-close]");
+    var prevBtn = overlay.querySelector("[data-sp-supports-prev]");
+    var nextBtn = overlay.querySelector("[data-sp-supports-next]");
+    var headings = overlay.querySelectorAll("[data-sp-supports-heading]");
+    var bodies = overlay.querySelectorAll("[data-sp-supports-body]");
+    if (!panel || !headings.length || headings.length !== bodies.length) return;
+
+    var count = headings.length;
+    var current = 0;
+    var lastFocused = null;
+
+    function show(index) {
+      current = ((index % count) + count) % count;
+      for (var i = 0; i < count; i++) {
+        headings[i].hidden = i !== current;
+        bodies[i].hidden = i !== current;
+      }
+      panel.scrollTop = 0;
+    }
+
+    function open(index, opener) {
+      lastFocused = opener || document.activeElement;
+      show(index);
+      overlay.style.display = "flex";
+      overlay.setAttribute("aria-hidden", "false");
+      document.body.style.overflow = "hidden";
+      if (closeBtn) closeBtn.focus();
+    }
+
+    function close() {
+      overlay.style.display = "none";
+      overlay.setAttribute("aria-hidden", "true");
+      document.body.style.overflow = "";
+      if (lastFocused && lastFocused.focus) lastFocused.focus();
+    }
+
+    function isOpen() {
+      return overlay.style.display === "flex";
+    }
+
+    document.addEventListener("click", function (e) {
+      if (!e.target.closest) return;
+      var opener = e.target.closest("[data-sp-supports-open]");
+      if (!opener) return;
+      open(parseInt(opener.getAttribute("data-sp-supports-index"), 10) || 0, opener);
+    });
+
+    if (closeBtn) closeBtn.addEventListener("click", close);
+    if (prevBtn)
+      prevBtn.addEventListener("click", function () {
+        show(current - 1);
+      });
+    if (nextBtn)
+      nextBtn.addEventListener("click", function () {
+        show(current + 1);
+      });
+
+    overlay.addEventListener("click", function (e) {
+      if (e.target === overlay) close();
+    });
+
+    document.addEventListener("keydown", function (e) {
+      if (!isOpen()) return;
+
+      if (e.key === "Escape") {
+        close();
+        return;
+      }
+
+      if (e.key === "ArrowLeft") {
+        show(current - 1);
+        return;
+      }
+      if (e.key === "ArrowRight") {
+        show(current + 1);
+        return;
+      }
+
+      if (e.key !== "Tab") return;
+      var focusable = panel.querySelectorAll(
+        'a[href], button:not([disabled]), input:not([disabled]):not([type="hidden"]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])',
+      );
+      if (!focusable.length) return;
+      var first = focusable[0];
+      var last = focusable[focusable.length - 1];
+
+      if (e.shiftKey && document.activeElement === first) {
+        e.preventDefault();
+        last.focus();
+      } else if (!e.shiftKey && document.activeElement === last) {
+        e.preventDefault();
+        first.focus();
+      }
+    });
+  })();
+</script>

@@ -1,0 +1,221 @@
+---
+/**
+ * Data residency — Figma node 15026:11567.
+ *
+ * Copy and a 3+2 grid of trust badges on the left; the region list on the right.
+ *
+ * The mock draws that list clipped top and bottom behind two 112px fades, with
+ * partial cards showing at both edges — i.e. a track taller than its window,
+ * scrolling. So it is built as a vertical marquee: the list is rendered twice and
+ * the track translated by half its height, which is the same seamless-loop trick
+ * `global-homepage/SocialProof.astro` uses horizontally. Hover pauses it and
+ * `prefers-reduced-motion` stops it outright, at which point the fades simply
+ * read as a soft-edged list.
+ *
+ * ── ASSETS TO UPLOAD ─────────────────────────────────────────────────────────
+ * BADGES point at `public/images/trust-centre/*.png`, exported from Figma. Those
+ * paths render in `npm run dev` and in `dist/preview`, but resolve to nothing
+ * once the section is pasted into Webflow. Upload the five files to Webflow
+ * assets and swap each `src` for its CDN URL before pasting. The flag URLs below
+ * are already Webflow-hosted (lifted from `_shared/NavbarRb.astro`) and need no
+ * action.
+ * ─────────────────────────────────────────────────────────────────────────────
+ */
+interface Badge {
+  alt: string;
+  src: string;
+}
+
+const badges: Badge[] = [
+  { alt: "GST Suvidha Provider", src: "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6ab26e680580f1347e8e8fae_gsp.png" },
+  { alt: "ISO 27001 certified", src: "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6ab26e68ec63561a843630ec_iso-27001-certified.png" },
+  { alt: "AICPA SOC 2", src: "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6ab26e686aa6b8ff0ae9e25a_soc-2-type-ii.png" },
+  { alt: "SSL Secure", src: "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6ab26e68bc5572adf4a17c0b_ssl-secure.png" },
+  { alt: "GDPR", src: "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6ab26e68d381ea6d28ca4089_gdpr.png" },
+];
+
+interface Region {
+  name: string;
+  flag: string;
+  detail: string;
+  tag: string;
+}
+
+const regions: Region[] = [
+  {
+    name: "KSA",
+    flag: "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6ab26e68709f44a0fbdd626c_saudi-arabia-flag.png",
+    detail: "OCI — Saudi Arabia West (Jeddah)",
+    tag: "Sovereign",
+  },
+  {
+    name: "UAE",
+    flag: "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6ab26e68ec63561a84363114_uae-flag.png",
+    detail: "AWS — UAE Region (3 AZs)",
+    tag: "Sovereign",
+  },
+  {
+    name: "France",
+    flag: "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6ab26eb1cd30d8963df43a63_france-flag.png",
+    detail: "S3NS France (Sovereign Cloud)",
+    tag: "Sovereign",
+  },
+  {
+    name: "EU / MY",
+    flag: "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6ab26e68cbb96cfd20c17875_malaysia-flag.png",
+    detail: "AWS — Paris / Singapore",
+    tag: "In-Region",
+  },
+];
+
+/* Rendered twice so the track can loop by translating exactly half its height.
+   The duplicate is hidden from assistive tech — it is the same four rows. */
+const marqueeRegions = [...regions, ...regions];
+---
+
+<section class="bg-generic-00 py-12 lg:py-20">
+  <div class="container mx-auto">
+    <div class="flex flex-col items-center gap-10 lg:flex-row lg:items-center lg:justify-between lg:gap-8">
+      <!-- Copy + badge grid -->
+      <div class="flex w-full flex-col gap-6 lg:w-[554px] lg:shrink-0">
+        <div class="flex flex-col gap-4">
+          <p
+            class="m-0 font-body font-semibold uppercase text-neutral-500 text-[length:var(--fs-body-sm)] leading-[length:var(--lh-body-sm)] tracking-[1px]"
+          >
+            Data Residency
+          </p>
+          <div class="flex flex-col gap-4">
+            <h2
+              class="m-0 font-heading font-medium text-vault-navy text-[length:var(--fs-h2)] leading-[length:var(--lh-h2)] lg:text-[length:var(--fs-h1)] lg:leading-[length:var(--lh-h1)] tracking-[-0.5px]"
+            >
+              Your Data Stays in Your Country.
+            </h2>
+            <p
+              class="m-0 font-body font-normal text-neutral-500 text-[length:var(--fs-body)] leading-[length:var(--lh-body)] lg:text-[length:var(--fs-body-lg)] lg:leading-[length:var(--lh-body-lg)]"
+            >
+              No cross-border data transfer under normal operations. Each region
+              runs on dedicated, sovereign infrastructure.
+            </p>
+          </div>
+        </div>
+
+        <ul class="m-0 grid list-none grid-cols-2 gap-4 p-0 sm:grid-cols-3 lg:gap-6">
+          {
+            badges.map((badge) => (
+              <li class="flex h-[134px] items-center justify-center rounded-lg border border-neutral-300 p-4">
+                <span
+                  class="flex size-20 items-center justify-center overflow-hidden rounded-full border border-[#ECECF4] bg-generic-00"
+                >
+                  <img
+                    src={badge.src}
+                    alt={badge.alt}
+                    class="size-[58px] object-contain"
+                    loading="lazy"
+                    decoding="async"
+                  />
+                </span>
+              </li>
+            ))
+          }
+        </ul>
+      </div>
+
+      <!-- Region list -->
+      <div class="tc-dr-window relative w-full lg:w-[624px] lg:shrink-0">
+        <ul class="tc-dr-track m-0 flex list-none flex-col gap-6 p-0 pb-6">
+          {
+            marqueeRegions.map((region, i) => (
+              <li
+                class="flex items-start justify-between gap-4 rounded-lg border border-neutral-300 p-6"
+                aria-hidden={i >= regions.length ? "true" : undefined}
+              >
+                <div class="flex flex-col gap-4">
+                  <span class="flex items-center gap-2">
+                    <img
+                      src={region.flag}
+                      alt=""
+                      class="size-6 shrink-0 rounded-full border-[0.667px] border-[rgba(0,0,0,0.08)] object-cover"
+                      loading="lazy"
+                      decoding="async"
+                    />
+                    <span
+                      class="font-body font-medium text-vault-navy text-[length:var(--fs-body)] leading-[length:var(--lh-body)]"
+                    >
+                      {region.name}
+                    </span>
+                  </span>
+                  <span
+                    class="font-body font-normal text-vault-navy text-[length:var(--fs-body)] leading-[length:var(--lh-body)]"
+                  >
+                    {region.detail}
+                  </span>
+                </div>
+                <span
+                  class="shrink-0 rounded-lg bg-nova-blue px-3 py-1.5 font-body font-medium text-generic-00 text-[length:var(--fs-label)] leading-[length:var(--lh-label)]"
+                >
+                  {region.tag}
+                </span>
+              </li>
+            ))
+          }
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style is:global>
+  /* The window is shorter than the track, which is what puts a partial card at
+     each edge. Mobile gets a taller window because the cards wrap to two lines
+     of text there, and a 520px window would cut one in half. */
+  .tc-dr-window {
+    height: 420px;
+    overflow: hidden;
+    -webkit-mask-image: linear-gradient(
+      to bottom,
+      transparent 0%,
+      #000 18%,
+      #000 82%,
+      transparent 100%
+    );
+    mask-image: linear-gradient(
+      to bottom,
+      transparent 0%,
+      #000 18%,
+      #000 82%,
+      transparent 100%
+    );
+  }
+
+  @media (width >= 1024px) {
+    .tc-dr-window {
+      height: 520px;
+    }
+  }
+
+  /* `pb-6` on the track is load-bearing: it supplies the eighth gap, so the
+     track measures 8 × (row + gap) and -50% lands exactly on the duplicate's
+     first row. Without it the loop jumps by half a gap every cycle. */
+  .tc-dr-track {
+    animation: tc-dr-scroll 32s linear infinite;
+  }
+
+  .tc-dr-window:hover .tc-dr-track {
+    animation-play-state: paused;
+  }
+
+  @keyframes tc-dr-scroll {
+    from {
+      transform: translateY(0);
+    }
+    to {
+      transform: translateY(-50%);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .tc-dr-track {
+      animation: none;
+    }
+  }
+</style>

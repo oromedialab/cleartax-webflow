@@ -1,0 +1,330 @@
+---
+/**
+ * "From every selling channel to one source of truth." Figma node
+ * 15389:33433 / instance 15389:33440 ("Source of truth - item").
+ *
+ * The actual diagram (cards + connectors) lives in ./FlowCanvas.astro — see
+ * that file's doc comment for the pixel-coordinate provenance. This file
+ * owns the two tab datasets and the interaction:
+ *
+ * - Scale-to-fit, not scroll: FlowCanvas is a fixed 1239x700 px design, so
+ *   `data-sot-stage` measures its own width on load/resize and applies a
+ *   uniform `transform: scale()` to `data-sot-track` (which holds both
+ *   panels). A uniform transform keeps every card, line and font size in
+ *   the exact proportion Figma drew, which plain CSS reflow (or letting it
+ *   overflow-x: scroll) can't — the earlier version scrolled horizontally
+ *   below ~1239px, which is the "scrollable" behaviour this replaces.
+ * - Selling channels / Marketplaces tabs: both are real Figma frames —
+ *   "Selling channels" is node 15389:33433/15389:33440, "Marketplaces" is
+ *   node 15432:48377. Same card/connector skeleton, different content: the
+ *   Marketplaces sources column is headed "MARKETPLACES" (not "SOURCES")
+ *   and left-shifted to 81px (vs 106px) since it's a longer word — see
+ *   FlowCanvas.astro's `sourcesLabel`/`sourcesLabelX` props.
+ */
+import FlowCanvas, { CANVAS_W, CANVAS_H, type FlowCard } from "./FlowCanvas.astro";
+
+const channelsSources: FlowCard[] = [
+  { x: 0, y: 52, w: 286, h: 144, tag: "purple", title: "Source · POS", desc: "NCR Aloha · Oracle Xstore · Lightspeed · Square" },
+  { x: 0, y: 220, w: 286, h: 144, tag: "purple", title: "Own D2C", desc: "NCR Aloha · Oracle Xstore · Lightspeed · Square" },
+  { x: 0, y: 388, w: 286, h: 144, tag: "purple", title: "Wholesale · B2B", desc: "ERP sales / biling\nClearance or Peppol, per country" },
+  { x: 0, y: 556, w: 286, h: 144, tag: "orange", title: "Procurement / AP", desc: "Vendor invoices\nReverse charge" },
+];
+
+const channelsBilling: FlowCard[] = [
+  { x: 332, y: 220, w: 286, h: 144, tag: "green", title: "Sales E-Invoice", desc: "Structured e-invoice per country\nStandard-rated retail supply" },
+  { x: 332, y: 388, w: 286, h: 144, tag: "green", title: "B2B / Wholesale Invoice", desc: "60+ mandate countries\nTax on wholesale supply" },
+];
+
+const marketplaceSources: FlowCard[] = [
+  { x: 0, y: 52, w: 286, h: 144, tag: "purple", title: "Amazon • eBay", desc: "Horizontal marketplaces\nDeemed supplier / facilitator" },
+  { x: 0, y: 220, w: 286, h: 144, tag: "purple", title: "ASOS • Zalando", desc: "Fashion / vertical\nMarketplace tax model" },
+  { x: 0, y: 388, w: 286, h: 144, tag: "purple", title: "Quick-commerce", desc: "Deliveroo・DoorDash・Rappi・Blinkit" },
+  { x: 0, y: 556, w: 286, h: 144, tag: "orange", title: "Procurement / AP", desc: "Vendor invoices\nReverse charge" },
+];
+
+const marketplaceBilling: FlowCard[] = [
+  { x: 332, y: 220, w: 286, h: 144, tag: "green", title: "Marketplace Tax Doc", desc: "Deemed-supplier tax settlement\nStructured e-invoice per country" },
+  { x: 332, y: 388, w: 286, h: 144, tag: "green", title: "Commission / Fees Invoice", desc: "Tax on marketplace fees\nInput tax on commissions" },
+];
+---
+
+<section class="bg-generic-00 border-t border-neutral-200 py-16 lg:py-20">
+  <div class="container">
+    <div class="rounded-xl border border-neutral-200 p-6 lg:p-8">
+      <div class="flex flex-wrap items-center justify-between gap-4 mb-12">
+        <h2 class="m-0 font-heading font-medium text-vault-navy text-[length:var(--fs-h1)] leading-[length:var(--lh-h1)] tracking-[-0.5px]">
+          From every selling channel to one source of truth.
+        </h2>
+        <div class="inline-flex items-center gap-1 rounded-xl bg-neutral-100 p-1" data-sot-tabs>
+          <button
+            type="button"
+            class="sot-tab inline-flex items-center justify-center rounded-lg px-6 py-2 font-body font-medium text-[length:var(--fs-label)] leading-[length:var(--lh-label)] cursor-pointer border-0 bg-generic-00 text-nova-blue shadow-[0px_1px_2px_0px_rgba(16,24,40,0.04)]"
+            data-sot-tab="channels"
+            aria-selected="true"
+          >
+            Selling channels
+          </button>
+          <button
+            type="button"
+            class="sot-tab inline-flex items-center justify-center rounded-lg px-6 py-2 font-body font-medium text-[length:var(--fs-label)] leading-[length:var(--lh-label)] cursor-pointer border-0 bg-transparent text-neutral-700"
+            data-sot-tab="marketplaces"
+            aria-selected="false"
+          >
+            Marketplaces
+          </button>
+        </div>
+      </div>
+
+      <div class="sot-stage relative w-full" data-sot-stage>
+        <div class="sot-track absolute top-0 left-0" style={`width:${CANVAS_W}px;height:${CANVAS_H}px;`} data-sot-track>
+          <FlowCanvas id="channels" active={true} sourcesLabel="Sources" sourcesLabelX={106} sourceCards={channelsSources} billingCards={channelsBilling} />
+          <FlowCanvas id="marketplaces" active={false} sourcesLabel="Marketplaces" sourcesLabelX={81} sourceCards={marketplaceSources} billingCards={marketplaceBilling} />
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style is:global>
+  .sot-tab[aria-selected="true"] {
+    background-color: var(--color-generic-00);
+    color: var(--color-nova-blue);
+    box-shadow: 0px 1px 2px 0px rgba(16, 24, 40, 0.04);
+  }
+  .sot-tab[aria-selected="false"] {
+    background-color: transparent;
+    color: var(--color-neutral-700);
+  }
+</style>
+
+<script is:inline>
+  (function () {
+    /**
+     * Connector draw-in: no <mask>, no stroke-dashoffset-through-a-mask —
+     * see FlowCanvas.astro's doc comment on `straightLines`/`bentWires` for
+     * why (a real Chrome bug: `zoom` — this site's `--page-zoom`, shared.css
+     * — breaks SVG masks outright). Instead GSAP animates the actual
+     * geometry: a straight <line>'s `x2`/`y2` attributes grow from its
+     * `x1`/`y1` (its own `6 5` dasharray is never touched, so the dots you
+     * see are the same dots throughout — just more of them as the line
+     * extends); a bent <path>'s `d` is rebuilt every frame from a
+     * length-truncated copy of its point list (`data-points`), re-rounded
+     * with the same `roundedPolylineJS` FlowCanvas.astro's build-time
+     * `roundedPolyline` mirrors.
+     *
+     * Staged in the order data actually moves through the diagram (see
+     * FlowCanvas.astro's `Stage` type for the exact grouping) — sources
+     * emit, merge onto the purple bus, feed billing; billing emits, merges
+     * onto the green bus (and taps the middleware feed), feeds ERP GL; ERP
+     * GL emits to cleartax. Procurement/AP's `orange-full` wire bypasses
+     * billing entirely in one continuous path, so it gets a longer duration
+     * instead of its own stage, timed to land at ERP GL together with the
+     * other two colors rather than arriving early.
+     *
+     * Plays once, on first scroll into view. GSAP loads from the same CDN
+     * this codebase already uses elsewhere (global-homepage/WhyGenericAi.astro),
+     * self-injected here rather than assumed already present on the page,
+     * so this section works even if pasted somewhere that doesn't load it.
+     */
+    const STAGE_DURATION = 0.45;
+    const EASE = "sine.out";
+    const STAGE_ORDER = ["src-entry", "src-trunk", "src-exit", "bill-entry", "bill-trunk", "bill-exit", "final"];
+
+    const prefersReducedMotion = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+    function loadGsap(onReady) {
+      if (window.gsap) return onReady();
+      const existing = document.querySelector("script[data-gsap-cdn]");
+      if (existing) {
+        existing.addEventListener("load", onReady, { once: true });
+        return;
+      }
+      const s = document.createElement("script");
+      s.src = "https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js";
+      s.dataset.gsapCdn = "true";
+      s.onload = onReady;
+      document.head.appendChild(s);
+    }
+
+    // Mirrors FlowCanvas.astro's build-time `roundedPolyline` exactly.
+    function roundedPolylineJS(points, r) {
+      if (points.length < 2) return "";
+      let d = `M ${points[0].x} ${points[0].y}`;
+      for (let i = 1; i < points.length - 1; i++) {
+        const prev = points[i - 1];
+        const curr = points[i];
+        const next = points[i + 1];
+        const inLen = Math.hypot(curr.x - prev.x, curr.y - prev.y);
+        const outLen = Math.hypot(next.x - curr.x, next.y - curr.y);
+        const radius = Math.min(r, inLen / 2, outLen / 2);
+        const inX = curr.x + ((prev.x - curr.x) / inLen) * radius;
+        const inY = curr.y + ((prev.y - curr.y) / inLen) * radius;
+        const outX = curr.x + ((next.x - curr.x) / outLen) * radius;
+        const outY = curr.y + ((next.y - curr.y) / outLen) * radius;
+        d += ` L ${inX} ${inY} Q ${curr.x} ${curr.y} ${outX} ${outY}`;
+      }
+      const last = points[points.length - 1];
+      d += ` L ${last.x} ${last.y}`;
+      return d;
+    }
+
+    function parsePoints(str) {
+      return str.split(" ").map((pair) => {
+        const [x, y] = pair.split(",").map(Number);
+        return { x, y };
+      });
+    }
+
+    function polylineLength(points) {
+      let len = 0;
+      for (let i = 0; i < points.length - 1; i++) len += Math.hypot(points[i + 1].x - points[i].x, points[i + 1].y - points[i].y);
+      return len;
+    }
+
+    // Points from the wire's start up to `targetLen` along it — the
+    // truncated shape `roundedPolylineJS` re-rounds every frame.
+    function pointsUpToLength(points, targetLen) {
+      let acc = 0;
+      const result = [points[0]];
+      for (let i = 0; i < points.length - 1; i++) {
+        const a = points[i];
+        const b = points[i + 1];
+        const segLen = Math.hypot(b.x - a.x, b.y - a.y);
+        if (acc + segLen >= targetLen) {
+          const t = segLen === 0 ? 0 : (targetLen - acc) / segLen;
+          result.push({ x: a.x + (b.x - a.x) * t, y: a.y + (b.y - a.y) * t });
+          return result;
+        }
+        result.push(b);
+        acc += segLen;
+      }
+      return result;
+    }
+
+    function prepareLine(gsap, el) {
+      const x1 = Number(el.getAttribute("x1"));
+      const y1 = Number(el.getAttribute("y1"));
+      const x2 = Number(el.getAttribute("x2"));
+      const y2 = Number(el.getAttribute("y2"));
+      gsap.set(el, { attr: { x2: x1, y2: y1 } });
+      return { type: "line", el, final: { x2, y2 } };
+    }
+
+    function preparePath(el) {
+      const points = parsePoints(el.getAttribute("data-points"));
+      const radius = Number(el.getAttribute("data-radius"));
+      const total = polylineLength(points);
+      el.setAttribute("d", `M ${points[0].x} ${points[0].y}`);
+      return { type: "path", el, points, radius, total };
+    }
+
+    function tweenItem(tl, item, duration, position) {
+      if (item.type === "line") {
+        tl.to(item.el, { attr: { x2: item.final.x2, y2: item.final.y2 }, duration, ease: EASE }, position);
+      } else {
+        const proxy = { p: 0 };
+        tl.to(
+          proxy,
+          {
+            p: 1,
+            duration,
+            ease: EASE,
+            onUpdate: () => item.el.setAttribute("d", roundedPolylineJS(pointsUpToLength(item.points, proxy.p * item.total), item.radius)),
+          },
+          position,
+        );
+      }
+    }
+
+    function animatePanel(panel) {
+      if (!panel || panel.dataset.sotAnimated === "true") return;
+      panel.dataset.sotAnimated = "true";
+      const lines = Array.from(panel.querySelectorAll("[data-sot-line]"));
+      if (!lines.length) return;
+
+      if (prefersReducedMotion) return; // leave the static dashed lines as-is
+
+      const gsap = window.gsap;
+      const byStage = {};
+      lines.forEach((line) => {
+        const item = line.getAttribute("data-shape") === "line" ? prepareLine(gsap, line) : preparePath(line);
+        const stage = line.getAttribute("data-stage");
+        if (!byStage[stage]) byStage[stage] = [];
+        byStage[stage].push(item);
+      });
+
+      const tl = gsap.timeline();
+      STAGE_ORDER.forEach((stage, i) => {
+        const group = byStage[stage];
+        if (!group) return;
+        group.forEach((item) => tweenItem(tl, item, STAGE_DURATION, i * STAGE_DURATION));
+      });
+
+      // Procurement/AP bypasses billing in one continuous wire — stretch its
+      // draw to land at ERP GL (stage index of "final") in step with the
+      // other two colors instead of finishing after just one stage.
+      const orangeGroup = byStage["orange-full"];
+      if (orangeGroup) {
+        const finalIndex = STAGE_ORDER.indexOf("final");
+        orangeGroup.forEach((item) => tweenItem(tl, item, STAGE_DURATION * finalIndex, 0));
+      }
+
+      // The middleware feed taps off the billing bus, so it plays alongside
+      // that merge rather than getting its own place in STAGE_ORDER.
+      const midFeedGroup = byStage["mid-feed"];
+      if (midFeedGroup) {
+        const billTrunkIndex = STAGE_ORDER.indexOf("bill-trunk");
+        midFeedGroup.forEach((item) => tweenItem(tl, item, STAGE_DURATION, billTrunkIndex * STAGE_DURATION));
+      }
+    }
+
+    document.querySelectorAll("[data-sot-stage]").forEach((stage) => {
+      const track = stage.querySelector("[data-sot-track]");
+      if (!track) return;
+      const designWidth = track.offsetWidth;
+      const designHeight = track.offsetHeight;
+
+      const resize = () => {
+        const scale = stage.clientWidth / designWidth;
+        track.style.transform = `scale(${scale})`;
+        track.style.transformOrigin = "top left";
+        stage.style.height = `${designHeight * scale}px`;
+      };
+
+      window.addEventListener("resize", resize);
+      resize();
+
+      const tabsRoot = stage.parentElement.querySelector("[data-sot-tabs]");
+      const tabs = tabsRoot ? tabsRoot.querySelectorAll("[data-sot-tab]") : [];
+      const panels = track.querySelectorAll("[data-sot-panel]");
+
+      let hasEnteredView = false;
+      const activePanel = () => Array.from(panels).find((p) => !p.classList.contains("hidden"));
+
+      const observer = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (!entry.isIntersecting) return;
+            hasEnteredView = true;
+            loadGsap(() => animatePanel(activePanel()));
+            observer.disconnect();
+          });
+        },
+        { threshold: 0.2 },
+      );
+      observer.observe(stage);
+
+      tabs.forEach((tab) => {
+        tab.addEventListener("click", () => {
+          const key = tab.getAttribute("data-sot-tab");
+          tabs.forEach((t) => t.setAttribute("aria-selected", t === tab ? "true" : "false"));
+          panels.forEach((p) => p.classList.toggle("hidden", p.getAttribute("data-sot-panel") !== key));
+          // If the diagram was already visible before this switch, the
+          // panel being switched TO has never had its own draw-in — play it
+          // now instead of leaving it permanently hidden mid-animation.
+          if (hasEnteredView) loadGsap(() => animatePanel(activePanel()));
+        });
+      });
+    });
+  })();
+</script>

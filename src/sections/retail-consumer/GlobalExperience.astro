@@ -1,0 +1,175 @@
+---
+/**
+ * "Global experience, mandate after mandate." Figma node 15389:33441.
+ *
+ * Left: click-to-expand accordion (one open at a time), each row a
+ * title + stat + description with a coloured underline while active.
+ * Right: visual placeholder.
+ */
+interface MandateItem {
+  title: string;
+  stat: string;
+  text: string;
+}
+
+const items: MandateItem[] = [
+  {
+    title: "Retail · Hypermarket",
+    stat: "54 M+ invoices",
+    text: "ClearTax absorbs mandate updates on the platform, so your IT team doesn't have to rebuild integrations.",
+  },
+  {
+    title: "Sportswear · Omnichannel",
+    stat: "100 % Peppol compliance",
+    text: "Every channel — store, app, marketplace — settles through the same compliant invoice stream.",
+  },
+  {
+    title: "Aviation · Multi-Entity",
+    stat: "9 ERPs · 25+ TINs",
+    text: "One integration layer reconciles every entity's tax IDs against a single mandate engine.",
+  },
+];
+---
+
+<section class="bg-generic-00 border-t border-neutral-200 py-16 lg:py-20">
+  <div class="container">
+    <div class="grid lg:grid-cols-2 gap-12 items-center">
+      <div class="flex flex-col gap-12">
+        <h2 class="m-0 font-heading font-medium text-vault-navy text-[length:var(--fs-h1)] leading-[length:var(--lh-h1)] tracking-[-0.5px]">
+          Global experience,<br />mandate after mandate.
+        </h2>
+
+        <div class="flex flex-col gap-12" data-mandate-root>
+          {
+            items.map((item, i) => (
+              <button
+                type="button"
+                class:list={["mandate-item flex flex-col gap-4 text-left bg-transparent border-0 p-0 cursor-pointer font-[inherit]", i === 0 && "mandate-open"]}
+                data-mandate-item
+              >
+                <div class="flex flex-col gap-3">
+                  <p class="m-0 font-heading font-medium text-vault-navy text-[length:var(--fs-h5)] leading-[length:var(--lh-h5)] tracking-[-0.5px]">
+                    {item.title}
+                  </p>
+                  <p class="mandate-stat m-0 font-heading font-medium text-vault-navy text-[length:var(--fs-h6)] leading-[length:var(--lh-h6)] tracking-[-0.5px] overflow-hidden">
+                    {item.stat}
+                  </p>
+                </div>
+                <p class="mandate-text m-0 font-body text-neutral-500 text-[length:var(--fs-body-lg)] leading-[length:var(--lh-body-lg)] max-w-105 overflow-hidden">
+                  {item.text}
+                </p>
+                <div class="relative h-1 w-full rounded-lg bg-neutral-300 overflow-hidden">
+                  <div class="mandate-bar absolute inset-y-0 left-0 rounded-lg bg-nova-blue" />
+                </div>
+              </button>
+            ))
+          }
+        </div>
+      </div>
+
+      <div class="relative aspect-square lg:aspect-[624/500] w-full" data-mandate-thumbs>
+        {
+          items.map((_, i) => (
+            <div
+              class:list={[
+                "absolute inset-0 rounded-lg bg-visual-placeholder transition-opacity duration-300",
+                i === 0 ? "opacity-100" : "opacity-0",
+              ]}
+              data-mandate-panel
+              aria-hidden={i !== 0}
+            />
+          ))
+        }
+      </div>
+    </div>
+  </div>
+</section>
+
+<style is:global>
+  .mandate-stat,
+  .mandate-text {
+    max-height: 0;
+    opacity: 0;
+    transition:
+      max-height 300ms ease,
+      opacity 200ms ease;
+  }
+  .mandate-item.mandate-open .mandate-stat {
+    max-height: 40px;
+    opacity: 1;
+  }
+  .mandate-item.mandate-open .mandate-text {
+    max-height: 110px;
+    opacity: 1;
+    transition:
+      max-height 300ms ease,
+      opacity 300ms ease 100ms;
+  }
+  .mandate-item:not(.mandate-open) .mandate-item-title-only {
+    opacity: 0.5;
+  }
+  .mandate-item .mandate-bar {
+    width: 0%;
+  }
+</style>
+
+<script is:inline>
+  (function () {
+    var DURATION = 4000;
+
+    document.querySelectorAll("[data-mandate-root]").forEach((root) => {
+      const items = Array.from(root.querySelectorAll("[data-mandate-item]"));
+      const section = root.closest("section");
+      const panels = section ? Array.from(section.querySelectorAll("[data-mandate-panel]")) : [];
+      if (!items.length) return;
+
+      let activeIndex = -1;
+      let timer = null;
+
+      function activate(index) {
+        activeIndex = index;
+
+        items.forEach((item, i) => {
+          item.classList.toggle("mandate-open", i === index);
+
+          const bar = item.querySelector(".mandate-bar");
+          if (!bar) return;
+          bar.style.transition = "none";
+          bar.style.width = "0%";
+        });
+
+        panels.forEach((panel, i) => {
+          const active = i === index;
+          panel.classList.toggle("opacity-100", active);
+          panel.classList.toggle("opacity-0", !active);
+          panel.setAttribute("aria-hidden", active ? "false" : "true");
+        });
+
+        const activeBar = items[index].querySelector(".mandate-bar");
+        if (activeBar) {
+          // Force a reflow so the 0% reset above is committed before the
+          // fill transition starts, otherwise the browser coalesces both
+          // style writes and the bar jumps straight to 100%.
+          void activeBar.offsetWidth;
+          activeBar.style.transition = `width ${DURATION}ms linear`;
+          activeBar.style.width = "100%";
+        }
+      }
+
+      function goTo(index) {
+        if (timer) clearTimeout(timer);
+        activate(index);
+        timer = setTimeout(() => goTo((index + 1) % items.length), DURATION);
+      }
+
+      items.forEach((item, i) => {
+        item.addEventListener("click", () => {
+          if (i === activeIndex) return;
+          goTo(i);
+        });
+      });
+
+      goTo(0);
+    });
+  })();
+</script>

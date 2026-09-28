@@ -1,0 +1,356 @@
+---
+/**
+ * Pixel-exact flow diagram canvas for SourceOfTruth.astro — see that file's
+ * doc comment for the full provenance/reasoning. Factored out because the
+ * page shows this same skeleton twice (Selling channels / Marketplaces),
+ * varying only the source and billing/tax-doc column content; the ERP GL
+ * hub and cleartax engine never change, so they live here as fixed markup
+ * rather than being threaded through as props.
+ *
+ * Sized in a fixed CANVAS_W x CANVAS_H pixel space and scaled to fit its
+ * container by retail-consumer/SourceOfTruth.astro's own script (a uniform
+ * CSS `transform: scale()`, not a reflow) — that is what lets every card and
+ * connector below keep its literal Figma coordinate instead of being
+ * converted to percentages.
+ */
+export const CANVAS_W = 1239;
+export const CANVAS_H = 700;
+
+export interface FlowCard {
+  x: number;
+  y: number;
+  w: number;
+  h: number;
+  tag: "purple" | "orange" | "green";
+  title: string;
+  desc: string;
+}
+
+interface Props {
+  id: string;
+  active?: boolean;
+  /** "Sources" (Selling channels tab) or "Marketplaces" (Marketplaces tab) —
+   * Figma repositions this label's left offset per word length (106px for
+   * "SOURCES", 81px for "MARKETPLACES") to keep it flush with the card
+   * column below, hence `sourcesLabelX` alongside the label text itself. */
+  sourcesLabel?: string;
+  sourcesLabelX?: number;
+  sourceCards: FlowCard[];
+  billingCards: FlowCard[];
+}
+
+/* Defaults matter here beyond convenience: embed-build/[page]/[section].astro
+   renders every .astro file in this folder standalone with no props at all
+   (including primitives like this one — see docs/adding-a-new-page.md,
+   "Props never reach Webflow"), so sourceCards/billingCards must default to
+   something `.map`-able or that route's build crashes outright. */
+const { id = "", active = false, sourcesLabel = "Sources", sourcesLabelX = 106, sourceCards = [], billingCards = [] } = Astro.props;
+
+const FLOW_COLOR: Record<FlowCard["tag"], string> = {
+  purple: "bg-nova-blue",
+  orange: "bg-warning-500",
+  green: "bg-success-500",
+};
+
+const erpChecklist = ["Output tax (all channels)", "e-invoice per country model", "Input tax recovery", "Cross-border stock docs", "Tax reconciliation"];
+
+const receives = [
+  { tag: "purple" as const, label: "Output VAT / GST" },
+  { tag: "orange" as const, label: "Reverse charge" },
+  { tag: "green" as const, label: "Input VAT • GL" },
+];
+
+type Flow = "purple" | "orange" | "green";
+type Point = { x: number; y: number };
+
+/**
+ * Connectors render as SVG, not absolutely-positioned `border-dashed`
+ * <span>s — a CSS border is pixel-snapped for crispness, which is
+ * inconsistent under this canvas's non-1:1 `transform: scale()`.
+ *
+ * The draw-in animation (SourceOfTruth.astro's script) does NOT use the
+ * usual stroke-dasharray/dashoffset-through-a-<mask> technique for
+ * revealing a dashed line progressively. Found by isolated repro: this
+ * site applies `zoom: var(--page-zoom)` to `<body>` for 768–1439px
+ * viewports (shared.css, for the 1280px-design-on-a-1280px-laptop problem),
+ * and Chrome has a rendering bug where an SVG `<mask>` renders as only a
+ * sliver near each masked line's endpoints whenever `zoom` is active
+ * anywhere up the ancestor chain — with or without an additional
+ * `transform: scale()` in the mix. Since `zoom` can't be turned off for
+ * this one section, masking an SVG line/path here is never safe. Instead,
+ * the script animates the actual geometry: a straight line's `x2`/`y2`
+ * attributes grow from its `x1`/`y1`, and a bent wire's `d` is rebuilt every
+ * frame from a length-truncated point list (`data-points` below, walked by
+ * `roundedPolylineJS` in the script). Neither technique touches a mask, so
+ * neither is exposed to the bug.
+ *
+ * Two shapes of connector:
+ *  - `straightLines`: a stub or trunk with no bend (including the three
+ *    T-merges — 3 source rows onto the purple trunk, 2 billing cards onto
+ *    the green trunk — which are junctions, not corners, so there's nothing
+ *    to round there). `stroke-linecap="round"` alone gives these a soft end.
+ *  - `bentWires`: a single wire with 1+ genuine corners (Procurement/AP's
+ *    run to ERP GL; the billing-to-middleware feed). Rendered as one <path>
+ *    per wire via `roundedPolyline` so every corner gets an actual 4px
+ *    radius, not just `stroke-linejoin`'s subtle (~half-stroke-width) round.
+ *
+ * Every coordinate below is snapped so a stub's endpoint is IDENTICAL to
+ * the trunk/wire point it meets — the earlier version had several 1-2px
+ * mismatches (e.g. a stub ending at x=641 while its trunk sat at x=643)
+ * inherited from Figma's own export rounding, which read as connectors not
+ * quite joining. There is nothing left to snap after this. Every
+ * straightLines entry also reads x1,y1 -> x2,y2 in the actual direction
+ * data flows (source -> destination), since the script grows each line
+ * from its x1,y1 — reversing that pair would draw it backwards.
+ *
+ * `stage` groups every connector into the animation sequence
+ * SourceOfTruth.astro's script plays on scroll-into-view: sources emit ->
+ * merge onto the purple bus -> feed billing -> billing emits -> merges onto
+ * the green bus (and taps the middleware feed) -> feeds ERP GL -> ERP GL
+ * emits to cleartax. `orange-full` is its own stage because Procurement/AP
+ * bypasses the billing column entirely in one continuous wire — its tween
+ * just runs longer so it lands at ERP GL in step with the other two colors
+ * (see STAGE_DURATION/ORANGE_STAGES in the script) rather than arriving
+ * early.
+ */
+type Stage = "src-entry" | "src-trunk" | "src-exit" | "bill-entry" | "bill-trunk" | "bill-exit" | "mid-feed" | "orange-full" | "final";
+
+const straightLines: { flow: Flow; stage: Stage; x1: number; y1: number; x2: number; y2: number }[] = [
+  // Trunk 1 (x=308): source rows 1-3 merge here, one exit into billing. Purple.
+  { flow: "purple", stage: "src-trunk", x1: 308, y1: 124, x2: 308, y2: 460 },
+  { flow: "purple", stage: "src-entry", x1: 286, y1: 124, x2: 308, y2: 124 },
+  { flow: "purple", stage: "src-entry", x1: 286, y1: 294, x2: 308, y2: 294 },
+  { flow: "purple", stage: "src-entry", x1: 286, y1: 458, x2: 308, y2: 458 },
+  { flow: "purple", stage: "src-exit", x1: 308, y1: 294, x2: 335, y2: 294 },
+
+  // Trunk 2 (x=643): both billing cards merge here, one exit into ERP GL. Green.
+  { flow: "green", stage: "bill-trunk", x1: 643, y1: 290, x2: 643, y2: 459 },
+  { flow: "green", stage: "bill-entry", x1: 619, y1: 290, x2: 643, y2: 290 },
+  { flow: "green", stage: "bill-entry", x1: 619, y1: 458, x2: 643, y2: 458 },
+  { flow: "green", stage: "bill-exit", x1: 643, y1: 372, x2: 669, y2: 372 },
+
+  // ERP GL -> the three RECEIVES rows on the cleartax card.
+  { flow: "purple", stage: "final", x1: 943, y1: 348, x2: 991, y2: 348 },
+  { flow: "orange", stage: "final", x1: 943, y1: 372, x2: 991, y2: 372 },
+  { flow: "green", stage: "final", x1: 943, y1: 396, x2: 991, y2: 396 },
+];
+
+const bentWires: { flow: Flow; stage: Stage; points: Point[] }[] = [
+  // Procurement/AP -> up alongside the billing column -> right into ERP GL.
+  {
+    flow: "orange",
+    stage: "orange-full",
+    points: [
+      { x: 286, y: 628 },
+      { x: 643, y: 628 },
+      { x: 643, y: 482 },
+      { x: 669, y: 482 },
+    ],
+  },
+  // Billing output -> up -> right into the middleware feed / cleartax top.
+  {
+    flow: "green",
+    stage: "mid-feed",
+    points: [
+      { x: 619, y: 259 },
+      { x: 643, y: 259 },
+      { x: 643, y: 90 },
+      { x: 991, y: 90 },
+    ],
+  },
+];
+
+const FLOW_HEX: Record<Flow, string> = {
+  purple: "#5446FF",
+  orange: "#F59E0B",
+  green: "#10B981",
+};
+
+const CORNER_RADIUS = 4;
+
+/** Builds an SVG path `d` for a polyline with each interior corner rounded
+ * to `r` (clamped to half the shorter of its two adjacent segments, so a
+ * short segment never gets a radius bigger than itself). Mirrored in plain
+ * JS as `roundedPolylineJS` in SourceOfTruth.astro's script, which redraws
+ * this same shape frame-by-frame from a shortening point list. */
+function roundedPolyline(points: Point[], r: number): string {
+  if (points.length < 2) return "";
+  let d = `M ${points[0].x} ${points[0].y}`;
+  for (let i = 1; i < points.length - 1; i++) {
+    const prev = points[i - 1];
+    const curr = points[i];
+    const next = points[i + 1];
+    const inLen = Math.hypot(curr.x - prev.x, curr.y - prev.y);
+    const outLen = Math.hypot(next.x - curr.x, next.y - curr.y);
+    const radius = Math.min(r, inLen / 2, outLen / 2);
+    const inX = curr.x + ((prev.x - curr.x) / inLen) * radius;
+    const inY = curr.y + ((prev.y - curr.y) / inLen) * radius;
+    const outX = curr.x + ((next.x - curr.x) / outLen) * radius;
+    const outY = curr.y + ((next.y - curr.y) / outLen) * radius;
+    d += ` L ${inX} ${inY} Q ${curr.x} ${curr.y} ${outX} ${outY}`;
+  }
+  const last = points[points.length - 1];
+  d += ` L ${last.x} ${last.y}`;
+  return d;
+}
+---
+
+<div class:list={["sot-canvas absolute inset-0", !active && "hidden"]} style={`width:${CANVAS_W}px;height:${CANVAS_H}px;`} data-sot-panel={id}>
+  <p
+    class="absolute top-[16px] m-0 font-body font-semibold text-vault-navy text-[length:var(--fs-body)] leading-[length:var(--lh-body)] tracking-[1px] uppercase whitespace-nowrap"
+    style={`left:${sourcesLabelX}px;`}
+  >
+    {sourcesLabel}
+  </p>
+  <p class="absolute left-[401px] top-[184px] m-0 font-body font-semibold text-vault-navy text-[length:var(--fs-body)] leading-[length:var(--lh-body)] tracking-[1px] uppercase">
+    Billing / tax-doc
+  </p>
+  <p class="absolute left-[775px] top-[184px] m-0 font-body font-medium text-nova-blue text-[length:var(--fs-body)] leading-[length:var(--lh-body)]">
+    ERP · GL
+  </p>
+
+  <!-- Connectors, drawn under the cards. data-sot-line + data-stage are the
+       hooks the fit-to-width script's GSAP draw-in animation targets;
+       data-shape tells it whether to grow x2/y2 (a line) or rebuild `d`
+       from data-points (a bent wire) — see the doc comment above. -->
+  <svg class="absolute inset-0 pointer-events-none" width={CANVAS_W} height={CANVAS_H} viewBox={`0 0 ${CANVAS_W} ${CANVAS_H}`} aria-hidden="true">
+    {
+      straightLines.map((seg) => (
+        <line
+          x1={seg.x1}
+          y1={seg.y1}
+          x2={seg.x2}
+          y2={seg.y2}
+          stroke={FLOW_HEX[seg.flow]}
+          stroke-width="2"
+          stroke-dasharray="6 5"
+          stroke-linecap="round"
+          data-flow={seg.flow}
+          data-stage={seg.stage}
+          data-shape="line"
+          data-sot-line
+        />
+      ))
+    }
+    {
+      bentWires.map((wire) => (
+        <path
+          d={roundedPolyline(wire.points, CORNER_RADIUS)}
+          fill="none"
+          stroke={FLOW_HEX[wire.flow]}
+          stroke-width="2"
+          stroke-dasharray="6 5"
+          stroke-linecap="round"
+          data-flow={wire.flow}
+          data-stage={wire.stage}
+          data-shape="path"
+          data-points={wire.points.map((p) => `${p.x},${p.y}`).join(" ")}
+          data-radius={CORNER_RADIUS}
+          data-sot-line
+        />
+      ))
+    }
+  </svg>
+
+  <!-- Source cards -->
+  {
+    sourceCards.map((c) => (
+      <div
+        class="absolute flex gap-4 rounded-xl border border-neutral-200 bg-generic-00 p-6"
+        style={`left:${c.x}px;top:${c.y}px;width:${c.w}px;height:${c.h}px;`}
+      >
+        <span class={`w-1 shrink-0 rounded-lg ${FLOW_COLOR[c.tag]}`} />
+        <div class="flex flex-col gap-2">
+          <p class="m-0 font-body font-semibold text-vault-navy text-[length:var(--fs-body-lg)] leading-[length:var(--lh-body-lg)]">{c.title}</p>
+          <p class="m-0 font-body text-neutral-500 text-[length:var(--fs-label)] leading-[length:var(--lh-body-sm)] whitespace-pre-line">{c.desc}</p>
+        </div>
+      </div>
+    ))
+  }
+
+  <!-- Billing / tax-doc cards -->
+  {
+    billingCards.map((c) => (
+      <div
+        class="absolute flex gap-4 rounded-xl border border-neutral-200 bg-generic-00 p-6"
+        style={`left:${c.x}px;top:${c.y}px;width:${c.w}px;height:${c.h}px;`}
+      >
+        <span class={`w-1 shrink-0 rounded-lg ${FLOW_COLOR[c.tag]}`} />
+        <div class="flex flex-col gap-2">
+          <p class="m-0 font-body font-semibold text-vault-navy text-[length:var(--fs-body-lg)] leading-[length:var(--lh-body-lg)]">{c.title}</p>
+          <p class="m-0 font-body text-neutral-500 text-[length:var(--fs-label)] leading-[length:var(--lh-body-sm)] whitespace-pre-line">{c.desc}</p>
+        </div>
+      </div>
+    ))
+  }
+
+  <!-- Middleware badge. Its dashed border is an SVG rect (not a CSS
+       `border-dashed`) so the dash length/gap and stroke width are
+       identical to the connector lines' — a CSS border-dashed can't be
+       tuned to match an SVG stroke-dasharray pixel for pixel. -->
+  <div class="absolute flex items-center justify-center bg-generic-00 px-3" style="left:665px;top:69px;width:278px;height:40px;">
+    <svg class="absolute inset-0" width="278" height="40" viewBox="0 0 278 40" aria-hidden="true">
+      <rect x="1" y="1" width="276" height="38" rx="12" fill="none" stroke={FLOW_HEX.green} stroke-width="2" stroke-dasharray="6 5" stroke-linecap="round" />
+    </svg>
+    <p class="relative m-0 font-body font-medium text-success-600 text-[length:var(--fs-body)] leading-[length:var(--lh-body)] whitespace-nowrap">
+      Middleware · feed as required
+    </p>
+  </div>
+
+  <!-- ERP GL card -->
+  <div class="absolute flex gap-4 rounded-lg border border-neutral-200 bg-generic-00 p-6" style="left:668px;top:220px;width:275px;">
+    <span class="w-1 shrink-0 rounded-lg bg-nova-blue" />
+    <div class="flex flex-col gap-3 flex-1">
+      <div class="flex flex-col gap-2">
+        <p class="m-0 font-body font-semibold text-vault-navy text-[length:var(--fs-body-lg)] leading-[length:var(--lh-body-lg)]">ERP GL</p>
+        <p class="m-0 font-body text-neutral-500 text-[length:var(--fs-label)] leading-[length:var(--lh-body-sm)]">SAP · Oracle · Dynamics 365</p>
+      </div>
+      <ul class="m-0 flex flex-col gap-2 list-none p-0">
+        {erpChecklist.map((item) => (
+          <li class="flex items-center gap-2 font-body text-neutral-500 text-[length:var(--fs-label)] leading-[length:var(--lh-body-sm)]">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" class="shrink-0" aria-hidden="true">
+              <circle cx="8" cy="8" r="8" fill="#5446FF" />
+              <path d="M4.5 8.2 6.8 10.5 11.5 5.5" stroke="white" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
+            {item}
+          </li>
+        ))}
+      </ul>
+      <div class="h-px w-full bg-neutral-200" />
+      <p class="m-0 font-body font-medium text-nova-blue text-[length:var(--fs-label)] leading-[length:var(--lh-body-sm)]">
+        THE CONSTANT NODE — EVERY TXN SETTLES HERE
+      </p>
+    </div>
+  </div>
+
+  <!-- cleartax engine card -->
+  <div class="absolute flex flex-col gap-6 justify-between rounded-lg border-2 border-neutral-400 bg-generic-00 p-6" style="left:991px;top:52px;width:248px;height:648px;">
+    <div class="flex flex-col gap-6">
+      <div class="flex flex-col gap-3">
+        <p class="m-0 font-heading font-semibold text-vault-navy text-[length:var(--fs-h6)] leading-[length:var(--lh-h6)]">cleartax</p>
+        <p class="m-0 font-body font-semibold text-nova-blue text-[length:var(--fs-body-lg)] leading-[length:var(--lh-body-lg)]">multi-mandate engine</p>
+        <div class="h-px w-full bg-neutral-200" />
+      </div>
+      <div class="flex flex-col gap-4">
+        <p class="m-0 font-body font-semibold text-vault-navy text-[length:var(--fs-body-sm)] leading-[length:var(--lh-body-sm)] tracking-[1px] uppercase">Receives</p>
+        <ul class="m-0 flex flex-col gap-3 list-none p-0">
+          {receives.map((r) => (
+            <li class="flex items-center gap-2 font-body text-neutral-500 text-[length:var(--fs-label)] leading-[length:var(--lh-body-sm)]">
+              <span class={`h-4 w-4 shrink-0 rounded-xs ${FLOW_COLOR[r.tag]}`} />
+              {r.label}
+            </li>
+          ))}
+        </ul>
+      </div>
+    </div>
+    <div class="flex flex-col gap-4">
+      <div class="h-px w-full bg-neutral-200" />
+      <div class="flex flex-col gap-1">
+        <p class="m-0 font-body font-semibold text-vault-navy text-[length:var(--fs-label)] leading-[length:var(--lh-body-sm)]">Single source of tax truth</p>
+        <p class="m-0 font-body text-neutral-500 text-[length:var(--fs-label)] leading-[length:var(--lh-body-sm)]">
+          - Audit-proof<br />- Reconciled<br />- Archived
+        </p>
+      </div>
+    </div>
+  </div>
+</div>

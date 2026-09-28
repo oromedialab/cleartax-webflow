@@ -1,0 +1,278 @@
+---
+/**
+ * Global compliance coverage — Figma node 15026:12136.
+ *
+ * Five 480px country cards on one row inside a 1280px frame — a scroll
+ * container, not a marquee (the chips are there to be read). Native overflow
+ * scrolling handles trackpad, touch and shift-wheel; scroll-snap keeps a card
+ * edge at the left when it settles.
+ *
+ * Both ends are softened with a mask rather than left as a hard clip, so the
+ * row reads as continuing past the frame instead of being cut. See the note on
+ * `.tc-cov-scroller` below for why it is a mask and not two overlays.
+ *
+ * ── ASSET TO UPLOAD ──────────────────────────────────────────────────────────
+ * EU_FLAG is the one image here with no Webflow-hosted original. The file sits
+ * at `public/images/trust-centre/eu-flag.png`; upload it to Webflow assets and
+ * replace this one line with the CDN URL before pasting the section. The other
+ * flags come from `_shared/NavbarRb.astro` and are already on the CDN.
+ * ─────────────────────────────────────────────────────────────────────────────
+ */
+const EU_FLAG = "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6ab26e69f1cc7421388afc1b_europe-flag.png";
+
+interface Geography {
+  /** More than one where a card covers a bloc plus a member state. */
+  places: { label: string; flag: string }[];
+  chips: string[];
+}
+
+const geographies: Geography[] = [
+  {
+    places: [
+      {
+        label: "India",
+        flag: "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6ab26e682610f7dcf4a0863f_india-flag.png",
+      },
+    ],
+    chips: [
+      "ISO 27001:2022",
+      "SOC 2 Type II",
+      "GSP / ASP / IRP",
+      "GSTN/NIC",
+      "DPDP Act 2023",
+    ],
+  },
+  {
+    places: [
+      {
+        label: "UAE",
+        flag: "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6ab26e68ec63561a84363114_uae-flag.png",
+      },
+    ],
+    chips: [
+      "ISO 27001:2022",
+      "ISO 22301:2019",
+      "FTA compliant",
+      "UAE PDPL aligned",
+    ],
+  },
+  {
+    places: [
+      {
+        label: "Saudi Arabia",
+        flag: "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6ab26e68709f44a0fbdd626c_saudi-arabia-flag.png",
+      },
+    ],
+    chips: [
+      "ISO 27001:2022",
+      "SOC 2 Type II",
+      "SAMA compliant",
+      "KSA PDPL aligned",
+      "Local data hosting",
+    ],
+  },
+  {
+    places: [
+      {
+        label: "Malaysia",
+        flag: "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6ab26e68cbb96cfd20c17875_malaysia-flag.png",
+      },
+    ],
+    chips: ["ISO 27001:2022", "SOC 2 Type II", "RMiT compliant"],
+  },
+  {
+    places: [
+      { label: "EU", flag: EU_FLAG },
+      {
+        label: "Belgium",
+        flag: "https://cdn.prod.website-files.com/6141e3720a248d2024615d96/67e3e6ae1e19488131f26dfd_belgium_flag.png",
+      },
+    ],
+    chips: [
+      "ISO27001:2022",
+      "SOC 2 Type II",
+      "GDPR aligned",
+      "SCCs available",
+    ],
+  },
+];
+---
+
+<section class="overflow-hidden bg-generic-00 py-12 lg:py-20">
+  <div class="container mx-auto">
+    <div class="mx-auto flex max-w-[801px] flex-col items-center gap-4 text-center">
+      <h2
+        class="m-0 font-heading font-medium text-vault-navy text-[length:var(--fs-h2)] leading-[length:var(--lh-h2)] lg:text-[length:var(--fs-h1)] lg:leading-[length:var(--lh-h1)] tracking-[-0.5px]"
+      >
+        Global compliance coverage
+      </h2>
+      <p
+        class="m-0 font-body font-normal text-neutral-500 text-[length:var(--fs-body)] leading-[length:var(--lh-body)] lg:text-[length:var(--fs-body-lg)] lg:leading-[length:var(--lh-body-lg)]"
+      >
+        Each geography we operate in has its own regulatory requirements. Here is
+        where we stand in each.
+      </p>
+    </div>
+
+    <!-- The row keeps the container's left gutter and bleeds off the right edge,
+         the way the mock clips its third card. `50% - 50vw` is the bleed: margin
+         percentages resolve against the containing block's width, so inside the
+         centred container it always evaluates to exactly the distance from the
+         container's right edge to the viewport's — 80px at 1440, 16px on mobile
+         — with no breakpoint-by-breakpoint arithmetic to keep in step with
+         `@utility container`. -->
+    <div
+      class="tc-cov-scroller mt-8 mr-[calc(50%_-_50vw)] overflow-x-auto lg:mt-12"
+    >
+      <ul class="m-0 flex list-none gap-6 p-0 pb-1">
+        {
+          geographies.map((geo) => (
+            <li
+              class="flex w-[86vw] max-w-[480px] shrink-0 snap-start flex-col gap-6 rounded-xl border border-[#DCDEE2] bg-generic-00 px-[22px] py-6 sm:w-[480px]"
+            >
+              <div class="flex flex-col gap-6">
+                <span class="flex flex-wrap items-center gap-3">
+                  {geo.places.map((place) => (
+                    <span class="flex items-center gap-3">
+                      <img
+                        src={place.flag}
+                        alt=""
+                        class="size-6 shrink-0 rounded-full border-[0.667px] border-[rgba(0,0,0,0.08)] object-cover"
+                        loading="lazy"
+                        decoding="async"
+                      />
+                      <span
+                        class="whitespace-nowrap font-heading font-medium text-vault-navy text-[length:var(--fs-h6)] leading-[length:var(--lh-h6)]"
+                      >
+                        {place.label}
+                      </span>
+                    </span>
+                  ))}
+                </span>
+
+                <span class="block h-px w-full bg-[#DCDEE2]" aria-hidden="true" />
+              </div>
+
+              <ul class="m-0 flex list-none flex-wrap gap-2 p-0">
+                {geo.chips.map((chip) => (
+                  <li
+                    class="rounded-3xl border border-neutral-200 px-3 py-1.5 font-body font-medium text-neutral-700 text-[length:var(--fs-label)] leading-[length:var(--lh-label)]"
+                  >
+                    {chip}
+                  </li>
+                ))}
+              </ul>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </div>
+</section>
+
+<style is:global>
+  /* Snap only on the axis that scrolls, and hide the bar — the clipped card is
+     the affordance the design leans on, and a visible bar under a card row
+     reads as a layout seam.
+
+     THE EDGE FADE IS A MASK, NOT TWO GRADIENT OVERLAYS. `events/Upcoming.astro`
+     uses overlays for its rail and explains why: masking a scroller fades its
+     scrollbar along with its content, and there the scrollbar is the only thing
+     saying the list continues. Here the bar is hidden two lines above, so that
+     objection does not apply — and a mask is the better fit, because the row
+     bleeds past the container to the viewport edge and an overlay would need
+     its own positioned wrapper spanning that bled width to sit on top of.
+     A mask also fades to genuine transparency rather than to a hard-coded
+     white, so it keeps working if the section background ever changes.
+
+     EACH END FADES ONLY WHEN THERE IS ROW PAST IT. A fixed fade on both sides
+     is wrong at the extremes: at rest the first card sits flush with the
+     container gutter, clipped by nothing, and a 2% fade is ~27px at desktop
+     width — enough to eat its left border and read as a rendering fault rather
+     than as depth. Scrolled to the end, the same is true of the last card's
+     right border. So the stop positions are variables and the script below
+     moves them: 0% / 100% means "no fade this side".
+
+     Coincident stops are the off switch. With `--tc-cov-l: 0%` the gradient
+     reads `transparent 0, #000 0%`, which is a hard transition at the very
+     first pixel rather than a fade — the border survives intact.
+
+     Not `animation-timeline: scroll()`, which would do this with no script:
+     Safari and Firefox do not ship it, and this gets pasted into production
+     Webflow. Both mask syntaxes are required — WebKit still needs the prefix. */
+  .tc-cov-scroller {
+    scroll-snap-type: x proximity;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    --tc-cov-l: 0%;
+    --tc-cov-r: 100%;
+    -webkit-mask-image: linear-gradient(
+      to right,
+      transparent 0,
+      #000 var(--tc-cov-l),
+      #000 var(--tc-cov-r),
+      transparent 100%
+    );
+    mask-image: linear-gradient(
+      to right,
+      transparent 0,
+      #000 var(--tc-cov-l),
+      #000 var(--tc-cov-r),
+      transparent 100%
+    );
+  }
+
+  .tc-cov-scroller::-webkit-scrollbar {
+    display: none;
+  }
+</style>
+
+<script is:inline>
+  /* Moves the mask's stop positions so each end only fades while there is row
+     past it — see the note in the <style> block above for why a fixed fade
+     clips the first and last card's borders.
+
+     `querySelectorAll`, not `querySelector`: section styles are one flat
+     namespace per Webflow page and nothing stops this Embed being pasted twice.
+
+     Reads the scroll position rather than tracking an index, because the row is
+     a plain overflow region a reader can drag, wheel or snap — the scroll
+     offset IS the state, and an index would disagree with it the moment anyone
+     touches the trackpad. */
+  (function () {
+    var EDGE = 4; /* px of slack — browsers report a fractional scrollLeft at
+                     the ends, so an exact compare leaves a fade permanently on
+                     at whichever end you have just reached. */
+
+    function sync(el) {
+      var max = el.scrollWidth - el.clientWidth;
+      /* Nothing overflows: no fade at either end, on any of them. */
+      if (max <= EDGE) {
+        el.style.setProperty('--tc-cov-l', '0%');
+        el.style.setProperty('--tc-cov-r', '100%');
+        return;
+      }
+      el.style.setProperty('--tc-cov-l', el.scrollLeft > EDGE ? '2%' : '0%');
+      el.style.setProperty('--tc-cov-r', el.scrollLeft < max - EDGE ? '96%' : '100%');
+    }
+
+    function init() {
+      var rows = document.querySelectorAll('.tc-cov-scroller');
+      for (var i = 0; i < rows.length; i++) {
+        (function (el) {
+          sync(el);
+          // Passive: this handler prevents nothing, and a non-passive scroll
+          // listener on a scroller costs scroll performance.
+          el.addEventListener('scroll', function () { sync(el); }, { passive: true });
+          window.addEventListener('resize', function () { sync(el); });
+        })(rows[i]);
+      }
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', init);
+    } else {
+      init();
+    }
+  })();
+</script>

@@ -1,0 +1,2191 @@
+---
+/**
+ * Experience Centre — Figma node 15070:52961 ("Experience Centre - {{insert
+ * link}}"). One paste unit, deliberately.
+ *
+ * WHAT THE FIGMA FRAME IS
+ * ---------------------------------------------------------------------------
+ * A template: one tool page out of the six its sidebar lists. The sidebar items
+ * do NOT navigate — clicking one swaps the whole right-hand column (tool, "How
+ * to use", article, FAQ) for that tool's own content, in place.
+ *
+ * The swap is plain show/hide plus one CSS animation, and carries no library.
+ * It was a Swiper pair for a while — `press/Hero.astro` and
+ * `v1-clear-compliance-cloud/ComparisonComp.astro` use that pattern — but
+ * sliding six panels sideways reads as a carousel, and this is a tab. See the
+ * notes at the rail and panel markup for what replaced it and why.
+ *
+ * WHY ONE SECTION AND NOT SIX
+ * ---------------------------------------------------------------------------
+ * The mock is a two-column grid: the rail on the left (405px), everything else
+ * on the right (843px, 32px gutter). Webflow Embeds stack vertically, so
+ * splitting the right column into its own embeds would break the grid the
+ * moment it was pasted — and the tab swap needs every panel in one DOM tree
+ * anyway. The whole block ships as one embed.
+ *
+ * WHERE THE CSS IS
+ * ---------------------------------------------------------------------------
+ * `src/styles/experience-centre.css`, not a `<style is:global>` here. Six tools
+ * of markup written as Tailwind utility strings blew past Webflow's ~50 KB
+ * per-Embed cap; the `.exc-*` component classes move those bytes into the page
+ * head bundle instead. The reasoning is written out at the top of that file.
+ *
+ * THE GREY BOX IN THE MOCK
+ * ---------------------------------------------------------------------------
+ * Figma draws every tool as an empty "Visual Placeholder", so the design does
+ * not specify any calculator UI. The rest of each frame does: the "How to use"
+ * card names the controls and the article gives the formulas. Each tool below is
+ * built from its own published ClearTax page — the five links the rail used to
+ * point at — so the in-page tool matches the one it replaces field for field.
+ *
+ * TWO TOOLS THAT COULD NOT BE PORTED WHOLE — see the notes at `roiAssumptions`
+ * and at the HSN tool's `sections` list.
+ */
+
+import Dotgrid from "../_shared/Dotgrid.astro";
+
+/* ------------------------------------------------------------------ types */
+
+interface Block {
+  kind: "h" | "p" | "ul" | "steps";
+  text?: string;
+  /* An `<a>` rendered before `text`. Avoids `set:html`, which this repo bans
+     for React portability. */
+  linkText?: string;
+  linkHref?: string;
+  items?: string[];
+  groups?: { lead: string; lines: string[] }[];
+}
+
+interface Faq {
+  q: string;
+  a: string;
+}
+
+interface RateOption {
+  value: number;
+  label: string;
+}
+
+interface TaxType {
+  label: string;
+  rates: RateOption[];
+}
+
+interface Calc {
+  kind: "rate" | "roi" | "hsn";
+  currency?: string;
+  amountLabel?: string;
+  amount?: number;
+  amountMax?: number;
+  amountStep?: number;
+  rateLabel?: string;
+  rate?: number;
+  /* Slider for VAT (the Figma "How to use" copy says slider); a select for the
+     tools whose source page ships a fixed rate list. */
+  rateSlider?: boolean;
+  rates?: RateOption[];
+  taxTypes?: TaxType[];
+  inclusiveLabel?: string;
+  inclusive?: boolean;
+  netLabel?: string;
+  taxLabel?: string;
+  totalLabel?: string;
+  /* GST: CGST/SGST/IGST rows plus the intra-state toggle that drives them. */
+  split?: boolean;
+  /* VAT: the country pill from the mock. */
+  country?: boolean;
+  note?: string;
+}
+
+interface Tool {
+  id: string;
+  label: string;
+  calc: Calc;
+  howTitle: string;
+  howToUse: string[];
+  article: Block[];
+  faqs: Faq[];
+}
+
+/* -------------------------------------------------------- country pill ----
+   VAT tool only — the other five are single-market tools whose currency is
+   fixed. Standard (not reduced or zero) VAT rates. Flag URLs are the
+   Webflow-hosted set `about-us/Presence.astro` already uses, so this adds no
+   new asset uploads. */
+
+interface Country {
+  short: string;
+  name: string;
+  currency: string;
+  rate: number;
+  flag: string;
+  /* Each country carries its own article and FAQ, because the pill swaps the
+     written content too — a UAE calculator sitting above Saudi thresholds and
+     a 15% worked example was just wrong. */
+  article: Block[];
+  faqs: Faq[];
+}
+
+/* Exactly the five markets where ClearTax publishes a VAT calculator, which is
+   where this content comes from. Oman, Bahrain and Spain were in this list and
+   are gone: they have no published calculator page, so there was nothing to
+   put under them but invented prose. */
+const countries: Country[] = [
+  /* ------------------------------------------------------- Saudi Arabia --- */
+  {
+    short: "KSA",
+    name: "Saudi Arabia",
+    currency: "SAR",
+    rate: 15,
+    flag: "https://cdn.prod.website-files.com/6141e3720a248d2024615d96/63e28756aeabe12df79ff5d5_Rectangle%202515530.svg",
+    article: [
+      {
+        kind: "p",
+        text: "The KSA VAT Calculator is a user-friendly tool that helps you quickly determine VAT amounts for any transaction. Whether you need to add VAT to a price or extract it from an inclusive amount, our online VAT calculator ensures accurate and hassle-free calculations in just a few clicks.",
+      },
+      { kind: "h", text: "What is VAT?" },
+      {
+        kind: "p",
+        linkText: "Value Added Tax (VAT)",
+        linkHref: "https://cleartax.in/s/what-is-vat",
+        text: " is an indirect tax levied on the supply and import of goods and services, with some exemptions. This consumption-based tax is applied at each stage of the supply chain, from production to final sale.",
+      },
+      {
+        kind: "p",
+        text: "In Saudi Arabia, VAT was introduced in 2018 at 5%, but in response to the COVID-19 pandemic, the rate increased to 15% from July 1, 2020. Businesses and individuals are required to comply with VAT regulations as per government policies.",
+      },
+      { kind: "h", text: "How to Calculate VAT in KSA?" },
+      {
+        kind: "p",
+        text: "VAT in Saudi Arabia can be calculated in two ways: adding VAT to a sale price or extracting VAT from an inclusive price.",
+      },
+      {
+        kind: "steps",
+        groups: [
+          {
+            lead: "Adding VAT to a Sale Price (Exclusive VAT Calculation)",
+            lines: [
+              "This method is used when the VAT is not included in the sale price.",
+              "A. VAT Amount = Sale price × (VAT Rate ÷ 100)",
+              "B. Gross Amount = Sale price × ( 1 + VAT Rate ÷ 100 )",
+            ],
+          },
+          {
+            lead: "Excluding VAT from sale price (Inclusive VAT Calculation)",
+            lines: [
+              "This method is used when the sale price already includes VAT.",
+              "A. VAT Amount = Sale Price × ( VAT rate ÷ (100 + VAT rate) )",
+              "B. Net Sale amount = Sale Price × (100 ÷ (100 + VAT rate))",
+            ],
+          },
+        ],
+      },
+      { kind: "h", text: "VAT Calculation Example in KSA" },
+      { kind: "p", text: "Let’s take an example to understand VAT calculation:" },
+      { kind: "p", text: "Sale amount = SAR 1,000. VAT rate = 15%." },
+      {
+        kind: "steps",
+        groups: [
+          {
+            lead: "If the sale price is exclusive of VAT:",
+            lines: [
+              "VAT amount = SAR 1,000 × (15 ÷ 100) = SAR 150",
+              "Gross Amount = SAR 1,000 × (1 + 15) ÷ 100 = SAR 1,150",
+            ],
+          },
+          {
+            lead: "If the sale price is inclusive of VAT:",
+            lines: [
+              "A. VAT Amount = SAR 1,000 × (15 ÷ (100 + 15)) = SAR 130.43",
+              "B. Net Sale amount = SAR 1,000 × (100 ÷ (100 + 15)) = SAR 869.56",
+            ],
+          },
+        ],
+      },
+      { kind: "h", text: "Benefits of using the KSA VAT calculator" },
+      { kind: "p", text: "Using our Saudi VAT calculator offers several advantages:" },
+      {
+        kind: "ul",
+        items: [
+          "Instant VAT Calculation – Quickly compute VAT for any transaction.",
+          "Accurate Invoicing – Ensure your invoices are correct and compliant.",
+          "Eliminates Human Errors – Reduces miscalculations and incorrect tax applications.",
+          "Time-Saving – Automates VAT computation, streamlining business operations.",
+        ],
+      },
+    ],
+    faqs: [
+      {
+        q: "What is the current VAT rate in Saudi Arabia?",
+        a: "The standard VAT rate in Saudi Arabia is 15%. VAT was introduced on 1 January 2018 at 5% and tripled to 15% on 1 July 2020. Some supplies — such as exports and qualifying international transport — are zero-rated, and a small number are exempt.",
+      },
+      {
+        q: "How do I calculate VAT on an inclusive price?",
+        a: "Multiply the inclusive price by the rate divided by 100 plus the rate: VAT Amount = Sale Price × (VAT rate ÷ (100 + VAT rate)). At 15%, that is the price × 15 ÷ 115. Subtract the result from the price to get the net amount.",
+      },
+      {
+        q: "How is VAT calculated in Saudi Arabia?",
+        a: "Two ways, depending on what the price already contains. If the price excludes VAT, VAT Amount = Sale price × (VAT Rate ÷ 100) and the gross is the price plus that. If the price already includes VAT, VAT Amount = Sale Price × (VAT rate ÷ (100 + VAT rate)).",
+      },
+      {
+        q: "How to calculate VAT on MRP?",
+        a: "MRP is a VAT-inclusive price, so use the inclusive formula. At 15%, VAT = MRP × 15 ÷ 115 and the net value = MRP × 100 ÷ 115. Set the toggle above to “Yes” and the calculator does both for you.",
+      },
+      {
+        q: "Who is required to register for VAT in KSA?",
+        a: "Registration is mandatory for residents whose annual taxable supplies exceed SAR 375,000, and voluntary once they exceed SAR 187,500. Non-resident businesses making taxable supplies in the Kingdom must register regardless of turnover.",
+      },
+      {
+        q: "How do you add 15% VAT on a calculator?",
+        a: "Multiply the net amount by 0.15 for the VAT, or by 1.15 to get the gross straight away. SAR 1,000 × 1.15 = SAR 1,150, of which SAR 150 is VAT.",
+      },
+    ],
+  },
+
+  /* ------------------------------------------------- United Arab Emirates -- */
+  {
+    short: "UAE",
+    name: "United Arab Emirates",
+    currency: "AED",
+    rate: 5,
+    flag: "https://cdn.prod.website-files.com/6141e3720a248d2024615d96/63e29d24f310792735ab4bba_Mask%20group%20(3).svg",
+    article: [
+      {
+        kind: "p",
+        text: "The UAE VAT Calculator works out the 5% VAT on a transaction in either direction — adding it to a net price, or extracting it from a price that already includes it.",
+      },
+      { kind: "h", text: "What is a VAT Calculator in UAE?" },
+      {
+        kind: "p",
+        text: "A VAT calculator UAE is an online tool that computes the 5% VAT on a transaction. It works out both VAT-inclusive and VAT-exclusive prices for goods or services.",
+      },
+      { kind: "h", text: "VAT Calculation Formula" },
+      {
+        kind: "steps",
+        groups: [
+          {
+            lead: "For a price exclusive of VAT",
+            lines: ["A. VAT Amount = Sale price × VAT rate", "B. Gross Amount = Sale price × (1 + VAT rate)"],
+          },
+          {
+            lead: "For a price inclusive of VAT",
+            lines: [
+              "A. VAT Amount = Sale price × [ VAT rate ÷ (1 + VAT rate) ]",
+              "B. Net Sale Amount = Sale price ÷ (1 + VAT rate)",
+            ],
+          },
+        ],
+      },
+      { kind: "h", text: "VAT Calculation Example" },
+      { kind: "p", text: "Take an item priced at AED 100, with VAT at 5%." },
+      {
+        kind: "ul",
+        items: [
+          "Exclusive of VAT: VAT = AED 5, and the gross amount = AED 105.",
+          "Inclusive of VAT: VAT = AED 4.76, and the net amount = AED 95.24.",
+        ],
+      },
+      { kind: "h", text: "VAT Registration Threshold in UAE" },
+      {
+        kind: "ul",
+        items: [
+          "Mandatory registration – taxable supplies above AED 375,000. Register within 30 days.",
+          "Voluntary registration – taxable supplies above AED 187,500. No deadline.",
+          "Non-resident businesses – no threshold. Register before making taxable supplies.",
+        ],
+      },
+    ],
+    faqs: [
+      { q: "What is the current VAT rate in the UAE?", a: "The standard VAT rate in the UAE is 5%." },
+      { q: "When was VAT introduced in the UAE?", a: "VAT was officially introduced in the UAE on 1st January 2018." },
+      {
+        q: "Are there VAT rates other than 5%?",
+        a: "The standard rate is 5%. Beyond it, some supplies are zero-rated and others are exempt.",
+      },
+      {
+        q: "What distinguishes zero-rated from exempt supplies?",
+        a: "Zero-rated supplies are subject to 0% VAT, but businesses can reclaim input VAT on them. Exempt supplies are not subject to VAT at all, and businesses cannot reclaim input VAT.",
+      },
+      {
+        q: "Who must register for VAT in the UAE?",
+        a: "Registration is mandatory once taxable supplies exceed AED 375,000, and voluntary above AED 187,500. Non-resident businesses making taxable supplies in the UAE must register regardless of turnover.",
+      },
+    ],
+  },
+
+  /* -------------------------------------------------------------- France --- */
+  {
+    short: "France",
+    name: "France",
+    currency: "EUR",
+    rate: 20,
+    flag: "https://cdn.prod.website-files.com/6141e3720a248d2024615d96/64999768870655432964457d_france_flag.png",
+    article: [
+      {
+        kind: "p",
+        text: "The France VAT Calculator applies any of the French rates to a net or gross amount and shows the VAT inside it.",
+      },
+      { kind: "h", text: "VAT rates in France" },
+      {
+        kind: "ul",
+        items: [
+          "20% – standard rate: most goods and services, broadcasting, telecom, professional and digital services.",
+          "10% – certain restaurant services, hotel accommodation, passenger transport, home renovations, takeaway food.",
+          "5.5% – basic foodstuffs, books including e-books, social housing, cultural events, energy-saving works.",
+          "2.1% – press publications, certain medicines, TV licences, select cultural events.",
+          "0% – exports, intra-EU supplies, international transport, certain medical and dental services.",
+        ],
+      },
+      { kind: "h", text: "VAT calculation formula" },
+      {
+        kind: "steps",
+        groups: [
+          {
+            lead: "Amount exclusive of VAT",
+            lines: ["A. VAT Amount = Net Amount × VAT Rate", "B. Gross Amount = Net Amount × (1 + VAT Rate)"],
+          },
+          {
+            lead: "Amount inclusive of VAT",
+            lines: ["A. Net Amount = Gross Amount ÷ (1 + VAT Rate)", "B. VAT Amount = Gross Amount – Net Amount"],
+          },
+        ],
+      },
+      { kind: "h", text: "VAT calculation example" },
+      { kind: "p", text: "A net amount of €100 at the standard 20% rate:" },
+      { kind: "ul", items: ["VAT Amount: €100 × 0.20 = €20", "Gross Amount: €100 × 1.20 = €120"] },
+      { kind: "h", text: "Who must register for VAT in France?" },
+      {
+        kind: "p",
+        text: "French businesses must register once annual turnover exceeds €85,000 for goods or €37,500 for services. French VAT numbers use the format FR + 11 digits, for example FR32123456789.",
+      },
+      { kind: "h", text: "Benefits of using the France VAT calculator" },
+      {
+        kind: "ul",
+        items: [
+          "Accurate and up to date with the rates in force.",
+          "Time-saving – no manual arithmetic on invoice values.",
+          "Supports all rates – 20%, 10%, 5.5%, 2.1% and 0%.",
+          "Scenario-based – works from a net amount or a gross one.",
+        ],
+      },
+    ],
+    faqs: [
+      {
+        q: "How to calculate VAT in France?",
+        a: "Use the formulas above or the ClearTax VAT Calculator. Enter the amount, select the VAT rate, and let the tool do the math.",
+      },
+      {
+        q: "What is the standard VAT rate in France?",
+        a: "The standard VAT rate in France is 20%. This rate applies to the majority of goods and services sold within France, including consumer products, professional services, electronics, fashion, cars, digital and telecommunications services, entertainment, and most commercial activities.",
+      },
+      {
+        q: "Who must register for VAT in France?",
+        a: "French businesses must register if annual turnover exceeds €85,000 for goods or €37,500 for services. Foreign businesses making taxable supplies in France generally register from the first transaction.",
+      },
+      {
+        q: "What is the French VAT number format?",
+        a: "French VAT numbers use the format FR + 11 digits (e.g., FR32123456789).",
+      },
+      {
+        q: "Can I use this VAT calculator for EU cross-border invoices?",
+        a: "Yes. The calculator supports French VAT for both domestic and EU intra-community supplies.",
+      },
+    ],
+  },
+
+  /* ------------------------------------------------------------- Belgium --- */
+  {
+    short: "Belgium",
+    name: "Belgium",
+    currency: "EUR",
+    rate: 21,
+    flag: "https://cdn.prod.website-files.com/6141e3720a248d2024615d96/67e3e6ae1e19488131f26dfd_belgium_flag.png",
+    article: [
+      {
+        kind: "p",
+        text: "The Belgium VAT Calculator applies any of the Belgian rates to a net or gross amount and shows the VAT inside it.",
+      },
+      { kind: "h", text: "VAT rates in Belgium" },
+      {
+        kind: "ul",
+        items: [
+          "21% – standard rate: most goods and services, including electronics, fashion and professional services.",
+          "12% – certain restaurant services, public housing, some foodstuffs.",
+          "6% – essential goods: basic food, medicines, books, public transport.",
+          "0% – exports, intra-EU supplies, specific newspapers and periodicals.",
+        ],
+      },
+      { kind: "h", text: "VAT calculation formula" },
+      {
+        kind: "steps",
+        groups: [
+          {
+            lead: "Amount exclusive of VAT",
+            lines: ["A. VAT Amount = Net Amount × VAT Rate", "B. Gross Amount = Net Amount × (1 + VAT Rate)"],
+          },
+          {
+            lead: "Amount inclusive of VAT",
+            lines: ["A. Net Amount = Gross Amount ÷ (1 + VAT Rate)", "B. VAT Amount = Gross Amount – Net Amount"],
+          },
+        ],
+      },
+      { kind: "h", text: "VAT calculation example" },
+      { kind: "p", text: "A net amount of €100 at the standard 21% rate:" },
+      { kind: "ul", items: ["VAT Amount: €100 × 0.21 = €21", "Gross Amount: €100 × 1.21 = €121"] },
+      { kind: "h", text: "Who must register for VAT in Belgium?" },
+      {
+        kind: "p",
+        text: "Belgian businesses must register once annual turnover exceeds €25,000. Belgian VAT numbers have the format BE + 10 digits, for example BE0123456789.",
+      },
+      { kind: "h", text: "Benefits of using the Belgium VAT calculator" },
+      {
+        kind: "ul",
+        items: [
+          "Accurate and up to date with the rates in force.",
+          "Time-saving – no manual arithmetic on invoice values.",
+          "Supports all rates – 21%, 12%, 6% and 0%.",
+          "Scenario-based – works from a net amount or a gross one.",
+        ],
+      },
+    ],
+    faqs: [
+      { q: "What is the standard VAT rate in Belgium?", a: "The standard VAT rate in Belgium is 21%." },
+      {
+        q: "How do I calculate VAT in Belgium?",
+        a: "For a net amount, VAT = Net × Rate and the gross = Net × (1 + Rate). For a gross amount, Net = Gross ÷ (1 + Rate) and the VAT is the difference.",
+      },
+      {
+        q: "What is the Belgian VAT number format?",
+        a: "Belgian VAT numbers have the format BE + 10 digits (e.g., BE0123456789).",
+      },
+      {
+        q: "Who must register for VAT in Belgium?",
+        a: "Belgian businesses are required to register if annual turnover exceeds €25,000.",
+      },
+    ],
+  },
+
+  /* ------------------------------------------------------------- Germany --- */
+  {
+    short: "Germany",
+    name: "Germany",
+    currency: "EUR",
+    rate: 19,
+    flag: "https://assets.clear.in/cleartax/images/1771829770_flagforflaggermanysvgrepocom1.svg",
+    article: [
+      {
+        kind: "p",
+        text: "The Germany VAT Calculator applies the German rates to a net or gross amount and shows the VAT inside it.",
+      },
+      { kind: "h", text: "What is VAT?" },
+      {
+        kind: "p",
+        text: "Value Added Tax (VAT), or Umsatzsteuer (USt) in Germany, is a consumption tax levied on most goods and services sold within Germany and across the EU.",
+      },
+      { kind: "h", text: "VAT rates in Germany" },
+      {
+        kind: "ul",
+        items: [
+          "19% – standard rate on most goods and services.",
+          "7% – reduced rate on essentials such as food and books.",
+          "0% – exempt transactions.",
+        ],
+      },
+      {
+        kind: "p",
+        text: "From January 1, 2026, Germany will permanently apply the 7% reduced VAT rate on food sales by restaurants, cafés, and catering services.",
+      },
+      { kind: "h", text: "VAT calculation formula" },
+      {
+        kind: "steps",
+        groups: [
+          {
+            lead: "Amount exclusive of VAT",
+            lines: ["A. VAT Amount = Net Amount × VAT Rate", "B. Gross Amount = Net Amount × (1 + VAT Rate)"],
+          },
+          {
+            lead: "Amount inclusive of VAT",
+            lines: ["A. Net Amount = Gross Amount ÷ (1 + VAT Rate)", "B. VAT Amount = Gross Amount – Net Amount"],
+          },
+        ],
+      },
+      { kind: "h", text: "VAT calculation example" },
+      { kind: "p", text: "A net amount of €100 at the standard 19% rate:" },
+      { kind: "ul", items: ["VAT Amount: €100 × 0.19 = €19", "Gross Amount: €100 × 1.19 = €119"] },
+      { kind: "h", text: "Rounding off VAT in Germany" },
+      {
+        kind: "p",
+        text: "German VAT amounts must be rounded to two decimal places (nearest cent) according to standard rounding rules. For example, €849.99 × 19% = €161.50 and €25.75 × 19% = €4.89, totalling €166.39.",
+      },
+      { kind: "h", text: "Who must register for VAT in Germany?" },
+      {
+        kind: "p",
+        text: "German businesses must register if annual turnover exceeded €25,000 in the previous year and is expected to exceed €100,000 in the current year. German VAT numbers use the format DE + 9 digits, and invoices must meet the requirements of Section 14 UStG.",
+      },
+    ],
+    faqs: [
+      {
+        q: "How to calculate VAT in Germany?",
+        a: "Use the formulas above or the ClearTax VAT Calculator. Enter the amount, select the rate (19%, 7%, or 0%), and the calculator will do the rest.",
+      },
+      {
+        q: "What is the standard VAT rate in Germany?",
+        a: "The standard VAT rate is 19%, applicable to most goods and services including clothing, alcohol, electronics, and commercial services.",
+      },
+      {
+        q: "Who must register for VAT in Germany?",
+        a: "German businesses must register once turnover exceeded €25,000 in the previous year and is expected to exceed €100,000 in the current year. Foreign businesses making taxable supplies in Germany generally register from the first transaction.",
+      },
+      {
+        q: "Can I use this calculator for EU cross-border invoices?",
+        a: "Yes. The calculator supports German VAT for both domestic transactions and EU intra-community supplies (0% VAT may apply).",
+      },
+    ],
+  },
+];
+
+/* The ROI model's assumption constants live in the `<script is:inline>` block
+   at the bottom (`ROI`) — an inline script cannot read frontmatter, and two
+   copies of a number nobody can see is how they drift apart. The reasoning
+   behind them is written out there. */
+
+/* ------------------------------------------------------------------ tools */
+
+const tools: Tool[] = [
+  /* ===================================================== 1. VAT Calculator */
+  {
+    id: "vat",
+    label: "VAT Calculator",
+    calc: {
+      kind: "rate",
+      country: true,
+      currency: "SAR",
+      amountLabel: "Sale value",
+      amount: 1500,
+      /* 10,000 keeps the default 1,500 at a readable 15% of the track. Larger
+         amounts go in the field beside it, which is unbounded; the slider just
+         pins at its own max. */
+      amountMax: 10000,
+      amountStep: 50,
+      rateLabel: "VAT Rate (%)",
+      rate: 15,
+      rateSlider: true,
+      inclusiveLabel: "Is Sale Inclusive of VAT?",
+      inclusive: false,
+      netLabel: "Sale Value (Exclusive of VAT)",
+      taxLabel: "VAT Amount",
+      totalLabel: "Total Value",
+    },
+    howTitle: "How to use",
+    howToUse: [
+      "Use the slider for selecting value of taxable goods or services (Sale value)",
+      "Adjust the slider to set the VAT rate",
+      "Select whether the price is inclusive or exclusive of VAT",
+      "Modify the values as needed with the slider",
+    ],
+    /* Article and FAQ are per country and live on `countries` above — the
+       pill swaps them along with the currency and rate. These stay empty so
+       the generic renderer skips this tool and the country blocks render
+       instead. */
+    article: [],
+    faqs: [],
+  },
+
+  /* ===================================================== 2. SST Calculator */
+  {
+    id: "sst",
+    label: "SST Calculator",
+    calc: {
+      kind: "rate",
+      currency: "RM",
+      amountLabel: "Amount",
+      amount: 20000,
+      amountMax: 100000,
+      amountStep: 100,
+      rateLabel: "Tax rate",
+      rate: 6,
+      taxTypes: [
+        {
+          label: "Service Tax",
+          rates: [
+            { value: 6, label: "6%" },
+            { value: 8, label: "8%" },
+          ],
+        },
+        {
+          label: "Sales Tax",
+          rates: [
+            { value: 5, label: "5%" },
+            { value: 10, label: "10%" },
+          ],
+        },
+      ],
+      inclusiveLabel: "Is the amount inclusive of SST?",
+      inclusive: false,
+      netLabel: "Net Sales Value",
+      taxLabel: "SST Amount",
+      totalLabel: "Total Amount",
+    },
+    howTitle: "How to use",
+    howToUse: [
+      "Select the type of tax to calculate — Sales Tax or Service Tax",
+      "Choose the tax rate that applies to your goods or service",
+      "Choose whether the amount is inclusive or exclusive of SST",
+      "Enter the amount in Malaysian Ringgit",
+      "Review the results — the tax and total update as you type",
+    ],
+    article: [
+      {
+        kind: "p",
+        text: "The Malaysia SST Calculator works out Sales Tax or Service Tax in either direction — adding it to an exclusive amount, or extracting it from an amount that already includes it.",
+      },
+      { kind: "h", text: "What is SST?" },
+      {
+        kind: "p",
+        text: "SST stands for Sales and Service Tax. It is the major consumption tax levied on goods and services traded in Malaysia. It comprises Service Tax, charged on taxable services, and Sales Tax, a single-stage tax levied on goods that are imported into or manufactured in Malaysia.",
+      },
+      { kind: "h", text: "SST Calculation Formula" },
+      {
+        kind: "p",
+        text: "Establish the taxable value first, then apply the rate that fits the goods or service.",
+      },
+      {
+        kind: "steps",
+        groups: [
+          {
+            lead: "Exclusive of SST",
+            lines: [
+              "Use this when the amount does not yet include the tax.",
+              "A. SST Amount = Taxable Value × (Tax Rate ÷ 100)",
+              "B. Total Amount = Taxable Value + SST Amount",
+            ],
+          },
+          {
+            lead: "Inclusive of SST",
+            lines: [
+              "Use this when the amount already includes the tax.",
+              "A. SST Amount = Total Amount × ( Tax Rate ÷ (100 + Tax Rate) )",
+              "B. Net Sales Value = Total Amount − SST Amount",
+            ],
+          },
+        ],
+      },
+      { kind: "h", text: "SST Calculation Example" },
+      {
+        kind: "p",
+        text: "Consulting services valued at RM 20,000 attract Service Tax at 6%.",
+      },
+      {
+        kind: "p",
+        text: "SST Amount = RM 20,000 × (6 ÷ 100) = RM 1,200. Total Amount = RM 20,000 + RM 1,200 = RM 21,200.",
+      },
+      { kind: "h", text: "Benefits of using the Malaysia SST calculator" },
+      {
+        kind: "ul",
+        items: [
+          "Works in both directions – add SST to a net amount or extract it from a gross one.",
+          "Covers every rate – 5% and 10% Sales Tax, 6% and 8% Service Tax.",
+          "Removes manual error – no rounding slips on invoice values.",
+          "Speeds up invoicing – the tax and total update as you type.",
+        ],
+      },
+    ],
+    faqs: [
+      {
+        q: "How is SST calculated in Malaysia?",
+        a: "SST in Malaysia is calculated on the taxable services provided or on the sale of goods. Service tax is due when payment is received; sales tax is levied at the point of importation or sale.",
+      },
+      {
+        q: "How do I use an SST Calculator?",
+        a: "Select the type of tax, choose the tax rate, specify whether the amount is inclusive or exclusive, enter the amount, and review the results.",
+      },
+      {
+        q: "What is the SST rate in Malaysia?",
+        a: "There are four SST rates in Malaysia: service tax at 8% or 6%, and sales tax at 5% or 10%, depending on the nature of the services and goods.",
+      },
+      {
+        q: "Who is required to register for SST in Malaysia?",
+        a: "For Sales Tax, registration applies to manufacturers whose taxable goods exceed RM 500,000 over 12 months. For Service Tax, the threshold is also RM 500,000 over 12 months — except for restaurants and food and beverage operators, where it is RM 1,500,000.",
+      },
+      {
+        q: "Is it better to use an SST calculator or calculate SST manually?",
+        a: "An SST calculator is generally better for both accuracy and speed, particularly for inclusive amounts where the reverse formula is easy to get wrong.",
+      },
+      {
+        q: "How do I know if a product or service is subject to SST?",
+        a: "Check whether it falls within the gazetted taxable goods or taxable services categories, and whether any exemption order applies to it.",
+      },
+    ],
+  },
+
+  /* ========================================= 3. Compliance ROI Calculator */
+  {
+    id: "roi",
+    label: "Compliance ROI Calculator",
+    calc: {
+      kind: "roi",
+      currency: "₹",
+      note: "Indicative estimate. Clear's own tool runs on proprietary mappers and assumptions that are not published, so the figures here are modelled from the constants documented in this section's script. Industry, active vendors and payment blocking are the inputs those mappers consume — they are captured here but do not move the estimate below.",
+    },
+    howTitle: "How does Clear's Compliance Platform ROI Calculator work?",
+    howToUse: [
+      "Step 1 — Enter a few key details about your business: number of GSTINs and PANs, annual sales revenue, B2B sales and purchase invoice volumes, and your industry. Vendor and ITC data are optional and sharpen the estimate.",
+      "Step 2 — Once you enter your data, the calculator instantly processes it using our inbuilt mappers and assumptions to project your potential savings.",
+      "Step 3 — Your results are broken into three categories: Productivity ROI, Money ROI and Assurance ROI.",
+    ],
+    article: [
+      { kind: "h", text: "What is a compliance ROI calculator?" },
+      {
+        kind: "p",
+        text: "A Compliance ROI Calculator is an interactive tool designed to help you quantify the financial impact and value of our platform. Instead of simply explaining features, this calculator translates your business's specific data into a clear, personalised estimate of the savings and efficiencies you can achieve.",
+      },
+      { kind: "h", text: "Who should use this ROI calculator?" },
+      {
+        kind: "p",
+        text: "This calculator is designed for business leaders and finance teams who need to make data-driven decisions. If you are a CFO, finance manager, tax head, or any professional responsible for managing tax compliance and its associated costs, this tool is for you.",
+      },
+      { kind: "h", text: "What the three ROI categories cover" },
+      {
+        kind: "steps",
+        groups: [
+          {
+            lead: "Productivity Savings",
+            lines: ["Time savings.", "Streamlined processes.", "Strategic focus."],
+          },
+          {
+            lead: "Money Savings",
+            lines: ["ITC maximisation.", "Reduced delayed ITC.", "Improved cash flow."],
+          },
+          {
+            lead: "Assurance Savings",
+            lines: ["Reduced tax notices.", "Penalty avoidance.", "Litigation cost avoidance."],
+          },
+        ],
+      },
+      { kind: "h", text: "Benefits of using the ROI calculator" },
+      {
+        kind: "ul",
+        items: [
+          "Make a data-driven case – quickly generate a personalised estimate from your own numbers.",
+          "Highlight the true value – shift the conversation from the cost of a platform to its significant business value.",
+          "Get a personalised report – after viewing your results, you can request a detailed report.",
+        ],
+      },
+    ],
+    faqs: [
+      {
+        q: "What is ROI in compliance?",
+        a: "ROI in compliance stands for Return on Investment. It measures the financial benefits you gain by investing in a compliance solution. This includes not only the money you save but also the value you gain from increased productivity and risk mitigation.",
+      },
+      {
+        q: "Why is ROI important in tax and GST compliance?",
+        a: "ROI is crucial in tax and GST compliance because it shifts the focus from compliance as a cost center to a value driver. By quantifying the financial return, you can justify investments in new technology, reduce business risk, and show clear savings from preventing penalties, litigation, and lost credits.",
+      },
+      {
+        q: "What types of savings does the calculator estimate?",
+        a: "Three. Productivity ROI covers the time and effort taken out of manual compliance work. Money ROI covers Input Tax Credit management. Assurance ROI covers avoiding notices and penalties.",
+      },
+      {
+        q: "How does GST compliance impact ROI?",
+        a: "Effective GST compliance directly impacts your ROI by ensuring you meet regulatory requirements and maximize financial benefits. This includes properly claiming ITC, avoiding interest on late payments, and reducing the risk of penalties and legal costs.",
+      },
+      {
+        q: "What inputs are required for this calculator?",
+        a: "The mandatory fields are number of GSTINs, number of PANs, annual sales revenue, B2B sales invoices per year, purchase invoices per year, and industry. Active vendors, payment blocking, and your lost and delayed ITC percentages are optional inputs that make the estimate more precise.",
+      },
+      {
+        q: "Is the ROI estimate accurate for my industry?",
+        a: "While the calculator provides a strong estimate based on industry averages and your specific data, the final results for your business may vary. The tool uses a set of proprietary assumptions and inbuilt mappers to give you a realistic and data-driven projection.",
+      },
+      {
+        q: "How is ITC considered in ROI calculation?",
+        a: "Input Tax Credit (ITC) is a key component of the Money ROI calculation. The calculator helps you quantify the financial benefits of optimising your ITC process, including recovering lost credits and preventing delayed credits.",
+      },
+      {
+        q: "How can I get a detailed ROI report?",
+        a: "After the calculator provides your estimated results, you can submit your contact information to receive a comprehensive, personalised ROI report via email.",
+      },
+    ],
+  },
+
+  /* ====================================================== 4. HSN Code Finder */
+  {
+    id: "hsn",
+    label: "HSN Code Finder",
+    calc: {
+      kind: "hsn",
+      note: "Section-level search. The 21 HS sections and their chapter ranges are the stable WCO classification; the exact 6- or 8-digit code and its GST rate live in ClearTax's full HSN database.",
+    },
+    howTitle: "How to use",
+    howToUse: [
+      "Type what you sell — a material, a product or a chapter number",
+      "The matching HS sections and their chapter ranges filter as you type",
+      "Note the chapter your goods fall under — the first two digits of the HSN code",
+      "Open the full ClearTax lookup for the exact 6- or 8-digit code and GST rate",
+    ],
+    article: [
+      { kind: "h", text: "What is an HSN code?" },
+      {
+        kind: "p",
+        text: "HSN code stands for “Harmonized System of Nomenclature”. This system has been introduced for the systematic classification of goods all over the world. It was developed by the World Customs Organisation and is used consistently across the countries that are party to it.",
+      },
+      { kind: "h", text: "How the HSN structure works" },
+      {
+        kind: "p",
+        text: "The Harmonized System is a 6-digit international code. India extends it to 8 digits for greater precision. The digits read outwards from the broadest grouping to the most specific one.",
+      },
+      {
+        kind: "ul",
+        items: [
+          "First 2 digits – the chapter the goods fall under.",
+          "Next 2 digits – the heading within that chapter.",
+          "Next 2 digits – the subheading, which completes the 6-digit international code.",
+          "Final 2 digits – the Indian tariff item, added on top of the WCO code.",
+        ],
+      },
+      { kind: "h", text: "How many digits must you declare?" },
+      {
+        kind: "p",
+        text: "The requirement is tiered by aggregate turnover. Taxpayers with annual turnover above ₹5 crore must declare 6-digit HSN codes on all invoices. Below that threshold, 4-digit codes are required on B2B invoices only.",
+      },
+      { kind: "h", text: "SAC codes for services" },
+      {
+        kind: "p",
+        text: "Services use the Services Accounting Code instead. SAC follows a similar pattern but a different classification system — HSN classifies goods, SAC classifies services.",
+      },
+    ],
+    faqs: [
+      {
+        q: "What is the difference between an HSN code and a SAC code?",
+        a: "HSN codes are used for the classification of goods, whereas SAC codes are used for services.",
+      },
+      {
+        q: "Is the HSN code mandatory for a GST invoice?",
+        a: "Yes, with tiered requirements based on aggregate turnover. Above ₹5 crore, 6 digits on all invoices; below it, 4 digits on B2B invoices.",
+      },
+      {
+        q: "Are HSN codes the same across all countries?",
+        a: "HSN was developed by the World Customs Organisation and is used to classify goods. The codes are the same to 6 digits across the countries that are under the WCO; digits beyond that are national extensions.",
+      },
+      {
+        q: "What happens if I use the wrong HSN code?",
+        a: "The wrong code can mean the wrong GST rate on the invoice, which leads to short payment or excess payment of tax, mismatches in the recipient's ITC, and notices at reconciliation.",
+      },
+    ],
+  },
+
+  /* ===================================================== 5. GST Calculator */
+  {
+    id: "gst",
+    label: "GST Calculator",
+    calc: {
+      kind: "rate",
+      split: true,
+      currency: "₹",
+      amountLabel: "Amount",
+      amount: 100000,
+      amountMax: 500000,
+      amountStep: 500,
+      rateLabel: "GST rate",
+      rate: 18,
+      rates: [
+        { value: 0.1, label: "0.1%" },
+        { value: 0.25, label: "0.25%" },
+        { value: 1, label: "1%" },
+        { value: 1.5, label: "1.5%" },
+        { value: 3, label: "3%" },
+        { value: 5, label: "5%" },
+        { value: 6, label: "6%" },
+        { value: 7.5, label: "7.5%" },
+        { value: 12, label: "12%" },
+        { value: 18, label: "18%" },
+        { value: 28, label: "28%" },
+        { value: 40, label: "40%" },
+      ],
+      inclusiveLabel: "Does the amount include GST?",
+      inclusive: false,
+      netLabel: "Taxable value",
+      taxLabel: "GST Amount",
+      totalLabel: "Total Amount",
+    },
+    howTitle: "How to use",
+    howToUse: [
+      "Enter the transaction amount and pick the applicable GST rate",
+      "Say whether that amount already includes GST",
+      "Say whether you are selling within the same state — this decides CGST/SGST against IGST",
+      "Read off the taxable value, the tax split and the total invoice amount",
+    ],
+    article: [
+      {
+        kind: "p",
+        text: "Enter the amount — whether or not inclusive of GST — and select the applicable GST rate to get a clear breakdown of CGST, SGST or IGST instantly.",
+      },
+      { kind: "h", text: "GST calculation formulas" },
+      {
+        kind: "steps",
+        groups: [
+          {
+            lead: "Price exclusive of GST",
+            lines: [
+              "Use this when the amount does not yet include the tax.",
+              "A. GST Amount = (Value of supply × GST rate) ÷ 100",
+              "B. Price to be charged = Value of supply + GST Amount",
+            ],
+          },
+          {
+            lead: "Price inclusive of GST",
+            lines: [
+              "Use this when the amount already includes the tax.",
+              "A. GST Amount = Value of supply – [Value of supply × {100 ÷ (100 + GST rate)}]",
+              "B. Taxable value = Value of supply × {100 ÷ (100 + GST rate)}",
+            ],
+          },
+        ],
+      },
+      { kind: "h", text: "GST calculation example" },
+      { kind: "p", text: "A product valued at ₹1,00,000 charged at 18% GST:" },
+      {
+        kind: "ul",
+        items: [
+          "Value of product = ₹1,00,000",
+          "Add: GST @18% = ₹18,000",
+          "Price to charge on the invoice = ₹1,18,000",
+        ],
+      },
+      { kind: "h", text: "CGST, SGST and IGST" },
+      {
+        kind: "p",
+        text: "CGST, or Central Goods and Services Tax, is GST charged on the sale of goods or services within the same state or Union Territory, the revenue of which is passed to the Central Government.",
+      },
+      {
+        kind: "p",
+        text: "SGST, or State Goods and Services Tax, is GST charged on the sale of goods or services within the same state or Union Territory, and goes to that state. On an intra-state sale the rate splits equally between the two; on an inter-state sale the whole rate is charged as IGST instead.",
+      },
+    ],
+    faqs: [
+      {
+        q: "What is the difference between GST inclusive and GST exclusive price?",
+        a: "GST inclusive price means the price or amount already contains the GST value. GST exclusive price means the price or amount before adding the GST value to it.",
+      },
+      {
+        q: "Is this calculator updated with the latest GST rates?",
+        a: "Yes, the rate list carries the GST rates in force, as notified by the CBIC.",
+      },
+      {
+        q: "Is the GST calculator applicable for interstate transactions?",
+        a: "Yes. Toggle the “Selling within the same state?” field to No. That implies an inter-state sale, and the whole rate is charged as IGST.",
+      },
+      {
+        q: "Can businesses use a GST calculator for invoicing?",
+        a: "Yes. Businesses can use a GST calculator to arrive at the amounts to be mentioned on an invoice.",
+      },
+      {
+        q: "How do I calculate GST on MRP or on a total amount?",
+        a: "Set “Does the amount include GST?” to Yes. The calculator then works backwards with the inclusive formula to give you the taxable value and the tax within it.",
+      },
+      {
+        q: "How do I calculate an exclusive GST amount?",
+        a: "GST Amount = (Value of supply × GST%) ÷ 100, and the price to charge is the value of supply plus that amount.",
+      },
+    ],
+  },
+
+  /* ============================================= 6. Reverse GST Calculator */
+  {
+    id: "reverse-gst",
+    label: "Reverse GST Calculator",
+    calc: {
+      kind: "rate",
+      split: true,
+      currency: "₹",
+      amountLabel: "Total amount (inclusive of GST)",
+      amount: 118000,
+      amountMax: 500000,
+      amountStep: 500,
+      rateLabel: "GST rate",
+      rate: 18,
+      rates: [
+        { value: 0.1, label: "0.1%" },
+        { value: 0.25, label: "0.25%" },
+        { value: 1, label: "1%" },
+        { value: 1.5, label: "1.5%" },
+        { value: 3, label: "3%" },
+        { value: 5, label: "5%" },
+        { value: 6, label: "6%" },
+        { value: 7.5, label: "7.5%" },
+        { value: 12, label: "12%" },
+        { value: 18, label: "18%" },
+        { value: 28, label: "28%" },
+        { value: 40, label: "40%" },
+      ],
+      inclusiveLabel: "Does the amount include GST?",
+      inclusive: true,
+      netLabel: "Taxable value",
+      taxLabel: "GST Amount",
+      totalLabel: "Total Amount",
+    },
+    howTitle: "How to use",
+    howToUse: [
+      "Enter the gross amount you already have — an MRP, or a total from an invoice",
+      "Pick the GST rate that applies to those goods or services",
+      "Leave the inclusive toggle on Yes to work backwards out of the total",
+      "Read off the taxable value and the tax hidden inside the amount",
+    ],
+    article: [
+      { kind: "h", text: "What is a reverse GST calculation?" },
+      {
+        kind: "p",
+        text: "A reverse, or inclusive, GST calculation starts from a gross amount and works out how much of it is tax. It is the calculation you need whenever the figure in front of you is an MRP, a receipt total, or any price a customer has already been quoted.",
+      },
+      { kind: "h", text: "Reverse GST formula" },
+      {
+        kind: "steps",
+        groups: [
+          {
+            lead: "Extracting GST from an inclusive amount",
+            lines: [
+              "A. Taxable value = Total amount × {100 ÷ (100 + GST rate)}",
+              "B. GST Amount = Total amount – Taxable value",
+              "On an intra-state sale that GST amount splits equally into CGST and SGST; on an inter-state sale it is all IGST.",
+            ],
+          },
+        ],
+      },
+      { kind: "h", text: "Reverse GST example" },
+      { kind: "p", text: "An invoice total of ₹1,18,000 at 18% GST:" },
+      {
+        kind: "ul",
+        items: [
+          "Taxable value = ₹1,18,000 × (100 ÷ 118) = ₹1,00,000",
+          "GST Amount = ₹1,18,000 – ₹1,00,000 = ₹18,000",
+          "Intra-state: CGST ₹9,000 + SGST ₹9,000",
+        ],
+      },
+      { kind: "h", text: "When you need it" },
+      {
+        kind: "ul",
+        items: [
+          "Working out the tax inside an MRP before raising a tax invoice.",
+          "Reconciling a gross receipt against a supplier's invoice.",
+          "Checking that a quoted all-in price carries the rate you expect.",
+        ],
+      },
+    ],
+    faqs: [
+      {
+        q: "How do I calculate GST on MRP?",
+        a: "MRP is inclusive of GST, so use the reverse formula: taxable value = MRP × 100 ÷ (100 + rate), and the GST is the difference. At 18%, that is MRP × 100 ÷ 118.",
+      },
+      {
+        q: "How do I calculate an inclusive GST amount?",
+        a: "GST Amount = Value of supply – [Value of supply × {100 ÷ (100 + GST%)}]. That is what this calculator does when the inclusive toggle is set to Yes.",
+      },
+      {
+        q: "Is reverse GST the same as reverse charge mechanism?",
+        a: "No. Reverse GST here means extracting tax from an inclusive amount. Reverse charge mechanism is a separate provision where the recipient, not the supplier, is liable to pay the tax.",
+      },
+      {
+        q: "Why does the taxable value not come out to a round number?",
+        a: "Because the reverse calculation divides by 100 plus the rate. Only totals that are exact multiples of (100 + rate) reduce to round taxable values — ₹1,18,000 at 18% does, ₹1,00,000 at 18% does not.",
+      },
+    ],
+  },
+];
+
+/* Industry list for the ROI panel. Clear's tool offers 40+; this is the subset
+   its page names plus the common Indian verticals. It feeds Clear's proprietary
+   mapper, which is not published, so it is captured and does not move the
+   indicative estimate — the panel's note says so. */
+const industries: string[] = [
+  "FMCG",
+  "BFSI / NBFC",
+  "Mining & Metals",
+  "Construction & Infrastructure",
+  "Automotive & Auto Components",
+  "Pharmaceuticals & Healthcare",
+  "Chemicals & Petrochemicals",
+  "Retail & E-commerce",
+  "IT & Software Services",
+  "Telecom",
+  "Logistics & Transportation",
+  "Textiles & Apparel",
+  "Engineering & Capital Goods",
+  "Energy & Utilities",
+  "Media & Entertainment",
+  "Hospitality & Travel",
+  "Agriculture & Agri-processing",
+  "Other",
+];
+
+/* HS sections — the stable WCO top-level classification, searched in the HSN
+   panel. Chapter ranges only; the 6/8-digit codes and rates are not embeddable
+   and live in ClearTax's database. */
+const hsSections: { chapters: string; title: string }[] = [
+  { chapters: "01–05", title: "Live animals and animal products" },
+  { chapters: "06–14", title: "Vegetable products" },
+  { chapters: "15", title: "Animal or vegetable fats, oils and waxes" },
+  { chapters: "16–24", title: "Prepared foodstuffs, beverages, spirits and tobacco" },
+  { chapters: "25–27", title: "Mineral products" },
+  { chapters: "28–38", title: "Products of the chemical or allied industries" },
+  { chapters: "39–40", title: "Plastics and rubber, and articles thereof" },
+  { chapters: "41–43", title: "Raw hides, skins, leather, furskins and travel goods" },
+  { chapters: "44–46", title: "Wood, cork, straw and articles thereof" },
+  { chapters: "47–49", title: "Pulp of wood, paper, paperboard and printed books" },
+  { chapters: "50–63", title: "Textiles and textile articles" },
+  { chapters: "64–67", title: "Footwear, headgear, umbrellas and prepared feathers" },
+  { chapters: "68–70", title: "Articles of stone, plaster, cement, ceramics and glass" },
+  { chapters: "71", title: "Pearls, precious stones and metals, and imitation jewellery" },
+  { chapters: "72–83", title: "Base metals and articles of base metal" },
+  { chapters: "84–85", title: "Machinery, mechanical appliances and electrical equipment" },
+  { chapters: "86–89", title: "Vehicles, aircraft, vessels and associated transport equipment" },
+  { chapters: "90–92", title: "Optical, photographic, medical instruments, clocks and musical instruments" },
+  { chapters: "93", title: "Arms and ammunition" },
+  { chapters: "94–96", title: "Miscellaneous manufactured articles, furniture, toys" },
+  { chapters: "97", title: "Works of art, collectors' pieces and antiques" },
+];
+
+const defaultCountry = countries[0];
+---
+
+<!-- No `overflow-hidden` on this section, deliberately. It would make the
+     section a scrollport, and the sticky rail below resolves its offsets
+     against the nearest scrollport — one that never scrolls. That both pushed
+     the rail 168px down its own grid row and stopped it ever sticking. The dot
+     band is inset within the section, so nothing needs clipping anyway. -->
+<section
+  id="exc-root"
+  class="exc-section relative bg-generic-00 max-lg:pt-28 max-lg:pb-16 lg:pt-[184px] lg:pb-30"
+>
+  <!-- The lime dot field from the Figma BG layer, washed out at the centre so
+       the cards keep contrast.
+
+       Figma draws it as an 842px band at the top that fades out. Here it is a
+       sticky viewport-height layer instead, so it stays under the content for
+       the whole section rather than scrolling away after the first screen —
+       which is also why the band's bottom fade is gone: on a fixed layer it
+       would read as a permanent line across the viewport.
+
+       The field is `_shared/Dotgrid.astro` — the same interactive canvas
+       trust-centre and scale-and-security use, where each dot draws out into a
+       stroke aimed at the cursor. It was a CSS drift for a while; at a pitch
+       you can actually loop seamlessly the movement is imperceptible, so it
+       read as a static field.
+
+       Pointer coordinates resolve against the CANVAS's own rect, not the
+       section's, which is what lets it sit inside a sticky layer and still
+       track correctly. Listeners go on the section, so anywhere over the
+       content drives it.
+
+       `lineWidth` + `gap` is the pitch: 4 + 22 = the 26px the Figma BG layer
+       measures. `maxLength` must stay under that or the strokes knit into a
+       mesh. -->
+  <div class="exc-bg" aria-hidden="true">
+    <div class="exc-bg-inner">
+      <Dotgrid
+        containerId="exc-root"
+        canvasId="exc-dotgrid"
+        lineWidth={3}
+        gap={22}
+        maxLength={6}
+        lengthRadius={260}
+        tilt={1}
+        baseColor="#C8F006"
+        cursorRadius={320}
+        pull={14}
+        fadeRadius={40}
+      />
+      <div class="exc-bg-wash"></div>
+    </div>
+  </div>
+
+  <div class="container relative z-10 mx-auto">
+    <!-- `grid-cols-1` is load-bearing below lg, not decoration. Without it the
+         single column is an implicit `auto` track, whose minimum is the items'
+         min-content width — the nowrap tool labels — so the track refused to
+         shrink and pushed the whole page ~700px wide on a phone. -->
+    <div class="grid grid-cols-1 items-start gap-8 lg:grid-cols-[405px_minmax(0,1fr)]">
+      <!-- ============================== RAIL =============================== -->
+      <aside class="exc-rail lg:sticky lg:top-[var(--nav-clear,112px)]">
+        <div class="exc-rail-head">
+          <h1 class="exc-rail-title">Experience centre</h1>
+        </div>
+
+        <!-- A plain list. This was briefly the thumbs half of a Swiper pair,
+             which is worth recording as a warning: a vertical Swiper whose
+             slides are `height: auto` is circular by construction —
+             `slidesPerView: 6` derives each slide's size from the container's
+             height, which is derived from the slides. It resolved at Chrome's
+             33,554,432px layout ceiling and took the document's width with it.
+
+             All six items are visible at once on desktop anyway, so there was
+             never a carousel here to drive. -->
+        <div class="exc-rail-list" role="tablist" aria-label="Experience Centre tools">
+          {
+            tools.map((tool, i) => (
+              <button
+                type="button"
+                role="tab"
+                id={`exc-tab-${tool.id}`}
+                class="exc-tab"
+                aria-selected={i === 0 ? "true" : "false"}
+                aria-controls={`exc-panel-${tool.id}`}
+              >
+                <span class="exc-tab-ind" aria-hidden="true" />
+                <span>{tool.label}</span>
+              </button>
+            ))
+          }
+        </div>
+      </aside>
+
+      <!-- ============================= PANELS =============================
+           Plain show/hide, no carousel. This was a Swiper, and sliding six
+           panels sideways read as a carousel rather than a tab switch — which
+           is what it is. Only the active panel is in flow; the incoming one
+           cross-fades up into place via a CSS animation that replays on every
+           `display: none` → `block` transition, so the script only has to move
+           one class and never coordinates timings.
+
+           Nothing animates the container's height. Panels differ by thousands
+           of pixels and easing between those numbers is slow and draws the eye
+           to the wrong thing; the rail is sticky, so the eye is already at the
+           top where the swap happens. -->
+      <div class="exc-panels min-w-0">
+          {
+            tools.map((tool, i) => (
+              <div class={`exc-panel-slide ${i === 0 ? "exc-is-active" : ""}`}>
+                <div
+                  class="exc-stack"
+                  id={`exc-panel-${tool.id}`}
+                  role="tabpanel"
+                  aria-labelledby={`exc-tab-${tool.id}`}
+                >
+                  {/* ------------------------------- the tool ------------- */}
+                  <div class="exc-panel" data-exc-calc={tool.calc.kind} data-currency={tool.calc.currency}>
+                    {tool.calc.country && (
+                      <div class="flex justify-end">
+                        <div class="exc-country" data-exc-country>
+                          <button
+                            type="button"
+                            class="exc-country-trigger"
+                            aria-haspopup="listbox"
+                            aria-expanded="false"
+                            data-exc-country-trigger
+                          >
+                            <img
+                              class="exc-flag"
+                              src={defaultCountry.flag}
+                              alt=""
+                              width="24"
+                              height="18"
+                              loading="lazy"
+                              decoding="async"
+                              data-exc-country-flag
+                            />
+                            <span data-exc-country-label>{defaultCountry.short}</span>
+                            <svg class="exc-country-caret" viewBox="0 0 12 8" fill="none" aria-hidden="true">
+                              <path
+                                d="M1 1.5 6 6.5 11 1.5"
+                                stroke="currentColor"
+                                stroke-width="1.5"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                              />
+                            </svg>
+                          </button>
+                          <ul class="exc-country-menu" role="listbox" aria-label="Select country" data-exc-country-menu>
+                            {countries.map((country) => (
+                              <li>
+                                <button
+                                  type="button"
+                                  role="option"
+                                  aria-selected={country.short === defaultCountry.short ? "true" : "false"}
+                                  class="exc-country-option"
+                                  data-exc-country-option
+                                  data-short={country.short}
+                                  data-currency={country.currency}
+                                  data-rate={String(country.rate)}
+                                  data-flag={country.flag}
+                                >
+                                  <img class="exc-flag" src={country.flag} alt="" width="24" height="18" loading="lazy" decoding="async" />
+                                  <span>{country.name}</span>
+                                  <span class="exc-country-rate">{country.rate}%</span>
+                                </button>
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* --- rate calculators: VAT, SST, GST, Reverse GST --- */}
+                    {tool.calc.kind === "rate" && (
+                      <div class="exc-calc">
+                        <div class="exc-controls">
+                          {tool.calc.taxTypes && (
+                            <div class="exc-row-inline">
+                              <span class="exc-label" id={`exc-${tool.id}-type`}>
+                                Type of tax
+                              </span>
+                              <div class="exc-segment" role="radiogroup" aria-labelledby={`exc-${tool.id}-type`}>
+                                {tool.calc.taxTypes.map((type, ti) => (
+                                  <button
+                                    type="button"
+                                    role="radio"
+                                    aria-checked={ti === 0 ? "true" : "false"}
+                                    class={`exc-segment-btn ${ti === 0 ? "exc-segment-btn-on" : ""}`}
+                                    data-exc-taxtype
+                                    data-rates={type.rates.map((r) => r.value).join(",")}
+                                  >
+                                    {type.label}
+                                  </button>
+                                ))}
+                              </div>
+                            </div>
+                          )}
+
+                          <div class="exc-row">
+                            <div class="exc-row-inline">
+                              <label class="exc-label" for={`exc-${tool.id}-amount`}>
+                                {tool.calc.amountLabel}
+                              </label>
+                              <div class="exc-field">
+                                <span class="exc-affix" data-exc-currency-label>
+                                  {tool.calc.currency}
+                                </span>
+                                <input
+                                  id={`exc-${tool.id}-amount`}
+                                  class="exc-num"
+                                  type="number"
+                                  min="0"
+                                  step="1"
+                                  inputmode="decimal"
+                                  value={String(tool.calc.amount)}
+                                  data-exc-amount
+                                />
+                              </div>
+                            </div>
+                            <input
+                              class="exc-slider"
+                              type="range"
+                              min="0"
+                              max={String(tool.calc.amountMax)}
+                              step={String(tool.calc.amountStep)}
+                              value={String(tool.calc.amount)}
+                              aria-label={tool.calc.amountLabel}
+                              data-exc-amount-range
+                            />
+                          </div>
+
+                          {tool.calc.rateSlider ? (
+                            <div class="exc-row">
+                              <div class="exc-row-inline">
+                                <label class="exc-label" for={`exc-${tool.id}-rate`}>
+                                  {tool.calc.rateLabel}
+                                </label>
+                                <div class="exc-field">
+                                  <input
+                                    id={`exc-${tool.id}-rate`}
+                                    class="exc-num exc-num-sm"
+                                    type="number"
+                                    min="0"
+                                    max="30"
+                                    step="0.5"
+                                    inputmode="decimal"
+                                    value={String(tool.calc.rate)}
+                                    data-exc-rate
+                                  />
+                                  <span class="exc-affix">%</span>
+                                </div>
+                              </div>
+                              <input
+                                class="exc-slider"
+                                type="range"
+                                min="0"
+                                max="30"
+                                step="0.5"
+                                value={String(tool.calc.rate)}
+                                aria-label={tool.calc.rateLabel}
+                                data-exc-rate-range
+                              />
+                            </div>
+                          ) : (
+                            <div class="exc-row-inline">
+                              <label class="exc-label" for={`exc-${tool.id}-rate`}>
+                                {tool.calc.rateLabel}
+                              </label>
+                              <select id={`exc-${tool.id}-rate`} class="exc-select" data-exc-rate>
+                                {(tool.calc.rates ?? tool.calc.taxTypes?.[0].rates ?? []).map((r) => (
+                                  <option value={String(r.value)} selected={r.value === tool.calc.rate}>
+                                    {r.label}
+                                  </option>
+                                ))}
+                              </select>
+                            </div>
+                          )}
+
+                          <div class="exc-row-inline">
+                            <span class="exc-label" id={`exc-${tool.id}-incl`}>
+                              {tool.calc.inclusiveLabel}
+                            </span>
+                            <div class="exc-segment" role="radiogroup" aria-labelledby={`exc-${tool.id}-incl`}>
+                              <button
+                                type="button"
+                                role="radio"
+                                aria-checked={tool.calc.inclusive ? "true" : "false"}
+                                class={`exc-segment-btn ${tool.calc.inclusive ? "exc-segment-btn-on" : ""}`}
+                                data-exc-inclusive="yes"
+                              >
+                                Yes
+                              </button>
+                              <button
+                                type="button"
+                                role="radio"
+                                aria-checked={tool.calc.inclusive ? "false" : "true"}
+                                class={`exc-segment-btn ${tool.calc.inclusive ? "" : "exc-segment-btn-on"}`}
+                                data-exc-inclusive="no"
+                              >
+                                No
+                              </button>
+                            </div>
+                          </div>
+
+                          {tool.calc.split && (
+                            <div class="exc-row-inline">
+                              <span class="exc-label" id={`exc-${tool.id}-intra`}>
+                                Selling within the same state?
+                              </span>
+                              <div class="exc-segment" role="radiogroup" aria-labelledby={`exc-${tool.id}-intra`}>
+                                <button
+                                  type="button"
+                                  role="radio"
+                                  aria-checked="true"
+                                  class="exc-segment-btn exc-segment-btn-on"
+                                  data-exc-intra="yes"
+                                >
+                                  Yes
+                                </button>
+                                <button type="button" role="radio" aria-checked="false" class="exc-segment-btn" data-exc-intra="no">
+                                  No
+                                </button>
+                              </div>
+                            </div>
+                          )}
+                        </div>
+
+                        <div class="exc-result" aria-live="polite">
+                          <div class="exc-out">
+                            <span class="exc-out-label">{tool.calc.netLabel}</span>
+                            <span class="exc-out-value" data-exc-out-net />
+                          </div>
+                          <div class="exc-out">
+                            <span class="exc-out-label">{tool.calc.taxLabel}</span>
+                            <span class="exc-out-value" data-exc-out-tax />
+                          </div>
+                          {tool.calc.split && (
+                            <>
+                              <div class="exc-out">
+                                <span class="exc-out-label">CGST</span>
+                                <span class="exc-out-value" data-exc-out-cgst />
+                              </div>
+                              <div class="exc-out">
+                                <span class="exc-out-label">SGST</span>
+                                <span class="exc-out-value" data-exc-out-sgst />
+                              </div>
+                              <div class="exc-out">
+                                <span class="exc-out-label">IGST</span>
+                                <span class="exc-out-value" data-exc-out-igst />
+                              </div>
+                            </>
+                          )}
+                          <div class="exc-rule" />
+                          <div class="exc-out exc-out-total">
+                            <span class="exc-out-label">{tool.calc.totalLabel}</span>
+                            <span class="exc-out-value" data-exc-out-total />
+                          </div>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* --- Compliance ROI --- */}
+                    {tool.calc.kind === "roi" && (
+                      <div class="exc-calc exc-calc-roi">
+                        <div class="exc-controls">
+                          {/* The six mandatory fields from Clear's tool, in its
+                              order, then its four optional ones. */}
+                          <div class="exc-roi-fields">
+                            <div class="exc-roi-field">
+                              <label class="exc-label" for="exc-roi-gstins">No of GSTINs</label>
+                              <div class="exc-field">
+                                <input id="exc-roi-gstins" class="exc-num" type="number" min="0" step="1" value="12" data-exc-roi="gstins" />
+                              </div>
+                            </div>
+                            <div class="exc-roi-field">
+                              <label class="exc-label" for="exc-roi-pans">No of PANs</label>
+                              <div class="exc-field">
+                                <input id="exc-roi-pans" class="exc-num" type="number" min="0" step="1" value="3" data-exc-roi="pans" />
+                              </div>
+                            </div>
+                            <div class="exc-roi-field">
+                              <label class="exc-label" for="exc-roi-revenue">Annual Sales Revenue (Cr)</label>
+                              <div class="exc-field">
+                                <input id="exc-roi-revenue" class="exc-num" type="number" min="0" step="1" value="500" data-exc-roi="revenue" />
+                              </div>
+                            </div>
+                            <div class="exc-roi-field">
+                              <label class="exc-label" for="exc-roi-sales">No of B2B Sales Invoices per year</label>
+                              <div class="exc-field">
+                                <input id="exc-roi-sales" class="exc-num" type="number" min="0" step="1000" value="240000" data-exc-roi="sales" />
+                              </div>
+                            </div>
+                            <div class="exc-roi-field">
+                              <label class="exc-label" for="exc-roi-purchase">No of Purchase Invoices per year</label>
+                              <div class="exc-field">
+                                <input id="exc-roi-purchase" class="exc-num" type="number" min="0" step="1000" value="180000" data-exc-roi="purchase" />
+                              </div>
+                            </div>
+                            <div class="exc-roi-field">
+                              <label class="exc-label" for="exc-roi-industry">Industry</label>
+                              <select id="exc-roi-industry" class="exc-select" data-exc-roi="industry">
+                                {industries.map((name) => (
+                                  <option value={name}>{name}</option>
+                                ))}
+                              </select>
+                            </div>
+                            <div class="exc-roi-field">
+                              <label class="exc-label" for="exc-roi-vendors">No. of Active Vendors per year</label>
+                              <div class="exc-field">
+                                <input id="exc-roi-vendors" class="exc-num" type="number" min="0" step="10" value="2500" data-exc-roi="vendors" />
+                              </div>
+                            </div>
+                            <div class="exc-roi-field">
+                              <label class="exc-label" for="exc-roi-blocking">Payment Blocking</label>
+                              <select id="exc-roi-blocking" class="exc-select" data-exc-roi="blocking">
+                                <option value="no">No</option>
+                                <option value="yes">Yes</option>
+                              </select>
+                            </div>
+                            <div class="exc-roi-field">
+                              <label class="exc-label" for="exc-roi-lost">Any lost ITC Per Annum (%)</label>
+                              <div class="exc-field">
+                                <input id="exc-roi-lost" class="exc-num" type="number" min="0" step="0.1" value="0.5" data-exc-roi="lost" />
+                                <span class="exc-affix">%</span>
+                              </div>
+                            </div>
+                            <div class="exc-roi-field">
+                              <label class="exc-label" for="exc-roi-delayed">Delayed ITC Per Annum (%)</label>
+                              <div class="exc-field">
+                                <input id="exc-roi-delayed" class="exc-num" type="number" min="0" step="0.1" value="1" data-exc-roi="delayed" />
+                                <span class="exc-affix">%</span>
+                              </div>
+                            </div>
+                            {/* Not on Clear's tool — it knows its own pricing, so
+                                it can show a multiplier and payback without
+                                asking. This build cannot, so the price is an
+                                input rather than an invented constant. */}
+                            <div class="exc-roi-field">
+                              <label class="exc-label" for="exc-roi-cost">Annual platform cost (₹ lakh)</label>
+                              <div class="exc-field">
+                                <input id="exc-roi-cost" class="exc-num" type="number" min="0" step="1" value="60" data-exc-roi="cost" />
+                              </div>
+                            </div>
+                          </div>
+                          <p class="exc-note">{tool.calc.note}</p>
+                        </div>
+
+                        <div class="exc-result" aria-live="polite">
+                          <div class="exc-out">
+                            <span class="exc-out-label">Productivity savings</span>
+                            <span class="exc-out-value" data-exc-roi-out="productivity" />
+                          </div>
+                          <div class="exc-out">
+                            <span class="exc-out-label">Money Savings</span>
+                            <span class="exc-out-value" data-exc-roi-out="money" />
+                          </div>
+                          <div class="exc-out">
+                            <span class="exc-out-label">Assurance Savings</span>
+                            <span class="exc-out-value" data-exc-roi-out="assurance" />
+                          </div>
+                          <div class="exc-rule" />
+                          <div class="exc-out exc-out-total">
+                            <span class="exc-out-label">Total Savings</span>
+                            <span class="exc-out-value" data-exc-roi-out="total" />
+                          </div>
+                          <div class="exc-out">
+                            <span class="exc-out-label">ROI</span>
+                            <span class="exc-out-value" data-exc-roi-out="roi" />
+                          </div>
+                          <div class="exc-out">
+                            <span class="exc-out-label">Payback Period</span>
+                            <span class="exc-out-value" data-exc-roi-out="payback" />
+                          </div>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* --- HSN Code Finder --- */}
+                    {tool.calc.kind === "hsn" && (
+                      <div class="flex flex-col gap-6">
+                        <div class="exc-hsn-form">
+                          <div class="exc-field">
+                            <input
+                              id="exc-hsn-q"
+                              class="exc-num"
+                              type="search"
+                              placeholder="Search a product, material or chapter number"
+                              aria-label="Search HS sections"
+                              data-exc-hsn-input
+                            />
+                          </div>
+                          <a
+                            class="exc-btn"
+                            href="https://cleartax.in/s/gst-hsn-lookup"
+                            target="_blank"
+                            rel="noopener"
+                          >
+                            Open the full HSN database
+                          </a>
+                        </div>
+                        <div class="exc-hsn-results">
+                          <ul class="exc-hsn-list">
+                            {hsSections.map((s) => (
+                              <li
+                                class="exc-hsn-row"
+                                data-exc-hsn-row
+                                data-text={`${s.chapters} ${s.title}`.toLowerCase()}
+                              >
+                                <span class="exc-hsn-chapters">{s.chapters}</span>
+                                <span class="exc-out-label">{s.title}</span>
+                              </li>
+                            ))}
+                          </ul>
+                          <p class="exc-note exc-hsn-empty" data-exc-hsn-empty hidden>
+                            No section matches that term. Try a broader word, or open the full database.
+                          </p>
+                        </div>
+                        <p class="exc-note">{tool.calc.note}</p>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* ----------------------------- how to use ------------- */}
+                  <div class="exc-card flex flex-col gap-6 p-6">
+                    <h2 class="exc-h2">{tool.howTitle}</h2>
+                    <ul class="exc-steps">
+                      {tool.howToUse.map((step) => (
+                        <li class="exc-step">
+                          <span class="exc-check" aria-hidden="true" />
+                          <span>{step}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+
+                  {/* --------------------------- article + faq -----------
+                      One "doc" per tool, except the VAT tool, which gets one
+                      per country: the pill swaps the written content along with
+                      the currency and the rate. Only the active doc is in
+                      flow. */}
+                  {(tool.calc.country
+                    ? countries.map((c, ci) => ({ key: c.short, active: ci === 0, article: c.article, faqs: c.faqs }))
+                    : [{ key: tool.id, active: true, article: tool.article, faqs: tool.faqs }]
+                  ).map((doc) => (
+                    <div
+                      class={`exc-stack-lg exc-doc ${doc.active ? "exc-is-active" : ""}`}
+                      data-exc-doc={doc.key}
+                    >
+                      <div class="exc-prose">
+                        {doc.article.map((block) =>
+                          block.kind === "h" ? (
+                            <h2 class="exc-h2 mt-16 first:mt-0">{block.text}</h2>
+                          ) : block.kind === "p" ? (
+                            <p>
+                              {block.linkText && (
+                                <a href={block.linkHref} target="_blank" rel="noopener">
+                                  {block.linkText}
+                                </a>
+                              )}
+                              {block.text}
+                            </p>
+                          ) : block.kind === "ul" ? (
+                            <ul class="exc-list-tight">
+                              {(block.items ?? []).map((li) => (
+                                <li>{li}</li>
+                              ))}
+                            </ul>
+                          ) : (
+                            <ul class="exc-list">
+                              {(block.groups ?? []).map((g) => (
+                                <li>
+                                  <strong>{g.lead}</strong>
+                                  {g.lines.map((line) => (
+                                    <p>{line}</p>
+                                  ))}
+                                </li>
+                              ))}
+                            </ul>
+                          ),
+                        )}
+                      </div>
+
+                      <div class="flex flex-col gap-6" data-exc-faq>
+                        <h2 class="exc-h3">Frequently Asked Questions</h2>
+                        <div class="exc-faq">
+                          {doc.faqs.map((item, i) => (
+                            <div class="exc-faq-item">
+                              <button
+                                type="button"
+                                class="exc-faq-trigger"
+                                aria-expanded="false"
+                                aria-controls={`exc-faq-${doc.key}-${i}`}
+                                id={`exc-faqt-${doc.key}-${i}`}
+                              >
+                                <span class="exc-faq-q">{item.q}</span>
+                                <span class="exc-faq-icon" aria-hidden="true" />
+                              </button>
+                              <div
+                                class="exc-faq-panel"
+                                id={`exc-faq-${doc.key}-${i}`}
+                                role="region"
+                                aria-labelledby={`exc-faqt-${doc.key}-${i}`}
+                              >
+                                <p>{item.a}</p>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ))
+          }
+      </div>
+    </div>
+  </div>
+</section>
+
+<script is:inline>
+  (function () {
+    /* ClearTax does not publish the coefficients behind its Compliance ROI
+       calculator, and inventing numbers that read as authoritative would be
+       worse than useless on a tool finance teams quote from. So that panel
+       takes the real input fields and the real three-category breakdown, and
+       computes them from the named constants below. Anything that depends on a
+       figure only the customer knows — lost ITC, platform cost — is an input,
+       not a guess, which is why there is no invented "typical savings" number.
+
+       REPLACE THESE with ClearTax's published model before the page goes live.
+       The panel carries an "Indicative estimate" note for as long as they
+       stand. */
+    var ROI = {
+      minutesPerInvoice: 0.75, // manual handling time removed per invoice
+      personDaysPerGstin: 8, // return prep/recon days removed per GSTIN per year
+      costPerPersonDay: 6000, // fully-loaded ₹ cost of a compliance person-day
+      itcRecoveryRate: 0.7, // share of lost ITC recovered
+      costOfCapital: 0.09, // annual cost of money delayed ITC ties up
+      noticesPerPan: 3, // tax notices per PAN per year
+      costPerNotice: 60000, // ₹ cost to answer one notice
+      noticesAvoided: 0.5, // share of those notices avoided
+    };
+
+    function num(el, fallback) {
+      var v = parseFloat(el && el.value);
+      return isNaN(v) ? fallback || 0 : v;
+    }
+
+    function paintTrack(range) {
+      var min = parseFloat(range.min) || 0;
+      var max = parseFloat(range.max) || 100;
+      var value = parseFloat(range.value) || 0;
+      range.style.setProperty("--exc-fill", (max === min ? 0 : ((value - min) / (max - min)) * 100) + "%");
+    }
+
+    function clamp(v, min, max) {
+      if (isNaN(v)) return min;
+      return v < min ? min : v > max ? max : v;
+    }
+
+    /* ------------------------------------------------ rate calculators --- */
+    function initRateCalc(root) {
+      var currency = root.getAttribute("data-currency") || "";
+      var split = !!root.querySelector("[data-exc-out-cgst]");
+      var amountInput = root.querySelector("[data-exc-amount]");
+      var amountRange = root.querySelector("[data-exc-amount-range]");
+      var rateInput = root.querySelector("[data-exc-rate]");
+      var rateRange = root.querySelector("[data-exc-rate-range]");
+      var currencyLabel = root.querySelector("[data-exc-currency-label]");
+      var out = {
+        net: root.querySelector("[data-exc-out-net]"),
+        tax: root.querySelector("[data-exc-out-tax]"),
+        total: root.querySelector("[data-exc-out-total]"),
+        cgst: root.querySelector("[data-exc-out-cgst]"),
+        sgst: root.querySelector("[data-exc-out-sgst]"),
+        igst: root.querySelector("[data-exc-out-igst]"),
+      };
+      var inclusive = root.querySelector('[data-exc-inclusive="yes"]').getAttribute("aria-checked") === "true";
+      var intra = true;
+
+      function money(value) {
+        return (
+          currency +
+          " " +
+          value.toLocaleString(currency === "₹" ? "en-IN" : "en-US", {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2,
+          })
+        );
+      }
+
+      function compute() {
+        var amount = num(amountInput, 0);
+        if (amount < 0) amount = 0;
+        var rate = num(rateInput, 0);
+        if (rate < 0) rate = 0;
+
+        var net, tax, total;
+        if (inclusive) {
+          total = amount;
+          tax = amount * (rate / (100 + rate));
+          net = total - tax;
+        } else {
+          net = amount;
+          tax = amount * (rate / 100);
+          total = net + tax;
+        }
+
+        out.net.textContent = money(net);
+        out.tax.textContent = money(tax);
+        out.total.textContent = money(total);
+        if (split) {
+          out.cgst.textContent = money(intra ? tax / 2 : 0);
+          out.sgst.textContent = money(intra ? tax / 2 : 0);
+          out.igst.textContent = money(intra ? 0 : tax);
+        }
+      }
+
+      function syncRanges() {
+        /* The number field is deliberately unbounded above the slider's max —
+           someone pricing a ₹40 lakh contract should not be capped by a control
+           that exists for convenience. The slider just pins at its own max. */
+        if (amountRange) {
+          amountRange.value = String(clamp(num(amountInput, 0), 0, parseFloat(amountRange.max)));
+          paintTrack(amountRange);
+        }
+        if (rateRange) {
+          rateRange.value = String(clamp(num(rateInput, 0), 0, parseFloat(rateRange.max)));
+          paintTrack(rateRange);
+        }
+      }
+
+      function refresh() {
+        syncRanges();
+        compute();
+      }
+
+      if (amountRange) {
+        amountRange.addEventListener("input", function () {
+          amountInput.value = amountRange.value;
+          paintTrack(amountRange);
+          compute();
+        });
+      }
+      if (rateRange) {
+        rateRange.addEventListener("input", function () {
+          rateInput.value = rateRange.value;
+          paintTrack(rateRange);
+          compute();
+        });
+      }
+      amountInput.addEventListener("input", refresh);
+      rateInput.addEventListener("input", refresh);
+      if (rateInput.tagName === "SELECT") rateInput.addEventListener("change", refresh);
+
+      function bindSegment(selector, apply) {
+        var btns = root.querySelectorAll(selector);
+        btns.forEach(function (btn) {
+          btn.addEventListener("click", function () {
+            btns.forEach(function (other) {
+              var on = other === btn;
+              other.classList.toggle("exc-segment-btn-on", on);
+              other.setAttribute("aria-checked", on ? "true" : "false");
+            });
+            apply(btn);
+            refresh();
+          });
+        });
+      }
+
+      bindSegment("[data-exc-inclusive]", function (btn) {
+        inclusive = btn.getAttribute("data-exc-inclusive") === "yes";
+      });
+      bindSegment("[data-exc-intra]", function (btn) {
+        intra = btn.getAttribute("data-exc-intra") === "yes";
+      });
+      /* SST: the tax type decides which rates are on offer, so the select is
+         rebuilt rather than filtered. */
+      bindSegment("[data-exc-taxtype]", function (btn) {
+        var rates = (btn.getAttribute("data-rates") || "").split(",");
+        rateInput.innerHTML = "";
+        rates.forEach(function (r) {
+          var opt = document.createElement("option");
+          opt.value = r;
+          opt.textContent = r + "%";
+          rateInput.appendChild(opt);
+        });
+        rateInput.value = rates[0];
+      });
+
+      /* Country pill — VAT only. Swaps the currency and resets the rate to that
+         market's standard rate. It does not re-write the article below, which
+         is KSA-specific, which is why Saudi Arabia is the default. */
+      var countryRoot = root.querySelector("[data-exc-country]");
+      if (countryRoot) {
+        var trigger = countryRoot.querySelector("[data-exc-country-trigger]");
+        var menu = countryRoot.querySelector("[data-exc-country-menu]");
+        var flag = countryRoot.querySelector("[data-exc-country-flag]");
+        var label = countryRoot.querySelector("[data-exc-country-label]");
+
+        function closeMenu() {
+          menu.classList.remove("exc-is-open");
+          trigger.setAttribute("aria-expanded", "false");
+        }
+
+        trigger.addEventListener("click", function (e) {
+          e.stopPropagation();
+          var open = menu.classList.toggle("exc-is-open");
+          trigger.setAttribute("aria-expanded", open ? "true" : "false");
+        });
+
+        countryRoot.querySelectorAll("[data-exc-country-option]").forEach(function (option) {
+          option.addEventListener("click", function () {
+            var short = option.getAttribute("data-short");
+            currency = option.getAttribute("data-currency");
+            currencyLabel.textContent = currency;
+            label.textContent = short;
+            flag.setAttribute("src", option.getAttribute("data-flag"));
+            rateInput.value = option.getAttribute("data-rate");
+            countryRoot.querySelectorAll("[data-exc-country-option]").forEach(function (o) {
+              o.setAttribute("aria-selected", o === option ? "true" : "false");
+            });
+
+            /* The article and FAQ below the tool are per country too. They sit
+               outside the calculator's own root, so reach up to the panel. */
+            var slide = root.closest(".exc-panel-slide");
+            if (slide) {
+              slide.querySelectorAll("[data-exc-doc]").forEach(function (doc) {
+                doc.classList.toggle("exc-is-active", doc.getAttribute("data-exc-doc") === short);
+              });
+            }
+
+            closeMenu();
+            refresh();
+          });
+        });
+
+        document.addEventListener("click", function (e) {
+          if (!countryRoot.contains(e.target)) closeMenu();
+        });
+        document.addEventListener("keydown", function (e) {
+          if (e.key === "Escape") closeMenu();
+        });
+      }
+
+      refresh();
+    }
+
+    /* ---------------------------------------------------- ROI calculator -- */
+    function initRoiCalc(root) {
+      var fields = {};
+      root.querySelectorAll("[data-exc-roi]").forEach(function (el) {
+        fields[el.getAttribute("data-exc-roi")] = el;
+      });
+      var outs = {};
+      root.querySelectorAll("[data-exc-roi-out]").forEach(function (el) {
+        outs[el.getAttribute("data-exc-roi-out")] = el;
+      });
+
+      function rupees(value) {
+        return "₹ " + Math.round(value).toLocaleString("en-IN");
+      }
+
+      function compute() {
+        var gstins = num(fields.gstins);
+        var pans = num(fields.pans);
+        var revenue = num(fields.revenue) * 10000000; // ₹ crore → ₹
+        var invoices = num(fields.sales) + num(fields.purchase);
+        var cost = num(fields.cost) * 100000; // ₹ lakh → ₹
+
+        // Productivity: person-days taken out of manual handling, priced.
+        var personDays = (invoices * ROI.minutesPerInvoice) / 480 + gstins * ROI.personDaysPerGstin;
+        var productivity = personDays * ROI.costPerPersonDay;
+
+        /* Money: Clear's page takes lost and delayed ITC as percentages without
+           saying of what. Read here as a share of annual sales revenue, which
+           is the only turnover figure the form collects. Lost ITC is recovered
+           outright; delayed ITC only returns the cost of the money for the time
+           it was stuck, hence the two different rates. */
+        var money =
+          revenue * (num(fields.lost) / 100) * ROI.itcRecoveryRate +
+          revenue * (num(fields.delayed) / 100) * ROI.costOfCapital;
+
+        // Assurance: notices not raised, and the cost of answering them.
+        var assurance = pans * ROI.noticesPerPan * ROI.costPerNotice * ROI.noticesAvoided;
+
+        var total = productivity + money + assurance;
+
+        outs.productivity.textContent = rupees(productivity);
+        outs.money.textContent = rupees(money);
+        outs.assurance.textContent = rupees(assurance);
+        outs.total.textContent = rupees(total);
+
+        if (cost > 0 && total > 0) {
+          var multiple = total / cost;
+          outs.roi.textContent = multiple.toFixed(1) + "×";
+          outs.payback.textContent = Math.max(1, Math.round(365 / multiple)) + " days";
+        } else {
+          outs.roi.textContent = "—";
+          outs.payback.textContent = "—";
+        }
+      }
+
+      root.querySelectorAll("[data-exc-roi]").forEach(function (el) {
+        el.addEventListener("input", compute);
+        if (el.tagName === "SELECT") el.addEventListener("change", compute);
+      });
+      compute();
+    }
+
+    /* ------------------------------------------------------ HSN finder ---- */
+    function initHsn(root) {
+      var input = root.querySelector("[data-exc-hsn-input]");
+      var rows = root.querySelectorAll("[data-exc-hsn-row]");
+      var empty = root.querySelector("[data-exc-hsn-empty]");
+
+      /* The button's label stays fixed. It used to read "Search <term> in the
+         full database", which the href does not do — ClearTax's lookup takes no
+         query parameter, so the link would have dropped the term on arrival. */
+      input.addEventListener("input", function () {
+        var q = input.value.trim().toLowerCase();
+        var hits = 0;
+        rows.forEach(function (row) {
+          var match = !q || row.getAttribute("data-text").indexOf(q) !== -1;
+          row.hidden = !match;
+          if (match) hits++;
+        });
+        empty.hidden = hits > 0;
+      });
+    }
+
+    /* ------------------------------------------------------------- FAQ ---- */
+    function initFaq() {
+      document.querySelectorAll("#exc-root [data-exc-faq]").forEach(function (group) {
+        var items = group.querySelectorAll(".exc-faq-item");
+
+        function closeItem(item) {
+          var panel = item.querySelector(".exc-faq-panel");
+          panel.style.height = panel.scrollHeight + "px";
+          requestAnimationFrame(function () {
+            panel.style.height = "0px";
+          });
+          item.classList.remove("exc-is-open");
+          item.querySelector(".exc-faq-trigger").setAttribute("aria-expanded", "false");
+        }
+
+        function openItem(item) {
+          var panel = item.querySelector(".exc-faq-panel");
+          panel.style.height = panel.scrollHeight + "px";
+          item.classList.add("exc-is-open");
+          item.querySelector(".exc-faq-trigger").setAttribute("aria-expanded", "true");
+          panel.addEventListener("transitionend", function handler(e) {
+            if (e.propertyName !== "height") return;
+            panel.removeEventListener("transitionend", handler);
+            if (item.classList.contains("exc-is-open")) panel.style.height = "auto";
+          });
+        }
+
+        items.forEach(function (item) {
+          item.querySelector(".exc-faq-trigger").addEventListener("click", function () {
+            if (item.classList.contains("exc-is-open")) {
+              closeItem(item);
+            } else {
+              items.forEach(function (other) {
+                if (other !== item && other.classList.contains("exc-is-open")) closeItem(other);
+              });
+              openItem(item);
+            }
+          });
+        });
+
+        window.addEventListener("resize", function () {
+          items.forEach(function (item) {
+            if (item.classList.contains("exc-is-open")) item.querySelector(".exc-faq-panel").style.height = "auto";
+          });
+        });
+      });
+    }
+
+    /* ------------------------------------------------------------- tabs --- */
+    function initTabs(root) {
+      var tabs = root.querySelectorAll(".exc-tab");
+      var slides = root.querySelectorAll(".exc-panel-slide");
+      var panels = root.querySelector(".exc-panels");
+
+      tabs.forEach(function (tab, i) {
+        tab.addEventListener("click", function () {
+          if (tab.getAttribute("aria-selected") === "true") return;
+
+          tabs.forEach(function (t, ti) {
+            t.setAttribute("aria-selected", ti === i ? "true" : "false");
+          });
+          /* The whole transition. Going `display: none` → `block` restarts the
+             panel's CSS animation on its own, so there is no enter/leave state
+             machine to keep in sync and nothing to clean up if a second tab is
+             clicked mid-animation. */
+          slides.forEach(function (s, si) {
+            s.classList.toggle("exc-is-active", si === i);
+          });
+
+          // On mobile the rail is a scrolling strip, so the newly active tab may
+          // sit off to one side. `inline: "nearest"` only scrolls when it does.
+          tab.scrollIntoView({ block: "nearest", inline: "nearest", behavior: "smooth" });
+
+          /* Panels differ in length by thousands of pixels. Switching from a
+             long one to a short one while scrolled deep would otherwise leave
+             you somewhere in the footer, so pull back to the top of the panel —
+             but only when the switch happened from past that point. */
+          var navClear = parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--nav-clear")) || 112;
+          var top = panels.getBoundingClientRect().top;
+          if (top < navClear) {
+            window.scrollTo({ top: window.pageYOffset + top - navClear, behavior: "smooth" });
+          }
+        });
+      });
+    }
+
+    /* ------------------------------------------------------------- init --- */
+    function init() {
+      var root = document.getElementById("exc-root");
+      if (!root || root.dataset.excReady) return;
+      root.dataset.excReady = "true";
+
+      root.querySelectorAll("[data-exc-calc]").forEach(function (calc) {
+        var kind = calc.getAttribute("data-exc-calc");
+        if (kind === "rate") initRateCalc(calc);
+        else if (kind === "roi") initRoiCalc(calc);
+        else if (kind === "hsn") initHsn(calc);
+      });
+
+      initFaq();
+      initTabs(root);
+    }
+
+    if (document.readyState === "loading") {
+      document.addEventListener("DOMContentLoaded", init);
+    } else {
+      init();
+    }
+  })();
+</script>

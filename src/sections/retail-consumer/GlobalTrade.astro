@@ -1,0 +1,185 @@
+---
+/**
+ * "Solving the complexity of global trade." Figma node 15389:33452.
+ *
+ * Sticky scroll-jack: the section pins to the viewport and vertical page
+ * scroll drives the card track's horizontal translateX — same mechanism as
+ * `_shared/UnderneathMandate.astro` / `uae-regional/Network.astro` /
+ * `direct-tax-page/Filing.astro` (each keeps its own copy since sections
+ * ship standalone into Webflow Embeds, see CLAUDE.md "Portability"). This
+ * is the only one of those that also renders a progress bar — its fill
+ * width is the same `progress` value (0–1) that drives the translate,
+ * since a scroll-jacked track gives the visitor no native scrollbar
+ * affordance of its own.
+ */
+interface TradeCard {
+  title: string;
+  text: string;
+}
+
+const cards: TradeCard[] = [
+  {
+    title: "The checkout must decide B2B or B2C before the invoice is issued",
+    text: "ClearTax sits between the POS and every tax authority, branches B2B from B2C automatically, captures the buyer tax ID at swipe, and applies each country's model.",
+  },
+  {
+    title: "A single receipt can carry four different tax treatments at line level",
+    text: "Every SKU is validated against the code list of each country you sell in, with rate as well as category checked before issuance, so misclassified items never reach a gateway.",
+  },
+  {
+    title: "Returns and refunds require a credit note tied to the original invoice",
+    text: "Every credit note auto-links to its parent document ID, each POS return reason maps to the correct national code, and a ten-year retrieval index is held.",
+  },
+  {
+    title: "Marketplaces self-bill on behalf of sellers — at enormous scale",
+    text: "The marketplace SDK generates 12,000+ type-389 invoices in a single batch API call and validates every seller tax ID against the national registry pre-submission.",
+  },
+  {
+    title: "Duty-free sales carry no tax — but only if the exit conditions are met",
+    text: "Boarding-pass details are captured at swipe and attached as evidence via BT-125, with the line tagged BT-151 = G, clearing 4,500 daily transactions with the evidence chain intact.",
+  },
+  {
+    title: "Franchisors can issue one consolidated invoice across all franchisee activity",
+    text: "Delivery data from your POS or WMS aggregates into one summary invoice per franchisee per period, each delivery preserved as a distinct line, meeting each country's aggregation rules.",
+  },
+];
+---
+
+<div class="trade-sticky-container">
+  <section class="sticky top-0 flex flex-col justify-center bg-generic-00 border-t border-neutral-200 py-16 lg:py-20 overflow-hidden min-h-[calc(100vh-80px)]">
+    <div class="container flex flex-col gap-12">
+      <h2 class="m-0 font-heading font-medium text-vault-navy text-[length:var(--fs-h1)] leading-[length:var(--lh-h1)] tracking-[-0.5px]">
+        Solving the complexity of global trade.
+      </h2>
+
+      <div class="flex flex-col gap-12">
+        <div class="w-full h-auto">
+          <div
+            class="trade-track flex items-start gap-12 w-max transition-transform duration-[250ms] ease-out will-change-transform"
+            data-trade-track
+          >
+            {
+              cards.map((card) => (
+                <div class="trade-card flex flex-col gap-6 shrink-0 w-[85vw] sm:w-105 lg:w-[560px] select-none">
+                  <div class="trade-card-img aspect-[1280/720] w-full bg-visual-placeholder rounded-lg pointer-events-none"></div>
+                  <div class="flex flex-col gap-4 pointer-events-none">
+                    <p class="trade-card-title m-0 font-heading font-medium text-vault-navy text-[length:var(--fs-h5)] leading-[length:var(--lh-h5)] tracking-[-0.5px]">
+                      {card.title}
+                    </p>
+                    <p class="trade-card-desc m-0 font-body text-neutral-500 text-[length:var(--fs-body-lg)] leading-[length:var(--lh-body-lg)]">
+                      {card.text}
+                    </p>
+                  </div>
+                </div>
+              ))
+            }
+          </div>
+        </div>
+
+        <div class="relative h-2 w-full rounded-lg bg-neutral-300 overflow-hidden" aria-hidden="true">
+          <div class="trade-progress-fill absolute inset-y-0 left-0 rounded-lg bg-nova-blue" data-trade-fill></div>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<script is:inline>
+  (function () {
+    const initTradeScroll = () => {
+      const containers = document.querySelectorAll(".trade-sticky-container");
+      if (!containers.length) return;
+
+      containers.forEach((container) => {
+        const track = container.querySelector("[data-trade-track]");
+        const section = container.querySelector("section");
+        const fill = container.querySelector("[data-trade-fill]");
+        if (!track || !section) return;
+
+        const getHeaderHeight = () => {
+          const header = document.querySelector("header, .navbar, .w-nav");
+          return header ? header.offsetHeight : 80;
+        };
+
+        let maxTranslate = 0;
+        let totalScrollable = 0;
+        let stickyTop = 0;
+
+        const updateMeasurements = () => {
+          const sectionHeight = section.offsetHeight;
+          const windowHeight = window.innerHeight;
+          const headerHeight = getHeaderHeight();
+
+          const trackOffset = track.parentElement.getBoundingClientRect().top - section.getBoundingClientRect().top;
+          const trackHeight = track.offsetHeight;
+          const availableSpace = windowHeight - headerHeight;
+
+          const idealTrackTop = headerHeight + Math.max(40, (availableSpace - trackHeight) / 2);
+          const calculatedTop = idealTrackTop - trackOffset;
+
+          // Position section flush under header when sticky, avoiding gap on large screens
+          stickyTop = Math.min(headerHeight, calculatedTop);
+          section.style.top = `${stickyTop}px`;
+
+          const containerWidth = track.parentElement.getBoundingClientRect().width;
+          maxTranslate = Math.max(0, track.scrollWidth - containerWidth);
+          container.style.height = `${maxTranslate + windowHeight}px`;
+          totalScrollable = container.getBoundingClientRect().height - sectionHeight;
+        };
+
+        updateMeasurements();
+
+        if (window.ResizeObserver) {
+          const ro = new ResizeObserver(updateMeasurements);
+          ro.observe(section);
+          ro.observe(track);
+        }
+        window.addEventListener("resize", updateMeasurements);
+
+        let ticking = false;
+
+        const handleScroll = () => {
+          if (ticking) return;
+          window.requestAnimationFrame(() => {
+            const containerRect = container.getBoundingClientRect();
+            const scrolledDistance = Math.max(0, stickyTop - containerRect.top);
+
+            let progress = totalScrollable > 0 ? scrolledDistance / totalScrollable : 0;
+            progress = Math.max(0, Math.min(1, progress));
+
+            track.style.transform = `translate3d(-${progress * maxTranslate}px, 0, 0)`;
+
+            if (fill) {
+              fill.style.width = `${progress * 100}%`;
+            }
+
+            ticking = false;
+          });
+          ticking = true;
+        };
+
+        const observer = new IntersectionObserver(
+          (entries) => {
+            entries.forEach((entry) => {
+              if (entry.isIntersecting) {
+                window.addEventListener("scroll", handleScroll, { passive: true });
+                handleScroll();
+              } else {
+                window.removeEventListener("scroll", handleScroll);
+              }
+            });
+          },
+          { rootMargin: "100% 0px 100% 0px" },
+        );
+
+        observer.observe(container);
+      });
+    };
+
+    if (document.readyState === "loading") {
+      document.addEventListener("DOMContentLoaded", initTradeScroll);
+    } else {
+      initTradeScroll();
+    }
+  })();
+</script>

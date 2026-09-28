@@ -1,0 +1,942 @@
+/**
+ * Event / webinar detail (brand v2) — Figma node 14851:46962
+ * ("Events / Webinar {{ In person }} - Content page").
+ * Paste into the Webflow Collection Page's <head> AFTER shared.css.
+ *
+ * SIBLING OF blog-detail.css, AND DELIBERATELY BUILT THE SAME WAY.
+ * ---------------------------------------------------------------------------
+ * There are exactly THREE class hooks in this file, one per page region:
+ *
+ *     .ct-event            header + registration card + body
+ *     .ct-event-speakers   the "About the Speaker" carousel
+ *     .ct-event-related    the "Upcoming Events & Webinars" grid
+ *
+ * Everything below those is an ELEMENT selector — h1, h2, p, ul, figure,
+ * address, time, hr, button. Nothing inside a region carries a class.
+ *
+ * The reason is the CMS. In Webflow an event's description and agenda are
+ * Rich Text fields, and a Rich Text field emits bare tags with no class
+ * attribute at all. Utilities cannot reach those tags and an editor adding a
+ * webinar cannot be asked to type classes, so element selectors style whatever
+ * they produce, automatically. Add a class-based rule here and the first
+ * paragraph someone writes in the CMS renders unstyled.
+ *
+ * WHERE THE WYSIWYG ZONE IS: `.ct-event > article`. Style that subtree only by
+ * tag. The header, the registration card and the related grid are fixed
+ * Webflow layouts, so a positional selector (`p:nth-of-type(2)`) is safe there
+ * and is used where sibling tags have to differ.
+ *
+ * Unlayered on purpose: Webflow's element defaults are unlayered, and a layered
+ * rule loses to them regardless of specificity. Never wrap any of this in
+ * `@layer`.
+ *
+ * Values come from src/styles/tokens.css, which ships inside shared.css — paste
+ * that first or every `var()` here falls back to the browser default.
+ */
+@import 'tailwindcss/theme.css' layer(theme);
+@import 'tailwindcss/utilities.css' source(none);
+
+/* `container` and `bg-generic-00` are the ONLY utilities this page uses, and
+   they are named explicitly rather than found by scanning the page — the same
+   arrangement blog-detail.css uses, for the same two reasons.
+ *
+ * `bg-generic-00` is on <body>, because shared.css sets
+ * `body { background-color: var(--color-surface) }` — Ledger White #F2F1F0 —
+ * while this page's Figma frame is #FFFFFF. Without the override the white
+ * registration card and related-event cards float on a warm grey the design
+ * never asked for.
+ *
+ * Scanning would be actively wrong. Tailwind reads a `.astro` file as a bag of
+ * candidate class names, and this page is mostly English prose — the words
+ * "table", "grid", "contents" and "fixed" in an event summary each compile a
+ * real rule, which then gets pasted into the Webflow page <head> where a
+ * Webflow element named `grid` would silently inherit it. A page with no
+ * utility classes must emit no utilities.
+ *
+ * (A file glob would also need care: `[slug]` is a glob character class, so
+ * `@source '…/[slug].astro'` matches nothing.) */
+@source inline("container bg-generic-00");
+
+@config '../../tailwind.config.js';
+
+/* ==========================================================================
+   SHARED FOUNDATION
+   The one `container` utility on each region carries page width, so the
+   1328px identity stays defined once in theme.css. Everything else is here.
+   ========================================================================== */
+.ct-event,
+.ct-event-related {
+    font-family: var(--font-body);
+    letter-spacing: var(--tracking-body);
+    color: var(--palette-neutral-500);
+}
+
+.ct-event *,
+.ct-event-related * {
+    box-sizing: border-box;
+}
+
+.ct-event a,
+.ct-event-related a {
+    color: var(--palette-nova-blue);
+    text-decoration: none;
+}
+
+.ct-event img,
+.ct-event-related img {
+    display: block;
+    max-width: 100%;
+    height: auto;
+}
+
+.ct-event svg,
+.ct-event-related svg {
+    flex-shrink: 0;
+}
+
+/* ==========================================================================
+   LAYOUT — Figma: 720 content + 80 gap + 480 registration card = 1280
+   Three grid children, like the blog detail page: splitting the copy into
+   <header> and <article> is what lets the <aside> land BETWEEN them on mobile
+   — title, then the card you register from, then the detail — while sitting
+   beside both on desktop. A single column with the card after the body would
+   bury the only call to action on the page at the foot of a phone screen.
+   ========================================================================== */
+.ct-event {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    row-gap: var(--spacing-xxx-big);
+    /* Figma puts the breadcrumb 200px down. That is not decoration: the navbar
+       is `fixed top-4` and out of flow, so this padding is the only thing
+       keeping the breadcrumb from rendering underneath it. A literal, not a
+       token — the scale steps 160 -> 192 and neither is 200. The events
+       listing hero and the blog pages hard-code the same 200px, and all three
+       sit next to each other, so they must agree. */
+    padding-top: 200px;
+    padding-bottom: var(--spacing-x-lg);
+}
+
+@media (width >= 1024px) {
+    .ct-event {
+        grid-template-columns: minmax(0, 1fr) 480px;
+        column-gap: var(--spacing-xxx-lg);
+    }
+
+    .ct-event > header            { grid-column: 1; grid-row: 1; }
+    .ct-event > article           { grid-column: 1; grid-row: 2; }
+    .ct-event > .ct-event-speakers { grid-column: 1; grid-row: 3; }
+
+    /* `align-self: start` is load-bearing: without it the card stretches to
+       fill both rows and `position: sticky` has no room left to travel.
+
+       `top` HAS TO CLEAR THE NAVBAR. `_shared/NavbarRb` is `fixed top-4` and
+       out of flow, so it occupies roughly 16–80px of the viewport and nothing
+       in the document flow knows it is there. A smaller offset pins the card
+       underneath it — the card's top edge and its border disappear behind the
+       bar, which is what 32px was doing. 96px clears the navbar with a little
+       air below it, and is the same reasoning as the 200px `padding-top` on
+       `.ct-event` above. Raise them together if the navbar ever gets taller. */
+    .ct-event > aside {
+        grid-column: 2;
+        /* `1 / -1`, not a fixed span — the speaker carousel is a fourth grid
+           child on some events and absent on others, so a hard-coded span
+           would leave the card short of the bottom on one of the two. */
+        grid-row: 1 / -1;
+        align-self: start;
+        position: sticky;
+        top: var(--spacing-huge);
+    }
+}
+
+/* ==========================================================================
+   HEADER — breadcrumb, badges, title, speakers, date/time/place.
+   Figma 14851:46967. Fixed Webflow layout, so positional selectors are safe.
+   p1 = badge row, p2 = speakers, p3 = date/time/place.
+   ========================================================================== */
+.ct-event > header {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+/* Breadcrumb */
+.ct-event > header > nav ol {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--spacing-xx-sm);
+    margin: 0 0 var(--spacing-x-lg);
+    padding: 0;
+    list-style: none;
+    font-size: var(--fs-label);
+    line-height: var(--lh-label);
+}
+
+.ct-event > header > nav li {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-xx-sm);
+    color: var(--palette-neutral-500);
+}
+
+/* The separator, drawn rather than marked up — a chevron typed into the
+   markup would be read aloud between every crumb. */
+.ct-event > header > nav li + li::before {
+    content: '';
+    width: 6px;
+    height: 6px;
+    border-top: 1.5px solid var(--palette-neutral-400);
+    border-right: 1.5px solid var(--palette-neutral-400);
+    transform: rotate(45deg);
+}
+
+.ct-event > header > nav a { color: var(--palette-neutral-500); }
+.ct-event > header > nav a:hover { color: var(--palette-nova-blue); }
+.ct-event > header > nav [aria-current] { color: var(--palette-nova-800); }
+
+/* Badge row. <mark> is the status badge — Flux Lime for an upcoming session,
+   and THE one instance of it on this screen (docs/brand/colour.md). <span> is
+   the Online / In person type chip beside it. */
+.ct-event > header > p:first-of-type {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--spacing-x-sm);
+    margin: 0;
+}
+
+.ct-event > header > p:first-of-type mark,
+.ct-event > header > p:first-of-type span {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--spacing-x-sm);
+    padding: 6px 12px;
+    border-radius: var(--spacing-x-sm);
+    font-weight: var(--font-weight-medium);
+    font-size: var(--fs-label);
+    line-height: var(--lh-label);
+}
+
+.ct-event > header > p:first-of-type mark {
+    background: var(--palette-flux-lime);
+    color: var(--palette-vault-navy);
+}
+
+.ct-event > header > p:first-of-type span {
+    border: 1px solid var(--palette-ledger-300);
+    background: var(--palette-neutral-100);
+    color: var(--palette-neutral-700);
+}
+
+.ct-event > header > p:first-of-type svg {
+    width: 16px;
+    height: 16px;
+}
+
+.ct-event > header h1 {
+    margin: var(--spacing-sm) 0 0;
+    font-family: var(--font-heading);
+    font-weight: var(--font-weight-semibold);
+    font-size: var(--fs-h1-lg);
+    line-height: var(--lh-h1-lg);
+    letter-spacing: var(--tracking-heading);
+    color: var(--palette-vault-navy);
+}
+
+/* Speakers, then date / time / place. Both are header chrome rather than body
+   copy, so they are addressed by position as well as by tag. */
+.ct-event > header > p:nth-of-type(2),
+.ct-event > header > p:nth-of-type(3) {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--spacing-sm);
+    font-size: var(--fs-body);
+    line-height: var(--lh-body);
+}
+
+.ct-event > header > p:nth-of-type(2) {
+    margin: var(--spacing-x-big) 0 0;
+    color: var(--palette-vault-navy);
+}
+
+.ct-event > header > p:nth-of-type(3) {
+    margin: var(--spacing-sm) 0 0;
+}
+
+.ct-event > header > p:nth-of-type(2) > span,
+.ct-event > header > p:nth-of-type(3) > span,
+.ct-event > header > p:nth-of-type(3) > time {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--spacing-x-sm);
+}
+
+/* Speaker chips — one outlined box per speaker. The row's user icon is a
+   sibling of these rather than a child of the first one, so it is not caught
+   by this rule and stays outside the borders. */
+.ct-event > header > p:nth-of-type(2) > span {
+    padding: 4px 10px;
+    border: 1px solid var(--palette-ledger-300);
+    border-radius: var(--spacing-x-sm);
+}
+
+/* An empty <span> is a hairline divider — the same idiom the blog header uses
+   between its date and read time. */
+.ct-event > header > p:nth-of-type(3) > span:empty {
+    width: 1px;
+    height: 16px;
+    border-radius: var(--spacing-xx-sm);
+    background: var(--palette-ledger-300);
+}
+
+.ct-event > header svg {
+    width: 24px;
+    height: 24px;
+}
+
+/* The rule under the header. 2px and Ledger White, per Figma's Divider. */
+.ct-event hr {
+    width: 100%;
+    height: 2px;
+    margin: var(--spacing-xxx-big) 0 0;
+    border: 0;
+    border-radius: var(--spacing-xx-sm);
+    background: var(--palette-ledger-white);
+}
+
+/* ==========================================================================
+   REGISTRATION CARD — Figma 14851:47104 (".webinar item")
+   Thumbnail, the single primary action, then the share row.
+   ========================================================================== */
+.ct-event > aside {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-x-big);
+    padding: var(--spacing-md);
+    /* 2px Nova Blue. Figma's variable on this frame is `border/focus` (#35F),
+       which is the token a selected component picks up rather than a brand
+       colour — Nova Blue is the nearest real one and carries the right
+       meaning: this is the card you act from. */
+    border: 2px solid var(--palette-nova-blue);
+    border-radius: 12px;
+    background: var(--palette-generic-00);
+}
+
+/* Empty figure = the Figma "Visual Placeholder" tint standing in for artwork
+   that has not been uploaded, at the designed 16:9. */
+.ct-event > aside figure {
+    /* Positioning context for the play control below. */
+    position: relative;
+    margin: 0;
+    overflow: hidden;
+    aspect-ratio: 16 / 9;
+    border: 1px solid var(--palette-ledger-300);
+    border-radius: var(--spacing-x-sm);
+    background: var(--palette-visual-placeholder);
+}
+
+/* `> img`, not a descendant selector: the play button below is an <img> too,
+   and a descendant rule would stretch it to cover the whole thumbnail. */
+.ct-event > aside figure > img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* Play control — rendered by the page for past sessions only, where it is the
+   real action and the button below is disabled.
+   The anchor is the full thumbnail so the whole image is clickable; the white
+   chip is drawn on the <img> itself. No scrim over the artwork — the design
+   puts the button straight onto the thumbnail. */
+.ct-event > aside figure > a {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* USED AS SUPPLIED — no border, background, padding or shadow around it. The
+   PNG is not a bare glyph: it is a 72x72 rounded square already filled with
+   70%-opacity white, with the navy triangle drawn on top. Drawing a chip here
+   as well would stack a second white box behind the one in the asset.
+   Left at its natural 72x72 so the square artwork is never scaled unevenly. */
+.ct-event > aside figure > a img {
+    width: 72px;
+    height: 72px;
+    transition: transform var(--transition-base);
+}
+
+.ct-event > aside figure > a:hover img {
+    transform: scale(1.06);
+}
+
+/* Primary action */
+.ct-event > aside > p {
+    margin: 0;
+}
+
+/* Both forms, because the live state is an <a> and the past state is a real
+   <button disabled>. `font: inherit` matters on the button — form controls do
+   not inherit type from the page, so without it the label falls back to the
+   browser's UI font and the two states no longer match. */
+.ct-event > aside > p:first-of-type > a,
+.ct-event > aside > p:first-of-type > button {
+    display: block;
+    width: 100%;
+    padding: 14px 20px;
+    border: 1px solid var(--palette-nova-blue);
+    border-radius: var(--spacing-x-sm);
+    background: var(--palette-nova-blue);
+    box-shadow: 0 2px 3px rgba(16, 24, 40, 0.06);
+    text-align: center;
+    font-family: var(--font-body);
+    font-weight: var(--font-weight-medium);
+    font-size: var(--fs-label-lg);
+    line-height: var(--lh-label-lg);
+    letter-spacing: var(--tracking-body);
+    color: var(--palette-nova-50);
+    transition: background var(--transition-fast), color var(--transition-fast);
+}
+
+.ct-event > aside > p:first-of-type > a:hover {
+    background: var(--palette-generic-00);
+    color: var(--palette-nova-blue);
+}
+
+/* Registration closed. Flat and unmistakably inert — no shadow, no hover, and
+   the cursor says so before the click does. */
+.ct-event > aside > p:first-of-type > button[disabled] {
+    border-color: var(--palette-neutral-200);
+    background: var(--palette-neutral-100);
+    box-shadow: none;
+    color: var(--palette-neutral-400);
+    cursor: not-allowed;
+}
+
+.ct-event > aside hr {
+    margin: 0;
+}
+
+/* "Share" label */
+.ct-event > aside > p:nth-of-type(2) {
+    font-size: var(--fs-label);
+    line-height: var(--lh-body-sm);
+}
+
+.ct-event > aside ul {
+    display: flex;
+    gap: var(--spacing-x-sm);
+    margin: calc(var(--spacing-x-sm) * -1) 0 0;
+    padding: 0;
+    list-style: none;
+}
+
+.ct-event > aside li {
+    flex: 1 1 0;
+    min-width: 0;
+}
+
+.ct-event > aside li a {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 6px 12px;
+    border: 1px solid var(--palette-neutral-200);
+    border-radius: var(--spacing-x-sm);
+    background: var(--palette-generic-00);
+    transition: border-color var(--transition-fast), background var(--transition-fast);
+}
+
+.ct-event > aside li a:hover {
+    background: var(--palette-neutral-100);
+}
+
+.ct-event > aside li img {
+    width: 24px;
+    height: 24px;
+}
+
+/* ==========================================================================
+   BODY — the WYSIWYG zone. Figma 14851:47019.
+   TAG SELECTORS ONLY BELOW THIS LINE, down to the speaker block. Every rule
+   must survive a CMS Rich Text field that emits classless markup in any order.
+   ========================================================================== */
+.ct-event > article {
+    font-size: var(--fs-body-lg);
+    line-height: var(--lh-body-lg);
+}
+
+.ct-event > article > :first-child { margin-top: 0; }
+.ct-event > article > :last-child { margin-bottom: 0; }
+
+.ct-event > article h2,
+.ct-event > article h3 {
+    margin: var(--spacing-x-lg) 0 var(--spacing-md);
+    font-family: var(--font-heading);
+    font-weight: var(--font-weight-medium);
+    font-size: var(--fs-h2);
+    line-height: var(--lh-h2);
+    letter-spacing: var(--tracking-body);
+    color: var(--palette-vault-navy);
+}
+
+.ct-event > article h3 {
+    font-size: var(--fs-h4);
+    line-height: var(--lh-h4);
+}
+
+.ct-event > article p { margin: 0 0 var(--spacing-md); }
+
+.ct-event > article a:hover { text-decoration: underline; }
+
+.ct-event > article strong,
+.ct-event > article b {
+    font-weight: var(--font-weight-medium);
+    color: var(--palette-vault-navy);
+}
+
+/* The agenda. Figma draws a filled check against every line, and the marker is
+   DRAWN — a tinted disc and a rotated two-border tick — rather than marked up
+   as a per-item <svg>. Two reasons, and both matter here:
+   - a <ul> the CMS produced contains nothing but text, so anything that has to
+     be typed into each <li> would simply be absent;
+   - it is CSS, so it costs the stylesheet ~300 bytes once instead of ~250 per
+     bullet in every pasted Embed.
+   The same idiom already draws the breadcrumb chevron above and the FAQ
+   chevron in blog-detail.css. A `data:` URI would also have worked and is
+   deliberately not used — see the rule in CLAUDE.md. */
+.ct-event > article ul,
+.ct-event > article ol {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-x-big);
+    margin: 0 0 var(--spacing-md);
+    padding: 0;
+    list-style: none;
+}
+
+.ct-event > article li {
+    position: relative;
+    padding-left: var(--spacing-xx-big);
+}
+
+.ct-event > article ul li::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 4px;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: var(--palette-nova-blue);
+}
+
+.ct-event > article ul li::after {
+    content: '';
+    position: absolute;
+    left: 8px;
+    top: 9px;
+    width: 5px;
+    height: 9px;
+    border-right: 2px solid var(--palette-generic-00);
+    border-bottom: 2px solid var(--palette-generic-00);
+    transform: rotate(45deg);
+}
+
+.ct-event > article ol li { padding-left: 0; }
+
+.ct-event > article figure { margin: var(--spacing-x-lg) 0; }
+
+.ct-event > article img {
+    width: 100%;
+    border-radius: var(--spacing-x-sm);
+}
+
+.ct-event > article figure:empty {
+    aspect-ratio: 16 / 9;
+    border-radius: var(--spacing-x-sm);
+    background: var(--palette-visual-placeholder);
+}
+
+.ct-event > article blockquote {
+    margin: var(--spacing-x-lg) 0;
+    padding: 0 0 0 var(--spacing-x-big);
+    border-left: 2px solid var(--palette-nova-blue);
+    color: var(--palette-vault-navy);
+}
+
+/* ==========================================================================
+   ABOUT THE SPEAKER — Figma 14851:47047.
+   A Swiper carousel when the event has more than one speaker, a plain block
+   when it has one. Swiper 11 comes from the CDN, loaded beside the markup in
+   the page — the same arrangement `about-us/Testimonials.astro` uses.
+
+   WHY THIS IS A GRID CHILD OF `.ct-event` AND NOT PART OF <article>.
+   It used to live inside <article>, and that was a bug rather than a filing
+   choice. `.ct-event > article ol` scores (0,1,2); `.ct-event-speakers > ol`
+   scores (0,1,1), because a child combinator contributes nothing to
+   specificity. The agenda list's `flex-direction: column` therefore beat the
+   track's `row` no matter which rule came last, and every speaker stacked.
+   Out here nothing in the WYSIWYG block can reach this section, so these
+   selectors can stay as light as the rest of the file.
+
+   It is also the one region allowed to carry classes. <article> is the Rich
+   Text zone and must stay classless; the speakers are a multi-reference field
+   rendered by a Webflow Collection List, so `.swiper` and friends are safe. */
+/* The section owns the rule that separates it from the agenda. `.ct-event hr`
+   sets `margin: 32px 0 0`; here the gap belongs underneath it instead, and the
+   grid `row-gap` already supplies the space above. */
+.ct-event-speakers > hr {
+    margin: 0 0 var(--spacing-x-lg);
+}
+
+.ct-event-speakers > header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--spacing-md);
+    margin: 0 0 var(--spacing-x-big);
+}
+
+.ct-event-speakers > header h2 {
+    margin: 0;
+    font-family: var(--font-heading);
+    font-weight: var(--font-weight-medium);
+    font-size: var(--fs-h3);
+    line-height: var(--lh-h3);
+    letter-spacing: var(--tracking-heading);
+    color: var(--palette-vault-navy);
+}
+
+/* Pager. Rendered by the page only when there is more than one speaker —
+   there is nothing to page to otherwise, and two dead buttons read as a broken
+   control. */
+.ct-event-speakers > header > span {
+    display: flex;
+    gap: var(--spacing-x-sm);
+    flex-shrink: 0;
+}
+
+.ct-event-speakers button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--spacing-x-sm);
+    border: 1px solid var(--palette-ledger-300);
+    border-radius: var(--spacing-xx-sm);
+    background: var(--palette-generic-00);
+    color: var(--palette-neutral-700);
+    cursor: pointer;
+    transition: border-color var(--transition-fast), color var(--transition-fast);
+}
+
+.ct-event-speakers button:hover {
+    border-color: var(--palette-nova-blue);
+    color: var(--palette-nova-blue);
+}
+
+.ct-event-speakers button svg {
+    width: 20px;
+    height: 20px;
+}
+
+/* Swiper adds this at either end of the track. Faded rather than removed, so
+   the pager keeps its shape and the layout does not shift as you page. */
+.ct-event-speakers button.swiper-button-disabled {
+    opacity: 0.4;
+    cursor: default;
+    pointer-events: none;
+}
+
+/* ---- the track -----------------------------------------------------------
+   Swiper owns the horizontal layout — `.swiper`, `.swiper-wrapper` and
+   `.swiper-slide` come from the CDN stylesheet, and nothing here re-declares
+   them. The rules below style the CONTENTS of a panel, by tag, so they apply
+   whether or not Swiper is on the page: a single-speaker event renders the
+   same DOM with the classes omitted and must look identical.
+   No `overflow` rule here. `.swiper` from the CDN already clips its own track,
+   and without Swiper there is exactly one speaker, so there is nothing to
+   clip. */
+.ct-event-speakers article {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-md);
+    /* Slides size to their own content under `autoHeight`; without this
+       Swiper's default stretches every panel to the tallest bio. */
+    height: auto;
+    /* ROOM FOR THE BUTTON'S SHADOW, and the reason it lives on the slide.
+       `autoHeight` sets the track's height to this element's offsetHeight, and
+       `.swiper` clips to it — so the View Profile button's `0 2px 6px` shadow,
+       which extends ~8px past the bottom edge, was being sliced off along with
+       the last pixel of its border. Padding is inside offsetHeight, so it
+       widens the measured box and the shadow lands within the clip. Putting it
+       on the wrapper instead would not work: Swiper writes that height itself
+       on every resize. */
+    padding-bottom: 10px;
+}
+
+.ct-event-speakers article > p {
+    margin: 0;
+    font-size: var(--fs-body);
+    line-height: var(--lh-body);
+}
+
+/* Author row: avatar and name on the left, View Profile on the right. */
+.ct-event-speakers article > div {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--spacing-md);
+}
+
+.ct-event-speakers address {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--spacing-md);
+    font-style: normal;
+}
+
+/* Initials until a real image is dropped in — the same empty state the blog
+   author card and the event cards use. */
+.ct-event-speakers address > span:first-child {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 48px;
+    height: 48px;
+    flex-shrink: 0;
+    overflow: hidden;
+    border-radius: 50%;
+    background: var(--palette-nova-50);
+    font-weight: var(--font-weight-medium);
+    font-size: var(--fs-body-sm);
+    color: var(--palette-nova-blue);
+}
+
+.ct-event-speakers address > span:first-child img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.ct-event-speakers address > span:last-child {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-xx-sm);
+    font-size: var(--fs-body-sm);
+    line-height: var(--lh-body-sm);
+}
+
+.ct-event-speakers address strong {
+    font-weight: var(--font-weight-medium);
+    font-size: var(--fs-body);
+    line-height: var(--lh-body);
+    color: var(--palette-vault-navy);
+}
+
+.ct-event-speakers article > div > a {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--spacing-x-sm);
+    padding: 14px 20px;
+    border: 1px solid var(--palette-neutral-200);
+    border-radius: var(--spacing-x-sm);
+    background: var(--palette-generic-00);
+    box-shadow: 0 2px 6px rgba(16, 24, 40, 0.06);
+    font-weight: var(--font-weight-medium);
+    font-size: var(--fs-label-lg);
+    line-height: var(--lh-label-lg);
+    color: var(--palette-neutral-700);
+    transition: border-color var(--transition-fast), color var(--transition-fast);
+}
+
+.ct-event-speakers article > div > a svg {
+    width: 16px;
+    height: 16px;
+}
+
+/* ==========================================================================
+   UPCOMING EVENTS & WEBINARS — Figma 14851:47130
+   ========================================================================== */
+.ct-event-related {
+    padding-top: var(--spacing-xxx-lg);
+    padding-bottom: var(--spacing-xxx-lg);
+}
+
+.ct-event-related > h2 {
+    margin: 0;
+    font-family: var(--font-heading);
+    font-weight: var(--font-weight-medium);
+    font-size: var(--fs-h1);
+    line-height: var(--lh-h1);
+    letter-spacing: var(--tracking-heading);
+    color: var(--palette-vault-navy);
+}
+
+.ct-event-related > p {
+    margin: var(--spacing-x-sm) 0 0;
+    font-size: var(--fs-body-lg);
+    line-height: var(--lh-body-lg);
+}
+
+.ct-event-related ul {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--spacing-x-big);
+    margin: var(--spacing-x-big) 0 0;
+    padding: 0;
+    list-style: none;
+}
+
+@media (width >= 640px)  { .ct-event-related ul { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (width >= 1024px) { .ct-event-related ul { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+
+.ct-event-related li > a {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-md);
+    height: 100%;
+}
+
+/* Card thumbnail. The chips are absolutely positioned inside it:
+   1 = type, 2 = the corner arrow, 3 = the lead speaker. */
+.ct-event-related figure {
+    position: relative;
+    margin: 0;
+    overflow: hidden;
+    aspect-ratio: 16 / 9;
+    border: 1px solid var(--palette-ledger-300);
+    border-radius: 12px;
+    background: var(--palette-visual-placeholder);
+}
+
+.ct-event-related figure img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.ct-event-related figure > span {
+    position: absolute;
+    display: inline-flex;
+    align-items: center;
+    gap: var(--spacing-x-sm);
+    padding: 6px 12px;
+    border-radius: var(--spacing-x-sm);
+    background: var(--palette-neutral-100);
+    font-weight: var(--font-weight-medium);
+    font-size: var(--fs-label);
+    line-height: var(--lh-label);
+    color: var(--palette-neutral-700);
+}
+
+.ct-event-related figure > span:nth-of-type(1) {
+    top: var(--spacing-md);
+    left: var(--spacing-md);
+    border: 1px solid var(--palette-ledger-300);
+}
+
+.ct-event-related figure > span:nth-of-type(2) {
+    top: var(--spacing-md);
+    right: var(--spacing-md);
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    padding: 0;
+    background: var(--palette-ledger-white);
+    color: var(--palette-vault-navy);
+    transition: background var(--transition-base), color var(--transition-base);
+}
+
+.ct-event-related li > a:hover figure > span:nth-of-type(2) {
+    background: var(--palette-nova-blue);
+    color: var(--palette-ledger-white);
+}
+
+/* Bottom-left, and clipped rather than wrapped: speaker strings run long
+   ("Vivek Menon, Solutions Architect") and a second line would collide with
+   the image's bottom edge. */
+.ct-event-related figure > span:nth-of-type(3) {
+    right: var(--spacing-md);
+    bottom: var(--spacing-md);
+    left: var(--spacing-md);
+    display: block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    width: fit-content;
+}
+
+.ct-event-related figure svg {
+    width: 16px;
+    height: 16px;
+}
+
+.ct-event-related h3 {
+    /* Clamped: the Figma cards truncate at two lines, and without it one long
+       title leaves a card taller than the rest of its row. */
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    margin: 0;
+    font-family: var(--font-body);
+    font-weight: var(--font-weight-medium);
+    font-size: var(--fs-label-lg);
+    line-height: var(--lh-label-lg);
+    letter-spacing: var(--tracking-body);
+    color: var(--palette-vault-navy);
+    transition: color var(--transition-base);
+}
+
+.ct-event-related li > a > p {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--spacing-sm);
+    margin: calc(var(--spacing-xx-sm) * -1) 0 0;
+    font-size: var(--fs-body-sm);
+    line-height: var(--lh-body-sm);
+}
+
+.ct-event-related li > a > p > span,
+.ct-event-related li > a > p > time {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--spacing-x-sm);
+    color: var(--palette-neutral-500);
+}
+
+.ct-event-related li > a > p > span:empty {
+    width: 1px;
+    height: 16px;
+    border-radius: var(--spacing-xx-sm);
+    background: var(--palette-ledger-300);
+}
+
+.ct-event-related li > a > p svg {
+    width: 20px;
+    height: 20px;
+}
+
+/* ==========================================================================
+   MOBILE — the heading scale already steps down in tokens.css below 768px.
+   ========================================================================== */
+@media (width < 768px) {
+    /* Still has to clear the fixed navbar, so this is well above the 48px the
+       rest of the mobile rhythm uses. */
+    .ct-event {
+        padding-top: var(--spacing-x-huge);
+        padding-bottom: var(--spacing-x-big);
+    }
+
+    .ct-event-related {
+        padding-top: var(--spacing-x-lg);
+        padding-bottom: var(--spacing-x-lg);
+    }
+
+    .ct-event-speakers article > div > a { width: 100%; justify-content: center; }
+}

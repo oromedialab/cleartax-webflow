@@ -1,0 +1,121 @@
+---
+/**
+ * Hero — Retail and Consumers. Figma node 15389:31788.
+ *
+ * Two-column bordered hero card (left: headline + trusted-by strip, right:
+ * visual placeholder) over an interactive Dotgrid, matching the
+ * indirect-tax-page Hero's dot-grid + radial-wash treatment.
+ */
+import Dotgrid from "../_shared/Dotgrid.astro";
+
+/** Same brand marks as delivery-page/Logostrip.astro's social-proof strip. */
+const logos: string[] = [
+  "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6a2fc5fd373e2872bd820152_brand-1-img.png",
+  "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6a2fc6046e7426adbd019ed6_brand-2-img.png",
+  "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6a2fc60a6c38dc1440e954cd_brand-3-img.png",
+  "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6a2fc6116c38dc1440e9643c_brand-4-img.png",
+  "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6a2fc61609b3bd73c0f39c81_brand-5-img.png",
+  "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6a2fc61c3ca1726d5e2aa651_brand-6-img.png",
+  "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6a2fc623c06d0a708d98acf5_brand-7-img.png",
+  "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6a2fc628ad92208b0c0d0bcf_brand-8-img.png",
+  "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6a2fc62fe6176c452e670d85_brand-9-img.png",
+  "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6a2fc63571c2777eb595fc0a_brand-10-img.png",
+  "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6a2fc63b994e6f0061916071_brand-11-img.png",
+  "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6a2fc6410183fdb4f4d5dc99_brand-12-img.png",
+  "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6a2fc646a365fcbc02c11af3_brand-13-img.png",
+  "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6a2fc64da365fcbc02c11de4_brand-14-img.png",
+  "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6a2fc654a4df647a7bb2f894_brand-15-img.png",
+  "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6a2fc65af3eec20e67f5cd1c_brand-16-img.png",
+  "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6a2fc661da8cceda23ec5615_brand-17-img.png",
+];
+const marqueeLogos = [...logos, ...logos];
+---
+
+<section
+  id="hero"
+  class="relative bg-generic-00 overflow-hidden pt-32 pb-16 lg:pt-[calc(var(--nav-clear)+32px)] lg:pb-20"
+>
+  <Dotgrid containerId="hero" baseColor="#C8F006" />
+
+  <div
+    class="absolute inset-0 z-0 bg-[radial-gradient(circle_at_center,_#FFF_0%,_rgba(242,_241,_240,_0.25)_30.04%,_rgba(255,255,255,0)_65%)] pointer-events-none"
+  >
+  </div>
+
+  <div class="container relative z-10">
+    <div
+      class="relative overflow-hidden rounded-2xl border border-neutral-200 bg-generic-00 p-12 max-lg:p-6"
+    >
+      <div class="relative grid lg:grid-cols-2 gap-12 items-center">
+        <div class="flex flex-col gap-8 max-lg:gap-6">
+          <div class="flex flex-col gap-6">
+            <h1
+              class="m-0 font-heading font-semibold text-vault-navy text-[length:var(--fs-display-sm)] leading-[length:var(--lh-display-sm)] lg:text-[length:var(--fs-display-lg)] lg:leading-[length:var(--lh-display-lg)] tracking-[-1px]"
+            >
+              We understand<br />the billing counter,<br />not just the e-invoice.
+            </h1>
+            <p
+              class="m-0 font-body text-vault-navy text-[length:var(--fs-body-lg)] leading-[length:var(--lh-body-lg)]"
+            >
+              One integration. Every mandate.<br />No new project when the next country goes live.
+            </p>
+          </div>
+
+          <div class="flex flex-col gap-4 pt-6 border-t border-neutral-200">
+            <div class="flex items-center gap-6 max-sm:flex-col max-sm:items-start max-sm:gap-3">
+              <span class="shrink-0 font-body text-[length:var(--fs-body)] leading-[length:var(--lh-body)] text-neutral-500">
+                Trusted by
+              </span>
+              <div class="rc-hero-marquee relative w-full overflow-hidden">
+                <div class="rc-hero-marquee-track flex items-center gap-2 w-max motion-reduce:animate-none">
+                  {
+                    marqueeLogos.map((src, i) => (
+                      <span class="flex h-12 w-[124px] shrink-0 items-center justify-center rounded-lg bg-neutral-100">
+                        <img
+                          src={src}
+                          alt="Customer logo"
+                          aria-hidden={i >= logos.length}
+                          class="h-[26px] w-[86px] object-contain mix-blend-multiply"
+                          loading="lazy"
+                          decoding="async"
+                        />
+                      </span>
+                    ))
+                  }
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="aspect-[568/400] w-full bg-visual-placeholder rounded-xl"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style is:global>
+  /* Prefixed rc-hero- so it can't collide with another section's marquee on
+     the same page — see docs' "Section CSS is unscoped and shared per page". */
+  .rc-hero-marquee {
+    -webkit-mask-image: linear-gradient(to right, transparent 0%, #000 6%, #000 94%, transparent 100%);
+    mask-image: linear-gradient(to right, transparent 0%, #000 6%, #000 94%, transparent 100%);
+  }
+
+  .rc-hero-marquee-track {
+    animation: rc-hero-marquee-scroll 40s linear infinite;
+  }
+
+  .rc-hero-marquee:hover .rc-hero-marquee-track {
+    animation-play-state: paused;
+  }
+
+  @keyframes rc-hero-marquee-scroll {
+    from {
+      transform: translateX(0);
+    }
+    to {
+      transform: translateX(-50%);
+    }
+  }
+</style>
