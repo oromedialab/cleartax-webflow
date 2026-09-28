@@ -54,6 +54,7 @@ export const PAGE_TARGETS = [
   { name: 'about-us', input: 'src/styles/about-us.css', page: 'src/pages/about-us.astro' },
   { name: 'indirect-tax-page', input: 'src/styles/indirect-tax-page.css', page: 'src/pages/indirect-tax-page.astro' },
   { name: 'press', input: 'src/styles/press.css', page: 'src/pages/press.astro' },
+  { name: 'partner-program-page', input: 'src/styles/partner-program-page.css', page: 'src/pages/partner-program-page.astro' },
   { name: 'events', input: 'src/styles/events.css', page: 'src/pages/events.astro' },
   // Detail route, the events twin of `blog-detail` above. It uses no utilities
   // beyond `container` — the design is element selectors in event-detail.css
