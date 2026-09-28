@@ -1,0 +1,96 @@
+---
+/**
+ * "We speak the language of your existing stack." Real Estate variant of
+ * retail-consumer/ExistingSystems.astro — same three-category card layout,
+ * re-skinned for real estate/construction systems. None of these vendors
+ * have a hosted Webflow logo asset yet, so every badge falls back to the
+ * neutral monogram swatch (same fallback pattern the retail-consumer
+ * version uses for POS vendors without art).
+ */
+interface Logo {
+  name: string;
+  src?: string;
+}
+
+interface Category {
+  title: string;
+  desc: string;
+  logos: Logo[];
+}
+
+const categories: Category[] = [
+  {
+    title: "Real Estate ERPs",
+    desc: "Where leases, SPVs and off-plan schedules live.",
+    logos: [
+      { name: "SAP RE-FX" },
+      { name: "Yardi Voyager" },
+      { name: "Oracle Fusion" },
+      { name: "MS Dynamics 365" },
+      { name: "MRI Software" },
+    ],
+  },
+  {
+    title: "Construction Systems",
+    desc: "Where interim bills, Bills of Quantities (BOQs) and certification happen.",
+    logos: [
+      { name: "Procore" },
+      { name: "Primavera P6" },
+      { name: "JD Edwards" },
+      { name: "SAP PS" },
+      { name: "COINS ERP" },
+    ],
+  },
+  {
+    title: "SPV & JV Structures",
+    desc: "Where entity boundaries and VAT groups are managed.",
+    logos: [
+      { name: "Entity register" },
+      { name: "VAT group map" },
+      { name: "Grace-period logic" },
+      { name: "JV boundary rules" },
+    ],
+  },
+];
+---
+
+<section class="bg-generic-00 border-t border-neutral-200 py-16 lg:py-20">
+  <div class="container">
+    <div class="flex flex-col gap-12">
+      <h2 class="m-0 font-heading font-medium text-vault-navy text-center text-[length:var(--fs-h1)] leading-[length:var(--lh-h1)] tracking-[-0.5px]">
+        We speak the language of your existing stack.
+      </h2>
+
+      <div class="grid grid-cols-1 lg:grid-cols-3 rounded-xl border border-neutral-200 divide-y divide-neutral-200 lg:divide-y-0 lg:divide-x">
+        {
+          categories.map((cat) => (
+            <div class="flex flex-col gap-12 p-6">
+              <div class="flex flex-col gap-2">
+                <p class="m-0 font-body font-semibold text-vault-navy text-[length:var(--fs-body-lg)] leading-[length:var(--lh-body-lg)]">
+                  {cat.title}
+                </p>
+                <p class="m-0 font-body text-neutral-500 text-[length:var(--fs-body)] leading-[length:var(--lh-body)]">
+                  {cat.desc}
+                </p>
+              </div>
+              <div class="flex flex-wrap gap-2">
+                {cat.logos.map((logo) => (
+                  <span class="inline-flex items-center gap-x-3 gap-y-2 rounded-lg border border-neutral-200 px-3 py-1.5">
+                    {logo.src ? (
+                      <img src={logo.src} alt="" class="max-h-6 w-full object-contain" loading="lazy" decoding="async" />
+                    ) : (
+                      <span class="h-6 w-6 shrink-0 rounded-md bg-neutral-200" aria-hidden="true" />
+                    )}
+                    <span class="font-body font-medium text-neutral-700 text-[length:var(--fs-label)] leading-[length:var(--lh-label)] whitespace-nowrap">
+                      {logo.name}
+                    </span>
+                  </span>
+                ))}
+              </div>
+            </div>
+          ))
+        }
+      </div>
+    </div>
+  </div>
+</section>

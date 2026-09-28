@@ -1,0 +1,180 @@
+---
+/**
+ * "Solving the complexity of making and moving goods." Manufacturing variant
+ * of retail-consumer/GlobalTrade.astro's sticky scroll-jack card track — same
+ * mechanism (see that file's doc comment for the shared pattern across
+ * `_shared/UnderneathMandate.astro` / `uae-regional/Network.astro` /
+ * `direct-tax-page/Filing.astro`), re-skinned with the six manufacturing edge
+ * cases from the source doc.
+ */
+interface TradeCard {
+  title: string;
+  text: string;
+}
+
+const cards: TradeCard[] = [
+  {
+    title: "Moving your own stock across a border must be invoiced",
+    text: "Every transfer of own goods is tracked from dispatch to call-off, with the register entry and the recapitulative report built as the movement happens. The 12-month clock runs per consignment, and stock about to time out is flagged as a deemed acquisition before it becomes one.",
+  },
+  {
+    title: "Three companies, one shipment, and only one leg is zero-rated",
+    text: "The transport leg is assigned once, from who actually arranges the movement, and every document in the chain inherits that decision. Where the simplification does not hold, the registration it triggers surfaces before the goods leave, not after the return is filed.",
+  },
+  {
+    title: "Your ERP books a goods receipt. The tax is on a service.",
+    text: "Toll and subcontract flows are classified at item-category level, so a processing fee is treated as a service and free-issue material stays out of the sale. Ownership is tracked through the conversion, and the country where tax falls due follows the ownership, not the receipt.",
+  },
+  {
+    title: "Shipping something for nothing still needs an invoice",
+    text: "Each zero-value movement is classified when it is raised: warranty replacement, sample, promotional gift, scrap. The ones that are deemed supplies carry output tax on cost. The rest move on the right document with the evidence held against them.",
+  },
+  {
+    title: "A rebate agreed in March reprices invoices you filed in June",
+    text: "Volume rebates accrue against the invoices they will adjust, then settle as credit notes that reference each one. Domestic and cross-border lines are split before the credit is issued, so the adjustment lands in the right base and the right return.",
+  },
+  {
+    title: "Ex Works makes the export the buyer's job and the VAT yours",
+    text: "The Incoterm on the order decides the treatment, not the shipping note. Where the buyer clears the goods, proof of exit is tracked against the invoice, and a shipment still missing evidence is flagged as a domestic sale before the return, not after the audit.",
+  },
+];
+---
+
+<div class="trade-sticky-container">
+  <section class="sticky top-0 flex flex-col justify-center bg-generic-00 border-t border-neutral-200 py-16 lg:py-20 overflow-hidden min-h-[calc(100vh-80px)]">
+    <div class="container flex flex-col gap-12">
+      <h2 class="m-0 font-heading font-medium text-vault-navy text-[length:var(--fs-h1)] leading-[length:var(--lh-h1)] tracking-[-0.5px]">
+        Solving the complexity of making and moving goods.
+      </h2>
+
+      <div class="flex flex-col gap-12">
+        <div class="w-full h-auto">
+          <div
+            class="trade-track flex items-start gap-12 w-max transition-transform duration-[250ms] ease-out will-change-transform"
+            data-trade-track
+          >
+            {
+              cards.map((card) => (
+                <div class="trade-card flex flex-col gap-6 shrink-0 w-[85vw] sm:w-105 lg:w-[560px] select-none">
+                  <div class="trade-card-img aspect-[1280/720] w-full bg-visual-placeholder rounded-lg pointer-events-none"></div>
+                  <div class="flex flex-col gap-4 pointer-events-none">
+                    <p class="trade-card-title m-0 font-heading font-medium text-vault-navy text-[length:var(--fs-h5)] leading-[length:var(--lh-h5)] tracking-[-0.5px]">
+                      {card.title}
+                    </p>
+                    <p class="trade-card-desc m-0 font-body text-neutral-500 text-[length:var(--fs-body-lg)] leading-[length:var(--lh-body-lg)]">
+                      {card.text}
+                    </p>
+                  </div>
+                </div>
+              ))
+            }
+          </div>
+        </div>
+
+        <div class="relative h-2 w-full rounded-lg bg-neutral-300 overflow-hidden" aria-hidden="true">
+          <div class="trade-progress-fill absolute inset-y-0 left-0 rounded-lg bg-nova-blue" data-trade-fill></div>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<script is:inline>
+  (function () {
+    const initTradeScroll = () => {
+      const containers = document.querySelectorAll(".trade-sticky-container");
+      if (!containers.length) return;
+
+      containers.forEach((container) => {
+        const track = container.querySelector("[data-trade-track]");
+        const section = container.querySelector("section");
+        const fill = container.querySelector("[data-trade-fill]");
+        if (!track || !section) return;
+
+        const getHeaderHeight = () => {
+          const header = document.querySelector("header, .navbar, .w-nav");
+          return header ? header.offsetHeight : 80;
+        };
+
+        let maxTranslate = 0;
+        let totalScrollable = 0;
+        let stickyTop = 0;
+
+        const updateMeasurements = () => {
+          const sectionHeight = section.offsetHeight;
+          const windowHeight = window.innerHeight;
+          const headerHeight = getHeaderHeight();
+
+          const trackOffset = track.parentElement.getBoundingClientRect().top - section.getBoundingClientRect().top;
+          const trackHeight = track.offsetHeight;
+          const availableSpace = windowHeight - headerHeight;
+
+          const idealTrackTop = headerHeight + Math.max(40, (availableSpace - trackHeight) / 2);
+          const calculatedTop = idealTrackTop - trackOffset;
+
+          // Position section flush under header when sticky, avoiding gap on large screens
+          stickyTop = Math.min(headerHeight, calculatedTop);
+          section.style.top = `${stickyTop}px`;
+
+          const containerWidth = track.parentElement.getBoundingClientRect().width;
+          maxTranslate = Math.max(0, track.scrollWidth - containerWidth);
+          container.style.height = `${maxTranslate + windowHeight}px`;
+          totalScrollable = container.getBoundingClientRect().height - sectionHeight;
+        };
+
+        updateMeasurements();
+
+        if (window.ResizeObserver) {
+          const ro = new ResizeObserver(updateMeasurements);
+          ro.observe(section);
+          ro.observe(track);
+        }
+        window.addEventListener("resize", updateMeasurements);
+
+        let ticking = false;
+
+        const handleScroll = () => {
+          if (ticking) return;
+          window.requestAnimationFrame(() => {
+            const containerRect = container.getBoundingClientRect();
+            const scrolledDistance = Math.max(0, stickyTop - containerRect.top);
+
+            let progress = totalScrollable > 0 ? scrolledDistance / totalScrollable : 0;
+            progress = Math.max(0, Math.min(1, progress));
+
+            track.style.transform = `translate3d(-${progress * maxTranslate}px, 0, 0)`;
+
+            if (fill) {
+              fill.style.width = `${progress * 100}%`;
+            }
+
+            ticking = false;
+          });
+          ticking = true;
+        };
+
+        const observer = new IntersectionObserver(
+          (entries) => {
+            entries.forEach((entry) => {
+              if (entry.isIntersecting) {
+                window.addEventListener("scroll", handleScroll, { passive: true });
+                handleScroll();
+              } else {
+                window.removeEventListener("scroll", handleScroll);
+              }
+            });
+          },
+          { rootMargin: "100% 0px 100% 0px" },
+        );
+
+        observer.observe(container);
+      });
+    };
+
+    if (document.readyState === "loading") {
+      document.addEventListener("DOMContentLoaded", initTradeScroll);
+    } else {
+      initTradeScroll();
+    }
+  })();
+</script>

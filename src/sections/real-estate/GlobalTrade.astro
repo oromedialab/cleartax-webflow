@@ -1,0 +1,180 @@
+---
+/**
+ * "Every compliance edge case, pre-solved." Real Estate variant of
+ * retail-consumer/GlobalTrade.astro's sticky scroll-jack card track — same
+ * mechanism (see that file's doc comment for the shared pattern across
+ * `_shared/UnderneathMandate.astro` / `uae-regional/Network.astro` /
+ * `direct-tax-page/Filing.astro`), re-skinned with the six real-estate edge
+ * cases from the source doc.
+ */
+interface TradeCard {
+  title: string;
+  text: string;
+}
+
+const cards: TradeCard[] = [
+  {
+    title: "One property sale can have multiple tax rates on the same invoice",
+    text: "Tax category codes are assigned and validated at line level, never rolled up to the invoice. Exempt lines auto-match to the correct exemption reason at master-data load.",
+  },
+  {
+    title: "Off-plan sales are billed in stages, and credit notes are common",
+    text: "Instalment schedules auto-generate a compliant e-invoice at each milestone trigger, with the tax point set to the contractual event. Post-transmission amendment is blocked.",
+  },
+  {
+    title: "Long-term leases create recurring invoices across every payment cycle",
+    text: "Each periodic invoice generates from the lease master rather than the finance calendar, tagged as a continuous supply with the tax point set to the instalment due date.",
+  },
+  {
+    title: "Transfers between group entities still require valid invoices at arm's length",
+    text: "A live entity register maps every vehicle and joint venture against VAT-group membership, so the engine knows in real time whether a transfer is disregarded or invoiceable.",
+  },
+  {
+    title: "Retention is held back on every invoice but must still appear as a separate line",
+    text: "Retention is structured as a distinct, correctly classified line item on every interim bill, never a bottom-line deduction. Unapproved variations are blocked from invoice generation.",
+  },
+  {
+    title: "Property records outlive every other tax document",
+    text: "The archive stores the structured document at line level for the longest window that applies in each market, exportable in open UBL or the original national format at any time.",
+  },
+];
+---
+
+<div class="trade-sticky-container">
+  <section class="sticky top-0 flex flex-col justify-center bg-generic-00 border-t border-neutral-200 py-16 lg:py-20 overflow-hidden min-h-[calc(100vh-80px)]">
+    <div class="container flex flex-col gap-12">
+      <h2 class="m-0 font-heading font-medium text-vault-navy text-[length:var(--fs-h1)] leading-[length:var(--lh-h1)] tracking-[-0.5px]">
+        Every compliance edge case, pre-solved.
+      </h2>
+
+      <div class="flex flex-col gap-12">
+        <div class="w-full h-auto">
+          <div
+            class="trade-track flex items-start gap-12 w-max transition-transform duration-[250ms] ease-out will-change-transform"
+            data-trade-track
+          >
+            {
+              cards.map((card) => (
+                <div class="trade-card flex flex-col gap-6 shrink-0 w-[85vw] sm:w-105 lg:w-[560px] select-none">
+                  <div class="trade-card-img aspect-[1280/720] w-full bg-visual-placeholder rounded-lg pointer-events-none"></div>
+                  <div class="flex flex-col gap-4 pointer-events-none">
+                    <p class="trade-card-title m-0 font-heading font-medium text-vault-navy text-[length:var(--fs-h5)] leading-[length:var(--lh-h5)] tracking-[-0.5px]">
+                      {card.title}
+                    </p>
+                    <p class="trade-card-desc m-0 font-body text-neutral-500 text-[length:var(--fs-body-lg)] leading-[length:var(--lh-body-lg)]">
+                      {card.text}
+                    </p>
+                  </div>
+                </div>
+              ))
+            }
+          </div>
+        </div>
+
+        <div class="relative h-2 w-full rounded-lg bg-neutral-300 overflow-hidden" aria-hidden="true">
+          <div class="trade-progress-fill absolute inset-y-0 left-0 rounded-lg bg-nova-blue" data-trade-fill></div>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<script is:inline>
+  (function () {
+    const initTradeScroll = () => {
+      const containers = document.querySelectorAll(".trade-sticky-container");
+      if (!containers.length) return;
+
+      containers.forEach((container) => {
+        const track = container.querySelector("[data-trade-track]");
+        const section = container.querySelector("section");
+        const fill = container.querySelector("[data-trade-fill]");
+        if (!track || !section) return;
+
+        const getHeaderHeight = () => {
+          const header = document.querySelector("header, .navbar, .w-nav");
+          return header ? header.offsetHeight : 80;
+        };
+
+        let maxTranslate = 0;
+        let totalScrollable = 0;
+        let stickyTop = 0;
+
+        const updateMeasurements = () => {
+          const sectionHeight = section.offsetHeight;
+          const windowHeight = window.innerHeight;
+          const headerHeight = getHeaderHeight();
+
+          const trackOffset = track.parentElement.getBoundingClientRect().top - section.getBoundingClientRect().top;
+          const trackHeight = track.offsetHeight;
+          const availableSpace = windowHeight - headerHeight;
+
+          const idealTrackTop = headerHeight + Math.max(40, (availableSpace - trackHeight) / 2);
+          const calculatedTop = idealTrackTop - trackOffset;
+
+          // Position section flush under header when sticky, avoiding gap on large screens
+          stickyTop = Math.min(headerHeight, calculatedTop);
+          section.style.top = `${stickyTop}px`;
+
+          const containerWidth = track.parentElement.getBoundingClientRect().width;
+          maxTranslate = Math.max(0, track.scrollWidth - containerWidth);
+          container.style.height = `${maxTranslate + windowHeight}px`;
+          totalScrollable = container.getBoundingClientRect().height - sectionHeight;
+        };
+
+        updateMeasurements();
+
+        if (window.ResizeObserver) {
+          const ro = new ResizeObserver(updateMeasurements);
+          ro.observe(section);
+          ro.observe(track);
+        }
+        window.addEventListener("resize", updateMeasurements);
+
+        let ticking = false;
+
+        const handleScroll = () => {
+          if (ticking) return;
+          window.requestAnimationFrame(() => {
+            const containerRect = container.getBoundingClientRect();
+            const scrolledDistance = Math.max(0, stickyTop - containerRect.top);
+
+            let progress = totalScrollable > 0 ? scrolledDistance / totalScrollable : 0;
+            progress = Math.max(0, Math.min(1, progress));
+
+            track.style.transform = `translate3d(-${progress * maxTranslate}px, 0, 0)`;
+
+            if (fill) {
+              fill.style.width = `${progress * 100}%`;
+            }
+
+            ticking = false;
+          });
+          ticking = true;
+        };
+
+        const observer = new IntersectionObserver(
+          (entries) => {
+            entries.forEach((entry) => {
+              if (entry.isIntersecting) {
+                window.addEventListener("scroll", handleScroll, { passive: true });
+                handleScroll();
+              } else {
+                window.removeEventListener("scroll", handleScroll);
+              }
+            });
+          },
+          { rootMargin: "100% 0px 100% 0px" },
+        );
+
+        observer.observe(container);
+      });
+    };
+
+    if (document.readyState === "loading") {
+      document.addEventListener("DOMContentLoaded", initTradeScroll);
+    } else {
+      initTradeScroll();
+    }
+  })();
+</script>

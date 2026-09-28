@@ -1,0 +1,120 @@
+---
+/**
+ * Hero — Manufacturing. Modelled on retail-consumer/Hero.astro's two-column
+ * bordered hero card over a Dotgrid, re-skinned for plant/goods-in-motion
+ * copy.
+ *
+ * Trusted-by names have no hosted Webflow logo assets (source doc gives text
+ * only), so the marquee renders name pills instead of image badges — same
+ * "no fabricated logo" principle retail-consumer/ExistingSystems.astro uses
+ * for POS/e-commerce brands with no art yet.
+ */
+import Dotgrid from "../_shared/Dotgrid.astro";
+
+const trustedByNames: string[] = [
+  "H&M",
+  "IKEA",
+  "PUMA",
+  "Adidas",
+  "Giorgio Armani",
+  "Bisleri",
+  "Carrefour",
+  "Reckitt",
+  "PepsiCo",
+  "Landmark Group",
+  "Joyalukkas",
+  "Asics",
+  "Majid Al Futtaim",
+  "Malabar",
+  "LuLu",
+  "Dolce Gabbana",
+  "Nestle",
+  "Decathlon",
+];
+const marqueeNamePills = [...trustedByNames, ...trustedByNames];
+---
+
+<section
+  id="hero"
+  class="relative bg-generic-00 overflow-hidden pt-32 pb-16 lg:pt-[calc(var(--nav-clear)+32px)] lg:pb-20"
+>
+  <Dotgrid containerId="hero" baseColor="#C8F006" />
+
+  <div
+    class="absolute inset-0 z-0 bg-[radial-gradient(circle_at_center,_#FFF_0%,_rgba(242,_241,_240,_0.25)_30.04%,_rgba(255,255,255,0)_65%)] pointer-events-none"
+  >
+  </div>
+
+  <div class="container relative z-10">
+    <div
+      class="relative overflow-hidden rounded-2xl border border-neutral-200 bg-generic-00 p-12 max-lg:p-6"
+    >
+      <div class="relative grid lg:grid-cols-2 gap-12 items-center">
+        <div class="flex flex-col gap-8 max-lg:gap-6">
+          <div class="flex flex-col gap-6">
+            <h1
+              class="m-0 font-heading font-semibold text-vault-navy text-[length:var(--fs-display-sm)] leading-[length:var(--lh-display-sm)] lg:text-[length:var(--fs-display-lg)] lg:leading-[length:var(--lh-display-lg)] tracking-[-1px]"
+            >
+              Built for goods in motion,<br />not just invoices in a system.
+            </h1>
+            <p
+              class="m-0 font-body text-vault-navy text-[length:var(--fs-body-lg)] leading-[length:var(--lh-body-lg)]"
+            >
+              One integration. Every mandate.<br />No new project when the next plant or country goes live.
+            </p>
+          </div>
+
+          <div class="flex flex-col gap-4 pt-6 border-t border-neutral-200">
+            <div class="flex items-center gap-6 max-sm:flex-col max-sm:items-start max-sm:gap-3">
+              <span class="shrink-0 font-body text-[length:var(--fs-body)] leading-[length:var(--lh-body)] text-neutral-500">
+                Trusted by
+              </span>
+              <div class="mf-hero-marquee relative w-full overflow-hidden">
+                <div class="mf-hero-marquee-track flex items-center gap-2 w-max motion-reduce:animate-none">
+                  {
+                    marqueeNamePills.map((name, i) => (
+                      <span
+                        class="flex h-12 shrink-0 items-center justify-center rounded-lg bg-neutral-100 px-4 font-body font-medium text-[length:var(--fs-label)] leading-[length:var(--lh-label)] text-neutral-700 whitespace-nowrap"
+                        aria-hidden={i >= trustedByNames.length}
+                      >
+                        {name}
+                      </span>
+                    ))
+                  }
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="aspect-[568/400] w-full bg-visual-placeholder rounded-xl"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style is:global>
+  /* Prefixed mf-hero- so it can't collide with another section's marquee on
+     the same page — see docs' "Section CSS is unscoped and shared per page". */
+  .mf-hero-marquee {
+    -webkit-mask-image: linear-gradient(to right, transparent 0%, #000 6%, #000 94%, transparent 100%);
+    mask-image: linear-gradient(to right, transparent 0%, #000 6%, #000 94%, transparent 100%);
+  }
+
+  .mf-hero-marquee-track {
+    animation: mf-hero-marquee-scroll 40s linear infinite;
+  }
+
+  .mf-hero-marquee:hover .mf-hero-marquee-track {
+    animation-play-state: paused;
+  }
+
+  @keyframes mf-hero-marquee-scroll {
+    from {
+      transform: translateX(0);
+    }
+    to {
+      transform: translateX(-50%);
+    }
+  }
+</style>
