@@ -75,7 +75,8 @@ export const PAGE_TARGETS = [
   { name: 'philippines-regional', input: 'src/styles/philippines-regional.css', page: 'src/pages/philippines-regional.astro' },
   { name: 'real-estate', input: 'src/styles/real-estate.css', page: 'src/pages/real-estate.astro' },
   { name: 'manufacturing', input: 'src/styles/manufacturing.css', page: 'src/pages/manufacturing.astro' },
-  { name: 'germany-regional-page', input: 'src/styles/germany-regional-page.css', page: 'src/pages/germany-regional-page.astro' }
+  { name: 'germany-regional-page', input: 'src/styles/germany-regional-page.css', page: 'src/pages/germany-regional-page.astro' },
+  { name: 'uk-regional', input: 'src/styles/uk-regional.css', page: 'src/pages/uk-regional.astro' }
 ];
 
 /**
