@@ -1,22 +1,25 @@
 ---
 /**
- * France regional hero — Figma node 13600:27940.
+ * Closing CTA band — Figma node 13600:29645 ("Container - Partner program").
  *
- * Background is the interactive stroke field from
- * `sections/global-homepage/Hero.astro` (originally
- * `sections/blog-listing/Newsletter.astro`, which carries the full explanation of
- * the geometry): a plain grid of lime dots until a pointer enters, at which point
- * each dot draws out into a stroke aimed at the cursor, longest beside it and back
- * to a dot by `lengthRadius`. Same four gradient layers over it — page gradient,
- * radial wash behind the copy, a mobile-only top fade, and a bottom fade.
+ * Background is the same interactive stroke field as `Hero.astro`, not the
+ * static seven-column dot grid this section used to draw: a plain grid of dots
+ * until a pointer enters, at which point each dot draws out into a stroke aimed
+ * at the cursor, longest beside it and back to a dot by `lengthRadius`. Same
+ * four layers over it too — the page gradient on the section, a radial wash
+ * behind the copy, a mobile-only top fade, and a bottom fade.
  *
- * Ids and the canvas id are `uae-` prefixed rather than the `hero` /
- * `hero-dots-canvas` older files use, because embeds share one namespace per page
- * and a bare `hero` is exactly the kind of name that collides later.
+ * Two deliberate differences from the hero:
+ *   - `baseColor` stays this section's Nova Blue rather than the hero's Flux
+ *     Lime, so the band keeps the tint it was designed with. The geometry is
+ *     identical: lineWidth 2 + gap 24 is the same 26px pitch the old dot grid
+ *     used, so the field lands on the same lattice.
+ *   - The animation loop is gated on an IntersectionObserver. The hero's runs
+ *     unconditionally, and a second always-on 60fps loop on the same page is
+ *     worth not adding. Behaviour while the section is on screen is unchanged.
  *
- * The three badges carry a 28px `bg-visual-placeholder` square where the Figma
- * has an unfilled "Icon placeholder" frame. Swap each for a Webflow-hosted asset
- * once the icons exist — never a `data:` URI, which would blow the paste cap.
+ * Ids are `fr-cta-` prefixed: embeds share one namespace per page, and this
+ * canvas sits on the same page as the hero's.
  */
 interface Props {
     /** Stroke width, and so the diameter of the dot it becomes at rest. */
@@ -39,22 +42,16 @@ const {
     maxLength = 6,
     lengthRadius = 260,
     tilt = 1,
-    baseColor = "#C8F006",
+    baseColor = "rgba(84, 70, 255, 0.5)",
     cursorRadius = 320,
     pull = 14,
     fadeRadius = 40,
 } = Astro.props;
-
-const badges = [
-    "Pre-configured for RR 11-2025",
-    "JSON + JWS signing, EIS transmission, and CAS registration support",
-    "AI-powered integration with SAP, Oracle, MS Dynamics, and 60+ ERPs",
-];
 ---
 
 <section
-    id="uae-hero"
-    class="uae-hero relative overflow-hidden bg-generic-00"
+    id="fr-cta"
+    class="fr-cta relative overflow-hidden bg-generic-00 max-lg:py-16 lg:py-[121px]"
     data-line-width={String(lineWidth)}
     data-gap={String(gap)}
     data-max-length={String(maxLength)}
@@ -67,61 +64,42 @@ const badges = [
 >
     <!-- Interactive stroke field -->
     <div class="absolute inset-0 z-0 w-full h-full pointer-events-none">
-        <canvas id="uae-hero-dots" class="absolute inset-0 w-full h-full"
+        <canvas id="fr-cta-dots" class="absolute inset-0 w-full h-full"
         ></canvas>
     </div>
 
     <!-- Radial wash, so the headline keeps its contrast over the field -->
     <div
-        class="absolute inset-0 z-0 bg-[radial-gradient(circle_at_center,_#FFF_0%,_rgba(242,_241,_240,_0.25)_30.04%,_rgba(255,255,255,0)_65%)] pointer-events-none"
+        class="absolute inset-0 z-0 bg-[radial-gradient(circle_at_center,_rgba(255,255,255,1)_30%,_rgba(255,255,255,0.7)_40%,_rgba(255,255,255,0)_65%)] pointer-events-none"
+    >
+    </div>
+
+    <!-- Top fade to blend smoothly into the preceding section -->
+    <div
+        class="absolute top-0 left-0 right-0 h-40 md:h-56 z-0 bg-gradient-to-b from-white via-white/80 to-transparent pointer-events-none"
+        style="background: linear-gradient(180deg, #FFFFFF 0%, rgba(255, 255, 255, 0.85) 40%, rgba(255, 255, 255, 0) 100%);"
     >
     </div>
 
     <div class="container mx-auto relative z-10">
         <div
-            class="flex flex-col items-center gap-6 text-center max-lg:pt-32 max-lg:pb-16 lg:pt-[257px] lg:pb-[177px]"
+            class="mx-auto flex max-w-[791px] flex-col items-center gap-6 text-center"
         >
-            <div class="flex flex-col items-center w-full">
-                <div class="flex flex-col items-center gap-4 mb-12">
-                    <h1
-                        class="m-0 font-heading font-semibold text-vault-navy text-[length:var(--fs-h1)] md:text-[length:var(--fs-display-sm)] lg:text-[length:var(--fs-display-lg)] leading-[length:var(--lh-h1)] md:leading-[length:var(--lh-display-sm)] lg:leading-[length:var(--lh-display-lg)] tracking-[-1px] max-w-173"
-                    >
-                        The <span class="uae-hero-mark">BIR deadline</span> won't
-                        wait. Are you ready?
-                    </h1>
-
-                    <p
-                        class="m-0 font-body text-neutral-500 text-[length:var(--fs-body-lg)] leading-[length:var(--lh-body-lg)]"
-                    >
-                        ClearTax is the only e-invoicing platform purpose-built
-                        for Philippine tax compliance.
-                    </p>
-                </div>
-
-                <!-- 3 up on desktop, stacking below. Each badge is a fixed 320px in the
-             Figma; `basis` keeps that as the preferred width while still letting
-             them shrink rather than overflow the container. -->
-                <ul
-                    class="flex flex-wrap items-stretch justify-center gap-2 list-none m-0 p-0 w-full"
+            <div class="flex flex-col items-center">
+                <h2
+                    class="m-0 font-heading font-medium text-vault-navy text-[length:var(--fs-h2)] leading-[length:var(--lh-h2)]"
                 >
-                    {
-                        badges.map((label) => (
-                            <li class="flex basis-[350px] grow-0 shrink items-center gap-3 rounded-xl border border-neutral-300 bg-generic-00 p-4 text-left">
-                                <span
-                                    class="block h-9 w-9 shrink-0 rounded-lg bg-visual-placeholder"
-                                    aria-hidden="true"
-                                />
-                                <span class="font-body text-[length:var(--fs-body-sm)] leading-[length:var(--lh-body-sm)] text-vault-navy max-w-[270px]">
-                                    {label}
-                                </span>
-                            </li>
-                        ))
-                    }
-                </ul>
+                    December 2026 is closer than it looks.
+                </h2>
+                <p
+                    class="m-0 font-body font-normal text-neutral-500 text-[length:var(--fs-sm)] leading-[length:var(--lh-sm)] tracking-[-0.5px] max-w-154 mt-6"
+                >
+                    No commitment required. Our compliance team will map your
+                    current state against BIR requirements and tell you exactly
+                    where you stand.
+                </p>
             </div>
 
-            <!-- Opens the HubSpot modal from `DemoModal.astro`. The href is kept real
-           so the CTA still goes somewhere if that section is absent. -->
             <a
                 href="https://www.cleartax.com/contact-us"
                 data-demo-open
@@ -133,29 +111,18 @@ const badges = [
     </div>
 </section>
 
-<style is:global>
-    /* The single Flux Lime instance on this screen. Keeps the highlight intact
-       with proportional horizontal padding and clearance from adjacent text. */
-    .uae-hero-mark {
-        display: inline-block;
-        background-color: var(--color-flux-lime);
-        padding: 4px 13px;
-        -webkit-box-decoration-break: clone;
-        box-decoration-break: clone;
-        border-radius: 12px;
-        vertical-align: baseline;
-    }
-</style>
-
 <script is:inline>
-    /* Interactive stroke field — the one from `sections/global-invoicing/Hero.astro`,
-     which took it from `sections/blog-listing/Newsletter.astro`. That file carries
-     the full explanation of the geometry; the numbers here come off the section's
-     data-* attributes so there is a single source for each. */
-    function initUaeHeroGrid() {
-        const section = document.getElementById("uae-hero");
+    /* Interactive stroke field — the same one as `global-homepage/Hero.astro`,
+     which took it from `sections/blog-listing/Newsletter.astro`. That file
+     carries the full explanation of the geometry; the numbers here come off the
+     section's data-* attributes so there is a single source for each.
+
+     The one change from the hero copy is the IntersectionObserver at the bottom:
+     this loop only runs while the band is on screen. */
+    function initFrCtaGrid() {
+        const section = document.getElementById("fr-cta");
         if (!section) return;
-        const canvas = document.getElementById("uae-hero-dots");
+        const canvas = document.getElementById("fr-cta-dots");
         if (!canvas || !canvas.getContext) return;
         const ctx = canvas.getContext("2d");
 
@@ -170,7 +137,9 @@ const badges = [
             maxLength: num("data-max-length", 6),
             lengthRadius: num("data-length-radius", 260),
             tilt: num("data-tilt", 1),
-            baseColor: section.getAttribute("data-base-color") || "#C8F006",
+            baseColor:
+                section.getAttribute("data-base-color") ||
+                "rgba(84, 70, 255, 0.28)",
             cursorRadius: num("data-cursor-radius", 320),
             pull: num("data-pull", 14),
             fadeRadius: num("data-fade-radius", 40),
@@ -331,9 +300,12 @@ const badges = [
         }
 
         let lastTime = performance.now();
+        let running = false;
         let isFirstFrame = true;
 
         function draw(time) {
+            if (!running) return;
+
             if (dots.length === 0) {
                 initGrid();
             }
@@ -469,9 +441,42 @@ const badges = [
             requestAnimationFrame(draw);
         }
 
-        window.addEventListener("resize", initGrid);
-        initGrid();
-        requestAnimationFrame(draw);
+        function start() {
+            if (running) return;
+            running = true;
+            // Reseed, or the gap since the last visible frame lands as one huge dt.
+            lastTime = performance.now();
+            requestAnimationFrame(draw);
+        }
+
+        function stop() {
+            running = false;
+        }
+
+        function rebuild() {
+            initGrid();
+            paint();
+        }
+
+        window.addEventListener("resize", rebuild);
+        rebuild();
+
+        // The gate. IntersectionObserver answers "is it on screen" and nothing else,
+        // which is exactly what starting and stopping the loop needs.
+        if ("IntersectionObserver" in window) {
+            const io = new IntersectionObserver(
+                (entries) => {
+                    for (let i = 0; i < entries.length; i++) {
+                        if (entries[i].isIntersecting) start();
+                        else stop();
+                    }
+                },
+                { rootMargin: "200px 0px" },
+            );
+            io.observe(section);
+        } else {
+            start();
+        }
 
         section.addEventListener("mousemove", (e) => {
             const rect = canvas.getBoundingClientRect();
@@ -500,8 +505,8 @@ const badges = [
     }
 
     if (document.readyState === "loading") {
-        document.addEventListener("DOMContentLoaded", initUaeHeroGrid);
+        document.addEventListener("DOMContentLoaded", initFrCtaGrid);
     } else {
-        initUaeHeroGrid();
+        initFrCtaGrid();
     }
 </script>
