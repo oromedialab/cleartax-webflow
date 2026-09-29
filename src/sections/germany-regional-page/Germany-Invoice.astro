@@ -1,6 +1,6 @@
 ---
 /**
- * "France e-invoicing at a glance" — Figma node 13600:29559.
+ * "Germany e-invoicing at a glance" — Figma node 13600:29559.
  *
  * Header row (heading + intro on the left, "Talk to an expert" on the right),
  * a REQUIREMENTS overline, then three stacked cards. Each card is a text column
@@ -15,10 +15,10 @@
  * scroll choreography: they pin and stack. Same implementation as
  * `sections/global-homepage/WhyGenericAi.astro`:
  *
- *   - Two layers per card. The OUTER wrapper (`.philippine-mandate-sticky`) is what
+ *   - Two layers per card. The OUTER wrapper (`.germany-invoice-sticky`) is what
  *     `position: sticky` acts on and is NEVER transformed, so measuring it with
  *     getBoundingClientRect is always accurate. The INNER card
- *     (`.philippine-mandate-card`) is the only thing JS scales — measuring a transformed
+ *     (`.germany-invoice-card`) is the only thing JS scales — measuring a transformed
  *     element would feed its own transform back into the next frame.
  *   - Each wrapper sticks 16px below the previous one, with a rising z-index, so
  *     the stack leaves a visible sliver of every card behind it.
@@ -30,7 +30,7 @@
  * the heading, lede and CTA ride inside the first sticky wrapper and stay on
  * screen for the whole stack; on anything smaller they scroll away above it,
  * because pinned they would eat the height the cards need. One CSS rule picks
- * the copy — see .philippine-mandate-header-* in the style block — so exactly one is
+ * the copy — see .germany-invoice-header-* in the style block — so exactly one is
  * ever displayed and the duplicate <h2> and CTA never both reach the
  * accessibility tree. Edit the copy through the consts below, not in the markup.
  *
@@ -42,7 +42,7 @@
  * thing needs ~861px of layout height — which is what the style block's
  * min-height bound is derived from, rather than shrinking the card to fit.
  *
- * IMPORTANT: no ancestor of a `.philippine-mandate-sticky` may set `overflow` to
+ * IMPORTANT: no ancestor of a `.germany-invoice-sticky` may set `overflow` to
  * anything but `visible` — that silently kills `position: sticky`.
  */
 interface Requirement {
@@ -52,238 +52,85 @@ interface Requirement {
 
 const requirements: Requirement[] = [
     {
-        heading: "CAS Registration Support",
-        body: "Before you can issue a single invoice, BIR requires an Acknowledgement Certificate. An incomplete submission restarts the clock. Our compliance consultants walk your team through the Compliance Dossier Report submission to your RDO, so nothing gets rejected.",
+        heading: "Structured B2B invoicing, not PDFs",
+        body: "Germany's mandate makes structured e-invoices the default for domestic B2B. A PDF alone does not qualify, and paper or PDF invoicing is only possible if the buyer explicitly agrees. In practice, finance teams must reliably receive, read, validate, and process e-invoices end to end.",
     },
     {
-        heading: "Structured Invoice Issuance",
-        body: "ClearTax pulls data from your ERP, transforms it into BIR-compliant JSON, applies the required JWS digital signature (RS256), and delivers the signed invoice directly to your buyer. No BIR clearance gate. No manual steps.",
+        heading: "EN 16931 formats: XRechnung or ZUGFeRD",
+        body: "A compliant German e-invoice must follow EN 16931 and be machine-readable. Most businesses use XRechnung (XML) or ZUGFeRD 2.x (PDF with embedded XML). The XML data is the compliant core, so missing or incorrect structured fields can lead to rejection and payment delays.",
     },
     {
-        heading: "EIS Onboarding & PTT Support",
-        body: "Your Permit to Transmit and EIS Certificate are issued to you, not your vendor. We manage the joint UAT with BIR and ensure your team is certified on time, so the 3-day clock never catches you unprepared.",
-    },
-    {
-        heading: "Automated ESRS Reporting",
-        body: [
-            "Once the BIR infrastructure goes live, ClearTax automatically transmits the same invoice",
-            "payload to BIR EIS within the 3-day window. Idempotent retries, cancellation and amendment payloads are handled by the platform, not your team.",
-        ],
-    },
-    {
-        heading: "Reconciliation & Audit Readiness",
-        body: "ClearTax continuously reconciles your GL data against EIS-reported invoice data. AI surfaces mismatches, value gaps, and missing documents before BIR flags them, so audits stay routine reviews rather than board-level escalations.",
-    },
-];
-
-const COUNTRIES = [
-    {
-        label: "Saudi Arabia & UAE",
-        icon: "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6abb61bc33221f7a1cf2f8b7_Vector.png",
-    },
-    {
-        label: "France, Belgium, Germany, Poland",
-        icon: "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6abb61bc33221f7a1cf2f8b7_Vector.png",
-    },
-    {
-        label: "Malaysia & Singapore",
-        icon: "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6abb61bc33221f7a1cf2f8b7_Vector.png",
-    },
-    {
-        label: "India",
-        icon: "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6abb61bc33221f7a1cf2f8b7_Vector.png",
-    },
-    {
-        label: "United Kingdom",
-        icon: "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6abb61bc33221f7a1cf2f8b7_Vector.png",
-    },
-    {
-        label: "United States",
-        icon: "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6abb61bc33221f7a1cf2f8b7_Vector.png",
+        heading: "Direct exchange with audit-ready archiving",
+        body: "Germany uses a peer-to-peer model for B2B e-invoicing with no central portal. Partners can exchange via email, EDI, Peppol, or portals, as agreed. Compliance depends on strong operations such as validation checks, exception handling, and archiving the original structured invoice file in an audit-ready way.",
     },
 ];
 
 /* Written once and rendered twice — see the header note above. Keeping the copy
    in consts is what stops the two versions drifting apart. */
-const HEADING = "The US Isn't Mandated. Your Global Entities Might Already Be.";
-const LEDE =
-    "US federal procurement already requires structured digital invoicing. Beyond that, there's no national B2B mandate yet. But \"no mandate at home\" doesn't mean \"no exposure.\" If your enterprise has a subsidiary, branch, or trading partner in any of the markets below, e-invoicing compliance is already someone's job.";
-const COUNTRY_SELECT = "Select a country where your business operates";
-const DEFAULT_COUNTRY = "United States";
+const HEADING = "Germany e-invoicing mandate at a glance";
+const LEDE = "";
+const CTA_LABEL = "";
+const CTA_HREF = "";
 ---
 
 <section class="bg-generic-00 py-16 lg:py-20">
     <div class="min-[1400px]:container mx-auto px-4 md:px-6">
         <!-- Scroll-away header — copy left, CTA right, baselines aligned. Shown on
-         mobile AND on any window too short to pin it; see .philippine-mandate-header-*
+         mobile AND on any window too short to pin it; see .germany-invoice-header-*
          in the style block. -->
         <div
-            class="philippine-mandate-header-flow flex flex-col gap-6 bg-generic-00 lg:flex-row lg:items-end lg:justify-between lg:gap-12 mb-8 lg:mb-12"
+            class="germany-invoice-header-flow flex flex-col items-center text-center gap-6 bg-generic-00 mb-8 lg:mb-12"
         >
-            <div class="flex flex-col gap-3 lg:max-w-[786px]">
+            <div
+                class="flex flex-col items-center gap-3 w-full lg:max-w-[887px]"
+            >
                 <h2
                     class="m-0 font-heading font-medium text-vault-navy text-[length:var(--fs-h1)] leading-[length:var(--lh-h1)] tracking-[-0.5px]"
                 >
                     {HEADING}
                 </h2>
-                <p
-                    class="m-0 font-body font-normal text-neutral-500 text-[length:var(--fs-body)] lg:text-[length:var(--fs-body-lg)] leading-[length:var(--lh-body)] lg:leading-[length:var(--lh-body-lg)]"
-                >
-                    {LEDE}
-                </p>
-            </div>
-
-            <!-- Country Dropdown -->
-            <div class="country-dropdown-wrap flex flex-col gap-2 shrink-0 self-start lg:self-end w-full sm:w-[300px] lg:w-[377px]">
-                <span class="font-body text-[length:var(--fs-body-base)] leading-[length:var(--lh-body-lg)] text-neutral-500 font-normal">
-                    {COUNTRY_SELECT}
-                </span>
-                <div class="country-dropdown relative w-full" data-country-dropdown>
-                    <button
-                        type="button"
-                        class="country-dropdown-trigger flex w-full items-center justify-between gap-3 rounded-lg border border-neutral-300 bg-generic-00 px-4 py-3 text-left font-body text-[length:var(--fs-body-lg)] leading-[length:var(--lh-body-lg)] font-medium text-vault-navy transition-colors hover:border-neutral-400 cursor-pointer"
-                        aria-haspopup="listbox"
-                        aria-expanded="false"
-                    >
-                        <div class="flex items-center gap-2.5 min-w-0">
-                            <svg
-                                class="h-5 w-5 shrink-0 text-neutral-500"
-                                viewBox="0 0 24 24"
-                                fill="none"
-                                stroke="currentColor"
-                                stroke-width="1.75"
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                                aria-hidden="true"
-                            >
-                                <circle cx="12" cy="12" r="10"></circle>
-                                <path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"></path>
-                                <path d="M2 12h20"></path>
-                            </svg>
-                            <span class="country-dropdown-label text-vault-navy font-normal text-[length:var(--fs-body-lg)] leading-[length:var(--lh-body-lg)]">
-                                {DEFAULT_COUNTRY}
-                            </span>
-                        </div>
-                        <svg
-                            class="country-dropdown-chevron h-3 w-3 shrink-0 text-neutral-500 transition-transform duration-200"
-                            viewBox="0 0 18 11"
-                            fill="none"
-                            xmlns="http://www.w3.org/2000/svg"
-                            aria-hidden="true"
-                        >
-                            <path d="M8.99997 10.2605C8.67737 10.2605 8.35482 10.1374 8.10887 9.89152L0.369255 2.15183C-0.123085 1.65949 -0.123085 0.861247 0.369255 0.369106C0.861396 -0.123035 1.65948 -0.123035 2.15186 0.369106L8.99997 7.21761L15.8481 0.369345C16.3405 -0.122796 17.1385 -0.122796 17.6306 0.369345C18.1231 0.861486 18.1231 1.65973 17.6306 2.15207L9.89108 9.89176C9.645 10.1376 9.32245 10.2605 8.99997 10.2605Z" fill="#4B5563"/>
-                        </svg>
-                    </button>
-
-                    <div
-                        class="country-dropdown-menu absolute left-0 right-0 top-[calc(100%+6px)] z-50 hidden max-h-60 overflow-y-auto rounded-lg border border-neutral-200 bg-white py-1 shadow-lg"
-                        role="listbox"
-                    >
-                        {COUNTRIES.map((country) => (
-                            <button
-                                type="button"
-                                role="option"
-                                data-value={country.label}
-                                class="country-dropdown-option flex w-full items-center justify-between px-4 py-2.5 text-left text-sm font-body text-vault-navy transition-colors hover:bg-neutral-50 hover:text-nova-blue cursor-pointer"
-                            >
-                                <span class="truncate">{country.label}</span>
-                            </button>
-                        ))}
-                    </div>
-                </div>
+                {
+                    LEDE && (
+                        <p class="m-0 font-body font-normal text-neutral-500 text-[length:var(--fs-body)] lg:text-[length:var(--fs-body-lg)] leading-[length:var(--lh-body)] lg:leading-[length:var(--lh-body-lg)]">
+                            {LEDE}
+                        </p>
+                    )
+                }
             </div>
         </div>
 
         <div
-            id="philippine-mandate-stack"
-            class="philippine-mandate-stack flex w-full flex-col gap-[30vh] lg:gap-[50vh]"
+            id="germany-invoice-stack"
+            class="germany-invoice-stack flex w-full flex-col gap-[30vh] lg:gap-[50vh]"
         >
             {
                 requirements.map((r, i) => (
                     <div
-                        class="philippine-mandate-sticky sticky"
+                        class="germany-invoice-sticky sticky"
                         style={`top:calc(var(--nav-clear, 112px) + ${i * 16}px);z-index:${i};`}
                     >
                         {i === 0 && (
                             <div
-                                id="philippine-mandate-header"
+                                id="germany-invoice-header"
                                 class="bg-generic-00"
                             >
-                                <div class="philippine-mandate-header-stuck flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between lg:gap-12">
-                                    <div class="flex flex-col gap-3 lg:max-w-[786px]">
+                                <div class="germany-invoice-header-stuck flex flex-col items-center text-center gap-6">
+                                    <div class="flex flex-col items-center gap-3 w-full lg:max-w-[887px]">
                                         <h2 class="m-0 font-heading font-medium text-vault-navy text-[length:var(--fs-h1)] leading-[length:var(--lh-h1)] tracking-[-0.5px]">
                                             {HEADING}
                                         </h2>
-                                        <p class="m-0 font-body font-normal text-neutral-500 text-[length:var(--fs-body)] lg:text-[length:var(--fs-body-lg)] leading-[length:var(--lh-body)] lg:leading-[length:var(--lh-body-lg)]">
-                                            {LEDE}
-                                        </p>
-                                    </div>
-
-                                    <!-- Country Dropdown (stuck) -->
-                                    <div class="country-dropdown-wrap flex flex-col gap-2 shrink-0 self-start lg:self-end w-full sm:w-[280px] lg:w-[300px]">
-                                        <span class="font-body text-xs lg:text-sm text-neutral-500 font-normal">
-                                            {COUNTRY_SELECT}
-                                        </span>
-                                        <div class="country-dropdown relative w-full" data-country-dropdown>
-                                            <button
-                                                type="button"
-                                                class="country-dropdown-trigger flex w-full items-center justify-between gap-3 rounded-lg border border-neutral-300 bg-generic-00 px-4 py-2.5 text-left font-body text-sm font-medium text-vault-navy shadow-sm transition-colors hover:border-neutral-400 focus:outline-none focus:ring-2 focus:ring-nova-blue/20 cursor-pointer"
-                                                aria-haspopup="listbox"
-                                                aria-expanded="false"
-                                            >
-                                                <div class="flex items-center gap-2.5 min-w-0">
-                                                    <svg
-                                                        class="h-5 w-5 shrink-0 text-neutral-500"
-                                                        viewBox="0 0 24 24"
-                                                        fill="none"
-                                                        stroke="currentColor"
-                                                        stroke-width="1.75"
-                                                        stroke-linecap="round"
-                                                        stroke-linejoin="round"
-                                                        aria-hidden="true"
-                                                    >
-                                                        <circle cx="12" cy="12" r="10"></circle>
-                                                        <path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"></path>
-                                                        <path d="M2 12h20"></path>
-                                                    </svg>
-                                                    <span class="country-dropdown-label truncate text-vault-navy font-normal text-sm">
-                                                        {DEFAULT_COUNTRY}
-                                                    </span>
-                                                </div>
-                                                <svg
-                                                    class="country-dropdown-chevron h-3 w-3 shrink-0 text-neutral-500 transition-transform duration-200"
-                                                    viewBox="0 0 18 11"
-                                                    fill="none"
-                                                    xmlns="http://www.w3.org/2000/svg"
-                                                    aria-hidden="true"
-                                                >
-                                                    <path d="M8.99997 10.2605C8.67737 10.2605 8.35482 10.1374 8.10887 9.89152L0.369255 2.15183C-0.123085 1.65949 -0.123085 0.861247 0.369255 0.369106C0.861396 -0.123035 1.65948 -0.123035 2.15186 0.369106L8.99997 7.21761L15.8481 0.369345C16.3405 -0.122796 17.1385 -0.122796 17.6306 0.369345C18.1231 0.861486 18.1231 1.65973 17.6306 2.15207L9.89108 9.89176C9.645 10.1376 9.32245 10.2605 8.99997 10.2605Z" fill="#4B5563"/>
-                                                </svg>
-                                            </button>
-
-                                            <div
-                                                class="country-dropdown-menu absolute left-0 right-0 top-[calc(100%+6px)] z-50 hidden max-h-60 overflow-y-auto rounded-lg border border-neutral-200 bg-white py-1 shadow-lg"
-                                                role="listbox"
-                                            >
-                                                {COUNTRIES.map((country) => (
-                                                    <button
-                                                        type="button"
-                                                        role="option"
-                                                        data-value={country.label}
-                                                        class="country-dropdown-option flex w-full items-center justify-between px-4 py-2.5 text-left text-sm font-body text-vault-navy transition-colors hover:bg-neutral-50 hover:text-nova-blue cursor-pointer"
-                                                    >
-                                                        <span class="truncate">{country.label}</span>
-                                                    </button>
-                                                ))}
-                                            </div>
-                                        </div>
+                                        {LEDE && (
+                                            <p class="m-0 font-body font-normal text-neutral-500 text-[length:var(--fs-body)] lg:text-[length:var(--fs-body-lg)] leading-[length:var(--lh-body)] lg:leading-[length:var(--lh-body-lg)]">
+                                                {LEDE}
+                                            </p>
+                                        )}
                                     </div>
                                 </div>
                             </div>
                         )}
 
                         <article
-                            class="philippine-mandate-card flex flex-col items-stretch gap-6 rounded-xl border border-neutral-300 bg-generic-00 p-6 will-change-transform lg:flex-row lg:items-center lg:gap-12"
+                            class="germany-invoice-card flex flex-col items-stretch gap-6 rounded-xl border border-neutral-300 bg-generic-00 p-6 will-change-transform lg:flex-row lg:items-center lg:gap-12"
                             style="transform-origin: top center;"
                         >
                             <div class="flex flex-col justify-between gap-6 lg:max-w-[400px] lg:flex-1 lg:self-stretch">
@@ -334,15 +181,15 @@ const DEFAULT_COUNTRY = "United States";
      conservative; past 1440 there is no zoom and it is exactly the fit. 1024
      rather than 768 because the card only goes side-by-side at `lg` — stacked,
      it is far too tall to pin a header above. */
-    .philippine-mandate-header-stuck {
+    .germany-invoice-header-stuck {
         display: none;
     }
 
     @media (min-width: 1024px) and (min-height: 860px) {
-        .philippine-mandate-header-flow {
+        .germany-invoice-header-flow {
             display: none;
         }
-        .philippine-mandate-header-stuck {
+        .germany-invoice-header-stuck {
             display: flex;
         }
     }
@@ -351,13 +198,13 @@ const DEFAULT_COUNTRY = "United States";
      cards read as the plain evenly spaced stack this section used to be — so the
      huge scroll gaps that exist only to give the stack travel go with them. */
     @media (prefers-reduced-motion: reduce) {
-        .philippine-mandate-stack {
+        .germany-invoice-stack {
             gap: 1.5rem !important;
         }
-        .philippine-mandate-sticky {
+        .germany-invoice-sticky {
             position: static !important;
         }
-        .philippine-mandate-card {
+        .germany-invoice-card {
             transform: none !important;
         }
     }
@@ -365,16 +212,16 @@ const DEFAULT_COUNTRY = "United States";
 
 <script is:inline>
     document.addEventListener("DOMContentLoaded", () => {
-        const stack = document.getElementById("philippine-mandate-stack");
+        const stack = document.getElementById("germany-invoice-stack");
         if (!stack) return;
 
-        const textEl = document.getElementById("philippine-mandate-header");
+        const textEl = document.getElementById("germany-invoice-header");
         // Outers are never transformed, so their rects are always safe to measure.
         const outers = Array.from(
-            stack.querySelectorAll(".philippine-mandate-sticky"),
+            stack.querySelectorAll(".germany-invoice-sticky"),
         );
         const inners = Array.from(
-            stack.querySelectorAll(".philippine-mandate-card"),
+            stack.querySelectorAll(".germany-invoice-card"),
         );
         if (!outers.length || outers.length !== inners.length) return;
 
@@ -656,90 +503,7 @@ const DEFAULT_COUNTRY = "United States";
 
         setTimeout(handleLayoutShift, 100);
         setTimeout(handleLayoutShift, 300);
-        // Country dropdown interactive behavior
-        const dropdownWrappers = document.querySelectorAll("[data-country-dropdown]");
-        dropdownWrappers.forEach((dropdown) => {
-            const trigger = dropdown.querySelector(".country-dropdown-trigger");
-            const menu = dropdown.querySelector(".country-dropdown-menu");
-            const chevron = dropdown.querySelector(".country-dropdown-chevron");
-
-            if (!trigger || !menu) return;
-
-            const closeMenu = () => {
-                menu.classList.add("hidden");
-                chevron?.classList.remove("rotate-180");
-                trigger.setAttribute("aria-expanded", "false");
-            };
-
-            const openMenu = () => {
-                // Close any other open dropdowns first
-                document.querySelectorAll(".country-dropdown-menu").forEach((m) => {
-                    if (m !== menu) m.classList.add("hidden");
-                });
-                document.querySelectorAll(".country-dropdown-chevron").forEach((c) => {
-                    if (c !== chevron) c.classList.remove("rotate-180");
-                });
-                document.querySelectorAll(".country-dropdown-trigger").forEach((t) => {
-                    if (t !== trigger) t.setAttribute("aria-expanded", "false");
-                });
-
-                menu.classList.remove("hidden");
-                chevron?.classList.add("rotate-180");
-                trigger.setAttribute("aria-expanded", "true");
-            };
-
-            trigger.addEventListener("click", (e) => {
-                e.stopPropagation();
-                const isExpanded = trigger.getAttribute("aria-expanded") === "true";
-                if (isExpanded) {
-                    closeMenu();
-                } else {
-                    openMenu();
-                }
-            });
-
-            const options = dropdown.querySelectorAll(".country-dropdown-option");
-            options.forEach((opt) => {
-                opt.addEventListener("click", (e) => {
-                    e.stopPropagation();
-                    const val = opt.getAttribute("data-value") || opt.textContent?.trim();
-                    if (val) {
-                        // Sync all dropdown labels (both flow and stuck headers)
-                        document.querySelectorAll(".country-dropdown-label").forEach((lbl) => {
-                            lbl.textContent = val;
-                        });
-                        closeMenu();
-
-                        // If a matching card exists, scroll to it smoothly
-                        const cards = Array.from(document.querySelectorAll(".philippine-mandate-sticky, .philippine-mandate-card"));
-                        const targetCard = cards.find((card) =>
-                            card.textContent?.toLowerCase().includes(val.toLowerCase())
-                        );
-                        if (targetCard) {
-                            targetCard.scrollIntoView({ behavior: "smooth", block: "center" });
-                        }
-                    }
-                });
-            });
-        });
-
-        // Close on clicking outside
-        document.addEventListener("click", (e) => {
-            if (!e.target.closest("[data-country-dropdown]")) {
-                document.querySelectorAll(".country-dropdown-menu").forEach((m) => m.classList.add("hidden"));
-                document.querySelectorAll(".country-dropdown-chevron").forEach((c) => c.classList.remove("rotate-180"));
-                document.querySelectorAll(".country-dropdown-trigger").forEach((t) => t.setAttribute("aria-expanded", "false"));
-            }
-        });
-
-        // Close on escape key
-        document.addEventListener("keydown", (e) => {
-            if (e.key === "Escape") {
-                document.querySelectorAll(".country-dropdown-menu").forEach((m) => m.classList.add("hidden"));
-                document.querySelectorAll(".country-dropdown-chevron").forEach((c) => c.classList.remove("rotate-180"));
-                document.querySelectorAll(".country-dropdown-trigger").forEach((t) => t.setAttribute("aria-expanded", "false"));
-            }
-        });
+        setTimeout(handleLayoutShift, 1000);
 
         setTops();
         update();
