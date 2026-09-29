@@ -2,11 +2,12 @@
 /**
  * Pixel-exact flow diagram canvas for SourceOfTruth.astro — see that file's
  * doc comment for the pixel-coordinate provenance. Factored out because the
- * page shows this same skeleton twice (Real estate development & sales /
- * Construction & Procurement), varying only the source and billing/tax-doc
- * column content and wire routing; the ERP GL hub and cleartax engine never
- * change, so they live here as fixed markup rather than being threaded
- * through as props.
+ * page shows this same skeleton twice (Sell side & Dispatch / Procurement,
+ * Transfers & Group), varying the source and billing/tax-doc column content,
+ * wire routing, the middleware column label, and the ERP GL checklist; the
+ * ERP GL hub's fixed chrome (title, subtitle, footer tagline) and the
+ * cleartax engine never change, so they live here as fixed markup rather
+ * than being threaded through as props.
  *
  * Sized in a fixed CANVAS_W x CANVAS_H pixel space and scaled to fit its
  * container by SourceOfTruth.astro's own script (a uniform CSS
@@ -15,14 +16,12 @@
  * converted to percentages.
  */
 export const CANVAS_W = 1239;
-/** 732, not 700 — a gap directly above a `directToGL` card needs to be 40px
- * (not the original 24px) to fit the 28px-tall "Direct → GL" badge with 8px
- * clearance above it and 4px below; gaps with no badge stay 24px. In the
- * channels tab's 4-row source column, 2 of its 3 gaps are widened (before
- * Land Owner/JV and before Buyer/Tenant), so the column — and its last row —
- * grows by 2 * (40 - 24) = 32px. See the badge's own comment lower in this
- * file for the per-row math. */
-export const CANVAS_H = 732;
+/** 884 — 5 stacked 144px source rows (4 plain + 1 `directToGL`), not real
+ * estate's 4. Gaps are 24px, except 40px directly above the flagged last row
+ * (same badge-clearance math as real estate's FlowCanvas — see the badge's
+ * own comment lower in this file): rows sit at y = 52, 220, 388, 556, 740,
+ * so the last row's bottom (740 + 144) sets the canvas height. */
+export const CANVAS_H = 884;
 
 export type Flow = "purple" | "orange" | "green" | "grey";
 
@@ -90,13 +89,20 @@ export interface FlowWire {
 interface Props {
   id: string;
   active?: boolean;
-  /** "Sources" (Real estate tab) or "Marketplaces" (Construction &
-   * Procurement tab) — Figma repositions this label's left offset per word
-   * length (106px for "SOURCES", 81px for "MARKETPLACES") to keep it flush
-   * with the card column below, hence `sourcesLabelX` alongside the label
-   * text itself. */
+  /** Both manufacturing tabs use "Sources" (unlike real estate's
+   * Sources/Marketplaces split), so this and `sourcesLabelX` just keep the
+   * defaults below — kept as props rather than hard-coded only because
+   * FlowCanvas.astro is shared scaffolding across sections. */
   sourcesLabel?: string;
   sourcesLabelX?: number;
+  /** "BILLING // TAX-DOC" (Sell side & Dispatch) or "MOVEMENT // TAX-DOC"
+   * (Procurement, Transfers & Group) — unlike real estate's fixed
+   * "MIDDLEWARE", manufacturing's middleware column is labelled per tab. */
+  middlewareLabel?: string;
+  /** ERP GL's 5-item checklist — differs per tab (e.g. "Import VAT and
+   * deferment" only applies to the procurement tab), so it's a prop here
+   * instead of the fixed array real estate's version hard-coded. */
+  erpChecklist?: string[];
   sourceCards: FlowCard[];
   billingCards: FlowCard[];
   wires: FlowWire[];
@@ -107,7 +113,17 @@ interface Props {
    (including primitives like this one — see docs/adding-a-new-page.md,
    "Props never reach Webflow"), so every array prop must default to
    something `.map`-able or that route's build crashes outright. */
-const { id = "", active = false, sourcesLabel = "Sources", sourcesLabelX = 106, sourceCards = [], billingCards = [], wires = [] } = Astro.props;
+const {
+  id = "",
+  active = false,
+  sourcesLabel = "Sources",
+  sourcesLabelX = 106,
+  middlewareLabel = "Middleware",
+  erpChecklist = [],
+  sourceCards = [],
+  billingCards = [],
+  wires = [],
+} = Astro.props;
 
 const FLOW_COLOR: Record<FlowCard["tag"], string> = {
   purple: "bg-nova-blue",
@@ -115,8 +131,6 @@ const FLOW_COLOR: Record<FlowCard["tag"], string> = {
   green: "bg-success-500",
   grey: "bg-neutral-500",
 };
-
-const erpChecklist = ["Output tax (commercial supply)", "Residential relief (exempt or zero)", "Reverse charge (where it applies)", "Input tax recovery", "Archival & validation per market"];
 
 const receives = [
   { tag: "purple" as const, label: "Output VAT / GST" },
@@ -227,11 +241,11 @@ const bentWires = wires.map((w) => ({ ...w, points: wirePoints(w) }));
   >
     {sourcesLabel}
   </p>
-  <p class="absolute left-[401px] top-[184px] m-0 font-body font-semibold text-vault-navy text-[length:var(--fs-body)] leading-[length:var(--lh-body)] tracking-[1px] uppercase">
-    Middleware
+  <p class="absolute left-[401px] top-[184px] m-0 font-body font-semibold text-vault-navy text-[length:var(--fs-body)] leading-[length:var(--lh-body)] tracking-[1px] uppercase whitespace-nowrap">
+    {middlewareLabel}
   </p>
   <p class="absolute left-[775px] top-[184px] m-0 font-body font-medium text-nova-blue text-[length:var(--fs-body)] leading-[length:var(--lh-body)]">
-    RE ERP · GL
+    ERP · GL
   </p>
 
   <!-- Connectors, drawn under the cards. data-sot-line + data-stage are the
@@ -363,7 +377,7 @@ const bentWires = wires.map((w) => ({ ...w, points: wirePoints(w) }));
     <div class="flex flex-col gap-3 flex-1">
       <div class="flex flex-col gap-2">
         <p class="m-0 font-body font-semibold text-vault-navy text-[length:var(--fs-body-lg)] leading-[length:var(--lh-body-lg)]">ERP GL</p>
-        <p class="m-0 font-body text-neutral-500 text-[length:var(--fs-label)] leading-[length:var(--lh-body-sm)]">SAP RE-FX · Oracle · In4Suite (IN) · Farvision (IN)</p>
+        <p class="m-0 font-body text-neutral-500 text-[length:var(--fs-label)] leading-[length:var(--lh-body-sm)]">SAP • Oracle • Dynamics 365 • Infor</p>
       </div>
       <ul class="m-0 flex flex-col gap-2 list-none p-0">
         {erpChecklist.map((item) => (
@@ -378,15 +392,15 @@ const bentWires = wires.map((w) => ({ ...w, points: wirePoints(w) }));
       </ul>
       <div class="h-px w-full bg-neutral-200" />
       <p class="m-0 font-body font-medium text-nova-blue text-[length:var(--fs-label)] leading-[length:var(--lh-body-sm)]">
-        BILLING SYSTEM AND LEDGER IN ONE NODE
+        THE CONSTANT NODE · EVERY MOVEMENT SETTLES HERE
       </p>
     </div>
   </div>
 
   <!-- cleartax engine card. height is CANVAS_H - 52 (its own top offset) so
-       it stays flush with the canvas bottom, same as the channels tab's
-       last source row — see CANVAS_H's own comment for why that's 732. -->
-  <div class="absolute flex flex-col gap-6 justify-between rounded-lg border-2 border-neutral-400 bg-generic-00 p-6" style="left:991px;top:52px;width:248px;height:680px;">
+       it stays flush with the canvas bottom, same as each tab's last source
+       row — see CANVAS_H's own comment for why that's 884. -->
+  <div class="absolute flex flex-col gap-6 justify-between rounded-lg border-2 border-neutral-400 bg-generic-00 p-6" style="left:991px;top:52px;width:248px;height:832px;">
     <div class="flex flex-col gap-3">
       <p class="m-0 font-heading font-semibold text-vault-navy text-[length:var(--fs-h6)] leading-[length:var(--lh-h6)]">cleartax</p>
       <p class="m-0 font-body font-semibold text-nova-blue text-[length:var(--fs-body-lg)] leading-[length:var(--lh-body-lg)]">multi-mandate engine</p>
