@@ -1,8 +1,9 @@
 ---
+import { record } from "astro:schema";
+
 /**
  * "Clarity AI by ClearTax empowers finance to build with AI" — Figma node
- * 13275:28482. Identical to `global-homepage/ClarityAi.astro`; copied because
- * a page CSS entry only sources its own section folder.
+ * 13049:22786.
  *
  * Three numbered steps threaded by a vertical progress rail. The Figma ships
  * this as two variants, state "1" and state "3": in state 1 only the first card
@@ -23,7 +24,7 @@
 interface Row {
   title: string;
   desc: string;
-  icon?: string;
+  icon: string;
 }
 
 interface Step {
@@ -32,6 +33,7 @@ interface Step {
   lede: string;
   chips?: string[];
   rows?: Row[];
+  image: string;
 }
 
 const steps: Step[] = [
@@ -49,6 +51,8 @@ const steps: Step[] = [
       "Banking & payments",
       "Documents & mail",
     ],
+    image:
+      "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6aabb3adaa0f699ef856878e_clarity-ai-1.png",
   },
   {
     n: "2",
@@ -76,6 +80,8 @@ const steps: Step[] = [
         icon: "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6abb7d0359914c7b686fc901_n-icon-4.png",
       },
     ],
+    image:
+      "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6aabb3aa6a134e4f661d9e61_clarity-ai-2.png",
   },
   {
     n: "3",
@@ -98,11 +104,13 @@ const steps: Step[] = [
         icon: "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6abb7d28ab4c3aa8375ea41e_n-icon-7.png",
       },
     ],
+    image:
+      "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6aabb3aa8d06601035531c26_clarity-ai-3.png",
   },
 ];
 ---
 
-<section class="bg-generic-00 max-lg:py-12 lg:py-20" data-ih-clarity>
+<section class="bg-generic-00 max-lg:py-12 lg:py-20" data-gh-clarity>
   <div class="container mx-auto">
     <div class="flex flex-col items-center gap-12">
       <h2
@@ -117,11 +125,11 @@ const steps: Step[] = [
              pill, so the rail runs all the way down and meets the top edge of
              the box instead of stopping short at the last card. -->
         <div
-          class="ih-clarity-rail absolute -bottom-12 top-0 left-1/2 hidden w-2 -translate-x-1/2 overflow-hidden rounded-t-full bg-[#EFEFEF] lg:block"
+          class="gh-clarity-rail absolute -bottom-12 top-0 left-1/2 hidden w-2 -translate-x-1/2 overflow-hidden rounded-t-full bg-[#EFEFEF] lg:block"
           aria-hidden="true"
         >
           <div
-            class="ih-clarity-fill absolute inset-x-0 top-0 h-0 rounded-2xl bg-nova-blue"
+            class="gh-clarity-fill absolute inset-x-0 top-0 h-0 rounded-2xl bg-nova-blue"
           >
           </div>
         </div>
@@ -131,7 +139,7 @@ const steps: Step[] = [
             steps.map((step, i) => (
               <div
                 class="max-lg:flex max-lg:flex-col max-lg:gap-6 lg:grid lg:grid-cols-2 lg:items-center lg:gap-20"
-                data-ih-step
+                data-gh-step
                 data-step-index={i}
               >
                 {/* A 2-col GRID at lg, and neither column carries a width.
@@ -147,10 +155,10 @@ const steps: Step[] = [
                     these bundles carry no preflight, and .is-active takes the
                     border from 1px to 2px, which would otherwise nudge the row
                     every time a card latched. */}
-                <div class="ih-clarity-card box-border flex flex-col justify-between self-stretch overflow-hidden rounded-xl border border-[#CCCCCC] bg-generic-00 max-lg:w-full lg:min-w-0">
+                <div class="gh-clarity-card box-border flex flex-col justify-between self-stretch overflow-hidden rounded-xl border border-[#CCCCCC] bg-generic-00 max-lg:w-full lg:min-w-0">
                   <div class="flex flex-col gap-6 border-b border-[#CCCCCC] p-6">
                     <div class="flex flex-col gap-4">
-                      <span class="inline-flex h-[30px] w-[30px] items-center justify-center rounded-lg border border-[#C3C7CD] bg-[#FBFBFC] text-[length:var(--fs-label-sm)] leading-[length:var(--lh-label-sm)] font-medium text-[#5B6068] font-body">
+                      <span class="inline-flex h-[30px] w-[30px] items-center justify-center rounded-lg border border-[#C3C7CD] bg-[#FBFBFC] text-[length:var(--fs-label-sm)] leading-[length:var(--lh-label-sm)] font-normal text-[#5B6068] font-body">
                         {step.n}
                       </span>
                       <div class="flex flex-col gap-1.5">
@@ -186,13 +194,13 @@ const steps: Step[] = [
                               />
                             )}
                             <div class="flex items-start gap-4">
-                              <img
-                                src={r.icon}
-                                alt=""
-                                class="h-12 w-12 shrink-0 object-contain"
-                                loading="lazy"
-                                decoding="async"
-                              />
+                              <div class="max-w-12 w-full">
+                                <img
+                                  src={r.icon}
+                                  alt={r.title}
+                                  class="h-full w-full object-contain"
+                                />
+                              </div>
                               <div class="flex min-w-0 flex-1 flex-col gap-2">
                                 <p class="m-0 font-body font-medium text-vault-navy text-[length:var(--fs-label)] leading-[length:var(--lh-body-sm)]">
                                   {r.title}
@@ -209,20 +217,24 @@ const steps: Step[] = [
                   </div>
                 </div>
 
-                <div class="h-[515px] rounded-lg bg-visual-placeholder max-lg:h-64 max-lg:w-full lg:min-w-0" />
+                <div class="max-w-150 w-full">
+                  <img
+                    src={step.image}
+                    alt={step.title}
+                    class="object-contain h-full w-full"
+                  />
+                </div>
               </div>
             ))
           }
         </div>
       </div>
 
-      <!-- Closing pill. Full-bleed across the container: the dot strips are the
-           flexible part, so the sentence stays its natural width in the middle
-           and each strip repeats out to whatever space is left. -->
+      <!-- Closing pill -->
       <div
-        class="ih-clarity-pill flex w-full items-center justify-center gap-6 rounded-lg border-4 border-current p-6 max-md:flex-col max-md:gap-4"
+        class="gh-clarity-pill flex w-full items-center justify-center gap-6 rounded-lg border-4 border-current p-6 max-md:flex-col max-md:gap-4"
       >
-        <span class="ih-clarity-dots flex-1 max-md:hidden" aria-hidden="true"
+        <span class="gh-clarity-dots flex-1 max-md:hidden" aria-hidden="true"
         ></span>
         <!-- Explicitly Vault Navy, so it does NOT inherit the pill's colour.
              The border and dots go #EFEFEF -> Flux Lime; the sentence stays
@@ -232,7 +244,7 @@ const steps: Step[] = [
         >
           Give the model a foundation, and it stops guessing
         </p>
-        <span class="ih-clarity-dots flex-1 max-md:hidden" aria-hidden="true"
+        <span class="gh-clarity-dots flex-1 max-md:hidden" aria-hidden="true"
         ></span>
       </div>
     </div>
@@ -247,7 +259,7 @@ const steps: Step[] = [
      Only background-color is eased. Height is deliberately not: it is rewritten
      every frame while the rail is on screen, so easing it would make the bar lag
      behind the scroll rather than track it. */
-  .ih-clarity-fill {
+  .gh-clarity-fill {
     transition: background-color 0.45s ease;
   }
 
@@ -255,19 +267,19 @@ const steps: Step[] = [
      head, which is right mid-scroll but lets the grey track show through the
      corners once the line has to meet the pill's border flush, so the cap is
      squared off at the same moment. */
-  [data-ih-clarity].is-complete .ih-clarity-fill {
+  [data-gh-clarity].is-complete .gh-clarity-fill {
     background-color: var(--color-flux-lime);
     border-bottom-left-radius: 0;
     border-bottom-right-radius: 0;
   }
 
-  .ih-clarity-card {
+  .gh-clarity-card {
     transition:
       border-color 0.35s ease,
       box-shadow 0.35s ease;
   }
 
-  [data-ih-step].is-active .ih-clarity-card {
+  [data-gh-step].is-active .gh-clarity-card {
     border-color: var(--color-nova-blue);
     border-width: 2px;
   }
@@ -284,42 +296,61 @@ const steps: Step[] = [
      background-image is not, so a dot gradient with a fixed colour stop would
      snap while the border eased. The sentence itself opts out with an explicit
      text-vault-navy and stays black the whole way through. */
-  .ih-clarity-pill {
+  .gh-clarity-pill {
     color: #efefef;
     transition: color 0.45s ease;
   }
 
-  [data-ih-clarity].is-complete .ih-clarity-pill {
+  [data-gh-clarity].is-complete .gh-clarity-pill {
     color: var(--color-flux-lime);
   }
 
-  /* The dot strips flanking the closing line. No width: the spans are flex-1,
-     so each takes half the space the sentence leaves and the 25.2px pitch from
-     the Figma repeats to fill it — a wider pill means more dots, not stretched
-     ones. Centred so the partial dot lands at both ends of a strip rather than
-     all of the clipping piling up on one side. */
-  .ih-clarity-dots {
+  /* The dot rails flanking the closing line (Figma 14489:12089).
+     Spec is a 3.88px circle every 25.22px — 3.88 dot + 21.34 gap — in the
+     pill's own colour, which is why this tiles `currentColor` rather than
+     shipping the exported SVG: 28 static <img> dots could not follow the
+     #EFEFEF -> Flux Lime transition the pill drives.
+
+     No fixed width — `flex-1` in the markup mirrors the design's flex-[1_0_0]
+     rails, so both sides absorb whatever the full-width pill leaves either
+     side of the sentence and a wider pill simply gets more dots.
+
+     The dot sits at the LEADING edge of each tile, not centred in it, so the
+     run starts flush against the sentence exactly as the design's justify-start
+     does. Centring it would inset every rail by half a gap at both ends. */
+  .gh-clarity-dots {
     display: block;
-    height: 4px;
+    height: 3.88px;
     background-image: radial-gradient(
-      circle,
+      circle at 1.94px 50%,
       currentColor 1.94px,
       transparent 2px
     );
-    background-size: 25.2px 4px;
-    background-position: center;
+    background-size: 25.22px 3.88px;
     background-repeat: repeat-x;
+  }
+
+  /* Left rail is justify-end in the design: the run ends flush against the
+     sentence and any remainder falls at the outer edge. Mirror the tile and
+     anchor it right, so the two rails stay symmetrical about the sentence. */
+  .gh-clarity-pill .gh-clarity-dots:first-child {
+    background-image: radial-gradient(
+      circle at calc(100% - 1.94px) 50%,
+      currentColor 1.94px,
+      transparent 2px
+    );
+    background-position: right center;
   }
 </style>
 
 <script is:inline>
   (function () {
-    const root = document.querySelector("[data-ih-clarity]");
+    const root = document.querySelector("[data-gh-clarity]");
     if (!root) return;
 
-    const steps = Array.from(root.querySelectorAll("[data-ih-step]"));
-    const rail = root.querySelector(".ih-clarity-rail");
-    const fill = root.querySelector(".ih-clarity-fill");
+    const steps = Array.from(root.querySelectorAll("[data-gh-step]"));
+    const rail = root.querySelector(".gh-clarity-rail");
+    const fill = root.querySelector(".gh-clarity-fill");
     if (!steps.length) return;
 
     if (!("IntersectionObserver" in window)) {
