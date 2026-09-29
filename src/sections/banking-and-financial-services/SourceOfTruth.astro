@@ -1,118 +1,119 @@
 ---
 /**
- * "From every plant and every movement to one source of truth." Figma node
- * 15562:45982 ("Sell side & Dispatch" / "Procurement, Transfers & Group").
+ * "From your core systems to one source of truth." Banking and Financial
+ * Services variant of manufacturing/SourceOfTruth.astro — same tabbed flow
+ * diagram mechanism (see FlowCanvas.astro's doc comment for the shared
+ * skeleton), re-skinned with the Banking / Insurance card content and wire
+ * routing from the source-doc mockup screenshots (word/media/image6.png =
+ * Insurance, image7.png = Banking).
  *
- * Built from screenshots (no Figma tool access in this environment). Source
- * -> billing-card pairing was confirmed against zoomed screenshots and by
- * asking the user directly where a wire's target was genuinely ambiguous —
- * see sellSideWires/procurementWires' own comments. The one thing that's
- * still a judgement call rather than a confirmed read: when 2+ differently
- * coloured sources converge on one billing card, that card's single
- * billing -> ERP GL exit wire is rendered purple (this design's dominant
- * colour) since one wire can only carry one colour.
+ * Both billing cards per tab are kept (Fee & Charge E-Invoice + Intercompany
+ * Billing for Banking; Transfer document + Processing document for
+ * Insurance), same as manufacturing's sellSideWires/procurementWires shape,
+ * but only the first card of each pair receives any source connections —
+ * every purple source merges onto it via a true bus: one shared vertical
+ * trunk line at x:310 and one shared exit stub into the card, each drawn
+ * exactly once, with every source contributing only its own short stub up
+ * to the trunk. This is NOT 4-5 full-length overlapping paths — see
+ * bankingWires'/insuranceWires' own comments for why duplicating the shared
+ * segment per source produces a glitchy, out-of-phase-dashes overlap.
+ * Procurement/AP (orange) still bypasses the trunk entirely straight to ERP
+ * GL — same "orange-full" mechanic as manufacturing's Procurement/AP bypass
+ * row (whose card text is reused verbatim here, both tabs). The two billing
+ * cards' bill-exit wires are untouched — both still emit to ERP GL exactly
+ * as before, even though only one of them now has an incoming connection.
  *
- * The actual diagram (cards + connectors) lives in ./FlowCanvas.astro — see
- * that file's doc comment for the pixel-coordinate provenance. This file
- * owns the two tab datasets (card content AND wire routing) and the
- * interaction — see real-estate/SourceOfTruth.astro's doc comment for the
- * scale-to-fit / draw-in-animation mechanics shared by both sections.
- *
- * Unlike the real-estate version, each tab here has 5 source rows (4 plain +
- * 1 `directToGL`) instead of 4, and the middleware column label / ERP GL
- * checklist differ per tab — both threaded through as FlowCanvas props
- * (`middlewareLabel`, `erpChecklist`) rather than fixed markup.
+ * Insurance has one more source row than Banking (6 vs 5: 4 policy lines
+ * instead of manufacturing's usual 3-plus-1 split), so FlowCanvas.astro's
+ * CANVAS_H here is sized to Insurance's taller tab — see that file's own
+ * comment. Banking's shorter tab just leaves the extra vertical room empty
+ * below its last source row.
  */
 import FlowCanvas, { CANVAS_W, CANVAS_H, type FlowCard, type FlowWire } from "./FlowCanvas.astro";
 
-// Row gap is 40px (not the original 24px) ONLY directly above the
-// `directToGL` row (row 4, the last one) — that's the room FlowCanvas.astro's
-// floating "Direct → GL" badge needs to clear both the card above it (8px)
-// and its own top edge (4px). All other gaps stay the original 24px.
-const sellSideSources: FlowCard[] = [
-  { x: 0, y: 52, w: 286, h: 144, tag: "purple", title: "Domestic sales", desc: "Plant despatch • direct billing\nTax where the goods ship from" },
-  { x: 0, y: 220, w: 286, h: 144, tag: "purple", title: "Exports & cross-border", desc: "Intra-community supplies\nProof of exit held per shipment" },
-  { x: 0, y: 388, w: 286, h: 144, tag: "purple", title: "Distributor & channel", desc: "Dealer sales • OEM contracts\nVolume rebates settled later" },
-  { x: 0, y: 556, w: 286, h: 144, tag: "purple", title: "Scrap & by-product", desc: "Process waste • offcuts\nSamples and warranty despatch" },
-  { x: 0, y: 740, w: 286, h: 144, tag: "orange", title: "Procurement / AP", desc: "Vendor invoices\nReverse charge", directToGL: true },
+const bankingSources: FlowCard[] = [
+  { x: 0, y: 52, w: 286, h: 144, tag: "purple", title: "Core banking", desc: "Finacle · FLEXCUBE · BaNCS · Transact" },
+  { x: 0, y: 220, w: 286, h: 144, tag: "purple", title: "Cards & payments", desc: "FIS · TSYS · Zeta · M2P · Pismo" },
+  { x: 0, y: 388, w: 286, h: 144, tag: "purple", title: "Lending · LOS/LMS", desc: "FinOne · Pennant · Lentra" },
+  { x: 0, y: 556, w: 286, h: 144, tag: "purple", title: "Treasury", desc: "Murex · Calypso · Finastra" },
+  { x: 0, y: 740, w: 286, h: 144, tag: "orange", title: "Procurement / AP", desc: "Vendor invoices\nReverse charge · payments", directToGL: true },
 ];
 
-const sellSideBilling: FlowCard[] = [
-  { x: 332, y: 220, w: 286, h: 144, tag: "grey", title: "Dispatch e-invoice", desc: "Structured e-invoice per country.\nTax from ship-from and ship-to." },
-  { x: 332, y: 368, w: 286, h: 164, tag: "grey", title: "Movement document", desc: "Delivery note, goods in transit,\nexport evidence held against the invoice." },
+const bankingBilling: FlowCard[] = [
+  { x: 332, y: 220, w: 286, h: 144, tag: "grey", title: "Fee & Charge E-Invoice", desc: "Structured e-invoice per country.\nTax on taxable bank fees." },
+  { x: 332, y: 368, w: 286, h: 164, tag: "grey", title: "Intercompany Billing", desc: "Inter-entity tax allocation.\nCross-border service charges." },
 ];
 
-// Confirmed with the user: Domestic sales, Exports & cross-border AND
-// Distributor & channel (rows 0-2, all purple) converge on Dispatch
-// e-invoice — as one merged line, not 3 separate entry points. Each of the
-// 3 wires below is an explicit point path that travels to the SAME trunk
-// point (310, 292 — Dispatch e-invoice's own vertical center, which is also
-// Exports & cross-border's own row y, so its wire is already a straight
-// run) and then shares the identical final segment (310,292)->(332,292)
-// into the card — 3 overlapping dashed paths render as one line post-merge,
-// same trick real estate's FlowCanvas draws bypass wires with (`points`
-// instead of `from`/`to`/`turnX`). Scrap & by-product (row 3) is Movement
-// document's only input, so it keeps a plain one-corner wire. Procurement/AP
-// bypasses billing entirely, straight to ERP GL, same mechanic as real
-// estate's Buyer/Tenant (already the bottom-most row, so a plain
-// one-corner turn is safe — no card sits below it to hide behind).
-const sellSideWires: FlowWire[] = [
-  { flow: "purple", stage: "src-entry", points: [{ x: 286, y: 124 }, { x: 310, y: 124 }, { x: 310, y: 292 }, { x: 332, y: 292 }] },
-  { flow: "purple", stage: "src-entry", points: [{ x: 286, y: 292 }, { x: 310, y: 292 }, { x: 332, y: 292 }] },
-  { flow: "purple", stage: "src-entry", points: [{ x: 286, y: 460 }, { x: 310, y: 460 }, { x: 310, y: 292 }, { x: 332, y: 292 }] },
-  { flow: "purple", stage: "src-entry", from: { x: 286, y: 628 }, to: { x: 332, y: 450 }, turnX: 316 },
+// All 4 purple sources (Core banking, Cards & payments, Lending, Treasury)
+// merge onto Fee & Charge E-Invoice's own center (292) via a TRUE bus: one
+// shared vertical trunk line at x:310 (drawn ONCE, spanning every row's y)
+// plus one shared exit stub into the card (drawn ONCE, at y:292), with each
+// source contributing only its own short horizontal stub up to the trunk.
+// This is deliberately NOT 4 full-length overlapping paths — when multiple
+// <path> elements each redraw the same shared segment, their independent
+// `stroke-dasharray` phases (each starts fresh from that path's own origin)
+// fall out of sync and the overlap reads as a doubled/glitchy line. Drawing
+// the shared geometry exactly once removes that artifact entirely.
+const bankingWires: FlowWire[] = [
+  { flow: "purple", stage: "src-entry", points: [{ x: 286, y: 124 }, { x: 310, y: 124 }] },
+  { flow: "purple", stage: "src-entry", points: [{ x: 286, y: 292 }, { x: 310, y: 292 }] },
+  { flow: "purple", stage: "src-entry", points: [{ x: 286, y: 460 }, { x: 310, y: 460 }] },
+  { flow: "purple", stage: "src-entry", points: [{ x: 286, y: 628 }, { x: 310, y: 628 }] },
+  { flow: "purple", stage: "src-entry", points: [{ x: 310, y: 124 }, { x: 310, y: 628 }] },
+  { flow: "purple", stage: "src-entry", points: [{ x: 310, y: 292 }, { x: 332, y: 292 }] },
   { flow: "orange", stage: "orange-full", from: { x: 286, y: 812 }, to: { x: 668, y: 500 }, turnX: 643 },
-  // Same trunk-merge trick as the src-entry wires above: Dispatch e-invoice
-  // (own exit y 292) and Movement document (own exit y 450) both travel to
-  // (640, 371) — their true midpoint, (292 + 450) / 2, not an arbitrary
-  // point — then share the identical final segment (640,371)->(668,371)
-  // into ERP GL, reading as one centered bus line rather than 2 entries.
   { flow: "purple", stage: "bill-exit", points: [{ x: 618, y: 292 }, { x: 640, y: 292 }, { x: 640, y: 371 }, { x: 668, y: 371 }] },
   { flow: "purple", stage: "bill-exit", points: [{ x: 618, y: 450 }, { x: 640, y: 450 }, { x: 640, y: 371 }, { x: 668, y: 371 }] },
 ];
 
-const sellSideChecklist = ["Output tax by ship-from and ship-to", "Zero-rating evidence", "Reverse charge on cross-border B2B", "E-invoice per country model", "Tax reconciliation"];
+const bankingChecklist = ["Output tax (bank fees & services)", "Exempt (lending / interest)", "Input tax recovery", "Archival & validation per market", "Tax reconciliation"];
 
-// Same 5-row layout as sellSideSources.
-const procurementSources: FlowCard[] = [
-  { x: 0, y: 52, w: 286, h: 144, tag: "green", title: "Imports & customs", desc: "Entry declarations • duty and\nimport VAT • deferment" },
-  { x: 0, y: 220, w: 286, h: 144, tag: "purple", title: "Stock transfers", desc: "Plant to plant • cross-border\nOwn-goods movements" },
-  { x: 0, y: 388, w: 286, h: 144, tag: "orange", title: "Toll & subcontract", desc: "Free-issue material out\nProcessing fee back in" },
-  { x: 0, y: 556, w: 286, h: 144, tag: "purple", title: "Consignment & call-off", desc: "Stock at customer site\n12-month call-off clock" },
-  { x: 0, y: 740, w: 286, h: 144, tag: "orange", title: "Intercompany & AP", desc: "Group cross-charges\nForeign vendor spend", directToGL: true },
+// 6 rows (5 plain + 1 directToGL), unlike bankingSources' 5 — see this
+// file's doc comment and FlowCanvas.astro's CANVAS_H comment. Row y-values
+// follow the same 24px gap (40px directly above the flagged last row) rule
+// manufacturing's FlowCanvas rows use.
+const insuranceSources: FlowCard[] = [
+  { x: 0, y: 52, w: 286, h: 144, tag: "purple", title: "Policy Admin · Life", desc: "Oracle CIPA · BaNCS · Majesco" },
+  { x: 0, y: 220, w: 286, h: 144, tag: "purple", title: "Policy Admin · P&C", desc: "Guidewire · Duck Creek · Sapiens" },
+  { x: 0, y: 388, w: 286, h: 144, tag: "purple", title: "Policy Admin · Health", desc: "HealthEdge · Insuritas · Vitraya (IN) · TPA platforms" },
+  { x: 0, y: 556, w: 286, h: 144, tag: "purple", title: "Policy Admin · Motor", desc: "Guidewire · Sapiens · Insuritas" },
+  { x: 0, y: 724, w: 286, h: 144, tag: "purple", title: "Commission / Agency", desc: "Intermediary payouts · Broker management" },
+  { x: 0, y: 908, w: 286, h: 144, tag: "orange", title: "Procurement / AP", desc: "Vendor invoices\nReverse charge", directToGL: true },
 ];
 
-const procurementBilling: FlowCard[] = [
+// Billing column keeps manufacturing's Procurement-tab cards verbatim
+// (title, desc, and dimensions) under a "Movement // Tax-doc" label — that
+// is what the Figma frame actually shows for this tab, confirmed against
+// rendered screenshots. "Transfer document" keeps manufacturing's taller
+// 164px card (3-line desc); "Processing document" keeps its 144px card,
+// dropped to y:388 to sit flush under it.
+const insuranceBilling: FlowCard[] = [
   { x: 332, y: 220, w: 286, h: 164, tag: "grey", title: "Transfer document", desc: "Own-goods movement, call-off\nregister, 12-month clock tracked\nper consignment." },
   { x: 332, y: 388, w: 286, h: 144, tag: "grey", title: "Processing document", desc: "Toll fee raised as a service. Free-\nissue material held out of the sale." },
 ];
 
-// Confirmed with the user, a clean 2+2 split: Imports & customs (green) and
-// Stock transfers (purple) converge on Transfer document; Toll & subcontract
-// (orange — corrected from an earlier purple guess, its wire is clearly
-// orange in the zoomed screenshot) and Consignment & call-off (purple)
-// converge on Processing document. Each pair uses distinct turnX lanes per
-// colour, per the file's own convention, since same-lane + different colour
-// reads as one merged multi-colour wire.
-//
-// Unlike sellSideWires' bill-exit pair, these two do NOT bus-merge into one
-// shared entry — Transfer document's exit is purple and Processing
-// document's is orange, and 2 different colours drawn over the same final
-// segment wouldn't read as "one line", just a messy overlap. So each keeps
-// its own lane and entry point into ERP GL, same as sellSideWires' src-entry
-// wires. Intercompany & AP bypasses billing entirely, same mechanic as
-// sellSideWires' Procurement/AP.
-const procurementWires: FlowWire[] = [
-  { flow: "green", stage: "src-entry", from: { x: 286, y: 124 }, to: { x: 332, y: 260 }, turnX: 300 },
-  { flow: "purple", stage: "src-entry", from: { x: 286, y: 292 }, to: { x: 332, y: 344 }, turnX: 308 },
-  { flow: "orange", stage: "src-entry", from: { x: 286, y: 460 }, to: { x: 332, y: 415 }, turnX: 316 },
-  { flow: "purple", stage: "src-entry", from: { x: 286, y: 628 }, to: { x: 332, y: 480 }, turnX: 324 },
-  { flow: "orange", stage: "orange-full", from: { x: 286, y: 812 }, to: { x: 668, y: 500 }, turnX: 643 },
-  { flow: "purple", stage: "bill-exit", from: { x: 618, y: 302 }, to: { x: 668, y: 260 }, turnX: 632 },
-  { flow: "orange", stage: "bill-exit", from: { x: 618, y: 460 }, to: { x: 668, y: 320 }, turnX: 654 },
+// Same true-bus construction as bankingWires: one shared vertical trunk at
+// x:310 (drawn once, spanning all 5 rows) plus one shared exit stub into
+// Transfer document (drawn once, at y:302), each source contributing only
+// its own short stub — see bankingWires' comment for why per-source
+// duplication of the shared segment produces a glitchy overlap.
+const insuranceWires: FlowWire[] = [
+  { flow: "purple", stage: "src-entry", points: [{ x: 286, y: 124 }, { x: 310, y: 124 }] },
+  { flow: "purple", stage: "src-entry", points: [{ x: 286, y: 292 }, { x: 310, y: 292 }] },
+  { flow: "purple", stage: "src-entry", points: [{ x: 286, y: 460 }, { x: 310, y: 460 }] },
+  { flow: "purple", stage: "src-entry", points: [{ x: 286, y: 628 }, { x: 310, y: 628 }] },
+  { flow: "purple", stage: "src-entry", points: [{ x: 286, y: 796 }, { x: 310, y: 796 }] },
+  { flow: "purple", stage: "src-entry", points: [{ x: 310, y: 124 }, { x: 310, y: 796 }] },
+  { flow: "purple", stage: "src-entry", points: [{ x: 310, y: 302 }, { x: 332, y: 302 }] },
+  { flow: "orange", stage: "orange-full", from: { x: 286, y: 980 }, to: { x: 668, y: 500 }, turnX: 643 },
+  { flow: "purple", stage: "bill-exit", points: [{ x: 618, y: 302 }, { x: 640, y: 302 }, { x: 640, y: 381 }, { x: 668, y: 381 }] },
+  { flow: "purple", stage: "bill-exit", points: [{ x: 618, y: 460 }, { x: 640, y: 460 }, { x: 640, y: 381 }, { x: 668, y: 381 }] },
 ];
 
-const procurementChecklist = ["Import VAT and deferment", "Input VAT recovery", "Intercompany tax and credit", "Deemed supply on own-goods transfers", "Tax reconciliation"];
+// Identical to bankingChecklist — confirmed against rendered screenshots,
+// the ERP GL card's checklist does not vary per tab on this page (unlike
+// manufacturing's two tabs, which do use distinct checklists).
+const insuranceChecklist = bankingChecklist;
 ---
 
 <section class="bg-generic-00 border-t border-neutral-200 py-16 lg:py-20">
@@ -120,24 +121,24 @@ const procurementChecklist = ["Import VAT and deferment", "Input VAT recovery", 
     <div class="rounded-xl border border-neutral-200 p-6 lg:p-8">
       <div class="flex items-center justify-between gap-4 mb-12">
         <h2 class="m-0 font-heading font-medium text-vault-navy text-[length:var(--fs-h1)] leading-[length:var(--lh-h1)] tracking-[-0.5px] text-balance">
-          From every plant and every movement to one source of truth.
+          From your core systems to one source of truth.
         </h2>
-        <div class="inline-flex items-center gap-1 rounded-xl bg-neutral-100 p-1 max-w-[445px] w-full" data-sot-tabs>
+        <div class="inline-flex items-center gap-1 rounded-xl bg-neutral-100 p-1 max-w-[224px] w-full" data-sot-tabs>
           <button
             type="button"
             class="sot-tab inline-flex items-center justify-center rounded-lg px-6 py-2 font-body font-medium text-[length:var(--fs-label)] leading-[length:var(--lh-label)] cursor-pointer border-0 bg-generic-00 text-nova-blue shadow-[0px_1px_2px_0px_rgba(16,24,40,0.04)]"
-            data-sot-tab="sell-side"
+            data-sot-tab="banking"
             aria-selected="true"
           >
-            Sell side & Dispatch
+            Banking
           </button>
           <button
             type="button"
             class="sot-tab inline-flex items-center justify-center rounded-lg px-6 py-2 font-body font-medium text-[length:var(--fs-label)] leading-[length:var(--lh-label)] cursor-pointer border-0 bg-transparent text-neutral-700"
-            data-sot-tab="procurement"
+            data-sot-tab="insurance"
             aria-selected="false"
           >
-            Procurement, Transfers & Group
+            Insurance
           </button>
         </div>
       </div>
@@ -145,22 +146,22 @@ const procurementChecklist = ["Import VAT and deferment", "Input VAT recovery", 
       <div class="sot-stage relative w-full" data-sot-stage>
         <div class="sot-track absolute top-0 left-0" style={`width:${CANVAS_W}px;height:${CANVAS_H}px;`} data-sot-track>
           <FlowCanvas
-            id="sell-side"
+            id="banking"
             active={true}
             middlewareLabel="Billing // Tax-doc"
-            erpChecklist={sellSideChecklist}
-            sourceCards={sellSideSources}
-            billingCards={sellSideBilling}
-            wires={sellSideWires}
+            erpChecklist={bankingChecklist}
+            sourceCards={bankingSources}
+            billingCards={bankingBilling}
+            wires={bankingWires}
           />
           <FlowCanvas
-            id="procurement"
+            id="insurance"
             active={false}
             middlewareLabel="Movement // Tax-doc"
-            erpChecklist={procurementChecklist}
-            sourceCards={procurementSources}
-            billingCards={procurementBilling}
-            wires={procurementWires}
+            erpChecklist={insuranceChecklist}
+            sourceCards={insuranceSources}
+            billingCards={insuranceBilling}
+            wires={insuranceWires}
           />
         </div>
       </div>
