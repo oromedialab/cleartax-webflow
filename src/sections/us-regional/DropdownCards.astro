@@ -105,12 +105,11 @@ const COUNTRIES = [
 
 /* Written once and rendered twice — see the header note above. Keeping the copy
    in consts is what stops the two versions drifting apart. */
-const HEADING = "The World Moved to Structured e-Invoicing.";
+const HEADING = "The US Isn't Mandated. Your Global Entities Might Already Be.";
 const LEDE =
-    "If your business operates internationally, some part of it is already required to invoice electronically today.";
+    "US federal procurement already requires structured digital invoicing. Beyond that, there's no national B2B mandate yet. But \"no mandate at home\" doesn't mean \"no exposure.\" If your enterprise has a subsidiary, branch, or trading partner in any of the markets below, e-invoicing compliance is already someone's job.";
 const COUNTRY_SELECT = "Select a country where your business operates";
-const CTA_LABEL = "Talk to an expert";
-const CTA_HREF = "https://www.cleartax.com/contact-us";
+const DEFAULT_COUNTRY = "United States";
 ---
 
 <section class="bg-generic-00 py-16 lg:py-20">
@@ -121,7 +120,7 @@ const CTA_HREF = "https://www.cleartax.com/contact-us";
         <div
             class="philippine-mandate-header-flow flex flex-col gap-6 bg-generic-00 lg:flex-row lg:items-end lg:justify-between lg:gap-12 mb-8 lg:mb-12"
         >
-            <div class="flex flex-col gap-3 lg:max-w-[887px]">
+            <div class="flex flex-col gap-3 lg:max-w-[786px]">
                 <h2
                     class="m-0 font-heading font-medium text-vault-navy text-[length:var(--fs-h1)] leading-[length:var(--lh-h1)] tracking-[-0.5px]"
                 >
@@ -134,28 +133,65 @@ const CTA_HREF = "https://www.cleartax.com/contact-us";
                 </p>
             </div>
 
-            <!-- Opens the HubSpot modal from `DemoModal.astro`. The href is kept real
-           so the CTA still goes somewhere if that section is absent. -->
-            <a
-                href={CTA_HREF}
-                data-demo-open
-                class="inline-flex shrink-0 items-center justify-center gap-2 self-start rounded-lg border border-nova-500 px-5 py-3.5 font-body text-[length:var(--fs-label-lg)] leading-[length:var(--lh-label-lg)] font-medium text-nova-blue no-underline transition-all ease-in-out duration-200 hover:bg-generic-00 hover:text-nova-blue lg:self-auto"
-            >
-                {CTA_LABEL}
-                <svg
-                    width="14"
-                    height="9"
-                    viewBox="0 0 14 9"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                >
-                    <path
-                        fill-rule="evenodd"
-                        clip-rule="evenodd"
-                        d="M9.00628 0.256282C9.34799 -0.0854272 9.90201 -0.0854272 10.2437 0.256282L13.7437 3.75628C14.0854 4.09799 14.0854 4.65201 13.7437 4.99372L10.2437 8.49372C9.90201 8.83543 9.34799 8.83543 9.00628 8.49372C8.66457 8.15201 8.66457 7.59799 9.00628 7.25628L11.0126 5.25H0.875001C0.391751 5.25 -2.11235e-08 4.85825 0 4.375C2.11235e-08 3.89175 0.391751 3.5 0.875001 3.5H11.0126L9.00628 1.49372C8.66457 1.15201 8.66457 0.59799 9.00628 0.256282Z"
-                        fill="#5446FF"></path>
-                </svg>
-            </a>
+            <!-- Country Dropdown -->
+            <div class="country-dropdown-wrap flex flex-col gap-2 shrink-0 self-start lg:self-end w-full sm:w-[300px] lg:w-[377px]">
+                <span class="font-body text-[length:var(--fs-body-base)] leading-[length:var(--lh-body-lg)] text-neutral-500 font-normal">
+                    {COUNTRY_SELECT}
+                </span>
+                <div class="country-dropdown relative w-full" data-country-dropdown>
+                    <button
+                        type="button"
+                        class="country-dropdown-trigger flex w-full items-center justify-between gap-3 rounded-lg border border-neutral-300 bg-generic-00 px-4 py-3 text-left font-body text-[length:var(--fs-body-lg)] leading-[length:var(--lh-body-lg)] font-medium text-vault-navy transition-colors hover:border-neutral-400 cursor-pointer"
+                        aria-haspopup="listbox"
+                        aria-expanded="false"
+                    >
+                        <div class="flex items-center gap-2.5 min-w-0">
+                            <svg
+                                class="h-5 w-5 shrink-0 text-neutral-500"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="1.75"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                aria-hidden="true"
+                            >
+                                <circle cx="12" cy="12" r="10"></circle>
+                                <path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"></path>
+                                <path d="M2 12h20"></path>
+                            </svg>
+                            <span class="country-dropdown-label text-vault-navy font-normal text-[length:var(--fs-body-lg)] leading-[length:var(--lh-body-lg)]">
+                                {DEFAULT_COUNTRY}
+                            </span>
+                        </div>
+                        <svg
+                            class="country-dropdown-chevron h-3 w-3 shrink-0 text-neutral-500 transition-transform duration-200"
+                            viewBox="0 0 18 11"
+                            fill="none"
+                            xmlns="http://www.w3.org/2000/svg"
+                            aria-hidden="true"
+                        >
+                            <path d="M8.99997 10.2605C8.67737 10.2605 8.35482 10.1374 8.10887 9.89152L0.369255 2.15183C-0.123085 1.65949 -0.123085 0.861247 0.369255 0.369106C0.861396 -0.123035 1.65948 -0.123035 2.15186 0.369106L8.99997 7.21761L15.8481 0.369345C16.3405 -0.122796 17.1385 -0.122796 17.6306 0.369345C18.1231 0.861486 18.1231 1.65973 17.6306 2.15207L9.89108 9.89176C9.645 10.1376 9.32245 10.2605 8.99997 10.2605Z" fill="#4B5563"/>
+                        </svg>
+                    </button>
+
+                    <div
+                        class="country-dropdown-menu absolute left-0 right-0 top-[calc(100%+6px)] z-50 hidden max-h-60 overflow-y-auto rounded-lg border border-neutral-200 bg-white py-1 shadow-lg"
+                        role="listbox"
+                    >
+                        {COUNTRIES.map((country) => (
+                            <button
+                                type="button"
+                                role="option"
+                                data-value={country.label}
+                                class="country-dropdown-option flex w-full items-center justify-between px-4 py-2.5 text-left text-sm font-body text-vault-navy transition-colors hover:bg-neutral-50 hover:text-nova-blue cursor-pointer"
+                            >
+                                <span class="truncate">{country.label}</span>
+                            </button>
+                        ))}
+                    </div>
+                </div>
+            </div>
         </div>
 
         <div
@@ -174,7 +210,7 @@ const CTA_HREF = "https://www.cleartax.com/contact-us";
                                 class="bg-generic-00"
                             >
                                 <div class="philippine-mandate-header-stuck flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between lg:gap-12">
-                                    <div class="flex flex-col gap-3 lg:max-w-[887px]">
+                                    <div class="flex flex-col gap-3 lg:max-w-[786px]">
                                         <h2 class="m-0 font-heading font-medium text-vault-navy text-[length:var(--fs-h1)] leading-[length:var(--lh-h1)] tracking-[-0.5px]">
                                             {HEADING}
                                         </h2>
@@ -183,13 +219,65 @@ const CTA_HREF = "https://www.cleartax.com/contact-us";
                                         </p>
                                     </div>
 
-                                    <a
-                                        href={CTA_HREF}
-                                        data-demo-open
-                                        class="inline-flex shrink-0 items-center justify-center gap-2 self-start rounded-lg border border-nova-blue bg-nova-blue px-5 py-3.5 font-body text-[length:var(--fs-label-lg)] leading-[length:var(--lh-label-lg)] font-medium text-nova-50 no-underline transition-all ease-in-out duration-200 hover:bg-generic-00 hover:text-nova-blue lg:self-auto"
-                                    >
-                                        {CTA_LABEL}
-                                    </a>
+                                    <!-- Country Dropdown (stuck) -->
+                                    <div class="country-dropdown-wrap flex flex-col gap-2 shrink-0 self-start lg:self-end w-full sm:w-[280px] lg:w-[300px]">
+                                        <span class="font-body text-xs lg:text-sm text-neutral-500 font-normal">
+                                            {COUNTRY_SELECT}
+                                        </span>
+                                        <div class="country-dropdown relative w-full" data-country-dropdown>
+                                            <button
+                                                type="button"
+                                                class="country-dropdown-trigger flex w-full items-center justify-between gap-3 rounded-lg border border-neutral-300 bg-generic-00 px-4 py-2.5 text-left font-body text-sm font-medium text-vault-navy shadow-sm transition-colors hover:border-neutral-400 focus:outline-none focus:ring-2 focus:ring-nova-blue/20 cursor-pointer"
+                                                aria-haspopup="listbox"
+                                                aria-expanded="false"
+                                            >
+                                                <div class="flex items-center gap-2.5 min-w-0">
+                                                    <svg
+                                                        class="h-5 w-5 shrink-0 text-neutral-500"
+                                                        viewBox="0 0 24 24"
+                                                        fill="none"
+                                                        stroke="currentColor"
+                                                        stroke-width="1.75"
+                                                        stroke-linecap="round"
+                                                        stroke-linejoin="round"
+                                                        aria-hidden="true"
+                                                    >
+                                                        <circle cx="12" cy="12" r="10"></circle>
+                                                        <path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"></path>
+                                                        <path d="M2 12h20"></path>
+                                                    </svg>
+                                                    <span class="country-dropdown-label truncate text-vault-navy font-normal text-sm">
+                                                        {DEFAULT_COUNTRY}
+                                                    </span>
+                                                </div>
+                                                <svg
+                                                    class="country-dropdown-chevron h-3 w-3 shrink-0 text-neutral-500 transition-transform duration-200"
+                                                    viewBox="0 0 18 11"
+                                                    fill="none"
+                                                    xmlns="http://www.w3.org/2000/svg"
+                                                    aria-hidden="true"
+                                                >
+                                                    <path d="M8.99997 10.2605C8.67737 10.2605 8.35482 10.1374 8.10887 9.89152L0.369255 2.15183C-0.123085 1.65949 -0.123085 0.861247 0.369255 0.369106C0.861396 -0.123035 1.65948 -0.123035 2.15186 0.369106L8.99997 7.21761L15.8481 0.369345C16.3405 -0.122796 17.1385 -0.122796 17.6306 0.369345C18.1231 0.861486 18.1231 1.65973 17.6306 2.15207L9.89108 9.89176C9.645 10.1376 9.32245 10.2605 8.99997 10.2605Z" fill="#4B5563"/>
+                                                </svg>
+                                            </button>
+
+                                            <div
+                                                class="country-dropdown-menu absolute left-0 right-0 top-[calc(100%+6px)] z-50 hidden max-h-60 overflow-y-auto rounded-lg border border-neutral-200 bg-white py-1 shadow-lg"
+                                                role="listbox"
+                                            >
+                                                {COUNTRIES.map((country) => (
+                                                    <button
+                                                        type="button"
+                                                        role="option"
+                                                        data-value={country.label}
+                                                        class="country-dropdown-option flex w-full items-center justify-between px-4 py-2.5 text-left text-sm font-body text-vault-navy transition-colors hover:bg-neutral-50 hover:text-nova-blue cursor-pointer"
+                                                    >
+                                                        <span class="truncate">{country.label}</span>
+                                                    </button>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         )}
@@ -568,7 +656,90 @@ const CTA_HREF = "https://www.cleartax.com/contact-us";
 
         setTimeout(handleLayoutShift, 100);
         setTimeout(handleLayoutShift, 300);
-        setTimeout(handleLayoutShift, 1000);
+        // Country dropdown interactive behavior
+        const dropdownWrappers = document.querySelectorAll("[data-country-dropdown]");
+        dropdownWrappers.forEach((dropdown) => {
+            const trigger = dropdown.querySelector(".country-dropdown-trigger");
+            const menu = dropdown.querySelector(".country-dropdown-menu");
+            const chevron = dropdown.querySelector(".country-dropdown-chevron");
+
+            if (!trigger || !menu) return;
+
+            const closeMenu = () => {
+                menu.classList.add("hidden");
+                chevron?.classList.remove("rotate-180");
+                trigger.setAttribute("aria-expanded", "false");
+            };
+
+            const openMenu = () => {
+                // Close any other open dropdowns first
+                document.querySelectorAll(".country-dropdown-menu").forEach((m) => {
+                    if (m !== menu) m.classList.add("hidden");
+                });
+                document.querySelectorAll(".country-dropdown-chevron").forEach((c) => {
+                    if (c !== chevron) c.classList.remove("rotate-180");
+                });
+                document.querySelectorAll(".country-dropdown-trigger").forEach((t) => {
+                    if (t !== trigger) t.setAttribute("aria-expanded", "false");
+                });
+
+                menu.classList.remove("hidden");
+                chevron?.classList.add("rotate-180");
+                trigger.setAttribute("aria-expanded", "true");
+            };
+
+            trigger.addEventListener("click", (e) => {
+                e.stopPropagation();
+                const isExpanded = trigger.getAttribute("aria-expanded") === "true";
+                if (isExpanded) {
+                    closeMenu();
+                } else {
+                    openMenu();
+                }
+            });
+
+            const options = dropdown.querySelectorAll(".country-dropdown-option");
+            options.forEach((opt) => {
+                opt.addEventListener("click", (e) => {
+                    e.stopPropagation();
+                    const val = opt.getAttribute("data-value") || opt.textContent?.trim();
+                    if (val) {
+                        // Sync all dropdown labels (both flow and stuck headers)
+                        document.querySelectorAll(".country-dropdown-label").forEach((lbl) => {
+                            lbl.textContent = val;
+                        });
+                        closeMenu();
+
+                        // If a matching card exists, scroll to it smoothly
+                        const cards = Array.from(document.querySelectorAll(".philippine-mandate-sticky, .philippine-mandate-card"));
+                        const targetCard = cards.find((card) =>
+                            card.textContent?.toLowerCase().includes(val.toLowerCase())
+                        );
+                        if (targetCard) {
+                            targetCard.scrollIntoView({ behavior: "smooth", block: "center" });
+                        }
+                    }
+                });
+            });
+        });
+
+        // Close on clicking outside
+        document.addEventListener("click", (e) => {
+            if (!e.target.closest("[data-country-dropdown]")) {
+                document.querySelectorAll(".country-dropdown-menu").forEach((m) => m.classList.add("hidden"));
+                document.querySelectorAll(".country-dropdown-chevron").forEach((c) => c.classList.remove("rotate-180"));
+                document.querySelectorAll(".country-dropdown-trigger").forEach((t) => t.setAttribute("aria-expanded", "false"));
+            }
+        });
+
+        // Close on escape key
+        document.addEventListener("keydown", (e) => {
+            if (e.key === "Escape") {
+                document.querySelectorAll(".country-dropdown-menu").forEach((m) => m.classList.add("hidden"));
+                document.querySelectorAll(".country-dropdown-chevron").forEach((c) => c.classList.remove("rotate-180"));
+                document.querySelectorAll(".country-dropdown-trigger").forEach((t) => t.setAttribute("aria-expanded", "false"));
+            }
+        });
 
         setTops();
         update();
