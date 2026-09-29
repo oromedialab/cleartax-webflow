@@ -31,11 +31,24 @@
  */
 import FlowCanvas, { CANVAS_W, CANVAS_H, type FlowCard, type FlowWire } from "./FlowCanvas.astro";
 
+// Row gap is 40px (not the original 24px) ONLY directly above a
+// `directToGL` card — that's the room FlowCanvas.astro's floating "Direct →
+// GL" badge needs to clear both the card above it (8px) and its own top
+// edge (4px) — see CANVAS_H's comment. Gaps with no badge in them stay the
+// original 24px: Land Owner/JV -> Lease/Property Mgmt has no badge, so it's
+// still 144+24 = 168px below Land Owner/JV, not 184.
+//
+// `directToGL` is a tax-treatment note ("this posts straight to GL, no
+// separate invoice document"), not a routing instruction — Land Owner/JV
+// carries the badge in Figma even though its wire (below) still enters
+// Land Rights/JV Invoice like any other middleware-routed source. Only
+// Buyer/Tenant's wire is an actual bypass (see channelsWires' "orange-full"
+// stage comment).
 const channelsSources: FlowCard[] = [
   { x: 0, y: 52, w: 286, h: 144, tag: "purple", title: "Sales & Booking CRM", desc: "Salesforce • Zoho • Sell.Do (IN) • LeadRat (IN)" },
-  { x: 0, y: 220, w: 286, h: 144, tag: "orange", title: "Land Owner / JV", desc: "Development rights transferred IN reverse charge on TDR" },
-  { x: 0, y: 388, w: 286, h: 144, tag: "purple", title: "Lease / Property Mgmt", desc: "Yardi • MRI • SAP RE-FX leasing" },
-  { x: 0, y: 556, w: 286, h: 144, tag: "green", title: "Buyer / Tenant", desc: "Tax-registered buyer Input tax claim", directToGL: true },
+  { x: 0, y: 236, w: 286, h: 144, tag: "orange", title: "Land Owner / JV", desc: "Development rights transferred IN reverse charge on TDR", directToGL: true },
+  { x: 0, y: 404, w: 286, h: 144, tag: "purple", title: "Lease / Property Mgmt", desc: "Yardi • MRI • SAP RE-FX leasing" },
+  { x: 0, y: 588, w: 286, h: 144, tag: "green", title: "Buyer / Tenant", desc: "Tax-registered buyer Input tax claim", directToGL: true },
 ];
 
 const channelsBilling: FlowCard[] = [
@@ -58,17 +71,20 @@ const channelsBilling: FlowCard[] = [
 // underneath that card's body, which would hide the wire from view.
 const channelsWires: FlowWire[] = [
   { flow: "purple", stage: "src-entry", from: { x: 286, y: 124 }, to: { x: 332, y: 260 }, turnX: 304 },
-  { flow: "orange", stage: "src-entry", from: { x: 286, y: 292 }, to: { x: 332, y: 460 }, turnX: 316 },
-  { flow: "purple", stage: "src-entry", from: { x: 286, y: 460 }, to: { x: 332, y: 340 }, turnX: 304 },
-  { flow: "green", stage: "orange-full", from: { x: 286, y: 628 }, to: { x: 668, y: 500 }, turnX: 643 },
+  { flow: "orange", stage: "src-entry", from: { x: 286, y: 308 }, to: { x: 332, y: 460 }, turnX: 316 },
+  { flow: "purple", stage: "src-entry", from: { x: 286, y: 476 }, to: { x: 332, y: 340 }, turnX: 304 },
+  { flow: "green", stage: "orange-full", from: { x: 286, y: 660 }, to: { x: 668, y: 500 }, turnX: 643 },
   { flow: "purple", stage: "bill-exit", from: { x: 618, y: 302 }, to: { x: 668, y: 260 }, turnX: 632 },
   { flow: "orange", stage: "bill-exit", from: { x: 618, y: 460 }, to: { x: 668, y: 320 }, turnX: 654 },
 ];
 
+// Same 40px badge-gap as channelsSources, for the same reason — Contractor
+// Invoices and Procurement both carry the "Direct → GL" badge, so both need
+// the wider gap above them.
 const marketplaceSources: FlowCard[] = [
   { x: 0, y: 52, w: 286, h: 144, tag: "purple", title: "Project Mgmt / EPC", desc: "Primavera • Procore • RIB iTWO • Powerplay (IN)" },
-  { x: 0, y: 220, w: 286, h: 144, tag: "orange", title: "Contractor Invoices", desc: "Construction contract billing Forward or reverse charge (UK • CIS)", directToGL: true },
-  { x: 0, y: 388, w: 286, h: 144, tag: "green", title: "Procurement", desc: "Local supply (tax invoice) Import supply (import tax)", directToGL: true },
+  { x: 0, y: 236, w: 286, h: 144, tag: "orange", title: "Contractor Invoices", desc: "Construction contract billing Forward or reverse charge (UK • CIS)", directToGL: true },
+  { x: 0, y: 420, w: 286, h: 144, tag: "green", title: "Procurement", desc: "Local supply (tax invoice) Import supply (import tax)", directToGL: true },
 ];
 
 const marketplaceBilling: FlowCard[] = [
@@ -94,8 +110,8 @@ const marketplaceWires: FlowWire[] = [
     flow: "orange",
     stage: "orange-full",
     points: [
-      { x: 286, y: 292 },
-      { x: 309, y: 292 },
+      { x: 286, y: 308 },
+      { x: 309, y: 308 },
       { x: 309, y: 628 },
       { x: 643, y: 628 },
       { x: 643, y: 500 },
@@ -106,8 +122,8 @@ const marketplaceWires: FlowWire[] = [
     flow: "green",
     stage: "orange-full",
     points: [
-      { x: 286, y: 460 },
-      { x: 320, y: 460 },
+      { x: 286, y: 492 },
+      { x: 320, y: 492 },
       { x: 320, y: 650 },
       { x: 656, y: 650 },
       { x: 656, y: 540 },
@@ -123,10 +139,10 @@ const marketplaceWires: FlowWire[] = [
   <div class="container">
     <div class="rounded-xl border border-neutral-200 p-6 lg:p-8">
       <div class="flex items-center justify-between gap-4 mb-12">
-        <h2 class="m-0 font-heading font-medium text-vault-navy text-[length:var(--fs-h1)] leading-[length:var(--lh-h1)] tracking-[-0.5px]">
+        <h2 class="m-0 font-heading font-medium text-vault-navy text-[length:var(--fs-h1)] leading-[length:var(--lh-h1)] tracking-[-0.5px] text-balance">
           From every selling channel to one source of truth.
         </h2>
-        <div class="inline-flex items-center gap-1 rounded-xl bg-neutral-100 p-1" data-sot-tabs>
+        <div class="inline-flex items-center gap-1 rounded-xl bg-neutral-100 p-1 max-w-127.5 w-full" data-sot-tabs>
           <button
             type="button"
             class="sot-tab inline-flex items-center justify-center rounded-lg px-6 py-2 font-body font-medium text-[length:var(--fs-label)] leading-[length:var(--lh-label)] cursor-pointer border-0 bg-generic-00 text-nova-blue shadow-[0px_1px_2px_0px_rgba(16,24,40,0.04)]"
