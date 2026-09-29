@@ -1467,7 +1467,7 @@ const LEDE =
                       </div>
 
                       <!-- Frame 5: Chart Header at top-left -->
-                      <div class="gh-card4-chart-header hidden absolute left-0 top-0 flex flex-wrap items-center gap-x-5 md:gap-x-6 gap-y-2 opacity-0 pointer-events-none">
+                      <div class="gh-card4-chart-header hidden absolute left-0 top-0 flex flex-wrap items-center gap-x-5 md:gap-x-6 gap-y-2 opacity-0 pointer-events-none" style="display: none; opacity: 0;">
                         <div class="flex items-center gap-2 shrink-0">
                           <svg
                             class="shrink-0"
@@ -1610,13 +1610,17 @@ const LEDE =
                       </div>
 
                       <!-- Frame 5: Final Chart Image & Linked Trail -->
-                      <div class="gh-card4-chart hidden w-full flex-1 min-h-0 flex flex-col items-start justify-start gap-2 md:gap-2.5 opacity-0 pointer-events-none mt-1 md:mt-1.5">
+                      <div
+                        class="gh-card4-chart hidden absolute inset-x-0 top-1 md:top-1.5 bottom-2 md:bottom-2.5 flex w-full flex-col items-start justify-start gap-2 md:gap-2.5 opacity-0 pointer-events-none mt-1 md:mt-1.5 overflow-hidden"
+                        style="display: none; opacity: 0;"
+                      >
                         <img
                           src="https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6ab6579339baafb1fa1a60a5_linked.png"
                           alt="Flagged transactions review queue"
-                          class="w-full h-auto max-h-full block"
+                          class="gh-card4-chart-img w-full h-auto max-h-full block pointer-events-none opacity-0"
+                          style="display: none; opacity: 0;"
                         />
-                        <div class="gh-card4-bottom-area inline-flex items-center gap-1.5 cursor-pointer">
+                        <div class="gh-card4-bottom-area inline-flex items-center gap-1.5 cursor-pointer opacity-0" style="display: none; opacity: 0;">
                           <p class="m-0 text-sm font-normal text-text-default underline underline-offset-2">
                             Duplicates removed, documents linked, and checks recorded in one trail
                           </p>
@@ -3182,6 +3186,17 @@ const LEDE =
     }
   }
 
+  /* Ensure 5th card chart image and elements are strictly hidden until Frame 5 animation reveals them */
+  .gh-card4-chart,
+  .gh-card4-chart-header,
+  .gh-card4-chart-img,
+  .gh-card4-chart img,
+  .gh-card4-bottom-area,
+  img[src*="6ab6579339baafb1fa1a60a5_linked.png"] {
+    display: none;
+    opacity: 0;
+  }
+
   /* Sticky and the scroll-driven shrink are both enhancements. Switched off, the
      cards read as a plain stack — so the huge scroll gaps that exist only to give
      the stack travel have to go with them. */
@@ -3223,6 +3238,72 @@ const LEDE =
       window.addEventListener("gh-card4-generic-complete", () => {
         genericCardComplete[4] = true;
       });
+
+      // Webflow Embed Stitcher:
+      // When publishing in Webflow, the build splits across Embed elements.
+      // If Card 4 is split into the next Embed, its image, input pill, and
+      // ClearTax elements can be orphaned outside .gh-why-sticky.
+      // This reattaches all Card 4 elements into their proper containers so
+      // the 5th card sticks properly and animations function identically to local.
+      function stitchCard4Dom() {
+        const stickyOuters = document.querySelectorAll(".gh-why-sticky");
+        const sticky5 = stickyOuters[4];
+        if (!sticky5) return;
+
+        const grid5 = sticky5.querySelector(".gh-why-card-grid");
+        const card5 = sticky5.querySelector(".gh-why-generic-card-4");
+        const chart4 = document.querySelector(".gh-card4-chart");
+        const chart4Img =
+          document.querySelector(".gh-card4-chart-img") ||
+          document.querySelector('img[src*="6ab6579339baafb1fa1a60a5_linked.png"]');
+        const chart4Bottom = document.querySelector(".gh-card4-bottom-area");
+        const inputContainer4 = document.querySelector(".gh-card4-input-container");
+        const cursor4 = document.querySelector(".gh-card4-cursor");
+        const ctCard4 = document.querySelector(".gh-why-animation-card-4");
+
+        // 1. Ensure chart image and bottom trail are inside .gh-card4-chart
+        if (chart4) {
+          if (chart4Img && !chart4.contains(chart4Img)) {
+            chart4.insertBefore(chart4Img, chart4.firstChild);
+          }
+          if (chart4Bottom && !chart4.contains(chart4Bottom)) {
+            chart4.appendChild(chart4Bottom);
+          }
+        }
+
+        // 2. Ensure input container and cursor are inside .gh-why-generic-card-4
+        if (card5) {
+          if (inputContainer4 && !card5.contains(inputContainer4)) {
+            card5.appendChild(inputContainer4);
+          }
+          if (cursor4 && !card5.contains(cursor4)) {
+            card5.appendChild(cursor4);
+          }
+        }
+
+        // 3. Ensure ClearTax card and orphaned column elements are inside grid5
+        if (grid5 && ctCard4 && !grid5.contains(ctCard4)) {
+          const orphanParent = ctCard4.parentElement;
+          if (orphanParent && orphanParent !== grid5) {
+            const genCaption =
+              orphanParent.querySelector(".md\\:col-start-1.md\\:row-start-3") ||
+              document.querySelectorAll(".md\\:col-start-1.md\\:row-start-3")[4];
+            const ctBadge =
+              orphanParent.querySelector(".md\\:col-start-2.md\\:row-start-1") ||
+              document.querySelectorAll(".md\\:col-start-2.md\\:row-start-1")[4];
+            const ctCaption =
+              orphanParent.querySelector(".md\\:col-start-2.md\\:row-start-3") ||
+              document.querySelectorAll(".md\\:col-start-2.md\\:row-start-3")[4];
+
+            if (genCaption && !grid5.contains(genCaption)) grid5.appendChild(genCaption);
+            if (ctBadge && !grid5.contains(ctBadge)) grid5.appendChild(ctBadge);
+            grid5.appendChild(ctCard4);
+            if (ctCaption && !grid5.contains(ctCaption)) grid5.appendChild(ctCaption);
+          }
+        }
+      }
+
+      stitchCard4Dom();
 
       for (let i = 0; i < 5; i++) {
         initGenericCardFlow(i);
@@ -3398,6 +3479,7 @@ const LEDE =
 
     let lastNavBottomMeasured = -1;
     const handleLayoutShift = () => {
+      stitchCard4Dom();
       setTops();
       update();
     };
@@ -3444,6 +3526,15 @@ const LEDE =
       const checklist = card.querySelector(`.gh-card${idx}-checklist`);
       const checkItems = card.querySelectorAll(`.gh-card${idx}-check-item`);
       const chart = card.querySelector(`.gh-card${idx}-chart`);
+      const chartImg =
+        card.querySelector(`.gh-card${idx}-chart-img`) ||
+        card.querySelector(`.gh-card${idx}-chart img`) ||
+        (idx === 4
+          ? document.querySelector('.gh-card4-chart-img, img[src*="6ab6579339baafb1fa1a60a5_linked.png"]')
+          : null);
+      const chartBottom =
+        card.querySelector(`.gh-card${idx}-bottom-area`) ||
+        (idx === 4 ? document.querySelector(".gh-card4-bottom-area") : null);
       const inputPill = card.querySelector(`.gh-card${idx}-input-pill`);
       const pillPlaceholder = card.querySelector(`.gh-card${idx}-pill-placeholder`);
       const pillTyped = card.querySelector(`.gh-card${idx}-pill-typed`);
@@ -3453,6 +3544,13 @@ const LEDE =
       const borderPath = card.querySelector(`.gh-card${idx}-pill-border-path`);
 
       if (!inputPill || !cursor || !chart) return;
+
+      if (idx === 4) {
+        if (chart) { chart.style.display = "none"; chart.style.opacity = "0"; }
+        if (chartImg) { chartImg.style.display = "none"; chartImg.style.opacity = "0"; }
+        if (chartBottom) { chartBottom.style.display = "none"; chartBottom.style.opacity = "0"; }
+        if (chartHeader) { chartHeader.style.display = "none"; chartHeader.style.opacity = "0"; }
+      }
 
       const reduceMotion =
         window.matchMedia &&
@@ -3469,6 +3567,16 @@ const LEDE =
           chart.classList.remove("hidden");
           chart.style.display = "flex";
           chart.style.opacity = "1";
+        }
+        if (chartImg) {
+          chartImg.classList.remove("hidden");
+          chartImg.style.display = "block";
+          chartImg.style.opacity = "1";
+        }
+        if (chartBottom) {
+          chartBottom.classList.remove("hidden");
+          chartBottom.style.display = "inline-flex";
+          chartBottom.style.opacity = "1";
         }
         if (centerTitle) centerTitle.style.opacity = "0";
         if (glow) glow.style.opacity = "0";
@@ -3552,9 +3660,9 @@ const LEDE =
         });
 
         // Frame 1: Initial state
-        tl.set([chartHeader, chart, bubble, skeleton, checklist], { display: "none" });
+        tl.set([chartHeader, chart, chartImg, chartBottom, bubble, skeleton, checklist].filter(Boolean), { display: "none" });
         tl.set(chartHeader, { opacity: 0, y: 8, pointerEvents: "none" });
-        tl.set(chart, { opacity: 0, y: 10, pointerEvents: "none" });
+        tl.set([chart, chartImg, chartBottom].filter(Boolean), { opacity: 0, y: 10, pointerEvents: "none" });
         tl.set(bubble, { opacity: 0, scale: 0.9, y: 8, pointerEvents: "none" });
         tl.set(skeleton, { opacity: 0, pointerEvents: "none" });
         tl.set(checklist, { opacity: 0, pointerEvents: "none" });
@@ -3690,6 +3798,8 @@ const LEDE =
         tl.set([bubble, checklist], { display: "none" });
         tl.set(chartHeader, { display: "flex" });
         tl.set(chart, { display: "flex" });
+        if (chartImg) tl.set(chartImg, { display: "block" });
+        if (chartBottom) tl.set(chartBottom, { display: "inline-flex" });
         tl.to(pillThinking, { opacity: 0, duration: 0.2 }, "<");
         tl.to(pillPlaceholder, { opacity: 1, duration: 0.25 }, "<+=0.1");
 
@@ -3699,7 +3809,7 @@ const LEDE =
           "-=0.05"
         );
         tl.to(
-          chart,
+          [chart, chartImg, chartBottom].filter(Boolean),
           {
             opacity: 1,
             y: 0,
