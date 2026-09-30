@@ -77,7 +77,8 @@ export const PAGE_TARGETS = [
   { name: 'manufacturing', input: 'src/styles/manufacturing.css', page: 'src/pages/manufacturing.astro' },
   { name: 'germany-regional-page', input: 'src/styles/germany-regional-page.css', page: 'src/pages/germany-regional-page.astro' },
   { name: 'us-regional', input: 'src/styles/us-regional.css', page: 'src/pages/us-regional.astro' },
-  { name: 'banking-and-financial-services', input: 'src/styles/banking-and-financial-services.css', page: 'src/pages/banking-and-financial-services.astro' }
+  { name: 'banking-and-financial-services', input: 'src/styles/banking-and-financial-services.css', page: 'src/pages/banking-and-financial-services.astro' },
+  { name: 'travel-and-hospitality', input: 'src/styles/travel-and-hospitality.css', page: 'src/pages/travel-and-hospitality.astro' }
 ];
 
 /**

@@ -1,0 +1,396 @@
+---
+/**
+ * "From every booking channel to one source of truth." Travel and
+ * Hospitality variant of banking-and-financial-services/SourceOfTruth.astro
+ * — same tabbed flow diagram mechanism (see FlowCanvas.astro's doc comment
+ * for the shared skeleton), re-skinned with the Direct & Distribution /
+ * Platforms & OTAs card content and wire routing from the source-doc mockup
+ * screenshots (word/media/image7.png = Direct & Distribution, image8.png =
+ * Platforms & OTAs).
+ *
+ * Direct & Distribution has 3 plain sources + 1 `directToGL` (Procurement /
+ * AP) — one fewer than Platforms & OTAs' 4 plain + 1 `directToGL` — so its
+ * rows stop at y:388 instead of y:556; the "Direct → GL" row still gets the
+ * wider 40px gap above it either way (see FlowCanvas.astro's CANVAS_H
+ * comment). Every purple source merges onto its tab's first billing card via
+ * a true bus: one shared vertical trunk line (drawn once, spanning every
+ * row's y) plus one shared exit stub into the card (drawn once), with each
+ * source contributing only its own short stub up to the trunk — see
+ * platformsWires' own comment for why duplicating the shared segment per
+ * source produces a glitchy, out-of-phase-dashes overlap. Procurement/AP
+ * (orange) bypasses the trunk entirely straight to ERP GL on both tabs, same
+ * "orange-full" mechanic banking-and-financial-services/SourceOfTruth.astro
+ * uses for its own Procurement/AP row. The billing cards' bill-exit wires
+ * are untouched — both still emit to ERP GL exactly as before, even though
+ * only the first of each pair has an incoming connection.
+ */
+import FlowCanvas, { CANVAS_W, CANVAS_H, type FlowCard, type FlowWire } from "./FlowCanvas.astro";
+
+const directSources: FlowCard[] = [
+  { x: 0, y: 52, w: 286, h: 144, tag: "purple", title: "Property · PMS", desc: "Opera · Protel · Mews · Cloudbeds" },
+  { x: 0, y: 220, w: 286, h: 144, tag: "purple", title: "Booking channels", desc: "own web · SynXis (CRS) · Amadeus · Sabre (GDS)" },
+  { x: 0, y: 388, w: 286, h: 144, tag: "purple", title: "Corporate · MICE", desc: "Negotiated rates and group blocks\nClearance or Peppol, per country" },
+  { x: 0, y: 572, w: 286, h: 144, tag: "orange", title: "Procurement / AP", desc: "Vendor invoices\nReverse charge", directToGL: true },
+];
+
+const directBilling: FlowCard[] = [
+  { x: 332, y: 220, w: 286, h: 144, tag: "grey", title: "Guest folio · e-invoice", desc: "Structured e-invoice per country.\nRoom, F&B and city tax split." },
+  { x: 332, y: 368, w: 286, h: 164, tag: "grey", title: "Corporate invoice", desc: "Consolidated per account.\nTax where the property stands." },
+];
+
+// All 3 purple sources (Property · PMS, Booking channels, Corporate · MICE)
+// merge onto Guest folio · e-invoice's own center (292) via a TRUE bus: one
+// shared vertical trunk line at x:310 (drawn ONCE, spanning every row's y)
+// plus one shared exit stub into the card (drawn ONCE, at y:292), with each
+// source contributing only its own short horizontal stub up to the trunk.
+// This is deliberately NOT 3 full-length overlapping paths — when multiple
+// <path> elements each redraw the same shared segment, their independent
+// `stroke-dasharray` phases (each starts fresh from that path's own origin)
+// fall out of sync and the overlap reads as a doubled/glitchy line. Drawing
+// the shared geometry exactly once removes that artifact entirely.
+const directWires: FlowWire[] = [
+  { flow: "purple", stage: "src-entry", points: [{ x: 286, y: 124 }, { x: 310, y: 124 }] },
+  { flow: "purple", stage: "src-entry", points: [{ x: 286, y: 292 }, { x: 310, y: 292 }] },
+  { flow: "purple", stage: "src-entry", points: [{ x: 286, y: 460 }, { x: 310, y: 460 }] },
+  { flow: "purple", stage: "src-entry", points: [{ x: 310, y: 124 }, { x: 310, y: 460 }] },
+  { flow: "purple", stage: "src-entry", points: [{ x: 310, y: 292 }, { x: 332, y: 292 }] },
+  { flow: "orange", stage: "orange-full", from: { x: 286, y: 644 }, to: { x: 668, y: 500 }, turnX: 643 },
+  { flow: "purple", stage: "bill-exit", points: [{ x: 618, y: 292 }, { x: 640, y: 292 }, { x: 640, y: 371 }, { x: 668, y: 371 }] },
+  { flow: "purple", stage: "bill-exit", points: [{ x: 618, y: 450 }, { x: 640, y: 450 }, { x: 640, y: 371 }, { x: 668, y: 371 }] },
+];
+
+const directChecklist = ["Output tax, or margin scheme", "e-invoice per country model", "Input tax recovery", "Place of supply per property", "Tax reconciliation"];
+
+// 5 rows (4 plain + 1 directToGL), unlike directSources' 4 — see this file's
+// doc comment and FlowCanvas.astro's CANVAS_H comment. Row y-values follow
+// the same 24px gap (40px directly above the flagged last row) rule
+// directSources' rows use.
+const platformsSources: FlowCard[] = [
+  { x: 0, y: 52, w: 286, h: 144, tag: "purple", title: "Booking.com · Expedia", desc: "Global accommodation OTAs\nViDA deemed-supplier test applies" },
+  { x: 0, y: 220, w: 286, h: 144, tag: "purple", title: "Airbnb · Vrbo", desc: "Short-term accommodation\nPlatform tax model" },
+  { x: 0, y: 388, w: 286, h: 144, tag: "purple", title: "Ride & transfer", desc: "Uber · Bolt · Grab · Careem\nPassenger transport by road · Also in ViDA scope" },
+  { x: 0, y: 556, w: 286, h: 144, tag: "purple", title: "Tour operators", desc: "TUI · Jet2 · DER Touristik\nPackaged trips · Margin scheme, not normal rules" },
+  { x: 0, y: 740, w: 286, h: 144, tag: "orange", title: "Procurement / AP", desc: "Vendor invoices\nReverse charge", directToGL: true },
+];
+
+const platformsBilling: FlowCard[] = [
+  { x: 332, y: 220, w: 286, h: 144, tag: "grey", title: "Platform tax doc", desc: "Deemed-supplier settlement.\nStructured e-invoice per country." },
+  { x: 332, y: 368, w: 286, h: 164, tag: "grey", title: "Commission / Fees Invoice", desc: "Tax on platform commission.\nInput tax on commissions." },
+];
+
+// Same true-bus construction as directWires: one shared vertical trunk at
+// x:310 (drawn once, spanning all 4 rows) plus one shared exit stub into
+// Platform tax doc (drawn once, at y:292), each source contributing only
+// its own short stub — see directWires' comment for why per-source
+// duplication of the shared segment produces a glitchy overlap.
+const platformsWires: FlowWire[] = [
+  { flow: "purple", stage: "src-entry", points: [{ x: 286, y: 124 }, { x: 310, y: 124 }] },
+  { flow: "purple", stage: "src-entry", points: [{ x: 286, y: 292 }, { x: 310, y: 292 }] },
+  { flow: "purple", stage: "src-entry", points: [{ x: 286, y: 460 }, { x: 310, y: 460 }] },
+  { flow: "purple", stage: "src-entry", points: [{ x: 286, y: 628 }, { x: 310, y: 628 }] },
+  { flow: "purple", stage: "src-entry", points: [{ x: 310, y: 124 }, { x: 310, y: 628 }] },
+  { flow: "purple", stage: "src-entry", points: [{ x: 310, y: 292 }, { x: 332, y: 292 }] },
+  { flow: "orange", stage: "orange-full", from: { x: 286, y: 812 }, to: { x: 668, y: 500 }, turnX: 643 },
+  { flow: "purple", stage: "bill-exit", points: [{ x: 618, y: 292 }, { x: 640, y: 292 }, { x: 640, y: 371 }, { x: 668, y: 371 }] },
+  { flow: "purple", stage: "bill-exit", points: [{ x: 618, y: 450 }, { x: 640, y: 450 }, { x: 640, y: 371 }, { x: 668, y: 371 }] },
+];
+
+const platformsChecklist = ["Output tax, or margin scheme", "Platform-liable tax", "Input tax recovery", "e-invoice per country model", "Tax reconciliation"];
+---
+
+<section class="bg-generic-00 border-t border-neutral-200 py-16 lg:py-20">
+  <div class="container">
+    <div class="rounded-xl border border-neutral-200 p-6 lg:p-8">
+      <div class="flex items-center justify-between gap-4 mb-12">
+        <h2 class="m-0 font-heading font-medium text-vault-navy text-[length:var(--fs-h1)] leading-[length:var(--lh-h1)] tracking-[-0.5px] text-balance">
+          From every booking channel to one source of truth.
+        </h2>
+        <div class="inline-flex items-center gap-1 rounded-xl bg-neutral-100 p-1 max-w-[355px] w-full" data-sot-tabs>
+          <button
+            type="button"
+            class="sot-tab inline-flex items-center justify-center rounded-lg px-6 py-2 font-body font-medium text-[length:var(--fs-label)] leading-[length:var(--lh-label)] cursor-pointer border-0 bg-generic-00 text-nova-blue shadow-[0px_1px_2px_0px_rgba(16,24,40,0.04)]"
+            data-sot-tab="direct"
+            aria-selected="true"
+          >
+            Direct & Distribution
+          </button>
+          <button
+            type="button"
+            class="sot-tab inline-flex items-center justify-center rounded-lg px-6 py-2 font-body font-medium text-[length:var(--fs-label)] leading-[length:var(--lh-label)] cursor-pointer border-0 bg-transparent text-neutral-700"
+            data-sot-tab="platforms"
+            aria-selected="false"
+          >
+            Platforms & OTAs
+          </button>
+        </div>
+      </div>
+
+      <div class="sot-stage relative w-full" data-sot-stage>
+        <div class="sot-track absolute top-0 left-0" style={`width:${CANVAS_W}px;height:${CANVAS_H}px;`} data-sot-track>
+          <FlowCanvas
+            id="direct"
+            active={true}
+            middlewareLabel="Billing // Tax-doc"
+            erpChecklist={directChecklist}
+            sourceCards={directSources}
+            billingCards={directBilling}
+            wires={directWires}
+          />
+          <FlowCanvas
+            id="platforms"
+            active={false}
+            middlewareLabel="Billing // Tax-doc"
+            erpChecklist={platformsChecklist}
+            sourceCards={platformsSources}
+            billingCards={platformsBilling}
+            wires={platformsWires}
+          />
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style is:global>
+  .sot-tab[aria-selected="true"] {
+    background-color: var(--color-generic-00);
+    color: var(--color-nova-blue);
+    box-shadow: 0px 1px 2px 0px rgba(16, 24, 40, 0.04);
+  }
+  .sot-tab[aria-selected="false"] {
+    background-color: transparent;
+    color: var(--color-neutral-700);
+  }
+</style>
+
+<script is:inline>
+  (function () {
+    /**
+     * Connector draw-in: no <mask>, no stroke-dashoffset-through-a-mask —
+     * see FlowCanvas.astro's doc comment on `straightLines`/`bentWires` for
+     * why (a real Chrome bug: `zoom` — this site's `--page-zoom`, shared.css
+     * — breaks SVG masks outright). Instead GSAP animates the actual
+     * geometry: a straight <line>'s `x2`/`y2` attributes grow from its
+     * `x1`/`y1` (its own `6 5` dasharray is never touched, so the dots you
+     * see are the same dots throughout — just more of them as the line
+     * extends); a bent <path>'s `d` is rebuilt every frame from a
+     * length-truncated copy of its point list (`data-points`), re-rounded
+     * with the same `roundedPolylineJS` FlowCanvas.astro's build-time
+     * `roundedPolyline` mirrors.
+     *
+     * Staged in the order data actually moves through the diagram (see
+     * FlowCanvas.astro's `Stage` type for the exact grouping) — sources
+     * emit, merge onto the purple bus, feed billing; billing emits, merges
+     * onto the green bus (and taps the middleware feed), feeds ERP GL; ERP
+     * GL emits to cleartax. The bypass source's `orange-full` wire skips
+     * billing entirely in one continuous path, so it gets a longer duration
+     * instead of its own stage, timed to land at ERP GL together with the
+     * other colors rather than arriving early.
+     *
+     * Plays once, on first scroll into view. GSAP loads from the same CDN
+     * this codebase already uses elsewhere (global-homepage/WhyGenericAi.astro),
+     * self-injected here rather than assumed already present on the page,
+     * so this section works even if pasted somewhere that doesn't load it.
+     */
+    const STAGE_DURATION = 0.45;
+    const EASE = "sine.out";
+    const STAGE_ORDER = ["src-entry", "src-trunk", "src-exit", "bill-entry", "bill-trunk", "bill-exit", "final"];
+
+    const prefersReducedMotion = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+    function loadGsap(onReady) {
+      if (window.gsap) return onReady();
+      const existing = document.querySelector("script[data-gsap-cdn]");
+      if (existing) {
+        existing.addEventListener("load", onReady, { once: true });
+        return;
+      }
+      const s = document.createElement("script");
+      s.src = "https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js";
+      s.dataset.gsapCdn = "true";
+      s.onload = onReady;
+      document.head.appendChild(s);
+    }
+
+    // Mirrors FlowCanvas.astro's build-time `roundedPolyline` exactly.
+    function roundedPolylineJS(points, r) {
+      if (points.length < 2) return "";
+      let d = `M ${points[0].x} ${points[0].y}`;
+      for (let i = 1; i < points.length - 1; i++) {
+        const prev = points[i - 1];
+        const curr = points[i];
+        const next = points[i + 1];
+        const inLen = Math.hypot(curr.x - prev.x, curr.y - prev.y);
+        const outLen = Math.hypot(next.x - curr.x, next.y - curr.y);
+        const radius = Math.min(r, inLen / 2, outLen / 2);
+        const inX = curr.x + ((prev.x - curr.x) / inLen) * radius;
+        const inY = curr.y + ((prev.y - curr.y) / inLen) * radius;
+        const outX = curr.x + ((next.x - curr.x) / outLen) * radius;
+        const outY = curr.y + ((next.y - curr.y) / outLen) * radius;
+        d += ` L ${inX} ${inY} Q ${curr.x} ${curr.y} ${outX} ${outY}`;
+      }
+      const last = points[points.length - 1];
+      d += ` L ${last.x} ${last.y}`;
+      return d;
+    }
+
+    function parsePoints(str) {
+      return str.split(" ").map((pair) => {
+        const [x, y] = pair.split(",").map(Number);
+        return { x, y };
+      });
+    }
+
+    function polylineLength(points) {
+      let len = 0;
+      for (let i = 0; i < points.length - 1; i++) len += Math.hypot(points[i + 1].x - points[i].x, points[i + 1].y - points[i].y);
+      return len;
+    }
+
+    // Points from the wire's start up to `targetLen` along it — the
+    // truncated shape `roundedPolylineJS` re-rounds every frame.
+    function pointsUpToLength(points, targetLen) {
+      let acc = 0;
+      const result = [points[0]];
+      for (let i = 0; i < points.length - 1; i++) {
+        const a = points[i];
+        const b = points[i + 1];
+        const segLen = Math.hypot(b.x - a.x, b.y - a.y);
+        if (acc + segLen >= targetLen) {
+          const t = segLen === 0 ? 0 : (targetLen - acc) / segLen;
+          result.push({ x: a.x + (b.x - a.x) * t, y: a.y + (b.y - a.y) * t });
+          return result;
+        }
+        result.push(b);
+        acc += segLen;
+      }
+      return result;
+    }
+
+    function prepareLine(gsap, el) {
+      const x1 = Number(el.getAttribute("x1"));
+      const y1 = Number(el.getAttribute("y1"));
+      const x2 = Number(el.getAttribute("x2"));
+      const y2 = Number(el.getAttribute("y2"));
+      gsap.set(el, { attr: { x2: x1, y2: y1 } });
+      return { type: "line", el, final: { x2, y2 } };
+    }
+
+    function preparePath(el) {
+      const points = parsePoints(el.getAttribute("data-points"));
+      const radius = Number(el.getAttribute("data-radius"));
+      const total = polylineLength(points);
+      el.setAttribute("d", `M ${points[0].x} ${points[0].y}`);
+      return { type: "path", el, points, radius, total };
+    }
+
+    function tweenItem(tl, item, duration, position) {
+      if (item.type === "line") {
+        tl.to(item.el, { attr: { x2: item.final.x2, y2: item.final.y2 }, duration, ease: EASE }, position);
+      } else {
+        const proxy = { p: 0 };
+        tl.to(
+          proxy,
+          {
+            p: 1,
+            duration,
+            ease: EASE,
+            onUpdate: () => item.el.setAttribute("d", roundedPolylineJS(pointsUpToLength(item.points, proxy.p * item.total), item.radius)),
+          },
+          position,
+        );
+      }
+    }
+
+    function animatePanel(panel) {
+      if (!panel || panel.dataset.sotAnimated === "true") return;
+      panel.dataset.sotAnimated = "true";
+      const lines = Array.from(panel.querySelectorAll("[data-sot-line]"));
+      if (!lines.length) return;
+
+      if (prefersReducedMotion) return; // leave the static dashed lines as-is
+
+      const gsap = window.gsap;
+      const byStage = {};
+      lines.forEach((line) => {
+        const item = line.getAttribute("data-shape") === "line" ? prepareLine(gsap, line) : preparePath(line);
+        const stage = line.getAttribute("data-stage");
+        if (!byStage[stage]) byStage[stage] = [];
+        byStage[stage].push(item);
+      });
+
+      const tl = gsap.timeline();
+      STAGE_ORDER.forEach((stage, i) => {
+        const group = byStage[stage];
+        if (!group) return;
+        group.forEach((item) => tweenItem(tl, item, STAGE_DURATION, i * STAGE_DURATION));
+      });
+
+      // The bypass source's wire skips billing in one continuous wire —
+      // stretch its draw to land at ERP GL (stage index of "final") in step
+      // with the other colors instead of finishing after just one stage.
+      const orangeGroup = byStage["orange-full"];
+      if (orangeGroup) {
+        const finalIndex = STAGE_ORDER.indexOf("final");
+        orangeGroup.forEach((item) => tweenItem(tl, item, STAGE_DURATION * finalIndex, 0));
+      }
+
+      // The middleware feed taps off the billing bus, so it plays alongside
+      // that merge rather than getting its own place in STAGE_ORDER.
+      const midFeedGroup = byStage["mid-feed"];
+      if (midFeedGroup) {
+        const billTrunkIndex = STAGE_ORDER.indexOf("bill-trunk");
+        midFeedGroup.forEach((item) => tweenItem(tl, item, STAGE_DURATION, billTrunkIndex * STAGE_DURATION));
+      }
+    }
+
+    document.querySelectorAll("[data-sot-stage]").forEach((stage) => {
+      const track = stage.querySelector("[data-sot-track]");
+      if (!track) return;
+      const designWidth = track.offsetWidth;
+      const designHeight = track.offsetHeight;
+
+      const resize = () => {
+        const scale = stage.clientWidth / designWidth;
+        track.style.transform = `scale(${scale})`;
+        track.style.transformOrigin = "top left";
+        stage.style.height = `${designHeight * scale}px`;
+      };
+
+      window.addEventListener("resize", resize);
+      resize();
+
+      const tabsRoot = stage.parentElement.querySelector("[data-sot-tabs]");
+      const tabs = tabsRoot ? tabsRoot.querySelectorAll("[data-sot-tab]") : [];
+      const panels = track.querySelectorAll("[data-sot-panel]");
+
+      let hasEnteredView = false;
+      const activePanel = () => Array.from(panels).find((p) => !p.classList.contains("hidden"));
+
+      const observer = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (!entry.isIntersecting) return;
+            hasEnteredView = true;
+            loadGsap(() => animatePanel(activePanel()));
+            observer.disconnect();
+          });
+        },
+        { threshold: 0.2 },
+      );
+      observer.observe(stage);
+
+      tabs.forEach((tab) => {
+        tab.addEventListener("click", () => {
+          const key = tab.getAttribute("data-sot-tab");
+          tabs.forEach((t) => t.setAttribute("aria-selected", t === tab ? "true" : "false"));
+          panels.forEach((p) => p.classList.toggle("hidden", p.getAttribute("data-sot-panel") !== key));
+          // If the diagram was already visible before this switch, the
+          // panel being switched TO has never had its own draw-in — play it
+          // now instead of leaving it permanently hidden mid-animation.
+          if (hasEnteredView) loadGsap(() => animatePanel(activePanel()));
+        });
+      });
+    });
+  })();
+</script>
