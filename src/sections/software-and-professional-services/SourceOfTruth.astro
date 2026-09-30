@@ -2,117 +2,77 @@
 /**
  * "From every billing channel to one source of truth." Software and
  * Professional Services variant of travel-and-hospitality/SourceOfTruth.astro
- * — same tabbed flow diagram mechanism (see FlowCanvas.astro's doc comment
- * for the shared skeleton), re-skinned for this page's two billing models:
- * the source doc names the first tab "DIRECT & SELF-SERVE" (subscription
- * billing engines feeding a per-period subscription invoice); the second tab
- * ("Enterprise & Managed") isn't named in the source doc but is the doc's
- * other half — PSA/CRM-mediated engagements and their staged, recharge-heavy
- * billing (the doc's "Billing in stages does not stage the tax" / "Your
- * parent company lends you staff" pain points, reused verbatim in
- * GlobalTrade.astro).
+ * — same FlowCanvas skeleton, but a single flow, not a tabbed pair: this
+ * page's billing model is one diagram (self-serve + enterprise-contract
+ * subscriptions and professional-services engagements all settling through
+ * one ERP GL), so there is no second tab to switch to. "Direct & Self-Serve"
+ * — the source doc's own label for this flow — renders as a plain caption
+ * under the heading instead of a `data-sot-tab` button.
  *
- * Both tabs use a 2-purple-source + 1-`directToGL`-orange geometry (rows at
- * y: 52, 220, and the flagged last row at y:404 with the wider 40px
- * clearance gap), which leaves comfortable empty room below the last card
- * inside this page's CANVAS_H of 720 — see FlowCanvas.astro's CANVAS_H
- * comment for why that's fine (no taller/shorter tab split needed here).
- * Every purple source merges onto its tab's first billing card via a true
- * bus: one shared vertical trunk line (drawn once, spanning every row's y)
- * plus one shared exit stub into the card (drawn once), with each source
- * contributing only its own short stub up to the trunk — see this file's
- * `wires` array comment (copied from travel-and-hospitality) for why
- * duplicating the shared segment per source produces a glitchy,
- * out-of-phase-dashes overlap. Procurement/AP (orange) bypasses the trunk
- * entirely straight to ERP GL on both tabs, same "orange-full" mechanic
- * every page in this family uses for its own Procurement/AP row.
+ * 4 source rows (3 plain + 1 `directToGL`) at y: 52, 220, 388, 572 (the
+ * flagged last row gets the wider 40px clearance gap — see FlowCanvas.astro's
+ * CANVAS_H comment). Self-serve checkout and Enterprise contracts are both
+ * subscription-driven, so they merge onto Subscription e-invoice via a true
+ * bus: one shared vertical trunk line (drawn once) plus one shared exit stub
+ * into the card (drawn once), with each source contributing only its own
+ * short stub up to the trunk — see the `directWires` comment below for why
+ * duplicating that shared segment per source produces a glitchy,
+ * out-of-phase-dashes overlap. Professional services is its own line
+ * straight into Engagement invoice, since it isn't part of that bus.
+ * Vendor spend / AP (orange) bypasses both billing cards entirely, straight
+ * to ERP GL, same "orange-full" mechanic every page in this family uses for
+ * its own Procurement/AP row.
  */
 import FlowCanvas, { CANVAS_W, CANVAS_H, type FlowCard, type FlowWire } from "./FlowCanvas.astro";
 
-const directSources: FlowCard[] = [
-  { x: 0, y: 52, w: 286, h: 144, tag: "purple", title: "Subscription billing", desc: "Stripe Billing · Zuora · Chargebee\nRecurly · Paddle · in-house metering" },
-  { x: 0, y: 220, w: 286, h: 144, tag: "purple", title: "Self-serve checkout", desc: "Web / app signup\nCard-on-file renewals" },
-  { x: 0, y: 404, w: 286, h: 144, tag: "orange", title: "Procurement / AP", desc: "Vendor invoices\nReverse charge", directToGL: true },
+const sources: FlowCard[] = [
+  { x: 0, y: 52, w: 286, h: 144, tag: "purple", title: "Self-serve checkout", desc: "Card payment · in-app purchase\nInstant provisioning" },
+  { x: 0, y: 220, w: 286, h: 144, tag: "purple", title: "Enterprise contracts", desc: "Order forms · MSAs\nAnnual subscriptions" },
+  { x: 0, y: 388, w: 286, h: 144, tag: "purple", title: "Professional services", desc: "Time and materials · milestones\nRetainers" },
+  { x: 0, y: 572, w: 286, h: 144, tag: "orange", title: "Vendor spend · AP", desc: "Cloud, contractors\nForeign agencies", directToGL: true },
 ];
 
-const directBilling: FlowCard[] = [
-  { x: 332, y: 220, w: 286, h: 144, tag: "grey", title: "Subscription invoice", desc: "Raised per period against contract due date.\nStructured e-invoice per country." },
-  { x: 332, y: 368, w: 286, h: 164, tag: "grey", title: "Renewal / amendment note", desc: "Upgrades, downgrades and refunds link\nback to the invoice they correct." },
+const billing: FlowCard[] = [
+  { x: 332, y: 220, w: 286, h: 144, tag: "grey", title: "Subscription e-invoice", desc: "Structured e-invoice per country.\nRate set by customer location." },
+  { x: 332, y: 368, w: 286, h: 164, tag: "grey", title: "Engagement invoice", desc: "Fees, milestones and recharges.\nDisbursements kept out of scope." },
 ];
 
-// Both purple sources merge onto Subscription invoice's own center (292) via
-// a TRUE bus: one shared vertical trunk line at x:310 (drawn ONCE, spanning
-// both rows' y) plus one shared exit stub into the card (drawn ONCE, at
-// y:292), with each source contributing only its own short horizontal stub
-// up to the trunk. This is deliberately NOT 2 full-length overlapping paths
-// — when multiple <path> elements each redraw the same shared segment, their
-// independent `stroke-dasharray` phases (each starts fresh from that path's
-// own origin) fall out of sync and the overlap reads as a doubled/glitchy
-// line. Drawing the shared geometry exactly once removes that artifact
-// entirely.
-const directWires: FlowWire[] = [
+// Self-serve checkout + Enterprise contracts merge onto Subscription
+// e-invoice's own center (292) via a TRUE bus: one shared vertical trunk
+// line at x:310 (drawn ONCE, spanning both rows' y) plus one shared exit
+// stub into the card (drawn ONCE, at y:292), with each source contributing
+// only its own short horizontal stub up to the trunk. This is deliberately
+// NOT 2 full-length overlapping paths — when multiple <path> elements each
+// redraw the same shared segment, their independent `stroke-dasharray`
+// phases (each starts fresh from that path's own origin) fall out of sync
+// and the overlap reads as a doubled/glitchy line. Drawing the shared
+// geometry exactly once removes that artifact entirely.
+const wires: FlowWire[] = [
   { flow: "purple", stage: "src-entry", points: [{ x: 286, y: 124 }, { x: 310, y: 124 }] },
   { flow: "purple", stage: "src-entry", points: [{ x: 286, y: 292 }, { x: 310, y: 292 }] },
   { flow: "purple", stage: "src-entry", points: [{ x: 310, y: 124 }, { x: 310, y: 292 }] },
   { flow: "purple", stage: "src-entry", points: [{ x: 310, y: 292 }, { x: 332, y: 292 }] },
-  { flow: "orange", stage: "orange-full", from: { x: 286, y: 476 }, to: { x: 668, y: 500 }, turnX: 643 },
+  // Professional services -> Engagement invoice, its own line (not part of
+  // the bus above — it feeds the other billing card).
+  { flow: "purple", stage: "src-entry", from: { x: 286, y: 460 }, to: { x: 332, y: 450 }, turnX: 309 },
+  { flow: "orange", stage: "orange-full", from: { x: 286, y: 644 }, to: { x: 668, y: 500 }, turnX: 643 },
   { flow: "purple", stage: "bill-exit", points: [{ x: 618, y: 292 }, { x: 640, y: 292 }, { x: 640, y: 371 }, { x: 668, y: 371 }] },
   { flow: "purple", stage: "bill-exit", points: [{ x: 618, y: 450 }, { x: 640, y: 450 }, { x: 640, y: 371 }, { x: 668, y: 371 }] },
 ];
 
-const directChecklist = ["Renewal due-date tracking", "Bundle unbundling by rate", "Export condition checks", "Input tax recovery", "Tax reconciliation"];
-
-// Same 2-purple + 1-orange geometry as directSources — see this file's doc
-// comment for why reusing it unchanged for a second panel is safe.
-const managedSources: FlowCard[] = [
-  { x: 0, y: 52, w: 286, h: 144, tag: "purple", title: "PSA & delivery", desc: "Kantata · Certinia · Workday\nEngagement and time tracking" },
-  { x: 0, y: 220, w: 286, h: 144, tag: "purple", title: "CRM & middleware", desc: "Salesforce · HubSpot · Unified API\nContract terms and cost feed" },
-  { x: 0, y: 404, w: 286, h: 144, tag: "orange", title: "Procurement / AP", desc: "Vendor invoices\nReverse charge", directToGL: true },
-];
-
-const managedBilling: FlowCard[] = [
-  { x: 332, y: 220, w: 286, h: 144, tag: "grey", title: "Engagement invoice", desc: "Staged against the contract due date,\nnot a month-end batch." },
-  { x: 332, y: 368, w: 286, h: 164, tag: "grey", title: "Recharge / disbursement note", desc: "Costs classified at booking; recharges\nmatched to the agreement behind them." },
-];
-
-const managedWires: FlowWire[] = [
-  { flow: "purple", stage: "src-entry", points: [{ x: 286, y: 124 }, { x: 310, y: 124 }] },
-  { flow: "purple", stage: "src-entry", points: [{ x: 286, y: 292 }, { x: 310, y: 292 }] },
-  { flow: "purple", stage: "src-entry", points: [{ x: 310, y: 124 }, { x: 310, y: 292 }] },
-  { flow: "purple", stage: "src-entry", points: [{ x: 310, y: 292 }, { x: 332, y: 292 }] },
-  { flow: "orange", stage: "orange-full", from: { x: 286, y: 476 }, to: { x: 668, y: 500 }, turnX: 643 },
-  { flow: "purple", stage: "bill-exit", points: [{ x: 618, y: 292 }, { x: 640, y: 292 }, { x: 640, y: 371 }, { x: 668, y: 371 }] },
-  { flow: "purple", stage: "bill-exit", points: [{ x: 618, y: 450 }, { x: 640, y: 450 }, { x: 640, y: 371 }, { x: 668, y: 371 }] },
-];
-
-const managedChecklist = ["Engagement due-date tracking", "Cost classification", "Intercompany recharge evidence", "Input tax recovery", "Tax reconciliation"];
+const erpChecklist = ["Output tax by customer location", "Reverse charge on B2B exports", "Input tax recovery", "e-invoice per country model", "Tax reconciliation"];
 ---
 
 <section class="bg-generic-00 border-t border-neutral-200 py-16 lg:py-20">
   <div class="container">
     <div class="rounded-xl border border-neutral-200 p-6 lg:p-8">
-      <div class="flex items-center justify-between gap-4 mb-12">
+      <div class="flex flex-col gap-6 mb-12">
         <h2 class="m-0 font-heading font-medium text-vault-navy text-[length:var(--fs-h1)] leading-[length:var(--lh-h1)] tracking-[-0.5px] text-balance">
           From every billing channel to one source of truth.
         </h2>
-        <div class="inline-flex items-center gap-1 rounded-xl bg-neutral-100 p-1 max-w-[374px] w-full" data-sot-tabs>
-          <button
-            type="button"
-            class="sot-tab inline-flex items-center justify-center rounded-lg px-6 py-2 font-body font-medium text-[length:var(--fs-label)] leading-[length:var(--lh-label)] cursor-pointer border-0 bg-generic-00 text-nova-blue shadow-[0px_1px_2px_0px_rgba(16,24,40,0.04)]"
-            data-sot-tab="direct"
-            aria-selected="true"
-          >
-            Direct & Self-Serve
-          </button>
-          <button
-            type="button"
-            class="sot-tab inline-flex items-center justify-center rounded-lg px-6 py-2 font-body font-medium text-[length:var(--fs-label)] leading-[length:var(--lh-label)] cursor-pointer border-0 bg-transparent text-neutral-700"
-            data-sot-tab="managed"
-            aria-selected="false"
-          >
-            Enterprise & Managed
-          </button>
-        </div>
+        <p class="m-0 font-body font-medium text-neutral-500 text-[length:var(--fs-h6)] leading-[length:var(--lh-h6)] tracking-[1px] uppercase">
+          Direct & Self-Serve
+        </p>
       </div>
 
       <div class="sot-stage relative w-full" data-sot-stage>
@@ -121,37 +81,16 @@ const managedChecklist = ["Engagement due-date tracking", "Cost classification",
             id="direct"
             active={true}
             middlewareLabel="Billing // Tax-doc"
-            erpChecklist={directChecklist}
-            sourceCards={directSources}
-            billingCards={directBilling}
-            wires={directWires}
-          />
-          <FlowCanvas
-            id="managed"
-            active={false}
-            middlewareLabel="Billing // Tax-doc"
-            erpChecklist={managedChecklist}
-            sourceCards={managedSources}
-            billingCards={managedBilling}
-            wires={managedWires}
+            erpChecklist={erpChecklist}
+            sourceCards={sources}
+            billingCards={billing}
+            wires={wires}
           />
         </div>
       </div>
     </div>
   </div>
 </section>
-
-<style is:global>
-  .sot-tab[aria-selected="true"] {
-    background-color: var(--color-generic-00);
-    color: var(--color-nova-blue);
-    box-shadow: 0px 1px 2px 0px rgba(16, 24, 40, 0.04);
-  }
-  .sot-tab[aria-selected="false"] {
-    background-color: transparent;
-    color: var(--color-neutral-700);
-  }
-</style>
 
 <script is:inline>
   (function () {
@@ -350,37 +289,19 @@ const managedChecklist = ["Engagement due-date tracking", "Cost classification",
       window.addEventListener("resize", resize);
       resize();
 
-      const tabsRoot = stage.parentElement.querySelector("[data-sot-tabs]");
-      const tabs = tabsRoot ? tabsRoot.querySelectorAll("[data-sot-tab]") : [];
       const panels = track.querySelectorAll("[data-sot-panel]");
-
-      let hasEnteredView = false;
-      const activePanel = () => Array.from(panels).find((p) => !p.classList.contains("hidden"));
 
       const observer = new IntersectionObserver(
         (entries) => {
           entries.forEach((entry) => {
             if (!entry.isIntersecting) return;
-            hasEnteredView = true;
-            loadGsap(() => animatePanel(activePanel()));
+            loadGsap(() => animatePanel(panels[0]));
             observer.disconnect();
           });
         },
         { threshold: 0.2 },
       );
       observer.observe(stage);
-
-      tabs.forEach((tab) => {
-        tab.addEventListener("click", () => {
-          const key = tab.getAttribute("data-sot-tab");
-          tabs.forEach((t) => t.setAttribute("aria-selected", t === tab ? "true" : "false"));
-          panels.forEach((p) => p.classList.toggle("hidden", p.getAttribute("data-sot-panel") !== key));
-          // If the diagram was already visible before this switch, the
-          // panel being switched TO has never had its own draw-in — play it
-          // now instead of leaving it permanently hidden mid-animation.
-          if (hasEnteredView) loadGsap(() => animatePanel(activePanel()));
-        });
-      });
     });
   })();
 </script>
