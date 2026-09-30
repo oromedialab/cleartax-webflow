@@ -1467,7 +1467,7 @@ const LEDE =
                       </div>
 
                       <!-- Frame 5: Chart Header at top-left -->
-                      <div class="gh-card4-chart-header hidden absolute left-0 top-0 flex flex-wrap items-center gap-x-5 md:gap-x-6 gap-y-2 opacity-0 pointer-events-none">
+                      <div class="gh-card4-chart-header hidden absolute left-0 top-0 flex flex-wrap items-center gap-x-5 md:gap-x-6 gap-y-2 opacity-0 pointer-events-none" style="display: none; opacity: 0;">
                         <div class="flex items-center gap-2 shrink-0">
                           <svg
                             class="shrink-0"
@@ -1610,13 +1610,17 @@ const LEDE =
                       </div>
 
                       <!-- Frame 5: Final Chart Image & Linked Trail -->
-                      <div class="gh-card4-chart hidden w-full flex-1 min-h-0 flex flex-col items-start justify-start gap-2 md:gap-2.5 opacity-0 pointer-events-none mt-1 md:mt-1.5">
+                      <div
+                        class="gh-card4-chart hidden absolute inset-x-0 top-1 md:top-1.5 bottom-2 md:bottom-2.5 flex w-full flex-col items-start justify-start gap-2 md:gap-2.5 opacity-0 pointer-events-none mt-1 md:mt-1.5 overflow-hidden"
+                        style="display: none; opacity: 0;"
+                      >
                         <img
                           src="https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6ab6579339baafb1fa1a60a5_linked.png"
                           alt="Flagged transactions review queue"
-                          class="w-full h-auto max-h-full block"
+                          class="gh-card4-chart-img w-full h-auto max-h-full block pointer-events-none opacity-0"
+                          style="display: none; opacity: 0;"
                         />
-                        <div class="gh-card4-bottom-area inline-flex items-center gap-1.5 cursor-pointer">
+                        <div class="gh-card4-bottom-area inline-flex items-center gap-1.5 cursor-pointer opacity-0" style="display: none; opacity: 0;">
                           <p class="m-0 text-sm font-normal text-text-default underline underline-offset-2">
                             Duplicates removed, documents linked, and checks recorded in one trail
                           </p>
@@ -3182,6 +3186,17 @@ const LEDE =
     }
   }
 
+  /* Ensure 5th card chart image and elements are strictly hidden until Frame 5 animation reveals them */
+  .gh-card4-chart,
+  .gh-card4-chart-header,
+  .gh-card4-chart-img,
+  .gh-card4-chart img,
+  .gh-card4-bottom-area,
+  img[src*="6ab6579339baafb1fa1a60a5_linked.png"] {
+    display: none;
+    opacity: 0;
+  }
+
   /* Sticky and the scroll-driven shrink are both enhancements. Switched off, the
      cards read as a plain stack — so the huge scroll gaps that exist only to give
      the stack travel have to go with them. */
@@ -3223,6 +3238,72 @@ const LEDE =
       window.addEventListener("gh-card4-generic-complete", () => {
         genericCardComplete[4] = true;
       });
+
+      // Webflow Embed Stitcher:
+      // When publishing in Webflow, the build splits across Embed elements.
+      // If Card 4 is split into the next Embed, its image, input pill, and
+      // ClearTax elements can be orphaned outside .gh-why-sticky.
+      // This reattaches all Card 4 elements into their proper containers so
+      // the 5th card sticks properly and animations function identically to local.
+      function stitchCard4Dom() {
+        const stickyOuters = document.querySelectorAll(".gh-why-sticky");
+        const sticky5 = stickyOuters[4];
+        if (!sticky5) return;
+
+        const grid5 = sticky5.querySelector(".gh-why-card-grid");
+        const card5 = sticky5.querySelector(".gh-why-generic-card-4");
+        const chart4 = document.querySelector(".gh-card4-chart");
+        const chart4Img =
+          document.querySelector(".gh-card4-chart-img") ||
+          document.querySelector('img[src*="6ab6579339baafb1fa1a60a5_linked.png"]');
+        const chart4Bottom = document.querySelector(".gh-card4-bottom-area");
+        const inputContainer4 = document.querySelector(".gh-card4-input-container");
+        const cursor4 = document.querySelector(".gh-card4-cursor");
+        const ctCard4 = document.querySelector(".gh-why-animation-card-4");
+
+        // 1. Ensure chart image and bottom trail are inside .gh-card4-chart
+        if (chart4) {
+          if (chart4Img && !chart4.contains(chart4Img)) {
+            chart4.insertBefore(chart4Img, chart4.firstChild);
+          }
+          if (chart4Bottom && !chart4.contains(chart4Bottom)) {
+            chart4.appendChild(chart4Bottom);
+          }
+        }
+
+        // 2. Ensure input container and cursor are inside .gh-why-generic-card-4
+        if (card5) {
+          if (inputContainer4 && !card5.contains(inputContainer4)) {
+            card5.appendChild(inputContainer4);
+          }
+          if (cursor4 && !card5.contains(cursor4)) {
+            card5.appendChild(cursor4);
+          }
+        }
+
+        // 3. Ensure ClearTax card and orphaned column elements are inside grid5
+        if (grid5 && ctCard4 && !grid5.contains(ctCard4)) {
+          const orphanParent = ctCard4.parentElement;
+          if (orphanParent && orphanParent !== grid5) {
+            const genCaption =
+              orphanParent.querySelector(".md\\:col-start-1.md\\:row-start-3") ||
+              document.querySelectorAll(".md\\:col-start-1.md\\:row-start-3")[4];
+            const ctBadge =
+              orphanParent.querySelector(".md\\:col-start-2.md\\:row-start-1") ||
+              document.querySelectorAll(".md\\:col-start-2.md\\:row-start-1")[4];
+            const ctCaption =
+              orphanParent.querySelector(".md\\:col-start-2.md\\:row-start-3") ||
+              document.querySelectorAll(".md\\:col-start-2.md\\:row-start-3")[4];
+
+            if (genCaption && !grid5.contains(genCaption)) grid5.appendChild(genCaption);
+            if (ctBadge && !grid5.contains(ctBadge)) grid5.appendChild(ctBadge);
+            grid5.appendChild(ctCard4);
+            if (ctCaption && !grid5.contains(ctCaption)) grid5.appendChild(ctCaption);
+          }
+        }
+      }
+
+      stitchCard4Dom();
 
       for (let i = 0; i < 5; i++) {
         initGenericCardFlow(i);
@@ -3398,6 +3479,7 @@ const LEDE =
 
     let lastNavBottomMeasured = -1;
     const handleLayoutShift = () => {
+      stitchCard4Dom();
       setTops();
       update();
     };
@@ -3444,6 +3526,15 @@ const LEDE =
       const checklist = card.querySelector(`.gh-card${idx}-checklist`);
       const checkItems = card.querySelectorAll(`.gh-card${idx}-check-item`);
       const chart = card.querySelector(`.gh-card${idx}-chart`);
+      const chartImg =
+        card.querySelector(`.gh-card${idx}-chart-img`) ||
+        card.querySelector(`.gh-card${idx}-chart img`) ||
+        (idx === 4
+          ? document.querySelector('.gh-card4-chart-img, img[src*="6ab6579339baafb1fa1a60a5_linked.png"]')
+          : null);
+      const chartBottom =
+        card.querySelector(`.gh-card${idx}-bottom-area`) ||
+        (idx === 4 ? document.querySelector(".gh-card4-bottom-area") : null);
       const inputPill = card.querySelector(`.gh-card${idx}-input-pill`);
       const pillPlaceholder = card.querySelector(`.gh-card${idx}-pill-placeholder`);
       const pillTyped = card.querySelector(`.gh-card${idx}-pill-typed`);
@@ -3453,6 +3544,13 @@ const LEDE =
       const borderPath = card.querySelector(`.gh-card${idx}-pill-border-path`);
 
       if (!inputPill || !cursor || !chart) return;
+
+      if (idx === 4) {
+        if (chart) { chart.style.display = "none"; chart.style.opacity = "0"; }
+        if (chartImg) { chartImg.style.display = "none"; chartImg.style.opacity = "0"; }
+        if (chartBottom) { chartBottom.style.display = "none"; chartBottom.style.opacity = "0"; }
+        if (chartHeader) { chartHeader.style.display = "none"; chartHeader.style.opacity = "0"; }
+      }
 
       const reduceMotion =
         window.matchMedia &&
@@ -3469,6 +3567,16 @@ const LEDE =
           chart.classList.remove("hidden");
           chart.style.display = "flex";
           chart.style.opacity = "1";
+        }
+        if (chartImg) {
+          chartImg.classList.remove("hidden");
+          chartImg.style.display = "block";
+          chartImg.style.opacity = "1";
+        }
+        if (chartBottom) {
+          chartBottom.classList.remove("hidden");
+          chartBottom.style.display = "inline-flex";
+          chartBottom.style.opacity = "1";
         }
         if (centerTitle) centerTitle.style.opacity = "0";
         if (glow) glow.style.opacity = "0";
@@ -3552,9 +3660,9 @@ const LEDE =
         });
 
         // Frame 1: Initial state
-        tl.set([chartHeader, chart, bubble, skeleton, checklist], { display: "none" });
+        tl.set([chartHeader, chart, chartImg, chartBottom, bubble, skeleton, checklist].filter(Boolean), { display: "none" });
         tl.set(chartHeader, { opacity: 0, y: 8, pointerEvents: "none" });
-        tl.set(chart, { opacity: 0, y: 10, pointerEvents: "none" });
+        tl.set([chart, chartImg, chartBottom].filter(Boolean), { opacity: 0, y: 10, pointerEvents: "none" });
         tl.set(bubble, { opacity: 0, scale: 0.9, y: 8, pointerEvents: "none" });
         tl.set(skeleton, { opacity: 0, pointerEvents: "none" });
         tl.set(checklist, { opacity: 0, pointerEvents: "none" });
@@ -3690,6 +3798,8 @@ const LEDE =
         tl.set([bubble, checklist], { display: "none" });
         tl.set(chartHeader, { display: "flex" });
         tl.set(chart, { display: "flex" });
+        if (chartImg) tl.set(chartImg, { display: "block" });
+        if (chartBottom) tl.set(chartBottom, { display: "inline-flex" });
         tl.to(pillThinking, { opacity: 0, duration: 0.2 }, "<");
         tl.to(pillPlaceholder, { opacity: 1, duration: 0.25 }, "<+=0.1");
 
@@ -3699,7 +3809,7 @@ const LEDE =
           "-=0.05"
         );
         tl.to(
-          chart,
+          [chart, chartImg, chartBottom].filter(Boolean),
           {
             opacity: 1,
             y: 0,
@@ -3822,6 +3932,12 @@ const LEDE =
         return;
       }
 
+      const plusIcon = inputBox
+        ? (inputBox.querySelector('.flex.w-full.items-center svg.text-vault-navy') ||
+           inputBox.querySelector('.flex.w-full.items-center svg.shrink-0') ||
+           inputBox.querySelector('.flex.w-full.items-center svg'))
+        : null;
+
       const getSubmitBtnPos = () => {
         const cRect = card.getBoundingClientRect();
         const bRect = submitBtn.getBoundingClientRect();
@@ -3831,6 +3947,20 @@ const LEDE =
           x: (bRect.left - cRect.left) / scaleX - (card.clientLeft || 0) + (bRect.width / scaleX) * 0.5,
           y: (bRect.top - cRect.top) / scaleY - (card.clientTop || 0) + (bRect.height / scaleY) * 0.58,
         };
+      };
+
+      const getPlusIconPos = () => {
+        const cRect = card.getBoundingClientRect();
+        if (plusIcon) {
+          const pRect = plusIcon.getBoundingClientRect();
+          const scaleX = (cRect.width / (card.offsetWidth || 1)) || 1;
+          const scaleY = (cRect.height / (card.offsetHeight || 1)) || 1;
+          return {
+            x: (pRect.left - cRect.left) / scaleX - (card.clientLeft || 0) + (pRect.width / scaleX) * 0.45,
+            y: (pRect.top - cRect.top) / scaleY - (card.clientTop || 0) + (pRect.height / scaleY) * 0.5,
+          };
+        }
+        return getInputAreaPos();
       };
 
       const getInputAreaPos = () => {
@@ -3879,12 +4009,16 @@ const LEDE =
           }
         }, 0);
 
-        // Frame 1: Chip starts collapsed, then expands
+        if (plusIcon) {
+          tl.set(plusIcon, { transformOrigin: "center center", scale: 1 });
+        }
+
+        // Frame 1: Chip starts collapsed, hidden
         tl.set(chipWrapper, { display: "none", height: 0, marginBottom: 0 });
         tl.set(chipsToAnimate, {
           opacity: 0,
-          scale: 0.85,
-          y: -6,
+          scale: 0.8,
+          y: -4,
           transformOrigin: "left center",
           height: "auto",
           minHeight: "auto",
@@ -3905,60 +4039,111 @@ const LEDE =
         tl.set(pillThinking, { opacity: 0 });
         tl.set(cursor, {
           opacity: 0,
-          x: () => card.offsetWidth * 0.65,
-          y: () => card.offsetHeight * 0.65,
+          x: () => card.offsetWidth * 0.6,
+          y: () => card.offsetHeight * 0.8,
           scale: 1,
           transformOrigin: "0% 0%",
         });
 
-        // Frame 1: Input gets bigger (box smoothly expands to accommodate incoming attachment)
-        tl.set(chipWrapper, { display: (idx >= 1) ? "flex" : "block", height: 0, marginBottom: -8 });
+        // Step 1: Marker cursor appears and glides to Plus (+) attachment trigger
+        tl.to(cursor, { opacity: 1, duration: 0.3 }, "+=0.25");
+        tl.to(
+          cursor,
+          {
+            x: () => getPlusIconPos().x,
+            y: () => getPlusIconPos().y,
+            duration: 0.65,
+            ease: "power2.out",
+          },
+          "-=0.05"
+        );
+
+        // Step 2: First click on Plus button — input opens & 1st PDF / spreadsheet chip appears
+        tl.to(cursor, { scale: 0.8, duration: 0.1, yoyo: true, repeat: 1 });
+        if (plusIcon) {
+          tl.to(plusIcon, { scale: 0.88, duration: 0.1, yoyo: true, repeat: 1 }, "<");
+        }
+
+        // Input box smoothly expands open
+        tl.set(chipWrapper, { display: (idx >= 1) ? "flex" : "block", height: 0, marginBottom: -6 });
         tl.to(
           chipWrapper,
           {
             height: "auto",
             marginBottom: 0,
-            duration: 0.35,
+            duration: 0.32,
             ease: "power2.out",
           },
-          "+=0.2"
+          "<+=0.04"
+        );
+        // Track plus icon as wrapper expands
+        tl.to(
+          cursor,
+          {
+            x: () => getPlusIconPos().x,
+            y: () => getPlusIconPos().y,
+            duration: 0.32,
+            ease: "power2.out",
+          },
+          "<"
         );
         tl.set(chipWrapper, { height: "auto" });
 
-        // Frame 1: Then PDF / spreadsheet chip(s) come in
-        tl.to(
-          chipsToAnimate,
-          {
-            opacity: 1,
-            scale: 1,
-            y: 0,
-            duration: 0.35,
-            stagger: 0.08,
-            ease: "back.out(1.5)",
-          },
-          "+=0.04"
-        );
+        // 1st PDF / chip appears
+        if (chipsToAnimate.length > 0) {
+          tl.to(
+            chipsToAnimate[0],
+            {
+              opacity: 1,
+              scale: 1,
+              y: 0,
+              duration: 0.3,
+              ease: "back.out(1.5)",
+            },
+            "<+=0.04"
+          );
+        }
 
-        // Frame 1 -> Frame 2: Marker cursor appears & glides to input box
-        tl.to(cursor, { opacity: 1, duration: 0.35 }, "+=0.25");
+        // Step 3: For each additional PDF, marker clicks again and the chip appears
+        for (let c = 1; c < chipsToAnimate.length; c++) {
+          tl.to(cursor, { scale: 0.8, duration: 0.1, yoyo: true, repeat: 1 }, "+=0.22");
+          if (plusIcon) {
+            tl.to(plusIcon, { scale: 0.88, duration: 0.1, yoyo: true, repeat: 1 }, "<");
+          }
+          tl.to(
+            chipsToAnimate[c],
+            {
+              opacity: 1,
+              scale: 1,
+              y: 0,
+              duration: 0.3,
+              ease: "back.out(1.5)",
+            },
+            "<+=0.04"
+          );
+        }
+
+        // Step 4: After all PDFs are attached ("after full"), cursor glides to text line
         tl.to(
           cursor,
           {
             x: () => getInputAreaPos().x,
             y: () => getInputAreaPos().y,
-            duration: 0.75,
-            ease: "power2.out",
+            duration: 0.5,
+            ease: "power2.inOut",
           },
-          "-=0.1"
+          "+=0.25"
         );
 
-        // Frame 2: Cursor clicks input box, placeholder fades, prompt types out character by character ("one by one")
-        const typingObj = { charIndex: 0 };
-        tl.to(cursor, { scale: 0.85, duration: 0.12, yoyo: true, repeat: 1 });
-        tl.to(pillPlaceholder, { opacity: 0, duration: 0.15 }, "<+=0.05");
+        // Click to focus text input
+        tl.to(cursor, { scale: 0.85, duration: 0.1, yoyo: true, repeat: 1 });
+        tl.to(pillPlaceholder, { opacity: 0, duration: 0.15 }, "<+=0.04");
         if (inputTyped) {
           tl.set(inputTyped, { display: "block", height: "auto", minHeight: "40px", opacity: 1 }, "<");
         }
+
+        // Text prompt types out character by character
+        const typingObj = { charIndex: 0 };
         tl.to(
           typingObj,
           {
@@ -3971,7 +4156,7 @@ const LEDE =
               }
             },
           },
-          "<+=0.1"
+          "<+=0.06"
         );
 
         // Cursor glides to submit button
