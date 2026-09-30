@@ -1,0 +1,101 @@
+---
+/**
+ * "We speak the language of your existing systems." Software and
+ * Professional Services variant of travel-and-hospitality/ExistingSystems.astro
+ * — same three-category card layout, re-skinned for finance/billing,
+ * subscription, and PSA/CRM/middleware systems. None of these vendors have a
+ * hosted Webflow logo asset yet, so every badge falls back to the neutral
+ * monogram swatch — same fallback pattern travel-and-hospitality's version
+ * uses for vendors without art.
+ */
+interface Logo {
+  name: string;
+  src?: string;
+}
+
+interface Category {
+  title: string;
+  desc: string;
+  logos: Logo[];
+}
+
+const categories: Category[] = [
+  {
+    title: "Finance & billing",
+    desc: "Where the invoice is raised.",
+    logos: [
+      { name: "NetSuite" },
+      { name: "SAP" },
+      { name: "Oracle Fusion" },
+      { name: "Microsoft Dynamics 365" },
+      { name: "Sage Intacct" },
+      { name: "Xero" },
+    ],
+  },
+  {
+    title: "Subscription engines",
+    desc: "Where recurring revenue is priced and charged.",
+    logos: [
+      { name: "Stripe Billing" },
+      { name: "Zuora" },
+      { name: "Chargebee" },
+      { name: "Recurly" },
+      { name: "Paddle" },
+      { name: "In-house metering" },
+    ],
+  },
+  {
+    title: "PSA, CRM & middleware",
+    desc: "Where the engagement and the client record live.",
+    logos: [
+      { name: "Salesforce" },
+      { name: "HubSpot" },
+      { name: "Kantata" },
+      { name: "Certinia" },
+      { name: "Workday" },
+      { name: "Unified API" },
+    ],
+  },
+];
+---
+
+<section class="bg-generic-00 border-t border-neutral-200 py-16 lg:py-20">
+  <div class="container">
+    <div class="flex flex-col gap-12">
+      <h2 class="m-0 font-heading font-medium text-vault-navy text-center text-[length:var(--fs-h1)] leading-[length:var(--lh-h1)] tracking-[-0.5px]">
+        We speak the language of your existing systems.
+      </h2>
+
+      <div class="grid grid-cols-1 lg:grid-cols-3 rounded-xl border border-neutral-200 divide-y divide-neutral-200 lg:divide-y-0 lg:divide-x">
+        {
+          categories.map((cat) => (
+            <div class="flex flex-col gap-12 p-6">
+              <div class="flex flex-col gap-2">
+                <p class="m-0 font-body font-semibold text-vault-navy text-[length:var(--fs-body-lg)] leading-[length:var(--lh-body-lg)]">
+                  {cat.title}
+                </p>
+                <p class="m-0 font-body text-neutral-500 text-[length:var(--fs-body)] leading-[length:var(--lh-body)]">
+                  {cat.desc}
+                </p>
+              </div>
+              <div class="flex flex-wrap gap-2">
+                {cat.logos.map((logo) => (
+                  <span class="inline-flex items-center gap-x-3 gap-y-2 rounded-lg border border-neutral-200 px-3 py-1.5">
+                    {logo.src ? (
+                      <img src={logo.src} alt="" class="max-h-6 w-full object-contain" loading="lazy" decoding="async" />
+                    ) : (
+                      <span class="h-6 w-6 shrink-0 rounded-md bg-neutral-200" aria-hidden="true" />
+                    )}
+                    <span class="font-body font-medium text-neutral-700 text-[length:var(--fs-label)] leading-[length:var(--lh-label)] whitespace-nowrap">
+                      {logo.name}
+                    </span>
+                  </span>
+                ))}
+              </div>
+            </div>
+          ))
+        }
+      </div>
+    </div>
+  </div>
+</section>
