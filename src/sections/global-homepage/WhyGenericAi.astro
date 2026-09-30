@@ -1815,7 +1815,7 @@ const LEDE =
                         </div>
 
                         <div class="gh-ct-card0-sent-bubble w-full max-w-full rounded-2xl border border-dashed border-[#11182726] bg-[#EDEDED] px-2.5 py-1.5 md:px-4 md:py-2.5 lg:px-5 lg:py-3.5">
-                          <p class="m-0 font-body text-[11px] md:text-xs lg:text-sm font-normal leading-[1.4] text-[#111827]">
+                          <p class="m-0 font-body text-[11px] md:text-xs lg:text-base xl:text-base font-normal leading-[1.4] text-[#111827]">
                             Using the attached invoice aging report, which invoices cross 180 days this month?
                           </p>
                         </div>
@@ -2064,7 +2064,7 @@ const LEDE =
                         </div>
 
                         <div class="gh-ct-card1-sent-bubble max-w-full rounded-2xl border border-dashed border-[#11182726] bg-[#EDEDED] px-2.5 py-1.5 md:px-4 md:py-2.5 lg:px-5 lg:py-3.5">
-                          <p class="m-0 font-body text-[11px] md:text-xs lg:text-sm font-normal leading-[1.4] text-[#111827]">
+                          <p class="m-0 font-body text-[11px] md:text-xs lg:text-base xl:text-base font-normal leading-[1.4] text-[#111827]">
                             Flag unusual transactions across invoices, contracts &amp; shipping.
                           </p>
                         </div>
@@ -2630,7 +2630,7 @@ const LEDE =
                         </div>
 
                         <div class="gh-ct-card3-sent-bubble max-w-full rounded-2xl border border-dashed border-[#11182726] bg-[#EDEDED] px-2.5 py-1.5 md:px-4 md:py-2.5 lg:px-5 lg:py-3.5">
-                          <p class="m-0 font-body text-[11px] md:text-xs lg:text-sm font-normal leading-[1.4] block w-full text-[#111827]">
+                          <p class="m-0 font-body text-[11px] md:text-xs lg:text-base xl:text-base font-normal leading-[1.4] block w-full text-[#111827]">
                             Compute this month’s tax returns across all entities.
                           </p>
                         </div>
@@ -3270,10 +3270,10 @@ const LEDE =
 
       // Webflow Embed Stitcher:
       // When publishing in Webflow, the build splits across Embed elements.
-      // If Card 4 is split into the next Embed, its image, input pill, and
-      // ClearTax elements can be orphaned outside .gh-why-sticky.
-      // This reattaches all Card 4 elements into their proper containers so
-      // the 5th card sticks properly and animations function identically to local.
+      // If a card is split across an Embed boundary, its submit button,
+      // sent group bubble, cursor, or ClearTax elements can be orphaned outside
+      // their proper containers. This reattaches all elements into their proper
+      // containers so all 5 cards stick, layout, and animate identically to local.
       function stitchCard4Dom() {
         const stickyOuters = document.querySelectorAll(".gh-why-sticky");
         const sticky5 = stickyOuters[4];
@@ -3332,7 +3332,50 @@ const LEDE =
         }
       }
 
-      stitchCard4Dom();
+      function stitchAllCardsDom() {
+        for (let c = 0; c < 5; c++) {
+          // 1. Generic card input pill submit button
+          const pill = document.querySelector(`.gh-card${c}-input-pill`);
+          const btn = document.querySelector(`.gh-card${c}-submit-btn`);
+          if (pill && btn && !pill.contains(btn)) {
+            pill.appendChild(btn);
+          }
+
+          // 2. ClearTax card input box submit button
+          const ctBox = document.querySelector(`.gh-ct-card${c}-input-box`);
+          const ctBtn = document.querySelector(`.gh-ct-card${c}-submit-btn`);
+          if (ctBox && ctBtn && !ctBox.contains(ctBtn)) {
+            const inputRow = ctBox.querySelector('.flex.w-full.items-center');
+            if (inputRow) inputRow.appendChild(ctBtn);
+            else ctBox.appendChild(ctBtn);
+          }
+
+          // 3. ClearTax card sent group and sent bubble
+          const sentGroup = document.querySelector(`.gh-ct-card${c}-sent-group`);
+          const sentBubble = document.querySelector(`.gh-ct-card${c}-sent-bubble`);
+          if (sentGroup && sentBubble && !sentGroup.contains(sentBubble)) {
+            sentGroup.appendChild(sentBubble);
+          }
+
+          // 4. Generic card cursor
+          const gCard = document.querySelector(`.gh-why-generic-card-${c}`);
+          const gCursor = document.querySelector(`.gh-card${c}-cursor`);
+          if (gCard && gCursor && !gCard.contains(gCursor)) {
+            gCard.appendChild(gCursor);
+          }
+
+          // 5. ClearTax card cursor
+          const ctCard = document.querySelector(`.gh-why-animation-card-${c}`);
+          const ctCursor = document.querySelector(`.gh-ct-card${c}-cursor`);
+          if (ctCard && ctCursor && !ctCard.contains(ctCursor)) {
+            ctCard.appendChild(ctCursor);
+          }
+        }
+
+        stitchCard4Dom();
+      }
+
+      stitchAllCardsDom();
 
       for (let i = 0; i < 5; i++) {
         initGenericCardFlow(i);
@@ -3508,7 +3551,7 @@ const LEDE =
 
     let lastNavBottomMeasured = -1;
     const handleLayoutShift = () => {
-      stitchCard4Dom();
+      stitchAllCardsDom();
       setTops();
       update();
     };
