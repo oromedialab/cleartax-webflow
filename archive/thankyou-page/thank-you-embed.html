@@ -141,7 +141,38 @@
     if (backLink) {
       backLink.addEventListener('click', (e) => {
         e.preventDefault();
-        window.history.back();
+
+        // Only ever redirect to a same-origin, relative destination.
+        // Anything else (absolute URL to another host, javascript:, protocol-relative //host) returns null.
+        function safeRelativePath(url) {
+          if (!url) return null;
+          try {
+            const resolved = new URL(url, window.location.origin);
+            if (resolved.origin !== window.location.origin) return null;
+            return resolved.pathname + resolved.search + resolved.hash;
+          } catch (err) {
+            return null;
+          }
+        }
+
+        // 1. Priority 1: Check for explicit backUrl parameter
+        const params = new URLSearchParams(window.location.search);
+        const backUrl = params.get('backUrl');
+
+        // 2. Priority 2: Use document.referrer
+        // 3. Priority 3: Fallback to home
+        const destination = safeRelativePath(backUrl) || safeRelativePath(document.referrer) || '/';
+
+        // Handle Iframe context (Navigate the top window)
+        if (window.self !== window.top) {
+          try {
+            window.top.location.href = destination;
+          } catch (err) {
+            window.location.href = destination;
+          }
+        } else {
+          window.location.href = destination;
+        }
       });
     }
   });
