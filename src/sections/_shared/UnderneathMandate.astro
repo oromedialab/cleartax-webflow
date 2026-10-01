@@ -10,38 +10,71 @@ interface Props {
     }[];
 }
 
-const { title = '', description = '', descriptionClass = '', items = [] } = Astro.props;
+const {
+    title = "",
+    description = "",
+    descriptionClass = "",
+    items = [],
+} = Astro.props;
 ---
 
-<div class="sticky-scroll-container">
-    <section class="sticky top-0 flex flex-col justify-center bg-generic-00 py-12 md:py-16 xl:py-20 border border-y-[#00000033] overflow-hidden min-h-[calc(100vh-80px)]">
+<div class="sticky-scroll-container bg-generic-00">
+    <section
+        class="sticky top-0 flex flex-col justify-center bg-generic-00 py-12 md:py-16 xl:py-20 border border-y-[#00000033] overflow-hidden min-h-[calc(100vh-80px)]"
+    >
         <div class="mx-auto lg:container w-full px-4 lg:px-6">
-
             <div class="header-wrapper text-center mx-auto mb-8 md:mb-12">
-                <h2 class="section-title text-[length:var(--fs-h2)] md:text-[length:var(--fs-h1)] leading-[length:var(--lh-h2)] md:leading-[length:var(--lh-h1)] font-medium text-text-default max-w-216 mx-auto m-0" class:list={[{ 'mb-4': Boolean(description) }]}>{title}</h2>
-                {description && (
-                    <p class={`section-desc text-neutral-500 font-normal text-[length:var(--fs-body)] leading-[length:var(--lh-body)] sm:text-[length:var(--fs-body-lg)] sm:leading-[length:var(--lh-body-lg)] mx-auto ${descriptionClass}`}>{description}</p>
-                )}
+                <h2
+                    class="section-title text-[length:var(--fs-h2)] md:text-[length:var(--fs-h1)] leading-[length:var(--lh-h2)] md:leading-[length:var(--lh-h1)] font-medium text-text-default max-w-216 mx-auto m-0"
+                    class:list={[{ "mb-4": Boolean(description) }]}
+                >
+                    {title}
+                </h2>
+                {
+                    description && (
+                        <p
+                            class={`section-desc text-neutral-500 font-normal text-[length:var(--fs-body)] leading-[length:var(--lh-body)] sm:text-[length:var(--fs-body-lg)] sm:leading-[length:var(--lh-body-lg)] mx-auto ${descriptionClass}`}
+                        >
+                            {description}
+                        </p>
+                    )
+                }
             </div>
 
             <div class="w-full h-auto">
-                <div class="compliance-scroll-track flex items-stretch gap-6 w-max transition-transform duration-[250ms] ease-out will-change-transform">
+                <div
+                    class="compliance-scroll-track flex items-stretch gap-6 w-max transition-transform duration-[250ms] ease-out will-change-transform"
+                >
                     {
                         items.map((item) => (
                             <div class="card-item bg-generic-00 rounded-lg p-4 sm:p-6 xl:p-8 w-[calc(100vw-32px)] md:w-[48vw] lg:w-[45vw] max-w-[628px] border-2 border-neutral-300 flex flex-col select-none">
-                                <h3 class="card-title text-[26px] xl:text-[32px] leading-[1.26] font-medium max-w-[564px] text-text-default mb-4 md:mb-6 pointer-events-none">{item.title}</h3>
-                                {item.img && (item.img.startsWith('http') || item.img.startsWith('/') || item.img.startsWith('./')) ? (
-                                    <img src={item.img} alt={item.title} class="card-img w-full max-w-[564px] object-contain rounded-sm pointer-events-none min-h-[320px] max-h-[440px]" loading="lazy" decoding="async" />
+                                <h3 class="card-title text-[26px] xl:text-[32px] leading-[1.26] font-medium max-w-[564px] text-text-default mb-4 md:mb-6 pointer-events-none">
+                                    {item.title}
+                                </h3>
+                                {item.img &&
+                                (item.img.startsWith("http") ||
+                                    item.img.startsWith("/") ||
+                                    item.img.startsWith("./")) ? (
+                                    <img
+                                        src={item.img}
+                                        alt={item.title}
+                                        class="card-img w-full max-w-[564px] object-contain rounded-sm pointer-events-none min-h-[320px] max-h-[440px]"
+                                        loading="lazy"
+                                        decoding="async"
+                                    />
                                 ) : (
-                                    <div class={`card-img w-full max-w-[564px] h-[320px] min-h-[320px] max-h-[440px] rounded-sm pointer-events-none ${item.img}`} />
+                                    <div
+                                        class={`card-img w-full max-w-[564px] h-[320px] min-h-[320px] max-h-[440px] rounded-sm pointer-events-none ${item.img}`}
+                                    />
                                 )}
-                                <p class="card-desc text-neutral-500 font-normal text-[length:var(--fs-body)] leading-[length:var(--lh-body)] sm:text-[length:var(--fs-body-lg)] sm:leading-[length:var(--lh-body-lg)] mt-6 pointer-events-none">{item.desc}</p>
+                                <p class="card-desc text-neutral-500 font-normal text-[length:var(--fs-body)] leading-[length:var(--lh-body)] sm:text-[length:var(--fs-body-lg)] sm:leading-[length:var(--lh-body-lg)] mt-6 pointer-events-none">
+                                    {item.desc}
+                                </p>
                             </div>
                         ))
                     }
                 </div>
             </div>
-
         </div>
     </section>
 </div>
@@ -85,17 +118,21 @@ const { title = '', description = '', descriptionClass = '', items = [] } = Astr
 </style>
 
 <script is:inline>
-    document.addEventListener('DOMContentLoaded', () => {
-        const containers = document.querySelectorAll('.sticky-scroll-container');
+    document.addEventListener("DOMContentLoaded", () => {
+        const containers = document.querySelectorAll(
+            ".sticky-scroll-container",
+        );
         if (!containers.length) return;
 
         containers.forEach((container) => {
-            const track = container.querySelector('.compliance-scroll-track');
-            const section = container.querySelector('section');
+            const track = container.querySelector(".compliance-scroll-track");
+            const section = container.querySelector("section");
             if (!container || !track || !section) return;
 
             const getHeaderHeight = () => {
-                const header = document.querySelector('header, .navbar, .w-nav');
+                const header = document.querySelector(
+                    "header, .navbar, .w-nav",
+                );
                 return header ? header.offsetHeight : 80;
             };
 
@@ -108,21 +145,27 @@ const { title = '', description = '', descriptionClass = '', items = [] } = Astr
                 const windowHeight = window.innerHeight;
                 const headerHeight = getHeaderHeight();
 
-                const trackOffset = track.parentElement.getBoundingClientRect().top - section.getBoundingClientRect().top;
+                const trackOffset =
+                    track.parentElement.getBoundingClientRect().top -
+                    section.getBoundingClientRect().top;
                 const trackHeight = track.offsetHeight;
                 const availableSpace = windowHeight - headerHeight;
 
-                const idealTrackTop = headerHeight + Math.max(40, (availableSpace - trackHeight) / 2);
+                const idealTrackTop =
+                    headerHeight +
+                    Math.max(40, (availableSpace - trackHeight) / 2);
                 let calculatedTop = idealTrackTop - trackOffset;
 
                 // Position section flush under header when sticky, avoiding gap on large screens
                 stickyTop = Math.min(headerHeight, calculatedTop);
                 section.style.top = `${stickyTop}px`;
 
-                const containerWidth = track.parentElement.getBoundingClientRect().width;
+                const containerWidth =
+                    track.parentElement.getBoundingClientRect().width;
                 maxTranslate = Math.max(0, track.scrollWidth - containerWidth);
                 container.style.height = `${maxTranslate + windowHeight}px`;
-                totalScrollable = container.getBoundingClientRect().height - sectionHeight;
+                totalScrollable =
+                    container.getBoundingClientRect().height - sectionHeight;
             };
 
             updateMeasurements();
@@ -132,7 +175,7 @@ const { title = '', description = '', descriptionClass = '', items = [] } = Astr
                 ro.observe(section);
                 ro.observe(track);
             }
-            window.addEventListener('resize', updateMeasurements);
+            window.addEventListener("resize", updateMeasurements);
 
             let ticking = false;
 
@@ -140,9 +183,15 @@ const { title = '', description = '', descriptionClass = '', items = [] } = Astr
                 if (!ticking) {
                     window.requestAnimationFrame(() => {
                         const containerRect = container.getBoundingClientRect();
-                        const scrolledDistance = Math.max(0, stickyTop - containerRect.top);
+                        const scrolledDistance = Math.max(
+                            0,
+                            stickyTop - containerRect.top,
+                        );
 
-                        let progress = totalScrollable > 0 ? scrolledDistance / totalScrollable : 0;
+                        let progress =
+                            totalScrollable > 0
+                                ? scrolledDistance / totalScrollable
+                                : 0;
                         progress = Math.max(0, Math.min(1, progress));
 
                         track.style.transform = `translate3d(-${progress * maxTranslate}px, 0, 0)`;
@@ -153,18 +202,23 @@ const { title = '', description = '', descriptionClass = '', items = [] } = Astr
                 }
             };
 
-            const observer = new IntersectionObserver((entries) => {
-                entries.forEach((entry) => {
-                    if (entry.isIntersecting) {
-                        window.addEventListener('scroll', handleScroll, { passive: true });
-                        handleScroll();
-                    } else {
-                        window.removeEventListener('scroll', handleScroll);
-                    }
-                });
-            }, {
-                rootMargin: '100% 0px 100% 0px'
-            });
+            const observer = new IntersectionObserver(
+                (entries) => {
+                    entries.forEach((entry) => {
+                        if (entry.isIntersecting) {
+                            window.addEventListener("scroll", handleScroll, {
+                                passive: true,
+                            });
+                            handleScroll();
+                        } else {
+                            window.removeEventListener("scroll", handleScroll);
+                        }
+                    });
+                },
+                {
+                    rootMargin: "100% 0px 100% 0px",
+                },
+            );
 
             observer.observe(container);
         });
