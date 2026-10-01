@@ -162,11 +162,11 @@ function toBlocks(items: NavChild[]): Block[] {
     <div class="container max-w-full min-[1400px]:max-w-[1328px] pointer-events-auto">
       <div
         data-nav-card
-        class="w-full bg-generic-00 border-2 border-[#ECECF4] rounded-xl shadow-[0px_6px_15px_-2px_rgba(16,24,40,0.08)] p-2"
+        class="w-full bg-generic-00 border-2 border-[#ECECF4] rounded-xl shadow-[0px_6px_15px_-2px_rgba(16,24,40,0.08)] p-4"
       >
         <div class="flex items-center justify-between gap-2">
           <!-- Menu disclosure -->
-          <div class="flex items-center lg:w-52 shrink-0">
+          <div class="flex items-center order-2 lg:order-1 lg:w-52 shrink-0">
             <button
               type="button"
               data-nav-toggle
@@ -200,18 +200,18 @@ function toBlocks(items: NavChild[]): Block[] {
                 <rect y="14" width="24" height="2" rx="1" fill="currentColor"></rect>
               </svg>
               <span
-                class="text-[length:var(--fs-label-lg)] leading-[length:var(--lh-label-lg)] font-semibold text-vault-navy font-body"
+                class="max-lg:hidden text-[length:var(--fs-label-lg)] leading-[length:var(--lh-label-lg)] font-semibold text-vault-navy font-body"
                 >Menu</span
               >
             </button>
           </div>
 
           <!-- Wordmark -->
-          <a href="/" class="flex items-center shrink-0" aria-label="ClearTax home">
+          <a href="/" class="flex items-center order-1 lg:order-2 shrink-0" aria-label="ClearTax home">
             <img
               src="https://cdn.prod.website-files.com/6093bce33d9b4bae841b04e3/69dfcff6071b983201f5f097_logo-cleartax.svg"
               alt="ClearTax"
-              class="h-6 w-28"
+              class="h-4.5 lg:h-6 max-w-28 w-full"
               width="112"
               height="24"
               loading="eager"
@@ -220,8 +220,10 @@ function toBlocks(items: NavChild[]): Block[] {
             />
           </a>
 
-          <!-- Country + CTA -->
-          <div class="flex items-center gap-2 justify-end shrink-0">
+          <!-- Country + CTA — desktop only; the mobile panel carries its own
+               copies of both at the bottom of each view (see below), since
+               there is no room for them in a logo + hamburger mobile bar. -->
+          <div class="hidden lg:flex items-center gap-2 justify-end shrink-0 lg:order-3">
             <button
               type="button"
               data-country-btn
@@ -269,21 +271,51 @@ function toBlocks(items: NavChild[]): Block[] {
           <div class="overflow-y-auto max-h-[calc(100svh-5rem)] lg:overflow-hidden lg:max-h-none">
             <div class="pt-6 pb-4 px-2">
               <!-- justify-between with content-width columns is what produces the
-                   design's uneven column gaps; the columns are not a 4-up grid. -->
-              <div class="flex flex-wrap items-start justify-between gap-4 ">
+                   design's uneven column gaps; the columns are not a 4-up grid.
+                   Below lg the columns stack full-width and gap-0 so the
+                   between-group rhythm is border+padding, not gap — same
+                   reasoning as the top-level accordion rows below. -->
+              <div class="flex flex-wrap items-start justify-between gap-0 lg:gap-4">
                 {
                   groups.map((g) => (
-                    <div class="flex flex-col gap-4 p-4 max-sm:p-2">
-                      <p class="m-0 font-body font-medium text-vault-navy text-[length:var(--fs-body-lg)] leading-[length:var(--lh-body-lg)]">
-                        {g.label}
-                      </p>
-
+                    <div class="group/top flex flex-col w-full lg:w-auto border-b border-neutral-200 lg:border-0 py-4 lg:p-4" data-nav-top>
+                      {/* Collapsed by default below lg — a page like this one
+                          with four groups otherwise opens into one very long
+                          scroll of every link at once. At lg+ the chevron is
+                          hidden and the panel forced open via `lg:grid-rows-[1fr]`
+                          below, so desktop is untouched. */}
+                      <button
+                        type="button"
+                        data-top-trigger
+                        aria-expanded="false"
+                        class="flex items-center justify-between gap-2 w-full p-0 m-0 bg-transparent border-0 cursor-pointer lg:cursor-default font-[inherit] text-left"
+                      >
+                        <span class="font-body font-medium text-vault-navy text-[length:var(--fs-body-lg)] leading-[length:var(--lh-body-lg)]">
+                          {g.label}
+                        </span>
+                        <svg
+                          class="lg:hidden shrink-0 transition-transform duration-200 group-[.open]/top:rotate-180"
+                          width="14"
+                          height="14"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          stroke-width="2.5"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          aria-hidden="true"
+                        >
+                          <path d="m6 9 6 6 6-6" />
+                        </svg>
+                      </button>
+                      <div class="grid grid-rows-[0fr] lg:grid-rows-[1fr] transition-[grid-template-rows] duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] group-[.open]/top:grid-rows-[1fr]">
+                        <div class="overflow-hidden">
                       {/* One rhythm, everywhere: 12px between every row and
                           every block, expanded or collapsed. The design separates
                           blocks by 32px, but that makes a collapsed group sit in a
                           block-sized gap around nothing, so the panel is kept on a
                           single 12px step instead. */}
-                      <div class="flex flex-col gap-3">
+                      <div class="flex flex-col gap-3 pt-4">
                         {toBlocks(g.dropdown!).map((block) =>
                           block.kind === "run" ? (
                             <ul class="list-none m-0 p-0 flex flex-col gap-3">
@@ -386,16 +418,41 @@ function toBlocks(items: NavChild[]): Block[] {
                           ),
                         )}
                       </div>
+                        </div>
+                      </div>
                     </div>
                   ))
                 }
                 {
                   singles.length > 0 && (
-                    <div class="flex flex-col gap-4 p-4 max-sm:p-2">
-                      <p class="m-0 font-body font-medium text-vault-navy text-[length:var(--fs-body-lg)] leading-[length:var(--lh-body-lg)]">
-                        More
-                      </p>
-                      <ul class="list-none m-0 p-0 flex flex-col gap-3">
+                    <div class="group/top flex flex-col w-full lg:w-auto border-b border-neutral-200 lg:border-0 py-4 lg:p-4" data-nav-top>
+                      <button
+                        type="button"
+                        data-top-trigger
+                        aria-expanded="false"
+                        class="flex items-center justify-between gap-2 w-full p-0 m-0 bg-transparent border-0 cursor-pointer lg:cursor-default font-[inherit] text-left"
+                      >
+                        <span class="font-body font-medium text-vault-navy text-[length:var(--fs-body-lg)] leading-[length:var(--lh-body-lg)]">
+                          More
+                        </span>
+                        <svg
+                          class="lg:hidden shrink-0 transition-transform duration-200 group-[.open]/top:rotate-180"
+                          width="14"
+                          height="14"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          stroke-width="2.5"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          aria-hidden="true"
+                        >
+                          <path d="m6 9 6 6 6-6" />
+                        </svg>
+                      </button>
+                      <div class="grid grid-rows-[0fr] lg:grid-rows-[1fr] transition-[grid-template-rows] duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] group-[.open]/top:grid-rows-[1fr]">
+                        <div class="overflow-hidden">
+                      <ul class="list-none m-0 p-0 pt-4 flex flex-col gap-3">
                         {singles.map((l) => (
                           <li>
                             <a href={l.href} class="block no-underline font-medium font-body text-neutral-500 text-[length:var(--fs-body-lg)] leading-[length:var(--lh-body-lg)] transition-colors hover:text-nova-blue">
@@ -404,19 +461,46 @@ function toBlocks(items: NavChild[]): Block[] {
                           </li>
                         ))}
                       </ul>
+                        </div>
+                      </div>
                     </div>
                   )
                 }
               </div>
 
-              <a
-                href={resolvedCtaHref}
-                onclick={ctaClickAttr}
-                data-demo-open={demoOpenAttr}
-                class="sm:hidden inline-flex items-center justify-center w-full gap-2 mt-6 px-5 py-3.5 text-[length:var(--fs-label-lg)] leading-[length:var(--lh-label-lg)] font-medium text-nova-50 bg-nova-blue rounded-lg no-underline transition-all duration-200 hover:bg-generic-00 hover:text-nova-blue ease-in-out"
-              >
-                {ctaLabel}
-              </a>
+              <!-- Mobile-only bottom row: the header's CTA + globe toggle have
+                   no room in a logo + hamburger bar below lg, so this panel
+                   (and the country panel below) each carry their own copy.
+                   Multiple `[data-country-btn]` instances stay in sync — see
+                   the script's `countryBtns` loop. -->
+              <div class="lg:hidden flex items-center gap-2 mt-6">
+                <a
+                  href={resolvedCtaHref}
+                  onclick={ctaClickAttr}
+                  data-demo-open={demoOpenAttr}
+                  class="flex-1 inline-flex items-center justify-center gap-2 px-5 py-3.5 text-[length:var(--fs-label-lg)] leading-[length:var(--lh-label-lg)] font-medium text-nova-50 bg-nova-blue rounded-lg no-underline transition-all duration-200 hover:bg-generic-00 hover:text-nova-blue ease-in-out"
+                >
+                  {ctaLabel}
+                </a>
+                <button
+                  type="button"
+                  data-country-btn
+                  aria-expanded="false"
+                  aria-controls={countryId}
+                  class="group/country inline-flex items-center justify-center gap-2 h-[50px] px-[14px] shrink-0 bg-generic-00 border border-[#CCCCCC] rounded-lg shadow-[0px_2px_6px_rgba(16,24,40,0.06)] cursor-pointer font-[inherit] transition-colors hover:bg-slate-50"
+                >
+                  <span class="inline-flex items-center justify-center w-5 h-5 shrink-0 text-vault-navy">
+                    <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M9.75 0C7.82164 0 5.93657 0.571828 4.33319 1.64317C2.72982 2.71452 1.48013 4.23726 0.742179 6.01884C0.00422448 7.80042 -0.188858 9.76082 0.187348 11.6521C0.563554 13.5434 1.49215 15.2807 2.85571 16.6443C4.21927 18.0079 5.95656 18.9365 7.84787 19.3127C9.73919 19.6889 11.6996 19.4958 13.4812 18.7578C15.2627 18.0199 16.7855 16.7702 17.8568 15.1668C18.9282 13.5634 19.5 11.6784 19.5 9.75C19.4973 7.16498 18.4692 4.68661 16.6413 2.85872C14.8134 1.03084 12.335 0.00272983 9.75 0ZM9.75 1.5C11.3484 1.4983 12.9125 1.96361 14.25 2.83875V4.6875L12.1716 7.10063L9.22125 7.5L9.19219 7.47937L7.34813 6.27375C7.18464 6.15858 6.99976 6.07727 6.80439 6.0346C6.60901 5.99192 6.40707 5.98875 6.21045 6.02526C6.01382 6.06177 5.82649 6.13723 5.65945 6.24721C5.49242 6.35718 5.34906 6.49944 5.23782 6.66562L3.27469 9.6C3.11115 9.84453 3.02312 10.1318 3.02157 10.4259L3 13.8225L2.69344 14.0241C1.93558 12.7728 1.52404 11.3426 1.50101 9.87988C1.47798 8.4172 1.84429 6.9747 2.56238 5.70021C3.28048 4.42573 4.32454 3.3651 5.58756 2.62703C6.85058 1.88896 8.28714 1.5 9.75 1.5ZM3.58969 15.2316L3.82594 15.0769C4.03224 14.9408 4.20172 14.7559 4.31932 14.5385C4.43691 14.3211 4.49898 14.0781 4.5 13.8309L4.51969 10.4344L6.48469 7.5C6.49432 7.50741 6.50433 7.51429 6.51469 7.52063L8.35875 8.72719C8.66779 8.9453 9.04805 9.0381 9.42282 8.98688L12.375 8.58656C12.7391 8.53798 13.0726 8.35751 13.3125 8.07938L15.3909 5.66437C15.6234 5.39204 15.7507 5.04554 15.75 4.6875V4.09406C16.7644 5.16731 17.4717 6.49352 17.7978 7.93387C18.1238 9.37422 18.0567 10.8757 17.6034 12.2812L16.0903 10.8975C15.88 10.7044 15.6189 10.5754 15.3377 10.5256C15.0566 10.4757 14.767 10.5072 14.5031 10.6163L11.6475 11.8022C11.4087 11.9024 11.1998 12.0625 11.0408 12.2669C10.8819 12.4713 10.7783 12.7133 10.74 12.9694L10.5159 14.4872C10.4621 14.8525 10.5449 15.2249 10.7485 15.533C10.9521 15.841 11.2622 16.0632 11.6194 16.1569L13.6313 16.6875L13.8525 16.9097C12.2096 17.8523 10.2921 18.2001 8.42288 17.8944C6.55362 17.5888 4.84676 16.6484 3.58969 15.2316ZM15.0938 16.0312L14.6906 15.6272C14.5026 15.4384 14.2677 15.3032 14.01 15.2353L12 14.7047L12.2241 13.1869L15.0788 12L16.9688 13.7325C16.487 14.6052 15.8519 15.384 15.0938 16.0312Z" fill="#05022A"/>
+                    </svg>
+                  </span>
+                  <span
+                    data-country-current
+                    class="hidden group-aria-expanded/country:inline text-[length:var(--fs-label-lg)] leading-[length:var(--lh-label-lg)] font-medium text-vault-navy font-body"
+                    >{countryLabel}</span
+                  >
+                </button>
+              </div>
             </div>
           </div>
         </div>
@@ -429,10 +513,10 @@ function toBlocks(items: NavChild[]): Block[] {
           data-country-panel
           class="grid grid-rows-[0fr] transition-[grid-template-rows] duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] [&.open]:grid-rows-[1fr]"
         >
-          <div class="overflow-hidden">
+          <div class="overflow-y-auto max-h-[calc(100svh-5rem)] lg:overflow-hidden lg:max-h-none">
             <div class="px-4 pt-6 pb-4 max-lg:px-2">
               <ul
-                class="list-none m-0 p-0 grid gap-2 grid-cols-2 sm:grid-cols-4 lg:grid-cols-7"
+                class="list-none m-0 p-0 grid gap-2 grid-cols-1 lg:grid-cols-7"
               >
                 {
                   countries.map((c) => {
@@ -474,6 +558,38 @@ function toBlocks(items: NavChild[]): Block[] {
                   })
                 }
               </ul>
+
+              <!-- Same mobile-only bottom row as the menu panel. This copy's
+                   globe button toggles the panel it already sits inside —
+                   clicking it while the country list is open just closes it. -->
+              <div class="lg:hidden flex items-center gap-2 mt-6">
+                <a
+                  href={resolvedCtaHref}
+                  onclick={ctaClickAttr}
+                  data-demo-open={demoOpenAttr}
+                  class="flex-1 inline-flex items-center justify-center gap-2 px-5 py-3.5 text-[length:var(--fs-label-lg)] leading-[length:var(--lh-label-lg)] font-medium text-nova-50 bg-nova-blue rounded-lg no-underline transition-all duration-200 hover:bg-generic-00 hover:text-nova-blue ease-in-out"
+                >
+                  {ctaLabel}
+                </a>
+                <button
+                  type="button"
+                  data-country-btn
+                  aria-expanded="false"
+                  aria-controls={countryId}
+                  class="group/country inline-flex items-center justify-center gap-2 h-[50px] px-[14px] shrink-0 bg-generic-00 border border-[#CCCCCC] rounded-lg shadow-[0px_2px_6px_rgba(16,24,40,0.06)] cursor-pointer font-[inherit] transition-colors hover:bg-slate-50"
+                >
+                  <span class="inline-flex items-center justify-center w-5 h-5 shrink-0 text-vault-navy">
+                    <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M9.75 0C7.82164 0 5.93657 0.571828 4.33319 1.64317C2.72982 2.71452 1.48013 4.23726 0.742179 6.01884C0.00422448 7.80042 -0.188858 9.76082 0.187348 11.6521C0.563554 13.5434 1.49215 15.2807 2.85571 16.6443C4.21927 18.0079 5.95656 18.9365 7.84787 19.3127C9.73919 19.6889 11.6996 19.4958 13.4812 18.7578C15.2627 18.0199 16.7855 16.7702 17.8568 15.1668C18.9282 13.5634 19.5 11.6784 19.5 9.75C19.4973 7.16498 18.4692 4.68661 16.6413 2.85872C14.8134 1.03084 12.335 0.00272983 9.75 0ZM9.75 1.5C11.3484 1.4983 12.9125 1.96361 14.25 2.83875V4.6875L12.1716 7.10063L9.22125 7.5L9.19219 7.47937L7.34813 6.27375C7.18464 6.15858 6.99976 6.07727 6.80439 6.0346C6.60901 5.99192 6.40707 5.98875 6.21045 6.02526C6.01382 6.06177 5.82649 6.13723 5.65945 6.24721C5.49242 6.35718 5.34906 6.49944 5.23782 6.66562L3.27469 9.6C3.11115 9.84453 3.02312 10.1318 3.02157 10.4259L3 13.8225L2.69344 14.0241C1.93558 12.7728 1.52404 11.3426 1.50101 9.87988C1.47798 8.4172 1.84429 6.9747 2.56238 5.70021C3.28048 4.42573 4.32454 3.3651 5.58756 2.62703C6.85058 1.88896 8.28714 1.5 9.75 1.5ZM3.58969 15.2316L3.82594 15.0769C4.03224 14.9408 4.20172 14.7559 4.31932 14.5385C4.43691 14.3211 4.49898 14.0781 4.5 13.8309L4.51969 10.4344L6.48469 7.5C6.49432 7.50741 6.50433 7.51429 6.51469 7.52063L8.35875 8.72719C8.66779 8.9453 9.04805 9.0381 9.42282 8.98688L12.375 8.58656C12.7391 8.53798 13.0726 8.35751 13.3125 8.07938L15.3909 5.66437C15.6234 5.39204 15.7507 5.04554 15.75 4.6875V4.09406C16.7644 5.16731 17.4717 6.49352 17.7978 7.93387C18.1238 9.37422 18.0567 10.8757 17.6034 12.2812L16.0903 10.8975C15.88 10.7044 15.6189 10.5754 15.3377 10.5256C15.0566 10.4757 14.767 10.5072 14.5031 10.6163L11.6475 11.8022C11.4087 11.9024 11.1998 12.0625 11.0408 12.2669C10.8819 12.4713 10.7783 12.7133 10.74 12.9694L10.5159 14.4872C10.4621 14.8525 10.5449 15.2249 10.7485 15.533C10.9521 15.841 11.2622 16.0632 11.6194 16.1569L13.6313 16.6875L13.8525 16.9097C12.2096 17.8523 10.2921 18.2001 8.42288 17.8944C6.55362 17.5888 4.84676 16.6484 3.58969 15.2316ZM15.0938 16.0312L14.6906 15.6272C14.5026 15.4384 14.2677 15.3032 14.01 15.2353L12 14.7047L12.2241 13.1869L15.0788 12L16.9688 13.7325C16.487 14.6052 15.8519 15.384 15.0938 16.0312Z" fill="#05022A"/>
+                    </svg>
+                  </span>
+                  <span
+                    data-country-current
+                    class="hidden group-aria-expanded/country:inline text-[length:var(--fs-label-lg)] leading-[length:var(--lh-label-lg)] font-medium text-vault-navy font-body"
+                    >{countryLabel}</span
+                  >
+                </button>
+              </div>
             </div>
           </div>
         </div>
@@ -490,9 +606,13 @@ function toBlocks(items: NavChild[]): Block[] {
     const toggle = navbar.querySelector("[data-nav-toggle]");
     const panel = navbar.querySelector("[data-nav-panel]");
     const card = navbar.querySelector("[data-nav-card]");
-    const countryBtn = navbar.querySelector("[data-country-btn]");
+    // Three copies below lg (header, menu-panel footer, country-panel footer)
+    // vs. one at lg+ — all kept in sync by `setCountryOpen` below.
+    const countryBtns = Array.from(navbar.querySelectorAll("[data-country-btn]"));
+    const countryBtn = countryBtns[0];
     const countryPanel = navbar.querySelector("[data-country-panel]");
     const subItems = Array.from(navbar.querySelectorAll("[data-nav-sub]"));
+    const topItems = Array.from(navbar.querySelectorAll("[data-nav-top]"));
 
     // Hover-to-open is for mice only. On touch, a tap fires a synthetic
     // mouseenter before the click, so wiring it up there would open the panel
@@ -519,6 +639,15 @@ function toBlocks(items: NavChild[]): Block[] {
       });
     };
 
+    // Collapse every top-level group too, so reopening the menu panel is
+    // always the four collapsed rows, not whatever was left expanded.
+    const resetTops = () => {
+      topItems.forEach((item) => {
+        item.classList.remove("open");
+        item.querySelector("[data-top-trigger]")?.setAttribute("aria-expanded", "false");
+      });
+    };
+
     // The bars turn while EITHER panel is out, not just the menu — both open
     // states in the design show them vertical.
     const syncToggleIcon = () => {
@@ -533,15 +662,16 @@ function toBlocks(items: NavChild[]): Block[] {
       toggle.setAttribute("aria-expanded", open ? "true" : "false");
       if (!open) {
         resetSubs();
+        resetTops();
         if (hoverOpenedKey === "menu") hoverOpenedKey = null;
       }
       syncToggleIcon();
     };
 
     const setCountryOpen = (open) => {
-      if (!countryPanel || !countryBtn) return;
+      if (!countryPanel || countryBtns.length === 0) return;
       countryPanel.classList.toggle("open", open);
-      countryBtn.setAttribute("aria-expanded", open ? "true" : "false");
+      countryBtns.forEach((btn) => btn.setAttribute("aria-expanded", open ? "true" : "false"));
       if (!open && hoverOpenedKey === "country") hoverOpenedKey = null;
       syncToggleIcon();
     };
@@ -579,11 +709,11 @@ function toBlocks(items: NavChild[]): Block[] {
     };
 
     toggle?.addEventListener("click", onTriggerClick("menu"));
-    countryBtn?.addEventListener("click", onTriggerClick("country"));
+    countryBtns.forEach((btn) => btn.addEventListener("click", onTriggerClick("country")));
 
     if (canHover && card) {
       toggle?.addEventListener("mouseenter", onTriggerHover("menu"));
-      countryBtn?.addEventListener("mouseenter", onTriggerHover("country"));
+      countryBtns.forEach((btn) => btn.addEventListener("mouseenter", onTriggerHover("country")));
 
       // Close on leaving the whole card, not the trigger — both panels hang
       // below the bar inside the same card, so the cursor never leaves it on the
@@ -616,6 +746,23 @@ function toBlocks(items: NavChild[]): Block[] {
       item.querySelector("[data-sub-trigger]")?.addEventListener("click", (e) => {
         e.preventDefault();
         setSubOpen(item, !item.classList.contains("open"));
+      });
+    });
+
+    // Same click-only treatment for the four top-level groups. At lg+ the
+    // trigger is `cursor-default` and the panel is forced open via
+    // `lg:grid-rows-[1fr]` in CSS regardless of this class, so a stray click
+    // there is harmless — it just toggles a class with no visible effect.
+    const setTopOpen = (item, open) => {
+      item.classList.toggle("open", open);
+      item
+        .querySelector("[data-top-trigger]")
+        ?.setAttribute("aria-expanded", open ? "true" : "false");
+    };
+
+    topItems.forEach((item) => {
+      item.querySelector("[data-top-trigger]")?.addEventListener("click", () => {
+        setTopOpen(item, !item.classList.contains("open"));
       });
     });
 
