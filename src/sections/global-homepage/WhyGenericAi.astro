@@ -77,8 +77,12 @@ const LEDE =
 ---
 
 <style is:global>
-.html.w-mod-touch.w-mod-touch * {
+html.w-mod-touch * {
   background-attachment: unset !important;
+}
+
+.gh-why-card p {
+  margin-bottom: 0;
 }
 </style>
 <section class="bg-generic-00 py-16 md:py-20">
@@ -3343,7 +3347,26 @@ const LEDE =
         }
       }
 
-      stitchCard4Dom();
+      function stitchWebflowEmbeds() {
+        // Reattach any orphaned sent bubbles or submit buttons across all cards
+        for (let i = 0; i < 5; i++) {
+          const sentGroup = document.querySelector(`.gh-ct-card${i}-sent-group`);
+          const sentBubble = document.querySelector(`.gh-ct-card${i}-sent-bubble`);
+          if (sentGroup && sentBubble && !sentGroup.contains(sentBubble)) {
+            sentGroup.appendChild(sentBubble);
+          }
+
+          const pill = document.querySelector(`.gh-card${i}-input-pill`);
+          const submitBtn = document.querySelector(`.gh-card${i}-submit-btn`);
+          if (pill && submitBtn && !pill.contains(submitBtn)) {
+            pill.appendChild(submitBtn);
+          }
+        }
+
+        stitchCard4Dom();
+      }
+
+      stitchWebflowEmbeds();
 
       const stack = document.getElementById("gh-why-stack");
       if (!stack) return;
