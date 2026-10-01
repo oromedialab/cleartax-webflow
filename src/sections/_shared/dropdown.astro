@@ -1,0 +1,455 @@
+---
+/**
+ * Shared Dropdown & Interactive Card Section
+ * Reusable component for regional compliance / exposure cards with dropdown selector.
+ *
+ * Props:
+ * - heading: Section title
+ * - lede: Section description paragraph
+ * - selectLabel: Dropdown prompt (e.g. "Select a country where your business operates")
+ * - items: Array of card data items with id, label, optional title, status, means
+ * - defaultLabel: Label of initially active item (defaults to first item)
+ * - statusLabel: Heading for status block (default: "Status")
+ * - meansLabel: Heading for means block (default: "What It Means for a US Parent Company")
+ * - closingNote: Footnote text below the card
+ * - class: Optional additional classes for the outer section
+ */
+
+export interface DropdownCardItem {
+    id: string;
+    label: string;
+    title?: string;
+    status?: string;
+    means?: string;
+}
+
+export interface Props {
+    heading?: string;
+    lede?: string;
+    selectLabel?: string;
+    items?: DropdownCardItem[];
+    defaultLabel?: string;
+    statusLabel?: string;
+    meansLabel?: string;
+    closingNote?: string;
+    class?: string;
+    id?: string;
+}
+
+const {
+    heading = "",
+    lede = "",
+    selectLabel = "Select a country where your business operates",
+    items = [],
+    defaultLabel = items[0]?.label || "",
+    statusLabel = "Status",
+    meansLabel = "What It Means for a US Parent Company",
+    closingNote = "",
+    class: className = "",
+    id: componentId = `dropdown-${Math.random().toString(36).slice(2, 9)}`,
+} = Astro.props;
+---
+
+<section
+    class:list={["bg-generic-00 py-16 lg:py-20", className]}
+    id={componentId}
+    data-dropdown-section
+>
+    <div class="mx-auto w-full min-[1400px]:container px-4 md:px-6">
+        <!-- Section Header with Dropdown -->
+        <div
+            class="flex flex-col gap-6 bg-generic-00 lg:flex-row lg:items-end lg:justify-between lg:gap-8 xl:gap-12 mb-8 lg:mb-12 w-full"
+        >
+            <div class="flex flex-col gap-3 flex-1 min-w-0 lg:max-w-[786px]">
+                {
+                    heading && (
+                        <h2 class="m-0 font-heading font-medium text-vault-navy text-[length:var(--fs-h1)] leading-[length:var(--lh-h1)] tracking-[-0.5px]">
+                            {heading}
+                        </h2>
+                    )
+                }
+                {
+                    lede && (
+                        <p class="m-0 font-body font-normal text-neutral-500 text-[length:var(--fs-body)] lg:text-[length:var(--fs-body-lg)] leading-[length:var(--lh-body)] lg:leading-[length:var(--lh-body-lg)]">
+                            {lede}
+                        </p>
+                    )
+                }
+            </div>
+
+            <!-- Dropdown Selector -->
+            {
+                items.length > 0 && (
+                    <div class="country-dropdown-wrap flex flex-col gap-2 shrink-0 self-start lg:self-end w-full sm:w-[320px] lg:w-[340px] xl:w-[377px] max-w-full">
+                        {selectLabel && (
+                            <span class="font-body text-[length:var(--fs-body)] leading-[length:var(--lh-body)] font-normal text-neutral-500">
+                                {selectLabel}
+                            </span>
+                        )}
+                        <div
+                            class="country-dropdown relative w-full"
+                            data-country-dropdown
+                        >
+                            <button
+                                type="button"
+                                class="country-dropdown-trigger flex w-full items-center justify-between gap-3 rounded-lg border border-neutral-300 bg-generic-00 px-3.5 py-2.5 text-left font-body text-base font-medium text-slate-800 transition-colors hover:border-neutral-400 cursor-pointer"
+                                aria-haspopup="listbox"
+                                aria-expanded="false"
+                            >
+                                <div class="flex items-center gap-2.5 min-w-0">
+                                    <svg
+                                        class="h-4 w-4 shrink-0 text-slate-500"
+                                        viewBox="0 0 24 24"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        stroke-width="1.75"
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                        aria-hidden="true"
+                                    >
+                                        <circle cx="12" cy="12" r="10" />
+                                        <path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20" />
+                                        <path d="M2 12h20" />
+                                    </svg>
+                                    <span class="country-dropdown-label text-neutral-600 font-medium text-[length:var(--fs-body-lg)] leading-[length:var(--lh-body-lg)] truncate">
+                                        {defaultLabel}
+                                    </span>
+                                </div>
+                                <svg
+                                    class="country-dropdown-chevron h-3 w-3 shrink-0 text-slate-500 transition-transform duration-200"
+                                    viewBox="0 0 18 11"
+                                    fill="none"
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    aria-hidden="true"
+                                >
+                                    <path
+                                        d="M8.99997 10.2605C8.67737 10.2605 8.35482 10.1374 8.10887 9.89152L0.369255 2.15183C-0.123085 1.65949 -0.123085 0.861247 0.369255 0.369106C0.861396 -0.123035 1.65948 -0.123035 2.15186 0.369106L8.99997 7.21761L15.8481 0.369345C16.3405 -0.122796 17.1385 -0.122796 17.6306 0.369345C18.1231 0.861486 18.1231 1.65973 17.6306 2.15207L9.89108 9.89176C9.645 10.1376 9.32245 10.2605 8.99997 10.2605Z"
+                                        fill="#4B5563"
+                                    />
+                                </svg>
+                            </button>
+
+                            <div
+                                class="country-dropdown-menu absolute left-0 right-0 top-[calc(100%+4px)] z-50 hidden rounded-lg border border-neutral-200 bg-generic-00 p-1.5 shadow-xl"
+                                role="listbox"
+                            >
+                                {items.map((item, idx) => {
+                                    const isSelected =
+                                        item.label === defaultLabel;
+                                    return (
+                                        <button
+                                            type="button"
+                                            role="option"
+                                            data-value={item.label}
+                                            data-index={idx}
+                                            aria-selected={
+                                                isSelected ? "true" : "false"
+                                            }
+                                            class:list={[
+                                                "country-dropdown-option flex w-full items-center font-medium gap-2.5 rounded-md px-3 py-2 text-left text-[length:var(--fs-body-lg)] leading-[length:var(--lh-body-lg)] border-none font-body transition-colors cursor-pointer",
+                                                isSelected
+                                                    ? "bg-neutral-100 text-neutral-600 font-medium"
+                                                    : "text-neutral-500 bg-generic-00 font-medium",
+                                            ]}
+                                        >
+                                            <svg
+                                                class="h-4.5 w-4.5 shrink-0"
+                                                viewBox="0 0 24 24"
+                                                fill="none"
+                                                stroke="currentColor"
+                                                stroke-width="1.75"
+                                                stroke-linecap="round"
+                                                stroke-linejoin="round"
+                                                aria-hidden="true"
+                                            >
+                                                <circle
+                                                    cx="12"
+                                                    cy="12"
+                                                    r="10"
+                                                />
+                                                <path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20" />
+                                                <path d="M2 12h20" />
+                                            </svg>
+                                            <span class="truncate">
+                                                {item.label}
+                                            </span>
+                                        </button>
+                                    );
+                                })}
+                            </div>
+                        </div>
+                    </div>
+                )
+            }
+        </div>
+
+        <!-- Single Main Card Display -->
+        {
+            items.length > 0 && (
+                <div class="relative w-full">
+                    <div class="country-slides-track relative w-full">
+                        {items.map((c, index) => {
+                            const isDefault = c.label === defaultLabel;
+                            return (
+                                <div
+                                    class:list={[
+                                        "country-slide w-full",
+                                        {
+                                            "active-slide": isDefault,
+                                            "is-hidden": !isDefault,
+                                        },
+                                    ]}
+                                    data-slide-index={index}
+                                    data-country={c.label}
+                                    style={
+                                        !isDefault
+                                            ? "display: none !important;"
+                                            : "display: block;"
+                                    }
+                                >
+                                    <article class="flex flex-col items-stretch gap-6 rounded-2xl border border-neutral-200 bg-generic-00 p-4 sm:p-6 lg:flex-row lg:items-stretch lg:gap-10 min-h-[380px] w-full">
+                                        <!-- Left Content Column -->
+                                        <div class="flex flex-col justify-between gap-6 lg:max-w-[480px] lg:flex-1">
+                                            <div>
+                                                <!-- Small placeholder icon box -->
+                                                <div
+                                                    class="w-10 h-10 rounded-lg bg-visual-placeholder shrink-0"
+                                                    aria-hidden="true"
+                                                />
+                                                <h3 class="m-0 font-heading font-medium text-vault-navy text-[length:var(--fs-h5)] leading-[length:var(--lh-h5)] mt-4">
+                                                    {c.title || c.label}
+                                                </h3>
+                                            </div>
+
+                                            <!-- Status & What It Means -->
+                                            <div class="flex flex-col gap-4 lg:gap-5 mt-auto">
+                                                {c.status && (
+                                                    <div class="flex flex-col gap-1">
+                                                        <span class="text-[length:var(--fs-body)] leading-[length:var(--lh-body)] font-medium text-neutral-600 font-body">
+                                                            {statusLabel}
+                                                        </span>
+                                                        <p class="m-0 text-[length:var(--fs-body)] leading-[length:var(--lh-body)] font-normal text-neutral-500 font-body">
+                                                            {c.status}
+                                                        </p>
+                                                    </div>
+                                                )}
+
+                                                {c.means && (
+                                                    <div class="flex flex-col gap-1">
+                                                        <span class="text-[length:var(--fs-body)] leading-[length:var(--lh-body)] font-medium text-neutral-600 font-body">
+                                                            {meansLabel}
+                                                        </span>
+                                                        <p class="m-0 text-[length:var(--fs-body)] leading-[length:var(--lh-body)] font-normal text-neutral-500 font-body">
+                                                            {c.means}
+                                                        </p>
+                                                    </div>
+                                                )}
+                                            </div>
+                                        </div>
+
+                                        <!-- Right Visual Column (Green Placeholder) -->
+                                        <div
+                                            class="aspect-[16/10] sm:aspect-[16/9] lg:aspect-auto lg:h-full w-full rounded-xl bg-visual-placeholder lg:flex-1 min-h-[260px] lg:min-h-[340px]"
+                                            aria-hidden="true"
+                                        />
+                                    </article>
+                                </div>
+                            );
+                        })}
+                    </div>
+                </div>
+            )
+        }
+
+        <!-- Closing Note Below Card -->
+        {
+            closingNote && (
+                <p class="m-0 mt-6 lg:mt-8 font-body text-[length:var(--fs-body-lg)] leading-[length:var(--lh-body-lg)] font-normal max-w-240 text-neutral-500">
+                    {closingNote}
+                </p>
+            )
+        }
+    </div>
+</section>
+
+<style is:global>
+    /* Single-card visibility */
+    .country-slide.is-hidden {
+        display: none !important;
+    }
+
+    .country-slide.active-slide {
+        display: block !important;
+        animation: slideUpFadeIn 0.45s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        will-change: transform, opacity;
+    }
+
+    @keyframes slideUpFadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(28px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+</style>
+
+<script is:inline>
+    document.addEventListener("DOMContentLoaded", () => {
+        const sections = document.querySelectorAll("[data-dropdown-section]");
+
+        sections.forEach((section) => {
+            const dropdown = section.querySelector("[data-country-dropdown]");
+            const slides = Array.from(
+                section.querySelectorAll(".country-slide"),
+            );
+
+            if (!slides.length) return;
+
+            let currentIndex = 0;
+
+            function goToSlide(index) {
+                if (index < 0) index = slides.length - 1;
+                if (index >= slides.length) index = 0;
+                currentIndex = index;
+
+                // Only show the active slide, strictly hide all others
+                slides.forEach((slide, i) => {
+                    if (i === currentIndex) {
+                        slide.classList.remove("is-hidden");
+                        slide.classList.add("active-slide");
+                        slide.style.setProperty("display", "block", "important");
+                    } else {
+                        slide.classList.remove("active-slide");
+                        slide.classList.add("is-hidden");
+                        slide.style.setProperty("display", "none", "important");
+                    }
+                });
+
+                const activeCountry =
+                    slides[currentIndex].getAttribute("data-country");
+
+                // Update dropdown trigger label
+                section
+                    .querySelectorAll(".country-dropdown-label")
+                    .forEach((lbl) => {
+                        lbl.textContent = activeCountry;
+                    });
+
+                // Update dropdown options styling and aria-selected state
+                section
+                    .querySelectorAll(".country-dropdown-option")
+                    .forEach((opt) => {
+                        const val =
+                            opt.getAttribute("data-value") ||
+                            opt.textContent?.trim();
+                        const isSelected = val === activeCountry;
+                        opt.setAttribute(
+                            "aria-selected",
+                            isSelected ? "true" : "false",
+                        );
+                        if (isSelected) {
+                            opt.classList.add(
+                                "bg-neutral-100",
+                                "text-neutral-600",
+                                "font-medium",
+                            );
+                            opt.classList.remove(
+                                "text-neutral-500",
+                                "bg-generic-00",
+                            );
+                        } else {
+                            opt.classList.remove(
+                                "bg-neutral-100",
+                                "text-neutral-600",
+                            );
+                            opt.classList.add(
+                                "text-neutral-500",
+                                "bg-generic-00",
+                                "font-medium",
+                            );
+                        }
+                    });
+            }
+
+            // Country dropdown interactive behavior
+            if (dropdown) {
+                const trigger = dropdown.querySelector(
+                    ".country-dropdown-trigger",
+                );
+                const menu = dropdown.querySelector(".country-dropdown-menu");
+                const chevron = dropdown.querySelector(
+                    ".country-dropdown-chevron",
+                );
+
+                if (trigger && menu) {
+                    const closeMenu = () => {
+                        menu.classList.add("hidden");
+                        chevron?.classList.remove("rotate-180");
+                        trigger.setAttribute("aria-expanded", "false");
+                    };
+
+                    const openMenu = () => {
+                        menu.classList.remove("hidden");
+                        chevron?.classList.add("rotate-180");
+                        trigger.setAttribute("aria-expanded", "true");
+                    };
+
+                    trigger.addEventListener("click", (e) => {
+                        e.stopPropagation();
+                        const isExpanded =
+                            trigger.getAttribute("aria-expanded") === "true";
+                        if (isExpanded) {
+                            closeMenu();
+                        } else {
+                            openMenu();
+                        }
+                    });
+
+                    const options = dropdown.querySelectorAll(
+                        ".country-dropdown-option",
+                    );
+                    options.forEach((opt, idx) => {
+                        opt.addEventListener("click", (e) => {
+                            e.stopPropagation();
+                            goToSlide(idx);
+                            closeMenu();
+                        });
+                    });
+                }
+            }
+        });
+
+        // Close dropdown on clicking outside
+        document.addEventListener("click", (e) => {
+            if (!e.target.closest("[data-country-dropdown]")) {
+                document
+                    .querySelectorAll(".country-dropdown-menu")
+                    .forEach((m) => m.classList.add("hidden"));
+                document
+                    .querySelectorAll(".country-dropdown-chevron")
+                    .forEach((c) => c.classList.remove("rotate-180"));
+                document
+                    .querySelectorAll(".country-dropdown-trigger")
+                    .forEach((t) => t.setAttribute("aria-expanded", "false"));
+            }
+        });
+
+        // Close dropdown on escape key
+        document.addEventListener("keydown", (e) => {
+            if (e.key === "Escape") {
+                document
+                    .querySelectorAll(".country-dropdown-menu")
+                    .forEach((m) => m.classList.add("hidden"));
+                document
+                    .querySelectorAll(".country-dropdown-chevron")
+                    .forEach((c) => c.classList.remove("rotate-180"));
+                document
+                    .querySelectorAll(".country-dropdown-trigger")
+                    .forEach((t) => t.setAttribute("aria-expanded", "false"));
+            }
+        });
+    });
+</script>
