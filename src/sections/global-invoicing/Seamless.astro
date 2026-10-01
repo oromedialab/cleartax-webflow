@@ -1,8 +1,18 @@
 ---
 /**
- * Seamless integrations / compliance / support accordion.
+ * Seamless integrations / compliance / support.
  * Ported from global-e-invoicing-mandate-page/index.html:3076-3467.
- * Accordion selects one of three panels (compliance / integrations / support).
+ *
+ * Desktop (lg+): original two-column layout — a vertical accordion-style list
+ * of tab headers on the left (each reveals a one-line description when
+ * active), a single shared visual pane on the right that the script swaps
+ * between `[data-ssr-graphic]` panels.
+ *
+ * Mobile (<lg): a horizontal, scrollable tab bar up top; tapping a tab swaps
+ * a single panel below it that holds that tab's description AND its visual
+ * (cards / logo grid / icon grid / image) together — a plain tab switcher,
+ * not an accordion. Separate markup and a separate, independent script from
+ * the desktop block; the two never interact.
  */
 
 const complianceCardsRow1 = [
@@ -106,6 +116,13 @@ const securityCards = [
     desc: "Regulatory-compliant data privacy",
   },
 ];
+
+const mobileTabs = [
+  { key: "compliance", label: "Compliance" },
+  { key: "integrations", label: "Integrations" },
+  { key: "security", label: "Security" },
+  { key: "support", label: "Service and Support" },
+];
 ---
 
 <section
@@ -119,8 +136,224 @@ const securityCards = [
         Seamless integrations, compliance &amp; dependable support
       </h2>
     </div>
+
+    <!-- Mobile (<lg): sliding-pill tab bar + single switched panel. Same
+         tablist pattern as india-homepage/MakingAiWork.astro — a moving
+         `.gi-mtab-thumb` behind the active tab rather than per-tab background
+         classes, inline `display` on the panels (not a class) so they can't
+         race another unlayered utility once pasted into Webflow. -->
+    <div class="lg:hidden" data-mobile-tabs-root>
+      <div
+        class="gi-mtab-tablist relative flex max-w-full items-center gap-1 overflow-x-auto rounded-xl bg-neutral-100 px-1 py-1.5"
+        role="tablist"
+        aria-label="Seamless integrations by category"
+      >
+        <span class="gi-mtab-thumb" aria-hidden="true"></span>
+        {
+          mobileTabs.map((t, i) => (
+            <button
+              type="button"
+              role="tab"
+              id={`gi-mtab-tab-${t.key}`}
+              class="gi-mtab-tab relative z-10 shrink-0 cursor-pointer whitespace-nowrap rounded-lg border-0 bg-transparent px-6 py-2 text-center font-body text-[length:var(--fs-label)] leading-[length:var(--lh-label)] font-medium text-neutral-700"
+              aria-selected={i === 0 ? "true" : "false"}
+              aria-controls={`gi-mtab-panel-${t.key}`}
+              tabindex={i === 0 ? 0 : -1}
+              data-gi-mtab={t.key}
+            >
+              {t.label}
+            </button>
+          ))
+        }
+      </div>
+
+      <div class="mt-5">
+        <div
+          id="gi-mtab-panel-compliance"
+          role="tabpanel"
+          aria-labelledby="gi-mtab-tab-compliance"
+          data-gi-mtab-panel="compliance"
+        >
+          <p class="text-[length:var(--fs-body)]! font-normal! text-black/50! leading-[length:var(--lh-body)]! m-0! mb-4!">
+            Powering Global e-Invoicing Alongside Regulators
+          </p>
+          <div class="grid gap-3.5 grid-cols-1 sm:grid-cols-2 w-full">
+            {
+              complianceCardsRow1.map((c) => (
+                <div class="bg-generic-00 rounded-[12px] p-4 flex flex-col transition-[transform,box-shadow] duration-200 border border-black/12">
+                  <div class="flex gap-4 flex-wrap items-center min-h-[34px] mb-[36px] sm:gap-3">
+                    {c.flags.map((f) => (
+                      <img src={f} alt="" class="w-10 h-auto" loading="lazy" decoding="async" />
+                    ))}
+                  </div>
+                  <div class="flex flex-col h-full justify-end">
+                    <div class="text-[length:var(--fs-body)] font-semibold mb-2 leading-[length:var(--lh-body)] text-[var(--color-dark)]">
+                      {c.name}
+                    </div>
+                    <p class="text-[length:var(--fs-body-sm)] text-[var(--color-gray-500)] leading-[length:var(--lh-body-sm)] font-normal m-0">
+                      {c.desc}
+                    </p>
+                  </div>
+                </div>
+              ))
+            }
+            {
+              complianceCardsRow2.map((c) => (
+                <div class="bg-generic-00 rounded-[12px] p-4 flex flex-col transition-[transform,box-shadow] duration-200 border border-black/12">
+                  <div class="flex gap-4 flex-wrap items-center min-h-[34px] mb-[36px] sm:gap-3">
+                    <img src={c.flag} alt="" class="w-10 h-auto" loading="lazy" decoding="async" />
+                  </div>
+                  <div class="flex flex-col h-full justify-end">
+                    <div class="text-[length:var(--fs-body)] font-semibold mb-2 leading-[length:var(--lh-body)] text-[var(--color-dark)]">
+                      {c.name}
+                    </div>
+                    <p class="text-[length:var(--fs-body-sm)] text-[var(--color-gray-500)] leading-[length:var(--lh-body-sm)] font-normal m-0">
+                      {c.desc}
+                    </p>
+                  </div>
+                </div>
+              ))
+            }
+          </div>
+        </div>
+
+        <div
+          id="gi-mtab-panel-integrations"
+          role="tabpanel"
+          aria-labelledby="gi-mtab-tab-integrations"
+          style="display:none"
+          data-gi-mtab-panel="integrations"
+        >
+          <p class="text-[length:var(--fs-body)]! font-normal! text-black/50! leading-[length:var(--lh-body)]! m-0! mb-4!">
+            Deep integrations means minimal to no changes in your daily
+            workflow
+          </p>
+          <div class="w-full rounded-[14px] border border-black/10 bg-generic-00 flex flex-col p-6">
+            <div class="mb-5">
+              <h3 class="m-0 text-[length:var(--fs-h6)] font-medium leading-[length:var(--lh-h6)] text-vault-navy">
+                Multiple Systems
+              </h3>
+              <p class="m-0 mt-2 text-[length:var(--fs-body)] text-neutral-500 font-normal leading-[length:var(--lh-body)]">
+                EPRs, POS, Handheld systems
+              </p>
+            </div>
+            <div class="w-full mb-8 flex flex-col gap-3 sm:gap-4">
+              <div class="grid grid-cols-4 gap-3 sm:gap-4">
+                <div class="bg-generic-00 rounded-[8px] shadow-sm border border-black/5 min-h-15 flex items-center justify-center p-3">
+                  <img src="https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6a8d790081c75dc61c33ce75_integration-logo-1.png" alt="Logo 1" class="max-h-8 w-auto object-contain" loading="lazy" decoding="async" />
+                </div>
+                <div class="bg-generic-00 rounded-[8px] shadow-sm border border-black/5 min-h-15 flex items-center justify-center p-3">
+                  <img src="https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6a8d7907ea849ad69964661e_integration-logo-2.png" alt="Logo 2" class="max-h-8 w-auto object-contain" loading="lazy" decoding="async" />
+                </div>
+                <div class="bg-generic-00 rounded-[8px] shadow-sm border border-black/5 min-h-15 flex items-center justify-center p-3">
+                  <img src="https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6a8d790c06c0ef7ae5ed1090_integration-logo-3.png" alt="Logo 3" class="max-h-8 w-auto object-contain" loading="lazy" decoding="async" />
+                </div>
+                <div class="bg-generic-00 rounded-[8px] shadow-sm border border-black/5 min-h-15 flex items-center justify-center p-3">
+                  <img src="https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6a8d791276f0e1022c853905_integration-logo-4.png" alt="Logo 3" class="max-h-8 w-auto object-contain" loading="lazy" decoding="async" />
+                </div>
+              </div>
+              <div class="grid grid-cols-4 gap-3 sm:gap-4">
+                <div class="bg-generic-00 rounded-[8px] shadow-sm border border-black/5 min-h-15 flex items-center justify-center p-3">
+                  <img src="https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6a8d791aa74f509e0c3e01a6_integration-logo-5.png" alt="Logo 4" class="max-h-8 w-auto object-contain" loading="lazy" decoding="async" />
+                </div>
+                <div class="bg-generic-00 rounded-[8px] shadow-sm border border-black/5 min-h-15 flex items-center justify-center p-3">
+                  <img src="https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6a8d792462236fe25ed8bd17_integration-logo-6.png" alt="Logo 5" class="max-h-8 w-auto object-contain" loading="lazy" decoding="async" />
+                </div>
+                <div class="bg-generic-00 rounded-[8px] shadow-sm border border-black/5 min-h-15 flex items-center justify-center p-3">
+                  <img src="https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6a8d792b62ee0e705e570a67_integration-logo-7.png" alt="Logo 6" class="max-h-8 w-auto object-contain" loading="lazy" decoding="async" />
+                </div>
+                <div class="bg-generic-00 rounded-[8px] shadow-sm border border-black/5 min-h-15 flex items-center justify-center p-3">
+                  <img src="https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6a8d7930fc483189b07616fa_integration-logo-8.png" alt="Logo 7" class="max-h-8 w-auto object-contain" loading="lazy" decoding="async" />
+                </div>
+              </div>
+            </div>
+            <div class="grid grid-cols-2 gap-6 mt-auto">
+              <div>
+                <div class="text-[length:var(--fs-h5)] font-medium leading-[length:var(--lh-h5)] text-vault-navy">
+                  2,000+
+                </div>
+                <p class="m-0 text-[length:var(--fs-body)] text-neutral-500 font-normal leading-[length:var(--lh-body)]">
+                  Successful Integrations
+                </p>
+              </div>
+              <div>
+                <div class="text-[length:var(--fs-h5)] font-medium leading-[length:var(--lh-h5)] text-vault-navy">
+                  1000+
+                </div>
+                <p class="m-0 text-[length:var(--fs-body)] text-neutral-500 font-normal leading-[length:var(--lh-body)]">
+                  Engineers
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div
+          id="gi-mtab-panel-security"
+          role="tabpanel"
+          aria-labelledby="gi-mtab-tab-security"
+          style="display:none"
+          data-gi-mtab-panel="security"
+        >
+          <p class="text-[length:var(--fs-body)]! font-normal! text-black/50! leading-[length:var(--lh-body)]! m-0! mb-4!">
+            Powering Global e-Invoicing Alongside Regulators
+          </p>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full">
+            {
+              securityCards.map((card) => (
+                <div class="bg-generic-00 rounded-[12px] p-5 flex items-start gap-4 transition-[transform,box-shadow] duration-200 border border-neutral-300">
+                  <div class="flex items-center justify-center shrink-0 w-10 h-10">
+                    <img src={card.icon} alt="icon" loading="lazy" decoding="async" />
+                  </div>
+                  <div class="flex flex-col flex-1">
+                    <div class="text-[length:var(--fs-body)] leading-[length:var(--lh-body)] font-medium mb-2 text-[var(--color-dark)]">
+                      {card.title}
+                    </div>
+                    <p class="text-[length:var(--fs-body-sm)] text-[var(--color-gray-500)] leading-[length:var(--lh-body-sm)] font-normal m-0">
+                      {card.desc}
+                    </p>
+                  </div>
+                </div>
+              ))
+            }
+          </div>
+        </div>
+
+        <div
+          id="gi-mtab-panel-support"
+          role="tabpanel"
+          aria-labelledby="gi-mtab-tab-support"
+          style="display:none"
+          data-gi-mtab-panel="support"
+        >
+          <p class="text-[length:var(--fs-body)]! font-normal! text-black/50! leading-[length:var(--lh-body)]! m-0! mb-4!">
+            End-to-end assistance for your business
+          </p>
+          <div class="w-full rounded-[14px] border border-black/10 bg-[#FDFDF8] p-4">
+            <h3 class="m-0 text-[length:var(--fs-body-lg)] font-medium leading-[length:var(--lh-body-lg)] text-black">
+              360° Support
+            </h3>
+            <p class="m-0 mt-3 mb-4 text-[length:var(--fs-body)] leading-[length:var(--lh-body)] text-black font-normal">
+              End-to-end assistance from onboarding to ongoing optimization
+              for your business
+            </p>
+            <div class="relative w-full h-[200px] overflow-hidden rounded-[10px]">
+              <img
+                src="https://cdn.prod.website-files.com/63ede4a3da6dbd6b05c4612f/69f32b6d22f58630b6926564_mandate-logos-1.png"
+                alt=""
+                class="w-full h-full object-contain"
+                loading="lazy"
+                decoding="async"
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Desktop (lg+): original vertical accordion list + shared visual pane -->
     <div
-      class="grid grid-cols-1 lg:grid-cols-[340px_1fr] gap-6 items-start lg:gap-8"
+      class="hidden lg:grid lg:grid-cols-[340px_1fr] gap-6 items-start lg:gap-8"
     >
       <div class="flex flex-col" data-ssr-root>
         <div
@@ -283,7 +516,7 @@ const securityCards = [
                 <div class="lg:col-span-3 md:col-span-3 bg-generic-00 rounded-[12px] p-4 flex flex-col transition-[transform,box-shadow] duration-200 border border-black/12">
                   <div class="flex gap-4 flex-wrap items-center min-h-[34px] mb-[36px] sm:gap-3">
                     {c.flags.map((f) => (
-                      <img src={f} alt="" class="w-10 h-auto" />
+                      <img src={f} alt="" class="w-10 h-auto" loading="lazy" decoding="async" />
                     ))}
                   </div>
                   <div class="flex flex-col h-full justify-end">
@@ -301,7 +534,7 @@ const securityCards = [
               complianceCardsRow2.map((c) => (
                 <div class="lg:col-span-3 md:col-span-3 bg-generic-00 rounded-[12px] p-4 flex flex-col transition-[transform,box-shadow] duration-200 border border-black/12">
                   <div class="flex gap-4 flex-wrap items-center min-h-[34px] mb-[36px] sm:gap-3">
-                    <img src={c.flag} alt="" class="w-10 h-auto" />
+                    <img src={c.flag} alt="" class="w-10 h-auto" loading="lazy" decoding="async" />
                   </div>
                   <div class="flex flex-col h-full justify-end">
                     <div class="text-[length:var(--fs-body)] font-semibold mb-2 leading-[length:var(--lh-body)] text-[var(--color-dark)]">
@@ -333,36 +566,36 @@ const securityCards = [
                 EPRs, POS, Handheld systems
               </p>
             </div>
-            
+
             <!-- Middle Section (Logo Grid) -->
             <div class="w-full mb-8 flex flex-col gap-3 sm:gap-4">
               <div class="grid grid-cols-4 gap-3 sm:gap-4">
                 <div class="bg-generic-00 rounded-[8px] shadow-sm border border-black/5 min-h-15 flex items-center justify-center p-3">
-                  <img src="https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6a8d790081c75dc61c33ce75_integration-logo-1.png" alt="Logo 1" class="max-h-8 w-auto object-contain" />
+                  <img src="https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6a8d790081c75dc61c33ce75_integration-logo-1.png" alt="Logo 1" class="max-h-8 w-auto object-contain" loading="lazy" decoding="async" />
                 </div>
                 <div class="bg-generic-00 rounded-[8px] shadow-sm border border-black/5 min-h-15 flex items-center justify-center p-3">
-                  <img src="https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6a8d7907ea849ad69964661e_integration-logo-2.png" alt="Logo 2" class="max-h-8 w-auto object-contain" />
+                  <img src="https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6a8d7907ea849ad69964661e_integration-logo-2.png" alt="Logo 2" class="max-h-8 w-auto object-contain" loading="lazy" decoding="async" />
                 </div>
                 <div class="bg-generic-00 rounded-[8px] shadow-sm border border-black/5 min-h-15 flex items-center justify-center p-3">
-                  <img src="https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6a8d790c06c0ef7ae5ed1090_integration-logo-3.png" alt="Logo 3" class="max-h-8 w-auto object-contain" />
+                  <img src="https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6a8d790c06c0ef7ae5ed1090_integration-logo-3.png" alt="Logo 3" class="max-h-8 w-auto object-contain" loading="lazy" decoding="async" />
                 </div>
                 <div class="bg-generic-00 rounded-[8px] shadow-sm border border-black/5 min-h-15 flex items-center justify-center p-3">
-                  <img src="https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6a8d791276f0e1022c853905_integration-logo-4.png" alt="Logo 3" class="max-h-8 w-auto object-contain" />
+                  <img src="https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6a8d791276f0e1022c853905_integration-logo-4.png" alt="Logo 3" class="max-h-8 w-auto object-contain" loading="lazy" decoding="async" />
                 </div>
               </div>
-              
+
               <div class="grid grid-cols-4 gap-3 sm:gap-4">
                 <div class="bg-generic-00 rounded-[8px] shadow-sm border border-black/5 min-h-15 flex items-center justify-center p-3">
-                  <img src="https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6a8d791aa74f509e0c3e01a6_integration-logo-5.png" alt="Logo 4" class="max-h-8 w-auto object-contain" />
+                  <img src="https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6a8d791aa74f509e0c3e01a6_integration-logo-5.png" alt="Logo 4" class="max-h-8 w-auto object-contain" loading="lazy" decoding="async" />
                 </div>
                 <div class="bg-generic-00 rounded-[8px] shadow-sm border border-black/5 min-h-15 flex items-center justify-center p-3">
-                  <img src="https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6a8d792462236fe25ed8bd17_integration-logo-6.png" alt="Logo 5" class="max-h-8 w-auto object-contain" />
+                  <img src="https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6a8d792462236fe25ed8bd17_integration-logo-6.png" alt="Logo 5" class="max-h-8 w-auto object-contain" loading="lazy" decoding="async" />
                 </div>
                 <div class="bg-generic-00 rounded-[8px] shadow-sm border border-black/5 min-h-15 flex items-center justify-center p-3">
-                  <img src="https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6a8d792b62ee0e705e570a67_integration-logo-7.png" alt="Logo 6" class="max-h-8 w-auto object-contain" />
+                  <img src="https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6a8d792b62ee0e705e570a67_integration-logo-7.png" alt="Logo 6" class="max-h-8 w-auto object-contain" loading="lazy" decoding="async" />
                 </div>
                 <div class="bg-generic-00 rounded-[8px] shadow-sm border border-black/5 min-h-15 flex items-center justify-center p-3">
-                  <img src="https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6a8d7930fc483189b07616fa_integration-logo-8.png" alt="Logo 7" class="max-h-8 w-auto object-contain" />
+                  <img src="https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6a8d7930fc483189b07616fa_integration-logo-8.png" alt="Logo 7" class="max-h-8 w-auto object-contain" loading="lazy" decoding="async" />
                 </div>
               </div>
             </div>
@@ -403,7 +636,7 @@ const securityCards = [
                     class="bg-generic-00 rounded-[12px] p-5 flex items-start gap-4 transition-[transform,box-shadow] duration-200 border border-neutral-300"
                   >
                     <div class="flex items-center justify-center shrink-0 w-10 h-10">
-                        <img src={card.icon} alt="icon" />
+                        <img src={card.icon} alt="icon" loading="lazy" decoding="async" />
                     </div>
                     <div class="flex flex-col flex-1">
                       <div class="text-[length:var(--fs-body)] leading-[length:var(--lh-body)] font-medium mb-2 text-[var(--color-dark)]">
@@ -448,6 +681,8 @@ const securityCards = [
                   src="https://cdn.prod.website-files.com/63ede4a3da6dbd6b05c4612f/69f32b6d22f58630b6926564_mandate-logos-1.png"
                   alt=""
                   class="w-full h-full object-contain"
+                  loading="lazy"
+                  decoding="async"
                 />
               </div>
             </div>
@@ -527,14 +762,61 @@ const securityCards = [
       black 100%
     );
   }
+
+  /* Mobile tab bar — same sliding-pill pattern as
+     india-homepage/MakingAiWork.astro's .ih-maiw-tablist. */
+  .gi-mtab-tab {
+    transition: color 0.2s ease;
+  }
+
+  .gi-mtab-tab[aria-selected="true"] {
+    color: var(--color-nova-blue);
+  }
+
+  .gi-mtab-thumb {
+    position: absolute;
+    top: 6px;
+    bottom: 6px;
+    left: 0;
+    width: 0;
+    border-radius: 8px;
+    background-color: var(--color-generic-00);
+    box-shadow:
+      0 1px 2px 0 rgba(16, 24, 40, 0.04),
+      0 1px 2px 0 rgba(16, 24, 40, 0.04);
+    opacity: 0;
+    transition:
+      transform 0.35s cubic-bezier(0.4, 0, 0.2, 1),
+      width 0.35s cubic-bezier(0.4, 0, 0.2, 1),
+      opacity 0.2s ease;
+  }
+
+  .gi-mtab-tablist.is-ready .gi-mtab-thumb {
+    opacity: 1;
+  }
+
+  /* No JS, no thumb — so the current pill paints its own background instead. */
+  .gi-mtab-tablist:not(.is-ready) .gi-mtab-tab[aria-selected="true"] {
+    background-color: var(--color-generic-00);
+    box-shadow:
+      0 1px 2px 0 rgba(16, 24, 40, 0.04),
+      0 1px 2px 0 rgba(16, 24, 40, 0.04);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .gi-mtab-thumb {
+      transition: opacity 0.2s ease;
+    }
+  }
 </style>
 
 <script is:inline>
+  // Desktop (lg+): vertical accordion list driving the shared visual pane.
   (function () {
-    const root = document.currentScript.previousElementSibling;
+    const root = document.querySelector("[data-ssr-root]");
     if (!root) return;
     const items = root.querySelectorAll("[data-ssr]");
-    const graphics = root.querySelectorAll("[data-ssr-graphic]");
+    const graphics = document.querySelectorAll("[data-ssr-graphic]");
     items.forEach((item) => {
       // The header is the first child of the item (the div containing the label and chevron)
       const header = item.firstElementChild;
@@ -544,10 +826,84 @@ const securityCards = [
         items.forEach((i) => i.classList.remove("active"));
         graphics.forEach((g) => g.classList.remove("active"));
         item.classList.add("active");
-        root
+        document
           .querySelector(`[data-ssr-graphic="${key}"]`)
           ?.classList.add("active");
       });
     });
+  })();
+
+  // Mobile (<lg): sliding-pill tab bar, same mechanics as
+  // india-homepage/MakingAiWork.astro's tablist — thumb follows the active
+  // tab's measured position, panels toggle via inline `display`, roving
+  // tabindex + arrow/Home/End keys, remeasure on resize and webfont load.
+  (function () {
+    const tablist = document.querySelector(".gi-mtab-tablist");
+    if (!tablist) return;
+
+    const reduceMotion =
+      window.matchMedia &&
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+    const tabs = Array.prototype.slice.call(tablist.querySelectorAll("[data-gi-mtab]"));
+    const thumb = tablist.querySelector(".gi-mtab-thumb");
+    const panels = tabs.map((tab) =>
+      document.getElementById(`gi-mtab-panel-${tab.getAttribute("data-gi-mtab")}`)
+    );
+    let activeTab = 0;
+
+    function moveThumb(i) {
+      if (!thumb) return;
+      thumb.style.width = tabs[i].offsetWidth + "px";
+      thumb.style.transform = "translateX(" + tabs[i].offsetLeft + "px)";
+      tablist.classList.add("is-ready");
+    }
+
+    // Inline `display`, not a class swap — these panels get pasted into
+    // Webflow's unlayered cascade, where a hiding class could race another
+    // utility on source order. Inline always wins.
+    function selectTab(i) {
+      activeTab = i;
+      tabs.forEach((tab, n) => {
+        tab.setAttribute("aria-selected", n === i ? "true" : "false");
+        tab.tabIndex = n === i ? 0 : -1;
+        if (panels[n]) panels[n].style.display = n === i ? "block" : "none";
+      });
+      moveThumb(i);
+
+      if (tablist.scrollWidth > tablist.clientWidth) {
+        tablist.scrollTo({
+          left: tabs[i].offsetLeft - (tablist.clientWidth - tabs[i].offsetWidth) / 2,
+          behavior: reduceMotion ? "auto" : "smooth",
+        });
+      }
+    }
+
+    tabs.forEach((tab, i) => {
+      tab.addEventListener("click", () => selectTab(i));
+    });
+
+    // Roving tabindex: role="tablist" promises arrow keys move between tabs
+    // and Tab leaves the group entirely.
+    tablist.addEventListener("keydown", (e) => {
+      let next;
+      if (e.key === "Home") next = 0;
+      else if (e.key === "End") next = tabs.length - 1;
+      else if (e.key === "ArrowRight") next = (activeTab + 1) % tabs.length;
+      else if (e.key === "ArrowLeft") next = (activeTab - 1 + tabs.length) % tabs.length;
+      else return;
+
+      e.preventDefault();
+      selectTab(next);
+      tabs[next].focus();
+    });
+
+    moveThumb(0);
+    // The bar can lay out before its webfont arrives, which changes every
+    // tab's width — remeasure rather than leave the thumb on stale geometry.
+    if (document.fonts && document.fonts.ready) {
+      document.fonts.ready.then(() => moveThumb(activeTab));
+    }
+    window.addEventListener("resize", () => moveThumb(activeTab));
   })();
 </script>
