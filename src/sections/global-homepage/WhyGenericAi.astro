@@ -1978,7 +1978,7 @@ html.w-mod-touch * {
                             23 possible duplicates found.
                           </h4>
                           
-                          <div class="gh-ct-card1-result-p opacity-0 flex flex-col gap-0.5 font-body text-[10px] md:text-xs lg:text-sm text-[#4B5563]">
+                          <div class="gh-ct-card1-result-p opacity-0 flex flex-col gap-0.5 font-body text-[10px] md:text-xs lg:text-base text-[#4B5563]">
                             <div class="">
                               <span class="font-semibold text-[#111827]">12</span> <span class="font-normal">repeated invoice numbers</span>
                               <span class="mx-1 text-neutral-400">•</span>
@@ -3289,7 +3289,17 @@ html.w-mod-touch * {
       // sent group bubble, cursor, or ClearTax elements can be orphaned outside
       // their proper containers. This reattaches all elements into their proper
       // containers so all 5 cards stick, layout, and animate identically to local.
+      function restoreCard4SvgPaths() {
+        const svgs = document.querySelectorAll('svg[viewBox="0 0 13 16"]');
+        svgs.forEach((svg) => {
+          if (svg.querySelectorAll("path").length === 0) {
+            svg.innerHTML = '<path d="M11.6834 14.6001H1.18343C1.02872 14.6001 0.880348 14.5386 0.770952 14.4292C0.661556 14.3198 0.600098 14.1715 0.600098 14.0168V1.18343C0.600098 1.02872 0.661556 0.880348 0.770952 0.770952C0.880348 0.661556 1.02872 0.600098 1.18343 0.600098H8.18343L12.2668 4.68343V14.0168C12.2668 14.1715 12.2053 14.3198 12.0959 14.4292C11.9865 14.5386 11.8381 14.6001 11.6834 14.6001Z" stroke="black" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/><path d="M8.18115 0.600098V4.68343H12.2645" stroke="black" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/><path d="M6.14176 11.099C7.26935 11.099 8.18343 10.1849 8.18343 9.05729C8.18343 7.92971 7.26935 7.01562 6.14176 7.01562C5.01418 7.01562 4.1001 7.92971 4.1001 9.05729C4.1001 10.1849 5.01418 11.099 6.14176 11.099Z" stroke="#5446FF" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/><path d="M7.58301 10.502L8.76426 11.6832" stroke="#5446FF" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>';
+          }
+        });
+      }
+
       function stitchCard4Dom() {
+        restoreCard4SvgPaths();
         const stickyOuters = document.querySelectorAll(".gh-why-sticky");
         const sticky5 = stickyOuters[4];
         if (!sticky5) return;
@@ -3630,6 +3640,7 @@ html.w-mod-touch * {
           chartHeader.classList.remove("hidden");
           chartHeader.style.display = "flex";
           chartHeader.style.opacity = "1";
+          restoreCard4SvgPaths();
         }
         if (chart) {
           chart.classList.remove("hidden");
@@ -3693,7 +3704,7 @@ html.w-mod-touch * {
         centerOffset = calcCenterOffset();
         borderLen = updatePillPath();
         if (genericCardComplete[idx]) {
-          if (chartHeader) { chartHeader.classList.remove("hidden"); chartHeader.style.removeProperty("display"); chartHeader.style.display = "flex"; chartHeader.style.opacity = "1"; }
+          if (chartHeader) { chartHeader.classList.remove("hidden"); chartHeader.style.removeProperty("display"); chartHeader.style.display = "flex"; chartHeader.style.opacity = "1"; restoreCard4SvgPaths(); }
           if (chart) { chart.classList.remove("hidden"); chart.classList.add("is-revealed"); chart.style.removeProperty("display"); chart.style.display = "flex"; chart.style.opacity = "1"; }
           if (chartImg) { chartImg.classList.remove("hidden"); chartImg.style.removeProperty("display"); chartImg.style.display = "block"; chartImg.style.opacity = "1"; }
           if (chartBottom) { chartBottom.classList.remove("hidden"); chartBottom.style.removeProperty("display"); chartBottom.style.display = "inline-flex"; chartBottom.style.opacity = "1"; }
@@ -3890,7 +3901,10 @@ html.w-mod-touch * {
         tl.to([bubble, checklist], { opacity: 0, y: -10, duration: 0.35, ease: "power2.in" });
         tl.set([bubble, checklist], { display: "none" });
         tl.add(() => {
-          if (chartHeader) chartHeader.classList.remove("hidden");
+          if (chartHeader) {
+            chartHeader.classList.remove("hidden");
+            restoreCard4SvgPaths();
+          }
           if (chart) {
             chart.classList.remove("hidden");
             chart.classList.add("is-revealed");
