@@ -3468,8 +3468,36 @@ html.w-mod-touch * {
 
           const pill = document.querySelector(`.gh-card${i}-input-pill`);
           const submitBtn = document.querySelector(`.gh-card${i}-submit-btn`);
+          if (pill) {
+            const textWrap = pill.querySelector(".min-w-0.flex-1");
+            const placeholder = document.querySelector(`.gh-card${i}-pill-placeholder`);
+            const typed = document.querySelector(`.gh-card${i}-pill-typed`);
+            const thinking = document.querySelector(`.gh-card${i}-pill-thinking`);
+            if (textWrap) {
+              if (placeholder && !textWrap.contains(placeholder)) textWrap.appendChild(placeholder);
+              if (typed && !textWrap.contains(typed)) textWrap.appendChild(typed);
+              if (thinking && !textWrap.contains(thinking)) textWrap.appendChild(thinking);
+            }
+          }
           if (pill && submitBtn && !pill.contains(submitBtn)) {
             pill.appendChild(submitBtn);
+          }
+
+          // Also reattach ClearTax AI input box text elements if orphaned across embeds
+          const ctPill = document.querySelector(`.gh-ct-card${i}-input-box`);
+          if (ctPill) {
+            const ctTextWrap = ctPill.querySelector(".min-w-0.flex-1");
+            const ctPlaceholder = document.querySelector(`.gh-ct-card${i}-pill-placeholder`);
+            const ctThinking = document.querySelector(`.gh-ct-card${i}-pill-thinking`);
+            const ctSubmitBtn = document.querySelector(`.gh-ct-card${i}-submit-btn`);
+            const ctRow = ctPill.querySelector(".flex.w-full.items-center.gap-2") || ctPill;
+            if (ctTextWrap) {
+              if (ctPlaceholder && !ctTextWrap.contains(ctPlaceholder)) ctTextWrap.appendChild(ctPlaceholder);
+              if (ctThinking && !ctTextWrap.contains(ctThinking)) ctTextWrap.appendChild(ctThinking);
+            }
+            if (ctSubmitBtn && !ctRow.contains(ctSubmitBtn)) {
+              ctRow.appendChild(ctSubmitBtn);
+            }
           }
 
           // Reattach any orphaned thinking dots and remove empty .w-embed wrappers inside the pill
@@ -3706,6 +3734,7 @@ html.w-mod-touch * {
 
     // --- GENERIC CARDS GSAP ANIMATION SEQUENCE ---
     function initGenericCardFlow(idx) {
+      stitchWebflowEmbeds();
       const card = document.querySelector(`.gh-why-generic-card-${idx}`);
       if (!card) return;
 
@@ -4147,6 +4176,7 @@ html.w-mod-touch * {
 
     // --- CLEARTAX CARDS GSAP ANIMATION SEQUENCE ---
     function initClearTaxCardFlow(idx) {
+      stitchWebflowEmbeds();
       const card = document.querySelector(`.gh-why-animation-card-${idx}`);
       if (!card) return;
 
@@ -4163,8 +4193,8 @@ html.w-mod-touch * {
       const inputChip = card.querySelector(`.gh-ct-card${idx}-input-chip`);
       const inputTyped = card.querySelector(`.gh-ct-card${idx}-input-typed`);
       const typedText = card.querySelector(`.gh-ct-card${idx}-typed-text`);
-      const pillPlaceholder = card.querySelector(`.gh-ct-card${idx}-pill-placeholder`);
-      const pillThinking = card.querySelector(`.gh-ct-card${idx}-pill-thinking`);
+      const pillPlaceholder = card.querySelector(`.gh-ct-card${idx}-pill-placeholder`) || document.querySelector(`.gh-ct-card${idx}-pill-placeholder`);
+      const pillThinking = card.querySelector(`.gh-ct-card${idx}-pill-thinking`) || document.querySelector(`.gh-ct-card${idx}-pill-thinking`);
       const submitBtn = card.querySelector(`.gh-ct-card${idx}-submit-btn`);
       const cursor = card.querySelector(`.gh-ct-card${idx}-cursor`);
 
@@ -4525,6 +4555,7 @@ html.w-mod-touch * {
 
         tl.set([chipWrapper, ...chipsToAnimate], { display: "none" });
         if (inputTyped) tl.set(inputTyped, { display: "none" });
+        tl.set(pillThinking, { display: "flex" });
         tl.to(pillThinking, { opacity: 1, duration: 0.25, ease: "power2.out" }, "<");
 
         // Top-right sent group (chip + dashed bubble) springs into view
@@ -4669,6 +4700,8 @@ html.w-mod-touch * {
 
         // In input box: "Thinking..." fades out, "Ask anything..." returns
         tl.to(pillThinking, { opacity: 0, duration: 0.2 }, "<");
+        tl.set(pillThinking, { display: "none" });
+        tl.set(pillPlaceholder, { display: "flex" });
         tl.to(pillPlaceholder, { opacity: 1, duration: 0.25 }, "<+=0.1");
 
         // Viewport IntersectionObserver: Trigger once when 50% of ClearTax card is visible
