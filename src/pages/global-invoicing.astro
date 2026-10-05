@@ -32,6 +32,25 @@ import Footer from "../sections/global-invoicing/Footer.astro";
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!--
+      Usercentrics CMP loads immediately — not gated behind the interaction-or-
+      timeout bucket further down. Two reasons: the autoblocker only blocks
+      trackers it loads ahead of, so it has to precede GTM; and gating it meant
+      its consent banner painted 4s+ into page life after its own chain of ~10
+      sequential script loads, and — since a lab run never "interacts" — kept
+      getting picked up as a later, larger LCP candidate. PageSpeed flagged this
+      exact element ("privacy-text") with an 8,080ms render delay, which is most
+      of the mobile LCP budget. GTM and everything it fires (ads/analytics/FB/
+      Bing/Clarity) stay deferred below; none of that paints visible content.
+    -->
+    <script src="https://web.cmp.usercentrics.eu/modules/autoblocker.js"></script>
+    <script
+      is:inline
+      id="usercentrics-cmp"
+      src="https://web.cmp.usercentrics.eu/ui/loader.js"
+      data-settings-id="utqqyaEbvbzrTk"
+      async
+    ></script>
     <title>Global E-Invoicing Compliance Software | ClearTax</title>
     <meta
       name="description"
@@ -84,13 +103,18 @@ import Footer from "../sections/global-invoicing/Footer.astro";
     />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <!-- The hero thumbnail below is preloaded at fetchpriority=high; without this
+         preconnect that preload still pays a cold DNS+TLS round trip to YouTube. -->
+    <link rel="preconnect" href="https://img.youtube.com" />
+    <!-- One request for both families instead of two — each is a separate
+         render-blocking round trip to fonts.googleapis.com. Inter is also
+         narrowed to the only weights this page actually sets on font-body
+         text (400/500/600, never italic) instead of the full variable axis
+         (every weight 100-900, upright AND italic, opsz 14-32) — that full
+         axis was a single ~45KB file for three static weights. -->
     <link
-      href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Inter+Tight:wght@400;500;600;700&display=swap"
       rel="stylesheet"
-    />
-    <link 
-      href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600;700&display=swap" 
-      rel="stylesheet" 
     />
     <!-- Preload critical above-the-fold assets -->
     <link
@@ -133,19 +157,12 @@ import Footer from "../sections/global-invoicing/Footer.astro";
             f.parentNode.insertBefore(j, f);
           })(window, document, "script", "dataLayer", "GTM-P5NDQXGH");
 
-          // Load Usercentrics autoblocker
-          var blockScript = document.createElement("script");
-          blockScript.src =
-            "https://web.cmp.usercentrics.eu/modules/autoblocker.js";
-          document.head.appendChild(blockScript);
-
-          // Load Usercentrics loader
-          var cmpScript = document.createElement("script");
-          cmpScript.id = "usercentrics-cmp";
-          cmpScript.src = "https://web.cmp.usercentrics.eu/ui/loader.js";
-          cmpScript.setAttribute("data-settings-id", "utqqyaEbvbzrTk");
-          cmpScript.async = true;
-          document.head.appendChild(cmpScript);
+          // Load the HubSpot forms SDK (~330KB across its own sub-requests) —
+          // ContactFormRb already polls for window.hbspt and listens for this
+          // script's load event, so it's safe to arrive this late.
+          var hsScript = document.createElement("script");
+          hsScript.src = "https://js-na2.hsforms.net/forms/embed/v2.js";
+          document.head.appendChild(hsScript);
         }
 
         const triggerEvents = [
@@ -204,15 +221,10 @@ import Footer from "../sections/global-invoicing/Footer.astro";
         }
       })();
     </script>
-    <!-- Preconnect to HubSpot CDNs -->
+    <!-- PageSpeed flagged forms.hsforms.com / forms-na2.hsforms.com as unused
+         preconnects — the form only submits there after a visitor fills it in;
+         js-na2.hsforms.net is the one the deferred embed script itself needs. -->
     <link rel="preconnect" href="https://js-na2.hsforms.net" />
-    <link rel="preconnect" href="https://forms.hsforms.com" />
-    <link rel="preconnect" href="https://forms-na2.hsforms.com" />
-
-    <!-- HubSpot Embed Script -->
-    <script is:inline defer src="https://js-na2.hsforms.net/forms/embed/v2.js"
-    ></script>
-
   </head>
   <body class="bg-generic-00">
     <!-- Google Tag Manager (noscript) -->

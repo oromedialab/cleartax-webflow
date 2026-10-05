@@ -367,6 +367,7 @@ const {
 
     let lastTime = performance.now();
     let isFirstFrame = true;
+    let rafRunning = false;
 
     function draw(time) {
       if (dots.length === 0) {
@@ -479,12 +480,28 @@ const {
         paint();
         isFirstFrame = false;
       }
+
+      // Idle field: stop requesting frames instead of burning the main thread
+      // forever — on a touch device there is never a pointer to animate toward,
+      // so without this the loop recomputes every dot's distance every frame,
+      // for the life of the page, for nothing. mousemove below restarts it.
+      if (moving) {
+        requestAnimationFrame(draw);
+      } else {
+        rafRunning = false;
+      }
+    }
+
+    function ensureRunning() {
+      if (rafRunning) return;
+      rafRunning = true;
+      lastTime = performance.now();
       requestAnimationFrame(draw);
     }
 
     window.addEventListener('resize', initGrid);
     initGrid();
-    requestAnimationFrame(draw);
+    ensureRunning();
 
     section.addEventListener('mousemove', (e) => {
       const rect = canvas.getBoundingClientRect();
@@ -506,6 +523,7 @@ const {
       hover = true;
       mouse.x = nx;
       mouse.y = ny;
+      ensureRunning();
     });
 
     section.addEventListener('mouseleave', () => {
