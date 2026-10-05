@@ -75,18 +75,20 @@ const {
 
   <!-- Narrow viewports get a top fade instead, where the radial is too tight -->
   <div
-    class="absolute inset-0 z-0 bg-gradient-to-b from-white/85 via-white/50 to-transparent hidden max-[630px]:block pointer-events-none"
+    class="absolute inset-0 z-0 bg-gradient-to-b from-generic-00/85 via-generic-00/50 to-transparent hidden max-[630px]:block pointer-events-none"
   >
   </div>
 
   <!-- Bottom fade, blending the field into the section below -->
   <div
-    class="absolute bottom-0 inset-x-0 h-48 bg-gradient-to-t from-white via-white/50 to-transparent pointer-events-none z-0"
+    class="absolute bottom-0 inset-x-0 h-48 bg-gradient-to-t from-generic-00 via-generic-00/50 to-transparent pointer-events-none z-0"
   >
   </div>
 
   <div class="container mx-auto relative z-10">
-    <div class="mx-auto flex max-w-[791px] flex-col items-center gap-6 text-center">
+    <div
+      class="mx-auto flex max-w-[791px] flex-col items-center gap-6 text-center"
+    >
       <div class="flex flex-col items-center gap-4">
         <h2
           class="m-0 font-heading font-medium text-vault-navy text-[length:var(--fs-h2)] leading-[length:var(--lh-h2)] tracking-[-0.5px]"
@@ -96,8 +98,8 @@ const {
         <p
           class="m-0 font-body text-neutral-500 text-[length:var(--fs-body-lg)] leading-[length:var(--lh-body-lg)]"
         >
-          No spam. A 30-minute call to help you unlock the first finance use-case you
-          can solve.
+          No spam. A 30-minute call to help you unlock the first finance
+          use-case you can solve.
         </p>
       </div>
 
@@ -123,11 +125,11 @@ const {
      The one change from the hero copy is the IntersectionObserver at the bottom:
      this loop only runs while the band is on screen. */
   function initGhCtaGrid() {
-    const section = document.getElementById('gh-cta');
+    const section = document.getElementById("gh-cta");
     if (!section) return;
-    const canvas = document.getElementById('gh-cta-dots');
+    const canvas = document.getElementById("gh-cta-dots");
     if (!canvas || !canvas.getContext) return;
-    const ctx = canvas.getContext('2d');
+    const ctx = canvas.getContext("2d");
 
     function num(name, fallback) {
       const value = parseFloat(section.getAttribute(name));
@@ -135,15 +137,16 @@ const {
     }
 
     const config = {
-      lineWidth: num('data-line-width', 2),
-      gap: num('data-gap', 24),
-      maxLength: num('data-max-length', 6),
-      lengthRadius: num('data-length-radius', 260),
-      tilt: num('data-tilt', 1),
-      baseColor: section.getAttribute('data-base-color') || 'rgba(84, 70, 255, 0.28)',
-      cursorRadius: num('data-cursor-radius', 320),
-      pull: num('data-pull', 14),
-      fadeRadius: num('data-fade-radius', 40),
+      lineWidth: num("data-line-width", 2),
+      gap: num("data-gap", 24),
+      maxLength: num("data-max-length", 6),
+      lengthRadius: num("data-length-radius", 260),
+      tilt: num("data-tilt", 1),
+      baseColor:
+        section.getAttribute("data-base-color") || "rgba(84, 70, 255, 0.28)",
+      cursorRadius: num("data-cursor-radius", 320),
+      pull: num("data-pull", 14),
+      fadeRadius: num("data-fade-radius", 40),
       fadeSpeed: 12,
       followSpeed: 7,
       engageSpeed: 4,
@@ -248,7 +251,7 @@ const {
       ctx.clearRect(0, 0, width, height);
       ctx.strokeStyle = config.baseColor;
       ctx.lineWidth = config.lineWidth;
-      ctx.lineCap = 'round'; // so a stroke shrunk to nothing reads as a dot
+      ctx.lineCap = "round"; // so a stroke shrunk to nothing reads as a dot
 
       // Two passes. Only the strokes the cursor is touching have an alpha of
       // their own; the rest of the field goes down as one path in one stroke
@@ -277,13 +280,14 @@ const {
     }
 
     const reduceMotion =
-      window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      window.matchMedia &&
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
     if (reduceMotion) {
       // Static dot grid. No animation loop, no cursor reaction.
       initGrid();
       paint();
-      window.addEventListener('resize', () => {
+      window.addEventListener("resize", () => {
         initGrid();
         paint();
       });
@@ -317,7 +321,8 @@ const {
       speed += (Math.sqrt(travelX * travelX + travelY * travelY) - speed) * 0.5;
       if (speed < 0.01) speed = 0;
 
-      engagement += ((hover ? Math.min(speed / 6, 1) : 0) - engagement) * engageEase;
+      engagement +=
+        ((hover ? Math.min(speed / 6, 1) : 0) - engagement) * engageEase;
       if (engagement < 0.001) engagement = 0;
 
       // A parked cursor still holds the field open, just more gently.
@@ -327,7 +332,8 @@ const {
       const wantY = hover ? mouse.y : height / 2;
       const swungX = wantX - focusX;
       const swungY = wantY - focusY;
-      let swung = swungX > 0.05 || swungX < -0.05 || swungY > 0.05 || swungY < -0.05;
+      let swung =
+        swungX > 0.05 || swungX < -0.05 || swungY > 0.05 || swungY < -0.05;
       if (swung) {
         focusX += swungX * focusEase;
         focusY += swungY * focusEase;
@@ -436,12 +442,12 @@ const {
       paint();
     }
 
-    window.addEventListener('resize', rebuild);
+    window.addEventListener("resize", rebuild);
     rebuild();
 
     // The gate. IntersectionObserver answers "is it on screen" and nothing else,
     // which is exactly what starting and stopping the loop needs.
-    if ('IntersectionObserver' in window) {
+    if ("IntersectionObserver" in window) {
       const io = new IntersectionObserver(
         (entries) => {
           for (let i = 0; i < entries.length; i++) {
@@ -449,14 +455,14 @@ const {
             else stop();
           }
         },
-        { rootMargin: '200px 0px' }
+        { rootMargin: "200px 0px" },
       );
       io.observe(section);
     } else {
       start();
     }
 
-    section.addEventListener('mousemove', (e) => {
+    section.addEventListener("mousemove", (e) => {
       const rect = canvas.getBoundingClientRect();
       const sx = rect.width ? width / rect.width : 1;
       const sy = rect.height ? height / rect.height : 1;
@@ -473,7 +479,7 @@ const {
       mouse.y = ny;
     });
 
-    section.addEventListener('mouseleave', () => {
+    section.addEventListener("mouseleave", () => {
       // Dropping `hover` is what matters: the focus starts its swing back to the
       // centre, the strokes reel in and the pull lets go. Nothing reads the
       // parked coordinates while `hover` is false, and re-entry reseeds them.
@@ -482,8 +488,8 @@ const {
     });
   }
 
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initGhCtaGrid);
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", initGhCtaGrid);
   } else {
     initGhCtaGrid();
   }
