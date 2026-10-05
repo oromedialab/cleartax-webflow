@@ -111,19 +111,31 @@ import Footer from "../sections/global-invoicing/Footer.astro";
          narrowed to the only weights this page actually sets on font-body
          text (400/500/600, never italic) instead of the full variable axis
          (every weight 100-900, upright AND italic, opsz 14-32) — that full
-         axis was a single ~45KB file for three static weights. -->
-    <link
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Inter+Tight:wght@400;500;600;700&display=swap"
-      rel="stylesheet"
-    />
-    <!-- Preload critical above-the-fold assets -->
+         axis was a single ~45KB file for three static weights.
+
+         Loaded via preload+swap instead of a plain <link rel="stylesheet">:
+         a stylesheet link blocks rendering until it's fetched, but this CSS
+         only supplies @font-face rules — nothing it contains is needed to
+         paint the page (font-display:swap already shows the fallback font
+         immediately). Preloading it, then flipping it to a stylesheet once
+         it arrives, takes it off the render-blocking critical path. -->
     <link
       rel="preload"
-      href="https://cdn.prod.website-files.com/6093bce33d9b4bae841b04e3/69dfcff6071b983201f5f097_logo-cleartax.svg"
-      as="image"
-      type="image/svg+xml"
-      fetchpriority="high"
+      as="style"
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Inter+Tight:wght@400;500;600;700&display=swap"
+      onload="this.onload=null;this.rel='stylesheet'"
     />
+    <noscript>
+      <link
+        rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Inter+Tight:wght@400;500;600;700&display=swap"
+      />
+    </noscript>
+    <!-- Preload critical above-the-fold assets. (This page's Navbar wraps the
+         shared NavbarRb primitive, which never renders the old logo-cleartax
+         SVG that other pages' navbar variants use — a preload for it here
+         was competing for fetchpriority=high bandwidth against assets this
+         page actually needs, for a resource nothing on it requests.) -->
     <link
       rel="preload"
       href="https://img.youtube.com/vi/UX0Yt61EdfY/maxresdefault.jpg"
