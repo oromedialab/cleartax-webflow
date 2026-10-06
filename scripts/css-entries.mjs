@@ -82,7 +82,8 @@ export const PAGE_TARGETS = [
   { name: 'software-and-professional-services', input: 'src/styles/software-and-professional-services.css', page: 'src/pages/software-and-professional-services.astro' },
   { name: 'accounts-payable', input: 'src/styles/accounts-payable.css', page: 'src/pages/accounts-payable.astro' },
   { name: 'fraud-prevention', input: 'src/styles/fraud-prevention.css', page: 'src/pages/fraud-prevention.astro' },
-  { name: 'cfo-insights', input: 'src/styles/cfo-insights.css', page: 'src/pages/cfo-insights.astro' }
+  { name: 'cfo-insights', input: 'src/styles/cfo-insights.css', page: 'src/pages/cfo-insights.astro' },
+  { name: 'tax-automation', input: 'src/styles/tax-automation.css', page: 'src/pages/tax-automation.astro' }
 ];
 
 /**
