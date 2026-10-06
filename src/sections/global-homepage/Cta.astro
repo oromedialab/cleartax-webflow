@@ -1,6 +1,6 @@
 ---
 /**
- * Closing CTA band — Figma node 13049:22871 ("Container - Partner program").
+ * Closing CTA band — Figma node 13600:29645 ("Container - Partner program").
  *
  * Background is the same interactive stroke field as `Hero.astro`, not the
  * static seven-column dot grid this section used to draw: a plain grid of dots
@@ -18,7 +18,7 @@
  *     unconditionally, and a second always-on 60fps loop on the same page is
  *     worth not adding. Behaviour while the section is on screen is unchanged.
  *
- * Ids are `gh-cta-` prefixed: embeds share one namespace per page, and this
+ * Ids are `fr-cta-` prefixed: embeds share one namespace per page, and this
  * canvas sits on the same page as the hero's.
  */
 interface Props {
@@ -42,7 +42,7 @@ const {
   maxLength = 6,
   lengthRadius = 260,
   tilt = 1,
-  baseColor = "rgba(84, 70, 255, 0.28)",
+  baseColor = "rgba(84, 70, 255, 0.5)",
   cursorRadius = 320,
   pull = 14,
   fadeRadius = 40,
@@ -50,8 +50,8 @@ const {
 ---
 
 <section
-  id="gh-cta"
-  class="gh-cta relative overflow-hidden bg-[linear-gradient(180deg,_#FFF_0%,_rgba(242,_241,_240,_0.25)_30.04%,_rgba(242,_241,_240,_0.25)_87.79%,_#FFF_100%)] max-lg:py-16 lg:py-[121px]"
+  id="fr-cta"
+  class="fr-cta relative overflow-hidden bg-generic-00 max-lg:py-16 lg:py-[121px]"
   data-line-width={String(lineWidth)}
   data-gap={String(gap)}
   data-max-length={String(maxLength)}
@@ -64,7 +64,7 @@ const {
 >
   <!-- Interactive stroke field -->
   <div class="absolute inset-0 z-0 w-full h-full pointer-events-none">
-    <canvas id="gh-cta-dots" class="absolute inset-0 w-full h-full"></canvas>
+    <canvas id="fr-cta-dots" class="absolute inset-0 w-full h-full"></canvas>
   </div>
 
   <!-- Radial wash, so the headline keeps its contrast over the field -->
@@ -73,40 +73,35 @@ const {
   >
   </div>
 
-  <!-- Narrow viewports get a top fade instead, where the radial is too tight -->
+  <!-- Top fade to blend smoothly into the preceding section -->
   <div
-    class="absolute inset-0 z-0 bg-gradient-to-b from-white/85 via-white/50 to-transparent hidden max-[630px]:block pointer-events-none"
-  >
-  </div>
-
-  <!-- Bottom fade, blending the field into the section below -->
-  <div
-    class="absolute bottom-0 inset-x-0 h-48 bg-gradient-to-t from-white via-white/50 to-transparent pointer-events-none z-0"
+    class="absolute top-0 left-0 right-0 h-40 md:h-56 z-0 bg-gradient-to-b from-white via-white/80 to-transparent pointer-events-none"
+    style="background: linear-gradient(180deg, #FFFFFF 0%, rgba(255, 255, 255, 0.85) 40%, rgba(255, 255, 255, 0) 100%);"
   >
   </div>
 
   <div class="container mx-auto relative z-10">
-    <div class="mx-auto flex max-w-[791px] flex-col items-center gap-6 text-center">
-      <div class="flex flex-col items-center gap-4">
+    <div
+      class="mx-auto flex max-w-[791px] flex-col items-center gap-6 text-center"
+    >
+      <div class="flex flex-col items-center">
         <h2
-          class="m-0 font-heading font-medium text-vault-navy text-[length:var(--fs-h2)] leading-[length:var(--lh-h2)] tracking-[-0.5px]"
+          class="m-0 font-heading font-medium text-vault-navy text-[length:var(--fs-h2)] leading-[length:var(--lh-h2)]"
         >
           Ready to put AI in the hands of your finance team?
         </h2>
         <p
-          class="m-0 font-body text-neutral-500 text-[length:var(--fs-body-lg)] leading-[length:var(--lh-body-lg)]"
+          class="m-0 font-body font-normal text-neutral-500 text-[length:var(--fs-sm)] leading-[length:var(--lh-sm)] tracking-[-0.5px] max-w-154 mt-4"
         >
-          No spam. A 30-minute call to help you unlock the first finance use-case you
-          can solve.
+          No spam. A 30-minute call to help you unlock the first finance
+          use-case you can solve.
         </p>
       </div>
 
-      <!-- Opens the HubSpot modal from `DemoModal.astro`. The href is kept real
-           so the CTA still goes somewhere if that section is absent. -->
       <a
         href="https://www.cleartax.com/contact-us"
         data-demo-open
-        class="inline-flex items-center justify-center gap-2 rounded-lg border border-nova-blue bg-nova-blue px-5 py-3.5 text-[length:var(--fs-label-lg)] leading-[length:var(--lh-label-lg)] font-medium text-nova-50 no-underline shadow-[0px_2px_3px_rgba(16,24,40,0.06)] transition-all ease-in-out duration-200 hover:text-nova-blue hover:bg-generic-00"
+        class="inline-flex items-center justify-center gap-2 rounded-lg border border-nova-blue bg-nova-blue px-5 py-3.5 text-[length:var(--fs-label-lg)] leading-[length:var(--lh-label-lg)] font-medium text-nova-50 no-underline transition-all duration-200 hover:bg-nova-50 hover:text-nova-blue"
       >
         Book a demo
       </a>
@@ -122,12 +117,12 @@ const {
 
      The one change from the hero copy is the IntersectionObserver at the bottom:
      this loop only runs while the band is on screen. */
-  function initGhCtaGrid() {
-    const section = document.getElementById('gh-cta');
+  function initFrCtaGrid() {
+    const section = document.getElementById("fr-cta");
     if (!section) return;
-    const canvas = document.getElementById('gh-cta-dots');
+    const canvas = document.getElementById("fr-cta-dots");
     if (!canvas || !canvas.getContext) return;
-    const ctx = canvas.getContext('2d');
+    const ctx = canvas.getContext("2d");
 
     function num(name, fallback) {
       const value = parseFloat(section.getAttribute(name));
@@ -135,15 +130,16 @@ const {
     }
 
     const config = {
-      lineWidth: num('data-line-width', 2),
-      gap: num('data-gap', 24),
-      maxLength: num('data-max-length', 6),
-      lengthRadius: num('data-length-radius', 260),
-      tilt: num('data-tilt', 1),
-      baseColor: section.getAttribute('data-base-color') || 'rgba(84, 70, 255, 0.28)',
-      cursorRadius: num('data-cursor-radius', 320),
-      pull: num('data-pull', 14),
-      fadeRadius: num('data-fade-radius', 40),
+      lineWidth: num("data-line-width", 2),
+      gap: num("data-gap", 24),
+      maxLength: num("data-max-length", 6),
+      lengthRadius: num("data-length-radius", 260),
+      tilt: num("data-tilt", 1),
+      baseColor:
+        section.getAttribute("data-base-color") || "rgba(84, 70, 255, 0.28)",
+      cursorRadius: num("data-cursor-radius", 320),
+      pull: num("data-pull", 14),
+      fadeRadius: num("data-fade-radius", 40),
       fadeSpeed: 12,
       followSpeed: 7,
       engageSpeed: 4,
@@ -189,7 +185,15 @@ const {
           const cy = startY + y * spacing;
           // ox/oy is the stroke's home and the point it is drawn centred on;
           // x/y is where that centre is now; hx/hy is half its segment vector.
-          dots.push({ x: cx, y: cy, ox: cx, oy: cy, alpha: 1, hx: 0, hy: 0 });
+          dots.push({
+            x: cx,
+            y: cy,
+            ox: cx,
+            oy: cy,
+            alpha: 1,
+            hx: 0,
+            hy: 0,
+          });
         }
       }
 
@@ -198,6 +202,7 @@ const {
         focusY = height / 2;
       }
       aim();
+      paint();
     }
 
     // Length and angle, both straight off the focus. The focus and `presence`
@@ -248,7 +253,7 @@ const {
       ctx.clearRect(0, 0, width, height);
       ctx.strokeStyle = config.baseColor;
       ctx.lineWidth = config.lineWidth;
-      ctx.lineCap = 'round'; // so a stroke shrunk to nothing reads as a dot
+      ctx.lineCap = "round"; // so a stroke shrunk to nothing reads as a dot
 
       // Two passes. Only the strokes the cursor is touching have an alpha of
       // their own; the rest of the field goes down as one path in one stroke
@@ -277,13 +282,14 @@ const {
     }
 
     const reduceMotion =
-      window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      window.matchMedia &&
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
     if (reduceMotion) {
       // Static dot grid. No animation loop, no cursor reaction.
       initGrid();
       paint();
-      window.addEventListener('resize', () => {
+      window.addEventListener("resize", () => {
         initGrid();
         paint();
       });
@@ -317,7 +323,8 @@ const {
       speed += (Math.sqrt(travelX * travelX + travelY * travelY) - speed) * 0.5;
       if (speed < 0.01) speed = 0;
 
-      engagement += ((hover ? Math.min(speed / 6, 1) : 0) - engagement) * engageEase;
+      engagement +=
+        ((hover ? Math.min(speed / 6, 1) : 0) - engagement) * engageEase;
       if (engagement < 0.001) engagement = 0;
 
       // A parked cursor still holds the field open, just more gently.
@@ -327,7 +334,8 @@ const {
       const wantY = hover ? mouse.y : height / 2;
       const swungX = wantX - focusX;
       const swungY = wantY - focusY;
-      let swung = swungX > 0.05 || swungX < -0.05 || swungY > 0.05 || swungY < -0.05;
+      let swung =
+        swungX > 0.05 || swungX < -0.05 || swungY > 0.05 || swungY < -0.05;
       if (swung) {
         focusX += swungX * focusEase;
         focusY += swungY * focusEase;
@@ -436,12 +444,12 @@ const {
       paint();
     }
 
-    window.addEventListener('resize', rebuild);
+    window.addEventListener("resize", rebuild);
     rebuild();
 
     // The gate. IntersectionObserver answers "is it on screen" and nothing else,
     // which is exactly what starting and stopping the loop needs.
-    if ('IntersectionObserver' in window) {
+    if ("IntersectionObserver" in window) {
       const io = new IntersectionObserver(
         (entries) => {
           for (let i = 0; i < entries.length; i++) {
@@ -449,14 +457,14 @@ const {
             else stop();
           }
         },
-        { rootMargin: '200px 0px' }
+        { rootMargin: "200px 0px" },
       );
       io.observe(section);
     } else {
       start();
     }
 
-    section.addEventListener('mousemove', (e) => {
+    section.addEventListener("mousemove", (e) => {
       const rect = canvas.getBoundingClientRect();
       const sx = rect.width ? width / rect.width : 1;
       const sy = rect.height ? height / rect.height : 1;
@@ -473,7 +481,7 @@ const {
       mouse.y = ny;
     });
 
-    section.addEventListener('mouseleave', () => {
+    section.addEventListener("mouseleave", () => {
       // Dropping `hover` is what matters: the focus starts its swing back to the
       // centre, the strokes reel in and the pull lets go. Nothing reads the
       // parked coordinates while `hover` is false, and re-entry reseeds them.
@@ -482,9 +490,9 @@ const {
     });
   }
 
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initGhCtaGrid);
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", initFrCtaGrid);
   } else {
-    initGhCtaGrid();
+    initFrCtaGrid();
   }
 </script>

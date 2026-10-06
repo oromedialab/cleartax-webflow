@@ -144,18 +144,18 @@ const mobileTabs = [
          race another unlayered utility once pasted into Webflow. -->
     <div class="lg:hidden" data-mobile-tabs-root>
       <div
-        class="gi-mtab-tablist relative flex max-w-full items-center gap-1 overflow-x-auto rounded-xl bg-neutral-100 px-1 py-1.5"
+        class="gi-mtab-tablist relative flex w-full max-w-full items-center justify-around gap-1 overflow-x-auto rounded-xl bg-neutral-100 px-1 py-1.5"
         role="tablist"
         aria-label="Seamless integrations by category"
       >
-        <span class="gi-mtab-thumb" aria-hidden="true"></span>
+        <span class="gi-mtab-thumb pointer-events-none absolute" aria-hidden="true"></span>
         {
           mobileTabs.map((t, i) => (
             <button
               type="button"
               role="tab"
               id={`gi-mtab-tab-${t.key}`}
-              class="gi-mtab-tab relative z-10 shrink-0 cursor-pointer whitespace-nowrap rounded-lg border-0 bg-transparent px-6 py-2 text-center font-body text-[length:var(--fs-label)] leading-[length:var(--lh-label)] font-medium text-neutral-700"
+              class="gi-mtab-tab relative z-10 flex-1 min-w-max cursor-pointer whitespace-nowrap rounded-lg border-0 bg-transparent px-3 py-2 text-center font-body text-[length:var(--fs-label)] leading-[length:var(--lh-label)] font-medium text-neutral-700"
               aria-selected={i === 0 ? "true" : "false"}
               aria-controls={`gi-mtab-panel-${t.key}`}
               tabindex={i === 0 ? 0 : -1}
@@ -838,82 +838,84 @@ const mobileTabs = [
   // tab's measured position, panels toggle via inline `display`, roving
   // tabindex + arrow/Home/End keys, remeasure on resize and webfont load.
   (function () {
-    const tablist = document.querySelector(".gi-mtab-tablist");
-    if (!tablist) return;
+    const tablists = document.querySelectorAll(".gi-mtab-tablist");
+    if (!tablists.length) return;
 
     const reduceMotion =
       window.matchMedia &&
       window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-    const tabs = Array.prototype.slice.call(tablist.querySelectorAll("[data-gi-mtab]"));
-    const thumb = tablist.querySelector(".gi-mtab-thumb");
-    const panels = tabs.map((tab) =>
-      document.getElementById(`gi-mtab-panel-${tab.getAttribute("data-gi-mtab")}`)
-    );
-    let activeTab = 0;
+    tablists.forEach((tablist) => {
+      const tabs = Array.prototype.slice.call(tablist.querySelectorAll("[data-gi-mtab]"));
+      const thumb = tablist.querySelector(".gi-mtab-thumb");
+      const panels = tabs.map((tab) =>
+        document.getElementById(`gi-mtab-panel-${tab.getAttribute("data-gi-mtab")}`)
+      );
+      let activeTab = 0;
 
-    function moveThumb(i, instant) {
-      if (!thumb) return;
-      // Initial placement and remeasures (font load, resize) jump with no
-      // transition — animating `width` isn't GPU-composited, and doing it
-      // during page load is exactly the kind of main-thread work Lighthouse's
-      // "avoid non-composited animations" audit flags. Only a real tab click
-      // (selectTab, below) should slide.
-      if (instant) thumb.style.transition = "none";
-      thumb.style.width = tabs[i].offsetWidth + "px";
-      thumb.style.transform = "translateX(" + tabs[i].offsetLeft + "px)";
-      tablist.classList.add("is-ready");
-      if (instant) {
-        thumb.offsetWidth; // flush the instant position before restoring the transition
-        thumb.style.transition = "";
+      function moveThumb(i, instant) {
+        if (!thumb || !tabs[i]) return;
+        // Initial placement and remeasures (font load, resize) jump with no
+        // transition — animating `width` isn't GPU-composited, and doing it
+        // during page load is exactly the kind of main-thread work Lighthouse's
+        // "avoid non-composited animations" audit flags. Only a real tab click
+        // (selectTab, below) should slide.
+        if (instant) thumb.style.transition = "none";
+        thumb.style.width = tabs[i].offsetWidth + "px";
+        thumb.style.transform = "translateX(" + tabs[i].offsetLeft + "px)";
+        tablist.classList.add("is-ready");
+        if (instant) {
+          thumb.offsetWidth; // flush the instant position before restoring the transition
+          thumb.style.transition = "";
+        }
       }
-    }
 
-    // Inline `display`, not a class swap — these panels get pasted into
-    // Webflow's unlayered cascade, where a hiding class could race another
-    // utility on source order. Inline always wins.
-    function selectTab(i) {
-      activeTab = i;
-      tabs.forEach((tab, n) => {
-        tab.setAttribute("aria-selected", n === i ? "true" : "false");
-        tab.tabIndex = n === i ? 0 : -1;
-        if (panels[n]) panels[n].style.display = n === i ? "block" : "none";
-      });
-      moveThumb(i);
-
-      if (tablist.scrollWidth > tablist.clientWidth) {
-        tablist.scrollTo({
-          left: tabs[i].offsetLeft - (tablist.clientWidth - tabs[i].offsetWidth) / 2,
-          behavior: reduceMotion ? "auto" : "smooth",
+      // Inline `display`, not a class swap — these panels get pasted into
+      // Webflow's unlayered cascade, where a hiding class could race another
+      // utility on source order. Inline always wins.
+      function selectTab(i) {
+        activeTab = i;
+        tabs.forEach((tab, n) => {
+          tab.setAttribute("aria-selected", n === i ? "true" : "false");
+          tab.tabIndex = n === i ? 0 : -1;
+          if (panels[n]) panels[n].style.display = n === i ? "block" : "none";
         });
+        moveThumb(i);
+
+        if (tablist.scrollWidth > tablist.clientWidth) {
+          tablist.scrollTo({
+            left: tabs[i].offsetLeft - (tablist.clientWidth - tabs[i].offsetWidth) / 2,
+            behavior: reduceMotion ? "auto" : "smooth",
+          });
+        }
       }
-    }
 
-    tabs.forEach((tab, i) => {
-      tab.addEventListener("click", () => selectTab(i));
+      tabs.forEach((tab, i) => {
+        tab.addEventListener("click", () => selectTab(i));
+      });
+
+      // Roving tabindex: role="tablist" promises arrow keys move between tabs
+      // and Tab leaves the group entirely.
+      tablist.addEventListener("keydown", (e) => {
+        let next;
+        if (e.key === "Home") next = 0;
+        else if (e.key === "End") next = tabs.length - 1;
+        else if (e.key === "ArrowRight") next = (activeTab + 1) % tabs.length;
+        else if (e.key === "ArrowLeft") next = (activeTab - 1 + tabs.length) % tabs.length;
+        else return;
+
+        e.preventDefault();
+        selectTab(next);
+        tabs[next].focus();
+      });
+
+      moveThumb(0, true);
+      // The bar can lay out before its webfont arrives, which changes every
+      // tab's width — remeasure rather than leave the thumb on stale geometry.
+      if (document.fonts && document.fonts.ready) {
+        document.fonts.ready.then(() => moveThumb(activeTab, true));
+      }
+      window.addEventListener("resize", () => moveThumb(activeTab, true));
     });
-
-    // Roving tabindex: role="tablist" promises arrow keys move between tabs
-    // and Tab leaves the group entirely.
-    tablist.addEventListener("keydown", (e) => {
-      let next;
-      if (e.key === "Home") next = 0;
-      else if (e.key === "End") next = tabs.length - 1;
-      else if (e.key === "ArrowRight") next = (activeTab + 1) % tabs.length;
-      else if (e.key === "ArrowLeft") next = (activeTab - 1 + tabs.length) % tabs.length;
-      else return;
-
-      e.preventDefault();
-      selectTab(next);
-      tabs[next].focus();
-    });
-
-    moveThumb(0, true);
-    // The bar can lay out before its webfont arrives, which changes every
-    // tab's width — remeasure rather than leave the thumb on stale geometry.
-    if (document.fonts && document.fonts.ready) {
-      document.fonts.ready.then(() => moveThumb(activeTab, true));
-    }
-    window.addEventListener("resize", () => moveThumb(activeTab, true));
   })();
 </script>
