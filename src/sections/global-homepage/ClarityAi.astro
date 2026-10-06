@@ -303,7 +303,8 @@ const steps: Step[] = [
     transition: color 0.45s ease;
   }
 
-  [data-gh-clarity].is-complete .gh-clarity-pill {
+  [data-gh-clarity].is-complete .gh-clarity-pill,
+  .gh-clarity-pill.is-active {
     color: var(--color-flux-lime);
   }
 
@@ -388,6 +389,22 @@ const steps: Step[] = [
     );
 
     steps.forEach((s) => stepObserver.observe(s));
+
+    // ---- Closing Pill ----------------------------------------------------
+    // When the closing pill scrolls into view (particularly on iPad/mobile
+    // where the vertical rail is hidden), light up its Flux Lime green border.
+    const pill = root.querySelector(".gh-clarity-pill");
+    if (pill) {
+      const pillObserver = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            entry.target.classList.toggle("is-active", entry.isIntersecting);
+          });
+        },
+        { rootMargin: "-15% 0px -15% 0px", threshold: 0 },
+      );
+      pillObserver.observe(pill);
+    }
 
     // ---- Rail ------------------------------------------------------------
     // A progress bar has to answer "how far", which is a continuous question —
