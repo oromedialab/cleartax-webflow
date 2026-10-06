@@ -83,7 +83,8 @@ export const PAGE_TARGETS = [
   { name: 'accounts-payable', input: 'src/styles/accounts-payable.css', page: 'src/pages/accounts-payable.astro' },
   { name: 'fraud-prevention', input: 'src/styles/fraud-prevention.css', page: 'src/pages/fraud-prevention.astro' },
   { name: 'cfo-insights', input: 'src/styles/cfo-insights.css', page: 'src/pages/cfo-insights.astro' },
-  { name: 'tax-automation', input: 'src/styles/tax-automation.css', page: 'src/pages/tax-automation.astro' }
+  { name: 'tax-automation', input: 'src/styles/tax-automation.css', page: 'src/pages/tax-automation.astro' },
+  { name: 'financial-planning-and-analysis', input: 'src/styles/financial-planning-and-analysis.css', page: 'src/pages/financial-planning-and-analysis.astro' }
 ];
 
 /**
