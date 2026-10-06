@@ -3393,11 +3393,20 @@ html.w-mod-touch * {
           }
         }
 
-        // 2. Ensure input container, cursor, and top stage elements are inside .gh-why-generic-card-4
+        // 2. Ensure center title, top stage, middle stage, input container, and cursor are inside .gh-why-generic-card-4
         if (card5) {
-          const topStage4 = card5.querySelector(".gh-card4-top-stage");
+          const centerTitle4 = document.querySelector(".gh-card4-center-title");
+          const topStage4 = document.querySelector(".gh-card4-top-stage");
+          const middleStage4 = document.querySelector(".gh-card4-middle-stage");
           const chartHeader4 = document.querySelector(".gh-card4-chart-header");
           const bubble4 = document.querySelector(".gh-card4-bubble");
+
+          if (centerTitle4 && !card5.contains(centerTitle4)) {
+            card5.appendChild(centerTitle4);
+          }
+          if (topStage4 && !card5.contains(topStage4)) {
+            card5.appendChild(topStage4);
+          }
           if (topStage4) {
             if (chartHeader4 && !topStage4.contains(chartHeader4)) {
               topStage4.appendChild(chartHeader4);
@@ -3405,6 +3414,9 @@ html.w-mod-touch * {
             if (bubble4 && !topStage4.contains(bubble4)) {
               topStage4.appendChild(bubble4);
             }
+          }
+          if (middleStage4 && !card5.contains(middleStage4)) {
+            card5.appendChild(middleStage4);
           }
           if (inputContainer4 && !card5.contains(inputContainer4)) {
             card5.appendChild(inputContainer4);
@@ -3755,24 +3767,26 @@ html.w-mod-touch * {
       const skeleton = card.querySelector(`.gh-card${idx}-skeleton`);
       const checklist = card.querySelector(`.gh-card${idx}-checklist`);
       const checkItems = card.querySelectorAll(`.gh-card${idx}-check-item`);
-      const chart = card.querySelector(`.gh-card${idx}-chart`);
+      const chart = card.querySelector(`.gh-card${idx}-chart`) || document.querySelector(`.gh-card${idx}-chart`);
       const chartImg =
         card.querySelector(`.gh-card${idx}-chart-img`) ||
         card.querySelector(`.gh-card${idx}-chart img`) ||
+        document.querySelector(`.gh-card${idx}-chart-img`) ||
         (idx === 4
           ? document.querySelector('.gh-card4-chart-img, img[src*="6ab6579339baafb1fa1a60a5_linked.png"]')
           : null);
       const chartBottom =
         card.querySelector(`.gh-card${idx}-bottom-area`) ||
+        document.querySelector(`.gh-card${idx}-bottom-area`) ||
         (idx === 4 ? document.querySelector(".gh-card4-bottom-area") : null);
       // chartImg is the img inside chart for cards 0-3; only card 4 has it as a standalone element.
       // When it is a child of chart, we must NOT separately animate it — the parent div
       // controls display, and double GSAP inline-style on parent+child causes the img to stay hidden.
       const chartImgIsChildOfChart = !!(chartImg && chart && chart.contains(chartImg));
-      const inputPill = card.querySelector(`.gh-card${idx}-input-pill`);
-      const pillPlaceholder = card.querySelector(`.gh-card${idx}-pill-placeholder`);
-      const pillTyped = card.querySelector(`.gh-card${idx}-pill-typed`);
-      const pillTypedText = card.querySelector(`.gh-card${idx}-pill-typed-text`) || pillTyped;
+      const inputPill = card.querySelector(`.gh-card${idx}-input-pill`) || document.querySelector(`.gh-card${idx}-input-pill`);
+      const pillPlaceholder = card.querySelector(`.gh-card${idx}-pill-placeholder`) || document.querySelector(`.gh-card${idx}-pill-placeholder`);
+      const pillTyped = card.querySelector(`.gh-card${idx}-pill-typed`) || document.querySelector(`.gh-card${idx}-pill-typed`);
+      const pillTypedText = card.querySelector(`.gh-card${idx}-pill-typed-text`) || document.querySelector(`.gh-card${idx}-pill-typed-text`) || pillTyped;
       const genericQueryText = (pillTypedText && pillTypedText.textContent.trim())
         ? pillTypedText.textContent.trim().replace(/\s+/g, " ")
         : (idx === 1
@@ -3784,10 +3798,10 @@ html.w-mod-touch * {
                     : (idx === 4
                         ? "Process this month’s incoming invoices."
                         : "Which invoices cross 180 days this month?"))));
-      const pillThinking = card.querySelector(`.gh-card${idx}-pill-thinking`);
-      const submitBtn = card.querySelector(`.gh-card${idx}-submit-btn`);
-      const cursor = card.querySelector(`.gh-card${idx}-cursor`);
-      const borderPath = card.querySelector(`.gh-card${idx}-pill-border-path`);
+      const pillThinking = card.querySelector(`.gh-card${idx}-pill-thinking`) || document.querySelector(`.gh-card${idx}-pill-thinking`);
+      const submitBtn = card.querySelector(`.gh-card${idx}-submit-btn`) || document.querySelector(`.gh-card${idx}-submit-btn`);
+      const cursor = card.querySelector(`.gh-card${idx}-cursor`) || document.querySelector(`.gh-card${idx}-cursor`);
+      const borderPath = card.querySelector(`.gh-card${idx}-pill-border-path`) || document.querySelector(`.gh-card${idx}-pill-border-path`);
 
       if (!inputPill || !cursor || !chart) return;
 
