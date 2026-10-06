@@ -79,7 +79,11 @@ export const PAGE_TARGETS = [
   { name: 'us-regional', input: 'src/styles/us-regional.css', page: 'src/pages/us-regional.astro' },
   { name: 'banking-and-financial-services', input: 'src/styles/banking-and-financial-services.css', page: 'src/pages/banking-and-financial-services.astro' },
   { name: 'travel-and-hospitality', input: 'src/styles/travel-and-hospitality.css', page: 'src/pages/travel-and-hospitality.astro' },
-  { name: 'software-and-professional-services', input: 'src/styles/software-and-professional-services.css', page: 'src/pages/software-and-professional-services.astro' }
+  { name: 'software-and-professional-services', input: 'src/styles/software-and-professional-services.css', page: 'src/pages/software-and-professional-services.astro' },
+  { name: 'accounts-payable', input: 'src/styles/accounts-payable.css', page: 'src/pages/accounts-payable.astro' },
+  { name: 'fraud-prevention', input: 'src/styles/fraud-prevention.css', page: 'src/pages/fraud-prevention.astro' },
+  { name: 'cfo-insights', input: 'src/styles/cfo-insights.css', page: 'src/pages/cfo-insights.astro' },
+  { name: 'tax-automation', input: 'src/styles/tax-automation.css', page: 'src/pages/tax-automation.astro' }
 ];
 
 /**
