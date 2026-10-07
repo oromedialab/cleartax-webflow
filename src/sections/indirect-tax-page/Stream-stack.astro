@@ -5,6 +5,11 @@
  * with isolated slide tracks and smooth easing matching ClearTax brand standards.
  */
 
+interface FeatureItem {
+    icon: string;
+    text: string;
+}
+
 interface TabItem {
     id: string;
     tabLabel: string;
@@ -12,7 +17,9 @@ interface TabItem {
     title: string;
     subtitle: string;
     desc: string;
+    image: string;
     checklist: string[];
+    features: FeatureItem[];
 }
 
 const tabsData: TabItem[] = [
@@ -23,12 +30,19 @@ const tabsData: TabItem[] = [
         title: "AI validates every transaction.",
         subtitle: "Audit-ready from day one.",
         desc: "AI tags every transaction — RCM, SEZ, blocked credits — and flags ineligible ITC, missing HSN/GSTIN/POS, and duplicate vendors before filing.",
+        image: "/images/indirect-tax-page/iamge-1.png",
         checklist: [
             "AI data tagging & quality checks",
             "Ineligible ITC detection",
             "Missing HSN/GSTIN/POS flags",
             "Exception reports",
-        ]
+        ],
+        features: [
+            { icon: "/images/indirect-tax-page/1.png", text: "RCM tagged" },
+            { icon: "/images/indirect-tax-page/2.png", text: "HSN validated" },
+            { icon: "/images/indirect-tax-page/3.png", text: "POS checked" },
+            { icon: "/images/indirect-tax-page/4.png", text: "POS checked" },
+        ],
     },
     {
         id: "gst-filing",
@@ -37,12 +51,19 @@ const tabsData: TabItem[] = [
         title: "End-to-end multi-GST filing.",
         subtitle: "Validated before every return.",
         desc: "Clear auto-transforms GL into GST-ready SR/PR registers, then runs system-driven validations for ineligible ITC, missing HSN, and place-of-supply before you file.",
+        image: "/images/indirect-tax-page/image-2.png",
         checklist: [
             "PAN-level G1 to G9 filing",
             "Built-in pre-filing validations",
             "GSTR-1, 3B, 9, 9C",
             "Return-ready output",
-        ]
+        ],
+        features: [
+            { icon: "/images/indirect-tax-page/5.png", text: "GSTR-1 filed" },
+            { icon: "/images/indirect-tax-page/6.png", text: "GSTR-3B filed" },
+            { icon: "/images/indirect-tax-page/7.png", text: "GSTR-9 & 9C" },
+            { icon: "/images/indirect-tax-page/8.png", text: "PAN-level filing" },
+        ],
     },
     {
         id: "ims",
@@ -50,12 +71,19 @@ const tabsData: TabItem[] = [
         badge: "Accurate 2B",
         title: "Take control of your 2B with IMS.",
         subtitle: "",
-        desc: "\Manage the GST Invoice Management System end-to-end — bulk accept, reject, and pending actions, plus IMS-vs-PR reconciliation for an accurate 2B.",
+        desc: "Manage the GST Invoice Management System end-to-end — bulk accept, reject, and pending actions, plus IMS-vs-PR reconciliation for an accurate 2B.",
+        image: "/images/indirect-tax-page/image-3.png",
         checklist: [
             "IMS Console (bulk actions)",
             "IMS Pro (IMS vs PR recon)",
             "Accurate 2B generation",
             "Bulk accept / reject / pending",
+        ],
+        features: [
+            { icon: "/images/indirect-tax-page/9.png", text: "Bulk accept" },
+            { icon: "/images/indirect-tax-page/10.png", text: "Bulk reject" },
+            { icon: "/images/indirect-tax-page/11.png", text: "Bulk pending" },
+            { icon: "/images/indirect-tax-page/12.png", text: "Accurate 2B" },
         ],
     },
     {
@@ -65,11 +93,18 @@ const tabsData: TabItem[] = [
         title: "Industry-best reconciliation, with the highest ",
         subtitle: "matching %",
         desc: "AI reconciles 2B against your purchase register with configurable rules and sub-bucketing — moving teams from monthly to daily reconciliation.",
+        image: "/images/indirect-tax-page/image-4.png",
         checklist: [
             "Industry-leading match %",
             "Automated Table 4",
             "Configurable matching rules",
             "Rule 42 & 180-day reversals",
+        ],
+        features: [
+            { icon: "/images/indirect-tax-page/13.png", text: "Automated Table 4" },
+            { icon: "/images/indirect-tax-page/14.png", text: "Daily recon rules" },
+            { icon: "/images/indirect-tax-page/15.png", text: "PR vs 2B match" },
+            { icon: "/images/indirect-tax-page/16.png", text: "<10 min matching" },
         ],
     },
     {
@@ -79,11 +114,18 @@ const tabsData: TabItem[] = [
         title: "Never miss a notice",
         subtitle: "",
         desc: "Track and respond to GST notices with AI agents that surface the root cause and pull the exact data you need to reply — backed by 25+ post-filing reports and full audit trails.",
+        image: "/images/indirect-tax-page/image-5.png",
         checklist: [
             "GST Notice Tracker",
             "AI root-cause analysis",
             "25+ post-filing reports",
             "Full audit trails",
+        ],
+        features: [
+            { icon: "/images/indirect-tax-page/17.png", text: "GST Notice Tracker" },
+            { icon: "/images/indirect-tax-page/18.png", text: "AI root-cause" },
+            { icon: "/images/indirect-tax-page/19.png", text: "Full audit trails" },
+            { icon: "/images/indirect-tax-page/20.png", text: "25+ reports" },
         ],
     },
 ];
@@ -149,8 +191,12 @@ const tabsData: TabItem[] = [
                                         <div class="max-w-2xl">
                                             <h3 class="font-heading font-medium text-[24px] sm:text-[28px] md:text-[32px] leading-tight text-text-default m-0">
                                                 {tab.title}
-                                                <br />
-                                                <span>{tab.subtitle}</span>
+                                                {tab.subtitle && (
+                                                    <>
+                                                        <br />
+                                                        <span>{tab.subtitle}</span>
+                                                    </>
+                                                )}
                                             </h3>
                                             <p class="font-body font-normal text-neutral-500 text-sm sm:text-base leading-relaxed mt-4 max-w-3xl m-0">
                                                 {tab.desc}
@@ -166,10 +212,16 @@ const tabsData: TabItem[] = [
                                     <!-- Card Body Grid -->
                                     <div class="grid grid-cols-1 lg:grid-cols-12 gap-5.5 items-stretch">
                                         <!-- Left Column: Visual Area -->
-                                        <div class="lg:col-span-8 bg-visual-placeholder rounded-2xl min-h-[300px] sm:min-h-[380px] lg:min-h-[432px] w-full flex items-center justify-center p-6 relative overflow-hidden">
-                                            <div class="w-full h-full min-h-[220px] rounded-xl bg-visual-placeholder/80 flex items-center justify-center">
-                                                <!-- Visual placeholder box matching brand v2 standards -->
-                                            </div>
+                                        <div class="lg:col-span-8 rounded-2xl w-full flex items-center justify-center relative overflow-hidden">
+                                            <img
+                                                src={tab.image}
+                                                alt={tab.title}
+                                                width="1152"
+                                                height="648"
+                                                class="w-full h-auto object-contain rounded-2xl"
+                                                loading="lazy"
+                                                decoding="async"
+                                            />
                                         </div>
 
                                         <!-- Right Column: Checklist & Feature Tags -->
@@ -180,6 +232,26 @@ const tabsData: TabItem[] = [
                                                      <div class="py-2 lg:py-6 first:pt-0 last:pb-0 text-sm sm:text-[15px] font-body text-neutral-700 font-normal">
                                                          {item}
                                                      </div>
+                                                ))}
+                                            </div>
+
+                                            <!-- 4 Icons + Text Grid -->
+                                            <div class="grid grid-cols-2 gap-6 sm:gap-8 pt-5 sm:pt-6 border-t border-neutral-100">
+                                                {tab.features.map((feat) => (
+                                                    <div class="flex items-center gap-2 sm:gap-2.5 min-w-0">
+                                                        <img
+                                                            src={feat.icon}
+                                                            alt=""
+                                                            width="18"
+                                                            height="18"
+                                                            class="w-4 h-4 sm:w-[18px] sm:h-[18px] object-contain shrink-0"
+                                                            loading="lazy"
+                                                            decoding="async"
+                                                        />
+                                                        <span class="text-base font-body text-neutral-700 font-normal">
+                                                            {feat.text}
+                                                        </span>
+                                                    </div>
                                                 ))}
                                             </div>
                                         </div>
