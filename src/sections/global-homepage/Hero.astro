@@ -583,9 +583,17 @@ const badges = [
     });
   }
 
+  function scheduleHeroGrid() {
+    if ("requestIdleCallback" in window) {
+      requestIdleCallback(initGhHeroGrid, { timeout: 1500 });
+    } else {
+      setTimeout(initGhHeroGrid, 250);
+    }
+  }
+
   if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", initGhHeroGrid);
+    document.addEventListener("DOMContentLoaded", scheduleHeroGrid);
   } else {
-    initGhHeroGrid();
+    scheduleHeroGrid();
   }
 </script>
