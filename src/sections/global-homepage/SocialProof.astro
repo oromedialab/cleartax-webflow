@@ -1,15 +1,10 @@
 ---
 /**
  * Social proof strip — Figma node 13049:22748.
- *
- * Two rows: a divided achievements line, then a marquee of logo tiles.
- *
- * Not built on `_shared/LogostripRb.astro` — that one ships its own H2
- * ("Trusted by 5000+ Businesses Worldwide") and a gradient panel, neither of
- * which this design has. The logo URLs are the Webflow-hosted set already used
- * by `global-invoicing/Logostrip.astro`, not the Figma export URLs, which are
- * temporary and expire in about a week.
+ * Built on `_shared/LogostripRb.astro`.
  */
+import LogostripRb from '../_shared/LogostripRb.astro';
+
 const achievements = [
   { label: "100+ source systems", emphasis: false },
   { label: "50+ countries", emphasis: false },
@@ -37,133 +32,9 @@ const logos: string[] = [
   "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6a2fc65af3eec20e67f5cd1c_brand-16-img.png",
   "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6a2fc661da8cceda23ec5615_brand-17-img.png",
 ];
-
-const doubled = [...logos, ...logos];
 ---
 
-<section class="bg-generic-00 py-6 overflow-hidden">
-  <div class="max-w-[var(--container-max)] w-full px-4 md:px-6 mx-auto">
-    <div class="flex flex-col items-center gap-6">
-      <!-- Achievements -->
-      <div class="gh-sp-achievements relative w-full">
-        <!-- Mobile heading -->
-        <h2
-          class="m-0 text-center font-heading font-medium text-vault-navy text-[length:var(--fs-h4)] leading-[length:var(--lh-h4)] md:hidden"
-        >
-          Trusted by 5000+ enterprises
-        </h2>
-
-        <!-- Desktop achievements list -->
-        <ul
-          class="hidden md:flex items-center justify-center gap-x-8 list-none m-0 p-0"
-        >
-          {
-            achievements.map((a, i) => (
-              <>
-                {i > 0 && (
-                  <li
-                    class="h-4 w-px shrink-0 rounded-full bg-[#CCCCCC]"
-                    aria-hidden="true"
-                  />
-                )}
-                <li
-                  class:list={[
-                    "text-center font-body text-vault-navy",
-                    a.emphasis
-                      ? "text-[length:var(--fs-body-lg)] leading-[length:var(--lh-body-lg)] font-medium"
-                      : "text-[length:var(--fs-body)] leading-[length:var(--lh-body)]",
-                  ]}
-                >
-                  {a.label}
-                </li>
-              </>
-            ))
-          }
-        </ul>
-      </div>
-
-      <!-- Logo tiles -->
-      <div class="gh-sp-marquee relative w-full overflow-hidden">
-        <div
-          class="gh-sp-track flex w-max items-center gap-2 motion-reduce:animate-none"
-        >
-          {
-            doubled.map((src, i) => (
-              <span class="flex h-12 w-[124px] shrink-0 items-center justify-center rounded-lg bg-[#F5F5F5]">
-                <img
-                  src={src}
-                  alt={i < logos.length ? "Customer logo" : ""}
-                  aria-hidden={i >= logos.length}
-                  width="86"
-                  height="26"
-                  class="h-[26px] w-[86px] object-contain mix-blend-multiply"
-                  loading="lazy"
-                  decoding="async"
-                />
-              </span>
-            ))
-          }
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<style is:global>
-  /* Edge fade over the achievements line, matching the Figma "Gradient" layer. */
-  .gh-sp-achievements::after {
-    content: "";
-    position: absolute;
-    inset: 0;
-    pointer-events: none;
-    background: linear-gradient(
-      90deg,
-      #ffffff 0%,
-      rgba(255, 255, 255, 0) 5%,
-      rgba(255, 255, 255, 0) 95%,
-      #ffffff 100%
-    );
-  }
-
-  .gh-sp-marquee {
-    -webkit-mask-image: linear-gradient(
-      to right,
-      transparent 0%,
-      #000 6%,
-      #000 94%,
-      transparent 100%
-    );
-    mask-image: linear-gradient(
-      to right,
-      transparent 0%,
-      #000 6%,
-      #000 94%,
-      transparent 100%
-    );
-  }
-
-  .gh-sp-track {
-    animation: gh-sp-scroll 60s linear infinite;
-  }
-
-  .gh-sp-marquee:hover .gh-sp-track {
-    animation-play-state: paused;
-  }
-
-  /* The track holds the logo list twice, so translating by half its width
-     lands exactly on the duplicate and the loop is seamless. */
-  @keyframes gh-sp-scroll {
-    from {
-      transform: translateX(0);
-    }
-    to {
-      transform: translateX(-50%);
-    }
-  }
-
-  @media (prefers-reduced-motion: reduce) {
-    .gh-sp-track {
-      animation: none;
-    }
-  }
-</style>
+<LogostripRb
+  achievements={achievements}
+  logos={logos}
+/>
