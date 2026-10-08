@@ -1,0 +1,410 @@
+---
+/**
+ * France product page hero — Figma node 16433:45631.
+ *
+ * Background is `_shared/Dotgrid.astro`, the same interactive stroke field
+ * every brand-v2 hero uses (plain grid of lime dots until a pointer enters,
+ * then each dot draws into a stroke aimed at the cursor). Two gradient layers
+ * over it: a page-wide wash and a radial spot behind the copy, matching the
+ * Figma "BG - Gradient" layer.
+ *
+ * Content sits in a bordered card (Figma "Content" frame) split into a text
+ * column (headline, lede, four badges) and a lead-gen form column. The form
+ * itself is a HubSpot embed — same mount/skeleton/style pattern as
+ * `_shared/ContactFormRb.astro` and `global-invoicing/Hero.astro` — rather than
+ * hand-built inputs, so field validation, the phone country-selector and
+ * submission all come from the HubSpot form config instead of being
+ * reimplemented here.
+ *
+ * `#fp-hero-contact` (the mount div below) is this page's only form — there is
+ * no `DemoModal.astro`. Every "Book a demo" elsewhere on the page (navbar,
+ * closing Cta band) scrolls here instead of opening a modal with a second
+ * copy of the same form.
+ *
+ * Badge icons are unfilled "Icon placeholder" frames in the Figma — there is
+ * no icon in this design's badges though, just text, so none are rendered.
+ */
+import Dotgrid from "../_shared/Dotgrid.astro";
+
+const badges = [
+  "1B+ e-Invoices generated annually",
+  "6,000+ Global enterprise clients",
+  "50+ Countries covered globally",
+  "$500B+ Worth of invoices processed",
+];
+
+const hubspotPortalId = "245744706";
+const hubspotFormId = "5c52d4ba-5345-413a-b3cd-0ccec450aa30";
+const hubspotRegion = "na2";
+---
+
+<section
+  id="fp-hero"
+  class="fp-hero relative overflow-hidden bg-generic-00"
+>
+  <Dotgrid containerId="fp-hero" baseColor="#C8F006" />
+
+  <!-- Radial wash, so the headline keeps its contrast over the field -->
+  <div
+    class="absolute inset-0 z-0 bg-[radial-gradient(circle_at_center,_#FFF_0%,_rgba(242,_241,_240,_0.25)_30.04%,_rgba(255,255,255,0)_65%)] pointer-events-none"
+  >
+  </div>
+
+  <div class="container relative z-10 mx-auto max-lg:pt-30 max-lg:pb-16 lg:pt-40 lg:pb-20">
+    <div
+      class="fp-hero-card flex flex-col gap-10 rounded-xl border border-neutral-300 bg-generic-00 p-6 lg:flex-row lg:gap-12 lg:p-12"
+    >
+      <!-- Text column -->
+      <div class="flex flex-1 flex-col gap-10">
+        <div class="flex flex-col gap-6">
+          <h1
+            class="m-0 font-heading font-semibold text-vault-navy text-[length:var(--fs-h1)] md:text-[length:var(--fs-display-sm)] leading-[length:var(--lh-h1)] md:leading-[length:var(--lh-display-sm)] tracking-[-1px]"
+          >
+            {"Comply with France's e-Invoicing mandate, before it's urgent."}
+          </h1>
+          <p class="m-0 max-w-[432px] font-body font-normal text-neutral-500 text-[length:var(--fs-body-sm)] leading-[length:var(--lh-body-sm)]">
+            {"ClearTax is listed on DGFiP's official PA registry and live in the French ecosystem. One platform, zero rebuilds — ready for September 2026 and every mandate that follows."}
+          </p>
+        </div>
+
+        <ul class="flex flex-wrap items-stretch gap-2 list-none m-0 p-0">
+          {
+            badges.map((label) => (
+              <li class="flex items-center rounded-lg border border-neutral-200 bg-generic-00 px-4 py-3">
+                <span class="font-body text-[length:var(--fs-label)] leading-[length:var(--lh-label)] font-medium text-vault-navy">
+                  {label}
+                </span>
+              </li>
+            ))
+          }
+        </ul>
+      </div>
+
+      <!-- Divider -->
+      <div class="hidden w-px shrink-0 bg-[var(--border-divider,#f2f1f0)] lg:block"></div>
+
+      <!-- Form column -->
+      <div class="flex flex-1 flex-col justify-between gap-6">
+        <div
+          id="fp-hero-contact"
+          class="fp-hero-hs-form"
+          data-portal-id={hubspotPortalId}
+          data-form-id={hubspotFormId}
+          data-region={hubspotRegion}
+        >
+          <div id="fp-hero-form-skeleton" class="fp-hero-form-skeleton">
+            <div class="fp-hero-skeleton-row-2">
+              <div>
+                <div class="fp-hero-skeleton-label fp-hero-shimmer"></div>
+                <div class="fp-hero-skeleton-input fp-hero-shimmer"></div>
+              </div>
+              <div>
+                <div class="fp-hero-skeleton-label fp-hero-shimmer"></div>
+                <div class="fp-hero-skeleton-input fp-hero-shimmer"></div>
+              </div>
+            </div>
+            <div>
+              <div class="fp-hero-skeleton-label fp-hero-shimmer" style="width:100px;"></div>
+              <div class="fp-hero-skeleton-input fp-hero-shimmer"></div>
+            </div>
+            <div>
+              <div class="fp-hero-skeleton-label fp-hero-shimmer" style="width:120px;"></div>
+              <div class="fp-hero-skeleton-input fp-hero-shimmer"></div>
+            </div>
+            <div class="fp-hero-skeleton-button fp-hero-shimmer"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style is:global>
+  /* The single Flux Lime instance on this screen — none here; the form button
+     carries Nova Blue per the Figma, so no override needed. */
+
+  .fp-hero-hs-form {
+    width: 100%;
+    min-height: 300px;
+  }
+  .fp-hero-hs-form form {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 16px !important;
+  }
+  .fp-hero-hs-form .hs-form-field {
+    margin-bottom: 0 !important;
+  }
+  .fp-hero-hs-form .hs-form-field > label {
+    display: block !important;
+    font-family: var(--font-body) !important;
+    font-size: var(--fs-label) !important;
+    font-weight: var(--font-weight-medium) !important;
+    color: var(--color-vault-navy) !important;
+    margin-bottom: 8px !important;
+  }
+  .fp-hero-hs-form .hs-form-field > label .hs-form-required {
+    color: var(--palette-destructive-500) !important;
+    margin-left: 2px !important;
+  }
+  .fp-hero-hs-form input[type="text"],
+  .fp-hero-hs-form input[type="email"],
+  .fp-hero-hs-form input[type="tel"],
+  .fp-hero-hs-form input[type="number"],
+  .fp-hero-hs-form select,
+  .fp-hero-hs-form textarea {
+    width: 100% !important;
+    box-sizing: border-box !important;
+    height: 40px !important;
+    padding: 8px 12px !important;
+    border-radius: 8px !important;
+    border: 1px solid var(--palette-neutral-200) !important;
+    background-color: var(--color-generic-00) !important;
+    font-family: var(--font-body) !important;
+    font-size: var(--fs-body-sm) !important;
+    color: var(--color-vault-navy) !important;
+    outline: none !important;
+    box-shadow: 0 1px 1px rgba(16, 24, 40, 0.04) !important;
+    transition: border-color var(--transition-fast), box-shadow var(--transition-fast) !important;
+  }
+  .fp-hero-hs-form input::placeholder,
+  .fp-hero-hs-form textarea::placeholder {
+    color: var(--palette-neutral-400) !important;
+  }
+  .fp-hero-hs-form input:focus,
+  .fp-hero-hs-form select:focus,
+  .fp-hero-hs-form textarea:focus {
+    border-color: var(--color-nova-blue) !important;
+    box-shadow: 0 0 0 3px rgba(84, 70, 255, 0.12) !important;
+  }
+  .fp-hero-hs-form fieldset {
+    max-width: none !important;
+    border: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    display: flex !important;
+    flex-direction: row !important;
+    gap: 16px !important;
+  }
+  @media (max-width: 640px) {
+    .fp-hero-hs-form fieldset {
+      flex-direction: column !important;
+      gap: 16px !important;
+    }
+  }
+  .fp-hero-hs-form fieldset .hs-form-field {
+    flex: 1 !important;
+  }
+  .fp-hero-hs-form .hs-form-booleancheckbox label,
+  .fp-hero-hs-form .legal-consent-container label {
+    display: flex !important;
+    align-items: flex-start !important;
+    gap: 8px !important;
+    font-family: var(--font-body) !important;
+    font-size: var(--fs-body-xs) !important;
+    line-height: var(--lh-body-xs) !important;
+    color: var(--palette-neutral-500) !important;
+    cursor: pointer !important;
+  }
+  .fp-hero-hs-form .hs-form-booleancheckbox label a,
+  .fp-hero-hs-form .legal-consent-container label a {
+    color: var(--color-nova-blue) !important;
+    font-weight: var(--font-weight-medium) !important;
+    text-decoration: underline !important;
+  }
+  .fp-hero-hs-form input[type="checkbox"] {
+    width: 20px !important;
+    height: 20px !important;
+    margin-top: 2px !important;
+    flex-shrink: 0 !important;
+    accent-color: var(--color-nova-blue) !important;
+    cursor: pointer !important;
+  }
+  .fp-hero-hs-form .inputs-list {
+    list-style: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+  .fp-hero-hs-form .hs-submit {
+    margin-top: 8px !important;
+  }
+  .fp-hero-hs-form input[type="submit"],
+  .fp-hero-hs-form .hs-button {
+    width: 100% !important;
+    padding: 14px 20px !important;
+    border: 1px solid var(--color-nova-blue) !important;
+    border-radius: 8px !important;
+    background: var(--color-nova-blue) !important;
+    color: var(--color-nova-50) !important;
+    font-family: var(--font-body) !important;
+    font-size: var(--fs-label-lg) !important;
+    font-weight: var(--font-weight-medium) !important;
+    cursor: pointer !important;
+    box-shadow: 0 2px 3px rgba(16, 24, 40, 0.06) !important;
+    transition: opacity var(--transition-fast) !important;
+  }
+  .fp-hero-hs-form input[type="submit"]:hover,
+  .fp-hero-hs-form .hs-button:hover {
+    opacity: 0.92 !important;
+  }
+  .fp-hero-hs-form .hs-error-msgs {
+    list-style: none !important;
+    padding: 0 !important;
+    margin: 4px 0 0 !important;
+    font-size: var(--fs-body-xs) !important;
+    color: var(--palette-destructive-500) !important;
+  }
+  .fp-hero-hs-form .hs-error-msg {
+    color: var(--palette-destructive-500) !important;
+  }
+  .fp-hero-hs-form .submitted-message {
+    background: var(--color-ledger-100) !important;
+    color: var(--color-vault-navy) !important;
+    padding: 18px !important;
+    border-radius: 8px !important;
+    font-size: var(--fs-body-sm) !important;
+    font-weight: 600 !important;
+    text-align: center !important;
+    border: 1px solid var(--palette-neutral-300) !important;
+  }
+  .fp-hero-hs-form fieldset:has([class*="hs_utm_"]),
+  .fp-hero-hs-form .hs-form-field[style*="display: none"] {
+    display: none !important;
+  }
+
+  /* Skeleton shimmer, shown until the HubSpot form mounts */
+  .fp-hero-form-skeleton {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    width: 100%;
+    min-height: 300px;
+  }
+  .fp-hero-skeleton-row-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+  @media (max-width: 640px) {
+    .fp-hero-skeleton-row-2 {
+      grid-template-columns: 1fr;
+      gap: 16px;
+    }
+  }
+  .fp-hero-skeleton-label {
+    height: 14px;
+    width: 80px;
+    background: rgba(0, 0, 0, 0.08);
+    border-radius: 4px;
+    margin-bottom: 6px;
+  }
+  .fp-hero-skeleton-input {
+    height: 40px;
+    background: rgba(0, 0, 0, 0.03);
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    border-radius: 8px;
+    width: 100%;
+  }
+  .fp-hero-skeleton-button {
+    height: 46px;
+    background: rgba(84, 70, 255, 0.25);
+    border-radius: 8px;
+    width: 100%;
+    margin-top: 8px;
+  }
+  .fp-hero-shimmer {
+    position: relative;
+    overflow: hidden;
+  }
+  .fp-hero-shimmer::after {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    transform: translateX(-100%);
+    background-image: linear-gradient(
+      90deg,
+      rgba(255, 255, 255, 0) 0%,
+      rgba(255, 255, 255, 0.6) 20%,
+      rgba(255, 255, 255, 0.6) 60%,
+      rgba(255, 255, 255, 0) 100%
+    );
+    animation: fp-hero-shimmer-anim 1.6s infinite;
+    content: "";
+  }
+  @keyframes fp-hero-shimmer-anim {
+    100% {
+      transform: translateX(100%);
+    }
+  }
+</style>
+
+<script is:inline>
+  /* HubSpot form embed with URL parameters auto-prefill — same pattern as
+     `_shared/ContactFormRb.astro`. */
+  (() => {
+    let initialized = false;
+
+    const initForm = () => {
+      if (initialized) return;
+      const container = document.getElementById("fp-hero-contact");
+      if (!container) return;
+      const portalId = container.getAttribute("data-portal-id");
+      const formId = container.getAttribute("data-form-id");
+      const region = container.getAttribute("data-region") || "na2";
+
+      if (window.hbspt && window.hbspt.forms) {
+        initialized = true;
+        window.hbspt.forms.create({
+          portalId: portalId,
+          formId: formId,
+          region: region,
+          target: "#fp-hero-contact",
+          onFormReady: function ($form) {
+            const skeleton = document.getElementById("fp-hero-form-skeleton");
+            if (skeleton) skeleton.remove();
+
+            const formEl = $form && $form[0] ? $form[0] : $form;
+            if (formEl && formEl.querySelector) {
+              const urlParams = new URLSearchParams(window.location.search);
+              const utms = ["utm_source", "utm_medium", "utm_campaign", "utm_term", "utm_content"];
+              utms.forEach((utm) => {
+                const value = urlParams.get(utm);
+                if (value) {
+                  const input = formEl.querySelector('input[name="' + utm + '"]');
+                  if (input) input.value = value;
+                }
+              });
+            }
+          },
+        });
+      }
+    };
+
+    const checkAndInit = () => {
+      if (window.hbspt && window.hbspt.forms) {
+        initForm();
+      } else {
+        const script = document.querySelector('script[src*="hsforms.net"]');
+        if (script) script.addEventListener("load", initForm);
+        let pollCount = 0;
+        const interval = setInterval(() => {
+          pollCount++;
+          if (window.hbspt && window.hbspt.forms) {
+            clearInterval(interval);
+            initForm();
+          } else if (pollCount > 100) {
+            clearInterval(interval);
+          }
+        }, 100);
+      }
+    };
+
+    if (document.readyState === "loading") {
+      document.addEventListener("DOMContentLoaded", checkAndInit);
+    } else {
+      checkAndInit();
+    }
+  })();
+</script>
