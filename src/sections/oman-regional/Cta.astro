@@ -99,7 +99,7 @@ const {
       <a
         href="https://www.cleartax.com/contact-us"
         data-demo-open
-        class="inline-flex items-center justify-center gap-2 rounded-lg border border-nova-blue bg-nova-blue px-5 py-3.5 text-[length:var(--fs-label-lg)] leading-[length:var(--lh-label-lg)] font-medium text-nova-50 no-underline transition-all duration-200 hover:bg-nova-50 hover:text-nova-blue"
+        class="inline-flex items-center justify-center gap-2 rounded-lg border border-nova-blue bg-nova-blue px-5 py-3.5 text-[length:var(--fs-label-lg)] leading-[length:var(--lh-label-lg)] font-medium text-nova-50 no-underline transition-all duration-200 hover:bg-generic-00 hover:text-nova-blue"
       >
         Book a Demo
       </a>
@@ -116,11 +116,11 @@ const {
      The one change from the hero copy is the IntersectionObserver at the bottom:
      this loop only runs while the band is on screen. */
   function initOmCtaGrid() {
-    const section = document.getElementById('om-cta');
+    const section = document.getElementById("om-cta");
     if (!section) return;
-    const canvas = document.getElementById('om-cta-dots');
+    const canvas = document.getElementById("om-cta-dots");
     if (!canvas || !canvas.getContext) return;
-    const ctx = canvas.getContext('2d');
+    const ctx = canvas.getContext("2d");
 
     function num(name, fallback) {
       const value = parseFloat(section.getAttribute(name));
@@ -128,15 +128,16 @@ const {
     }
 
     const config = {
-      lineWidth: num('data-line-width', 2),
-      gap: num('data-gap', 24),
-      maxLength: num('data-max-length', 6),
-      lengthRadius: num('data-length-radius', 260),
-      tilt: num('data-tilt', 1),
-      baseColor: section.getAttribute('data-base-color') || 'rgba(84, 70, 255, 0.28)',
-      cursorRadius: num('data-cursor-radius', 320),
-      pull: num('data-pull', 14),
-      fadeRadius: num('data-fade-radius', 40),
+      lineWidth: num("data-line-width", 2),
+      gap: num("data-gap", 24),
+      maxLength: num("data-max-length", 6),
+      lengthRadius: num("data-length-radius", 260),
+      tilt: num("data-tilt", 1),
+      baseColor:
+        section.getAttribute("data-base-color") || "rgba(84, 70, 255, 0.28)",
+      cursorRadius: num("data-cursor-radius", 320),
+      pull: num("data-pull", 14),
+      fadeRadius: num("data-fade-radius", 40),
       fadeSpeed: 12,
       followSpeed: 7,
       engageSpeed: 4,
@@ -242,7 +243,7 @@ const {
       ctx.clearRect(0, 0, width, height);
       ctx.strokeStyle = config.baseColor;
       ctx.lineWidth = config.lineWidth;
-      ctx.lineCap = 'round'; // so a stroke shrunk to nothing reads as a dot
+      ctx.lineCap = "round"; // so a stroke shrunk to nothing reads as a dot
 
       // Two passes. Only the strokes the cursor is touching have an alpha of
       // their own; the rest of the field goes down as one path in one stroke
@@ -271,13 +272,14 @@ const {
     }
 
     const reduceMotion =
-      window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      window.matchMedia &&
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
     if (reduceMotion) {
       // Static dot grid. No animation loop, no cursor reaction.
       initGrid();
       paint();
-      window.addEventListener('resize', () => {
+      window.addEventListener("resize", () => {
         initGrid();
         paint();
       });
@@ -311,7 +313,8 @@ const {
       speed += (Math.sqrt(travelX * travelX + travelY * travelY) - speed) * 0.5;
       if (speed < 0.01) speed = 0;
 
-      engagement += ((hover ? Math.min(speed / 6, 1) : 0) - engagement) * engageEase;
+      engagement +=
+        ((hover ? Math.min(speed / 6, 1) : 0) - engagement) * engageEase;
       if (engagement < 0.001) engagement = 0;
 
       // A parked cursor still holds the field open, just more gently.
@@ -321,7 +324,8 @@ const {
       const wantY = hover ? mouse.y : height / 2;
       const swungX = wantX - focusX;
       const swungY = wantY - focusY;
-      let swung = swungX > 0.05 || swungX < -0.05 || swungY > 0.05 || swungY < -0.05;
+      let swung =
+        swungX > 0.05 || swungX < -0.05 || swungY > 0.05 || swungY < -0.05;
       if (swung) {
         focusX += swungX * focusEase;
         focusY += swungY * focusEase;
@@ -430,12 +434,12 @@ const {
       paint();
     }
 
-    window.addEventListener('resize', rebuild);
+    window.addEventListener("resize", rebuild);
     rebuild();
 
     // The gate. IntersectionObserver answers "is it on screen" and nothing else,
     // which is exactly what starting and stopping the loop needs.
-    if ('IntersectionObserver' in window) {
+    if ("IntersectionObserver" in window) {
       const io = new IntersectionObserver(
         (entries) => {
           for (let i = 0; i < entries.length; i++) {
@@ -443,14 +447,14 @@ const {
             else stop();
           }
         },
-        { rootMargin: '200px 0px' }
+        { rootMargin: "200px 0px" },
       );
       io.observe(section);
     } else {
       start();
     }
 
-    section.addEventListener('mousemove', (e) => {
+    section.addEventListener("mousemove", (e) => {
       const rect = canvas.getBoundingClientRect();
       const sx = rect.width ? width / rect.width : 1;
       const sy = rect.height ? height / rect.height : 1;
@@ -467,7 +471,7 @@ const {
       mouse.y = ny;
     });
 
-    section.addEventListener('mouseleave', () => {
+    section.addEventListener("mouseleave", () => {
       // Dropping `hover` is what matters: the focus starts its swing back to the
       // centre, the strokes reel in and the pull lets go. Nothing reads the
       // parked coordinates while `hover` is false, and re-entry reseeds them.
@@ -476,8 +480,8 @@ const {
     });
   }
 
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initOmCtaGrid);
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", initOmCtaGrid);
   } else {
     initOmCtaGrid();
   }
