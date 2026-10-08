@@ -47,6 +47,7 @@ export const PAGE_TARGETS = [
   { name: 'india-homepage', input: 'src/styles/india-homepage.css', page: 'src/pages/india-homepage.astro' },
   { name: 'integration-page', input: 'src/styles/integration-page.css', page: 'src/pages/integration-page.astro' },
   { name: 'france-regional', input: 'src/styles/france-regional.css', page: 'src/pages/france-regional.astro' },
+  { name: 'france-product', input: 'src/styles/france-product.css', page: 'src/pages/france-product.astro' },
   { name: 'contact-us', input: 'src/styles/contact-us.css', page: 'src/pages/contact-us.astro' },
   { name: 'scale-and-security-page', input: 'src/styles/scale-and-security-page.css', page: 'src/pages/scale-and-security-page.astro' },
   { name: 'career-page', input: 'src/styles/career-page.css', page: 'src/pages/career-page.astro' },
