@@ -78,18 +78,25 @@ const portals: Tile[] = [
     name: "NIC",
     src: "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6a9e5c40e26234b20c223960_NIC.png",
   },
-  { name: "GSTN",
-    src: "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6a9e5cf5da2e8ae853e88977_gstn.png"
-   },
-  { name: "TRACES",
-    src: "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6a9e5c40615cfd7b88152a8c_traces.png"
-   },
-  { name: "Income Tax",
-    src: "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6a9e5c40928141edd9f3050d_income-tax-department.svg"
-   },
+  {
+    name: "GSTN",
+    src: "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6a9e5cf5da2e8ae853e88977_gstn.png",
+  },
+  {
+    name: "TRACES",
+    src: "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6a9e5c40615cfd7b88152a8c_traces.png",
+  },
+  {
+    name: "Income Tax",
+    src: "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6a9e5c40928141edd9f3050d_income-tax-department.svg",
+  },
 ];
 
-const platformPills = ["GL Data", "Govt Data & Notices", "Compliance Registers"];
+const platformPills = [
+  "GL Data",
+  "Govt Data & Notices",
+  "Compliance Registers",
+];
 
 /** Column heights, outermost first. Mirrored on the right-hand side. */
 const dotColumns = [290, 264, 238, 212, 186, 160, 108, 82];
@@ -133,7 +140,8 @@ const PLATFORM_X = FAN_W + HEX_GUTTER + PLATFORM_W / 2;
 const dotsIn = (h: number) => (h + DOT_PITCH - DOT) / DOT_PITCH;
 
 /** Centre of dot `k` in a column of height `h`, in the fan's own coordinates. */
-const dotY = (h: number, k: number) => (FAN_H - h) / 2 + DOT / 2 + k * DOT_PITCH;
+const dotY = (h: number, k: number) =>
+  (FAN_H - h) / 2 + DOT / 2 + k * DOT_PITCH;
 
 /** `outer` counts from the fan's outer edge, so both fans share this. */
 const dotDist = (outer: number, h: number, k: number) =>
@@ -160,7 +168,9 @@ const spread = dotColumns.flatMap((h, i) =>
    Order is preserved, so the front still travels the same way; only the pacing
    changes, from "constant px per second" to "constant rings per second", and it
    is rings the eye is actually counting. */
-const rings = [...new Set(spread.map((d) => Math.round(d * 100)))].sort((a, b) => a - b);
+const rings = [...new Set(spread.map((d) => Math.round(d * 100)))].sort(
+  (a, b) => a - b,
+);
 const ringOf = (outer: number, h: number, k: number) =>
   rings.indexOf(Math.round(dotDist(outer, h, k) * 100));
 
@@ -201,7 +211,7 @@ const stages = [
 ---
 
 <section class="bg-generic-00 max-lg:py-12 lg:py-20" data-ih-datalayer>
-  <div class="container mx-auto">
+  <div class="min-[1400px]:container mx-auto px-4 md:px-6 w-full">
     <div class="flex flex-col items-center gap-12">
       <div class="flex flex-col items-center gap-4 text-center">
         <h2
@@ -330,7 +340,9 @@ const stages = [
             }
           </svg>
 
-          <div class="relative flex w-[280px] shrink-0 items-center justify-center">
+          <div
+            class="relative flex w-[280px] shrink-0 items-center justify-center"
+          >
             <!-- Figma's own path data, nested by translate rather than redrawn:
                  334.283x382.284, 316.963x362.147 and 297.913x340.382, each
                  centred in the outermost box. All three are unfilled — the
@@ -448,7 +460,10 @@ const stages = [
            take Nova Blue on the DIAGRAM's crossing, at the same instant as the
            dots, and hold it while this row is still on screen. The script has
            the reason that hold exists. -->
-      <div class="flex w-full items-stretch max-lg:flex-col max-lg:gap-4" data-ih-lit>
+      <div
+        class="flex w-full items-stretch max-lg:flex-col max-lg:gap-4"
+        data-ih-lit
+      >
         {
           stages.map((stage, i) => (
             <>
@@ -688,7 +703,9 @@ const stages = [
       if (centred) held = true;
       if (!inView) held = false;
       diagram.classList.toggle("is-lit", centred);
-      followers.forEach((block) => block.classList.toggle("is-lit", centred || held));
+      followers.forEach((block) =>
+        block.classList.toggle("is-lit", centred || held),
+      );
     }
 
     // Deliberately NOT the latch the stepped rail in `ClarityAi.astro` uses:
@@ -714,14 +731,17 @@ const stages = [
       // No margin here on purpose: this is "still on screen at all", not
       // "centred". It only ever extends a state the diagram already granted.
       const seen = new Set();
-      const holder = new IntersectionObserver((entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) seen.add(entry.target);
-          else seen.delete(entry.target);
-        });
-        inView = seen.size > 0;
-        apply();
-      }, { threshold: 0 });
+      const holder = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) seen.add(entry.target);
+            else seen.delete(entry.target);
+          });
+          inView = seen.size > 0;
+          apply();
+        },
+        { threshold: 0 },
+      );
       followers.forEach((block) => holder.observe(block));
     }
   })();
