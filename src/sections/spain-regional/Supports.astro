@@ -28,49 +28,65 @@
  *
  * Ids are `sp-supports-` prefixed: embeds share one namespace per page.
  */
-interface SupportCard {
+export interface SupportCard {
   heading: string;
   body: string;
+  icon?: string;
+  image?: string;
 }
 
-const cards: SupportCard[] = [
+export interface Props {
+  cards?: SupportCard[];
+}
+
+const { cards: propCards } = Astro.props;
+
+const cards: SupportCard[] = propCards || [
   {
     heading: "One Platform for Every e-Invoicing Requirement",
     body: "One ClearTax integration covers SII reporting, Crea y Crece B2B e-invoicing, VERI*FACTU-compliant billing software, Facturae B2G, and TicketBAI — no separate vendor or workflow per mandate.",
+    icon: "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6ac7769ec663aaac1dd24ceb_icon-1.png",
   },
   {
     heading: "Full Mandate Coverage",
     body: "From SII's four-day ledger reporting to the phased Crea y Crece rollout, ClearTax tracks every applicable Spanish e-invoicing and e-reporting requirement so nothing is missed as new phases go live.",
+    icon: "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6ac776a5158caa5fa89ffb9b_icon-2.png",
   },
   {
     heading: "ERP Integration without disruption",
     body: "Pre-built connectors for SAP, Oracle, Microsoft Dynamics and 60+ other ERP and accounting systems mean SII, TicketBAI and Facturae reporting run cloud-side, with no rework to existing finance workflows.",
+    icon: "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6ac776dd2c255f8957b060a7_icon-3.png",
   },
   {
     heading: "Automated Compliance Updates",
     body: "When AEAT, the Basque provincial authorities or the Crea y Crece regulation change a requirement, the update ships in the platform — no manual patching or waiting on an ERP release cycle.",
+    icon: "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6ac776e30b7b74424ee489e7_icon-4.png",
   },
   {
     heading: "VAT Reporting Done Right",
     body: "Continuous reconciliation between issued invoices, received invoices and SII ledger submissions surfaces mismatches before AEAT does, reducing audit exposure.",
+    icon: "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6ac776e909e9bc8ba8a13933_icon-5.png",
   },
   {
     heading: "B2B Invoice Real-Time Status",
     body: "Track every outgoing and incoming invoice's status — submitted, accepted, rejected or pending — in one live dashboard, across SII, Crea y Crece and TicketBAI flows alike.",
+    icon: "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6ac776f01478806146427a8f_icon-6.png",
   },
   {
     heading: "Penalty-Risk Prevention",
     body: "Automated validation catches formatting and data errors before submission, cutting the rejected-invoice and late-filing risk that drives SII and TicketBAI penalties.",
+    icon: "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6ac776f4ba84357143847315_icon-7.png",
   },
   {
     heading: "Dedicated Regional Support",
     body: "A Spain-based success team and in-house tax experts interpret AEAT and Basque provincial guidance as it changes, and translate it directly into product updates.",
+    icon: "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6ac776fa75f59687c09d7c26_icon-8.png",
   },
 ];
 ---
 
 <section class="bg-generic-00 py-16 lg:py-20">
-  <div class="container mx-auto">
+  <div class="min-[1400px]:container w-full px-4 md:px-6 mx-auto">
     <h2
       class="m-0 mb-8 text-center font-heading font-medium text-vault-navy text-[length:var(--fs-h1)] leading-[length:var(--lh-h1)] tracking-[-0.5px] lg:mb-12"
     >
@@ -88,9 +104,19 @@ const cards: SupportCard[] = [
             data-sp-supports-index={i}
           >
             <span
-              class="block h-14 w-14 shrink-0 self-stretch rounded-lg bg-visual-placeholder"
+              class="flex h-14 w-14 shrink-0 items-center justify-center rounded-lg overflow-hidden"
               aria-hidden="true"
-            />
+            >
+              {card.icon || card.image ? (
+                <img
+                  src={card.icon || card.image}
+                  alt={card.heading}
+                  class="h-full w-full object-contain"
+                  loading="lazy"
+                  decoding="async"
+                />
+              ) : null}
+            </span>
             <span class="min-w-0 flex-1 font-heading font-medium text-vault-navy text-balance max-w-[414px] text-[length:var(--fs-h6)] leading-[length:var(--lh-h6)]">
               {card.heading}
             </span>
@@ -178,10 +204,29 @@ const cards: SupportCard[] = [
         class="flex w-full flex-col justify-between gap-6 lg:w-[416px] lg:shrink-0 lg:self-stretch"
       >
         <div class="flex flex-col gap-6">
-          <span
-            class="block h-16 w-16 shrink-0 rounded-lg bg-visual-placeholder"
-            aria-hidden="true"
-          />
+          <div class="h-16 w-16 shrink-0">
+            {
+              cards.map((card, i) => (
+                <span
+                  class="h-16 w-16 shrink-0 items-center justify-center rounded-lg overflow-hidden"
+                  style={i === 0 ? "display: flex;" : "display: none;"}
+                  hidden={i !== 0}
+                  data-sp-supports-icon
+                  aria-hidden="true"
+                >
+                  {card.icon || card.image ? (
+                    <img
+                      src={card.icon || card.image}
+                      alt={card.heading}
+                      class="h-full w-full object-contain"
+                      loading="lazy"
+                      decoding="async"
+                    />
+                  ) : null}
+                </span>
+              ))
+            }
+          </div>
           <div id="sp-supports-overlay-title">
             {
               cards.map((card, i) => (
@@ -272,6 +317,12 @@ const cards: SupportCard[] = [
   </div>
 </div>
 
+<style>
+  [data-sp-supports-icon][hidden] {
+    display: none !important;
+  }
+</style>
+
 <script is:inline>
   /* Card -> detail overlay, with the chevrons walking the eight without closing. */
   (function () {
@@ -284,6 +335,7 @@ const cards: SupportCard[] = [
     var nextBtn = overlay.querySelector("[data-sp-supports-next]");
     var headings = overlay.querySelectorAll("[data-sp-supports-heading]");
     var bodies = overlay.querySelectorAll("[data-sp-supports-body]");
+    var icons = overlay.querySelectorAll("[data-sp-supports-icon]");
     if (!panel || !headings.length || headings.length !== bodies.length) return;
 
     var count = headings.length;
@@ -295,6 +347,10 @@ const cards: SupportCard[] = [
       for (var i = 0; i < count; i++) {
         headings[i].hidden = i !== current;
         bodies[i].hidden = i !== current;
+        if (icons[i]) {
+          icons[i].hidden = i !== current;
+          icons[i].style.display = i === current ? "flex" : "none";
+        }
       }
       panel.scrollTop = 0;
     }
@@ -323,7 +379,10 @@ const cards: SupportCard[] = [
       if (!e.target.closest) return;
       var opener = e.target.closest("[data-sp-supports-open]");
       if (!opener) return;
-      open(parseInt(opener.getAttribute("data-sp-supports-index"), 10) || 0, opener);
+      open(
+        parseInt(opener.getAttribute("data-sp-supports-index"), 10) || 0,
+        opener,
+      );
     });
 
     if (closeBtn) closeBtn.addEventListener("click", close);
