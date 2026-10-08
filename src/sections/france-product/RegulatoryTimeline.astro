@@ -1,0 +1,160 @@
+---
+/**
+ * "France's reform is on track. Are you?" — Figma node 16433:47265.
+ *
+ * A simple list of month/year + description rows, each separated by a
+ * divider. No accordion, no sticky/scale choreography — just the five-phase
+ * DGFiP rollout read top to bottom, EXCEPT for the opacity focus: the row
+ * nearest the vertical centre of the viewport is full opacity, every other
+ * row sits at 50%. Scrolling walks the focus down the list.
+ *
+ * Centre-tracking mechanics are copied from `global-homepage/Proven.astro`
+ * (`.is-centered` + the thin-band IntersectionObserver) — see that file for
+ * the long-form rationale. This version drops Proven's separate reveal-on-
+ * scroll observer; these rows have no `premium-reveal` entrance, only focus.
+ */
+interface Milestone {
+  when: string;
+  text: string;
+}
+
+const milestones: Milestone[] = [
+  {
+    when: "September 2025",
+    text: "Completed — Central directory API testing. DGFiP opened the Annuaire PPF API for certified PAs to begin integration and flow testing with the central directory.",
+  },
+  {
+    when: "October 2025",
+    text: "Completed — PPF qualification environment. PPF testing environment opened for flows 1, 6, and 10 — finalising the PA registration process for certified partners including ClearTax.",
+  },
+  {
+    when: "February 2026",
+    text: "Live now — Voluntary pilot phase launched. Businesses can begin voluntarily issuing e-invoices via certified PAs. Early movers resolve integration issues before the mandatory deadline.",
+  },
+  {
+    when: "September 2026",
+    text: "Mandatory — Large & mid-size companies (50M€+ turnover). Mandatory reception for all companies. Mandatory issuance and e-reporting for large and mid-size enterprises. Missing this date means penalties from day one.",
+  },
+  {
+    when: "September 2027",
+    text: "Planned — SMEs and micro-enterprises. Full mandate extended to all remaining businesses. France's digital tax transformation complete.",
+  },
+];
+---
+
+<section class="bg-generic-00 py-16 lg:py-20" data-fp-timeline>
+  <div class="container mx-auto flex flex-col gap-12">
+    <div class="flex flex-col items-center gap-3 text-center">
+      <p class="m-0 font-body font-semibold text-nova-blue text-[length:var(--fs-label)] leading-[length:var(--lh-label)] uppercase tracking-[1px]">
+        Regulatory Timeline
+      </p>
+      <h2 class="m-0 max-w-[683px] font-heading font-medium text-vault-navy text-[length:var(--fs-h1)] leading-[length:var(--lh-h1)] tracking-[-0.5px]">
+        {"France's reform is on track. Are you?"}
+      </h2>
+      <p class="m-0 max-w-[683px] font-body font-normal text-neutral-500 text-[length:var(--fs-body-lg)] leading-[length:var(--lh-body-lg)]">
+        The DGFiP mandate rolls out in phases. Large enterprises hit mandatory compliance in September 2026. Implementation takes 8–10 weeks — the window is closing.
+      </p>
+    </div>
+
+    <div class="flex flex-col">
+      {
+        milestones.map((m, i) => (
+          <div
+            class:list={[
+              "fp-timeline-row flex flex-col gap-2 py-6 lg:flex-row lg:items-center lg:justify-between lg:gap-8",
+              i < milestones.length - 1 && "border-b border-[var(--border-divider,#f2f1f0)]",
+            ]}
+          >
+            <p class="m-0 shrink-0 font-heading font-medium text-vault-navy text-[length:var(--fs-h3)] leading-[length:var(--lh-h3)] lg:w-[260px]">
+              {m.when}
+            </p>
+            <p class="m-0 font-body font-normal text-neutral-500 text-[length:var(--fs-body)] leading-[length:var(--lh-body)] lg:max-w-[804px]">
+              {m.text}
+            </p>
+          </div>
+        ))
+      }
+    </div>
+  </div>
+</section>
+
+<style is:global>
+  /* Resting rows sit at 50% opacity; the row nearest the viewport's vertical
+     centre is promoted to full opacity by the script below. Transition lives
+     on the row itself (not its children) — unlike Proven.astro there is no
+     premium-reveal entrance fighting for the same properties here. */
+  .fp-timeline-row {
+    opacity: 0.5;
+    transition: opacity 0.35s ease;
+  }
+
+  .fp-timeline-row.is-centered {
+    opacity: 1;
+  }
+</style>
+
+<script is:inline>
+  (function () {
+    const root = document.querySelector("[data-fp-timeline]");
+    if (!root) return;
+    const rows = Array.from(root.querySelectorAll(".fp-timeline-row"));
+    if (!rows.length) return;
+
+    if (
+      !("IntersectionObserver" in window) ||
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches
+    ) {
+      // No observer, or motion is unwelcome: every row full opacity rather
+      // than the whole list sitting dimmed with nothing to light it.
+      rows.forEach((el) => el.classList.add("is-centered"));
+      return;
+    }
+
+    // A thin 1% band pinned across the middle of the viewport — "centred"
+    // means the row the centre line is actually inside. The observer only
+    // fires on a crossing, so a wide band could let the nearest row change
+    // with nothing to trigger a recompute; kept thin, every change of row IS
+    // a crossing. `inBand` holds the running set because two rows can
+    // straddle the line for a frame; pick() resolves that by distance.
+    let centred = null;
+    const inBand = new Set();
+
+    const pick = () => {
+      // Nothing in the band means the middle has landed in a gap between
+      // rows — hold the last choice instead of clearing, so the focus never
+      // blinks off between rows.
+      if (!inBand.size) return;
+
+      const middle = window.innerHeight / 2;
+      let best = null;
+      let bestDistance = Infinity;
+
+      inBand.forEach((el) => {
+        const r = el.getBoundingClientRect();
+        const distance = Math.abs((r.top + r.bottom) / 2 - middle);
+        if (distance < bestDistance) {
+          bestDistance = distance;
+          best = el;
+        }
+      });
+
+      if (!best || best === centred) return;
+      if (centred) centred.classList.remove("is-centered");
+      centred = best;
+      centred.classList.add("is-centered");
+    };
+
+    const centreObserver = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) inBand.add(entry.target);
+          else inBand.delete(entry.target);
+        });
+        pick();
+      },
+      { rootMargin: "-49.5% 0px -49.5% 0px", threshold: 0 },
+    );
+
+    rows.forEach((el) => centreObserver.observe(el));
+  })();
+</script>

@@ -1,0 +1,56 @@
+---
+/**
+ * Closing CTA band — Figma node 16433:47416 ("Container - Partner program").
+ *
+ * Same interactive stroke field as `Hero.astro` via `_shared/Dotgrid.astro`,
+ * tinted Nova Blue per the Figma rather than the hero's Flux Lime, gated on
+ * an IntersectionObserver-free always-on loop like every other brand-v2 CTA
+ * band — `Dotgrid` already handles start/stop internally per instance.
+ *
+ * "Book a Demo" scrolls to the hero's inline form (`#fp-hero-contact`)
+ * instead of opening `DemoModal.astro` — this page has no modal, the lead
+ * form lives in the hero. Inline `onclick`, not a delegated listener: an
+ * Embed's own script may not have run yet when a visitor clicks, and this is
+ * the same pattern `delivery-page/CTA.astro` and `integration-page/Hero.astro`
+ * use for the same "scroll to the form already on the page" job.
+ */
+import Dotgrid from "../_shared/Dotgrid.astro";
+---
+
+<section
+  id="fp-cta"
+  class="fp-cta relative overflow-hidden bg-generic-00 max-lg:py-16 lg:py-[121px]"
+>
+  <Dotgrid containerId="fp-cta" baseColor="rgba(84, 70, 255, 0.5)" />
+
+  <!-- Radial wash, so the headline keeps its contrast over the field -->
+  <div
+    class="absolute inset-0 z-0 bg-[radial-gradient(circle_at_center,_rgba(255,255,255,1)_30%,_rgba(255,255,255,0.7)_40%,_rgba(255,255,255,0)_65%)] pointer-events-none"
+  >
+  </div>
+
+  <div class="container mx-auto relative z-10">
+    <div class="mx-auto flex max-w-[791px] flex-col items-center gap-6 text-center">
+      <div class="flex flex-col items-center gap-2">
+        <h2
+          class="m-0 font-heading font-medium text-vault-navy text-[length:var(--fs-h2)] leading-[length:var(--lh-h2)]"
+        >
+          September 2026 is closer than you think.
+        </h2>
+        <p
+          class="m-0 font-body font-normal text-neutral-500 text-[length:var(--fs-body-lg)] leading-[length:var(--lh-body-lg)]"
+        >
+          Implementation takes 8–10 weeks. Companies that start now avoid the rush — and the risk.
+        </p>
+      </div>
+
+      <a
+        href="javascript:void(0)"
+        onclick="event.preventDefault(); document.getElementById('fp-hero-contact')?.scrollIntoView({ behavior: 'smooth' });"
+        class="inline-flex items-center justify-center gap-2 rounded-lg border border-nova-blue bg-nova-blue px-5 py-3.5 text-[length:var(--fs-label-lg)] leading-[length:var(--lh-label-lg)] font-medium text-nova-50 no-underline transition-all duration-200 hover:bg-nova-50 hover:text-nova-blue"
+      >
+        Book a Demo
+      </a>
+    </div>
+  </div>
+</section>

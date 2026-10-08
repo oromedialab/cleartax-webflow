@@ -1,0 +1,266 @@
+---
+/**
+ * "The Y-Model, demystified" — Figma node 16433:47289.
+ *
+ * Four bordered cards in a row wider than the 1280px container (2272px of
+ * content), so the Figma intends a horizontal scroll strip rather than a
+ * wrap/grid — the fourth card is cut off mid-width in the design itself.
+ *
+ * Scroll animation ported from `global-invoicing/Platform.astro` (via
+ * `_shared/UnderneathMandate.astro`): the section pins with `position: sticky`
+ * and the card track translates horizontally as the page scrolls through an
+ * oversized wrapper, so vertical scrolling drives the horizontal reveal
+ * instead of a swipe/trackpad gesture. `fp-ymodel-` prefixed rather than
+ * reusing UnderneathMandate's bare `.sticky-scroll-container` / `.compliance-
+ * scroll-track` names — this is a page section, not a `_shared` import, and
+ * section CSS is unscoped per page (see CLAUDE.md).
+ *
+ * `--nav-clear` (defined in tokens.css) sets the sticky offset and the pinned
+ * section's height, rather than UnderneathMandate's DOM query for
+ * `header, .navbar, .w-nav` — NavbarRb's root has neither tag nor class, so
+ * that query would silently miss and fall back to a hardcoded 80px. The same
+ * token already drives the sticky math in `spain-regional/Glance.astro`.
+ *
+ * The visual panel in each card is an unfilled "Image holder" frame in the
+ * Figma (#E8FFE1 fill), so it renders as `bg-visual-placeholder`. Swap for a
+ * Webflow-hosted asset per card when the artwork lands — never a `data:` URI.
+ *
+ * On a short viewport (`max-height: 750px`, the same breakpoint
+ * `_shared/UnderneathMandate.astro` uses) the heading+lede hides for the
+ * DURATION of the pinned scroll — not permanently. The section's height is
+ * `100vh - nav-clear`, so on a short screen the heading was eating room the
+ * cards need while pinned; but hiding it the instant the section sticks reads
+ * as a layout jump before the user has scrolled at all. Instead the scroll
+ * handler below hides it once scroll progress leaves 0 and restores it when
+ * progress returns to 0 — i.e. only while the track is actually translating.
+ *
+ * The collapse is a `grid-template-rows: 1fr -> 0fr` transition, not
+ * `max-height`. A `max-height` transition interpolates across whatever value
+ * you declare as "open" — set it to the content's real height and it's fine,
+ * but any headroom above that (a safety margin like `1000px` for copy that's
+ * actually ~150px tall) gets interpolated too, so almost the entire
+ * transition duration is spent easing through empty padding and the content
+ * itself collapses in the last few frames: looks like a snap, not a fade.
+ * `1fr`/`0fr` has no such headroom to guess — the browser collapses the
+ * track's one row from its measured height to zero, so the whole declared
+ * duration is spent on content that's actually there. Needs the inner
+ * `.fp-ymodel-heading-inner` wrapper: a grid item must have `overflow: hidden`
+ * and no intrinsic minimum height to actually shrink past its content's
+ * natural size instead of just letting the content overflow the track.
+ */
+interface ValueItem {
+  heading: string;
+  body: string;
+}
+
+const items: ValueItem[] = [
+  {
+    heading: "DGFiP-approved PA",
+    body: "Already certified. ClearTax is listed on the official Partenaire Dématérialisateur registry. Not going through certification — already certified, live, and operational in the French PPF environment today.",
+  },
+  {
+    heading: "All EN16931 formats supported — UBL 2.1, CII, and Factur-X",
+    body: "Automatic format transformation from your ERP's native output — no manual field mapping required.",
+  },
+  {
+    heading: "Full 14-status lifecycle tracking",
+    body: "Every mandatory status from Déposée through Encaissée automatically reported to DGFiP in real time — without manual intervention.",
+  },
+  {
+    heading: "Sovereign French cloud",
+    body: "10-year archive hosted on AWS EU with multi-AZ local data residency. ISO 27001:2022, SOC-2, and GDPR compliant throughout the mandatory 10-year retention period.",
+  },
+];
+---
+
+<div class="fp-ymodel-container bg-generic-00">
+  <section class="fp-ymodel-sticky sticky flex flex-col justify-center bg-generic-00 py-16 lg:py-20 overflow-hidden">
+    <div class="container mx-auto flex flex-col gap-12">
+      <div class="fp-ymodel-heading">
+        <div class="fp-ymodel-heading-inner flex flex-col items-center gap-3 text-center">
+          <p class="m-0 font-body font-semibold text-nova-blue text-[length:var(--fs-label)] leading-[length:var(--lh-label)] uppercase tracking-[1px]">
+            Architecture
+          </p>
+          <h2 class="m-0 max-w-[621px] font-heading font-medium text-vault-navy text-[length:var(--fs-h1)] leading-[length:var(--lh-h1)] tracking-[-0.5px]">
+            The Y-Model, demystified
+          </h2>
+          <p class="m-0 max-w-[621px] font-body font-normal text-neutral-500 text-[length:var(--fs-body-lg)] leading-[length:var(--lh-body-lg)]">
+            France uses a decentralised CTC exchange model. Invoices flow via certified PAs — direct supplier-to-buyer exchange is not permitted by DGFiP.
+          </p>
+        </div>
+      </div>
+
+      <div class="w-full h-auto">
+        <div class="fp-ymodel-track flex w-max gap-8 will-change-transform">
+          {
+            items.map((item) => (
+              <div class="fp-ymodel-card flex w-[340px] shrink-0 flex-col rounded-xl border border-neutral-300 bg-generic-00 sm:w-[400px] select-none">
+                <div class="border-b border-neutral-300 p-6 pointer-events-none">
+                  <h3 class="m-0 font-heading font-medium text-vault-navy text-[length:var(--fs-h6)] leading-[length:var(--lh-h6)]">
+                    {item.heading}
+                  </h3>
+                </div>
+                <div class="flex flex-col gap-8 p-6 pointer-events-none">
+                  <div class="aspect-[1280/720] w-full rounded-lg bg-visual-placeholder" aria-hidden="true" />
+                  <p class="m-0 font-body font-normal text-neutral-500 text-[length:var(--fs-body-sm)] leading-[length:var(--lh-body-sm)]">
+                    {item.body}
+                  </p>
+                </div>
+              </div>
+            ))
+          }
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<style is:global>
+  .fp-ymodel-sticky {
+    top: var(--nav-clear, 112px);
+    min-height: calc(100vh - var(--nav-clear, 112px));
+  }
+
+  /* Toggled by the scroll handler below, short viewports only. `1fr` -> `0fr`
+     on the track collapses the row by its own measured height — see the doc
+     comment up top for why that reads smooth where a `max-height` guess does
+     not. The inner wrapper is what actually clips: a grid item needs
+     `overflow: hidden` and `min-height: 0` to shrink below its content's
+     natural size instead of just letting the content spill past the track. */
+  .fp-ymodel-heading {
+    display: grid;
+    grid-template-rows: 1fr;
+    opacity: 1;
+    transition: grid-template-rows 0.35s ease, opacity 0.25s ease;
+  }
+
+  .fp-ymodel-heading-inner {
+    overflow: hidden;
+    min-height: 0;
+  }
+
+  .fp-ymodel-heading.fp-ymodel-heading-hidden {
+    grid-template-rows: 0fr;
+    opacity: 0;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    /* The script never binds its scroll listener when motion is unwelcome
+       (see below), so fall back to a plain horizontal scroll strip rather
+       than a pinned section with an untranslated, overflowing track. */
+    .fp-ymodel-sticky {
+      position: static;
+      min-height: 0;
+    }
+    .fp-ymodel-track {
+      overflow-x: auto;
+      width: 100%;
+      padding-bottom: 8px;
+    }
+  }
+</style>
+
+<script is:inline>
+  /* Pinned horizontal scroll, same mechanics as `_shared/UnderneathMandate.astro`
+     (the Platform section's scroll animation): the wrapper is stretched tall
+     enough to hold the full horizontal distance, the section pins via
+     `position: sticky` while that distance is scrolled, and the track's
+     `translate3d` tracks scroll progress through it. */
+  document.addEventListener("DOMContentLoaded", () => {
+    const containers = document.querySelectorAll(".fp-ymodel-container");
+    if (!containers.length) return;
+
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+
+    const getNavClear = () => {
+      const value = parseFloat(
+        getComputedStyle(document.documentElement).getPropertyValue("--nav-clear"),
+      );
+      return isNaN(value) ? 112 : value;
+    };
+
+    const SHORT_VIEWPORT = 750; // matches UnderneathMandate's max-height breakpoint
+
+    containers.forEach((container) => {
+      const track = container.querySelector(".fp-ymodel-track");
+      const section = container.querySelector(".fp-ymodel-sticky");
+      const heading = container.querySelector(".fp-ymodel-heading");
+      if (!track || !section) return;
+
+      let maxTranslate = 0;
+      let totalScrollable = 0;
+      let stickyTop = 0;
+
+      const updateMeasurements = () => {
+        const sectionHeight = section.offsetHeight;
+        const windowHeight = window.innerHeight;
+        const navClear = getNavClear();
+
+        stickyTop = navClear;
+        section.style.top = `${stickyTop}px`;
+
+        const containerWidth = track.parentElement.getBoundingClientRect().width;
+        maxTranslate = Math.max(0, track.scrollWidth - containerWidth);
+        container.style.height = `${maxTranslate + windowHeight}px`;
+        totalScrollable = container.getBoundingClientRect().height - sectionHeight;
+      };
+
+      updateMeasurements();
+
+      // Only `track` is observed, not `section`. The heading's hide/show
+      // below changes `section`'s height on a timed CSS transition — watching
+      // it here would refire `updateMeasurements` every animation frame of
+      // that transition, changing `totalScrollable` mid-scroll and fighting
+      // the very progress value deciding whether the heading should be
+      // hidden. `track` still needs watching: its `scrollWidth` changes at
+      // the `sm:` card-width breakpoint.
+      if (window.ResizeObserver) {
+        const ro = new ResizeObserver(updateMeasurements);
+        ro.observe(track);
+      }
+      window.addEventListener("resize", updateMeasurements);
+
+      let ticking = false;
+
+      const handleScroll = () => {
+        if (ticking) return;
+        ticking = true;
+        window.requestAnimationFrame(() => {
+          const containerRect = container.getBoundingClientRect();
+          const scrolledDistance = Math.max(0, stickyTop - containerRect.top);
+
+          let progress = totalScrollable > 0 ? scrolledDistance / totalScrollable : 0;
+          progress = Math.max(0, Math.min(1, progress));
+
+          track.style.transform = `translate3d(-${progress * maxTranslate}px, 0, 0)`;
+
+          // Short screens only: hide the heading for the DURATION of the
+          // pinned scroll (progress > 0), not permanently — restored the
+          // moment scroll returns to the top of the pin.
+          if (heading) {
+            const shouldHide = window.innerHeight <= SHORT_VIEWPORT && progress > 0.01;
+            heading.classList.toggle("fp-ymodel-heading-hidden", shouldHide);
+          }
+
+          ticking = false;
+        });
+      };
+
+      const observer = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              window.addEventListener("scroll", handleScroll, { passive: true });
+              handleScroll();
+            } else {
+              window.removeEventListener("scroll", handleScroll);
+            }
+          });
+        },
+        { rootMargin: "100% 0px 100% 0px" },
+      );
+
+      observer.observe(container);
+    });
+  });
+</script>

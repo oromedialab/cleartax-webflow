@@ -1,0 +1,104 @@
+---
+/**
+ * "What to report, and when" — Figma node 16433:47376.
+ *
+ * A Nova Blue-bordered panel holding a 4-column data table (transaction type,
+ * what to report, frequency, deadline) plus a closing footnote. Static data,
+ * no accordion/overlay — the table itself is the content.
+ */
+interface ReportRow {
+  type: string;
+  what: string;
+  frequency: string;
+  deadline: string;
+}
+
+const rows: ReportRow[] = [
+  {
+    type: "B2C Transactions",
+    what: "Aggregated data — not invoice level",
+    frequency: "Every 10 days",
+    deadline: "Day 20, day 30 of month; day 10 following month",
+  },
+  {
+    type: "B2B Exports",
+    what: "Invoice & line item level data",
+    frequency: "Every 10 days",
+    deadline: "Day 20, day 30 of month; day 10 following month",
+  },
+  {
+    type: "B2B Imports",
+    what: "Invoice level data",
+    frequency: "Every 10 days",
+    deadline: "Day 20, day 30 of month; day 10 following month",
+  },
+  {
+    type: "Payment Reporting",
+    what: "Monthly data across all three categories",
+    frequency: "Monthly",
+    deadline: "Before 10th of the following month",
+  },
+];
+
+const columns = ["Transaction Type", "What to report", "Frequency", "Deadline"];
+---
+
+<section class="bg-generic-00 py-16 lg:py-20">
+  <div class="container mx-auto">
+    <div class="flex flex-col items-center gap-12 rounded-2xl border-2 border-nova-blue px-6 py-10 lg:px-8 lg:py-12">
+      <div class="flex flex-col items-center gap-3 text-center">
+        <p class="m-0 font-body font-semibold text-nova-blue text-[length:var(--fs-label)] leading-[length:var(--lh-label)] uppercase tracking-[1px]">
+          E-Reporting
+        </p>
+        <h2 class="m-0 max-w-[697px] font-heading font-medium text-vault-navy text-[length:var(--fs-h1)] leading-[length:var(--lh-h1)] tracking-[-0.5px]">
+          What to report, and when
+        </h2>
+        <p class="m-0 max-w-[697px] font-body font-normal text-neutral-500 text-[length:var(--fs-body-lg)] leading-[length:var(--lh-body-lg)]">
+          E-Reporting covers cross-border B2B and B2C transactions not in scope for domestic e-invoicing. Frequencies and deadlines vary by VAT regime and transaction type.
+        </p>
+      </div>
+
+      <div class="flex w-full flex-col items-center gap-6">
+        <div class="fp-ereport-table w-full overflow-x-auto rounded-xl border border-[#c2c8ff]">
+          <table class="w-full min-w-[720px] border-collapse">
+            <thead>
+              <tr class="bg-[#ecefff]">
+                {
+                  columns.map((c) => (
+                    <th class="px-3 py-4 text-left font-body font-medium text-vault-navy text-[length:var(--fs-body-sm)] leading-[length:var(--lh-body-sm)]">
+                      {c.toUpperCase()}
+                    </th>
+                  ))
+                }
+              </tr>
+            </thead>
+            <tbody>
+              {
+                rows.map((row, i) => (
+                  <tr class:list={["border-t border-[#c2c8ff]", i % 2 === 0 ? "bg-[#f3f4f6]" : "bg-generic-00"]}>
+                    <td class="px-3 py-4 font-body font-normal text-vault-navy text-[length:var(--fs-body-sm)] leading-[length:var(--lh-body-sm)]">
+                      {row.type}
+                    </td>
+                    <td class="px-3 py-4 font-body font-normal text-vault-navy text-[length:var(--fs-body-sm)] leading-[length:var(--lh-body-sm)]">
+                      {row.what}
+                    </td>
+                    <td class="px-3 py-4 font-body font-normal text-vault-navy text-[length:var(--fs-body-sm)] leading-[length:var(--lh-body-sm)]">
+                      {row.frequency}
+                    </td>
+                    <td class="px-3 py-4 font-body font-normal text-vault-navy text-[length:var(--fs-body-sm)] leading-[length:var(--lh-body-sm)]">
+                      {row.deadline}
+                    </td>
+                  </tr>
+                ))
+              }
+            </tbody>
+          </table>
+        </div>
+
+        <p class="m-0 max-w-[739px] text-center font-body font-normal text-neutral-500 text-[length:var(--fs-body-sm)] leading-[length:var(--lh-body-sm)]">
+          All e-reporting must follow DGFiP-approved XML/JSON structured schemas. ClearTax automates all transformations, scheduling, and submissions — your team sees a status dashboard, not raw XML.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>

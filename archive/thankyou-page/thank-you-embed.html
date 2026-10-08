@@ -142,14 +142,18 @@
       backLink.addEventListener('click', (e) => {
         e.preventDefault();
 
-        // Only ever redirect to a same-origin, relative destination.
-        // Anything else (absolute URL to another host, javascript:, protocol-relative //host) returns null.
-        function safeRelativePath(url) {
+        // Only ever redirect to a same-origin destination. Returns the full
+        // absolute URL (scheme + host included) rather than just pathname/search/hash:
+        // handing a bare string like "//evil.com" or "/\evil.com" back to location.href
+        // gets RE-PARSED by the browser as a network-path reference (new host), even
+        // though it was same-origin when first resolved against a base. Keeping the
+        // explicit scheme+host on reassignment prevents that re-parse from escaping.
+        function safeDestinationUrl(url) {
           if (!url) return null;
           try {
             const resolved = new URL(url, window.location.origin);
             if (resolved.origin !== window.location.origin) return null;
-            return resolved.pathname + resolved.search + resolved.hash;
+            return resolved.href;
           } catch (err) {
             return null;
           }
@@ -161,7 +165,7 @@
 
         // 2. Priority 2: Use document.referrer
         // 3. Priority 3: Fallback to home
-        const destination = safeRelativePath(backUrl) || safeRelativePath(document.referrer) || '/';
+        const destination = safeDestinationUrl(backUrl) || safeDestinationUrl(document.referrer) || '/';
 
         // Handle Iframe context (Navigate the top window)
         if (window.self !== window.top) {
