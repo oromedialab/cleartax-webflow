@@ -17,39 +17,69 @@ export interface LogoItem {
 
 export interface Props {
   logos?: (string | LogoItem)[];
-  title?: string | null;
   achievements?: Achievement[];
+  title?: string | null;
+  mobileTitle?: string | null;
   variant?: 'default' | 'tiles';
   bgClass?: string;
+  containerClass?: string;
+  speed?: string;
+  pauseOnHover?: boolean;
 }
 
 const {
   logos = [],
   achievements = [],
   variant = achievements.length > 0 ? 'tiles' : 'default',
-  title = achievements.length > 0 ? null : 'Trusted by <span class="text-nova-blue">5000+</span> Businesses Worldwide',
-  bgClass = achievements.length > 0 ? 'bg-generic-00 py-6' : 'bg-gradient-to-t from-[#F3F1F9] to-generic-00 py-12',
+  title = null,
+  mobileTitle = null,
+  bgClass = 'bg-generic-00 py-6',
+  containerClass = 'max-w-[var(--container-max)] w-full px-4 md:px-6 mx-auto',
+  speed = '60s',
+  pauseOnHover = true,
 } = Astro.props;
 
 const normalizedLogos: LogoItem[] = logos.map((l) =>
   typeof l === 'string' ? { src: l, alt: '' } : { src: l.src, alt: l.alt ?? '' }
 );
 const doubled = [...normalizedLogos, ...normalizedLogos];
+
+const computedMobileTitle =
+  mobileTitle ||
+  achievements.find((a) => a.emphasis)?.label ||
+  (achievements.length > 0 ? 'Trusted by 5000+ enterprises' : null);
 ---
 
 <section class:list={[bgClass, "overflow-hidden w-full"]}>
   {
     variant === 'tiles' ? (
-      <div class="container mx-auto">
+      <div class:list={[containerClass]}>
         <div class="flex flex-col items-center gap-6">
+          {/* Main title if provided */}
+          {title && (
+            <h2
+              class="v2-logos-title text-center text-[length:var(--fs-h2)] leading-[length:var(--lh-h2)] font-medium text-vault-navy mb-2 tracking-[-0.5px]"
+              set:html={title}
+            />
+          )}
+
+          {/* Achievements strip */}
           {achievements.length > 0 && (
             <div class="sp-achievements relative w-full">
-              <ul class="flex flex-wrap items-center justify-center gap-x-8 gap-y-2 list-none m-0 p-0 max-md:gap-x-5">
+              {/* Mobile heading */}
+              {computedMobileTitle && (
+                <h2 class="m-0 text-center font-heading font-medium text-vault-navy text-[length:var(--fs-h4)] leading-[length:var(--lh-h4)] md:hidden">
+                  {computedMobileTitle}
+                </h2>
+              )}
+
+              {/* Desktop achievements list */}
+              <ul class="hidden md:flex items-center justify-center gap-x-8 list-none m-0 p-0">
                 {achievements.map((a, i) => (
                   <>
                     {i > 0 && (
                       <li
-                        class="h-4 w-px shrink-0 rounded-full bg-[#CCCCCC] max-md:hidden"
+                        class="h-4 w-px shrink-0 rounded-full bg-[#CCCCCC]"
                         aria-hidden="true"
                       />
                     )}
@@ -58,7 +88,7 @@ const doubled = [...normalizedLogos, ...normalizedLogos];
                         "text-center font-body text-vault-navy",
                         a.emphasis
                           ? "text-[length:var(--fs-body-lg)] leading-[length:var(--lh-body-lg)] font-medium"
-                          : "max-md:hidden text-[length:var(--fs-body)] leading-[length:var(--lh-body)]",
+                          : "text-[length:var(--fs-body)] leading-[length:var(--lh-body)]",
                       ]}
                     >
                       {a.label}
@@ -69,21 +99,23 @@ const doubled = [...normalizedLogos, ...normalizedLogos];
             </div>
           )}
 
-          {title && (
-            <h2
-              class="v2-logos-title text-center text-[length:var(--fs-h2)] leading-[length:var(--lh-h2)] font-medium! text-vault-navy mb-2 tracking-[-0.5px]"
-              set:html={title}
-            />
-          )}
-
+          {/* Logo tiles marquee */}
           <div class="sp-marquee relative w-full overflow-hidden">
-            <div class="sp-track flex w-max items-center gap-2 motion-reduce:animate-none">
+            <div
+              class:list={[
+                "sp-track flex w-max items-center gap-2 motion-reduce:animate-none",
+                pauseOnHover ? "hover:[animation-play-state:paused]" : "",
+              ]}
+              style={`--sp-speed: ${speed};`}
+            >
               {doubled.map((logo, i) => (
                 <span class="flex h-12 w-[124px] shrink-0 items-center justify-center rounded-lg bg-[#F5F5F5]">
                   <img
                     src={logo.src}
-                    alt={logo.alt}
+                    alt={logo.alt || (i < normalizedLogos.length ? "Customer logo" : "")}
                     aria-hidden={i >= normalizedLogos.length}
+                    width="86"
+                    height="26"
                     class="h-[26px] w-[86px] object-contain mix-blend-multiply"
                     loading="lazy"
                     decoding="async"
@@ -95,10 +127,10 @@ const doubled = [...normalizedLogos, ...normalizedLogos];
         </div>
       </div>
     ) : (
-      <div class="max-w-[var(--container-max)] mx-auto px-4 md:px-6">
+      <div class:list={[containerClass]}>
         {title && (
           <h2
-            class="v2-logos-title text-center text-[length:var(--fs-h2)] leading-[length:var(--lh-h2)] font-medium! text-vault-navy mb-8 tracking-[-0.5px] max-lg:mb-11 max-sm:mb-9"
+            class="v2-logos-title text-center text-[length:var(--fs-h2)] leading-[length:var(--lh-h2)] font-medium text-vault-navy mb-8 tracking-[-0.5px] max-lg:mb-11 max-sm:mb-9"
             set:html={title}
           />
         )}
@@ -107,8 +139,10 @@ const doubled = [...normalizedLogos, ...normalizedLogos];
             {doubled.map((logo, i) => (
               <img
                 src={logo.src}
-                alt={logo.alt}
+                alt={logo.alt || (i < normalizedLogos.length ? "Customer logo" : "")}
                 aria-hidden={i >= normalizedLogos.length}
+                width="86"
+                height="26"
                 class="shrink-0 h-[26px] w-[86px] object-contain mix-blend-multiply transition-all duration-150 ease-in-out hover:scale-105 max-lg:h-[26px] max-lg:w-[76px] max-sm:h-14 max-sm:w-[60px]"
                 loading="lazy"
                 decoding="async"
@@ -183,7 +217,7 @@ const doubled = [...normalizedLogos, ...normalizedLogos];
   }
 
   .sp-track {
-    animation: sp-scroll 60s linear infinite;
+    animation: sp-scroll var(--sp-speed, 60s) linear infinite;
   }
 
   .sp-marquee:hover .sp-track {
