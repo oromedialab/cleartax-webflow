@@ -298,10 +298,21 @@ const {
       return;
     }
 
+    let rafId = null;
     let lastTime = performance.now();
     let isFirstFrame = true;
 
+    function isMobileScreen() {
+      return window.innerWidth < 768;
+    }
+
     function draw(time) {
+      if (isMobileScreen()) {
+        paint();
+        rafId = null;
+        return;
+      }
+
       if (dots.length === 0) {
         initGrid();
       }
@@ -423,12 +434,30 @@ const {
         paint();
         isFirstFrame = false;
       }
-      requestAnimationFrame(draw);
+      rafId = requestAnimationFrame(draw);
     }
 
-    window.addEventListener("resize", initGrid);
+    function handleResize() {
+      initGrid();
+      if (isMobileScreen()) {
+        if (rafId) {
+          cancelAnimationFrame(rafId);
+          rafId = null;
+        }
+        paint();
+      } else if (!rafId) {
+        lastTime = performance.now();
+        rafId = requestAnimationFrame(draw);
+      }
+    }
+
+    window.addEventListener("resize", handleResize);
     initGrid();
-    requestAnimationFrame(draw);
+    if (isMobileScreen()) {
+      paint();
+    } else {
+      rafId = requestAnimationFrame(draw);
+    }
 
     section.addEventListener("mousemove", (e) => {
       const rect = canvas.getBoundingClientRect();
@@ -456,9 +485,17 @@ const {
     });
   }
 
+  function scheduleHeroGrid() {
+    if ("requestIdleCallback" in window) {
+      requestIdleCallback(initSpHeroGrid, { timeout: 1500 });
+    } else {
+      setTimeout(initSpHeroGrid, 250);
+    }
+  }
+
   if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", initSpHeroGrid);
+    document.addEventListener("DOMContentLoaded", scheduleHeroGrid);
   } else {
-    initSpHeroGrid();
+    scheduleHeroGrid();
   }
 </script>
