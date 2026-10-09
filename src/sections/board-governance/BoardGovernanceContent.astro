@@ -1,0 +1,663 @@
+---
+/**
+ * Product deep-dive tabs — Figma node 16734:52020
+ * ("Container - Board Goverance content").
+ *
+ * Three pills (BLISS / BLISSDOC / Clear Compass) switch between three full
+ * panels, each pulled from the Figma instance's actual content (BLISSDOC's
+ * was hidden in the source tree behind the active Clear Compass state, not
+ * absent — recovered from the provided screenshots since hidden Figma
+ * layers don't come through the design-context API).
+ *
+ * The feature-card grids (BLISS's 6, BLISSDOC's 4) are the same reusable
+ * "Card" component in Figma — a button that expands on click, heading
+ * always visible, body collapsed behind a rotating plus icon. BLISSDOC's
+ * card bodies aren't in the source file; they expand to the same
+ * "content coming soon" placeholder already used for its tab panel
+ * elsewhere, rather than inventing copy.
+ *
+ * Tab-switcher mechanics (sliding pill, inline-`display` panels, roving
+ * tabindex) follow the same pattern as global-homepage/Seamless.astro's
+ * mobile tablist — inline display, not a class, so panel visibility can't
+ * race another unlayered utility once pasted into Webflow.
+ *
+ * Decorative swoosh/line graphics behind the Figma tables are omitted:
+ * they are pure flourish with no content, and the only source for them is
+ * a temporary Figma asset URL that expires in 7 days.
+ */
+interface FeatureCard {
+  heading: string;
+  body: string;
+}
+
+const blissFeatures: FeatureCard[] = [
+  {
+    heading: "Meetings & agendas",
+    body: "Board, sub-committee and shareholder meetings built from a standards-aligned template library. Statutory items due this cycle appear automatically, and unresolved carry-forwards come with them — so nothing drops off quietly between quarters.",
+  },
+  {
+    heading: "Minutes & resolutions",
+    body: "Drafted against the same library, with resolutions phrased in correct statutory form. Circular resolutions are managed end to end, and versions, approvals and signatures are tracked so the final record is unambiguous.",
+  },
+  {
+    heading: "Statutory registers",
+    body: "Members, directors, charges, related-party contracts, loans and investments update as events are recorded. Each entry links back to the resolution or filing that created it, so 'on what authority?' is answered in one click.",
+  },
+  {
+    heading: "Action trackers & returns",
+    body: "Follow-ups from board decisions and the statutory returns due across the year carry named owners and deadlines. The secretary chases a screen rather than an inbox, and the board sees what it asked for last quarter.",
+  },
+  {
+    heading: "e-Repository",
+    body: "Every resolution, minute, register and return auto-filed financial year-wise and, within a year, by category. Retrieval stops depending on which company secretary happened to hold the chair in 2019.",
+  },
+  {
+    heading: "Dashboard & Group MIS",
+    body: "Red, amber and green status across entities in real time — plus the dozen group facts you are always asked for (registered office, capital, statutory, secretarial and internal auditors) as a single export.",
+  },
+];
+
+const blissReplacesRows = [
+  ["Agenda built from the statutory calendar", "Retyped each quarter", "Not its job", "Assembled automatically"],
+  ["Registers kept current", "Rebuilt before audit", "Stores the file only", "Updated as events occur"],
+  ["Records filed by year and category", "Depends on the person", "Manual foldering", "Automatic, from incorporation"],
+  ["Group facts across companies", "A round of emails", "Search, then collate", "One MIS export"],
+  ["Survives a change of company secretary", "Rarely", "Files yes, context no", "Institutional memory intact"],
+];
+
+const blissVariants = [
+  { name: "BLISSPLUS", tag: "unlisted" },
+  { name: "BLISSLISTED", tag: "listed" },
+  { name: "BLISSGLOBAL", tag: "overseas subsidiaries" },
+  { name: "CimplyBest", tag: "board evaluation" },
+];
+
+const blissdocFeatures: FeatureCard[] = [
+  { heading: "One pack. One current version.", body: "Agenda, notes, annexures and supporting schedules arrive together. When a paper is updated the pack updates, so everyone in the room is reading the same version and nobody is scrolling an email thread to work out which attachment is live." },
+  { heading: "Read on the flight. Annotate privately.", body: "Packs are available offline, so preparation is not limited to where the connectivity is. Private annotations stay private to the director who made them — no shared-drive comment thread, no accidental disclosure." },
+  { heading: "Board history, searchable mid-discussion.", body: "Past meetings, minutes and resolutions sit in the same app — which matters most in the moment a discussion turns on what the board actually decided two years ago, and the answer is needed before the item moves on." },
+  { heading: "Access that ends when the directorship does.", body: "Role and committee-based permissions, two-factor authentication, and a full log of who opened what and when. When a director steps down, access is revoked centrally and the material goes with it." },
+];
+
+const blissdocReplacesRows = [
+  ["Everyone reading the same version", "No guarantees", "Yes", "Yes"],
+  ["Access revoked on resignation", "Impossible", "Usually, centrally", "Immediate"],
+  ["Board history in the same place", "Search your mailbox", "Only what was uploaded", "The secretarial record itself"],
+  ["Fed by the secretary's working system", "No", "Re-uploaded by hand", "Published from BLISS automatically"],
+];
+
+const documentAiRows = [
+  ["Authenticity", "Whether the document is a genuine issued instrument", "Placeholder files uploaded to close a task"],
+  ["Validity period", "Whether it is currently in force", "Licences and consents that expired months ago"],
+  ["Entity match", "Whether it was issued to the entity claiming it", "A sister company's certificate filed against the wrong subsidiary"],
+  ["Completeness", "Whether the full document is present", "Page one of a four-page acknowledgement"],
+  ["Relevance", "Whether it proves this obligation", "A generic registration filed against a specific return"],
+];
+
+const compassStats: FeatureCard[] = [
+  {
+    heading: "₹ exposure, live.",
+    body: "A High / Medium / Low risk score per entity with red-amber-green banding, rolled up to group and drillable to any unit or department — and penalty exposure in rupees, which is the number the CFO actually asks for.",
+  },
+  {
+    heading: "Maker–checker throughout.",
+    body: "Nothing closes on one person's word. A maker performs the task and uploads proof; a named checker reviews and approves. AI scores the evidence — the second signature is still human, and still required.",
+  },
+  {
+    heading: "A legal engine that stays current.",
+    body: "Circulars, amendments and judgments flow into the obligation library continuously, so your coverage does not quietly decay in the years between implementation and audit.",
+  },
+];
+
+interface Cluster {
+  title: string;
+  badges: string[];
+}
+
+const clusters: Cluster[] = [
+  { title: "Corporate & secretarial", badges: ["Companies Act, 2013", "MCA filings, registers", "board processes"] },
+  { title: "Securities & listing", badges: ["SEBI LODR", "insider trading", "takeover regulations"] },
+  { title: "Direct tax", badges: ["Income-tax calendar", "TDS and TCS obligations"] },
+  { title: "Indirect tax", badges: ["GST returns", "e-invoicing", "e-way bills"] },
+  { title: "Labour & employment", badges: ["Labour codes", "Shops & Establishments", "contract labour"] },
+  { title: "Social security", badges: ["EPF", "ESI", "gratuity", "bonus"] },
+  { title: "Foreign exchange", badges: ["FEMA", "RBI returns", "ODI", "FDI reporting"] },
+  { title: "Environment, health & safety", badges: ["Consents", "factory licences", "safety registers"] },
+  { title: "Workplace conduct", badges: ["POSH committee", "filings", "annual reporting"] },
+  { title: "Data & IT", badges: ["DPDP Act", "IT Act obligations"] },
+  { title: "Industry-specific", badges: ["Sectoral regulators", "licence conditions"] },
+];
+
+const compassReplacesRows = [
+  ["One view across every law and entity", "Manual consolidation", "One silo each", "Single dashboard"],
+  ["Is the proof document actually valid?", "Eyeballed at audit", "Stored, not checked", "Five AI signals on upload"],
+  ["What is the exposure worth?", "Unknown", "Unknown", "Quantified in ₹"],
+  ["Keeping up with amendments", "Whoever remembers", "Per vendor", "Auto-updating engine"],
+  ["Who approved this closure?", "A cell colour", "Varies", "Named maker and checker"],
+];
+
+const tabs = [
+  { key: "bliss", label: "BLISS" },
+  { key: "blissdoc", label: "BLISSDOC" },
+  { key: "compass", label: "Clear Compass" },
+];
+---
+
+<section class="bg-generic-00 px-4 py-16 md:px-6 lg:py-20">
+  <div class="mx-auto max-w-[var(--container-max)]">
+    <div
+      class="bgc-tablist relative mb-10 flex w-max max-w-full items-center gap-1 overflow-x-auto rounded-xl bg-neutral-100 p-1.5 lg:mb-12"
+      role="tablist"
+      aria-label="Board governance products"
+    >
+      <span class="bgc-tab-thumb pointer-events-none absolute" aria-hidden="true"></span>
+      {
+        tabs.map((t) => (
+          <button
+            type="button"
+            role="tab"
+            id={`bgc-tab-${t.key}`}
+            class="bgc-tab relative z-10 min-w-max cursor-pointer whitespace-nowrap rounded-lg border-0 bg-transparent px-6 py-2 text-center font-body text-[length:var(--fs-label)] leading-[length:var(--lh-label)] font-medium text-neutral-700"
+            aria-selected={t.key === "compass" ? "true" : "false"}
+            aria-controls={`bgc-panel-${t.key}`}
+            tabindex={t.key === "compass" ? 0 : -1}
+            data-bgc-tab={t.key}
+          >
+            {t.label}
+          </button>
+        ))
+      }
+    </div>
+
+    <!-- BLISS -->
+    <div
+      id="bgc-panel-bliss"
+      role="tabpanel"
+      aria-labelledby="bgc-tab-bliss"
+      data-bgc-panel="bliss"
+      style="display:none"
+    >
+      <div class="flex flex-col gap-16">
+        <div class="flex flex-col gap-6">
+          <p class="m-0 font-heading text-[length:var(--fs-h4)] leading-[length:var(--lh-h4)] font-medium text-vault-navy">
+            For the secretarial team
+          </p>
+          <div class="flex flex-col gap-3 font-body text-[length:var(--fs-body-lg)] leading-[length:var(--lh-body-lg)] text-neutral-500">
+            <p class="m-0">The secretarial work, in a fraction of the keystrokes.</p>
+            <p class="m-0">Agendas assembled from the statutory calendar. Minutes drafted to ICSI secretarial standards.</p>
+            <p class="m-0 text-balance">Registers that update as events are recorded, and an e-repository reaching back to your incorporation date, so a secretarial audit becomes an export rather than an excavation.</p>
+          </div>
+
+          <div class="grid grid-cols-1 items-start gap-6 md:grid-cols-2" data-bgc-card-grid>
+            {
+              blissFeatures.map((f) => (
+                <button type="button" class="bgc-card flex flex-col rounded-xl border border-neutral-300 p-6 text-left cursor-pointer bg-generic-00" data-bgc-card>
+                  <div class="flex items-center justify-between gap-4">
+                    <p class="m-0 font-body text-[length:var(--fs-body-lg)] leading-[length:var(--lh-body-lg)] text-vault-navy">
+                      {f.heading}
+                    </p>
+                    <span class="bgc-card-icon flex size-5 shrink-0 items-center justify-center text-vault-navy" aria-hidden="true">
+                      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M8 1.5V14.5M1.5 8H14.5" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" />
+                      </svg>
+                    </span>
+                  </div>
+                  <p class="bgc-card-body m-0 overflow-hidden font-body text-[length:var(--fs-body)] leading-[length:var(--lh-body)] text-neutral-500">
+                    {f.body}
+                  </p>
+                </button>
+              ))
+            }
+          </div>
+        </div>
+
+        <div class="flex flex-col gap-6">
+          <p class="m-0 font-heading text-[length:var(--fs-h4)] leading-[length:var(--lh-h4)] font-medium text-vault-navy">
+            What BLISS replaces
+          </p>
+          <p class="m-0 font-body text-[length:var(--fs-body-lg)] leading-[length:var(--lh-body-lg)] text-neutral-500 text-balance">
+            Most secretarial teams are running one of two things today: a folder structure plus Word templates, or a document store that holds files but knows nothing about the Companies Act.
+          </p>
+
+          <div class="overflow-x-auto rounded-xl border border-ledger-200">
+            <table class="w-full min-w-150 border-collapse">
+              <thead>
+                <tr class="bg-ledger-50">
+                  <th class="border-r border-b border-ledger-200 p-3 text-left font-body text-[length:var(--fs-body-sm)] font-medium text-vault-navy">Secretarial work</th>
+                  <th class="border-r border-b border-ledger-200 p-3 text-left font-body text-[length:var(--fs-body-sm)] font-medium text-neutral-500">Word templates & folders</th>
+                  <th class="border-r border-b border-ledger-200 p-3 text-left font-body text-[length:var(--fs-body-sm)] font-medium text-neutral-500">Generic document store</th>
+                  <th class="border-b border-ledger-200 bg-lime-500 p-3 text-left font-body text-[length:var(--fs-body-sm)] font-medium text-vault-navy">BLISS</th>
+                </tr>
+              </thead>
+              <tbody>
+                {
+                  blissReplacesRows.map((row) => (
+                    <tr>
+                      <td class="border-t border-r border-ledger-200 bg-ledger-50 p-3 font-body text-[length:var(--fs-body-sm)] text-vault-navy">{row[0]}</td>
+                      <td class="border-t border-r border-ledger-200 p-3 font-body text-[length:var(--fs-body-sm)] text-neutral-500">{row[1]}</td>
+                      <td class="border-t border-r border-ledger-200 p-3 font-body text-[length:var(--fs-body-sm)] text-neutral-500">{row[2]}</td>
+                      <td class="border-t border-ledger-200 bg-lime-50 p-3 font-body text-[length:var(--fs-body-sm)] text-vault-navy">{row[3]}</td>
+                    </tr>
+                  ))
+                }
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="flex flex-col gap-6 rounded-xl border border-neutral-300 p-6 md:flex-row md:items-start md:gap-8">
+          <div class="flex flex-col gap-3 md:w-80 md:shrink-0">
+            <p class="m-0 font-heading text-[length:var(--fs-h5)] leading-[length:var(--lh-h5)] font-medium text-vault-navy">
+              Variants
+            </p>
+            <p class="m-0 font-body text-[length:var(--fs-body)] leading-[length:var(--lh-body)] text-neutral-500">
+              Your variant follows from your compliance load and entity structure, not from headcount.
+            </p>
+          </div>
+          <div class="flex flex-1 flex-col divide-y divide-ledger-white">
+            {
+              blissVariants.map((v) => (
+                <div class="flex items-center justify-between gap-4 py-4 first:pt-0 last:pb-0">
+                  <span class="font-body text-[length:var(--fs-body)] leading-[length:var(--lh-body)] text-vault-navy">{v.name}</span>
+                  <span class="font-body text-[length:var(--fs-body)] leading-[length:var(--lh-body)] text-neutral-500">{v.tag}</span>
+                </div>
+              ))
+            }
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- BLISSDOC -->
+    <div
+      id="bgc-panel-blissdoc"
+      role="tabpanel"
+      aria-labelledby="bgc-tab-blissdoc"
+      data-bgc-panel="blissdoc"
+      style="display:none"
+    >
+      <div class="flex flex-col gap-16">
+        <div class="flex flex-col gap-6">
+          <p class="m-0 font-heading text-[length:var(--fs-h4)] leading-[length:var(--lh-h4)] font-medium text-vault-navy">
+            For directors
+          </p>
+          <div class="flex flex-col gap-3 font-body text-[length:var(--fs-body-lg)] leading-[length:var(--lh-body-lg)] text-neutral-500">
+            <p class="m-0">The board pack, on your tablet. Not in your inbox.</p>
+            <p class="m-0 text-balance">Every pack, annexure and past minute in one secure app on Android and iOS — read offline, annotated privately, and revoked centrally the day a directorship ends.</p>
+          </div>
+
+          <div class="grid grid-cols-1 items-start gap-6 md:grid-cols-2" data-bgc-card-grid>
+            {
+              blissdocFeatures.map((f) => (
+                <button type="button" class="bgc-card flex flex-col rounded-xl border border-neutral-300 p-6 text-left cursor-pointer bg-generic-00" data-bgc-card>
+                  <div class="flex items-center justify-between gap-4">
+                    <p class="m-0 font-body text-[length:var(--fs-body-lg)] leading-[length:var(--lh-body-lg)] text-vault-navy">
+                      {f.heading}
+                    </p>
+                    <span class="bgc-card-icon flex size-5 shrink-0 items-center justify-center text-vault-navy" aria-hidden="true">
+                      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M8 1.5V14.5M1.5 8H14.5" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" />
+                      </svg>
+                    </span>
+                  </div>
+                  <p class="bgc-card-body m-0 overflow-hidden font-body text-[length:var(--fs-body)] leading-[length:var(--lh-body)] text-neutral-500">
+                    {f.body}
+                  </p>
+                </button>
+              ))
+            }
+          </div>
+
+          <div class="flex flex-col gap-3 rounded-xl border border-warning-500 bg-warning-50 p-6">
+            <p class="m-0 font-body text-[length:var(--fs-body-lg)] leading-[length:var(--lh-body-lg)] font-medium text-vault-navy">
+              An inbox cannot do that. Board material is among the most price-sensitive information a company holds.
+            </p>
+            <div class="font-body text-[length:var(--fs-body)] leading-[length:var(--lh-body)] text-neutral-500">
+              <p class="m-0">Email offers:</p>
+              <ul class="m-0 list-disc pl-5">
+                <li>no version control.</li>
+                <li>no access revocation.</li>
+                <li>no record of who opened what</li>
+              </ul>
+            </div>
+            <p class="m-0 font-body text-[length:var(--fs-body)] leading-[length:var(--lh-body)] font-medium text-warning-700">
+              Unpublished financial results sitting in a personal mailbox is an insider-trading exposure, not just an IT preference.
+            </p>
+          </div>
+        </div>
+
+        <div class="flex flex-col gap-6">
+          <p class="m-0 font-heading text-[length:var(--fs-h4)] leading-[length:var(--lh-h4)] font-medium text-vault-navy">
+            What BLISSDOC replaces
+          </p>
+          <p class="m-0 font-body text-[length:var(--fs-body-lg)] leading-[length:var(--lh-body-lg)] text-neutral-500">
+            Directors are reading packs one of two ways: as email attachments, or through a board portal that was never connected to a secretarial system.
+          </p>
+
+          <div class="overflow-x-auto rounded-xl border border-ledger-200">
+            <table class="w-full min-w-150 border-collapse">
+              <thead>
+                <tr class="bg-ledger-50">
+                  <th class="border-r border-b border-ledger-200 p-3 text-left font-body text-[length:var(--fs-body-sm)] font-medium text-vault-navy">Director experience</th>
+                  <th class="border-r border-b border-ledger-200 p-3 text-left font-body text-[length:var(--fs-body-sm)] font-medium text-neutral-500">Email attachments</th>
+                  <th class="border-r border-b border-ledger-200 p-3 text-left font-body text-[length:var(--fs-body-sm)] font-medium text-neutral-500">Other board portals</th>
+                  <th class="border-b border-ledger-200 bg-lime-500 p-3 text-left font-body text-[length:var(--fs-body-sm)] font-medium text-vault-navy">BLISSDOCS</th>
+                </tr>
+              </thead>
+              <tbody>
+                {
+                  blissdocReplacesRows.map((row) => (
+                    <tr>
+                      <td class="border-t border-r border-ledger-200 bg-ledger-50 p-3 font-body text-[length:var(--fs-body-sm)] text-vault-navy">{row[0]}</td>
+                      <td class="border-t border-r border-ledger-200 p-3 font-body text-[length:var(--fs-body-sm)] text-neutral-500">{row[1]}</td>
+                      <td class="border-t border-r border-ledger-200 p-3 font-body text-[length:var(--fs-body-sm)] text-neutral-500">{row[2]}</td>
+                      <td class="border-t border-ledger-200 bg-lime-50 p-3 font-body text-[length:var(--fs-body-sm)] text-vault-navy">{row[3]}</td>
+                    </tr>
+                  ))
+                }
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Clear Compass -->
+    <div
+      id="bgc-panel-compass"
+      role="tabpanel"
+      aria-labelledby="bgc-tab-compass"
+      data-bgc-panel="compass"
+    >
+      <div class="flex flex-col gap-16">
+        <div class="flex flex-col gap-6">
+          <p class="m-0 font-heading text-[length:var(--fs-h4)] leading-[length:var(--lh-h4)] font-medium text-vault-navy">
+            For the compliance function
+          </p>
+          <p class="m-0 font-body text-[length:var(--fs-body-lg)] leading-[length:var(--lh-body-lg)] text-neutral-500">
+            A tracker records a tick. Compass checks the evidence.
+          </p>
+          <p class="m-0 font-body text-[length:var(--fs-body-lg)] leading-[length:var(--lh-body-lg)] text-neutral-500">
+            Every statutory obligation across 15+ law clusters, mapped per entity, priced in rupees, with AI validating each proof document the moment it is uploaded, so an obligation closes only when the evidence would survive an audit.
+          </p>
+
+          <div class="flex flex-col gap-4">
+            <p class="m-0 font-heading text-[length:var(--fs-h4)] leading-[length:var(--lh-h4)] font-medium text-vault-navy">
+              Document AI — five signals on every proof
+            </p>
+            <div class="overflow-x-auto rounded-xl border border-ledger-200">
+              <table class="w-full min-w-150 border-collapse">
+                <thead>
+                  <tr class="bg-ledger-50">
+                    <th class="border-r border-b border-ledger-200 p-3 text-left font-body text-[length:var(--fs-body-sm)] font-medium text-vault-navy">Signal</th>
+                    <th class="border-r border-b border-ledger-200 p-3 text-left font-body text-[length:var(--fs-body-sm)] font-medium text-vault-navy">What the AI checks</th>
+                    <th class="border-b border-ledger-200 p-3 text-left font-body text-[length:var(--fs-body-sm)] font-medium text-vault-navy">What it catches</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {
+                    documentAiRows.map((row) => (
+                      <tr>
+                        <td class="border-t border-r border-ledger-200 bg-ledger-50 p-3 font-body text-[length:var(--fs-body-sm)] text-vault-navy">{row[0]}</td>
+                        <td class="border-t border-r border-ledger-200 p-3 font-body text-[length:var(--fs-body-sm)] text-neutral-500">{row[1]}</td>
+                        <td class="border-t border-ledger-200 p-3 font-body text-[length:var(--fs-body-sm)] text-neutral-500">{row[2]}</td>
+                      </tr>
+                    ))
+                  }
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="flex flex-col gap-8 rounded-xl border border-neutral-300 p-6 md:flex-row md:items-start">
+            {
+              compassStats.map((s, i) => (
+                <>
+                  {i > 0 && <div class="hidden w-px shrink-0 self-stretch bg-ledger-white md:block" aria-hidden="true" />}
+                  <div class="flex flex-1 flex-col gap-3">
+                    <p class="m-0 font-body text-[length:var(--fs-body-lg)] leading-[length:var(--lh-body-lg)] text-vault-navy">{s.heading}</p>
+                    <p class="m-0 font-body text-[length:var(--fs-body)] leading-[length:var(--lh-body)] text-neutral-500">{s.body}</p>
+                  </div>
+                </>
+              ))
+            }
+          </div>
+        </div>
+
+        <div class="flex flex-col gap-6">
+          <div class="flex flex-col gap-3">
+            <p class="m-0 font-heading text-[length:var(--fs-h4)] leading-[length:var(--lh-h4)] font-medium text-vault-navy">
+              Fifteen-plus clusters, one obligation universe.
+            </p>
+            <p class="m-0 max-w-215 font-body text-[length:var(--fs-body-lg)] leading-[length:var(--lh-body-lg)] text-neutral-500">
+              Each entity is configured with only the laws that apply to it; so a manufacturing subsidiary and a services entity in the same group carry different obligation sets, without either team wading through the other's.
+            </p>
+          </div>
+
+          <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            {
+              clusters.map((c) => (
+                <div class="flex flex-col gap-4 rounded-xl border border-neutral-300 p-4">
+                  <div class="flex items-center gap-3">
+                    <span class="size-6 shrink-0 rounded bg-visual-placeholder" aria-hidden="true" />
+                    <p class="m-0 font-body text-[length:var(--fs-body-lg)] leading-[length:var(--lh-body-lg)] text-vault-navy font-medium">{c.title}</p>
+                  </div>
+                  <div class="flex flex-wrap gap-2">
+                    {
+                      c.badges.map((b) => (
+                        <span class="rounded-lg border border-neutral-200 px-2 py-1 font-body font-medium text-[length:var(--fs-label-sm)] leading-[length:var(--lh-label-sm)] text-neutral-700">
+                          {b}
+                        </span>
+                      ))
+                    }
+                  </div>
+                </div>
+              ))
+            }
+            <div class="flex flex-col justify-items-start gap-2 rounded-xl border border-neutral-300 p-4">
+              <p class="m-0 font-body text-[length:var(--fs-body-lg)] leading-[length:var(--lh-body-lg)] text-vault-navy font-medium">And the ones you name</p>
+              <p class="m-0 font-body text-[length:var(--fs-body-sm)] leading-[length:var(--lh-body-sm)] text-neutral-500">Configured per entity during implementation</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="flex flex-col gap-4">
+          <p class="m-0 font-heading text-[length:var(--fs-h4)] leading-[length:var(--lh-h4)] font-medium text-vault-navy">
+            What Clear Compass replaces
+          </p>
+          <p class="m-0 font-body text-[length:var(--fs-body-lg)] leading-[length:var(--lh-body-lg)] text-neutral-500 text-balance">
+            All-law compliance is usually held together by a master spreadsheet, a set of single-law point tools, or a retainer with a consultant who compiles a status report each quarter.
+          </p>
+          <div class="overflow-x-auto rounded-xl border border-ledger-200">
+            <table class="w-full min-w-150 border-collapse">
+              <thead>
+                <tr class="bg-ledger-50">
+                  <th class="border-r border-b border-ledger-200 p-3 text-left font-body text-[length:var(--fs-body-sm)] font-medium text-vault-navy">All-law compliance</th>
+                  <th class="border-r border-b border-ledger-200 p-3 text-left font-body text-[length:var(--fs-body-sm)] font-medium text-neutral-500">Master spreadsheet</th>
+                  <th class="border-r border-b border-ledger-200 p-3 text-left font-body text-[length:var(--fs-body-sm)] font-medium text-neutral-500">Other point tools</th>
+                  <th class="border-b border-ledger-200 bg-lime-500 p-3 text-left font-body text-[length:var(--fs-body-sm)] font-medium text-vault-navy">Clear Compass</th>
+                </tr>
+              </thead>
+              <tbody>
+                {
+                  compassReplacesRows.map((row) => (
+                    <tr>
+                      <td class="border-t border-r border-ledger-200 bg-ledger-50 p-3 font-body text-[length:var(--fs-body-sm)] text-vault-navy">{row[0]}</td>
+                      <td class="border-t border-r border-ledger-200 p-3 font-body text-[length:var(--fs-body-sm)] text-neutral-500">{row[1]}</td>
+                      <td class="border-t border-r border-ledger-200 p-3 font-body text-[length:var(--fs-body-sm)] text-neutral-500">{row[2]}</td>
+                      <td class="border-t border-ledger-200 bg-lime-50 p-3 font-body text-[length:var(--fs-body-sm)] text-vault-navy">{row[3]}</td>
+                    </tr>
+                  ))
+                }
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style is:global>
+  .bgc-tab {
+    transition: color 0.2s ease;
+  }
+
+  .bgc-tab[aria-selected="true"] {
+    color: var(--color-nova-blue);
+  }
+
+  .bgc-tab-thumb {
+    position: absolute;
+    top: 6px;
+    bottom: 6px;
+    left: 0;
+    width: 0;
+    border-radius: 8px;
+    background-color: var(--color-generic-00);
+    box-shadow:
+      0 1px 2px 0 rgba(16, 24, 40, 0.04),
+      0 1px 2px 0 rgba(16, 24, 40, 0.04);
+    opacity: 0;
+    transition:
+      transform 0.35s cubic-bezier(0.4, 0, 0.2, 1),
+      width 0.35s cubic-bezier(0.4, 0, 0.2, 1),
+      opacity 0.2s ease;
+  }
+
+  .bgc-tablist.is-ready .bgc-tab-thumb {
+    opacity: 1;
+  }
+
+  .bgc-tablist:not(.is-ready) .bgc-tab[aria-selected="true"] {
+    background-color: var(--color-generic-00);
+    box-shadow:
+      0 1px 2px 0 rgba(16, 24, 40, 0.04),
+      0 1px 2px 0 rgba(16, 24, 40, 0.04);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .bgc-tab-thumb {
+      transition: opacity 0.2s ease;
+    }
+  }
+
+  .bgc-card {
+    gap: 0;
+    transition: gap 300ms ease;
+  }
+
+  .bgc-card.is-open {
+    gap: 1rem;
+  }
+
+  .bgc-card-body {
+    max-height: 0;
+    opacity: 0;
+    transition:
+      max-height 300ms ease,
+      opacity 200ms ease;
+  }
+
+  .bgc-card.is-open .bgc-card-body {
+    opacity: 1;
+    transition:
+      max-height 300ms ease,
+      opacity 300ms ease 100ms;
+  }
+
+  .bgc-card-icon {
+    transition: transform 300ms ease;
+  }
+
+  .bgc-card.is-open .bgc-card-icon {
+    transform: rotate(45deg);
+  }
+</style>
+
+<script is:inline>
+  (function () {
+    const tablist = document.querySelector(".bgc-tablist");
+    if (!tablist) return;
+
+    const tabs = Array.prototype.slice.call(tablist.querySelectorAll("[data-bgc-tab]"));
+    const thumb = tablist.querySelector(".bgc-tab-thumb");
+    const panels = tabs.map((tab) =>
+      document.querySelector(`[data-bgc-panel="${tab.getAttribute("data-bgc-tab")}"]`),
+    );
+    let activeTab = tabs.findIndex((t) => t.getAttribute("aria-selected") === "true");
+    if (activeTab < 0) activeTab = 0;
+
+    function moveThumb(i, instant) {
+      if (!thumb || !tabs[i]) return;
+      if (instant) thumb.style.transition = "none";
+      thumb.style.width = tabs[i].offsetWidth + "px";
+      thumb.style.transform = "translateX(" + tabs[i].offsetLeft + "px)";
+      tablist.classList.add("is-ready");
+      if (instant) {
+        thumb.offsetWidth;
+        thumb.style.transition = "";
+      }
+    }
+
+    function selectTab(i) {
+      activeTab = i;
+      tabs.forEach((tab, n) => {
+        tab.setAttribute("aria-selected", n === i ? "true" : "false");
+        tab.tabIndex = n === i ? 0 : -1;
+        if (panels[n]) panels[n].style.display = n === i ? "block" : "none";
+      });
+      moveThumb(i);
+    }
+
+    tabs.forEach((tab, i) => {
+      tab.addEventListener("click", () => selectTab(i));
+    });
+
+    tablist.addEventListener("keydown", (e) => {
+      let next;
+      if (e.key === "Home") next = 0;
+      else if (e.key === "End") next = tabs.length - 1;
+      else if (e.key === "ArrowRight") next = (activeTab + 1) % tabs.length;
+      else if (e.key === "ArrowLeft") next = (activeTab - 1 + tabs.length) % tabs.length;
+      else return;
+
+      e.preventDefault();
+      selectTab(next);
+      tabs[next].focus();
+    });
+
+    moveThumb(activeTab, true);
+    if (document.fonts && document.fonts.ready) {
+      document.fonts.ready.then(() => moveThumb(activeTab, true));
+    }
+    window.addEventListener("resize", () => moveThumb(activeTab, true));
+
+    document.querySelectorAll("[data-bgc-card-grid]").forEach((grid) => {
+      const cards = Array.from(grid.querySelectorAll("[data-bgc-card]"));
+
+      cards.forEach((card) => {
+        const body = card.querySelector(".bgc-card-body");
+
+        card.addEventListener("click", () => {
+          const wasOpen = card.classList.contains("is-open");
+
+          cards.forEach((other) => {
+            if (other === card) return;
+            other.classList.remove("is-open");
+            const otherBody = other.querySelector(".bgc-card-body");
+            if (otherBody) otherBody.style.maxHeight = "0px";
+          });
+
+          if (wasOpen) {
+            card.classList.remove("is-open");
+            if (body) body.style.maxHeight = "0px";
+          } else {
+            card.classList.add("is-open");
+            if (body) body.style.maxHeight = body.scrollHeight + "px";
+          }
+        });
+      });
+    });
+  })();
+</script>

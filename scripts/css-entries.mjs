@@ -67,6 +67,7 @@ export const PAGE_TARGETS = [
   // there is no `knowledge-hub/[slug].astro`.
   { name: 'knowledge-hub', input: 'src/styles/knowledge-hub.css', page: 'src/pages/knowledge-hub.astro' },
   { name: 'trust-centre', input: 'src/styles/trust-centre.css', page: 'src/pages/trust-centre.astro' },
+  { name: 'board-governance', input: 'src/styles/board-governance.css', page: 'src/pages/board-governance.astro' },
   { name: 'experience-centre', input: 'src/styles/experience-centre.css', page: 'src/pages/experience-centre.astro' },
   { name: 'podcast', input: 'src/styles/podcast.css', page: 'src/pages/podcast.astro' },
   { name: 'uae-regional', input: 'src/styles/uae-regional.css', page: 'src/pages/uae-regional.astro' },

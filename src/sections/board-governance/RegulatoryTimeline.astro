@@ -1,0 +1,189 @@
+---
+/**
+ * "Three jobs. Three tools." — Figma node 16734:52006
+ * ("Container - Regulatory Timeline").
+ *
+ * Click-to-expand, auto-advancing accordion — same mechanics as
+ * real-estate/GlobalExperience.astro (progress-bar timer, cross-fading
+ * panel stack), adapted so the overline+headline stay visible for every
+ * item and only the description collapses, matching this section's Figma
+ * states instead of GlobalExperience's title+stat+text shape.
+ *
+ * Figma only designed body copy for the active (BLISS) item; BLISSDOCS has
+ * none in the source file, so it ships as the same "content coming soon"
+ * placeholder used for its tab panel in BoardGovernanceContent.astro. The
+ * Clear Compass line condenses copy already sourced from its own tab panel
+ * rather than inventing new claims. The right-hand visual stays the same
+ * placeholder tint Figma itself leaves unset ("Visual Placeholder", #E8FFE1).
+ */
+interface Product {
+  overline: string;
+  name: string;
+  text: string;
+}
+
+const products: Product[] = [
+  {
+    overline: "01. For the secretarial team",
+    name: "BLISS",
+    text: "Agendas, minutes, registers and returns; automated to the Companies Act, 2013 and SEBI LODR.",
+  },
+  {
+    overline: "02. For directors",
+    name: "BLISSDOCS",
+    text: "The full board pack on every director's device. Secure, current, and revocable.",
+  },
+  {
+    overline: "03. For the compliance function",
+    name: "Clear Compass",
+    text: "Every obligation across 800+ laws and 20,000+ compliances, with AI validating every proof.",
+  },
+];
+---
+
+<section class="bg-generic-00 px-4 py-16 md:px-6 lg:py-20">
+  <div class="mx-auto flex max-w-[var(--container-max)] flex-col gap-10 lg:gap-12">
+    <div class="flex flex-col gap-4">
+      <p class="m-0 font-body text-[length:var(--fs-label)] leading-[length:var(--lh-label)] font-semibold tracking-[1px] text-nova-blue uppercase">
+        Who each product is for
+      </p>
+      <h2 class="m-0 font-heading text-[length:var(--fs-h2)] leading-[length:var(--lh-h2)] font-medium text-vault-navy lg:text-[length:var(--fs-h1)] lg:leading-[length:var(--lh-h1)]">
+        Three jobs. Three tools. No overlap by accident.
+      </h2>
+      <p class="m-0 max-w-200 font-body text-[length:var(--fs-body)] leading-[length:var(--lh-body)] text-neutral-500 lg:text-[length:var(--fs-body-lg)] lg:leading-[length:var(--lh-body-lg)]">
+        The boardroom is deep and procedural. The director's problem is
+        reading and deciding. Everything else is wide and unowned. One tool
+        cannot be shaped for all three, so we did not build one.
+      </p>
+    </div>
+
+    <div class="grid items-center gap-10 lg:grid-cols-2 lg:gap-16">
+      <div class="flex w-full flex-col gap-10" data-rt-root>
+        {
+          products.map((product, i) => (
+            <button
+              type="button"
+              class:list={["rt-item flex flex-col gap-3 cursor-pointer border-0 bg-transparent p-0 text-left font-[inherit]", i === 0 && "rt-open"]}
+              data-rt-item
+            >
+              <p class="m-0 font-body text-[length:var(--fs-label)] leading-[length:var(--lh-label)] font-semibold tracking-[1px] text-vault-navy uppercase">
+                {product.overline}
+              </p>
+              <p class="m-0 font-heading text-[length:var(--fs-h4)] leading-[length:var(--lh-h4)] font-medium text-vault-navy">
+                {product.name}
+              </p>
+              <p class="rt-text m-0 overflow-hidden font-body text-[length:var(--fs-body)] leading-[length:var(--lh-body)] text-neutral-500 max-w-[338px] w-full">
+                {product.text}
+              </p>
+              <div class="relative h-1 w-full overflow-hidden rounded-full bg-ledger-white">
+                <div class="rt-bar absolute inset-y-0 left-0 rounded-full bg-nova-blue" />
+              </div>
+            </button>
+          ))
+        }
+      </div>
+
+      <div class="relative aspect-video w-full" data-rt-panels>
+        {
+          products.map((_, i) => (
+            <div
+              class:list={[
+                "absolute inset-0 rounded-xl bg-visual-placeholder transition-opacity duration-300",
+                i === 0 ? "opacity-100" : "opacity-0",
+              ]}
+              data-rt-panel
+              aria-hidden={i !== 0}
+            />
+          ))
+        }
+      </div>
+    </div>
+  </div>
+</section>
+
+<style is:global>
+  .rt-text {
+    max-height: 0;
+    opacity: 0;
+    transition:
+      max-height 300ms ease,
+      opacity 200ms ease;
+  }
+  .rt-item.rt-open .rt-text {
+    max-height: 84px;
+    opacity: 1;
+    transition:
+      max-height 300ms ease,
+      opacity 300ms ease 100ms;
+  }
+  .rt-item:not(.rt-open) p {
+    opacity: 0.5;
+  }
+  .rt-item.rt-open p {
+    opacity: 1;
+  }
+  .rt-item .rt-bar {
+    width: 0%;
+  }
+</style>
+
+<script is:inline>
+  (function () {
+    var DURATION = 4000;
+
+    document.querySelectorAll("[data-rt-root]").forEach((root) => {
+      const items = Array.from(root.querySelectorAll("[data-rt-item]"));
+      const section = root.closest("section");
+      const panels = section ? Array.from(section.querySelectorAll("[data-rt-panel]")) : [];
+      if (!items.length) return;
+
+      let activeIndex = -1;
+      let timer = null;
+
+      function activate(index) {
+        activeIndex = index;
+
+        items.forEach((item, i) => {
+          item.classList.toggle("rt-open", i === index);
+
+          const bar = item.querySelector(".rt-bar");
+          if (!bar) return;
+          bar.style.transition = "none";
+          bar.style.width = "0%";
+        });
+
+        panels.forEach((panel, i) => {
+          const active = i === index;
+          panel.classList.toggle("opacity-100", active);
+          panel.classList.toggle("opacity-0", !active);
+          panel.setAttribute("aria-hidden", active ? "false" : "true");
+        });
+
+        const activeBar = items[index].querySelector(".rt-bar");
+        if (activeBar) {
+          // Force a reflow so the 0% reset above is committed before the
+          // fill transition starts, otherwise the browser coalesces both
+          // style writes and the bar jumps straight to 100%.
+          void activeBar.offsetWidth;
+          activeBar.style.transition = `width ${DURATION}ms linear`;
+          activeBar.style.width = "100%";
+        }
+      }
+
+      function goTo(index) {
+        if (timer) clearTimeout(timer);
+        activate(index);
+        timer = setTimeout(() => goTo((index + 1) % items.length), DURATION);
+      }
+
+      items.forEach((item, i) => {
+        item.addEventListener("click", () => {
+          if (i === activeIndex) return;
+          goTo(i);
+        });
+      });
+
+      goTo(0);
+    });
+  })();
+</script>
