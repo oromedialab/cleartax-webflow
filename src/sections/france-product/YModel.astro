@@ -25,14 +25,21 @@
  * Figma (#E8FFE1 fill), so it renders as `bg-visual-placeholder`. Swap for a
  * Webflow-hosted asset per card when the artwork lands — never a `data:` URI.
  *
- * On a short viewport (`max-height: 750px`, the same breakpoint
- * `_shared/UnderneathMandate.astro` uses) the heading+lede hides for the
+ * On a short, non-huge viewport (`height <= 750px` AND `width < 2560px` — see
+ * `SHORT_VIEWPORT` / `HUGE_SCREEN_WIDTH` below) the heading+lede hides for the
  * DURATION of the pinned scroll — not permanently. The section's height is
  * `100vh - nav-clear`, so on a short screen the heading was eating room the
  * cards need while pinned; but hiding it the instant the section sticks reads
  * as a layout jump before the user has scrolled at all. Instead the scroll
  * handler below hides it once scroll progress leaves 0 and restores it when
  * progress returns to 0 — i.e. only while the track is actually translating.
+ *
+ * `HUGE_SCREEN_WIDTH` is 2560 (a QHD/27"+ monitor), not a typical laptop or
+ * 1440p-ish desktop width — those still hide-while-scrolling on a short
+ * window, because the card-crowding problem this solves shows up there too,
+ * just less often than on a laptop. Only screens wide enough that a short
+ * window on them is an unusual, deliberate choice (devtools open, a
+ * non-maximised panel) skip the hide outright.
  *
  * The collapse is a `grid-template-rows: 1fr -> 0fr` transition, not
  * `max-height`. A `max-height` transition interpolates across whatever value
@@ -180,6 +187,7 @@ const items: ValueItem[] = [
     };
 
     const SHORT_VIEWPORT = 750; // matches UnderneathMandate's max-height breakpoint
+    const HUGE_SCREEN_WIDTH = 2560; // at/above this width the heading never hides
 
     containers.forEach((container) => {
       const track = container.querySelector(".fp-ymodel-track");
@@ -234,11 +242,16 @@ const items: ValueItem[] = [
 
           track.style.transform = `translate3d(-${progress * maxTranslate}px, 0, 0)`;
 
-          // Short screens only: hide the heading for the DURATION of the
-          // pinned scroll (progress > 0), not permanently — restored the
-          // moment scroll returns to the top of the pin.
+          // Short, non-huge screens only: hide the heading for the DURATION
+          // of the pinned scroll (progress > 0), not permanently — restored
+          // the moment scroll returns to the top of the pin. A huge-width
+          // screen never hides it regardless of height — see the doc comment
+          // up top for why height alone isn't the right signal.
           if (heading) {
-            const shouldHide = window.innerHeight <= SHORT_VIEWPORT && progress > 0.01;
+            const shouldHide =
+              window.innerWidth < HUGE_SCREEN_WIDTH &&
+              window.innerHeight <= SHORT_VIEWPORT &&
+              progress > 0.01;
             heading.classList.toggle("fp-ymodel-heading-hidden", shouldHide);
           }
 
