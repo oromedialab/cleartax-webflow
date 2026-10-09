@@ -48,20 +48,24 @@
 interface Requirement {
   heading: string;
   body: string;
+  img: string;
 }
 
 const requirements: Requirement[] = [
   {
     heading: "Y-model infrastructure",
     body: "A government-led “Y-model” system connects businesses through certified PDPs and the public Chorus Pro directory for routing, validation and lifecycle management.",
+    img: "/images/france-regional/image-1.png",
   },
   {
     heading: "E-reporting & payment reporting",
     body: "Tax-relevant B2B and B2C transaction data must be reported to the DGFiP. E-reporting covers domestic and cross-border flows for VAT pre-filling and fraud detection.",
+    img: "/images/france-regional/image-2.png",
   },
   {
     heading: "14 status e-invoice lifecycle",
     body: "Each e-invoice passes through up to 14 mandatory status stages from issuance to payment. From deposit to final settlement, every state transition is tracked and reported to the French tax authority for audit and reconciliation.",
+    img: "/images/france-regional/image-3.png",
   },
 ];
 
@@ -147,10 +151,10 @@ const OVERLINE = "Requirements";
             )}
 
             <article
-              class="fr-mandate-card flex flex-col items-stretch gap-6 rounded-xl border border-neutral-300 bg-generic-00 p-6 will-change-transform lg:flex-row lg:items-center lg:gap-12"
+              class="fr-mandate-card flex flex-col items-stretch gap-6 rounded-xl border border-neutral-300 bg-generic-00 p-6 will-change-transform lg:flex-row lg:items-stretch lg:gap-12"
               style="transform-origin: top center;"
             >
-              <div class="flex flex-col justify-between gap-6 lg:max-w-[400px] lg:flex-1">
+              <div class="flex flex-col justify-between gap-6 self-stretch lg:max-w-[400px] lg:flex-1">
                 <h3 class="m-0 font-heading font-medium text-vault-navy text-[length:var(--fs-h3)] leading-[length:var(--lh-h3)] lg:text-[length:var(--fs-h2)] lg:leading-[length:var(--lh-h2)]">
                   {r.heading}
                 </h3>
@@ -158,17 +162,24 @@ const OVERLINE = "Requirements";
                   {r.body}
                 </p>
               </div>
-              <div
-                class="aspect-[1280/720] w-full rounded-lg bg-visual-placeholder lg:flex-1"
-                aria-hidden="true"
-              />
+              <div class="w-full lg:flex-1">
+                <img
+                  src={r.img}
+                  alt={r.heading}
+                  width="730"
+                  height="411"
+                  class="w-full h-auto block"
+                  loading="lazy"
+                  decoding="async"
+                />
+              </div>
             </article>
           </div>
         ))
       }
 
       <!-- Tail room so the last card can finish sticking before the next section -->
-      <div style="height: 80px;" />
+      <div style="height: 80px;"></div>
     </div>
   </div>
 </section>
@@ -233,7 +244,8 @@ const OVERLINE = "Requirements";
     if (!outers.length || outers.length !== inners.length) return;
 
     const reduceMotion =
-      window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      window.matchMedia &&
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     if (reduceMotion) return;
 
     const STACK_OFFSET = 16; // visible sliver of each card behind the next
@@ -244,7 +256,9 @@ const OVERLINE = "Requirements";
     // the token so a missing shared.css degrades to the same offset.
     const NAV_CLEAR =
       parseFloat(
-        getComputedStyle(document.documentElement).getPropertyValue("--nav-clear"),
+        getComputedStyle(document.documentElement).getPropertyValue(
+          "--nav-clear",
+        ),
       ) || 112;
 
     // Depth ramp: 3% smaller per card back from the front, so the front card is
@@ -354,7 +368,10 @@ const OVERLINE = "Requirements";
 
         // REVEAL_DISTANCE is a scroll distance, and scrolling is in rendered px,
         // so both sides of this ratio are already in the same unit.
-        const progress = Math.min(1, Math.max(0, 1 - distanceToStick / REVEAL_DISTANCE));
+        const progress = Math.min(
+          1,
+          Math.max(0, 1 - distanceToStick / REVEAL_DISTANCE),
+        );
         const scale = 1 - progress * (1 - targetScaleFor(i));
         inner.style.transform = `scale(${scale.toFixed(4)})`;
       });
