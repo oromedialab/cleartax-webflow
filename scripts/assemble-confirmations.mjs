@@ -17,6 +17,17 @@ const PAGES_DIR = resolve(ROOT, 'src/pages');
 const CSS_DIR = resolve(DIST, 'css');
 const OUT_DIR = resolve(DIST, 'preview');
 
+/**
+ * Webflow's `<html>` tag is controlled by its own Project Settings, not by
+ * anything pasted into an Embed — so a static `lang="en"` written here would
+ * claim an attribute the live site doesn't actually have. The real fix is a
+ * sitewide custom-code script (Project Settings -> Custom Code -> Head) that
+ * sets it at runtime; this is that same script, inlined into every preview
+ * page's <head> so preview matches what Webflow renders once it's pasted
+ * there once, sitewide.
+ */
+const LANG_SCRIPT = '  <script>document.documentElement.setAttribute(\'lang\', \'en\');</script>';
+
 if (!existsSync(EMBEDS_DIR)) {
   console.error('[assemble-preview] _embeds not found — run extract-embeds first.');
   process.exit(1);
@@ -236,9 +247,10 @@ function assembleDetailRoute(route) {
   const bodyClass = body.getAttribute('class');
 
   const finalHtml = `<!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
   <!-- Preview of ${route.page} rendered from /${route.builtDir}/${slug}/ -->
+${LANG_SCRIPT}
 ${headBody}
 ${buildCssStyleBlocks(cssImports)}
 </head>
@@ -365,8 +377,9 @@ for (const pageFile of pages) {
   const styleBlocks = buildCssStyleBlocks(cssImports);
 
   const finalHtml = `<!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
+${LANG_SCRIPT}
 ${headBody}
 ${styleBlocks}
 </head>
