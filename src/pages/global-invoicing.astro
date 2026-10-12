@@ -43,14 +43,16 @@ import Footer from "../sections/global-invoicing/Footer.astro";
       of the mobile LCP budget. GTM and everything it fires (ads/analytics/FB/
       Bing/Clarity) stay deferred below; none of that paints visible content.
     -->
-    <!-- The autoblocker's own config fetch cascades into these three
-         usercentrics.eu sub-origins (confirmed by PageSpeed's "preconnect
-         candidates", ~300ms savings apiece) — preconnecting lets the browser
-         open those connections while the first autoblocker.js request is
-         still in flight, instead of serially after it finishes. -->
+    <!-- The autoblocker's own config fetch cascades into this usercentrics.eu
+         sub-origin — preconnecting lets the browser open the connection while
+         the first autoblocker.js request is still in flight, instead of
+         serially after it finishes. app.usercentrics.eu and
+         uct.service.usercentrics.eu were here too, but a later PageSpeed run
+         flagged both "Unused preconnect" (the cascade never actually reaches
+         them in the lab window) and flagged the page for having too many
+         preconnects overall — removed rather than paying for connections
+         that don't get used. -->
     <link rel="preconnect" href="https://consent-api.service.consent.usercentrics.eu" />
-    <link rel="preconnect" href="https://app.usercentrics.eu" />
-    <link rel="preconnect" href="https://uct.service.usercentrics.eu" />
     <script src="https://web.cmp.usercentrics.eu/modules/autoblocker.js"></script>
     <script
       is:inline
@@ -86,8 +88,6 @@ import Footer from "../sections/global-invoicing/Footer.astro";
       content="Automate e-invoicing compliance across 50+ countries with ClearTax's single API — Peppol, ZATCA, FTA and more, backed by 2,000+ ERP integrations."
     />
     <meta name="twitter:image" content="https://img.youtube.com/vi/UX0Yt61EdfY/maxresdefault.jpg" />
-    <!-- Still noindex while on staging — clear this in Webflow page settings at launch, not here. -->
-    <meta content="noindex, nofollow" name="robots" />
     <link
       rel="shortcut icon"
       type="image/png"
@@ -109,11 +109,13 @@ import Footer from "../sections/global-invoicing/Footer.astro";
       rel="apple-touch-icon"
       href="https://cdn.prod.website-files.com/63ede4a3da6dbd6b05c4612f/63ede4a3da6dbd8997c46450_256by256.png"
     />
+    <!-- Navbar wordmark (blur-up placeholder + full logo, both fetchpriority=high,
+         see NavbarRb.astro) and the favicons above all load from this origin.
+         Without this, the very first above-the-fold image pays a cold
+         DNS+TLS round trip before the browser can even request it. -->
+    <link rel="preconnect" href="https://cdn.prod.website-files.com" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <!-- The hero thumbnail below is preloaded at fetchpriority=high; without this
-         preconnect that preload still pays a cold DNS+TLS round trip to YouTube. -->
-    <link rel="preconnect" href="https://img.youtube.com" />
     <!-- One request for both families instead of two — each is a separate
          render-blocking round trip to fonts.googleapis.com. Inter is also
          narrowed to the only weights this page actually sets on font-body
@@ -139,19 +141,6 @@ import Footer from "../sections/global-invoicing/Footer.astro";
         href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Inter+Tight:wght@400;500;600;700&display=swap"
       />
     </noscript>
-    <!-- Preload critical above-the-fold assets. (This page's Navbar wraps the
-         shared NavbarRb primitive, which never renders the old logo-cleartax
-         SVG that other pages' navbar variants use — a preload for it here
-         was competing for fetchpriority=high bandwidth against assets this
-         page actually needs, for a resource nothing on it requests.) -->
-    <link
-      rel="preload"
-      href="https://img.youtube.com/vi/UX0Yt61EdfY/maxresdefault.jpg"
-      as="image"
-      type="image/jpeg"
-      fetchpriority="high"
-    />
-
     <!-- Deferred script loader for performance -->
     <script is:inline>
       (function () {
@@ -241,10 +230,6 @@ import Footer from "../sections/global-invoicing/Footer.astro";
         }
       })();
     </script>
-    <!-- PageSpeed flagged forms.hsforms.com / forms-na2.hsforms.com as unused
-         preconnects — the form only submits there after a visitor fills it in;
-         js-na2.hsforms.net is the one the deferred embed script itself needs. -->
-    <link rel="preconnect" href="https://js-na2.hsforms.net" />
   </head>
   <body class="bg-generic-00">
     <!-- Google Tag Manager (noscript) -->
