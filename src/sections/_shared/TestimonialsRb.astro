@@ -115,7 +115,6 @@ const { Leaders = [], title = "Trusted by industry leaders across the world" } =
 />
 <script
     is:inline
-    defer
     src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
 
 <style is:inline>
@@ -133,35 +132,81 @@ const { Leaders = [], title = "Trusted by industry leaders across the world" } =
 
 <script is:inline>
     (function () {
+        let attempts = 0;
+        const maxAttempts = 100;
+
         const initSwiper = () => {
-            if (typeof Swiper === "undefined") return;
-            new Swiper(".trusted-swiper", {
-                slidesPerView: 1.2,
-                spaceBetween: 16,
-                loop: true,
-                speed: 500,
-                navigation: {
-                    prevEl: ".swiper-button-prev-custom",
-                    nextEl: ".swiper-button-next-custom",
-                },
-                grabCursor: true,
-                breakpoints: {
-                    640: {
-                        slidesPerView: 2.2,
-                        spaceBetween: 20,
+            const swiperEl = document.querySelector(".trusted-swiper");
+            if (!swiperEl) return;
+            if (swiperEl.dataset.swiperReady === "true") return;
+
+            if (typeof Swiper === "undefined") {
+                if (attempts++ < maxAttempts) {
+                    setTimeout(initSwiper, 50);
+                }
+                return;
+            }
+
+            swiperEl.dataset.swiperReady = "true";
+
+            const root = swiperEl.closest(".relative") || swiperEl.closest("section") || document;
+            const prevEl = root.querySelector(".swiper-button-prev-custom") || ".swiper-button-prev-custom";
+            const nextEl = root.querySelector(".swiper-button-next-custom") || ".swiper-button-next-custom";
+
+            try {
+                new Swiper(swiperEl, {
+                    slidesPerView: 1.2,
+                    spaceBetween: 16,
+                    loop: true,
+                    speed: 500,
+                    navigation: {
+                        prevEl: prevEl,
+                        nextEl: nextEl,
                     },
-                    1024: {
-                        slidesPerView: 3,
-                        spaceBetween: 24,
+                    grabCursor: true,
+                    breakpoints: {
+                        640: {
+                            slidesPerView: 2.2,
+                            spaceBetween: 20,
+                        },
+                        1024: {
+                            slidesPerView: 3,
+                            spaceBetween: 24,
+                        },
                     },
-                },
-            });
+                });
+            } catch (e) {
+                console.error("Swiper initialization error:", e);
+            }
         };
+
+        // Ensure Swiper CSS is loaded
+        if (!document.querySelector('link[href*="swiper-bundle"]')) {
+            const link = document.createElement("link");
+            link.rel = "stylesheet";
+            link.href = "https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css";
+            document.head.appendChild(link);
+        }
+
+        // Ensure Swiper JS is loaded and trigger initSwiper on load
+        if (typeof Swiper === "undefined") {
+            const existingScript = document.querySelector('script[src*="swiper-bundle"]');
+            if (existingScript) {
+                existingScript.addEventListener("load", initSwiper);
+            } else {
+                const script = document.createElement("script");
+                script.src = "https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js";
+                script.onload = initSwiper;
+                document.head.appendChild(script);
+            }
+        }
 
         if (document.readyState === "loading") {
             document.addEventListener("DOMContentLoaded", initSwiper);
         } else {
             initSwiper();
         }
+
+        window.addEventListener("load", initSwiper);
     })();
 </script>
