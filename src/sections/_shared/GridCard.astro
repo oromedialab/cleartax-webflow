@@ -1,6 +1,7 @@
 ---
 interface Props {
     title?: string;
+    paragraph?: string;
     items?: {
         title: string;
         desc: string;
@@ -8,10 +9,10 @@ interface Props {
     }[];
 }
 
-const { title = "", items = [] } = Astro.props;
+const { title = "", paragraph = "", items = [] } = Astro.props;
 ---
 
-<section class="pt-16 md:pt-20 bg-generic-00">
+<section class="py-16 md:py-20 bg-generic-00">
     <div class="mx-auto max-w-[var(--container-max)] w-full px-4 md:px-6">
         {
             title && (
@@ -19,6 +20,11 @@ const { title = "", items = [] } = Astro.props;
                     <h2 class="font-heading text-[length:var(--fs-h2)] md:text-[length:var(--fs-h1)] leading-[length:var(--lh-h2)] md:leading-[length:var(--lh-h1)] font-medium max-w-[800px] mx-auto m-0 text-text-default">
                         {title}
                     </h2>
+                    {paragraph && (
+                        <p class="font-body text-[length:var(--fs-body)] leading-[length:var(--lh-body)] text-[#6B7280CC] max-w-155 mx-auto mt-4 font-normal m-0">
+                            {paragraph}
+                        </p>
+                    )}
                 </div>
             )
         }
@@ -27,7 +33,7 @@ const { title = "", items = [] } = Astro.props;
             {
                 items.map((item) => (
                     <div class="flex items-start gap-4 p-6 md:p-8 border-2 border-neutral-200 rounded-xl bg-generic-00">
-                        <div class="flex flex-col gap-2 md:gap-3">
+                        <div class="w-8 h-8 shrink-0 flex items-center justify-center">
                             <img
                                 src={item.img}
                                 alt=""
@@ -37,6 +43,8 @@ const { title = "", items = [] } = Astro.props;
                                 loading="lazy"
                                 decoding="async"
                             />
+                        </div>
+                        <div class="flex flex-col gap-2 md:gap-3">
                             <h3 class="font-heading text-[length:var(--fs-h6)] md:text-[length:var(--fs-h5)] leading-[length:var(--lh-h6)] md:leading-[length:var(--lh-h5)] font-medium text-text-default m-0">
                                 {item.title}
                             </h3>
