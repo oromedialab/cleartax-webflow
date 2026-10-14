@@ -6,15 +6,21 @@
  * (checks, lime-bordered) — rather than cfo-insights/Comparison.astro's
  * row-wise table, since this mock stacks three independent columns.
  *
+ * Row heights can't be left to each column's own flow: "Knows your
+ * financial context…" wraps to two lines while its neighbours don't, so
+ * three independent `flex-col`s drift out of alignment row by row. Fixed
+ * with CSS subgrid — the outer grid owns one shared set of 7 row tracks
+ * (title + 6 rows), and each column is `grid-rows-subgrid` so its cells
+ * size to the tallest cell in that row across all three columns, not just
+ * its own content.
+ *
  * `id="comparison"` is the Hero's "See how it works" anchor target.
  *
- * ── ASSETS TO UPLOAD ─────────────────────────────────────────────────────
- * The cross/check marks are screenshot exports of Figma nodes 16985:65176
- * and 16985:65196, saved to public/images/ai-foundation/icons/cmp-*.png.
- * Render in `npm run dev` / `dist/preview`; resolve to nothing once pasted
- * into Webflow — upload each to Webflow assets and swap the `src` paths
- * below for the CDN URLs first.
- * ─────────────────────────────────────────────────────────────────────────
+ * The cross/check marks are already-uploaded Webflow assets (cross.png /
+ * tick.png). Only 5 of the 6 capability rows get a cross/check (Figma nodes
+ * 16985:65176–:65188 — five icons, not six); the 6th row is the summary
+ * line ("Re-reads everything…" / "Data and context already resident")
+ * rendered in place of an icon, not appended below a full set of six.
  */
 const rows = [
   "Knows your transaction-level data",
@@ -32,59 +38,50 @@ const rows = [
       Generic AI sees what you prompt. Clarity AI knows your business.
     </h2>
 
-    <div class="grid w-full grid-cols-1 gap-6 lg:grid-cols-3">
-      <div class="flex flex-col gap-7 rounded-xl border border-neutral-300 p-8">
-        <p class="m-0 font-heading text-vault-navy text-[length:var(--fs-h5)] leading-[length:var(--lh-h5)]">
+    <div class="grid w-full grid-cols-1 gap-6 lg:grid-cols-3 lg:grid-rows-[repeat(7,auto)]">
+      <div class="grid grid-rows-subgrid gap-0 divide-y divide-neutral-300 rounded-xl border border-neutral-300 p-8 lg:row-span-7">
+        <p class="m-0 pb-7 font-heading text-vault-navy text-[length:var(--fs-h5)] leading-[length:var(--lh-h5)]">
           Capability
         </p>
-        <div class="flex flex-col">
-          {rows.map((row, i) => (
-            <>
-              {i > 0 && <div class="h-px w-full bg-neutral-300" aria-hidden="true"></div>}
-              <p class="m-0 py-3.5 font-body text-neutral-500 text-[length:var(--fs-body)] leading-[length:var(--lh-body)]">
-                {row}
-              </p>
-            </>
-          ))}
-        </div>
+        {rows.map((row) => (
+          <p class="m-0 flex items-center py-3.5 font-body text-neutral-500 text-[length:var(--fs-body)] leading-[length:var(--lh-body)]">
+            {row}
+          </p>
+        ))}
       </div>
 
-      <div class="flex flex-col gap-7 rounded-xl border border-neutral-300 p-8 text-center">
-        <p class="m-0 font-heading text-vault-navy text-[length:var(--fs-h5)] leading-[length:var(--lh-h5)]">
+      <div class="grid grid-rows-subgrid gap-0 divide-y divide-neutral-300 rounded-xl border border-neutral-300 p-8 text-center lg:row-span-7">
+        <p class="m-0 pb-7 font-heading text-vault-navy text-[length:var(--fs-h5)] leading-[length:var(--lh-h5)]">
           General AI assistants
         </p>
-        <div class="flex flex-col items-center">
-          {rows.map((_, i) => (
-            <>
-              {i > 0 && <div class="h-px w-full bg-neutral-300" aria-hidden="true"></div>}
-              <span class="flex h-11 items-center justify-center py-7">
-                <img src="/images/ai-foundation/icons/cmp-x.png" alt="" width="20" height="20" loading="lazy" decoding="async" />
-              </span>
-            </>
-          ))}
-          <p class="m-0 pt-3.5 font-body text-neutral-500 text-[length:var(--fs-body)] leading-[length:var(--lh-body)]">
-            Re-reads everything, every time
-          </p>
-        </div>
+        {rows.map((_, i) => (
+          i < rows.length - 1 ? (
+            <span class="flex items-center justify-center py-7">
+              <img src="https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6acf117985dedd28f5678d9c_cross.png" alt="" width="20" height="20" loading="lazy" decoding="async" />
+            </span>
+          ) : (
+            <p class="m-0 flex items-center justify-center py-3.5 font-body text-neutral-500 text-[length:var(--fs-body)] leading-[length:var(--lh-body)]">
+              Re-reads everything, every time
+            </p>
+          )
+        ))}
       </div>
 
-      <div class="flex flex-col gap-7 rounded-xl border border-flux-lime bg-generic-00 p-8 text-center">
-        <p class="m-0 font-heading font-semibold text-vault-navy text-[length:var(--fs-h5)] leading-[length:var(--lh-h5)]">
+      <div class="grid grid-rows-subgrid gap-0 divide-y divide-neutral-300 rounded-xl border border-flux-lime bg-generic-00 p-8 text-center lg:row-span-7">
+        <p class="m-0 pb-7 font-heading font-semibold text-vault-navy text-[length:var(--fs-h5)] leading-[length:var(--lh-h5)]">
           With Clarity AI
         </p>
-        <div class="flex flex-col items-center">
-          {rows.map((_, i) => (
-            <>
-              {i > 0 && <div class="h-px w-full bg-neutral-300" aria-hidden="true"></div>}
-              <span class="flex h-11 items-center justify-center py-7">
-                <img src="/images/ai-foundation/icons/cmp-check.png" alt="" width="20" height="20" loading="lazy" decoding="async" />
-              </span>
-            </>
-          ))}
-          <p class="m-0 pt-3.5 font-body font-medium text-nova-blue text-[length:var(--fs-body)] leading-[length:var(--lh-body)]">
-            Data and context already resident
-          </p>
-        </div>
+        {rows.map((_, i) => (
+          i < rows.length - 1 ? (
+            <span class="flex items-center justify-center py-7">
+              <img src="https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6acf11793e74617468a37fed_tick.png" alt="" width="20" height="20" loading="lazy" decoding="async" />
+            </span>
+          ) : (
+            <p class="m-0 flex items-center justify-center py-3.5 font-body font-medium text-nova-blue text-[length:var(--fs-body)] leading-[length:var(--lh-body)]">
+              Data and context already resident
+            </p>
+          )
+        ))}
       </div>
     </div>
   </div>
