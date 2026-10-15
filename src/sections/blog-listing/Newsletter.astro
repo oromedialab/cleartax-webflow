@@ -77,23 +77,23 @@
  * IDs are prefixed `blog-cta-` so this can never collide with the hero's
  * `hero-dots-canvas` if both ever land on one Webflow page.
  */
-const heading = 'Stay ahead of every compliance update';
+const heading = "Stay ahead of every compliance update";
 const body =
-  'Get expert insights, e-invoicing updates, and tax compliance guides delivered to your inbox.';
-const ctaLabel = 'Book a demo';
+  "Get expert insights, e-invoicing updates, and tax compliance guides delivered to your inbox.";
+const ctaLabel = "Book a demo";
 /* Kept as a real href so the CTA still goes somewhere if JS never runs — the
    click handler calls preventDefault and opens the modal instead. */
-const ctaHref = 'https://www.cleartax.com/global/book-a-demo';
+const ctaHref = "https://www.cleartax.com/global/book-a-demo";
 
 /* HubSpot demo form. Same portal/form the site's other CTAs use — see
    `_shared/ContactFormRb.astro`. The embed script is NOT loaded on page load:
    it is injected the first time the modal opens, so this Embed stays
    self-contained in Webflow and visitors who never click pay nothing. */
-const hubspotPortalId = '245744706';
-const hubspotFormId = '5c52d4ba-5345-413a-b3cd-0ccec450aa30';
-const hubspotRegion = 'na2';
-const modalTitle = 'Book a demo';
-const modalBlurb = 'Tell us little about you and we will be in touch.';
+const hubspotPortalId = "245744706";
+const hubspotFormId = "5c52d4ba-5345-413a-b3cd-0ccec450aa30";
+const hubspotRegion = "na2";
+const modalTitle = "Book a demo";
+const modalBlurb = "Tell us little about you and we will be in touch.";
 
 /* lineWidth + gap = the 26px pitch this section has always used, matching the
    hero's 4 + 22. Stroke ends are round, so a zero-length stroke is a dot. */
@@ -111,8 +111,8 @@ const lengthRadius = 260;
 const tilt = 1;
 /* Every stroke is painted from one gradient laid corner to corner across the
    canvas, so the field shades Nova Blue → Nova 300 across the section. */
-const gradientFrom = 'rgba(84, 70, 255, 0.55)'; /* --palette-nova-blue */
-const gradientTo = 'rgba(156, 163, 255, 0.35)'; /* --palette-nova-300 */
+const gradientFrom = "rgba(84, 70, 255, 0.55)"; /* --palette-nova-blue */
+const gradientTo = "rgba(156, 163, 255, 0.35)"; /* --palette-nova-300 */
 /* How far the cursor's pull reaches, in px. Wide and soft — the whole
    neighbourhood leans in, rather than a tight ring snapping around. */
 const cursorRadius = 320;
@@ -142,7 +142,8 @@ const fadeRadius = 40;
 >
   <!-- Interactive dot grid -->
   <div class="pointer-events-none absolute inset-0 z-0 h-full w-full">
-    <canvas id="blog-cta-dots-canvas" class="absolute inset-0 h-full w-full"></canvas>
+    <canvas id="blog-cta-dots-canvas" class="absolute inset-0 h-full w-full"
+    ></canvas>
   </div>
 
   <!-- Radial clearing so the dots never run under the copy -->
@@ -161,8 +162,12 @@ const fadeRadius = 40;
   >
   </div>
 
-  <div class="container relative z-10">
-    <div class="mx-auto flex max-w-[764px] flex-col items-center gap-6 text-center">
+  <div
+    class="max-w-[var(--container-max)] w-full mx-auto px-4 md:px-6 relative z-10"
+  >
+    <div
+      class="mx-auto flex max-w-[764px] flex-col items-center gap-6 text-center"
+    >
       <div class="flex flex-col items-center gap-4">
         <h2
           class="font-heading font-medium text-vault-navy text-[length:var(--fs-h2)] leading-[var(--lh-h2)] tracking-[var(--tracking-body)] m-0"
@@ -255,11 +260,11 @@ const fadeRadius = 40;
 
 <script is:inline>
   (function () {
-    var section = document.getElementById('blog-cta');
+    var section = document.getElementById("blog-cta");
     if (!section) return;
-    var canvas = document.getElementById('blog-cta-dots-canvas');
+    var canvas = document.getElementById("blog-cta-dots-canvas");
     if (!canvas || !canvas.getContext) return;
-    var ctx = canvas.getContext('2d');
+    var ctx = canvas.getContext("2d");
 
     function num(name, fallback) {
       var v = parseFloat(section.getAttribute(name));
@@ -267,16 +272,18 @@ const fadeRadius = 40;
     }
 
     var config = {
-      lineWidth: num('data-line-width', 2),
-      gap: num('data-gap', 24),
-      maxLength: num('data-max-length', 16),
-      lengthRadius: num('data-length-radius', 260),
-      tilt: num('data-tilt', 1),
-      gradientFrom: section.getAttribute('data-gradient-from') || 'rgba(84, 70, 255, 0.55)',
-      gradientTo: section.getAttribute('data-gradient-to') || 'rgba(156, 163, 255, 0.35)',
-      cursorRadius: num('data-cursor-radius', 320),
-      pull: num('data-pull', 14),
-      fadeRadius: num('data-fade-radius', 90),
+      lineWidth: num("data-line-width", 2),
+      gap: num("data-gap", 24),
+      maxLength: num("data-max-length", 16),
+      lengthRadius: num("data-length-radius", 260),
+      tilt: num("data-tilt", 1),
+      gradientFrom:
+        section.getAttribute("data-gradient-from") || "rgba(84, 70, 255, 0.55)",
+      gradientTo:
+        section.getAttribute("data-gradient-to") || "rgba(156, 163, 255, 0.35)",
+      cursorRadius: num("data-cursor-radius", 320),
+      pull: num("data-pull", 14),
+      fadeRadius: num("data-fade-radius", 90),
       fadeSpeed: 12, // how fast a stroke eases to its target opacity
       // Slower than the fade on purpose: the strokes lag the cursor slightly,
       // and that lag is what reads as following rather than as the grid
@@ -389,7 +396,7 @@ const fadeRadius = 40;
       ctx.clearRect(0, 0, width, height);
       ctx.strokeStyle = strokeFill;
       ctx.lineWidth = config.lineWidth;
-      ctx.lineCap = 'round';
+      ctx.lineCap = "round";
 
       ctx.globalAlpha = 1;
       ctx.beginPath();
@@ -415,12 +422,13 @@ const fadeRadius = 40;
     }
 
     var reduceMotion =
-      window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      window.matchMedia &&
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
     if (reduceMotion) {
       initGrid();
       paint();
-      window.addEventListener('resize', function () {
+      window.addEventListener("resize", function () {
         initGrid();
         paint();
       });
@@ -451,7 +459,8 @@ const fadeRadius = 40;
       speed += (Math.sqrt(travelX * travelX + travelY * travelY) - speed) * 0.5;
       if (speed < 0.01) speed = 0;
 
-      engagement += ((hover ? Math.min(speed / 6, 1) : 0) - engagement) * engageEase;
+      engagement +=
+        ((hover ? Math.min(speed / 6, 1) : 0) - engagement) * engageEase;
       if (engagement < 0.001) engagement = 0;
 
       var grip = hover ? 0.4 + 0.6 * engagement : 0;
@@ -460,7 +469,8 @@ const fadeRadius = 40;
       var wantY = hover ? mouse.y : height / 2;
       var swungX = wantX - focusX;
       var swungY = wantY - focusY;
-      var swung = swungX > 0.05 || swungX < -0.05 || swungY > 0.05 || swungY < -0.05;
+      var swung =
+        swungX > 0.05 || swungX < -0.05 || swungY > 0.05 || swungY < -0.05;
       if (swung) {
         focusX += swungX * focusEase;
         focusY += swungY * focusEase;
@@ -544,14 +554,14 @@ const fadeRadius = 40;
       requestAnimationFrame(draw);
     }
 
-    window.addEventListener('resize', initGrid);
+    window.addEventListener("resize", initGrid);
     initGrid();
     requestAnimationFrame(draw);
 
     // Scoped to the section, not the window as DotField does: several of these
     // Embeds can share a Webflow page, and a global listener would have each
     // one reacting to a cursor nowhere near it.
-    section.addEventListener('mousemove', function (e) {
+    section.addEventListener("mousemove", function (e) {
       var rect = canvas.getBoundingClientRect();
       // TWO SPACES, and `zoom` makes them different sizes.
       // rect and clientX are RENDERED px. The grid lives in the canvas's own
@@ -579,7 +589,7 @@ const fadeRadius = 40;
       mouse.y = ny;
     });
 
-    section.addEventListener('mouseleave', function () {
+    section.addEventListener("mouseleave", function () {
       // Dropping `hover` is what matters: the focus starts its swing back to the
       // centre and the pull lets go. The parked coordinates just keep a stale
       // pointer position from being read as a real one.
@@ -597,15 +607,15 @@ const fadeRadius = 40;
   /* Book a demo → HubSpot form in a modal. The embed script is fetched on the
      first open, not on page load. */
   (function () {
-    var section = document.getElementById('blog-cta');
+    var section = document.getElementById("blog-cta");
     if (!section) return;
 
-    var modal = section.querySelector('[data-demo-modal]');
-    var mount = section.querySelector('#blog-cta-hs-form');
+    var modal = section.querySelector("[data-demo-modal]");
+    var mount = section.querySelector("#blog-cta-hs-form");
     if (!modal || !mount) return;
 
     var panel = modal.firstElementChild;
-    var closeBtn = modal.querySelector('[data-demo-close]');
+    var closeBtn = modal.querySelector("[data-demo-close]");
 
     var lastFocused = null;
     var scriptRequested = false;
@@ -616,19 +626,26 @@ const fadeRadius = 40;
       formCreated = true;
 
       window.hbspt.forms.create({
-        portalId: mount.getAttribute('data-portal-id'),
-        formId: mount.getAttribute('data-form-id'),
-        region: mount.getAttribute('data-region') || 'na2',
-        target: '#blog-cta-hs-form',
+        portalId: mount.getAttribute("data-portal-id"),
+        formId: mount.getAttribute("data-form-id"),
+        region: mount.getAttribute("data-region") || "na2",
+        target: "#blog-cta-hs-form",
         onFormReady: function ($form) {
-          var loading = mount.querySelector('[data-demo-loading]');
-          if (loading && loading.parentNode) loading.parentNode.removeChild(loading);
+          var loading = mount.querySelector("[data-demo-loading]");
+          if (loading && loading.parentNode)
+            loading.parentNode.removeChild(loading);
 
           // Carry campaign attribution through, same as the site's other forms.
           var formEl = $form && $form[0] ? $form[0] : $form;
           if (!formEl || !formEl.querySelector) return;
           var params = new URLSearchParams(window.location.search);
-          var utms = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 'utm_content'];
+          var utms = [
+            "utm_source",
+            "utm_medium",
+            "utm_campaign",
+            "utm_term",
+            "utm_content",
+          ];
           for (var i = 0; i < utms.length; i++) {
             var value = params.get(utms[i]);
             if (!value) continue;
@@ -652,13 +669,13 @@ const fadeRadius = 40;
       // section, or a paste in Webflow's page head) rather than adding a second.
       var loader = document.querySelector('script[src*="hsforms.net"]');
       if (!loader) {
-        loader = document.createElement('script');
-        loader.src = 'https://js-na2.hsforms.net/forms/embed/v2.js';
-        loader.charset = 'utf-8';
+        loader = document.createElement("script");
+        loader.src = "https://js-na2.hsforms.net/forms/embed/v2.js";
+        loader.charset = "utf-8";
         loader.async = true;
         document.head.appendChild(loader);
       }
-      loader.addEventListener('load', createForm);
+      loader.addEventListener("load", createForm);
 
       // Backstop: a cached loader may have fired `load` before we listened.
       var tries = 0;
@@ -682,29 +699,29 @@ const fadeRadius = 40;
       // click focuses an anchor, and on close focus has to land somewhere
       // predictable rather than on the document root.
       lastFocused = opener || document.activeElement;
-      modal.style.display = 'flex';
-      modal.setAttribute('aria-hidden', 'false');
-      document.body.style.overflow = 'hidden';
+      modal.style.display = "flex";
+      modal.setAttribute("aria-hidden", "false");
+      document.body.style.overflow = "hidden";
       loadHubspot();
       if (closeBtn) closeBtn.focus();
     }
 
     function closeModal() {
-      modal.style.display = 'none';
-      modal.setAttribute('aria-hidden', 'true');
-      document.body.style.overflow = '';
+      modal.style.display = "none";
+      modal.setAttribute("aria-hidden", "true");
+      document.body.style.overflow = "";
       if (lastFocused && lastFocused.focus) lastFocused.focus();
     }
 
     function isOpen() {
-      return modal.style.display === 'flex';
+      return modal.style.display === "flex";
     }
 
     // Delegated, so it does not matter which Embed mounts first or whether the
     // opener existed when this ran.
-    document.addEventListener('click', function (e) {
+    document.addEventListener("click", function (e) {
       if (!e.target.closest) return;
-      var opener = e.target.closest('[data-demo-open]');
+      var opener = e.target.closest("[data-demo-open]");
       if (!opener) return;
       openModal(e, opener);
     });
@@ -718,37 +735,37 @@ const fadeRadius = 40;
     function adoptNavbarCtas() {
       var ctas = document.querySelectorAll('a[onclick*="contactForm"]');
       for (var i = 0; i < ctas.length; i++) {
-        ctas[i].removeAttribute('onclick');
+        ctas[i].removeAttribute("onclick");
         ctas[i].onclick = null;
-        ctas[i].setAttribute('data-demo-open', '');
+        ctas[i].setAttribute("data-demo-open", "");
       }
     }
 
-    if (document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', adoptNavbarCtas);
+    if (document.readyState === "loading") {
+      document.addEventListener("DOMContentLoaded", adoptNavbarCtas);
     } else {
       adoptNavbarCtas();
     }
 
-    if (closeBtn) closeBtn.addEventListener('click', closeModal);
+    if (closeBtn) closeBtn.addEventListener("click", closeModal);
 
-    modal.addEventListener('click', function (e) {
+    modal.addEventListener("click", function (e) {
       if (e.target === modal) closeModal();
     });
 
-    document.addEventListener('keydown', function (e) {
+    document.addEventListener("keydown", function (e) {
       if (!isOpen()) return;
 
-      if (e.key === 'Escape') {
+      if (e.key === "Escape") {
         closeModal();
         return;
       }
 
       // Keep Tab inside the dialog — `aria-modal` claims the rest is inert, so
       // focus must not walk out into the page behind it.
-      if (e.key !== 'Tab' || !panel) return;
+      if (e.key !== "Tab" || !panel) return;
       var focusable = panel.querySelectorAll(
-        'a[href], button:not([disabled]), input:not([disabled]):not([type="hidden"]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
+        'a[href], button:not([disabled]), input:not([disabled]):not([type="hidden"]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])',
       );
       if (!focusable.length) return;
       var first = focusable[0];
@@ -808,7 +825,9 @@ const fadeRadius = 40;
     color: var(--color-vault-navy) !important;
     outline: none !important;
     box-shadow: 0 1px 1px rgba(16, 24, 40, 0.04) !important;
-    transition: border-color var(--transition-fast), box-shadow var(--transition-fast) !important;
+    transition:
+      border-color var(--transition-fast),
+      box-shadow var(--transition-fast) !important;
   }
   .blog-cta-hs-form input::placeholder,
   .blog-cta-hs-form textarea::placeholder {
