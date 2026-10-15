@@ -31,40 +31,40 @@
  * fires a bubbling `change`, which is exactly what `Events.astro` already
  * listens for, so none of the grid logic knows this UI exists.
  */
-const heading = 'Watch our past Webinars & Events here';
+const heading = "Watch our past Webinars & Events here";
 const subheading =
-  'Revisit high-impact sessions covering critical trends, regulatory shifts, and transformation strategies';
+  "Revisit high-impact sessions covering critical trends, regulatory shifts, and transformation strategies";
 
 /* Exactly the two values `EventItem.type` allows. This is a closed set, unlike
    Country — a third option here would be unreachable by construction. */
-const types: string[] = ['Online', 'In person'];
+const types: string[] = ["Online", "In person"];
 
 const countries: string[] = [
-  'Global',
-  'India',
-  'UAE',
-  'Saudi Arabia',
-  'Malaysia',
-  'France',
-  'Germany',
-  'Singapore',
+  "Global",
+  "India",
+  "UAE",
+  "Saudi Arabia",
+  "Malaysia",
+  "France",
+  "Germany",
+  "Singapore",
 ];
 
 const fieldClass =
-  'h-10 w-full rounded-lg border border-neutral-200 bg-generic-00 px-3 py-2 font-body font-normal text-[length:var(--fs-label)] leading-[var(--lh-label)] text-neutral-900 shadow-[0px_1px_2px_0px_rgba(16,24,40,0.04)] outline-none transition-colors duration-150 placeholder:text-neutral-400 focus:border-nova-blue';
+  "h-10 w-full rounded-lg border border-neutral-200 bg-generic-00 px-3 py-2 font-body font-normal text-[length:var(--fs-label)] leading-[var(--lh-label)] text-neutral-900 shadow-[0px_1px_2px_0px_rgba(16,24,40,0.04)] outline-none transition-colors duration-150 placeholder:text-neutral-400 focus:border-nova-blue";
 
 const labelClass =
-  'font-body font-medium text-[length:var(--fs-label)] leading-[var(--lh-label)] text-neutral-900';
+  "font-body font-medium text-[length:var(--fs-label)] leading-[var(--lh-label)] text-neutral-900";
 
 /* The trigger has to line up with the search input to the pixel, so it starts
    from the same `fieldClass` and only adds what a button needs. */
 const triggerClass = `${fieldClass} group flex cursor-pointer items-center justify-between gap-2 text-left aria-expanded:border-nova-blue data-[placeholder]:text-neutral-400`;
 
 const panelClass =
-  'absolute left-0 right-0 top-[calc(100%+6px)] z-20 hidden max-h-64 overflow-y-auto rounded-lg border border-neutral-200 bg-generic-00 p-1 shadow-[0px_12px_24px_-6px_rgba(16,24,40,0.12)]';
+  "absolute left-0 right-0 top-[calc(100%+6px)] z-20 hidden max-h-64 overflow-y-auto rounded-lg border border-neutral-200 bg-generic-00 p-1 shadow-[0px_12px_24px_-6px_rgba(16,24,40,0.12)]";
 
 const optionClass =
-  'group flex cursor-pointer items-center justify-between gap-2 rounded-md px-3 py-2 font-body font-normal text-[length:var(--fs-label)] leading-[var(--lh-label)] text-neutral-900 outline-none transition-colors duration-100 hover:bg-ledger-100 focus:bg-ledger-100 aria-selected:bg-nova-50 aria-selected:font-medium aria-selected:text-nova-blue';
+  "group flex cursor-pointer items-center justify-between gap-2 rounded-md px-3 py-2 font-body font-normal text-[length:var(--fs-label)] leading-[var(--lh-label)] text-neutral-900 outline-none transition-colors duration-100 hover:bg-ledger-100 focus:bg-ledger-100 aria-selected:bg-nova-50 aria-selected:font-medium aria-selected:text-nova-blue";
 
 /* One shape, rendered three times. `hook` carries the `data-ev-*` attribute the
    grid queries by, spread onto the native select.
@@ -85,34 +85,40 @@ const selects: Array<{
   width: string;
 }> = [
   {
-    id: 'ev-filter-type',
-    name: 'type',
-    label: 'Type',
-    hook: { 'data-ev-type': '' },
-    options: [{ value: '', label: 'Select' }, ...types.map((t) => ({ value: t, label: t }))],
-    value: '',
-    width: 'md:flex-1 md:min-w-0',
-  },
-  {
-    id: 'ev-filter-country',
-    name: 'country',
-    label: 'Country',
-    hook: { 'data-ev-country': '' },
-    options: [{ value: '', label: 'Select' }, ...countries.map((c) => ({ value: c, label: c }))],
-    value: '',
-    width: 'md:flex-1 md:min-w-0',
-  },
-  {
-    id: 'ev-filter-sort',
-    name: 'sort',
-    label: 'Sort by',
-    hook: { 'data-ev-sort': '' },
+    id: "ev-filter-type",
+    name: "type",
+    label: "Type",
+    hook: { "data-ev-type": "" },
     options: [
-      { value: 'new', label: 'New to old' },
-      { value: 'old', label: 'Old to new' },
+      { value: "", label: "Select" },
+      ...types.map((t) => ({ value: t, label: t })),
     ],
-    value: 'new',
-    width: 'md:flex-1 md:min-w-0',
+    value: "",
+    width: "md:flex-1 md:min-w-0",
+  },
+  {
+    id: "ev-filter-country",
+    name: "country",
+    label: "Country",
+    hook: { "data-ev-country": "" },
+    options: [
+      { value: "", label: "Select" },
+      ...countries.map((c) => ({ value: c, label: c })),
+    ],
+    value: "",
+    width: "md:flex-1 md:min-w-0",
+  },
+  {
+    id: "ev-filter-sort",
+    name: "sort",
+    label: "Sort by",
+    hook: { "data-ev-sort": "" },
+    options: [
+      { value: "new", label: "New to old" },
+      { value: "old", label: "Old to new" },
+    ],
+    value: "new",
+    width: "md:flex-1 md:min-w-0",
   },
 ];
 ---
@@ -149,8 +155,12 @@ const selects: Array<{
     <!-- The gap down to the controls is this element's `mb` — it is a child of
          the fixed block, not the block itself, so the margin-box rule above
          does not apply to it. -->
-    <div class="container mb-6 md:mb-8">
-      <div class="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between lg:gap-8">
+    <div
+      class="max-w-[var(--container-max)] mx-auto w-full px-4 md:px-6 mb-6 md:mb-8"
+    >
+      <div
+        class="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between lg:gap-8"
+      >
         <h2
           class="font-heading font-medium text-vault-navy text-[length:var(--fs-h1)] leading-[var(--lh-h1)] tracking-[var(--tracking-heading)] m-0 lg:max-w-[672px]"
         >
@@ -164,7 +174,7 @@ const selects: Array<{
       </div>
     </div>
 
-    <div class="container">
+    <div class="max-w-[var(--container-max)] mx-auto w-full px-4 md:px-6">
       <form
         data-ev-filter
         role="search"
@@ -204,7 +214,10 @@ const selects: Array<{
                   aria-hidden="true"
                 >
                   {field.options.map((option) => (
-                    <option value={option.value} selected={option.value === field.value}>
+                    <option
+                      value={option.value}
+                      selected={option.value === field.value}
+                    >
                       {option.label}
                     </option>
                   ))}
@@ -213,7 +226,7 @@ const selects: Array<{
                 <button
                   type="button"
                   data-select-trigger
-                  data-placeholder={field.value === '' ? '' : undefined}
+                  data-placeholder={field.value === "" ? "" : undefined}
                   id={`${field.id}-button`}
                   role="combobox"
                   aria-haspopup="listbox"
@@ -223,7 +236,10 @@ const selects: Array<{
                   class={triggerClass}
                 >
                   <span data-select-value class="truncate">
-                    {field.options.filter((o) => o.value === field.value)[0].label}
+                    {
+                      field.options.filter((o) => o.value === field.value)[0]
+                        .label
+                    }
                   </span>
                   <svg
                     class="shrink-0 text-neutral-500 transition-transform duration-150 group-aria-expanded:rotate-180"
@@ -255,7 +271,9 @@ const selects: Array<{
                       data-select-option
                       data-value={option.value}
                       role="option"
-                      aria-selected={option.value === field.value ? 'true' : 'false'}
+                      aria-selected={
+                        option.value === field.value ? "true" : "false"
+                      }
                       tabindex="-1"
                       class={optionClass}
                     >
@@ -306,7 +324,7 @@ const selects: Array<{
      off the top of the screen, and a fixed-element child cannot add scroll. No
      JS has to keep it in sync with a navbar it does not own. */
   [data-ev-filter-bar][data-pinned]::before {
-    content: '';
+    content: "";
     position: absolute;
     bottom: 100%;
     left: 0;
@@ -324,66 +342,71 @@ const selects: Array<{
      and fires a bubbling `change`, so `Events.astro` filters and sorts exactly
      as it would have with native selects. */
   (function () {
-    if (document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', init);
+    if (document.readyState === "loading") {
+      document.addEventListener("DOMContentLoaded", init);
     } else {
       init();
     }
 
     function init() {
-      var roots = document.querySelectorAll('[data-ev-select]');
+      var roots = document.querySelectorAll("[data-ev-select]");
       for (var i = 0; i < roots.length; i++) setup(roots[i]);
     }
 
     function setup(root) {
-      var select = root.querySelector('select');
-      var trigger = root.querySelector('[data-select-trigger]');
-      var panel = root.querySelector('[data-select-panel]');
-      var valueEl = root.querySelector('[data-select-value]');
+      var select = root.querySelector("select");
+      var trigger = root.querySelector("[data-select-trigger]");
+      var panel = root.querySelector("[data-select-panel]");
+      var valueEl = root.querySelector("[data-select-value]");
       if (!select || !trigger || !panel || !valueEl) return;
 
-      var options = panel.querySelectorAll('[data-select-option]');
+      var options = panel.querySelectorAll("[data-select-option]");
       if (!options.length) return;
 
       // Inline display, not a class swap: the utilities pasted into Webflow are
       // unlayered, so `hidden` and `block` on one element would race on source
       // order. Inline always wins.
       function isOpen() {
-        return trigger.getAttribute('aria-expanded') === 'true';
+        return trigger.getAttribute("aria-expanded") === "true";
       }
 
       function open() {
-        panel.style.display = 'block';
-        trigger.setAttribute('aria-expanded', 'true');
-        var current = panel.querySelector('[aria-selected="true"]') || options[0];
+        panel.style.display = "block";
+        trigger.setAttribute("aria-expanded", "true");
+        var current =
+          panel.querySelector('[aria-selected="true"]') || options[0];
         if (current) {
           current.focus();
           // The selected row can be well down a scrolling panel.
-          if (current.scrollIntoView) current.scrollIntoView({ block: 'nearest' });
+          if (current.scrollIntoView)
+            current.scrollIntoView({ block: "nearest" });
         }
       }
 
       function close(returnFocus) {
-        panel.style.display = 'none';
-        trigger.setAttribute('aria-expanded', 'false');
+        panel.style.display = "none";
+        trigger.setAttribute("aria-expanded", "false");
         if (returnFocus) trigger.focus();
       }
 
       function choose(option) {
-        var value = option.getAttribute('data-value');
+        var value = option.getAttribute("data-value");
 
         for (var i = 0; i < options.length; i++) {
-          options[i].setAttribute('aria-selected', options[i] === option ? 'true' : 'false');
+          options[i].setAttribute(
+            "aria-selected",
+            options[i] === option ? "true" : "false",
+          );
         }
 
         valueEl.textContent = option.textContent.trim();
-        if (value) trigger.removeAttribute('data-placeholder');
-        else trigger.setAttribute('data-placeholder', '');
+        if (value) trigger.removeAttribute("data-placeholder");
+        else trigger.setAttribute("data-placeholder", "");
 
         select.value = value;
         // Dispatched from the select, not the button, so the grid's delegated
         // listener sees the same event shape a native select would have sent.
-        select.dispatchEvent(new Event('change', { bubbles: true }));
+        select.dispatchEvent(new Event("change", { bubbles: true }));
 
         close(true);
       }
@@ -397,60 +420,66 @@ const selects: Array<{
         if (next < 0) next = options.length - 1;
         if (next > options.length - 1) next = 0;
         options[next].focus();
-        if (options[next].scrollIntoView) options[next].scrollIntoView({ block: 'nearest' });
+        if (options[next].scrollIntoView)
+          options[next].scrollIntoView({ block: "nearest" });
       }
 
-      trigger.addEventListener('click', function () {
+      trigger.addEventListener("click", function () {
         if (isOpen()) close(false);
         else open();
       });
 
-      trigger.addEventListener('keydown', function (e) {
-        if (e.key === 'ArrowDown' || e.key === 'ArrowUp' || e.key === 'Enter' || e.key === ' ') {
+      trigger.addEventListener("keydown", function (e) {
+        if (
+          e.key === "ArrowDown" ||
+          e.key === "ArrowUp" ||
+          e.key === "Enter" ||
+          e.key === " "
+        ) {
           e.preventDefault(); // or Space scrolls the page and Enter submits the form
           open();
-        } else if (e.key === 'Escape') {
+        } else if (e.key === "Escape") {
           close(false);
         }
       });
 
-      panel.addEventListener('click', function (e) {
+      panel.addEventListener("click", function (e) {
         if (!e.target.closest) return;
-        var option = e.target.closest('[data-select-option]');
+        var option = e.target.closest("[data-select-option]");
         if (option) choose(option);
       });
 
-      panel.addEventListener('keydown', function (e) {
+      panel.addEventListener("keydown", function (e) {
         if (!e.target.closest) return;
-        var option = e.target.closest('[data-select-option]');
+        var option = e.target.closest("[data-select-option]");
         if (!option) return;
 
-        if (e.key === 'ArrowDown') {
+        if (e.key === "ArrowDown") {
           e.preventDefault();
           step(option, 1);
-        } else if (e.key === 'ArrowUp') {
+        } else if (e.key === "ArrowUp") {
           e.preventDefault();
           step(option, -1);
-        } else if (e.key === 'Home') {
+        } else if (e.key === "Home") {
           e.preventDefault();
           options[0].focus();
-        } else if (e.key === 'End') {
+        } else if (e.key === "End") {
           e.preventDefault();
           options[options.length - 1].focus();
-        } else if (e.key === 'Enter' || e.key === ' ') {
+        } else if (e.key === "Enter" || e.key === " ") {
           e.preventDefault();
           choose(option);
-        } else if (e.key === 'Escape') {
+        } else if (e.key === "Escape") {
           e.preventDefault();
           close(true);
-        } else if (e.key === 'Tab') {
+        } else if (e.key === "Tab") {
           // Let focus go where it was heading, just don't leave the panel open
           // behind it.
           close(false);
         }
       });
 
-      document.addEventListener('click', function (e) {
+      document.addEventListener("click", function (e) {
         if (!isOpen()) return;
         if (root.contains(e.target)) return;
         close(false);
@@ -475,36 +504,37 @@ const selects: Array<{
     // Deferred to DOM-ready on purpose. This Embed is pasted above the grid, so
     // at parse time `[data-ev-grid-root]` does not exist yet and setup would
     // bail every time.
-    if (document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', init);
+    if (document.readyState === "loading") {
+      document.addEventListener("DOMContentLoaded", init);
     } else {
       init();
     }
 
     function init() {
-      var root = document.querySelector('[data-ev-filter-root]');
+      var root = document.querySelector("[data-ev-filter-root]");
       if (!root) return;
-      var block = root.querySelector('[data-ev-filter-bar]');
-      var grid = document.querySelector('[data-ev-grid-root]');
+      var block = root.querySelector("[data-ev-filter-bar]");
+      var grid = document.querySelector("[data-ev-grid-root]");
       // No grid to scroll through means nothing to pin against — leave the
       // block in flow rather than sticking it to the top forever.
       if (!block || !grid) return;
 
-      var navRoot = document.querySelector('[data-giwip-nav-root]');
-      var navCard = navRoot ? navRoot.querySelector('[data-nav-card]') : null;
+      var navRoot = document.querySelector("[data-giwip-nav-root]");
+      var navCard = navRoot ? navRoot.querySelector("[data-nav-card]") : null;
 
       // Stacked on a phone the head plus the form is most of a screen; pinning
       // it would leave no room for the grid it filters. Desktop layout only.
-      var wideEnough = window.matchMedia('(min-width: 768px)');
+      var wideEnough = window.matchMedia("(min-width: 768px)");
 
       // Decelerating curve, not the symmetric material ease. The block enters
       // and leaves at the top of the screen where there is nothing to ease
       // against, so a slow finish reads as settling rather than stopping.
-      var EASE = 'cubic-bezier(0.16, 1, 0.3, 1)';
+      var EASE = "cubic-bezier(0.16, 1, 0.3, 1)";
       var EXIT = 420;
 
       var reduceMotion =
-        window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        window.matchMedia &&
+        window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
       /* TWO COORDINATE SPACES, AND MIXING THEM IS THE BUG THIS SECTION EXISTS
          TO AVOID. `shared.css` puts `zoom` on the body element between 768px and
@@ -549,7 +579,9 @@ const selects: Array<{
         // `top-4` plus its own content height and that changes with the
         // breakpoint. No navbar on the page (a lone Embed in isolation) and the
         // block simply parks at the top of the screen.
-        navBottomPx = navCard ? Math.max(0, navCard.getBoundingClientRect().bottom) : 0;
+        navBottomPx = navCard
+          ? Math.max(0, navCard.getBoundingClientRect().bottom)
+          : 0;
         pinTopCss = navBottomPx / zoom;
       }
 
@@ -559,7 +591,7 @@ const selects: Array<{
       // not a full-width bar. Layout px, because transforms scale with zoom
       // exactly as `top` does.
       function offscreen() {
-        return 'translateY(-' + (blockHeightCss + pinTopCss) + 'px)';
+        return "translateY(-" + (blockHeightCss + pinTopCss) + "px)";
       }
 
       function pin(animateIn) {
@@ -571,51 +603,51 @@ const selects: Array<{
         pinned = true;
         releasedBelow = false;
 
-        root.style.height = sectionHeight + 'px';
-        root.setAttribute('data-pinned', '');
-        block.setAttribute('data-pinned', '');
-        block.style.position = 'fixed';
-        block.style.top = pinTopCss + 'px';
-        block.style.left = '0';
-        block.style.right = '0';
+        root.style.height = sectionHeight + "px";
+        root.setAttribute("data-pinned", "");
+        block.setAttribute("data-pinned", "");
+        block.style.position = "fixed";
+        block.style.top = pinTopCss + "px";
+        block.style.left = "0";
+        block.style.right = "0";
         // BELOW the navbar's z-[1000], never over it. The navbar keeps the top
         // of the screen; this block parks under it and slides away behind it.
-        block.style.zIndex = '900';
+        block.style.zIndex = "900";
         // Promoted for the whole pinned stretch, not just while a transition is
         // running. Setting `will-change` at the moment the slide starts is too
         // late — the layer is created in the same frame that has to paint the
         // first step, which is exactly where the hitch shows.
-        block.style.willChange = 'transform';
+        block.style.willChange = "transform";
 
         // Entering from above, fixed and static put the block in the same
         // place, so there is nothing to animate — animating would invent motion
         // the scroll did not ask for. Only a re-entry from below needs to
         // travel.
         if (!animateIn || reduceMotion) {
-          block.style.transition = '';
-          block.style.transform = '';
+          block.style.transition = "";
+          block.style.transform = "";
           return;
         }
 
-        block.style.transition = 'none';
+        block.style.transition = "none";
         block.style.transform = offscreen();
         void block.offsetHeight; // flush, or both assignments collapse into one paint
-        block.style.transition = 'transform ' + EXIT + 'ms ' + EASE;
-        block.style.transform = 'translateY(0)';
+        block.style.transition = "transform " + EXIT + "ms " + EASE;
+        block.style.transform = "translateY(0)";
       }
 
       function reset() {
-        root.removeAttribute('data-pinned');
-        block.removeAttribute('data-pinned');
-        block.style.position = '';
-        block.style.top = '';
-        block.style.left = '';
-        block.style.right = '';
-        block.style.zIndex = '';
-        block.style.transition = '';
-        block.style.transform = '';
-        block.style.willChange = ''; // a permanent layer on a static element is waste
-        root.style.height = '';
+        root.removeAttribute("data-pinned");
+        block.removeAttribute("data-pinned");
+        block.style.position = "";
+        block.style.top = "";
+        block.style.left = "";
+        block.style.right = "";
+        block.style.zIndex = "";
+        block.style.transition = "";
+        block.style.transform = "";
+        block.style.willChange = ""; // a permanent layer on a static element is waste
+        root.style.height = "";
         measure();
       }
 
@@ -632,7 +664,7 @@ const selects: Array<{
           return;
         }
 
-        block.style.transition = 'transform ' + EXIT + 'ms ' + EASE;
+        block.style.transition = "transform " + EXIT + "ms " + EASE;
         block.style.transform = offscreen();
         releaseTimer = setTimeout(function () {
           releaseTimer = null;
@@ -675,8 +707,8 @@ const selects: Array<{
         requestAnimationFrame(update);
       }
 
-      window.addEventListener('scroll', onScroll, { passive: true });
-      window.addEventListener('resize', function () {
+      window.addEventListener("scroll", onScroll, { passive: true });
+      window.addEventListener("resize", function () {
         measure();
         onScroll();
       });

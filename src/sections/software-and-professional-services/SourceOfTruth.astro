@@ -23,18 +23,72 @@
  * to ERP GL, same "orange-full" mechanic every page in this family uses for
  * its own Procurement/AP row.
  */
-import FlowCanvas, { CANVAS_W, CANVAS_H, type FlowCard, type FlowWire } from "./FlowCanvas.astro";
+import FlowCanvas, {
+  CANVAS_W,
+  CANVAS_H,
+  type FlowCard,
+  type FlowWire,
+} from "./FlowCanvas.astro";
 
 const sources: FlowCard[] = [
-  { x: 0, y: 52, w: 286, h: 144, tag: "purple", title: "Self-serve checkout", desc: "Card payment · in-app purchase\nInstant provisioning" },
-  { x: 0, y: 220, w: 286, h: 144, tag: "purple", title: "Enterprise contracts", desc: "Order forms · MSAs\nAnnual subscriptions" },
-  { x: 0, y: 388, w: 286, h: 144, tag: "purple", title: "Professional services", desc: "Time and materials · milestones\nRetainers" },
-  { x: 0, y: 572, w: 286, h: 144, tag: "orange", title: "Vendor spend · AP", desc: "Cloud, contractors\nForeign agencies", directToGL: true },
+  {
+    x: 0,
+    y: 52,
+    w: 286,
+    h: 144,
+    tag: "purple",
+    title: "Self-serve checkout",
+    desc: "Card payment · in-app purchase\nInstant provisioning",
+  },
+  {
+    x: 0,
+    y: 220,
+    w: 286,
+    h: 144,
+    tag: "purple",
+    title: "Enterprise contracts",
+    desc: "Order forms · MSAs\nAnnual subscriptions",
+  },
+  {
+    x: 0,
+    y: 388,
+    w: 286,
+    h: 144,
+    tag: "purple",
+    title: "Professional services",
+    desc: "Time and materials · milestones\nRetainers",
+  },
+  {
+    x: 0,
+    y: 572,
+    w: 286,
+    h: 144,
+    tag: "orange",
+    title: "Vendor spend · AP",
+    desc: "Cloud, contractors\nForeign agencies",
+    directToGL: true,
+  },
 ];
 
 const billing: FlowCard[] = [
-  { x: 332, y: 220, w: 286, h: 144, tag: "grey", title: "Subscription e-invoice", desc: "Structured e-invoice per country.\nRate set by customer location." },
-  { x: 332, y: 368, w: 286, h: 164, tag: "grey", title: "Engagement invoice", desc: "Fees, milestones and recharges.\nDisbursements kept out of scope." },
+  {
+    x: 332,
+    y: 220,
+    w: 286,
+    h: 144,
+    tag: "grey",
+    title: "Subscription e-invoice",
+    desc: "Structured e-invoice per country.\nRate set by customer location.",
+  },
+  {
+    x: 332,
+    y: 368,
+    w: 286,
+    h: 164,
+    tag: "grey",
+    title: "Engagement invoice",
+    desc: "Fees, milestones and recharges.\nDisbursements kept out of scope.",
+  },
 ];
 
 // Self-serve checkout + Enterprise contracts merge onto Subscription
@@ -48,35 +102,107 @@ const billing: FlowCard[] = [
 // and the overlap reads as a doubled/glitchy line. Drawing the shared
 // geometry exactly once removes that artifact entirely.
 const wires: FlowWire[] = [
-  { flow: "purple", stage: "src-entry", points: [{ x: 286, y: 124 }, { x: 310, y: 124 }] },
-  { flow: "purple", stage: "src-entry", points: [{ x: 286, y: 292 }, { x: 310, y: 292 }] },
-  { flow: "purple", stage: "src-entry", points: [{ x: 310, y: 124 }, { x: 310, y: 292 }] },
-  { flow: "purple", stage: "src-entry", points: [{ x: 310, y: 292 }, { x: 332, y: 292 }] },
+  {
+    flow: "purple",
+    stage: "src-entry",
+    points: [
+      { x: 286, y: 124 },
+      { x: 310, y: 124 },
+    ],
+  },
+  {
+    flow: "purple",
+    stage: "src-entry",
+    points: [
+      { x: 286, y: 292 },
+      { x: 310, y: 292 },
+    ],
+  },
+  {
+    flow: "purple",
+    stage: "src-entry",
+    points: [
+      { x: 310, y: 124 },
+      { x: 310, y: 292 },
+    ],
+  },
+  {
+    flow: "purple",
+    stage: "src-entry",
+    points: [
+      { x: 310, y: 292 },
+      { x: 332, y: 292 },
+    ],
+  },
   // Professional services -> Engagement invoice, its own line (not part of
   // the bus above — it feeds the other billing card).
-  { flow: "purple", stage: "src-entry", from: { x: 286, y: 460 }, to: { x: 332, y: 450 }, turnX: 309 },
-  { flow: "orange", stage: "orange-full", from: { x: 286, y: 644 }, to: { x: 668, y: 500 }, turnX: 643 },
-  { flow: "purple", stage: "bill-exit", points: [{ x: 618, y: 292 }, { x: 640, y: 292 }, { x: 640, y: 371 }, { x: 668, y: 371 }] },
-  { flow: "purple", stage: "bill-exit", points: [{ x: 618, y: 450 }, { x: 640, y: 450 }, { x: 640, y: 371 }, { x: 668, y: 371 }] },
+  {
+    flow: "purple",
+    stage: "src-entry",
+    from: { x: 286, y: 460 },
+    to: { x: 332, y: 450 },
+    turnX: 309,
+  },
+  {
+    flow: "orange",
+    stage: "orange-full",
+    from: { x: 286, y: 644 },
+    to: { x: 668, y: 500 },
+    turnX: 643,
+  },
+  {
+    flow: "purple",
+    stage: "bill-exit",
+    points: [
+      { x: 618, y: 292 },
+      { x: 640, y: 292 },
+      { x: 640, y: 371 },
+      { x: 668, y: 371 },
+    ],
+  },
+  {
+    flow: "purple",
+    stage: "bill-exit",
+    points: [
+      { x: 618, y: 450 },
+      { x: 640, y: 450 },
+      { x: 640, y: 371 },
+      { x: 668, y: 371 },
+    ],
+  },
 ];
 
-const erpChecklist = ["Output tax by customer location", "Reverse charge on B2B exports", "Input tax recovery", "e-invoice per country model", "Tax reconciliation"];
+const erpChecklist = [
+  "Output tax by customer location",
+  "Reverse charge on B2B exports",
+  "Input tax recovery",
+  "e-invoice per country model",
+  "Tax reconciliation",
+];
 ---
 
 <section class="bg-generic-00 border-t border-neutral-200 py-16 lg:py-20">
-  <div class="container">
+  <div class="max-w-[var(--container-max)] w-full mx-auto px-4 md:px-6">
     <div class="rounded-xl border border-neutral-200 p-6 lg:p-8">
       <div class="flex flex-col gap-6 mb-12">
-        <h2 class="m-0 font-heading font-medium text-vault-navy text-[length:var(--fs-h1)] leading-[length:var(--lh-h1)] tracking-[-0.5px] text-balance">
+        <h2
+          class="m-0 font-heading font-medium text-vault-navy text-[length:var(--fs-h1)] leading-[length:var(--lh-h1)] tracking-[-0.5px] text-balance"
+        >
           From every billing channel to one source of truth.
         </h2>
-        <p class="m-0 font-body font-medium text-neutral-500 text-[length:var(--fs-h6)] leading-[length:var(--lh-h6)] tracking-[1px] uppercase">
+        <p
+          class="m-0 font-body font-medium text-neutral-500 text-[length:var(--fs-h6)] leading-[length:var(--lh-h6)] tracking-[1px] uppercase"
+        >
           Direct & Self-Serve
         </p>
       </div>
 
       <div class="sot-stage relative w-full" data-sot-stage>
-        <div class="sot-track absolute top-0 left-0" style={`width:${CANVAS_W}px;height:${CANVAS_H}px;`} data-sot-track>
+        <div
+          class="sot-track absolute top-0 left-0"
+          style={`width:${CANVAS_W}px;height:${CANVAS_H}px;`}
+          data-sot-track
+        >
           <FlowCanvas
             id="direct"
             active={true}
@@ -123,9 +249,19 @@ const erpChecklist = ["Output tax by customer location", "Reverse charge on B2B 
      */
     const STAGE_DURATION = 0.45;
     const EASE = "sine.out";
-    const STAGE_ORDER = ["src-entry", "src-trunk", "src-exit", "bill-entry", "bill-trunk", "bill-exit", "final"];
+    const STAGE_ORDER = [
+      "src-entry",
+      "src-trunk",
+      "src-exit",
+      "bill-entry",
+      "bill-trunk",
+      "bill-exit",
+      "final",
+    ];
 
-    const prefersReducedMotion = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const prefersReducedMotion =
+      window.matchMedia &&
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
     function loadGsap(onReady) {
       if (window.gsap) return onReady();
@@ -172,7 +308,11 @@ const erpChecklist = ["Output tax by customer location", "Reverse charge on B2B 
 
     function polylineLength(points) {
       let len = 0;
-      for (let i = 0; i < points.length - 1; i++) len += Math.hypot(points[i + 1].x - points[i].x, points[i + 1].y - points[i].y);
+      for (let i = 0; i < points.length - 1; i++)
+        len += Math.hypot(
+          points[i + 1].x - points[i].x,
+          points[i + 1].y - points[i].y,
+        );
       return len;
     }
 
@@ -215,7 +355,15 @@ const erpChecklist = ["Output tax by customer location", "Reverse charge on B2B 
 
     function tweenItem(tl, item, duration, position) {
       if (item.type === "line") {
-        tl.to(item.el, { attr: { x2: item.final.x2, y2: item.final.y2 }, duration, ease: EASE }, position);
+        tl.to(
+          item.el,
+          {
+            attr: { x2: item.final.x2, y2: item.final.y2 },
+            duration,
+            ease: EASE,
+          },
+          position,
+        );
       } else {
         const proxy = { p: 0 };
         tl.to(
@@ -224,7 +372,14 @@ const erpChecklist = ["Output tax by customer location", "Reverse charge on B2B 
             p: 1,
             duration,
             ease: EASE,
-            onUpdate: () => item.el.setAttribute("d", roundedPolylineJS(pointsUpToLength(item.points, proxy.p * item.total), item.radius)),
+            onUpdate: () =>
+              item.el.setAttribute(
+                "d",
+                roundedPolylineJS(
+                  pointsUpToLength(item.points, proxy.p * item.total),
+                  item.radius,
+                ),
+              ),
           },
           position,
         );
@@ -242,7 +397,10 @@ const erpChecklist = ["Output tax by customer location", "Reverse charge on B2B 
       const gsap = window.gsap;
       const byStage = {};
       lines.forEach((line) => {
-        const item = line.getAttribute("data-shape") === "line" ? prepareLine(gsap, line) : preparePath(line);
+        const item =
+          line.getAttribute("data-shape") === "line"
+            ? prepareLine(gsap, line)
+            : preparePath(line);
         const stage = line.getAttribute("data-stage");
         if (!byStage[stage]) byStage[stage] = [];
         byStage[stage].push(item);
@@ -252,7 +410,9 @@ const erpChecklist = ["Output tax by customer location", "Reverse charge on B2B 
       STAGE_ORDER.forEach((stage, i) => {
         const group = byStage[stage];
         if (!group) return;
-        group.forEach((item) => tweenItem(tl, item, STAGE_DURATION, i * STAGE_DURATION));
+        group.forEach((item) =>
+          tweenItem(tl, item, STAGE_DURATION, i * STAGE_DURATION),
+        );
       });
 
       // The bypass source's wire skips billing in one continuous wire —
@@ -261,7 +421,9 @@ const erpChecklist = ["Output tax by customer location", "Reverse charge on B2B 
       const orangeGroup = byStage["orange-full"];
       if (orangeGroup) {
         const finalIndex = STAGE_ORDER.indexOf("final");
-        orangeGroup.forEach((item) => tweenItem(tl, item, STAGE_DURATION * finalIndex, 0));
+        orangeGroup.forEach((item) =>
+          tweenItem(tl, item, STAGE_DURATION * finalIndex, 0),
+        );
       }
 
       // The middleware feed taps off the billing bus, so it plays alongside
@@ -269,7 +431,9 @@ const erpChecklist = ["Output tax by customer location", "Reverse charge on B2B 
       const midFeedGroup = byStage["mid-feed"];
       if (midFeedGroup) {
         const billTrunkIndex = STAGE_ORDER.indexOf("bill-trunk");
-        midFeedGroup.forEach((item) => tweenItem(tl, item, STAGE_DURATION, billTrunkIndex * STAGE_DURATION));
+        midFeedGroup.forEach((item) =>
+          tweenItem(tl, item, STAGE_DURATION, billTrunkIndex * STAGE_DURATION),
+        );
       }
     }
 
