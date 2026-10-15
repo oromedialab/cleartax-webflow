@@ -88,6 +88,24 @@ import DemoModal from "../sections/spain-regional/DemoModal.astro";
       fetchpriority="high"
     />
 
+    <!-- Usercentrics CMP loads immediately (not deferred) so the consent
+         banner and autoblocker are in place before other scripts run. -->
+    <script is:inline>
+      (function () {
+        var blockScript = document.createElement("script");
+        blockScript.src =
+          "https://web.cmp.usercentrics.eu/modules/autoblocker.js";
+        document.head.appendChild(blockScript);
+
+        var cmpScript = document.createElement("script");
+        cmpScript.id = "usercentrics-cmp";
+        cmpScript.src = "https://web.cmp.usercentrics.eu/ui/loader.js";
+        cmpScript.setAttribute("data-settings-id", "utqqyaEbvbzrTk");
+        cmpScript.async = true;
+        document.head.appendChild(cmpScript);
+      })();
+    </script>
+
     <!-- Deferred script loader for performance -->
     <script is:inline>
       (function () {
@@ -111,18 +129,6 @@ import DemoModal from "../sections/spain-regional/DemoModal.astro";
             j.src = "https://www.googletagmanager.com/gtm.js?id=" + i + dl;
             f.parentNode.insertBefore(j, f);
           })(window, document, "script", "dataLayer", "GTM-P5NDQXGH");
-
-          var blockScript = document.createElement("script");
-          blockScript.src =
-            "https://web.cmp.usercentrics.eu/modules/autoblocker.js";
-          document.head.appendChild(blockScript);
-
-          var cmpScript = document.createElement("script");
-          cmpScript.id = "usercentrics-cmp";
-          cmpScript.src = "https://web.cmp.usercentrics.eu/ui/loader.js";
-          cmpScript.setAttribute("data-settings-id", "utqqyaEbvbzrTk");
-          cmpScript.async = true;
-          document.head.appendChild(cmpScript);
         }
 
         const triggerEvents = [
@@ -183,7 +189,6 @@ import DemoModal from "../sections/spain-regional/DemoModal.astro";
 
     <link rel="preconnect" href="https://js-na2.hsforms.net" />
     <link rel="preconnect" href="https://forms.hsforms.com" />
-    <link rel="preconnect" href="https://forms-na2.hsforms.com" />
     <script is:inline defer src="https://js-na2.hsforms.net/forms/embed/v2.js"
     ></script>
   </head>
