@@ -1,0 +1,164 @@
+---
+/**
+ * "Norway E-Invoicing Mandate at a glance" — Figma node 17103:83413
+ * ("Container - Regulatory Timeline").
+ *
+ * Unlike the sticky-card stack used for the "at a glance" section on other
+ * brand v2 regional pages (`spain-regional/Glance.astro`,
+ * `france-regional/Mandate.astro`), the Norway Figma shows a flat single-
+ * column list: an icon placeholder, a row label and a description, divided
+ * by hairlines. Each row is the shared "Timeline" component (Figma node
+ * 16433:24519) used standalone, not inside a scroll-pinned stack.
+ *
+ * Scroll-scale focus effect ported from `france-product/RegulatoryTimeline.astro`:
+ * the row nearest the vertical centre of the viewport sits at full opacity
+ * and scale(1); every other row rests at 50% opacity and scale(0.95).
+ * Mechanics (thin-band IntersectionObserver picking the closest row to the
+ * centre line) are copied verbatim from that file — see its docblock for the
+ * long-form rationale, originally from `global-homepage/Proven.astro`.
+ *
+ * The icon placeholder is an empty `#E8FFE1`-tinted box in the Figma (no
+ * fill asset) — reproduced as a flat tinted block rather than invented
+ * iconography.
+ */
+interface Row {
+  label: string;
+  desc: string;
+}
+
+const rows: Row[] = [
+  {
+    label: "Transmission model",
+    desc: "Post-audit. Invoices delivered directly to buyers — no BIR clearance required.",
+  },
+  {
+    label: "Scope",
+    desc: "From 1 January 2027, bookkeeping-obliged businesses must issue structured electronic invoices for sales to other bookkeeping-obliged businesses. Digital bookkeeping and e-invoice reception will follow by January 2030, subject to the transitional rules.",
+  },
+  {
+    label: "Invoice Format",
+    desc: "The B2B law requires a structured electronic sales document suitable for automated processing. EHF Fakturering 3.0 and Peppol BIS Billing 3.0 are established formats under Norway's public-procurement rules; detailed format requirements for the new B2B obligation are to be set in regulations.",
+  },
+  {
+    label: "Check Your Recipient's eligibility",
+    desc: "Check whether your buyer is subject to Norwegian bookkeeping obligations and can receive structured e-invoices. ELMA registration is relevant to EHF/Peppol delivery, but does not treat absence from ELMA as an automatic legal exemption from the 2027 issuing rule without checking the applicable transitional rules.",
+  },
+];
+---
+
+<section class="bg-generic-00 py-16 lg:py-20" data-no-glance>
+  <div class="w-full max-w-[var(--container-max)] mx-auto px-4 md:px-6">
+    <h2
+      class="m-0 mb-8 font-heading font-medium text-vault-navy text-[length:var(--fs-h1)] leading-[length:var(--lh-h1)] tracking-[-0.5px] lg:mb-12"
+    >
+      Norway E-Invoicing Mandate at a glance
+    </h2>
+
+    <div class="flex flex-col">
+      {
+        rows.map((row, i) => (
+          <div
+            class:list={[
+              "no-glance-row flex flex-col justify-between gap-4 py-6 md:flex-row md:items-center md:gap-8",
+              i < rows.length - 1 && "border-b border-neutral-200",
+            ]}
+          >
+            <div class="flex shrink-0 items-center gap-6 md:max-w-[434px] flex-1">
+              <span
+                class="h-11 w-11 shrink-0 rounded-xl bg-[#e8ffe1]"
+                aria-hidden="true"
+              />
+              <span class="font-heading text-[length:var(--fs-h5)] leading-[length:var(--lh-h5)] font-medium text-vault-navy">
+                {row.label}
+              </span>
+            </div>
+            <p class="m-0 font-body text-[length:var(--fs-body)] leading-[length:var(--lh-body)] text-neutral-500 md:flex-1">
+              {row.desc}
+            </p>
+          </div>
+        ))
+      }
+    </div>
+  </div>
+</section>
+
+<style is:global>
+  /* Resting rows sit at 50% opacity; the row nearest the viewport's vertical
+     centre is promoted to full opacity by the script below. */
+  .no-glance-row {
+    opacity: 0.5;
+    scale: 0.95;
+    transition: all 0.35s ease-in-out;
+  }
+
+  .no-glance-row.is-centered {
+    opacity: 1;
+    scale: 1;
+  }
+</style>
+
+<script is:inline>
+  (function () {
+    const root = document.querySelector("[data-no-glance]");
+    if (!root) return;
+    const rows = Array.from(root.querySelectorAll(".no-glance-row"));
+    if (!rows.length) return;
+
+    if (
+      !("IntersectionObserver" in window) ||
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches
+    ) {
+      // No observer, or motion is unwelcome: every row full opacity rather
+      // than the whole list sitting dimmed with nothing to light it.
+      rows.forEach((el) => el.classList.add("is-centered"));
+      return;
+    }
+
+    // A thin 1% band pinned across the middle of the viewport — "centred"
+    // means the row the centre line is actually inside. The observer only
+    // fires on a crossing, so a wide band could let the nearest row change
+    // with nothing to trigger a recompute; kept thin, every change of row IS
+    // a crossing. `inBand` holds the running set because two rows can
+    // straddle the line for a frame; pick() resolves that by distance.
+    let centred = null;
+    const inBand = new Set();
+
+    const pick = () => {
+      // Nothing in the band means the middle has landed in a gap between
+      // rows — hold the last choice instead of clearing, so the focus never
+      // blinks off between rows.
+      if (!inBand.size) return;
+
+      const middle = window.innerHeight / 2;
+      let best = null;
+      let bestDistance = Infinity;
+
+      inBand.forEach((el) => {
+        const r = el.getBoundingClientRect();
+        const distance = Math.abs((r.top + r.bottom) / 2 - middle);
+        if (distance < bestDistance) {
+          bestDistance = distance;
+          best = el;
+        }
+      });
+
+      if (!best || best === centred) return;
+      if (centred) centred.classList.remove("is-centered");
+      centred = best;
+      centred.classList.add("is-centered");
+    };
+
+    const centreObserver = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) inBand.add(entry.target);
+          else inBand.delete(entry.target);
+        });
+        pick();
+      },
+      { rootMargin: "-49.5% 0px -49.5% 0px", threshold: 0 },
+    );
+
+    rows.forEach((el) => centreObserver.observe(el));
+  })();
+</script>

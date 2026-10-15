@@ -1,0 +1,180 @@
+---
+/**
+ * "What you should do before 2027" — Figma node 17103:83435 ("Fold 8").
+ *
+ * A vertical numbered stepper of 8 cards connected by a hairline, one open at
+ * a time (accordion behaviour — the Figma ships every card's body text, just
+ * opacity-0/height-0 on the seven collapsed ones, which is how the card
+ * component expresses its closed state rather than the content being absent).
+ * The first card is open by default, matching the Figma's default state.
+ *
+ * Background is the same dot-grid field used in the hero, static here (no
+ * cursor interaction) since this section sits well below the fold — see
+ * `.no-roadmap-bg` below.
+ */
+interface Step {
+  no: string;
+  heading: string;
+  body: string;
+}
+
+const steps: Step[] = [
+  {
+    no: "01",
+    heading: "Confirm your bookkeeping obligation",
+    body: "Determine whether your Norwegian entity falls within the new e-invoicing requirement.",
+  },
+  {
+    no: "02",
+    heading: "Check how your customers receive e-invoices",
+    body: "Check which business buyers are registered in ELMA and can receive e-invoices. Confirm each customer's reception capability; use ELMA lookup when sending through the EHF/Peppol network. Do not assume that an absent ELMA listing automatically removes a legal obligation.",
+  },
+  {
+    no: "03",
+    heading: "Choose an invoice-exchange route.",
+    body: "Check the final B2B format rules before describing any one route as mandatory. If you use EHF through Peppol, confirm how your system connects to an Access Point and test delivery to recipients.",
+  },
+  {
+    no: "04",
+    heading: "Prepare structured invoice data.",
+    body: "Review the information your systems need to produce for an electronic invoice suitable for automated processing.",
+  },
+  {
+    no: "05",
+    heading: "Related accounting deadline",
+    body: "Update your SAF-T capability separately because SAF-T Financial v1.40 is required from January 2027. Manage it as a parallel accounting-data workstream.",
+  },
+  {
+    no: "06",
+    heading: "Connect your ERP",
+    body: "Establish an e-invoicing software to your ERP. It works as a compliant layer for sending e-invoices through the required digital infrastructure. ClearTax acts as both Seller's and Buyer's Peppol Access Point for e-invoice exchange.",
+  },
+  {
+    no: "07",
+    heading: "Review retention and storage.",
+    body: "Preserve the original electronic invoices, apply the retention period relevant to your records and business, and check the conditions before storing accounting material outside Norway.",
+  },
+  {
+    no: "08",
+    heading: "Prepare for 2030",
+    body: "Don't build only for outbound invoices. Your accounts will also need to receive and automatically process e-invoices from 2030.",
+  },
+];
+---
+
+<section class="no-roadmap-bg relative overflow-hidden bg-generic-00 py-16 lg:py-20">
+  <div
+    class="absolute inset-0 z-0 opacity-60"
+    style="background-image: radial-gradient(circle, #C8F006 1.5px, transparent 1.5px); background-size: 27px 27px; mask-image: radial-gradient(ellipse 70% 60% at center, #000 0%, transparent 75%); -webkit-mask-image: radial-gradient(ellipse 70% 60% at center, #000 0%, transparent 75%);"
+    aria-hidden="true"
+  >
+  </div>
+  <div class="relative z-10 w-full max-w-[var(--container-max)] mx-auto px-4 md:px-6">
+    <h2
+      class="m-0 mb-8 text-center font-heading font-medium text-vault-navy text-[length:var(--fs-h1)] leading-[length:var(--lh-h1)] tracking-[-0.5px] lg:mb-12"
+    >
+      What you should do before 2027
+    </h2>
+
+    <div
+      class="no-roadmap-list mx-auto flex max-w-[534px] flex-col items-stretch"
+      data-no-roadmap
+    >
+      {
+        steps.map((step, i) => (
+          <>
+            <div
+              class:list={[
+                "no-roadmap-item flex gap-4 rounded-xl border-2 p-4",
+                i === 0
+                  ? "no-roadmap-open border-nova-blue"
+                  : "border-neutral-300",
+              ]}
+              data-no-roadmap-item
+            >
+              <button
+                type="button"
+                class="no-roadmap-trigger flex w-full cursor-pointer items-start gap-4 border-0 bg-transparent p-0 text-left"
+                aria-expanded={i === 0 ? "true" : "false"}
+              >
+                <span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-neutral-300 bg-generic-00 font-body text-[length:var(--fs-body-lg)] font-medium text-vault-navy">
+                  {step.no}
+                </span>
+                <span class="flex flex-1 flex-col justify-center gap-3 pt-[3px]">
+                  <span class="font-body text-[length:var(--fs-body-lg)] leading-[length:var(--lh-body-lg)] font-medium text-vault-navy">
+                    {step.heading}
+                  </span>
+                  <span
+                    class:list={[
+                      "no-roadmap-body font-body text-[length:var(--fs-body)] leading-[length:var(--lh-body)] text-neutral-500",
+                      i !== 0 && "h-0 opacity-0",
+                    ]}
+                  >
+                    {step.body}
+                  </span>
+                </span>
+              </button>
+            </div>
+            {i < steps.length - 1 && (
+              <div
+                class:list={[
+                  "no-roadmap-connector ml-[36px] h-10 w-0.5",
+                  i === 0 ? "bg-nova-blue" : "bg-neutral-300",
+                ]}
+                data-no-roadmap-connector
+                aria-hidden="true"
+              />
+            )}
+          </>
+        ))
+      }
+    </div>
+  </div>
+</section>
+
+<style is:global>
+  .no-roadmap-body {
+    overflow: hidden;
+    transition: opacity 200ms ease-in-out;
+  }
+  .no-roadmap-open .no-roadmap-body {
+    height: auto;
+    opacity: 1;
+  }
+</style>
+
+<script is:inline>
+  (function () {
+    const root = document.querySelector("[data-no-roadmap]");
+    if (!root) return;
+    const items = Array.from(root.querySelectorAll("[data-no-roadmap-item]"));
+    const connectors = Array.from(
+      root.querySelectorAll("[data-no-roadmap-connector]"),
+    );
+
+    function setActive(activeIndex) {
+      items.forEach((item, i) => {
+        const trigger = item.querySelector(".no-roadmap-trigger");
+        const isActive = i === activeIndex;
+        item.classList.toggle("no-roadmap-open", isActive);
+        item.classList.toggle("border-nova-blue", isActive);
+        item.classList.toggle("border-neutral-300", !isActive);
+        if (trigger) trigger.setAttribute("aria-expanded", String(isActive));
+      });
+      connectors.forEach((connector, i) => {
+        const isBeforeNext = i === activeIndex;
+        connector.classList.toggle("bg-nova-blue", isBeforeNext);
+        connector.classList.toggle("bg-neutral-300", !isBeforeNext);
+      });
+    }
+
+    items.forEach((item, i) => {
+      const trigger = item.querySelector(".no-roadmap-trigger");
+      if (!trigger) return;
+      trigger.addEventListener("click", () => {
+        if (item.classList.contains("no-roadmap-open")) return;
+        setActive(i);
+      });
+    });
+  })();
+</script>
