@@ -176,12 +176,12 @@ const cardsData = [
 
         <!-- Main Stack Layout Grid -->
         <div
-            class="relative max-w-[1280px] mx-auto w-full flex flex-col md:flex-row gap-6 lg:gap-10 items-start"
+            class="relative max-w-[1280px] mx-auto w-full flex flex-col lg:flex-row gap-6 lg:gap-8 xl:gap-10 items-start"
         >
-            <!-- Aside Menu (Sticky Left Sidebar) -->
+            <!-- Aside Menu (Sticky Left Sidebar: hidden on iPad/mobile < 1024px, shown on laptop/desktop >= 1024px) -->
             <div
                 id="sc-aside-menu"
-                class="hidden md:flex flex-col gap-3 w-40 lg:w-48 shrink-0 sticky z-30 pt-2 pointer-events-auto will-change-transform"
+                class="hidden lg:flex flex-col gap-3 w-40 xl:w-48 shrink-0 sticky z-30 pt-2 pointer-events-auto will-change-transform"
                 style="top: calc(var(--nav-clear, 112px) + 8px);"
             >
                 {
@@ -225,19 +225,19 @@ const cardsData = [
                                             {card.description}
                                         </p>
                                     </div>
-                                    <div class="mt-4 md:mt-auto grid grid-cols-2 gap-x-3 sm:gap-x-4 lg:gap-x-6 xl:gap-x-8 gap-y-3 xl:gap-y-6 w-full">
+                                    <div class="mt-4 md:mt-auto grid grid-cols-2 gap-x-3 sm:gap-x-4 lg:gap-x-4 xl:gap-x-8 gap-y-3 xl:gap-y-6 w-full">
                                         {card.points.map((point) => (
-                                            <div class="flex items-center gap-2 md:gap-2.5 min-w-0">
+                                            <div class="flex items-start gap-2 md:gap-2.5 min-w-0">
                                                 <img
                                                     src={point.cardIcon}
                                                     alt=""
                                                     width="24"
                                                     height="24"
-                                                    class="w-5 h-5 md:w-6 md:h-6 rounded-sm shrink-0 object-contain"
+                                                    class="w-5 h-5 md:w-6 md:h-6 rounded-sm shrink-0 object-contain mt-0.5"
                                                     loading="lazy"
                                                     decoding="async"
                                                 />
-                                                <span class="font-body text-[length:var(--fs-body)] leading-[length:var(--lh-body)] font-normal text-neutral-500 whitespace-nowrap">
+                                                <span class="font-body text-[14px] xl:text-[length:var(--fs-body)] leading-snug xl:leading-[length:var(--lh-body)] font-normal text-neutral-500 min-w-0 break-words">
                                                     {point.label}
                                                 </span>
                                             </div>
@@ -317,7 +317,6 @@ const cardsData = [
         .invoice-stack-card h3 {
             font-size: clamp(1.25rem, 2.2vh, 1.75rem) !important;
             line-height: 1.25 !important;
-            margin-bottom: 0.35rem !important;
         }
         .invoice-stack-card p {
             font-size: clamp(0.875rem, 1.7vh, 1rem) !important;
@@ -325,7 +324,6 @@ const cardsData = [
         }
         .invoice-stack-card .grid {
             gap: 0.5rem !important;
-            padding-top: 0.25rem !important;
         }
     }
 
@@ -334,11 +332,24 @@ const cardsData = [
             height: clamp(
                 260px,
                 calc(100vh - var(--nav-clear, 112px) - 100px),
-                350px
+                300px
             ) !important;
         }
-        .invoice-stack-card > div {
-            padding: 0.875rem !important;
+        .sc-card-img-wrap {
+            padding-top: 2rem !important;
+        }
+        .sc-card-img {
+            object-position: right bottom !important;
+        }
+    }
+
+    @media (max-height: 680px) and (min-width: 1024px) {
+        .invoice-stack-card {
+            height: clamp(
+                300px,
+                calc(100vh - var(--nav-clear, 112px) - 100px),
+                350px
+            ) !important;
         }
     }
 </style>
