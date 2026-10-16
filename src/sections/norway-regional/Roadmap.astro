@@ -2,11 +2,13 @@
 /**
  * "What you should do before 2027" — Figma node 17103:83435 ("Fold 8").
  *
- * A vertical numbered stepper of 8 cards connected by a hairline, one open at
- * a time (accordion behaviour — the Figma ships every card's body text, just
- * opacity-0/height-0 on the seven collapsed ones, which is how the card
- * component expresses its closed state rather than the content being absent).
- * The first card is open by default, matching the Figma's default state.
+ * A vertical numbered stepper of 8 cards connected by a hairline. Diverges
+ * from the Figma's single-open accordion: every card from the first through
+ * whichever is closest to the viewport's vertical centre is open at once —
+ * scrolling down grows that open set (opening the next card); scrolling back
+ * up shrinks it from the end, closing one card at a time. Clicking a card
+ * sets the open set to end there. The connecting hairline fills cumulatively
+ * to match, reading as a progress bar.
  *
  * Background is the same dot-grid field used in the hero, static here (no
  * cursor interaction) since this section sits well below the fold — see
@@ -84,43 +86,35 @@ const steps: Step[] = [
         steps.map((step, i) => (
           <>
             <div
-              class:list={[
-                "no-roadmap-item flex gap-4 rounded-xl border-2 p-4",
-                i === 0
-                  ? "no-roadmap-open border-nova-blue"
-                  : "border-neutral-300",
-              ]}
+              class="no-roadmap-item flex gap-4 rounded-xl border-2 border-neutral-300 p-4"
               data-no-roadmap-item
             >
               <button
                 type="button"
                 class="no-roadmap-trigger flex w-full cursor-pointer items-start gap-4 border-0 bg-transparent p-0 text-left"
-                aria-expanded={i === 0 ? "true" : "false"}
+                aria-expanded="false"
               >
                 <span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-neutral-300 bg-generic-00 font-body text-[length:var(--fs-body-lg)] font-medium text-vault-navy">
                   {step.no}
                 </span>
-                <span class="flex flex-1 flex-col justify-center gap-3 pt-[3px]">
-                  <span class="font-body text-[length:var(--fs-body-lg)] leading-[length:var(--lh-body-lg)] font-medium text-vault-navy">
+                <span class="flex flex-1 flex-col justify-center pt-[3px]">
+                  <span
+                    class="font-body text-[length:var(--fs-body-lg)] leading-[length:var(--lh-body-lg)] font-medium text-vault-navy"
+                    data-no-roadmap-anchor
+                  >
                     {step.heading}
                   </span>
-                  <span
-                    class:list={[
-                      "no-roadmap-body font-body text-[length:var(--fs-body)] leading-[length:var(--lh-body)] text-neutral-500",
-                      i !== 0 && "h-0 opacity-0",
-                    ]}
-                  >
-                    {step.body}
+                  <span class="no-roadmap-body-wrap">
+                    <span class="no-roadmap-body font-body text-[length:var(--fs-body)] leading-[length:var(--lh-body)] text-neutral-500">
+                      {step.body}
+                    </span>
                   </span>
                 </span>
               </button>
             </div>
             {i < steps.length - 1 && (
               <div
-                class:list={[
-                  "no-roadmap-connector ml-[36px] h-10 w-0.5",
-                  i === 0 ? "bg-nova-blue" : "bg-neutral-300",
-                ]}
+                class="no-roadmap-connector mx-auto h-10 w-0.5 bg-neutral-300"
                 data-no-roadmap-connector
                 aria-hidden="true"
               />
@@ -133,12 +127,36 @@ const steps: Step[] = [
 </section>
 
 <style is:global>
+  .no-roadmap-list {
+    /* Accordion items change height when they open/close. Without this, the
+       browser's scroll-anchoring can silently nudge scrollY to compensate
+       for that height change, which our scroll-direction detection then
+       misreads as the user scrolling up — closing a step they never asked
+       to close. */
+    overflow-anchor: none;
+  }
+  .no-roadmap-item {
+    transition: border-color 350ms ease-in-out;
+  }
+  .no-roadmap-connector {
+    transition: background-color 350ms ease-in-out;
+  }
+  .no-roadmap-body-wrap {
+    display: grid;
+    grid-template-rows: 0fr;
+    transition: grid-template-rows 400ms cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .no-roadmap-open .no-roadmap-body-wrap {
+    grid-template-rows: 1fr;
+  }
   .no-roadmap-body {
     overflow: hidden;
-    transition: opacity 200ms ease-in-out;
+    min-height: 0;
+    padding-top: 0.75rem;
+    opacity: 0;
+    transition: opacity 300ms ease-in-out;
   }
   .no-roadmap-open .no-roadmap-body {
-    height: auto;
     opacity: 1;
   }
 </style>
@@ -151,30 +169,83 @@ const steps: Step[] = [
     const connectors = Array.from(
       root.querySelectorAll("[data-no-roadmap-connector]"),
     );
+    const anchors = Array.from(
+      root.querySelectorAll("[data-no-roadmap-anchor]"),
+    );
 
-    function setActive(activeIndex) {
+    // Every step from 0 through this index is open. Scrolling down grows
+    // it (opening the next step); scrolling back up shrinks it from the
+    // end (closing the trailing step), one at a time, since it's
+    // recomputed from scratch on every scroll frame rather than only
+    // ever allowed to increase.
+    let openUpTo = -1;
+
+    function setOpenUpTo(index) {
+      if (index === openUpTo) return;
+      openUpTo = index;
       items.forEach((item, i) => {
         const trigger = item.querySelector(".no-roadmap-trigger");
-        const isActive = i === activeIndex;
-        item.classList.toggle("no-roadmap-open", isActive);
-        item.classList.toggle("border-nova-blue", isActive);
-        item.classList.toggle("border-neutral-300", !isActive);
-        if (trigger) trigger.setAttribute("aria-expanded", String(isActive));
+        const isOpen = i <= openUpTo;
+        item.classList.toggle("no-roadmap-open", isOpen);
+        item.classList.toggle("border-nova-blue", isOpen);
+        item.classList.toggle("border-neutral-300", !isOpen);
+        if (trigger) trigger.setAttribute("aria-expanded", String(isOpen));
       });
       connectors.forEach((connector, i) => {
-        const isBeforeNext = i === activeIndex;
-        connector.classList.toggle("bg-nova-blue", isBeforeNext);
-        connector.classList.toggle("bg-neutral-300", !isBeforeNext);
+        // Connector i sits between item i and item i+1 — fill it once the
+        // open set has reached at least that point, so the line reads as
+        // a cumulative progress bar.
+        const isFilled = i <= openUpTo;
+        connector.classList.toggle("bg-nova-blue", isFilled);
+        connector.classList.toggle("bg-neutral-300", !isFilled);
       });
     }
 
     items.forEach((item, i) => {
       const trigger = item.querySelector(".no-roadmap-trigger");
       if (!trigger) return;
-      trigger.addEventListener("click", () => {
-        if (item.classList.contains("no-roadmap-open")) return;
-        setActive(i);
-      });
+      trigger.addEventListener("click", () => setOpenUpTo(i));
     });
+
+    if (anchors.length === 0) return;
+
+    // Recompute from live geometry on every scroll frame, rather than
+    // reacting to IntersectionObserver enter/exit edges — a step opening
+    // or closing changes the page's layout height, which can make
+    // edge-crossing events fire out of order. Picking whichever heading is
+    // actually closest to the viewport centre is immune to that, and keeps
+    // working correctly in both scroll directions since it's recomputed
+    // from scratch every frame rather than tracked incrementally.
+    let ticking = false;
+
+    function updateActiveFromScroll() {
+      const rootRect = root.getBoundingClientRect();
+      const inView = rootRect.top < window.innerHeight && rootRect.bottom > 0;
+      if (!inView) return;
+
+      const centerY = window.innerHeight / 2;
+      let closestIndex = -1;
+      let closestDistance = Infinity;
+      anchors.forEach((anchor, i) => {
+        const rect = anchor.getBoundingClientRect();
+        const distance = Math.abs(rect.top + rect.height / 2 - centerY);
+        if (distance < closestDistance) {
+          closestDistance = distance;
+          closestIndex = i;
+        }
+      });
+      if (closestIndex !== -1) setOpenUpTo(closestIndex);
+    }
+
+    function onScroll() {
+      if (ticking) return;
+      ticking = true;
+      requestAnimationFrame(() => {
+        updateActiveFromScroll();
+        ticking = false;
+      });
+    }
+
+    window.addEventListener("scroll", onScroll, { passive: true });
   })();
 </script>
