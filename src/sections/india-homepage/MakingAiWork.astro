@@ -49,6 +49,7 @@ interface Card {
   icon?: string;
   image?: string;
   query?: string;
+  resultHeading?: string;
   /** The Nova Blue one-liner under the title in the overlay. */
   claim: string;
   caption: string;
@@ -78,6 +79,7 @@ const groups: Group[] = [
         title: "CFO Dashboard Agent",
         claim: "Walk into the monthly review with insights, not numbers.",
         query: "Board meeting next month. Any compliance risk likely before then?",
+        resultHeading: "here’s what holds up and what needs a board line",
         icon: "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6abb81d24cbe5f2136a1a893_ai-icon-1.png",
         image:
           "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6ad0c097a38114b75867f1b4_chart-1.png",
@@ -111,7 +113,7 @@ const groups: Group[] = [
         query: "Track active notices and evaluate exposure by entity",
         icon: "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6abb823b7c5a09e10a549d4f_ai-icon-4.png",
         image:
-          "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6abb8bdb157c8e2396245bf6_cfo-img-4.png",
+          "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6ad0c0aa562de4fba48e12c8_chart-4.png",
         caption:
           "Combines ClearTax notice data with your own tracking rules. You define your own controls.",
       },
@@ -125,7 +127,7 @@ const groups: Group[] = [
         title: "Litigation Agent",
         icon: "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6abb8242335ac8a6e3350503_ai-icon-5.png",
         image:
-          "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6abb8be23cd35f1e1e3b6992_tax-img-1.png",
+          "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6ad0c0b1250a0da3dbb373e0_chart-5.png",
         claim:
           "Every notice type answered with the transactions behind it, inside the deadline",
         query: "Draft notice response with line-item transaction trail",
@@ -136,7 +138,7 @@ const groups: Group[] = [
         title: "Refund Agent",
         icon: "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6abb82478a474f0459c88db6_ai-icon-6.png",
         image:
-          "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6abb8be8075549fbc8a369dd_tax-img-2.png",
+          "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6ad0c0b6658e3765d9aec9d4_chart-6.png",
         claim: "The bottleneck is data preparation, not filing",
         query: "Prepare complete refund dossier and justification trail",
         caption:
@@ -146,7 +148,7 @@ const groups: Group[] = [
         title: "180-Day Reversal and Reclaim Agent",
         icon: "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6abb8676075549fbc89fb389_ai-icon-7.png",
         image:
-          "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6abb8bee4712c77d3ad7d684_tax-img-3.png",
+          "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6ad0c0bf67ba56b6bce0e7be_chart-7.png",
         claim: "Section 16(2)(b), computed per document",
         query: "Calculate Section 16(2)(b) reversals and eligible reclaims",
         caption:
@@ -156,7 +158,7 @@ const groups: Group[] = [
         title: "ERP Writeback Agent",
         icon: "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6abb867a4cd43cf8d771ca55_ai-icon-8.png",
         image:
-          "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6abb8c0075a4841598156ed1_tax-img-4.png",
+          "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6ad0c0c60721bdf80cec31af_chart-8.png",
         claim: "Codify your transformation logic once, then it runs itself",
         query: "Generate automated ERP writeback transformations",
         caption:
@@ -166,7 +168,7 @@ const groups: Group[] = [
         title: "RCM and Ineligible Classification Agent",
         icon: "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6abb867eb5786e7dd20ef6cc_ai-icon-9.png",
         image:
-          "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6abb8c093cd35f1e1e3b8454_tax-img-5.png",
+          "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6ad0c0d6259045960b7213ac_chart-9.png",
         claim: "A prioritised review queue instead of a line-by-line scan",
         query: "Triage ledger codes for RCM and ITC eligibility",
         caption:
@@ -176,7 +178,7 @@ const groups: Group[] = [
         title: "Advance Adjustment Agent",
         icon: "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6abb86847d265e719ca18da2_ai-icon-10.png",
         image:
-          "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6abb8c0f33617fb4f7f711b4_tax-img-6.png",
+          "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6ad0c0dddc63355f520ca3f9_chart-10.png",
         claim: "Catches unmatched advances before they become a penalty",
         query: "Match advances with invoices to prevent compliance penalties",
         caption:
@@ -457,9 +459,8 @@ const panels = groups.map((group) => ({
 
                 <!-- Stage / Visual Column (Right) -->
                 <div
-                  class="ih-maiw-stage-wrap relative flex w-full flex-col bg-generic-00 justify-between overflow-hidden rounded-xl border border-[#111827] p-3.5 sm:p-4 md:p-5 aspect-[1280/720] min-h-[320px] md:min-h-[420px] select-none bg-cover bg-center bg-no-repeat lg:w-auto lg:flex-1 cursor-pointer"
+                  class="ih-maiw-stage-wrap relative flex w-full flex-col bg-generic-00 justify-between overflow-hidden rounded-xl border border-[#111827] p-3.5 sm:p-4 md:px-14 md:py-4 aspect-[1280/720] min-h-[320px] md:min-h-[420px] select-none bg-cover bg-center bg-no-repeat lg:w-auto lg:flex-1 cursor-pointer"
                   style="background-image:url('https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6ab399f1e2c6a1e38c91700f_dots-bg.png');"
-                  title="Click to skip animation"
                 >
                   <!-- Ambient Center Glow for Frame 1 -->
                   <div
@@ -484,24 +485,34 @@ const panels = groups.map((group) => ({
                     </h3>
                   </div>
 
-                  <!-- Top Stage Area: Frame 3 & 4 Chat Bubble -->
+                  <!-- Top Stage Area: Frame 3 & 4 Chat Bubble, Frame 5 Result Heading -->
                   <div
                     class="ih-maiw-top-stage relative z-10 w-full shrink-0 min-h-[42px] flex items-start"
                   >
                     <div
-                      class="ih-maiw-bubble hidden absolute right-0 top-0 self-end max-w-fit rounded-2xl border border-dashed border-[#11182726] bg-[#EDEDED] px-3 py-1.5 md:px-4 md:py-2.5 opacity-0 pointer-events-none"
+                      class="ih-maiw-bubble hidden absolute right-12 md:right-14 top-0 self-end max-w-fit rounded-2xl border border-dashed border-[#11182726] bg-generic-00 px-3 py-1.5 md:px-4 md:py-2.5 opacity-0 pointer-events-none"
                     >
                       <p
-                        class="ih-maiw-bubble-text m-0 font-body text-xs md:text-sm lg:text-base font-normal leading-[1.35] md:leading-[1.4] text-[#111827]"
+                        class="ih-maiw-bubble-text m-0 font-body text-xs md:text-sm font-normal leading-[1.35] md:leading-[1.7] text-[#111827]"
                       >
                         {card.query || "Board meeting next month. Any compliance risk likely before then?"}
                       </p>
+                    </div>
+
+                    <div
+                      class="ih-maiw-result-heading hidden absolute inset-x-0 bottom-0 max-w-[615px] w-full mx-auto flex items-end justify-start opacity-0 pointer-events-none"
+                    >
+                      <span
+                        class="font-body font-normal text-xs md:text-sm lg:text-[length:var(--fs-body)] text-[#111827] leading-tight"
+                      >
+                        {card.resultHeading || "here’s what holds up and what needs a board line"}
+                      </span>
                     </div>
                   </div>
 
                   <!-- Middle Stage Area: Frame 3 Skeleton, Frame 4 Process Checklist, Frame 5 Chart -->
                   <div
-                    class="ih-maiw-middle-stage relative z-10 w-full min-h-0 flex-1 flex flex-col items-start justify-start py-1"
+                    class="ih-maiw-middle-stage max-w-[615px] mx-auto relative z-10 w-full min-h-0 flex-1 flex flex-col items-start justify-start py-1"
                   >
                     <!-- Frame 3: Skeleton shimmer bars -->
                     <div
@@ -525,25 +536,33 @@ const panels = groups.map((group) => ({
                         class="grid w-full grid-cols-2 gap-x-3.5 sm:gap-x-4 md:gap-x-6 xl:w-fit xl:grid-cols-[max-content_max-content] xl:gap-x-7 gap-y-2 md:gap-y-2.5"
                       >
                         <div class="ih-maiw-check-item flex items-start xl:items-center gap-1 sm:gap-1.5 xl:gap-2 min-w-0 opacity-0">
-                          <svg class="shrink-0 mt-0.5 xl:mt-0" width="10" height="12" viewBox="0 0 10 12" fill="none"><path d="M8.76315 10.9508H0.887604C0.771563 10.9508 0.660276 10.9047 0.578223 10.8227C0.49617 10.7406 0.450073 10.6293 0.450073 10.5133V0.887604C0.450073 0.771563 0.49617 0.660276 0.578223 0.578223C0.660276 0.49617 0.771563 0.450073 0.887604 0.450073H6.13797L9.20068 3.51279V10.5133C9.20068 10.6293 9.15459 10.7406 9.07253 10.8227C8.99048 10.9047 8.87919 10.9508 8.76315 10.9508Z" stroke="black" stroke-width="0.900063" stroke-linecap="round" stroke-linejoin="round"></path><path d="M6.13757 0.450073V3.51279H9.20029" stroke="black" stroke-width="0.900063" stroke-linecap="round" stroke-linejoin="round"></path><path d="M4.60655 8.32565C5.4523 8.32565 6.13791 7.64004 6.13791 6.7943C6.13791 5.94855 5.4523 5.26294 4.60655 5.26294C3.76081 5.26294 3.0752 5.94855 3.0752 6.7943C3.0752 7.64004 3.76081 8.32565 4.60655 8.32565Z" stroke="#5446FF" stroke-width="0.900063" stroke-linecap="round" stroke-linejoin="round"></path><path d="M5.68835 7.87708L6.57435 8.76307" stroke="#5446FF" stroke-width="0.900063" stroke-linecap="round" stroke-linejoin="round"></path></svg>
-                          <span class="text-[8px] md:text-[10px] xl:text-xs font-normal text-[#111827] underline underline-offset-2 leading-tight break-words">Aggregating GL balances</span>
+                          <img src="https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6ad1c662b91ef9913bf8a199_checklist-1-1.png" alt="checklist" width="11" height="14" class="shrink-0 mt-0.5 xl:mt-0">
+                          <span class="text-[8px] md:text-[10px] xl:text-xs font-normal text-[#111827] underline underline-offset-2 leading-tight break-words">12 months of filings + 2B reconciliation</span>
                         </div>
                         <div class="ih-maiw-check-item flex items-start xl:items-center gap-1 sm:gap-1.5 xl:gap-2 min-w-0 opacity-0">
-                          <svg class="shrink-0 mt-0.5 xl:mt-0" width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M7.37441 4.77747H4.77808V7.3738H7.37441V4.77747Z" stroke="#5446FF" stroke-width="0.900063" stroke-linecap="round" stroke-linejoin="round"></path><path d="M9.9705 1.74817H2.1815C1.94252 1.74817 1.74878 1.94191 1.74878 2.18089V9.96989C1.74878 10.2089 1.94252 10.4026 2.1815 10.4026H9.9705C10.2095 10.4026 10.4032 10.2089 10.4032 9.96989V2.18089C10.4032 1.94191 10.2095 1.74817 9.9705 1.74817Z" stroke="black" stroke-width="0.900063" stroke-linecap="round" stroke-linejoin="round"></path></svg>
-                          <span class="text-[8px] md:text-[10px] xl:text-xs font-normal text-[#111827] underline underline-offset-2 leading-tight break-words">Computing variance per entity</span>
+                          <img src="https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6ad1c667a6af7f9a939f4d1d_checklist-1-2.png" alt="checklist-2" width="14" height="14" class="shrink-0 mt-0.5 xl:mt-0">
+                          <span class="text-[8px] md:text-[10px] xl:text-xs font-normal text-[#111827] underline underline-offset-2 leading-tight break-words">Notice register — 310 cases, 18 GSTINs</span>
+                        </div>
+                        <div class="ih-maiw-check-item flex items-start xl:items-center gap-1 sm:gap-1.5 xl:gap-2 min-w-0 opacity-0">
+                          <img src="https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6ad1c66cb1caeb82a7499f88_checklist-1-3.png" alt="checklist-3" width="17" height="17" class="shrink-0 mt-0.5 xl:mt-0">
+                          <span class="text-[8px] md:text-[10px] xl:text-xs font-normal text-[#111827] underline underline-offset-2 leading-tight break-words">Settled hygiene vs live exposure</span>
+                        </div>
+                        <div class="ih-maiw-check-item flex items-start xl:items-center gap-1 sm:gap-1.5 xl:gap-2 min-w-0 opacity-0">
+                          <img src="https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6ad1c6716ae44fb179c3f880_checklist-1-4.png" alt="checklist-4" width="13" height="14" class="shrink-0 mt-0.5 xl:mt-0">
+                          <span class="text-[8px] md:text-[10px] xl:text-xs font-normal text-[#111827] underline underline-offset-2 leading-tight break-words">What holds up vs needs a board line</span>
                         </div>
                       </div>
                     </div>
 
-                    <!-- Frame 5: Final Chart Image -->
+                    <!-- Frame 5: Final Result (Chart Image) -->
                     <div
-                      class="ih-maiw-chart hidden absolute inset-0 flex items-center justify-center opacity-0 pointer-events-none"
+                      class="ih-maiw-chart ih-maiw-result hidden absolute inset-0 flex items-center justify-center max-w-[615px] w-full mx-auto opacity-0 pointer-events-none"
                     >
                       {card.image && (
                         <img
                           src={card.image}
                           alt={card.title}
-                          class="w-full h-auto max-h-[88%] md:max-h-[92%] object-contain rounded-lg block"
+                          class="w-full h-auto max-h-[88%] md:max-h-[87%] object-contain block"
                           loading="lazy"
                           decoding="async"
                         />
@@ -553,10 +572,10 @@ const panels = groups.map((group) => ({
 
                   <!-- Bottom Stage Area: Animated Input Pill -->
                   <div
-                    class="ih-maiw-input-container relative z-20 flex w-full shrink-0 items-center justify-center"
+                    class="ih-maiw-input-container relative z-20 flex w-full max-w-[615px] mx-auto shrink-0 items-center justify-center"
                   >
                     <div
-                      class="ih-maiw-input-pill relative flex w-full items-center gap-2 rounded-full border border-[#A6C705]/40 bg-generic-00 pl-3.5 pr-2 py-2.5 md:py-3 shadow-xs"
+                      class="ih-maiw-input-pill relative flex w-full max-w-[480px] items-center gap-2 rounded-full border border-[#A6C705]/40 bg-generic-00 pl-3.5 pr-2 py-2.5 md:py-3 shadow-xs"
                     >
                       <!-- Animated border SVG -->
                       <svg
@@ -621,7 +640,7 @@ const panels = groups.map((group) => ({
                         <span
                           class="ih-maiw-pill-placeholder absolute inset-y-0 left-0 flex items-center font-body text-xs md:text-sm lg:text-[length:var(--fs-body)] text-neutral-400 pointer-events-none"
                         >
-                          Ask anything...
+                          Ask anything
                         </span>
                         <span
                           class="ih-maiw-pill-typed hidden absolute inset-y-0 left-0 right-0 flex items-center font-body text-sm md:text-sm lg:text-[length:var(--fs-body)] text-vault-navy opacity-0 pointer-events-none font-medium tracking-tight"
@@ -633,7 +652,7 @@ const panels = groups.map((group) => ({
                         <span
                           class="ih-maiw-pill-thinking absolute inset-y-0 left-0 flex items-center gap-1.5 font-body text-xs md:text-sm lg:text-[length:var(--fs-body)] text-neutral-500 opacity-0 pointer-events-none font-medium"
                         >
-                          <span>Thinking</span>
+                          <span>Reading files</span>
                           <span class="inline-flex items-center gap-0.5 ml-0.5">
                             <span class="inline-block h-1 w-1 rounded-full bg-neutral-400 animate-bounce" style="animation-delay: 0ms;"></span>
                             <span class="inline-block h-1 w-1 rounded-full bg-neutral-400 animate-bounce" style="animation-delay: 150ms;"></span>
@@ -725,9 +744,8 @@ const panels = groups.map((group) => ({
 
                 <!-- Stage / Visual Column (Right) -->
                 <div
-                  class="ih-maiw-stage-wrap relative flex w-full flex-col bg-generic-00 justify-between overflow-hidden rounded-xl border border-[#111827] p-3.5 sm:p-4 md:p-5 aspect-[1280/720] min-h-[320px] md:min-h-[420px] select-none bg-cover bg-center bg-no-repeat lg:w-auto lg:flex-1 cursor-pointer"
+                  class="ih-maiw-stage-wrap relative flex w-full flex-col bg-generic-00 justify-between overflow-hidden rounded-xl border border-[#111827] p-3.5 sm:p-4 md:px-12 md:py-4 aspect-[1280/720] min-h-[320px] md:min-h-[420px] select-none bg-cover bg-center bg-no-repeat lg:w-auto lg:flex-1 cursor-pointer"
                   style="background-image:url('https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6ab399f1e2c6a1e38c91700f_dots-bg.png');"
-                  title="Click to skip animation"
                 >
                   <div
                     class="ih-maiw-glow pointer-events-none absolute inset-0 z-0 opacity-100"
@@ -745,7 +763,7 @@ const panels = groups.map((group) => ({
                   </div>
 
                   <div class="ih-maiw-top-stage relative z-10 w-full shrink-0 min-h-[42px] flex items-start">
-                    <div class="ih-maiw-bubble hidden absolute right-0 top-0 self-end max-w-fit rounded-2xl border border-dashed border-[#11182726] bg-[#EDEDED] px-3 py-1.5 md:px-4 md:py-2.5 opacity-0 pointer-events-none">
+                    <div class="ih-maiw-bubble hidden absolute right-12 md:right-14 top-0 self-end max-w-fit rounded-2xl border border-dashed border-[#11182726] bg-[#EDEDED] px-3 py-1.5 md:px-4 md:py-2.5 opacity-0 pointer-events-none">
                       <p class="ih-maiw-bubble-text m-0 font-body text-xs md:text-sm lg:text-base font-normal leading-[1.35] md:leading-[1.4] text-[#111827]">
                         {card.query || card.claim}
                       </p>
@@ -782,7 +800,7 @@ const panels = groups.map((group) => ({
                         <img
                           src={card.image}
                           alt={card.title}
-                          class="w-full h-auto max-h-[88%] md:max-h-[92%] object-contain rounded-lg block"
+                          class="w-full h-auto max-h-[88%] md:max-h-[87%] object-contain rounded-lg block"
                           loading="lazy"
                           decoding="async"
                         />
@@ -791,7 +809,7 @@ const panels = groups.map((group) => ({
                   </div>
 
                   <div class="ih-maiw-input-container relative z-20 flex w-full shrink-0 items-center justify-center">
-                    <div class="ih-maiw-input-pill relative flex w-full items-center gap-2 rounded-full border border-[#A6C705]/40 bg-generic-00 pl-3.5 pr-2 py-2.5 md:py-3 shadow-xs">
+                    <div class="ih-maiw-input-pill relative flex w-full max-w-[480px] items-center gap-2 rounded-full border border-[#A6C705]/40 bg-generic-00 pl-3.5 pr-2 py-2.5 md:py-3 shadow-xs">
                       <svg class="ih-maiw-pill-border pointer-events-none absolute inset-0 h-full w-full overflow-visible" aria-hidden="true">
                         <defs>
                           <linearGradient id={`ih-maiw-pill-border-grad-${i}`} x1="0%" y1="0%" x2="100%" y2="0%" gradientUnits="objectBoundingBox">
@@ -809,13 +827,13 @@ const panels = groups.map((group) => ({
                       </svg>
                       <div class="min-w-0 flex-1 relative h-6 flex items-center overflow-hidden">
                         <span class="ih-maiw-pill-placeholder absolute inset-y-0 left-0 flex items-center font-body text-xs md:text-sm lg:text-[length:var(--fs-body)] text-neutral-400 pointer-events-none">
-                          Ask anything...
+                          Ask anything
                         </span>
                         <span class="ih-maiw-pill-typed hidden absolute inset-y-0 left-0 right-0 flex items-center font-body text-sm md:text-sm lg:text-[length:var(--fs-body)] text-vault-navy opacity-0 pointer-events-none font-medium tracking-tight">
                           <span class="ih-maiw-pill-typed-text truncate block w-full">{card.query || card.claim}</span>
                         </span>
                         <span class="ih-maiw-pill-thinking absolute inset-y-0 left-0 flex items-center gap-1.5 font-body text-xs md:text-sm lg:text-[length:var(--fs-body)] text-neutral-500 opacity-0 pointer-events-none font-medium">
-                          <span>Thinking</span>
+                          <span>Reading files</span>
                           <span class="inline-flex items-center gap-0.5 ml-0.5">
                             <span class="inline-block h-1 w-1 rounded-full bg-neutral-400 animate-bounce" style="animation-delay: 0ms;"></span>
                             <span class="inline-block h-1 w-1 rounded-full bg-neutral-400 animate-bounce" style="animation-delay: 150ms;"></span>
@@ -879,9 +897,8 @@ const panels = groups.map((group) => ({
 
                 <!-- Stage / Visual Column (Right) -->
                 <div
-                  class="ih-maiw-stage-wrap relative flex w-full flex-col bg-generic-00 justify-between overflow-hidden rounded-xl border border-[#111827] p-3.5 sm:p-4 md:p-5 aspect-[1280/720] min-h-[320px] md:min-h-[420px] select-none bg-cover bg-center bg-no-repeat lg:w-auto lg:flex-1 cursor-pointer"
+                  class="ih-maiw-stage-wrap relative flex w-full flex-col bg-generic-00 justify-between overflow-hidden rounded-xl border border-[#111827] p-3.5 sm:p-4 md:px-12 md:py-4 aspect-[1280/720] min-h-[320px] md:min-h-[420px] select-none bg-cover bg-center bg-no-repeat lg:w-auto lg:flex-1 cursor-pointer"
                   style="background-image:url('https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6ab399f1e2c6a1e38c91700f_dots-bg.png');"
-                  title="Click to skip animation"
                 >
                   <div
                     class="ih-maiw-glow pointer-events-none absolute inset-0 z-0 opacity-100"
@@ -899,7 +916,7 @@ const panels = groups.map((group) => ({
                   </div>
 
                   <div class="ih-maiw-top-stage relative z-10 w-full shrink-0 min-h-[42px] flex items-start">
-                    <div class="ih-maiw-bubble hidden absolute right-0 top-0 self-end max-w-fit rounded-2xl border border-dashed border-[#11182726] bg-[#EDEDED] px-3 py-1.5 md:px-4 md:py-2.5 opacity-0 pointer-events-none">
+                    <div class="ih-maiw-bubble hidden absolute right-12 md:right-14 top-0 self-end max-w-fit rounded-2xl border border-dashed border-[#11182726] bg-[#EDEDED] px-3 py-1.5 md:px-4 md:py-2.5 opacity-0 pointer-events-none">
                       <p class="ih-maiw-bubble-text m-0 font-body text-xs md:text-sm lg:text-base font-normal leading-[1.35] md:leading-[1.4] text-[#111827]">
                         {card.query || card.claim}
                       </p>
@@ -936,7 +953,7 @@ const panels = groups.map((group) => ({
                         <img
                           src={card.image}
                           alt={card.title}
-                          class="w-full h-auto max-h-[88%] md:max-h-[92%] object-contain rounded-lg block"
+                          class="w-full h-auto max-h-[88%] md:max-h-[87%] object-contain rounded-lg block"
                           loading="lazy"
                           decoding="async"
                         />
@@ -945,7 +962,7 @@ const panels = groups.map((group) => ({
                   </div>
 
                   <div class="ih-maiw-input-container relative z-20 flex w-full shrink-0 items-center justify-center">
-                    <div class="ih-maiw-input-pill relative flex w-full items-center gap-2 rounded-full border border-[#A6C705]/40 bg-generic-00 pl-3.5 pr-2 py-2.5 md:py-3 shadow-xs">
+                    <div class="ih-maiw-input-pill relative flex w-full max-w-[480px] items-center gap-2 rounded-full border border-[#A6C705]/40 bg-generic-00 pl-3.5 pr-2 py-2.5 md:py-3 shadow-xs">
                       <svg class="ih-maiw-pill-border pointer-events-none absolute inset-0 h-full w-full overflow-visible" aria-hidden="true">
                         <defs>
                           <linearGradient id={`ih-maiw-pill-border-grad-${i}`} x1="0%" y1="0%" x2="100%" y2="0%" gradientUnits="objectBoundingBox">
@@ -963,13 +980,13 @@ const panels = groups.map((group) => ({
                       </svg>
                       <div class="min-w-0 flex-1 relative h-6 flex items-center overflow-hidden">
                         <span class="ih-maiw-pill-placeholder absolute inset-y-0 left-0 flex items-center font-body text-xs md:text-sm lg:text-[length:var(--fs-body)] text-neutral-400 pointer-events-none">
-                          Ask anything...
+                          Ask anything
                         </span>
                         <span class="ih-maiw-pill-typed hidden absolute inset-y-0 left-0 right-0 flex items-center font-body text-sm md:text-sm lg:text-[length:var(--fs-body)] text-vault-navy opacity-0 pointer-events-none font-medium tracking-tight">
                           <span class="ih-maiw-pill-typed-text truncate block w-full">{card.query || card.claim}</span>
                         </span>
                         <span class="ih-maiw-pill-thinking absolute inset-y-0 left-0 flex items-center gap-1.5 font-body text-xs md:text-sm lg:text-[length:var(--fs-body)] text-neutral-500 opacity-0 pointer-events-none font-medium">
-                          <span>Thinking</span>
+                          <span>Reading files</span>
                           <span class="inline-flex items-center gap-0.5 ml-0.5">
                             <span class="inline-block h-1 w-1 rounded-full bg-neutral-400 animate-bounce" style="animation-delay: 0ms;"></span>
                             <span class="inline-block h-1 w-1 rounded-full bg-neutral-400 animate-bounce" style="animation-delay: 150ms;"></span>
@@ -1033,9 +1050,8 @@ const panels = groups.map((group) => ({
 
                 <!-- Stage / Visual Column (Right) -->
                 <div
-                  class="ih-maiw-stage-wrap relative flex w-full flex-col bg-generic-00 justify-between overflow-hidden rounded-xl border border-[#111827] p-3.5 sm:p-4 md:p-5 aspect-[1280/720] min-h-[320px] md:min-h-[420px] select-none bg-cover bg-center bg-no-repeat lg:w-auto lg:flex-1 cursor-pointer"
+                  class="ih-maiw-stage-wrap relative flex w-full flex-col bg-generic-00 justify-between overflow-hidden rounded-xl border border-[#111827] p-3.5 sm:p-4 md:px-12 md:py-4 aspect-[1280/720] min-h-[320px] md:min-h-[420px] select-none bg-cover bg-center bg-no-repeat lg:w-auto lg:flex-1 cursor-pointer"
                   style="background-image:url('https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6ab399f1e2c6a1e38c91700f_dots-bg.png');"
-                  title="Click to skip animation"
                 >
                   <div
                     class="ih-maiw-glow pointer-events-none absolute inset-0 z-0 opacity-100"
@@ -1053,7 +1069,7 @@ const panels = groups.map((group) => ({
                   </div>
 
                   <div class="ih-maiw-top-stage relative z-10 w-full shrink-0 min-h-[42px] flex items-start">
-                    <div class="ih-maiw-bubble hidden absolute right-0 top-0 self-end max-w-fit rounded-2xl border border-dashed border-[#11182726] bg-[#EDEDED] px-3 py-1.5 md:px-4 md:py-2.5 opacity-0 pointer-events-none">
+                    <div class="ih-maiw-bubble hidden absolute right-12 md:right-14 top-0 self-end max-w-fit rounded-2xl border border-dashed border-[#11182726] bg-[#EDEDED] px-3 py-1.5 md:px-4 md:py-2.5 opacity-0 pointer-events-none">
                       <p class="ih-maiw-bubble-text m-0 font-body text-xs md:text-sm lg:text-base font-normal leading-[1.35] md:leading-[1.4] text-[#111827]">
                         {card.query || card.claim}
                       </p>
@@ -1090,7 +1106,7 @@ const panels = groups.map((group) => ({
                         <img
                           src={card.image}
                           alt={card.title}
-                          class="w-full h-auto max-h-[88%] md:max-h-[92%] object-contain rounded-lg block"
+                          class="w-full h-auto max-h-[88%] md:max-h-[87%] object-contain rounded-lg block"
                           loading="lazy"
                           decoding="async"
                         />
@@ -1099,7 +1115,7 @@ const panels = groups.map((group) => ({
                   </div>
 
                   <div class="ih-maiw-input-container relative z-20 flex w-full shrink-0 items-center justify-center">
-                    <div class="ih-maiw-input-pill relative flex w-full items-center gap-2 rounded-full border border-[#A6C705]/40 bg-generic-00 pl-3.5 pr-2 py-2.5 md:py-3 shadow-xs">
+                    <div class="ih-maiw-input-pill relative flex w-full max-w-[480px] items-center gap-2 rounded-full border border-[#A6C705]/40 bg-generic-00 pl-3.5 pr-2 py-2.5 md:py-3 shadow-xs">
                       <svg class="ih-maiw-pill-border pointer-events-none absolute inset-0 h-full w-full overflow-visible" aria-hidden="true">
                         <defs>
                           <linearGradient id={`ih-maiw-pill-border-grad-${i}`} x1="0%" y1="0%" x2="100%" y2="0%" gradientUnits="objectBoundingBox">
@@ -1117,13 +1133,13 @@ const panels = groups.map((group) => ({
                       </svg>
                       <div class="min-w-0 flex-1 relative h-6 flex items-center overflow-hidden">
                         <span class="ih-maiw-pill-placeholder absolute inset-y-0 left-0 flex items-center font-body text-xs md:text-sm lg:text-[length:var(--fs-body)] text-neutral-400 pointer-events-none">
-                          Ask anything...
+                          Ask anything
                         </span>
                         <span class="ih-maiw-pill-typed hidden absolute inset-y-0 left-0 right-0 flex items-center font-body text-sm md:text-sm lg:text-[length:var(--fs-body)] text-vault-navy opacity-0 pointer-events-none font-medium tracking-tight">
                           <span class="ih-maiw-pill-typed-text truncate block w-full">{card.query || card.claim}</span>
                         </span>
                         <span class="ih-maiw-pill-thinking absolute inset-y-0 left-0 flex items-center gap-1.5 font-body text-xs md:text-sm lg:text-[length:var(--fs-body)] text-neutral-500 opacity-0 pointer-events-none font-medium">
-                          <span>Thinking</span>
+                          <span>Reading files</span>
                           <span class="inline-flex items-center gap-0.5 ml-0.5">
                             <span class="inline-block h-1 w-1 rounded-full bg-neutral-400 animate-bounce" style="animation-delay: 0ms;"></span>
                             <span class="inline-block h-1 w-1 rounded-full bg-neutral-400 animate-bounce" style="animation-delay: 150ms;"></span>
@@ -1187,9 +1203,8 @@ const panels = groups.map((group) => ({
 
                 <!-- Stage / Visual Column (Right) -->
                 <div
-                  class="ih-maiw-stage-wrap relative flex w-full flex-col bg-generic-00 justify-between overflow-hidden rounded-xl border border-[#111827] p-3.5 sm:p-4 md:p-5 aspect-[1280/720] min-h-[320px] md:min-h-[420px] select-none bg-cover bg-center bg-no-repeat lg:w-auto lg:flex-1 cursor-pointer"
+                  class="ih-maiw-stage-wrap relative flex w-full flex-col bg-generic-00 justify-between overflow-hidden rounded-xl border border-[#111827] p-3.5 sm:p-4 md:px-12 md:py-4 aspect-[1280/720] min-h-[320px] md:min-h-[420px] select-none bg-cover bg-center bg-no-repeat lg:w-auto lg:flex-1 cursor-pointer"
                   style="background-image:url('https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6ab399f1e2c6a1e38c91700f_dots-bg.png');"
-                  title="Click to skip animation"
                 >
                   <div
                     class="ih-maiw-glow pointer-events-none absolute inset-0 z-0 opacity-100"
@@ -1207,7 +1222,7 @@ const panels = groups.map((group) => ({
                   </div>
 
                   <div class="ih-maiw-top-stage relative z-10 w-full shrink-0 min-h-[42px] flex items-start">
-                    <div class="ih-maiw-bubble hidden absolute right-0 top-0 self-end max-w-fit rounded-2xl border border-dashed border-[#11182726] bg-[#EDEDED] px-3 py-1.5 md:px-4 md:py-2.5 opacity-0 pointer-events-none">
+                    <div class="ih-maiw-bubble hidden absolute right-12 md:right-14 top-0 self-end max-w-fit rounded-2xl border border-dashed border-[#11182726] bg-[#EDEDED] px-3 py-1.5 md:px-4 md:py-2.5 opacity-0 pointer-events-none">
                       <p class="ih-maiw-bubble-text m-0 font-body text-xs md:text-sm lg:text-base font-normal leading-[1.35] md:leading-[1.4] text-[#111827]">
                         {card.query || card.claim}
                       </p>
@@ -1244,7 +1259,7 @@ const panels = groups.map((group) => ({
                         <img
                           src={card.image}
                           alt={card.title}
-                          class="w-full h-auto max-h-[88%] md:max-h-[92%] object-contain rounded-lg block"
+                          class="w-full h-auto max-h-[88%] md:max-h-[87%] object-contain rounded-lg block"
                           loading="lazy"
                           decoding="async"
                         />
@@ -1253,7 +1268,7 @@ const panels = groups.map((group) => ({
                   </div>
 
                   <div class="ih-maiw-input-container relative z-20 flex w-full shrink-0 items-center justify-center">
-                    <div class="ih-maiw-input-pill relative flex w-full items-center gap-2 rounded-full border border-[#A6C705]/40 bg-generic-00 pl-3.5 pr-2 py-2.5 md:py-3 shadow-xs">
+                    <div class="ih-maiw-input-pill relative flex w-full max-w-[480px] items-center gap-2 rounded-full border border-[#A6C705]/40 bg-generic-00 pl-3.5 pr-2 py-2.5 md:py-3 shadow-xs">
                       <svg class="ih-maiw-pill-border pointer-events-none absolute inset-0 h-full w-full overflow-visible" aria-hidden="true">
                         <defs>
                           <linearGradient id={`ih-maiw-pill-border-grad-${i}`} x1="0%" y1="0%" x2="100%" y2="0%" gradientUnits="objectBoundingBox">
@@ -1271,13 +1286,13 @@ const panels = groups.map((group) => ({
                       </svg>
                       <div class="min-w-0 flex-1 relative h-6 flex items-center overflow-hidden">
                         <span class="ih-maiw-pill-placeholder absolute inset-y-0 left-0 flex items-center font-body text-xs md:text-sm lg:text-[length:var(--fs-body)] text-neutral-400 pointer-events-none">
-                          Ask anything...
+                          Ask anything
                         </span>
                         <span class="ih-maiw-pill-typed hidden absolute inset-y-0 left-0 right-0 flex items-center font-body text-sm md:text-sm lg:text-[length:var(--fs-body)] text-vault-navy opacity-0 pointer-events-none font-medium tracking-tight">
                           <span class="ih-maiw-pill-typed-text truncate block w-full">{card.query || card.claim}</span>
                         </span>
                         <span class="ih-maiw-pill-thinking absolute inset-y-0 left-0 flex items-center gap-1.5 font-body text-xs md:text-sm lg:text-[length:var(--fs-body)] text-neutral-500 opacity-0 pointer-events-none font-medium">
-                          <span>Thinking</span>
+                          <span>Reading files</span>
                           <span class="inline-flex items-center gap-0.5 ml-0.5">
                             <span class="inline-block h-1 w-1 rounded-full bg-neutral-400 animate-bounce" style="animation-delay: 0ms;"></span>
                             <span class="inline-block h-1 w-1 rounded-full bg-neutral-400 animate-bounce" style="animation-delay: 150ms;"></span>
@@ -1341,9 +1356,8 @@ const panels = groups.map((group) => ({
 
                 <!-- Stage / Visual Column (Right) -->
                 <div
-                  class="ih-maiw-stage-wrap relative flex w-full flex-col bg-generic-00 justify-between overflow-hidden rounded-xl border border-[#111827] p-3.5 sm:p-4 md:p-5 aspect-[1280/720] min-h-[320px] md:min-h-[420px] select-none bg-cover bg-center bg-no-repeat lg:w-auto lg:flex-1 cursor-pointer"
+                  class="ih-maiw-stage-wrap relative flex w-full flex-col bg-generic-00 justify-between overflow-hidden rounded-xl border border-[#111827] p-3.5 sm:p-4 md:px-12 md:py-4 aspect-[1280/720] min-h-[320px] md:min-h-[420px] select-none bg-cover bg-center bg-no-repeat lg:w-auto lg:flex-1 cursor-pointer"
                   style="background-image:url('https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6ab399f1e2c6a1e38c91700f_dots-bg.png');"
-                  title="Click to skip animation"
                 >
                   <div
                     class="ih-maiw-glow pointer-events-none absolute inset-0 z-0 opacity-100"
@@ -1361,7 +1375,7 @@ const panels = groups.map((group) => ({
                   </div>
 
                   <div class="ih-maiw-top-stage relative z-10 w-full shrink-0 min-h-[42px] flex items-start">
-                    <div class="ih-maiw-bubble hidden absolute right-0 top-0 self-end max-w-fit rounded-2xl border border-dashed border-[#11182726] bg-[#EDEDED] px-3 py-1.5 md:px-4 md:py-2.5 opacity-0 pointer-events-none">
+                    <div class="ih-maiw-bubble hidden absolute right-12 md:right-14 top-0 self-end max-w-fit rounded-2xl border border-dashed border-[#11182726] bg-[#EDEDED] px-3 py-1.5 md:px-4 md:py-2.5 opacity-0 pointer-events-none">
                       <p class="ih-maiw-bubble-text m-0 font-body text-xs md:text-sm lg:text-base font-normal leading-[1.35] md:leading-[1.4] text-[#111827]">
                         {card.query || card.claim}
                       </p>
@@ -1398,7 +1412,7 @@ const panels = groups.map((group) => ({
                         <img
                           src={card.image}
                           alt={card.title}
-                          class="w-full h-auto max-h-[88%] md:max-h-[92%] object-contain rounded-lg block"
+                          class="w-full h-auto max-h-[88%] md:max-h-[87%] object-contain rounded-lg block"
                           loading="lazy"
                           decoding="async"
                         />
@@ -1407,7 +1421,7 @@ const panels = groups.map((group) => ({
                   </div>
 
                   <div class="ih-maiw-input-container relative z-20 flex w-full shrink-0 items-center justify-center">
-                    <div class="ih-maiw-input-pill relative flex w-full items-center gap-2 rounded-full border border-[#A6C705]/40 bg-generic-00 pl-3.5 pr-2 py-2.5 md:py-3 shadow-xs">
+                    <div class="ih-maiw-input-pill relative flex w-full max-w-[480px] items-center gap-2 rounded-full border border-[#A6C705]/40 bg-generic-00 pl-3.5 pr-2 py-2.5 md:py-3 shadow-xs">
                       <svg class="ih-maiw-pill-border pointer-events-none absolute inset-0 h-full w-full overflow-visible" aria-hidden="true">
                         <defs>
                           <linearGradient id={`ih-maiw-pill-border-grad-${i}`} x1="0%" y1="0%" x2="100%" y2="0%" gradientUnits="objectBoundingBox">
@@ -1425,13 +1439,13 @@ const panels = groups.map((group) => ({
                       </svg>
                       <div class="min-w-0 flex-1 relative h-6 flex items-center overflow-hidden">
                         <span class="ih-maiw-pill-placeholder absolute inset-y-0 left-0 flex items-center font-body text-xs md:text-sm lg:text-[length:var(--fs-body)] text-neutral-400 pointer-events-none">
-                          Ask anything...
+                          Ask anything
                         </span>
                         <span class="ih-maiw-pill-typed hidden absolute inset-y-0 left-0 right-0 flex items-center font-body text-sm md:text-sm lg:text-[length:var(--fs-body)] text-vault-navy opacity-0 pointer-events-none font-medium tracking-tight">
                           <span class="ih-maiw-pill-typed-text truncate block w-full">{card.query || card.claim}</span>
                         </span>
                         <span class="ih-maiw-pill-thinking absolute inset-y-0 left-0 flex items-center gap-1.5 font-body text-xs md:text-sm lg:text-[length:var(--fs-body)] text-neutral-500 opacity-0 pointer-events-none font-medium">
-                          <span>Thinking</span>
+                          <span>Reading files</span>
                           <span class="inline-flex items-center gap-0.5 ml-0.5">
                             <span class="inline-block h-1 w-1 rounded-full bg-neutral-400 animate-bounce" style="animation-delay: 0ms;"></span>
                             <span class="inline-block h-1 w-1 rounded-full bg-neutral-400 animate-bounce" style="animation-delay: 150ms;"></span>
@@ -1495,9 +1509,8 @@ const panels = groups.map((group) => ({
 
                 <!-- Stage / Visual Column (Right) -->
                 <div
-                  class="ih-maiw-stage-wrap relative flex w-full flex-col bg-generic-00 justify-between overflow-hidden rounded-xl border border-[#111827] p-3.5 sm:p-4 md:p-5 aspect-[1280/720] min-h-[320px] md:min-h-[420px] select-none bg-cover bg-center bg-no-repeat lg:w-auto lg:flex-1 cursor-pointer"
+                  class="ih-maiw-stage-wrap relative flex w-full flex-col bg-generic-00 justify-between overflow-hidden rounded-xl border border-[#111827] p-3.5 sm:p-4 md:px-12 md:py-4 aspect-[1280/720] min-h-[320px] md:min-h-[420px] select-none bg-cover bg-center bg-no-repeat lg:w-auto lg:flex-1 cursor-pointer"
                   style="background-image:url('https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6ab399f1e2c6a1e38c91700f_dots-bg.png');"
-                  title="Click to skip animation"
                 >
                   <div
                     class="ih-maiw-glow pointer-events-none absolute inset-0 z-0 opacity-100"
@@ -1515,7 +1528,7 @@ const panels = groups.map((group) => ({
                   </div>
 
                   <div class="ih-maiw-top-stage relative z-10 w-full shrink-0 min-h-[42px] flex items-start">
-                    <div class="ih-maiw-bubble hidden absolute right-0 top-0 self-end max-w-fit rounded-2xl border border-dashed border-[#11182726] bg-[#EDEDED] px-3 py-1.5 md:px-4 md:py-2.5 opacity-0 pointer-events-none">
+                    <div class="ih-maiw-bubble hidden absolute right-12 md:right-14 top-0 self-end max-w-fit rounded-2xl border border-dashed border-[#11182726] bg-[#EDEDED] px-3 py-1.5 md:px-4 md:py-2.5 opacity-0 pointer-events-none">
                       <p class="ih-maiw-bubble-text m-0 font-body text-xs md:text-sm lg:text-base font-normal leading-[1.35] md:leading-[1.4] text-[#111827]">
                         {card.query || card.claim}
                       </p>
@@ -1552,7 +1565,7 @@ const panels = groups.map((group) => ({
                         <img
                           src={card.image}
                           alt={card.title}
-                          class="w-full h-auto max-h-[88%] md:max-h-[92%] object-contain rounded-lg block"
+                          class="w-full h-auto max-h-[88%] md:max-h-[87%] object-contain rounded-lg block"
                           loading="lazy"
                           decoding="async"
                         />
@@ -1561,7 +1574,7 @@ const panels = groups.map((group) => ({
                   </div>
 
                   <div class="ih-maiw-input-container relative z-20 flex w-full shrink-0 items-center justify-center">
-                    <div class="ih-maiw-input-pill relative flex w-full items-center gap-2 rounded-full border border-[#A6C705]/40 bg-generic-00 pl-3.5 pr-2 py-2.5 md:py-3 shadow-xs">
+                    <div class="ih-maiw-input-pill relative flex w-full max-w-[480px] items-center gap-2 rounded-full border border-[#A6C705]/40 bg-generic-00 pl-3.5 pr-2 py-2.5 md:py-3 shadow-xs">
                       <svg class="ih-maiw-pill-border pointer-events-none absolute inset-0 h-full w-full overflow-visible" aria-hidden="true">
                         <defs>
                           <linearGradient id={`ih-maiw-pill-border-grad-${i}`} x1="0%" y1="0%" x2="100%" y2="0%" gradientUnits="objectBoundingBox">
@@ -1579,13 +1592,13 @@ const panels = groups.map((group) => ({
                       </svg>
                       <div class="min-w-0 flex-1 relative h-6 flex items-center overflow-hidden">
                         <span class="ih-maiw-pill-placeholder absolute inset-y-0 left-0 flex items-center font-body text-xs md:text-sm lg:text-[length:var(--fs-body)] text-neutral-400 pointer-events-none">
-                          Ask anything...
+                          Ask anything
                         </span>
                         <span class="ih-maiw-pill-typed hidden absolute inset-y-0 left-0 right-0 flex items-center font-body text-sm md:text-sm lg:text-[length:var(--fs-body)] text-vault-navy opacity-0 pointer-events-none font-medium tracking-tight">
                           <span class="ih-maiw-pill-typed-text truncate block w-full">{card.query || card.claim}</span>
                         </span>
                         <span class="ih-maiw-pill-thinking absolute inset-y-0 left-0 flex items-center gap-1.5 font-body text-xs md:text-sm lg:text-[length:var(--fs-body)] text-neutral-500 opacity-0 pointer-events-none font-medium">
-                          <span>Thinking</span>
+                          <span>Reading files</span>
                           <span class="inline-flex items-center gap-0.5 ml-0.5">
                             <span class="inline-block h-1 w-1 rounded-full bg-neutral-400 animate-bounce" style="animation-delay: 0ms;"></span>
                             <span class="inline-block h-1 w-1 rounded-full bg-neutral-400 animate-bounce" style="animation-delay: 150ms;"></span>
@@ -1649,9 +1662,8 @@ const panels = groups.map((group) => ({
 
                 <!-- Stage / Visual Column (Right) -->
                 <div
-                  class="ih-maiw-stage-wrap relative flex w-full flex-col bg-generic-00 justify-between overflow-hidden rounded-xl border border-[#111827] p-3.5 sm:p-4 md:p-5 aspect-[1280/720] min-h-[320px] md:min-h-[420px] select-none bg-cover bg-center bg-no-repeat lg:w-auto lg:flex-1 cursor-pointer"
+                  class="ih-maiw-stage-wrap relative flex w-full flex-col bg-generic-00 justify-between overflow-hidden rounded-xl border border-[#111827] p-3.5 sm:p-4 md:px-12 md:py-4 aspect-[1280/720] min-h-[320px] md:min-h-[420px] select-none bg-cover bg-center bg-no-repeat lg:w-auto lg:flex-1 cursor-pointer"
                   style="background-image:url('https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6ab399f1e2c6a1e38c91700f_dots-bg.png');"
-                  title="Click to skip animation"
                 >
                   <div
                     class="ih-maiw-glow pointer-events-none absolute inset-0 z-0 opacity-100"
@@ -1669,7 +1681,7 @@ const panels = groups.map((group) => ({
                   </div>
 
                   <div class="ih-maiw-top-stage relative z-10 w-full shrink-0 min-h-[42px] flex items-start">
-                    <div class="ih-maiw-bubble hidden absolute right-0 top-0 self-end max-w-fit rounded-2xl border border-dashed border-[#11182726] bg-[#EDEDED] px-3 py-1.5 md:px-4 md:py-2.5 opacity-0 pointer-events-none">
+                    <div class="ih-maiw-bubble hidden absolute right-12 md:right-14 top-0 self-end max-w-fit rounded-2xl border border-dashed border-[#11182726] bg-[#EDEDED] px-3 py-1.5 md:px-4 md:py-2.5 opacity-0 pointer-events-none">
                       <p class="ih-maiw-bubble-text m-0 font-body text-xs md:text-sm lg:text-base font-normal leading-[1.35] md:leading-[1.4] text-[#111827]">
                         {card.query || card.claim}
                       </p>
@@ -1706,7 +1718,7 @@ const panels = groups.map((group) => ({
                         <img
                           src={card.image}
                           alt={card.title}
-                          class="w-full h-auto max-h-[88%] md:max-h-[92%] object-contain rounded-lg block"
+                          class="w-full h-auto max-h-[88%] md:max-h-[87%] object-contain rounded-lg block"
                           loading="lazy"
                           decoding="async"
                         />
@@ -1715,7 +1727,7 @@ const panels = groups.map((group) => ({
                   </div>
 
                   <div class="ih-maiw-input-container relative z-20 flex w-full shrink-0 items-center justify-center">
-                    <div class="ih-maiw-input-pill relative flex w-full items-center gap-2 rounded-full border border-[#A6C705]/40 bg-generic-00 pl-3.5 pr-2 py-2.5 md:py-3 shadow-xs">
+                    <div class="ih-maiw-input-pill relative flex w-full max-w-[480px] items-center gap-2 rounded-full border border-[#A6C705]/40 bg-generic-00 pl-3.5 pr-2 py-2.5 md:py-3 shadow-xs">
                       <svg class="ih-maiw-pill-border pointer-events-none absolute inset-0 h-full w-full overflow-visible" aria-hidden="true">
                         <defs>
                           <linearGradient id={`ih-maiw-pill-border-grad-${i}`} x1="0%" y1="0%" x2="100%" y2="0%" gradientUnits="objectBoundingBox">
@@ -1733,13 +1745,13 @@ const panels = groups.map((group) => ({
                       </svg>
                       <div class="min-w-0 flex-1 relative h-6 flex items-center overflow-hidden">
                         <span class="ih-maiw-pill-placeholder absolute inset-y-0 left-0 flex items-center font-body text-xs md:text-sm lg:text-[length:var(--fs-body)] text-neutral-400 pointer-events-none">
-                          Ask anything...
+                          Ask anything
                         </span>
                         <span class="ih-maiw-pill-typed hidden absolute inset-y-0 left-0 right-0 flex items-center font-body text-sm md:text-sm lg:text-[length:var(--fs-body)] text-vault-navy opacity-0 pointer-events-none font-medium tracking-tight">
                           <span class="ih-maiw-pill-typed-text truncate block w-full">{card.query || card.claim}</span>
                         </span>
                         <span class="ih-maiw-pill-thinking absolute inset-y-0 left-0 flex items-center gap-1.5 font-body text-xs md:text-sm lg:text-[length:var(--fs-body)] text-neutral-500 opacity-0 pointer-events-none font-medium">
-                          <span>Thinking</span>
+                          <span>Reading files</span>
                           <span class="inline-flex items-center gap-0.5 ml-0.5">
                             <span class="inline-block h-1 w-1 rounded-full bg-neutral-400 animate-bounce" style="animation-delay: 0ms;"></span>
                             <span class="inline-block h-1 w-1 rounded-full bg-neutral-400 animate-bounce" style="animation-delay: 150ms;"></span>
@@ -1803,9 +1815,8 @@ const panels = groups.map((group) => ({
 
                 <!-- Stage / Visual Column (Right) -->
                 <div
-                  class="ih-maiw-stage-wrap relative flex w-full flex-col bg-generic-00 justify-between overflow-hidden rounded-xl border border-[#111827] p-3.5 sm:p-4 md:p-5 aspect-[1280/720] min-h-[320px] md:min-h-[420px] select-none bg-cover bg-center bg-no-repeat lg:w-auto lg:flex-1 cursor-pointer"
+                  class="ih-maiw-stage-wrap relative flex w-full flex-col bg-generic-00 justify-between overflow-hidden rounded-xl border border-[#111827] p-3.5 sm:p-4 md:px-12 md:py-4 aspect-[1280/720] min-h-[320px] md:min-h-[420px] select-none bg-cover bg-center bg-no-repeat lg:w-auto lg:flex-1 cursor-pointer"
                   style="background-image:url('https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6ab399f1e2c6a1e38c91700f_dots-bg.png');"
-                  title="Click to skip animation"
                 >
                   <div
                     class="ih-maiw-glow pointer-events-none absolute inset-0 z-0 opacity-100"
@@ -1823,7 +1834,7 @@ const panels = groups.map((group) => ({
                   </div>
 
                   <div class="ih-maiw-top-stage relative z-10 w-full shrink-0 min-h-[42px] flex items-start">
-                    <div class="ih-maiw-bubble hidden absolute right-0 top-0 self-end max-w-fit rounded-2xl border border-dashed border-[#11182726] bg-[#EDEDED] px-3 py-1.5 md:px-4 md:py-2.5 opacity-0 pointer-events-none">
+                    <div class="ih-maiw-bubble hidden absolute right-12 md:right-14 top-0 self-end max-w-fit rounded-2xl border border-dashed border-[#11182726] bg-[#EDEDED] px-3 py-1.5 md:px-4 md:py-2.5 opacity-0 pointer-events-none">
                       <p class="ih-maiw-bubble-text m-0 font-body text-xs md:text-sm lg:text-base font-normal leading-[1.35] md:leading-[1.4] text-[#111827]">
                         {card.query || card.claim}
                       </p>
@@ -1860,7 +1871,7 @@ const panels = groups.map((group) => ({
                         <img
                           src={card.image}
                           alt={card.title}
-                          class="w-full h-auto max-h-[88%] md:max-h-[92%] object-contain rounded-lg block"
+                          class="w-full h-auto max-h-[88%] md:max-h-[87%] object-contain rounded-lg block"
                           loading="lazy"
                           decoding="async"
                         />
@@ -1869,7 +1880,7 @@ const panels = groups.map((group) => ({
                   </div>
 
                   <div class="ih-maiw-input-container relative z-20 flex w-full shrink-0 items-center justify-center">
-                    <div class="ih-maiw-input-pill relative flex w-full items-center gap-2 rounded-full border border-[#A6C705]/40 bg-generic-00 pl-3.5 pr-2 py-2.5 md:py-3 shadow-xs">
+                    <div class="ih-maiw-input-pill relative flex w-full max-w-[480px] items-center gap-2 rounded-full border border-[#A6C705]/40 bg-generic-00 pl-3.5 pr-2 py-2.5 md:py-3 shadow-xs">
                       <svg class="ih-maiw-pill-border pointer-events-none absolute inset-0 h-full w-full overflow-visible" aria-hidden="true">
                         <defs>
                           <linearGradient id={`ih-maiw-pill-border-grad-${i}`} x1="0%" y1="0%" x2="100%" y2="0%" gradientUnits="objectBoundingBox">
@@ -1887,13 +1898,13 @@ const panels = groups.map((group) => ({
                       </svg>
                       <div class="min-w-0 flex-1 relative h-6 flex items-center overflow-hidden">
                         <span class="ih-maiw-pill-placeholder absolute inset-y-0 left-0 flex items-center font-body text-xs md:text-sm lg:text-[length:var(--fs-body)] text-neutral-400 pointer-events-none">
-                          Ask anything...
+                          Ask anything
                         </span>
                         <span class="ih-maiw-pill-typed hidden absolute inset-y-0 left-0 right-0 flex items-center font-body text-sm md:text-sm lg:text-[length:var(--fs-body)] text-vault-navy opacity-0 pointer-events-none font-medium tracking-tight">
                           <span class="ih-maiw-pill-typed-text truncate block w-full">{card.query || card.claim}</span>
                         </span>
                         <span class="ih-maiw-pill-thinking absolute inset-y-0 left-0 flex items-center gap-1.5 font-body text-xs md:text-sm lg:text-[length:var(--fs-body)] text-neutral-500 opacity-0 pointer-events-none font-medium">
-                          <span>Thinking</span>
+                          <span>Reading files</span>
                           <span class="inline-flex items-center gap-0.5 ml-0.5">
                             <span class="inline-block h-1 w-1 rounded-full bg-neutral-400 animate-bounce" style="animation-delay: 0ms;"></span>
                             <span class="inline-block h-1 w-1 rounded-full bg-neutral-400 animate-bounce" style="animation-delay: 150ms;"></span>
@@ -1957,9 +1968,8 @@ const panels = groups.map((group) => ({
 
                 <!-- Stage / Visual Column (Right) -->
                 <div
-                  class="ih-maiw-stage-wrap relative flex w-full flex-col bg-generic-00 justify-between overflow-hidden rounded-xl border border-[#111827] p-3.5 sm:p-4 md:p-5 aspect-[1280/720] min-h-[320px] md:min-h-[420px] select-none bg-cover bg-center bg-no-repeat lg:w-auto lg:flex-1 cursor-pointer"
+                  class="ih-maiw-stage-wrap relative flex w-full flex-col bg-generic-00 justify-between overflow-hidden rounded-xl border border-[#111827] p-3.5 sm:p-4 md:px-12 md:py-4 aspect-[1280/720] min-h-[320px] md:min-h-[420px] select-none bg-cover bg-center bg-no-repeat lg:w-auto lg:flex-1 cursor-pointer"
                   style="background-image:url('https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6ab399f1e2c6a1e38c91700f_dots-bg.png');"
-                  title="Click to skip animation"
                 >
                   <div
                     class="ih-maiw-glow pointer-events-none absolute inset-0 z-0 opacity-100"
@@ -1977,7 +1987,7 @@ const panels = groups.map((group) => ({
                   </div>
 
                   <div class="ih-maiw-top-stage relative z-10 w-full shrink-0 min-h-[42px] flex items-start">
-                    <div class="ih-maiw-bubble hidden absolute right-0 top-0 self-end max-w-fit rounded-2xl border border-dashed border-[#11182726] bg-[#EDEDED] px-3 py-1.5 md:px-4 md:py-2.5 opacity-0 pointer-events-none">
+                    <div class="ih-maiw-bubble hidden absolute right-12 md:right-14 top-0 self-end max-w-fit rounded-2xl border border-dashed border-[#11182726] bg-[#EDEDED] px-3 py-1.5 md:px-4 md:py-2.5 opacity-0 pointer-events-none">
                       <p class="ih-maiw-bubble-text m-0 font-body text-xs md:text-sm lg:text-base font-normal leading-[1.35] md:leading-[1.4] text-[#111827]">
                         {card.query || card.claim}
                       </p>
@@ -2014,7 +2024,7 @@ const panels = groups.map((group) => ({
                         <img
                           src={card.image}
                           alt={card.title}
-                          class="w-full h-auto max-h-[88%] md:max-h-[92%] object-contain rounded-lg block"
+                          class="w-full h-auto max-h-[88%] md:max-h-[87%] object-contain rounded-lg block"
                           loading="lazy"
                           decoding="async"
                         />
@@ -2023,7 +2033,7 @@ const panels = groups.map((group) => ({
                   </div>
 
                   <div class="ih-maiw-input-container relative z-20 flex w-full shrink-0 items-center justify-center">
-                    <div class="ih-maiw-input-pill relative flex w-full items-center gap-2 rounded-full border border-[#A6C705]/40 bg-generic-00 pl-3.5 pr-2 py-2.5 md:py-3 shadow-xs">
+                    <div class="ih-maiw-input-pill relative flex w-full max-w-[480px] items-center gap-2 rounded-full border border-[#A6C705]/40 bg-generic-00 pl-3.5 pr-2 py-2.5 md:py-3 shadow-xs">
                       <svg class="ih-maiw-pill-border pointer-events-none absolute inset-0 h-full w-full overflow-visible" aria-hidden="true">
                         <defs>
                           <linearGradient id={`ih-maiw-pill-border-grad-${i}`} x1="0%" y1="0%" x2="100%" y2="0%" gradientUnits="objectBoundingBox">
@@ -2041,13 +2051,13 @@ const panels = groups.map((group) => ({
                       </svg>
                       <div class="min-w-0 flex-1 relative h-6 flex items-center overflow-hidden">
                         <span class="ih-maiw-pill-placeholder absolute inset-y-0 left-0 flex items-center font-body text-xs md:text-sm lg:text-[length:var(--fs-body)] text-neutral-400 pointer-events-none">
-                          Ask anything...
+                          Ask anything
                         </span>
                         <span class="ih-maiw-pill-typed hidden absolute inset-y-0 left-0 right-0 flex items-center font-body text-sm md:text-sm lg:text-[length:var(--fs-body)] text-vault-navy opacity-0 pointer-events-none font-medium tracking-tight">
                           <span class="ih-maiw-pill-typed-text truncate block w-full">{card.query || card.claim}</span>
                         </span>
                         <span class="ih-maiw-pill-thinking absolute inset-y-0 left-0 flex items-center gap-1.5 font-body text-xs md:text-sm lg:text-[length:var(--fs-body)] text-neutral-500 opacity-0 pointer-events-none font-medium">
-                          <span>Thinking</span>
+                          <span>Reading files</span>
                           <span class="inline-flex items-center gap-0.5 ml-0.5">
                             <span class="inline-block h-1 w-1 rounded-full bg-neutral-400 animate-bounce" style="animation-delay: 0ms;"></span>
                             <span class="inline-block h-1 w-1 rounded-full bg-neutral-400 animate-bounce" style="animation-delay: 150ms;"></span>
@@ -2085,10 +2095,34 @@ const panels = groups.map((group) => ({
     display: none !important;
   }
 
-  .ih-maiw-chart.is-revealed {
+  .ih-maiw-chart.is-revealed,
+  .ih-maiw-result-heading.is-revealed {
     display: flex;
     opacity: 1;
     pointer-events: auto;
+  }
+
+  .ih-maiw-input-pill {
+    width: 100%;
+    max-width: 480px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .ih-maiw-chart img {
+    width: 100%;
+    height: auto;
+    margin: 0 auto;
+  }
+
+  .ih-maiw-bubble {
+    right: 3rem !important; /* leaves clean space for cancel SVG in top-right */
+  }
+
+  @media (min-width: 768px) {
+    .ih-maiw-bubble {
+      right: 3.5rem !important;
+    }
   }
 
   .ih-maiw-tab {
@@ -2295,6 +2329,7 @@ const panels = groups.map((group) => ({
       var checklist = stage.querySelector(".ih-maiw-checklist");
       var checkItems = stage.querySelectorAll(".ih-maiw-check-item");
       var chart = stage.querySelector(".ih-maiw-chart");
+      var resultHeading = stage.querySelector(".ih-maiw-result-heading");
       var inputPill = stage.querySelector(".ih-maiw-input-pill");
       var pillPlaceholder = stage.querySelector(".ih-maiw-pill-placeholder");
       var pillTyped = stage.querySelector(".ih-maiw-pill-typed");
@@ -2302,7 +2337,11 @@ const panels = groups.map((group) => ({
       var pillThinking = stage.querySelector(".ih-maiw-pill-thinking");
       var cursor = stage.querySelector(".ih-maiw-cursor");
       var borderPath = stage.querySelector(".ih-maiw-pill-border-path");
+      var submitBtn = stage.querySelector(".ih-maiw-submit-btn");
 
+      if (submitBtn) {
+        submitBtn.style.transform = "none";
+      }
       if (chart) {
         chart.classList.remove("is-revealed");
         chart.classList.add("hidden");
@@ -2310,6 +2349,14 @@ const panels = groups.map((group) => ({
         chart.style.opacity = "0";
         chart.style.pointerEvents = "none";
         chart.style.transform = "none";
+      }
+      if (resultHeading) {
+        resultHeading.classList.remove("is-revealed");
+        resultHeading.classList.add("hidden");
+        resultHeading.style.display = "none";
+        resultHeading.style.opacity = "0";
+        resultHeading.style.pointerEvents = "none";
+        resultHeading.style.transform = "none";
       }
       if (glow) glow.style.opacity = "1";
       if (glowBottom) glowBottom.style.opacity = "0";
@@ -2353,6 +2400,8 @@ const panels = groups.map((group) => ({
       if (pillThinking) {
         pillThinking.style.display = "none";
         pillThinking.style.opacity = "0";
+        var resetStatusSpan = pillThinking.querySelector("span:first-child");
+        if (resetStatusSpan) resetStatusSpan.textContent = "Reading files";
       }
       if (cursor) {
         cursor.style.opacity = "0";
@@ -2363,6 +2412,7 @@ const panels = groups.map((group) => ({
       }
       if (inputPill) {
         inputPill.style.transform = "none";
+        inputPill.style.maxWidth = "480px";
       }
     }
 
@@ -2391,11 +2441,13 @@ const panels = groups.map((group) => ({
       var checklist = stage.querySelector(".ih-maiw-checklist");
       var checkItems = stage.querySelectorAll(".ih-maiw-check-item");
       var chart = stage.querySelector(".ih-maiw-chart");
+      var resultHeading = stage.querySelector(".ih-maiw-result-heading");
       var inputPill = stage.querySelector(".ih-maiw-input-pill");
       var pillPlaceholder = stage.querySelector(".ih-maiw-pill-placeholder");
       var pillTyped = stage.querySelector(".ih-maiw-pill-typed");
       var pillTypedText = stage.querySelector(".ih-maiw-pill-typed-text");
       var pillThinking = stage.querySelector(".ih-maiw-pill-thinking");
+      var pillStatusText = pillThinking ? pillThinking.querySelector("span:first-child") : null;
       var submitBtn = stage.querySelector(".ih-maiw-submit-btn");
       var cursor = stage.querySelector(".ih-maiw-cursor");
       var borderPath = stage.querySelector(".ih-maiw-pill-border-path");
@@ -2404,6 +2456,8 @@ const panels = groups.map((group) => ({
       stage.onclick = function () {
         if (currentTl && currentTl.isActive()) {
           currentTl.seek(currentTl.duration());
+          if (inputPill) inputPill.style.maxWidth = "100%";
+          updatePillPath();
         }
       };
 
@@ -2414,6 +2468,15 @@ const panels = groups.map((group) => ({
           chart.classList.add("is-revealed");
           chart.style.display = "flex";
           chart.style.opacity = "1";
+        }
+        if (resultHeading) {
+          resultHeading.classList.remove("hidden");
+          resultHeading.classList.add("is-revealed");
+          resultHeading.style.display = "flex";
+          resultHeading.style.opacity = "1";
+        }
+        if (inputPill) {
+          inputPill.style.maxWidth = "100%";
         }
         return;
       }
@@ -2540,6 +2603,12 @@ const panels = groups.map((group) => ({
           chart.style.display = "flex";
           chart.style.opacity = "1";
         }
+        if (resultHeading) {
+          resultHeading.classList.remove("hidden");
+          resultHeading.classList.add("is-revealed");
+          resultHeading.style.display = "flex";
+          resultHeading.style.opacity = "1";
+        }
         if (centerTitle) centerTitle.style.opacity = "0";
         if (glow) glow.style.opacity = "0";
         if (glowBottom) glowBottom.style.opacity = "1";
@@ -2552,7 +2621,11 @@ const panels = groups.map((group) => ({
         }
         if (pillTyped) pillTyped.style.display = "none";
         if (pillThinking) pillThinking.style.display = "none";
-        if (inputPill) inputPill.style.transform = "none";
+        if (inputPill) {
+          inputPill.style.transform = "none";
+          inputPill.style.maxWidth = "100%";
+        }
+        updatePillPath();
         return;
       }
 
@@ -2565,7 +2638,17 @@ const panels = groups.map((group) => ({
       }
 
       var centerOffset = calcCenterOffset();
+
+      // Measure coordinates at docked bottom position (maxWidth 100%, y 0)
+      inputPill.style.maxWidth = "100%";
+      inputPill.style.transform = "none";
+      var bottomPillPos = getPillPos();
+      var bottomSubmitPos = getSubmitBtnPos();
+
+      // Reset to centered position for Frame 1
+      inputPill.style.maxWidth = "480px";
       inputPill.style.transform = "translateY(" + centerOffset + "px)";
+      var centerPillPos = getPillPos();
 
       var tl = gsap.timeline({
         defaults: { ease: "power2.inOut" },
@@ -2573,12 +2656,17 @@ const panels = groups.map((group) => ({
       currentTl = tl;
 
       // Initial Frame 1 state
-      var hideElements = [chart, bubble, skeleton, checklist].filter(Boolean);
+      var hideElements = [chart, bubble, skeleton, checklist, resultHeading].filter(Boolean);
       if (hideElements.length) tl.set(hideElements, { display: "none" });
       if (chart) {
         chart.classList.remove("is-revealed");
         chart.classList.add("hidden");
         tl.set(chart, { opacity: 0, y: 10, display: "none", pointerEvents: "none" });
+      }
+      if (resultHeading) {
+        resultHeading.classList.remove("is-revealed");
+        resultHeading.classList.add("hidden");
+        tl.set(resultHeading, { opacity: 0, y: 6, display: "none", pointerEvents: "none" });
       }
       if (bubble) tl.set(bubble, { opacity: 0, scale: 0.9, y: 8, pointerEvents: "none" });
       if (skeleton) tl.set(skeleton, { opacity: 0, pointerEvents: "none" });
@@ -2590,6 +2678,7 @@ const panels = groups.map((group) => ({
       if (glowBottom) tl.set(glowBottom, { opacity: 0 });
       if (centerTitle) tl.set(centerTitle, { opacity: 1, y: 0 });
       tl.set(inputPill, {
+        maxWidth: 480,
         y: function () {
           return centerOffset;
         },
@@ -2611,30 +2700,67 @@ const panels = groups.map((group) => ({
         });
       }
 
-      // Frame 1: Cursor appears & moves to pill
+      // Frame 1: Cursor appears & moves to pill at center
       if (cursor) {
         tl.to(cursor, { opacity: 1, duration: 0.35 }, "+=0.2");
         tl.to(
           cursor,
           {
-            x: function () {
-              return getPillPos().x;
-            },
-            y: function () {
-              return getPillPos().y;
-            },
+            x: centerPillPos.x,
+            y: centerPillPos.y,
             duration: 0.7,
             ease: "power2.out",
           },
           "-=0.1",
         );
-        // Frame 2: Cursor clicks pill, prompt types out
+        // Cursor clicks pill at center
         tl.to(cursor, { scale: 0.85, duration: 0.12, yoyo: true, repeat: 1 });
       }
 
+      // Pill drops down: center title and center glow fade out, bottom ambient glow fades in
+      if (centerTitle) {
+        tl.to(
+          centerTitle,
+          { opacity: 0, y: -10, duration: 0.45, ease: "power2.in" },
+          "+=0.08",
+        );
+      }
+      if (glow) tl.to(glow, { opacity: 0, duration: 0.45 }, "<");
+      if (glowBottom) {
+        tl.to(
+          glowBottom,
+          { opacity: 1, duration: 0.6, ease: "power2.out" },
+          "<",
+        );
+      }
+      tl.to(
+        inputPill,
+        {
+          y: 0,
+          maxWidth: "100%",
+          duration: 0.6,
+          ease: "power3.inOut",
+          onUpdate: updatePillPath,
+        },
+        "<",
+      );
+      if (cursor) {
+        tl.to(
+          cursor,
+          {
+            x: bottomPillPos.x,
+            y: bottomPillPos.y,
+            duration: 0.6,
+            ease: "power3.inOut",
+          },
+          "<",
+        );
+      }
+
+      // Frame 2: Once pill is below, placeholder fades and prompt writes in
       if (pillTyped) tl.set(pillTyped, { display: "flex" });
       if (pillPlaceholder) {
-        tl.to(pillPlaceholder, { opacity: 0, duration: 0.15 }, "<+=0.05");
+        tl.to(pillPlaceholder, { opacity: 0, duration: 0.15 }, "+=0.05");
         tl.set(pillPlaceholder, { display: "none" });
       }
       if (pillTyped) tl.to(pillTyped, { opacity: 1, duration: 0.15 }, "<");
@@ -2658,55 +2784,33 @@ const panels = groups.map((group) => ({
         "<+=0.1",
       );
 
-      // Cursor moves to submit arrow button
+      // Frame 3: Cursor moves to submit arrow button at the bottom
       if (cursor && submitBtn) {
         tl.to(
           cursor,
           {
-            x: function () {
-              return getSubmitBtnPos().x;
-            },
-            y: function () {
-              return getSubmitBtnPos().y;
-            },
-            duration: 1.1,
+            x: bottomSubmitPos.x,
+            y: bottomSubmitPos.y,
+            duration: 0.65,
             ease: "power2.inOut",
           },
-          "+=0.25",
+          "+=0.2",
         );
-        // Click submit button
+        // Click submit button (subtle tactile feedback)
         tl.to(
           cursor,
-          { scale: 0.8, duration: 0.09, ease: "power2.in" },
-          "+=0.15",
+          { scale: 0.9, duration: 0.08, ease: "power2.in" },
+          "+=0.1",
         );
-        tl.to(submitBtn, { scale: 0.78, duration: 0.09, ease: "power2.in" }, "<");
-        tl.to(cursor, { scale: 1, duration: 0.14, ease: "power2.out" });
+        tl.to(submitBtn, { scale: 0.92, duration: 0.08, ease: "power2.in" }, "<");
+        tl.to(cursor, { scale: 1, duration: 0.12, ease: "power2.out" });
         tl.to(
           submitBtn,
-          { scale: 1, duration: 0.16, ease: "back.out(2.5)" },
+          { scale: 1, duration: 0.14, ease: "power2.out" },
           "<",
         );
         tl.to(cursor, { opacity: 0, duration: 0.25 }, "+=0.15");
       }
-
-      // Pill drops down: center title and center glow fade out, bottom ambient glow fades in
-      if (centerTitle) {
-        tl.to(
-          centerTitle,
-          { opacity: 0, y: -10, duration: 0.45, ease: "power2.in" },
-          "-=0.1",
-        );
-      }
-      if (glow) tl.to(glow, { opacity: 0, duration: 0.45 }, "<");
-      if (glowBottom) {
-        tl.to(
-          glowBottom,
-          { opacity: 1, duration: 0.65, ease: "power2.out" },
-          "<",
-        );
-      }
-      tl.to(inputPill, { y: 0, duration: 0.65, ease: "power3.inOut" }, "<");
 
       // BORDER LOADER: Draws 1 full round
       if (borderPath) {
@@ -2759,13 +2863,20 @@ const panels = groups.map((group) => ({
         );
       }
 
-      // Frame 4: Skeleton holds, then checklist appears
+      // Frame 4: Skeleton holds, then checklist appears & status transitions to "Analyzing..."
       if (skeleton) {
         tl.to(skeleton, { opacity: 0, duration: 0.25 }, "revealPoint+=1.8");
         tl.set(skeleton, { display: "none" });
       }
+      if (pillThinking && pillStatusText) {
+        tl.to(pillThinking, { opacity: 0, duration: 0.15 }, "revealPoint+=1.8");
+        tl.add(function () {
+          if (pillStatusText) pillStatusText.textContent = "Analyzing";
+        }, "revealPoint+=1.95");
+        tl.to(pillThinking, { opacity: 1, duration: 0.15 }, "revealPoint+=1.95");
+      }
       if (checklist) {
-        tl.set(checklist, { display: "flex", opacity: 1 });
+        tl.set(checklist, { display: "flex", opacity: 1 }, "revealPoint+=2.0");
         if (checkItems && checkItems.length) {
           tl.to(
             checkItems,
@@ -2808,6 +2919,14 @@ const panels = groups.map((group) => ({
         tl.set(chart, { display: "flex" });
       }
 
+      if (resultHeading) {
+        tl.add(function () {
+          resultHeading.classList.remove("hidden");
+          resultHeading.classList.add("is-revealed");
+        });
+        tl.set(resultHeading, { display: "flex" });
+      }
+
       if (pillThinking) {
         tl.to(pillThinking, { opacity: 0, duration: 0.2 }, "<");
         tl.set(pillThinking, { display: "none" });
@@ -2821,6 +2940,19 @@ const panels = groups.map((group) => ({
         if (pillTypedText) pillTypedText.textContent = "";
       });
 
+      if (resultHeading) {
+        tl.to(
+          resultHeading,
+          {
+            opacity: 1,
+            y: 0,
+            duration: 0.45,
+            ease: "power2.out",
+          },
+          "<+=0.1",
+        );
+      }
+
       if (chart) {
         tl.to(
           chart,
@@ -2831,7 +2963,7 @@ const panels = groups.map((group) => ({
             ease: "power2.out",
             pointerEvents: "auto",
           },
-          "<+=0.1",
+          resultHeading ? "<" : "<+=0.1",
         );
       }
     }
