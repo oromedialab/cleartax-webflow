@@ -48,9 +48,19 @@ interface Card {
   title: string;
   icon?: string;
   image?: string;
+  query?: string;
   /** The Nova Blue one-liner under the title in the overlay. */
   claim: string;
   caption: string;
+  /**
+   * Optional layout variant for this card's overlay.
+   * Use different numbers to apply different CSS layouts per card.
+   * Defaults to 1 (the standard text-left / stage-right layout).
+   * Change per card, then add CSS rules under
+   * `[data-ih-maiw-active="<flat-index>"]` or
+   * `.ih-maiw-layout-<N>` to customise each.
+   */
+  layout?: number;
 }
 
 interface Group {
@@ -67,18 +77,20 @@ const groups: Group[] = [
       {
         title: "CFO Dashboard Agent",
         claim: "Walk into the monthly review with insights, not numbers.",
+        query: "Board meeting next month. Any compliance risk likely before then?",
         icon: "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6abb81d24cbe5f2136a1a893_ai-icon-1.png",
         image:
-          "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6abb8bcb37b7863496fa8024_cfo-img-1.png",
+          "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6ad0c097a38114b75867f1b4_chart-1.png",
         caption:
           "Builds the CFO presentation from your data, in the format and narrative the tax team controls.",
       },
       {
         title: "Tax Governance Agent",
         claim: "An objective read on where you stand, not a self-assessment",
+        query: "Run objective six-dimension governance audit across entities",
         icon: "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6abb821559914c7b687369a7_ai-icon2.png",
         image:
-          "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6abb8bd037b7863496fa83dd_cfo-img-2.png",
+          "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6ad0c09e440668f84e79a408_chart-2.png",
         caption:
           "Scores six dimensions: reconciliation health, ITC quality, notice exposure, invoice rejection rates, Table-4 accuracy and vendor compliance, with independent commentary on each, benchmarked against industry peers",
       },
@@ -86,15 +98,17 @@ const groups: Group[] = [
         title: "Audit and Advisory Agent",
         claim:
           "The monthly CA audit, on every entity, without adding headcount",
+        query: "Map GL balances and calculate independent tax position",
         icon: "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6abb82364712c77d3ad13d11_ai-icon-3.png",
         image:
-          "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6abb8bd5423fbc957ec8a099_cfo-img-3.png",
+          "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6ad0c0a5231ffb954300911c_chart-3.png",
         caption:
           "Maps your GL, assess completeness, calculate an independent position and compare it to what you filed. Maps findings to known notice patterns to score risk.",
       },
       {
         title: "Notice Dashboard Agent",
         claim: "Notice tracking through your lens, not a generic dashboard",
+        query: "Track active notices and evaluate exposure by entity",
         icon: "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6abb823b7c5a09e10a549d4f_ai-icon-4.png",
         image:
           "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6abb8bdb157c8e2396245bf6_cfo-img-4.png",
@@ -114,6 +128,7 @@ const groups: Group[] = [
           "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6abb8be23cd35f1e1e3b6992_tax-img-1.png",
         claim:
           "Every notice type answered with the transactions behind it, inside the deadline",
+        query: "Draft notice response with line-item transaction trail",
         caption:
           "Drafts from the actual records: invoice, line item, date, counterparty, GSTIN and the rule in force on that date. At-scale reconciliation, case law from verified databases.",
       },
@@ -123,6 +138,7 @@ const groups: Group[] = [
         image:
           "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6abb8be8075549fbc8a369dd_tax-img-2.png",
         claim: "The bottleneck is data preparation, not filing",
+        query: "Prepare complete refund dossier and justification trail",
         caption:
           "Reads your specific scenario, whether inverted duty, excess payment or unutilised balance, and prepares a complete dossier: refund quantum, supporting data and justification trail.",
       },
@@ -132,6 +148,7 @@ const groups: Group[] = [
         image:
           "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6abb8bee4712c77d3ad7d684_tax-img-3.png",
         claim: "Section 16(2)(b), computed per document",
+        query: "Calculate Section 16(2)(b) reversals and eligible reclaims",
         caption:
           "Takes your Table-4 data and open payments report from SAP or your ERP, identifies documents needing reversal, eligible for reclaim and falling due next month, and calculates reversal and interest per document",
       },
@@ -141,6 +158,7 @@ const groups: Group[] = [
         image:
           "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6abb8c0075a4841598156ed1_tax-img-4.png",
         claim: "Codify your transformation logic once, then it runs itself",
+        query: "Generate automated ERP writeback transformations",
         caption:
           "Learns the transformation once from your writebacks and a sample ingestion file. Your team approves the logic; from then on it applies automatically every month.",
       },
@@ -150,6 +168,7 @@ const groups: Group[] = [
         image:
           "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6abb8c093cd35f1e1e3b8454_tax-img-5.png",
         claim: "A prioritised review queue instead of a line-by-line scan",
+        query: "Triage ledger codes for RCM and ITC eligibility",
         caption:
           "Auto-triages every line item using ledger codes, vendor master data and transaction commentary, assigning High or Medium confidence for RCM applicability and ITC ineligibility.",
       },
@@ -159,6 +178,7 @@ const groups: Group[] = [
         image:
           "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6abb8c0f33617fb4f7f711b4_tax-img-6.png",
         claim: "Catches unmatched advances before they become a penalty",
+        query: "Match advances with invoices to prevent compliance penalties",
         caption:
           "Tracks advances and matches them against invoices received, flags gaps before they become compliance issues, and generates the adjustment recommendations.",
       },
@@ -171,7 +191,11 @@ const groups: Group[] = [
    by both the grid and the overlay. Panels render from `panels`, the overlay
    from `flat`, and the two agree by construction. */
 const flat = groups.flatMap((group) =>
-  group.cards.map((card) => ({ card, group: group.id })),
+  group.cards.map((card) => ({
+    card,
+    group: group.id,
+    layout: card.layout ?? 1,
+  })),
 );
 
 let seq = 0;
@@ -355,140 +379,1716 @@ const panels = groups.map((group) => ({
       </svg>
     </button>
 
-    <div class="flex flex-col items-start gap-6 lg:flex-row lg:gap-12">
-      <!-- 416px = 1280 panel − 48 padding − 48 gap − the 768px the 16:9 visual
-           takes at the design's 432px height. justify-between is what puts the
-           caption and the chevrons on the visual's bottom edge. -->
-      <div
-        class="flex w-full flex-col justify-between gap-6 lg:w-[416px] lg:shrink-0 lg:self-stretch"
-      >
-        <div class="flex flex-col gap-6">
-          <div id="ih-maiw-overlay-title">
-            {
-              flat.map(({ card, group }, i) => (
-                <div
-                  hidden={i !== 0}
-                  data-ih-maiw-head
-                  data-ih-maiw-group={group}
-                >
-                  <div class="mb-6">
-                    {card.icon ? (
-                      <img
-                        src={card.icon}
-                        alt=""
-                        class="h-16 w-16 rounded-lg object-contain"
-                        loading="lazy"
-                        decoding="async"
-                      />
-                    ) : (
-                      <span
-                        class="block h-16 w-16 rounded-lg bg-visual-placeholder"
-                        aria-hidden="true"
-                      />
-                    )}
+    <!-- Overlay Cards: Each index has its own layout condition (i === 0 ? ... : i === 1 ? ...), exactly like WhyGenericAi -->
+    <div class="ih-maiw-overlay-cards-container w-full">
+      {
+        flat.map(({ card, group }, i) => (
+          <div
+            class={`ih-maiw-overlay-card ih-maiw-overlay-card-${i} w-full`}
+            data-ih-maiw-overlay-card
+            data-ih-maiw-index={i}
+            data-ih-maiw-group={group}
+            hidden={i !== 0}
+          >
+            {i === 0 ? (
+              <!-- ============================================================
+                   INDEX 0: CFO Dashboard Agent
+                   Customize this layout specifically for Card 0
+                   ============================================================ -->
+              <div class="ih-maiw-content ih-maiw-layout-0 flex flex-col items-start gap-6 lg:flex-row lg:gap-12">
+                <!-- Text Column (Left) -->
+                <div class="flex w-full flex-col justify-between gap-6 lg:w-[416px] lg:shrink-0 lg:self-stretch">
+                  <div class="flex flex-col gap-6">
+                    <div>
+                      <div class="mb-6">
+                        {card.icon ? (
+                          <img
+                            src={card.icon}
+                            alt=""
+                            class="h-16 w-16 rounded-lg object-contain"
+                            loading="lazy"
+                            decoding="async"
+                          />
+                        ) : (
+                          <span
+                            class="block h-16 w-16 rounded-lg bg-visual-placeholder"
+                            aria-hidden="true"
+                          />
+                        )}
+                      </div>
+                      <h3 class="m-0 mb-2 pr-12 font-heading font-medium text-vault-navy text-[length:var(--fs-h5)] leading-[length:var(--lh-h5)] tracking-[-0.5px] lg:pr-0">
+                        {card.title}
+                      </h3>
+                      <p class="m-0 font-body font-medium text-nova-blue text-[length:var(--fs-body)] leading-[length:var(--lh-body)]">
+                        {card.claim}
+                      </p>
+                    </div>
                   </div>
-                  <h3 class="m-0 mb-2 pr-12 font-heading font-medium text-vault-navy text-[length:var(--fs-h5)] leading-[length:var(--lh-h5)] tracking-[-0.5px] lg:pr-0">
-                    {card.title}
-                  </h3>
-                  <p class="m-0 font-body font-medium text-nova-blue text-[length:var(--fs-body)] leading-[length:var(--lh-body)]">
-                    {card.claim}
-                  </p>
+
+                  <div class="flex flex-col gap-6">
+                    <p class="m-0 font-body font-normal text-neutral-500 text-[length:var(--fs-body)] leading-[length:var(--lh-body)]">
+                      {card.caption}
+                    </p>
+
+                    <div class="flex items-center gap-2">
+                      <button
+                        type="button"
+                        aria-label="Previous"
+                        class="inline-flex cursor-pointer items-center justify-center rounded border border-neutral-300 bg-generic-00 p-2 text-vault-navy transition-colors duration-150 hover:border-nova-blue"
+                        data-ih-maiw-prev
+                      >
+                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true" focusable="false">
+                          <path d="M12 15L7 10L12 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                        </svg>
+                      </button>
+                      <button
+                        type="button"
+                        aria-label="Next"
+                        class="inline-flex cursor-pointer items-center justify-center rounded border border-neutral-300 bg-generic-00 p-2 text-vault-navy transition-colors duration-150 hover:border-nova-blue"
+                        data-ih-maiw-next
+                      >
+                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true" focusable="false">
+                          <path d="M7 5L12 10L7 15" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                        </svg>
+                      </button>
+                    </div>
+                  </div>
                 </div>
-              ))
-            }
-          </div>
-        </div>
 
-        <div class="flex flex-col gap-6">
-          <div>
-            {
-              flat.map(({ card }, i) => (
-                <p
-                  class="m-0 font-body font-normal text-neutral-500 text-[length:var(--fs-body)] leading-[length:var(--lh-body)]"
-                  hidden={i !== 0}
-                  data-ih-maiw-body
+                <!-- Stage / Visual Column (Right) -->
+                <div
+                  class="ih-maiw-stage-wrap relative flex w-full flex-col bg-generic-00 justify-between overflow-hidden rounded-xl border border-[#111827] p-3.5 sm:p-4 md:p-5 aspect-[1280/720] min-h-[320px] md:min-h-[420px] select-none bg-cover bg-center bg-no-repeat lg:w-auto lg:flex-1 cursor-pointer"
+                  style="background-image:url('https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6ab399f1e2c6a1e38c91700f_dots-bg.png');"
+                  title="Click to skip animation"
                 >
-                  {card.caption}
-                </p>
-              ))
-            }
-          </div>
+                  <!-- Ambient Center Glow for Frame 1 -->
+                  <div
+                    class="ih-maiw-glow pointer-events-none absolute inset-0 z-0 opacity-100"
+                    style="background: radial-gradient(ellipse 65% 50% at 50% 50%, rgba(212, 248, 66, 0.22) 0%, rgba(212, 248, 66, 0) 70%);"
+                  ></div>
 
-          <div class="flex items-center gap-2">
-            <button
-              type="button"
-              aria-label="Previous"
-              aria-controls="ih-maiw-overlay-title"
-              class="inline-flex cursor-pointer items-center justify-center rounded border border-neutral-300 bg-generic-00 p-2 text-vault-navy transition-colors duration-150 hover:border-nova-blue"
-              data-ih-maiw-prev
-            >
-              <svg
-                width="20"
-                height="20"
-                viewBox="0 0 20 20"
-                fill="none"
-                aria-hidden="true"
-                focusable="false"
-              >
-                <path
-                  d="M12 15L7 10L12 5"
-                  stroke="currentColor"
-                  stroke-width="1.5"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"></path>
-              </svg>
-            </button>
-            <button
-              type="button"
-              aria-label="Next"
-              aria-controls="ih-maiw-overlay-title"
-              class="inline-flex cursor-pointer items-center justify-center rounded border border-neutral-300 bg-generic-00 p-2 text-vault-navy transition-colors duration-150 hover:border-nova-blue"
-              data-ih-maiw-next
-            >
-              <svg
-                width="20"
-                height="20"
-                viewBox="0 0 20 20"
-                fill="none"
-                aria-hidden="true"
-                focusable="false"
-              >
-                <path
-                  d="M7 5L12 10L7 15"
-                  stroke="currentColor"
-                  stroke-width="1.5"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"></path>
-              </svg>
-            </button>
-          </div>
-        </div>
-      </div>
+                  <!-- Ambient Bottom Glow behind Input Pill (softer intensity) -->
+                  <div
+                    class="ih-maiw-glow-bottom pointer-events-none absolute inset-x-0 bottom-3 h-50 z-0 opacity-0"
+                    style="background: radial-gradient(ellipse 75% 65% at 50% 92%, rgba(212, 248, 66, 0.14) 0%, rgba(212, 248, 66, 0) 70%);"
+                  ></div>
 
-      <div
-        class="aspect-[1280/720] w-full overflow-hidden rounded-lg lg:w-auto lg:flex-1"
-      >
-        {
-          flat.map(({ card }, i) => (
-            <img
-              src={card.image}
-              alt={card.title}
-              hidden={i !== 0}
-              data-ih-maiw-image
-              class="h-full w-full rounded-lg object-contain"
-              loading="lazy"
-              decoding="async"
-            />
-          ))
-        }
-      </div>
+                  <!-- Frame 1: Center Heading -->
+                  <div
+                    class="ih-maiw-center-title pointer-events-none absolute inset-x-0 top-[26%] z-10 flex flex-col items-center justify-center text-center opacity-100 px-4"
+                  >
+                    <h3
+                      class="m-0 font-heading font-medium text-vault-navy text-base md:text-[length:var(--fs-h6)] leading-[length:var(--lh-h6)]"
+                    >
+                      What would you like to review?
+                    </h3>
+                  </div>
+
+                  <!-- Top Stage Area: Frame 3 & 4 Chat Bubble -->
+                  <div
+                    class="ih-maiw-top-stage relative z-10 w-full shrink-0 min-h-[42px] flex items-start"
+                  >
+                    <div
+                      class="ih-maiw-bubble hidden absolute right-0 top-0 self-end max-w-fit rounded-2xl border border-dashed border-[#11182726] bg-[#EDEDED] px-3 py-1.5 md:px-4 md:py-2.5 opacity-0 pointer-events-none"
+                    >
+                      <p
+                        class="ih-maiw-bubble-text m-0 font-body text-xs md:text-sm lg:text-base font-normal leading-[1.35] md:leading-[1.4] text-[#111827]"
+                      >
+                        {card.query || "Board meeting next month. Any compliance risk likely before then?"}
+                      </p>
+                    </div>
+                  </div>
+
+                  <!-- Middle Stage Area: Frame 3 Skeleton, Frame 4 Process Checklist, Frame 5 Chart -->
+                  <div
+                    class="ih-maiw-middle-stage relative z-10 w-full min-h-0 flex-1 flex flex-col items-start justify-start py-1"
+                  >
+                    <!-- Frame 3: Skeleton shimmer bars -->
+                    <div
+                      class="ih-maiw-skeleton hidden absolute inset-x-0 top-0 mt-4 md:mt-8 flex flex-col justify-start gap-3 opacity-0 pointer-events-none"
+                    >
+                      <div class="flex items-center gap-3 animate-pulse">
+                        <div class="h-3 w-6/12 rounded-full bg-[#E5E7EB]"></div>
+                        <div class="h-3 w-4/12 rounded-full bg-[#E5E7EB]"></div>
+                      </div>
+                      <div class="flex items-center gap-3 animate-pulse">
+                        <div class="h-3 w-3/12 rounded-full bg-[#E5E7EB]"></div>
+                        <div class="h-3 w-5/12 rounded-full bg-[#E5E7EB]"></div>
+                      </div>
+                    </div>
+
+                    <!-- Frame 4: Process Checklist grid -->
+                    <div
+                      class="ih-maiw-checklist hidden absolute inset-x-0 top-0 mt-4 md:mt-8 flex items-start justify-start opacity-0 pointer-events-none"
+                    >
+                      <div
+                        class="grid w-full grid-cols-2 gap-x-3.5 sm:gap-x-4 md:gap-x-6 xl:w-fit xl:grid-cols-[max-content_max-content] xl:gap-x-7 gap-y-2 md:gap-y-2.5"
+                      >
+                        <div class="ih-maiw-check-item flex items-start xl:items-center gap-1 sm:gap-1.5 xl:gap-2 min-w-0 opacity-0">
+                          <svg class="shrink-0 mt-0.5 xl:mt-0" width="10" height="12" viewBox="0 0 10 12" fill="none"><path d="M8.76315 10.9508H0.887604C0.771563 10.9508 0.660276 10.9047 0.578223 10.8227C0.49617 10.7406 0.450073 10.6293 0.450073 10.5133V0.887604C0.450073 0.771563 0.49617 0.660276 0.578223 0.578223C0.660276 0.49617 0.771563 0.450073 0.887604 0.450073H6.13797L9.20068 3.51279V10.5133C9.20068 10.6293 9.15459 10.7406 9.07253 10.8227C8.99048 10.9047 8.87919 10.9508 8.76315 10.9508Z" stroke="black" stroke-width="0.900063" stroke-linecap="round" stroke-linejoin="round"></path><path d="M6.13757 0.450073V3.51279H9.20029" stroke="black" stroke-width="0.900063" stroke-linecap="round" stroke-linejoin="round"></path><path d="M4.60655 8.32565C5.4523 8.32565 6.13791 7.64004 6.13791 6.7943C6.13791 5.94855 5.4523 5.26294 4.60655 5.26294C3.76081 5.26294 3.0752 5.94855 3.0752 6.7943C3.0752 7.64004 3.76081 8.32565 4.60655 8.32565Z" stroke="#5446FF" stroke-width="0.900063" stroke-linecap="round" stroke-linejoin="round"></path><path d="M5.68835 7.87708L6.57435 8.76307" stroke="#5446FF" stroke-width="0.900063" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+                          <span class="text-[8px] md:text-[10px] xl:text-xs font-normal text-[#111827] underline underline-offset-2 leading-tight break-words">Aggregating GL balances</span>
+                        </div>
+                        <div class="ih-maiw-check-item flex items-start xl:items-center gap-1 sm:gap-1.5 xl:gap-2 min-w-0 opacity-0">
+                          <svg class="shrink-0 mt-0.5 xl:mt-0" width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M7.37441 4.77747H4.77808V7.3738H7.37441V4.77747Z" stroke="#5446FF" stroke-width="0.900063" stroke-linecap="round" stroke-linejoin="round"></path><path d="M9.9705 1.74817H2.1815C1.94252 1.74817 1.74878 1.94191 1.74878 2.18089V9.96989C1.74878 10.2089 1.94252 10.4026 2.1815 10.4026H9.9705C10.2095 10.4026 10.4032 10.2089 10.4032 9.96989V2.18089C10.4032 1.94191 10.2095 1.74817 9.9705 1.74817Z" stroke="black" stroke-width="0.900063" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+                          <span class="text-[8px] md:text-[10px] xl:text-xs font-normal text-[#111827] underline underline-offset-2 leading-tight break-words">Computing variance per entity</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- Frame 5: Final Chart Image -->
+                    <div
+                      class="ih-maiw-chart hidden absolute inset-0 flex items-center justify-center opacity-0 pointer-events-none"
+                    >
+                      {card.image && (
+                        <img
+                          src={card.image}
+                          alt={card.title}
+                          class="w-full h-auto max-h-[88%] md:max-h-[92%] object-contain rounded-lg block"
+                          loading="lazy"
+                          decoding="async"
+                        />
+                      )}
+                    </div>
+                  </div>
+
+                  <!-- Bottom Stage Area: Animated Input Pill -->
+                  <div
+                    class="ih-maiw-input-container relative z-20 flex w-full shrink-0 items-center justify-center"
+                  >
+                    <div
+                      class="ih-maiw-input-pill relative flex w-full items-center gap-2 rounded-full border border-[#A6C705]/40 bg-generic-00 pl-3.5 pr-2 py-2.5 md:py-3 shadow-xs"
+                    >
+                      <!-- Animated border SVG -->
+                      <svg
+                        class="ih-maiw-pill-border pointer-events-none absolute inset-0 h-full w-full overflow-visible"
+                        aria-hidden="true"
+                      >
+                        <defs>
+                          <linearGradient
+                            id="ih-maiw-pill-border-grad"
+                            x1="0%"
+                            y1="0%"
+                            x2="100%"
+                            y2="0%"
+                            gradientUnits="objectBoundingBox"
+                          >
+                            <stop offset="0%" stop-color="#A6C705" stop-opacity="0.1"></stop>
+                            <stop offset="25%" stop-color="#A6C705" stop-opacity="0.5"></stop>
+                            <stop offset="50%" stop-color="#A6C705" stop-opacity="1"></stop>
+                            <stop offset="100%" stop-color="#A6C705" stop-opacity="1"></stop>
+                          </linearGradient>
+                        </defs>
+                        <path
+                          class="ih-maiw-pill-border-path"
+                          fill="none"
+                          stroke="url(#ih-maiw-pill-border-grad)"
+                          stroke-width="2"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          style="opacity: 0;"
+                        ></path>
+                      </svg>
+
+                      <svg
+                        class="shrink-0 text-vault-navy"
+                        width="18"
+                        height="18"
+                        viewBox="0 0 18 18"
+                        fill="none"
+                        xmlns="http://www.w3.org/2000/svg"
+                        aria-hidden="true"
+                      >
+                        <path
+                          d="M0.800003 8.80005H16.8"
+                          stroke="currentColor"
+                          stroke-width="1.6"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                        ></path>
+                        <path
+                          d="M8.8 0.800049V16.8"
+                          stroke="currentColor"
+                          stroke-width="1.6"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                        ></path>
+                      </svg>
+
+                      <!-- Dynamic pill text container -->
+                      <div
+                        class="min-w-0 flex-1 relative h-6 flex items-center overflow-hidden"
+                      >
+                        <span
+                          class="ih-maiw-pill-placeholder absolute inset-y-0 left-0 flex items-center font-body text-xs md:text-sm lg:text-[length:var(--fs-body)] text-neutral-400 pointer-events-none"
+                        >
+                          Ask anything...
+                        </span>
+                        <span
+                          class="ih-maiw-pill-typed hidden absolute inset-y-0 left-0 right-0 flex items-center font-body text-sm md:text-sm lg:text-[length:var(--fs-body)] text-vault-navy opacity-0 pointer-events-none font-medium tracking-tight"
+                        >
+                          <span class="ih-maiw-pill-typed-text truncate block w-full"
+                            >{card.query || "Generate monthly CFO summary and variance analysis"}</span
+                          >
+                        </span>
+                        <span
+                          class="ih-maiw-pill-thinking absolute inset-y-0 left-0 flex items-center gap-1.5 font-body text-xs md:text-sm lg:text-[length:var(--fs-body)] text-neutral-500 opacity-0 pointer-events-none font-medium"
+                        >
+                          <span>Thinking</span>
+                          <span class="inline-flex items-center gap-0.5 ml-0.5">
+                            <span class="inline-block h-1 w-1 rounded-full bg-neutral-400 animate-bounce" style="animation-delay: 0ms;"></span>
+                            <span class="inline-block h-1 w-1 rounded-full bg-neutral-400 animate-bounce" style="animation-delay: 150ms;"></span>
+                            <span class="inline-block h-1 w-1 rounded-full bg-neutral-400 animate-bounce" style="animation-delay: 300ms;"></span>
+                          </span>
+                        </span>
+                      </div>
+
+                      <button
+                        type="button"
+                        aria-label="Submit prompt"
+                        class="ih-maiw-submit-btn flex h-8 w-8 shrink-0 cursor-pointer items-center justify-center rounded-full border-0 bg-nova-blue"
+                      >
+                        <svg
+                          width="11"
+                          height="14"
+                          viewBox="0 0 11 14"
+                          fill="none"
+                          xmlns="http://www.w3.org/2000/svg"
+                          aria-hidden="true"
+                        >
+                          <path
+                            d="M5.22425 0.600025L5.22426 13.4M0.424255 5.40002L5.22425 0.600025L10.0243 5.40002"
+                            stroke="white"
+                            stroke-width="1.2"
+                            stroke-linejoin="round"
+                          ></path>
+                        </svg>
+                      </button>
+                    </div>
+                  </div>
+
+                  <!-- Virtual Mouse Cursor Pointer -->
+                  <div
+                    class="ih-maiw-cursor pointer-events-none absolute z-30 opacity-0 top-0 left-0"
+                  >
+                    <img
+                      src="https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6ab26584bc5572adf499e114_marker.png"
+                      alt=""
+                      width="24"
+                      height="24"
+                      loading="lazy"
+                      decoding="async"
+                      class="w-6 h-6 object-contain"
+                    />
+                  </div>
+                </div>
+              </div>
+            ) : i === 1 ? (
+              <!-- ============================================================
+                   INDEX 1: Tax Governance Agent
+                   Customize this layout specifically for Card 1
+                   ============================================================ -->
+              <div class="ih-maiw-content ih-maiw-layout-1 flex flex-col items-start gap-6 lg:flex-row lg:gap-12">
+                <div class="flex w-full flex-col justify-between gap-6 lg:w-[416px] lg:shrink-0 lg:self-stretch">
+                  <div class="flex flex-col gap-6">
+                    <div>
+                      <div class="mb-6">
+                        {card.icon ? (
+                          <img src={card.icon} alt="" class="h-16 w-16 rounded-lg object-contain" loading="lazy" decoding="async" />
+                        ) : (
+                          <span class="block h-16 w-16 rounded-lg bg-visual-placeholder" aria-hidden="true" />
+                        )}
+                      </div>
+                      <h3 class="m-0 mb-2 pr-12 font-heading font-medium text-vault-navy text-[length:var(--fs-h5)] leading-[length:var(--lh-h5)] tracking-[-0.5px] lg:pr-0">
+                        {card.title}
+                      </h3>
+                      <p class="m-0 font-body font-medium text-nova-blue text-[length:var(--fs-body)] leading-[length:var(--lh-body)]">
+                        {card.claim}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div class="flex flex-col gap-6">
+                    <p class="m-0 font-body font-normal text-neutral-500 text-[length:var(--fs-body)] leading-[length:var(--lh-body)]">
+                      {card.caption}
+                    </p>
+
+                    <div class="flex items-center gap-2">
+                      <button type="button" aria-label="Previous" class="inline-flex cursor-pointer items-center justify-center rounded border border-neutral-300 bg-generic-00 p-2 text-vault-navy transition-colors duration-150 hover:border-nova-blue" data-ih-maiw-prev>
+                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true" focusable="false"><path d="M12 15L7 10L12 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" /></svg>
+                      </button>
+                      <button type="button" aria-label="Next" class="inline-flex cursor-pointer items-center justify-center rounded border border-neutral-300 bg-generic-00 p-2 text-vault-navy transition-colors duration-150 hover:border-nova-blue" data-ih-maiw-next>
+                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true" focusable="false"><path d="M7 5L12 10L7 15" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" /></svg>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Stage / Visual Column (Right) -->
+                <div
+                  class="ih-maiw-stage-wrap relative flex w-full flex-col bg-generic-00 justify-between overflow-hidden rounded-xl border border-[#111827] p-3.5 sm:p-4 md:p-5 aspect-[1280/720] min-h-[320px] md:min-h-[420px] select-none bg-cover bg-center bg-no-repeat lg:w-auto lg:flex-1 cursor-pointer"
+                  style="background-image:url('https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6ab399f1e2c6a1e38c91700f_dots-bg.png');"
+                  title="Click to skip animation"
+                >
+                  <div
+                    class="ih-maiw-glow pointer-events-none absolute inset-0 z-0 opacity-100"
+                    style="background: radial-gradient(ellipse 65% 50% at 50% 50%, rgba(212, 248, 66, 0.22) 0%, rgba(212, 248, 66, 0) 70%);"
+                  ></div>
+                  <div
+                    class="ih-maiw-glow-bottom pointer-events-none absolute inset-x-0 bottom-3 h-50 z-0 opacity-0"
+                    style="background: radial-gradient(ellipse 75% 65% at 50% 92%, rgba(212, 248, 66, 0.14) 0%, rgba(212, 248, 66, 0) 70%);"
+                  ></div>
+
+                  <div class="ih-maiw-center-title pointer-events-none absolute inset-x-0 top-[26%] z-10 flex flex-col items-center justify-center text-center opacity-100 px-4">
+                    <h3 class="m-0 font-heading font-medium text-vault-navy text-base md:text-[length:var(--fs-h6)] leading-[length:var(--lh-h6)]">
+                      What would you like to review?
+                    </h3>
+                  </div>
+
+                  <div class="ih-maiw-top-stage relative z-10 w-full shrink-0 min-h-[42px] flex items-start">
+                    <div class="ih-maiw-bubble hidden absolute right-0 top-0 self-end max-w-fit rounded-2xl border border-dashed border-[#11182726] bg-[#EDEDED] px-3 py-1.5 md:px-4 md:py-2.5 opacity-0 pointer-events-none">
+                      <p class="ih-maiw-bubble-text m-0 font-body text-xs md:text-sm lg:text-base font-normal leading-[1.35] md:leading-[1.4] text-[#111827]">
+                        {card.query || card.claim}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div class="ih-maiw-middle-stage relative z-10 w-full min-h-0 flex-1 flex flex-col items-start justify-start py-1">
+                    <div class="ih-maiw-skeleton hidden absolute inset-x-0 top-0 mt-4 md:mt-8 flex flex-col justify-start gap-3 opacity-0 pointer-events-none">
+                      <div class="flex items-center gap-3 animate-pulse">
+                        <div class="h-3 w-6/12 rounded-full bg-[#E5E7EB]"></div>
+                        <div class="h-3 w-4/12 rounded-full bg-[#E5E7EB]"></div>
+                      </div>
+                      <div class="flex items-center gap-3 animate-pulse">
+                        <div class="h-3 w-3/12 rounded-full bg-[#E5E7EB]"></div>
+                        <div class="h-3 w-5/12 rounded-full bg-[#E5E7EB]"></div>
+                      </div>
+                    </div>
+
+                    <div class="ih-maiw-checklist hidden absolute inset-x-0 top-0 mt-4 md:mt-8 flex items-start justify-start opacity-0 pointer-events-none">
+                      <div class="grid w-full grid-cols-2 gap-x-3.5 sm:gap-x-4 md:gap-x-6 xl:w-fit xl:grid-cols-[max-content_max-content] xl:gap-x-7 gap-y-2 md:gap-y-2.5">
+                        <div class="ih-maiw-check-item flex items-start xl:items-center gap-1 sm:gap-1.5 xl:gap-2 min-w-0 opacity-0">
+                          <svg class="shrink-0 mt-0.5 xl:mt-0" width="10" height="12" viewBox="0 0 10 12" fill="none"><path d="M8.76315 10.9508H0.887604C0.771563 10.9508 0.660276 10.9047 0.578223 10.8227C0.49617 10.7406 0.450073 10.6293 0.450073 10.5133V0.887604C0.450073 0.771563 0.49617 0.660276 0.578223 0.578223C0.660276 0.49617 0.771563 0.450073 0.887604 0.450073H6.13797L9.20068 3.51279V10.5133C9.20068 10.6293 9.15459 10.7406 9.07253 10.8227C8.99048 10.9047 8.87919 10.9508 8.76315 10.9508Z" stroke="black" stroke-width="0.900063" stroke-linecap="round" stroke-linejoin="round"></path><path d="M6.13757 0.450073V3.51279H9.20029" stroke="black" stroke-width="0.900063" stroke-linecap="round" stroke-linejoin="round"></path><path d="M4.60655 8.32565C5.4523 8.32565 6.13791 7.64004 6.13791 6.7943C6.13791 5.94855 5.4523 5.26294 4.60655 5.26294C3.76081 5.26294 3.0752 5.94855 3.0752 6.7943C3.0752 7.64004 3.76081 8.32565 4.60655 8.32565Z" stroke="#5446FF" stroke-width="0.900063" stroke-linecap="round" stroke-linejoin="round"></path><path d="M5.68835 7.87708L6.57435 8.76307" stroke="#5446FF" stroke-width="0.900063" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+                          <span class="text-[8px] md:text-[10px] xl:text-xs font-normal text-[#111827] underline underline-offset-2 leading-tight break-words">Auditing reconciliation health</span>
+                        </div>
+                        <div class="ih-maiw-check-item flex items-start xl:items-center gap-1 sm:gap-1.5 xl:gap-2 min-w-0 opacity-0">
+                          <svg class="shrink-0 mt-0.5 xl:mt-0" width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M7.37441 4.77747H4.77808V7.3738H7.37441V4.77747Z" stroke="#5446FF" stroke-width="0.900063" stroke-linecap="round" stroke-linejoin="round"></path><path d="M9.9705 1.74817H2.1815C1.94252 1.74817 1.74878 1.94191 1.74878 2.18089V9.96989C1.74878 10.2089 1.94252 10.4026 2.1815 10.4026H9.9705C10.2095 10.4026 10.4032 10.2089 10.4032 9.96989V2.18089C10.4032 1.94191 10.2095 1.74817 9.9705 1.74817Z" stroke="black" stroke-width="0.900063" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+                          <span class="text-[8px] md:text-[10px] xl:text-xs font-normal text-[#111827] underline underline-offset-2 leading-tight break-words">Benchmarking against industry peers</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div class="ih-maiw-chart hidden absolute inset-0 flex items-center justify-center opacity-0 pointer-events-none">
+                      {card.image && (
+                        <img
+                          src={card.image}
+                          alt={card.title}
+                          class="w-full h-auto max-h-[88%] md:max-h-[92%] object-contain rounded-lg block"
+                          loading="lazy"
+                          decoding="async"
+                        />
+                      )}
+                    </div>
+                  </div>
+
+                  <div class="ih-maiw-input-container relative z-20 flex w-full shrink-0 items-center justify-center">
+                    <div class="ih-maiw-input-pill relative flex w-full items-center gap-2 rounded-full border border-[#A6C705]/40 bg-generic-00 pl-3.5 pr-2 py-2.5 md:py-3 shadow-xs">
+                      <svg class="ih-maiw-pill-border pointer-events-none absolute inset-0 h-full w-full overflow-visible" aria-hidden="true">
+                        <defs>
+                          <linearGradient id={`ih-maiw-pill-border-grad-${i}`} x1="0%" y1="0%" x2="100%" y2="0%" gradientUnits="objectBoundingBox">
+                            <stop offset="0%" stop-color="#A6C705" stop-opacity="0.1"></stop>
+                            <stop offset="25%" stop-color="#A6C705" stop-opacity="0.5"></stop>
+                            <stop offset="50%" stop-color="#A6C705" stop-opacity="1"></stop>
+                            <stop offset="100%" stop-color="#A6C705" stop-opacity="1"></stop>
+                          </linearGradient>
+                        </defs>
+                        <path class="ih-maiw-pill-border-path" fill="none" stroke={`url(#ih-maiw-pill-border-grad-${i})`} stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="opacity: 0;"></path>
+                      </svg>
+                      <svg class="shrink-0 text-vault-navy" width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                        <path d="M0.800003 8.80005H16.8" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"></path>
+                        <path d="M8.8 0.800049V16.8" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"></path>
+                      </svg>
+                      <div class="min-w-0 flex-1 relative h-6 flex items-center overflow-hidden">
+                        <span class="ih-maiw-pill-placeholder absolute inset-y-0 left-0 flex items-center font-body text-xs md:text-sm lg:text-[length:var(--fs-body)] text-neutral-400 pointer-events-none">
+                          Ask anything...
+                        </span>
+                        <span class="ih-maiw-pill-typed hidden absolute inset-y-0 left-0 right-0 flex items-center font-body text-sm md:text-sm lg:text-[length:var(--fs-body)] text-vault-navy opacity-0 pointer-events-none font-medium tracking-tight">
+                          <span class="ih-maiw-pill-typed-text truncate block w-full">{card.query || card.claim}</span>
+                        </span>
+                        <span class="ih-maiw-pill-thinking absolute inset-y-0 left-0 flex items-center gap-1.5 font-body text-xs md:text-sm lg:text-[length:var(--fs-body)] text-neutral-500 opacity-0 pointer-events-none font-medium">
+                          <span>Thinking</span>
+                          <span class="inline-flex items-center gap-0.5 ml-0.5">
+                            <span class="inline-block h-1 w-1 rounded-full bg-neutral-400 animate-bounce" style="animation-delay: 0ms;"></span>
+                            <span class="inline-block h-1 w-1 rounded-full bg-neutral-400 animate-bounce" style="animation-delay: 150ms;"></span>
+                            <span class="inline-block h-1 w-1 rounded-full bg-neutral-400 animate-bounce" style="animation-delay: 300ms;"></span>
+                          </span>
+                        </span>
+                      </div>
+                      <button type="button" aria-label="Submit prompt" class="ih-maiw-submit-btn flex h-8 w-8 shrink-0 cursor-pointer items-center justify-center rounded-full border-0 bg-nova-blue">
+                        <svg width="11" height="14" viewBox="0 0 11 14" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                          <path d="M5.22425 0.600025L5.22426 13.4M0.424255 5.40002L5.22425 0.600025L10.0243 5.40002" stroke="white" stroke-width="1.2" stroke-linejoin="round"></path>
+                        </svg>
+                      </button>
+                    </div>
+                  </div>
+
+                  <div class="ih-maiw-cursor pointer-events-none absolute z-30 opacity-0 top-0 left-0">
+                    <img src="https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6ab26584bc5572adf499e114_marker.png" alt="" width="24" height="24" loading="lazy" decoding="async" class="w-6 h-6 object-contain" />
+                  </div>
+                </div>
+              </div>
+            ) : i === 2 ? (
+              <!-- ============================================================
+                   INDEX 2: Audit and Advisory Agent
+                   Customize this layout specifically for Card 2
+                   ============================================================ -->
+              <div class="ih-maiw-content ih-maiw-layout-2 flex flex-col items-start gap-6 lg:flex-row lg:gap-12">
+                <div class="flex w-full flex-col justify-between gap-6 lg:w-[416px] lg:shrink-0 lg:self-stretch">
+                  <div class="flex flex-col gap-6">
+                    <div>
+                      <div class="mb-6">
+                        {card.icon ? (
+                          <img src={card.icon} alt="" class="h-16 w-16 rounded-lg object-contain" loading="lazy" decoding="async" />
+                        ) : (
+                          <span class="block h-16 w-16 rounded-lg bg-visual-placeholder" aria-hidden="true" />
+                        )}
+                      </div>
+                      <h3 class="m-0 mb-2 pr-12 font-heading font-medium text-vault-navy text-[length:var(--fs-h5)] leading-[length:var(--lh-h5)] tracking-[-0.5px] lg:pr-0">
+                        {card.title}
+                      </h3>
+                      <p class="m-0 font-body font-medium text-nova-blue text-[length:var(--fs-body)] leading-[length:var(--lh-body)]">
+                        {card.claim}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div class="flex flex-col gap-6">
+                    <p class="m-0 font-body font-normal text-neutral-500 text-[length:var(--fs-body)] leading-[length:var(--lh-body)]">
+                      {card.caption}
+                    </p>
+
+                    <div class="flex items-center gap-2">
+                      <button type="button" aria-label="Previous" class="inline-flex cursor-pointer items-center justify-center rounded border border-neutral-300 bg-generic-00 p-2 text-vault-navy transition-colors duration-150 hover:border-nova-blue" data-ih-maiw-prev>
+                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true" focusable="false"><path d="M12 15L7 10L12 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" /></svg>
+                      </button>
+                      <button type="button" aria-label="Next" class="inline-flex cursor-pointer items-center justify-center rounded border border-neutral-300 bg-generic-00 p-2 text-vault-navy transition-colors duration-150 hover:border-nova-blue" data-ih-maiw-next>
+                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true" focusable="false"><path d="M7 5L12 10L7 15" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" /></svg>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Stage / Visual Column (Right) -->
+                <div
+                  class="ih-maiw-stage-wrap relative flex w-full flex-col bg-generic-00 justify-between overflow-hidden rounded-xl border border-[#111827] p-3.5 sm:p-4 md:p-5 aspect-[1280/720] min-h-[320px] md:min-h-[420px] select-none bg-cover bg-center bg-no-repeat lg:w-auto lg:flex-1 cursor-pointer"
+                  style="background-image:url('https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6ab399f1e2c6a1e38c91700f_dots-bg.png');"
+                  title="Click to skip animation"
+                >
+                  <div
+                    class="ih-maiw-glow pointer-events-none absolute inset-0 z-0 opacity-100"
+                    style="background: radial-gradient(ellipse 65% 50% at 50% 50%, rgba(212, 248, 66, 0.22) 0%, rgba(212, 248, 66, 0) 70%);"
+                  ></div>
+                  <div
+                    class="ih-maiw-glow-bottom pointer-events-none absolute inset-x-0 bottom-3 h-50 z-0 opacity-0"
+                    style="background: radial-gradient(ellipse 75% 65% at 50% 92%, rgba(212, 248, 66, 0.14) 0%, rgba(212, 248, 66, 0) 70%);"
+                  ></div>
+
+                  <div class="ih-maiw-center-title pointer-events-none absolute inset-x-0 top-[26%] z-10 flex flex-col items-center justify-center text-center opacity-100 px-4">
+                    <h3 class="m-0 font-heading font-medium text-vault-navy text-base md:text-[length:var(--fs-h6)] leading-[length:var(--lh-h6)]">
+                      What would you like to review?
+                    </h3>
+                  </div>
+
+                  <div class="ih-maiw-top-stage relative z-10 w-full shrink-0 min-h-[42px] flex items-start">
+                    <div class="ih-maiw-bubble hidden absolute right-0 top-0 self-end max-w-fit rounded-2xl border border-dashed border-[#11182726] bg-[#EDEDED] px-3 py-1.5 md:px-4 md:py-2.5 opacity-0 pointer-events-none">
+                      <p class="ih-maiw-bubble-text m-0 font-body text-xs md:text-sm lg:text-base font-normal leading-[1.35] md:leading-[1.4] text-[#111827]">
+                        {card.query || card.claim}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div class="ih-maiw-middle-stage relative z-10 w-full min-h-0 flex-1 flex flex-col items-start justify-start py-1">
+                    <div class="ih-maiw-skeleton hidden absolute inset-x-0 top-0 mt-4 md:mt-8 flex flex-col justify-start gap-3 opacity-0 pointer-events-none">
+                      <div class="flex items-center gap-3 animate-pulse">
+                        <div class="h-3 w-6/12 rounded-full bg-[#E5E7EB]"></div>
+                        <div class="h-3 w-4/12 rounded-full bg-[#E5E7EB]"></div>
+                      </div>
+                      <div class="flex items-center gap-3 animate-pulse">
+                        <div class="h-3 w-3/12 rounded-full bg-[#E5E7EB]"></div>
+                        <div class="h-3 w-5/12 rounded-full bg-[#E5E7EB]"></div>
+                      </div>
+                    </div>
+
+                    <div class="ih-maiw-checklist hidden absolute inset-x-0 top-0 mt-4 md:mt-8 flex items-start justify-start opacity-0 pointer-events-none">
+                      <div class="grid w-full grid-cols-2 gap-x-3.5 sm:gap-x-4 md:gap-x-6 xl:w-fit xl:grid-cols-[max-content_max-content] xl:gap-x-7 gap-y-2 md:gap-y-2.5">
+                        <div class="ih-maiw-check-item flex items-start xl:items-center gap-1 sm:gap-1.5 xl:gap-2 min-w-0 opacity-0">
+                          <svg class="shrink-0 mt-0.5 xl:mt-0" width="10" height="12" viewBox="0 0 10 12" fill="none"><path d="M8.76315 10.9508H0.887604C0.771563 10.9508 0.660276 10.9047 0.578223 10.8227C0.49617 10.7406 0.450073 10.6293 0.450073 10.5133V0.887604C0.450073 0.771563 0.49617 0.660276 0.578223 0.578223C0.660276 0.49617 0.771563 0.450073 0.887604 0.450073H6.13797L9.20068 3.51279V10.5133C9.20068 10.6293 9.15459 10.7406 9.07253 10.8227C8.99048 10.9047 8.87919 10.9508 8.76315 10.9508Z" stroke="black" stroke-width="0.900063" stroke-linecap="round" stroke-linejoin="round"></path><path d="M6.13757 0.450073V3.51279H9.20029" stroke="black" stroke-width="0.900063" stroke-linecap="round" stroke-linejoin="round"></path><path d="M4.60655 8.32565C5.4523 8.32565 6.13791 7.64004 6.13791 6.7943C6.13791 5.94855 5.4523 5.26294 4.60655 5.26294C3.76081 5.26294 3.0752 5.94855 3.0752 6.7943C3.0752 7.64004 3.76081 8.32565 4.60655 8.32565Z" stroke="#5446FF" stroke-width="0.900063" stroke-linecap="round" stroke-linejoin="round"></path><path d="M5.68835 7.87708L6.57435 8.76307" stroke="#5446FF" stroke-width="0.900063" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+                          <span class="text-[8px] md:text-[10px] xl:text-xs font-normal text-[#111827] underline underline-offset-2 leading-tight break-words">Mapping General Ledger accounts</span>
+                        </div>
+                        <div class="ih-maiw-check-item flex items-start xl:items-center gap-1 sm:gap-1.5 xl:gap-2 min-w-0 opacity-0">
+                          <svg class="shrink-0 mt-0.5 xl:mt-0" width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M7.37441 4.77747H4.77808V7.3738H7.37441V4.77747Z" stroke="#5446FF" stroke-width="0.900063" stroke-linecap="round" stroke-linejoin="round"></path><path d="M9.9705 1.74817H2.1815C1.94252 1.74817 1.74878 1.94191 1.74878 2.18089V9.96989C1.74878 10.2089 1.94252 10.4026 2.1815 10.4026H9.9705C10.2095 10.4026 10.4032 10.2089 10.4032 9.96989V2.18089C10.4032 1.94191 10.2095 1.74817 9.9705 1.74817Z" stroke="black" stroke-width="0.900063" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+                          <span class="text-[8px] md:text-[10px] xl:text-xs font-normal text-[#111827] underline underline-offset-2 leading-tight break-words">Scoring risk across entity filings</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div class="ih-maiw-chart hidden absolute inset-0 flex items-center justify-center opacity-0 pointer-events-none">
+                      {card.image && (
+                        <img
+                          src={card.image}
+                          alt={card.title}
+                          class="w-full h-auto max-h-[88%] md:max-h-[92%] object-contain rounded-lg block"
+                          loading="lazy"
+                          decoding="async"
+                        />
+                      )}
+                    </div>
+                  </div>
+
+                  <div class="ih-maiw-input-container relative z-20 flex w-full shrink-0 items-center justify-center">
+                    <div class="ih-maiw-input-pill relative flex w-full items-center gap-2 rounded-full border border-[#A6C705]/40 bg-generic-00 pl-3.5 pr-2 py-2.5 md:py-3 shadow-xs">
+                      <svg class="ih-maiw-pill-border pointer-events-none absolute inset-0 h-full w-full overflow-visible" aria-hidden="true">
+                        <defs>
+                          <linearGradient id={`ih-maiw-pill-border-grad-${i}`} x1="0%" y1="0%" x2="100%" y2="0%" gradientUnits="objectBoundingBox">
+                            <stop offset="0%" stop-color="#A6C705" stop-opacity="0.1"></stop>
+                            <stop offset="25%" stop-color="#A6C705" stop-opacity="0.5"></stop>
+                            <stop offset="50%" stop-color="#A6C705" stop-opacity="1"></stop>
+                            <stop offset="100%" stop-color="#A6C705" stop-opacity="1"></stop>
+                          </linearGradient>
+                        </defs>
+                        <path class="ih-maiw-pill-border-path" fill="none" stroke={`url(#ih-maiw-pill-border-grad-${i})`} stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="opacity: 0;"></path>
+                      </svg>
+                      <svg class="shrink-0 text-vault-navy" width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                        <path d="M0.800003 8.80005H16.8" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"></path>
+                        <path d="M8.8 0.800049V16.8" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"></path>
+                      </svg>
+                      <div class="min-w-0 flex-1 relative h-6 flex items-center overflow-hidden">
+                        <span class="ih-maiw-pill-placeholder absolute inset-y-0 left-0 flex items-center font-body text-xs md:text-sm lg:text-[length:var(--fs-body)] text-neutral-400 pointer-events-none">
+                          Ask anything...
+                        </span>
+                        <span class="ih-maiw-pill-typed hidden absolute inset-y-0 left-0 right-0 flex items-center font-body text-sm md:text-sm lg:text-[length:var(--fs-body)] text-vault-navy opacity-0 pointer-events-none font-medium tracking-tight">
+                          <span class="ih-maiw-pill-typed-text truncate block w-full">{card.query || card.claim}</span>
+                        </span>
+                        <span class="ih-maiw-pill-thinking absolute inset-y-0 left-0 flex items-center gap-1.5 font-body text-xs md:text-sm lg:text-[length:var(--fs-body)] text-neutral-500 opacity-0 pointer-events-none font-medium">
+                          <span>Thinking</span>
+                          <span class="inline-flex items-center gap-0.5 ml-0.5">
+                            <span class="inline-block h-1 w-1 rounded-full bg-neutral-400 animate-bounce" style="animation-delay: 0ms;"></span>
+                            <span class="inline-block h-1 w-1 rounded-full bg-neutral-400 animate-bounce" style="animation-delay: 150ms;"></span>
+                            <span class="inline-block h-1 w-1 rounded-full bg-neutral-400 animate-bounce" style="animation-delay: 300ms;"></span>
+                          </span>
+                        </span>
+                      </div>
+                      <button type="button" aria-label="Submit prompt" class="ih-maiw-submit-btn flex h-8 w-8 shrink-0 cursor-pointer items-center justify-center rounded-full border-0 bg-nova-blue">
+                        <svg width="11" height="14" viewBox="0 0 11 14" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                          <path d="M5.22425 0.600025L5.22426 13.4M0.424255 5.40002L5.22425 0.600025L10.0243 5.40002" stroke="white" stroke-width="1.2" stroke-linejoin="round"></path>
+                        </svg>
+                      </button>
+                    </div>
+                  </div>
+
+                  <div class="ih-maiw-cursor pointer-events-none absolute z-30 opacity-0 top-0 left-0">
+                    <img src="https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6ab26584bc5572adf499e114_marker.png" alt="" width="24" height="24" loading="lazy" decoding="async" class="w-6 h-6 object-contain" />
+                  </div>
+                </div>
+              </div>
+            ) : i === 3 ? (
+              <!-- ============================================================
+                   INDEX 3: Notice Dashboard Agent
+                   Customize this layout specifically for Card 3
+                   ============================================================ -->
+              <div class="ih-maiw-content ih-maiw-layout-3 flex flex-col items-start gap-6 lg:flex-row lg:gap-12">
+                <div class="flex w-full flex-col justify-between gap-6 lg:w-[416px] lg:shrink-0 lg:self-stretch">
+                  <div class="flex flex-col gap-6">
+                    <div>
+                      <div class="mb-6">
+                        {card.icon ? (
+                          <img src={card.icon} alt="" class="h-16 w-16 rounded-lg object-contain" loading="lazy" decoding="async" />
+                        ) : (
+                          <span class="block h-16 w-16 rounded-lg bg-visual-placeholder" aria-hidden="true" />
+                        )}
+                      </div>
+                      <h3 class="m-0 mb-2 pr-12 font-heading font-medium text-vault-navy text-[length:var(--fs-h5)] leading-[length:var(--lh-h5)] tracking-[-0.5px] lg:pr-0">
+                        {card.title}
+                      </h3>
+                      <p class="m-0 font-body font-medium text-nova-blue text-[length:var(--fs-body)] leading-[length:var(--lh-body)]">
+                        {card.claim}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div class="flex flex-col gap-6">
+                    <p class="m-0 font-body font-normal text-neutral-500 text-[length:var(--fs-body)] leading-[length:var(--lh-body)]">
+                      {card.caption}
+                    </p>
+
+                    <div class="flex items-center gap-2">
+                      <button type="button" aria-label="Previous" class="inline-flex cursor-pointer items-center justify-center rounded border border-neutral-300 bg-generic-00 p-2 text-vault-navy transition-colors duration-150 hover:border-nova-blue" data-ih-maiw-prev>
+                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true" focusable="false"><path d="M12 15L7 10L12 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" /></svg>
+                      </button>
+                      <button type="button" aria-label="Next" class="inline-flex cursor-pointer items-center justify-center rounded border border-neutral-300 bg-generic-00 p-2 text-vault-navy transition-colors duration-150 hover:border-nova-blue" data-ih-maiw-next>
+                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true" focusable="false"><path d="M7 5L12 10L7 15" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" /></svg>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Stage / Visual Column (Right) -->
+                <div
+                  class="ih-maiw-stage-wrap relative flex w-full flex-col bg-generic-00 justify-between overflow-hidden rounded-xl border border-[#111827] p-3.5 sm:p-4 md:p-5 aspect-[1280/720] min-h-[320px] md:min-h-[420px] select-none bg-cover bg-center bg-no-repeat lg:w-auto lg:flex-1 cursor-pointer"
+                  style="background-image:url('https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6ab399f1e2c6a1e38c91700f_dots-bg.png');"
+                  title="Click to skip animation"
+                >
+                  <div
+                    class="ih-maiw-glow pointer-events-none absolute inset-0 z-0 opacity-100"
+                    style="background: radial-gradient(ellipse 65% 50% at 50% 50%, rgba(212, 248, 66, 0.22) 0%, rgba(212, 248, 66, 0) 70%);"
+                  ></div>
+                  <div
+                    class="ih-maiw-glow-bottom pointer-events-none absolute inset-x-0 bottom-3 h-50 z-0 opacity-0"
+                    style="background: radial-gradient(ellipse 75% 65% at 50% 92%, rgba(212, 248, 66, 0.14) 0%, rgba(212, 248, 66, 0) 70%);"
+                  ></div>
+
+                  <div class="ih-maiw-center-title pointer-events-none absolute inset-x-0 top-[26%] z-10 flex flex-col items-center justify-center text-center opacity-100 px-4">
+                    <h3 class="m-0 font-heading font-medium text-vault-navy text-base md:text-[length:var(--fs-h6)] leading-[length:var(--lh-h6)]">
+                      What would you like to review?
+                    </h3>
+                  </div>
+
+                  <div class="ih-maiw-top-stage relative z-10 w-full shrink-0 min-h-[42px] flex items-start">
+                    <div class="ih-maiw-bubble hidden absolute right-0 top-0 self-end max-w-fit rounded-2xl border border-dashed border-[#11182726] bg-[#EDEDED] px-3 py-1.5 md:px-4 md:py-2.5 opacity-0 pointer-events-none">
+                      <p class="ih-maiw-bubble-text m-0 font-body text-xs md:text-sm lg:text-base font-normal leading-[1.35] md:leading-[1.4] text-[#111827]">
+                        {card.query || card.claim}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div class="ih-maiw-middle-stage relative z-10 w-full min-h-0 flex-1 flex flex-col items-start justify-start py-1">
+                    <div class="ih-maiw-skeleton hidden absolute inset-x-0 top-0 mt-4 md:mt-8 flex flex-col justify-start gap-3 opacity-0 pointer-events-none">
+                      <div class="flex items-center gap-3 animate-pulse">
+                        <div class="h-3 w-6/12 rounded-full bg-[#E5E7EB]"></div>
+                        <div class="h-3 w-4/12 rounded-full bg-[#E5E7EB]"></div>
+                      </div>
+                      <div class="flex items-center gap-3 animate-pulse">
+                        <div class="h-3 w-3/12 rounded-full bg-[#E5E7EB]"></div>
+                        <div class="h-3 w-5/12 rounded-full bg-[#E5E7EB]"></div>
+                      </div>
+                    </div>
+
+                    <div class="ih-maiw-checklist hidden absolute inset-x-0 top-0 mt-4 md:mt-8 flex items-start justify-start opacity-0 pointer-events-none">
+                      <div class="grid w-full grid-cols-2 gap-x-3.5 sm:gap-x-4 md:gap-x-6 xl:w-fit xl:grid-cols-[max-content_max-content] xl:gap-x-7 gap-y-2 md:gap-y-2.5">
+                        <div class="ih-maiw-check-item flex items-start xl:items-center gap-1 sm:gap-1.5 xl:gap-2 min-w-0 opacity-0">
+                          <svg class="shrink-0 mt-0.5 xl:mt-0" width="10" height="12" viewBox="0 0 10 12" fill="none"><path d="M8.76315 10.9508H0.887604C0.771563 10.9508 0.660276 10.9047 0.578223 10.8227C0.49617 10.7406 0.450073 10.6293 0.450073 10.5133V0.887604C0.450073 0.771563 0.49617 0.660276 0.578223 0.578223C0.660276 0.49617 0.771563 0.450073 0.887604 0.450073H6.13797L9.20068 3.51279V10.5133C9.20068 10.6293 9.15459 10.7406 9.07253 10.8227C8.99048 10.9047 8.87919 10.9508 8.76315 10.9508Z" stroke="black" stroke-width="0.900063" stroke-linecap="round" stroke-linejoin="round"></path><path d="M6.13757 0.450073V3.51279H9.20029" stroke="black" stroke-width="0.900063" stroke-linecap="round" stroke-linejoin="round"></path><path d="M4.60655 8.32565C5.4523 8.32565 6.13791 7.64004 6.13791 6.7943C6.13791 5.94855 5.4523 5.26294 4.60655 5.26294C3.76081 5.26294 3.0752 5.94855 3.0752 6.7943C3.0752 7.64004 3.76081 8.32565 4.60655 8.32565Z" stroke="#5446FF" stroke-width="0.900063" stroke-linecap="round" stroke-linejoin="round"></path><path d="M5.68835 7.87708L6.57435 8.76307" stroke="#5446FF" stroke-width="0.900063" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+                          <span class="text-[8px] md:text-[10px] xl:text-xs font-normal text-[#111827] underline underline-offset-2 leading-tight break-words">Aggregating notice records</span>
+                        </div>
+                        <div class="ih-maiw-check-item flex items-start xl:items-center gap-1 sm:gap-1.5 xl:gap-2 min-w-0 opacity-0">
+                          <svg class="shrink-0 mt-0.5 xl:mt-0" width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M7.37441 4.77747H4.77808V7.3738H7.37441V4.77747Z" stroke="#5446FF" stroke-width="0.900063" stroke-linecap="round" stroke-linejoin="round"></path><path d="M9.9705 1.74817H2.1815C1.94252 1.74817 1.74878 1.94191 1.74878 2.18089V9.96989C1.74878 10.2089 1.94252 10.4026 2.1815 10.4026H9.9705C10.2095 10.4026 10.4032 10.2089 10.4032 9.96989V2.18089C10.4032 1.94191 10.2095 1.74817 9.9705 1.74817Z" stroke="black" stroke-width="0.900063" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+                          <span class="text-[8px] md:text-[10px] xl:text-xs font-normal text-[#111827] underline underline-offset-2 leading-tight break-words">Applying custom tracking rules</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div class="ih-maiw-chart hidden absolute inset-0 flex items-center justify-center opacity-0 pointer-events-none">
+                      {card.image && (
+                        <img
+                          src={card.image}
+                          alt={card.title}
+                          class="w-full h-auto max-h-[88%] md:max-h-[92%] object-contain rounded-lg block"
+                          loading="lazy"
+                          decoding="async"
+                        />
+                      )}
+                    </div>
+                  </div>
+
+                  <div class="ih-maiw-input-container relative z-20 flex w-full shrink-0 items-center justify-center">
+                    <div class="ih-maiw-input-pill relative flex w-full items-center gap-2 rounded-full border border-[#A6C705]/40 bg-generic-00 pl-3.5 pr-2 py-2.5 md:py-3 shadow-xs">
+                      <svg class="ih-maiw-pill-border pointer-events-none absolute inset-0 h-full w-full overflow-visible" aria-hidden="true">
+                        <defs>
+                          <linearGradient id={`ih-maiw-pill-border-grad-${i}`} x1="0%" y1="0%" x2="100%" y2="0%" gradientUnits="objectBoundingBox">
+                            <stop offset="0%" stop-color="#A6C705" stop-opacity="0.1"></stop>
+                            <stop offset="25%" stop-color="#A6C705" stop-opacity="0.5"></stop>
+                            <stop offset="50%" stop-color="#A6C705" stop-opacity="1"></stop>
+                            <stop offset="100%" stop-color="#A6C705" stop-opacity="1"></stop>
+                          </linearGradient>
+                        </defs>
+                        <path class="ih-maiw-pill-border-path" fill="none" stroke={`url(#ih-maiw-pill-border-grad-${i})`} stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="opacity: 0;"></path>
+                      </svg>
+                      <svg class="shrink-0 text-vault-navy" width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                        <path d="M0.800003 8.80005H16.8" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"></path>
+                        <path d="M8.8 0.800049V16.8" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"></path>
+                      </svg>
+                      <div class="min-w-0 flex-1 relative h-6 flex items-center overflow-hidden">
+                        <span class="ih-maiw-pill-placeholder absolute inset-y-0 left-0 flex items-center font-body text-xs md:text-sm lg:text-[length:var(--fs-body)] text-neutral-400 pointer-events-none">
+                          Ask anything...
+                        </span>
+                        <span class="ih-maiw-pill-typed hidden absolute inset-y-0 left-0 right-0 flex items-center font-body text-sm md:text-sm lg:text-[length:var(--fs-body)] text-vault-navy opacity-0 pointer-events-none font-medium tracking-tight">
+                          <span class="ih-maiw-pill-typed-text truncate block w-full">{card.query || card.claim}</span>
+                        </span>
+                        <span class="ih-maiw-pill-thinking absolute inset-y-0 left-0 flex items-center gap-1.5 font-body text-xs md:text-sm lg:text-[length:var(--fs-body)] text-neutral-500 opacity-0 pointer-events-none font-medium">
+                          <span>Thinking</span>
+                          <span class="inline-flex items-center gap-0.5 ml-0.5">
+                            <span class="inline-block h-1 w-1 rounded-full bg-neutral-400 animate-bounce" style="animation-delay: 0ms;"></span>
+                            <span class="inline-block h-1 w-1 rounded-full bg-neutral-400 animate-bounce" style="animation-delay: 150ms;"></span>
+                            <span class="inline-block h-1 w-1 rounded-full bg-neutral-400 animate-bounce" style="animation-delay: 300ms;"></span>
+                          </span>
+                        </span>
+                      </div>
+                      <button type="button" aria-label="Submit prompt" class="ih-maiw-submit-btn flex h-8 w-8 shrink-0 cursor-pointer items-center justify-center rounded-full border-0 bg-nova-blue">
+                        <svg width="11" height="14" viewBox="0 0 11 14" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                          <path d="M5.22425 0.600025L5.22426 13.4M0.424255 5.40002L5.22425 0.600025L10.0243 5.40002" stroke="white" stroke-width="1.2" stroke-linejoin="round"></path>
+                        </svg>
+                      </button>
+                    </div>
+                  </div>
+
+                  <div class="ih-maiw-cursor pointer-events-none absolute z-30 opacity-0 top-0 left-0">
+                    <img src="https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6ab26584bc5572adf499e114_marker.png" alt="" width="24" height="24" loading="lazy" decoding="async" class="w-6 h-6 object-contain" />
+                  </div>
+                </div>
+              </div>
+            ) : i === 4 ? (
+              <!-- ============================================================
+                   INDEX 4: Litigation Agent
+                   Customize this layout specifically for Card 4
+                   ============================================================ -->
+              <div class="ih-maiw-content ih-maiw-layout-4 flex flex-col items-start gap-6 lg:flex-row lg:gap-12">
+                <div class="flex w-full flex-col justify-between gap-6 lg:w-[416px] lg:shrink-0 lg:self-stretch">
+                  <div class="flex flex-col gap-6">
+                    <div>
+                      <div class="mb-6">
+                        {card.icon ? (
+                          <img src={card.icon} alt="" class="h-16 w-16 rounded-lg object-contain" loading="lazy" decoding="async" />
+                        ) : (
+                          <span class="block h-16 w-16 rounded-lg bg-visual-placeholder" aria-hidden="true" />
+                        )}
+                      </div>
+                      <h3 class="m-0 mb-2 pr-12 font-heading font-medium text-vault-navy text-[length:var(--fs-h5)] leading-[length:var(--lh-h5)] tracking-[-0.5px] lg:pr-0">
+                        {card.title}
+                      </h3>
+                      <p class="m-0 font-body font-medium text-nova-blue text-[length:var(--fs-body)] leading-[length:var(--lh-body)]">
+                        {card.claim}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div class="flex flex-col gap-6">
+                    <p class="m-0 font-body font-normal text-neutral-500 text-[length:var(--fs-body)] leading-[length:var(--lh-body)]">
+                      {card.caption}
+                    </p>
+
+                    <div class="flex items-center gap-2">
+                      <button type="button" aria-label="Previous" class="inline-flex cursor-pointer items-center justify-center rounded border border-neutral-300 bg-generic-00 p-2 text-vault-navy transition-colors duration-150 hover:border-nova-blue" data-ih-maiw-prev>
+                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true" focusable="false"><path d="M12 15L7 10L12 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" /></svg>
+                      </button>
+                      <button type="button" aria-label="Next" class="inline-flex cursor-pointer items-center justify-center rounded border border-neutral-300 bg-generic-00 p-2 text-vault-navy transition-colors duration-150 hover:border-nova-blue" data-ih-maiw-next>
+                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true" focusable="false"><path d="M7 5L12 10L7 15" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" /></svg>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Stage / Visual Column (Right) -->
+                <div
+                  class="ih-maiw-stage-wrap relative flex w-full flex-col bg-generic-00 justify-between overflow-hidden rounded-xl border border-[#111827] p-3.5 sm:p-4 md:p-5 aspect-[1280/720] min-h-[320px] md:min-h-[420px] select-none bg-cover bg-center bg-no-repeat lg:w-auto lg:flex-1 cursor-pointer"
+                  style="background-image:url('https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6ab399f1e2c6a1e38c91700f_dots-bg.png');"
+                  title="Click to skip animation"
+                >
+                  <div
+                    class="ih-maiw-glow pointer-events-none absolute inset-0 z-0 opacity-100"
+                    style="background: radial-gradient(ellipse 65% 50% at 50% 50%, rgba(212, 248, 66, 0.22) 0%, rgba(212, 248, 66, 0) 70%);"
+                  ></div>
+                  <div
+                    class="ih-maiw-glow-bottom pointer-events-none absolute inset-x-0 bottom-3 h-50 z-0 opacity-0"
+                    style="background: radial-gradient(ellipse 75% 65% at 50% 92%, rgba(212, 248, 66, 0.14) 0%, rgba(212, 248, 66, 0) 70%);"
+                  ></div>
+
+                  <div class="ih-maiw-center-title pointer-events-none absolute inset-x-0 top-[26%] z-10 flex flex-col items-center justify-center text-center opacity-100 px-4">
+                    <h3 class="m-0 font-heading font-medium text-vault-navy text-base md:text-[length:var(--fs-h6)] leading-[length:var(--lh-h6)]">
+                      What would you like to review?
+                    </h3>
+                  </div>
+
+                  <div class="ih-maiw-top-stage relative z-10 w-full shrink-0 min-h-[42px] flex items-start">
+                    <div class="ih-maiw-bubble hidden absolute right-0 top-0 self-end max-w-fit rounded-2xl border border-dashed border-[#11182726] bg-[#EDEDED] px-3 py-1.5 md:px-4 md:py-2.5 opacity-0 pointer-events-none">
+                      <p class="ih-maiw-bubble-text m-0 font-body text-xs md:text-sm lg:text-base font-normal leading-[1.35] md:leading-[1.4] text-[#111827]">
+                        {card.query || card.claim}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div class="ih-maiw-middle-stage relative z-10 w-full min-h-0 flex-1 flex flex-col items-start justify-start py-1">
+                    <div class="ih-maiw-skeleton hidden absolute inset-x-0 top-0 mt-4 md:mt-8 flex flex-col justify-start gap-3 opacity-0 pointer-events-none">
+                      <div class="flex items-center gap-3 animate-pulse">
+                        <div class="h-3 w-6/12 rounded-full bg-[#E5E7EB]"></div>
+                        <div class="h-3 w-4/12 rounded-full bg-[#E5E7EB]"></div>
+                      </div>
+                      <div class="flex items-center gap-3 animate-pulse">
+                        <div class="h-3 w-3/12 rounded-full bg-[#E5E7EB]"></div>
+                        <div class="h-3 w-5/12 rounded-full bg-[#E5E7EB]"></div>
+                      </div>
+                    </div>
+
+                    <div class="ih-maiw-checklist hidden absolute inset-x-0 top-0 mt-4 md:mt-8 flex items-start justify-start opacity-0 pointer-events-none">
+                      <div class="grid w-full grid-cols-2 gap-x-3.5 sm:gap-x-4 md:gap-x-6 xl:w-fit xl:grid-cols-[max-content_max-content] xl:gap-x-7 gap-y-2 md:gap-y-2.5">
+                        <div class="ih-maiw-check-item flex items-start xl:items-center gap-1 sm:gap-1.5 xl:gap-2 min-w-0 opacity-0">
+                          <svg class="shrink-0 mt-0.5 xl:mt-0" width="10" height="12" viewBox="0 0 10 12" fill="none"><path d="M8.76315 10.9508H0.887604C0.771563 10.9508 0.660276 10.9047 0.578223 10.8227C0.49617 10.7406 0.450073 10.6293 0.450073 10.5133V0.887604C0.450073 0.771563 0.49617 0.660276 0.578223 0.578223C0.660276 0.49617 0.771563 0.450073 0.887604 0.450073H6.13797L9.20068 3.51279V10.5133C9.20068 10.6293 9.15459 10.7406 9.07253 10.8227C8.99048 10.9047 8.87919 10.9508 8.76315 10.9508Z" stroke="black" stroke-width="0.900063" stroke-linecap="round" stroke-linejoin="round"></path><path d="M6.13757 0.450073V3.51279H9.20029" stroke="black" stroke-width="0.900063" stroke-linecap="round" stroke-linejoin="round"></path><path d="M4.60655 8.32565C5.4523 8.32565 6.13791 7.64004 6.13791 6.7943C6.13791 5.94855 5.4523 5.26294 4.60655 5.26294C3.76081 5.26294 3.0752 5.94855 3.0752 6.7943C3.0752 7.64004 3.76081 8.32565 4.60655 8.32565Z" stroke="#5446FF" stroke-width="0.900063" stroke-linecap="round" stroke-linejoin="round"></path><path d="M5.68835 7.87708L6.57435 8.76307" stroke="#5446FF" stroke-width="0.900063" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+                          <span class="text-[8px] md:text-[10px] xl:text-xs font-normal text-[#111827] underline underline-offset-2 leading-tight break-words">Reconciling invoice line items</span>
+                        </div>
+                        <div class="ih-maiw-check-item flex items-start xl:items-center gap-1 sm:gap-1.5 xl:gap-2 min-w-0 opacity-0">
+                          <svg class="shrink-0 mt-0.5 xl:mt-0" width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M7.37441 4.77747H4.77808V7.3738H7.37441V4.77747Z" stroke="#5446FF" stroke-width="0.900063" stroke-linecap="round" stroke-linejoin="round"></path><path d="M9.9705 1.74817H2.1815C1.94252 1.74817 1.74878 1.94191 1.74878 2.18089V9.96989C1.74878 10.2089 1.94252 10.4026 2.1815 10.4026H9.9705C10.2095 10.4026 10.4032 10.2089 10.4032 9.96989V2.18089C10.4032 1.94191 10.2095 1.74817 9.9705 1.74817Z" stroke="black" stroke-width="0.900063" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+                          <span class="text-[8px] md:text-[10px] xl:text-xs font-normal text-[#111827] underline underline-offset-2 leading-tight break-words">Cross-referencing verified case law</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div class="ih-maiw-chart hidden absolute inset-0 flex items-center justify-center opacity-0 pointer-events-none">
+                      {card.image && (
+                        <img
+                          src={card.image}
+                          alt={card.title}
+                          class="w-full h-auto max-h-[88%] md:max-h-[92%] object-contain rounded-lg block"
+                          loading="lazy"
+                          decoding="async"
+                        />
+                      )}
+                    </div>
+                  </div>
+
+                  <div class="ih-maiw-input-container relative z-20 flex w-full shrink-0 items-center justify-center">
+                    <div class="ih-maiw-input-pill relative flex w-full items-center gap-2 rounded-full border border-[#A6C705]/40 bg-generic-00 pl-3.5 pr-2 py-2.5 md:py-3 shadow-xs">
+                      <svg class="ih-maiw-pill-border pointer-events-none absolute inset-0 h-full w-full overflow-visible" aria-hidden="true">
+                        <defs>
+                          <linearGradient id={`ih-maiw-pill-border-grad-${i}`} x1="0%" y1="0%" x2="100%" y2="0%" gradientUnits="objectBoundingBox">
+                            <stop offset="0%" stop-color="#A6C705" stop-opacity="0.1"></stop>
+                            <stop offset="25%" stop-color="#A6C705" stop-opacity="0.5"></stop>
+                            <stop offset="50%" stop-color="#A6C705" stop-opacity="1"></stop>
+                            <stop offset="100%" stop-color="#A6C705" stop-opacity="1"></stop>
+                          </linearGradient>
+                        </defs>
+                        <path class="ih-maiw-pill-border-path" fill="none" stroke={`url(#ih-maiw-pill-border-grad-${i})`} stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="opacity: 0;"></path>
+                      </svg>
+                      <svg class="shrink-0 text-vault-navy" width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                        <path d="M0.800003 8.80005H16.8" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"></path>
+                        <path d="M8.8 0.800049V16.8" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"></path>
+                      </svg>
+                      <div class="min-w-0 flex-1 relative h-6 flex items-center overflow-hidden">
+                        <span class="ih-maiw-pill-placeholder absolute inset-y-0 left-0 flex items-center font-body text-xs md:text-sm lg:text-[length:var(--fs-body)] text-neutral-400 pointer-events-none">
+                          Ask anything...
+                        </span>
+                        <span class="ih-maiw-pill-typed hidden absolute inset-y-0 left-0 right-0 flex items-center font-body text-sm md:text-sm lg:text-[length:var(--fs-body)] text-vault-navy opacity-0 pointer-events-none font-medium tracking-tight">
+                          <span class="ih-maiw-pill-typed-text truncate block w-full">{card.query || card.claim}</span>
+                        </span>
+                        <span class="ih-maiw-pill-thinking absolute inset-y-0 left-0 flex items-center gap-1.5 font-body text-xs md:text-sm lg:text-[length:var(--fs-body)] text-neutral-500 opacity-0 pointer-events-none font-medium">
+                          <span>Thinking</span>
+                          <span class="inline-flex items-center gap-0.5 ml-0.5">
+                            <span class="inline-block h-1 w-1 rounded-full bg-neutral-400 animate-bounce" style="animation-delay: 0ms;"></span>
+                            <span class="inline-block h-1 w-1 rounded-full bg-neutral-400 animate-bounce" style="animation-delay: 150ms;"></span>
+                            <span class="inline-block h-1 w-1 rounded-full bg-neutral-400 animate-bounce" style="animation-delay: 300ms;"></span>
+                          </span>
+                        </span>
+                      </div>
+                      <button type="button" aria-label="Submit prompt" class="ih-maiw-submit-btn flex h-8 w-8 shrink-0 cursor-pointer items-center justify-center rounded-full border-0 bg-nova-blue">
+                        <svg width="11" height="14" viewBox="0 0 11 14" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                          <path d="M5.22425 0.600025L5.22426 13.4M0.424255 5.40002L5.22425 0.600025L10.0243 5.40002" stroke="white" stroke-width="1.2" stroke-linejoin="round"></path>
+                        </svg>
+                      </button>
+                    </div>
+                  </div>
+
+                  <div class="ih-maiw-cursor pointer-events-none absolute z-30 opacity-0 top-0 left-0">
+                    <img src="https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6ab26584bc5572adf499e114_marker.png" alt="" width="24" height="24" loading="lazy" decoding="async" class="w-6 h-6 object-contain" />
+                  </div>
+                </div>
+              </div>
+            ) : i === 5 ? (
+              <!-- ============================================================
+                   INDEX 5: Refund Agent
+                   Customize this layout specifically for Card 5
+                   ============================================================ -->
+              <div class="ih-maiw-content ih-maiw-layout-5 flex flex-col items-start gap-6 lg:flex-row lg:gap-12">
+                <div class="flex w-full flex-col justify-between gap-6 lg:w-[416px] lg:shrink-0 lg:self-stretch">
+                  <div class="flex flex-col gap-6">
+                    <div>
+                      <div class="mb-6">
+                        {card.icon ? (
+                          <img src={card.icon} alt="" class="h-16 w-16 rounded-lg object-contain" loading="lazy" decoding="async" />
+                        ) : (
+                          <span class="block h-16 w-16 rounded-lg bg-visual-placeholder" aria-hidden="true" />
+                        )}
+                      </div>
+                      <h3 class="m-0 mb-2 pr-12 font-heading font-medium text-vault-navy text-[length:var(--fs-h5)] leading-[length:var(--lh-h5)] tracking-[-0.5px] lg:pr-0">
+                        {card.title}
+                      </h3>
+                      <p class="m-0 font-body font-medium text-nova-blue text-[length:var(--fs-body)] leading-[length:var(--lh-body)]">
+                        {card.claim}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div class="flex flex-col gap-6">
+                    <p class="m-0 font-body font-normal text-neutral-500 text-[length:var(--fs-body)] leading-[length:var(--lh-body)]">
+                      {card.caption}
+                    </p>
+
+                    <div class="flex items-center gap-2">
+                      <button type="button" aria-label="Previous" class="inline-flex cursor-pointer items-center justify-center rounded border border-neutral-300 bg-generic-00 p-2 text-vault-navy transition-colors duration-150 hover:border-nova-blue" data-ih-maiw-prev>
+                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true" focusable="false"><path d="M12 15L7 10L12 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" /></svg>
+                      </button>
+                      <button type="button" aria-label="Next" class="inline-flex cursor-pointer items-center justify-center rounded border border-neutral-300 bg-generic-00 p-2 text-vault-navy transition-colors duration-150 hover:border-nova-blue" data-ih-maiw-next>
+                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true" focusable="false"><path d="M7 5L12 10L7 15" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" /></svg>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Stage / Visual Column (Right) -->
+                <div
+                  class="ih-maiw-stage-wrap relative flex w-full flex-col bg-generic-00 justify-between overflow-hidden rounded-xl border border-[#111827] p-3.5 sm:p-4 md:p-5 aspect-[1280/720] min-h-[320px] md:min-h-[420px] select-none bg-cover bg-center bg-no-repeat lg:w-auto lg:flex-1 cursor-pointer"
+                  style="background-image:url('https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6ab399f1e2c6a1e38c91700f_dots-bg.png');"
+                  title="Click to skip animation"
+                >
+                  <div
+                    class="ih-maiw-glow pointer-events-none absolute inset-0 z-0 opacity-100"
+                    style="background: radial-gradient(ellipse 65% 50% at 50% 50%, rgba(212, 248, 66, 0.22) 0%, rgba(212, 248, 66, 0) 70%);"
+                  ></div>
+                  <div
+                    class="ih-maiw-glow-bottom pointer-events-none absolute inset-x-0 bottom-3 h-50 z-0 opacity-0"
+                    style="background: radial-gradient(ellipse 75% 65% at 50% 92%, rgba(212, 248, 66, 0.14) 0%, rgba(212, 248, 66, 0) 70%);"
+                  ></div>
+
+                  <div class="ih-maiw-center-title pointer-events-none absolute inset-x-0 top-[26%] z-10 flex flex-col items-center justify-center text-center opacity-100 px-4">
+                    <h3 class="m-0 font-heading font-medium text-vault-navy text-base md:text-[length:var(--fs-h6)] leading-[length:var(--lh-h6)]">
+                      What would you like to review?
+                    </h3>
+                  </div>
+
+                  <div class="ih-maiw-top-stage relative z-10 w-full shrink-0 min-h-[42px] flex items-start">
+                    <div class="ih-maiw-bubble hidden absolute right-0 top-0 self-end max-w-fit rounded-2xl border border-dashed border-[#11182726] bg-[#EDEDED] px-3 py-1.5 md:px-4 md:py-2.5 opacity-0 pointer-events-none">
+                      <p class="ih-maiw-bubble-text m-0 font-body text-xs md:text-sm lg:text-base font-normal leading-[1.35] md:leading-[1.4] text-[#111827]">
+                        {card.query || card.claim}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div class="ih-maiw-middle-stage relative z-10 w-full min-h-0 flex-1 flex flex-col items-start justify-start py-1">
+                    <div class="ih-maiw-skeleton hidden absolute inset-x-0 top-0 mt-4 md:mt-8 flex flex-col justify-start gap-3 opacity-0 pointer-events-none">
+                      <div class="flex items-center gap-3 animate-pulse">
+                        <div class="h-3 w-6/12 rounded-full bg-[#E5E7EB]"></div>
+                        <div class="h-3 w-4/12 rounded-full bg-[#E5E7EB]"></div>
+                      </div>
+                      <div class="flex items-center gap-3 animate-pulse">
+                        <div class="h-3 w-3/12 rounded-full bg-[#E5E7EB]"></div>
+                        <div class="h-3 w-5/12 rounded-full bg-[#E5E7EB]"></div>
+                      </div>
+                    </div>
+
+                    <div class="ih-maiw-checklist hidden absolute inset-x-0 top-0 mt-4 md:mt-8 flex items-start justify-start opacity-0 pointer-events-none">
+                      <div class="grid w-full grid-cols-2 gap-x-3.5 sm:gap-x-4 md:gap-x-6 xl:w-fit xl:grid-cols-[max-content_max-content] xl:gap-x-7 gap-y-2 md:gap-y-2.5">
+                        <div class="ih-maiw-check-item flex items-start xl:items-center gap-1 sm:gap-1.5 xl:gap-2 min-w-0 opacity-0">
+                          <svg class="shrink-0 mt-0.5 xl:mt-0" width="10" height="12" viewBox="0 0 10 12" fill="none"><path d="M8.76315 10.9508H0.887604C0.771563 10.9508 0.660276 10.9047 0.578223 10.8227C0.49617 10.7406 0.450073 10.6293 0.450073 10.5133V0.887604C0.450073 0.771563 0.49617 0.660276 0.578223 0.578223C0.660276 0.49617 0.771563 0.450073 0.887604 0.450073H6.13797L9.20068 3.51279V10.5133C9.20068 10.6293 9.15459 10.7406 9.07253 10.8227C8.99048 10.9047 8.87919 10.9508 8.76315 10.9508Z" stroke="black" stroke-width="0.900063" stroke-linecap="round" stroke-linejoin="round"></path><path d="M6.13757 0.450073V3.51279H9.20029" stroke="black" stroke-width="0.900063" stroke-linecap="round" stroke-linejoin="round"></path><path d="M4.60655 8.32565C5.4523 8.32565 6.13791 7.64004 6.13791 6.7943C6.13791 5.94855 5.4523 5.26294 4.60655 5.26294C3.76081 5.26294 3.0752 5.94855 3.0752 6.7943C3.0752 7.64004 3.76081 8.32565 4.60655 8.32565Z" stroke="#5446FF" stroke-width="0.900063" stroke-linecap="round" stroke-linejoin="round"></path><path d="M5.68835 7.87708L6.57435 8.76307" stroke="#5446FF" stroke-width="0.900063" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+                          <span class="text-[8px] md:text-[10px] xl:text-xs font-normal text-[#111827] underline underline-offset-2 leading-tight break-words">Analysing duty & balance scenarios</span>
+                        </div>
+                        <div class="ih-maiw-check-item flex items-start xl:items-center gap-1 sm:gap-1.5 xl:gap-2 min-w-0 opacity-0">
+                          <svg class="shrink-0 mt-0.5 xl:mt-0" width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M7.37441 4.77747H4.77808V7.3738H7.37441V4.77747Z" stroke="#5446FF" stroke-width="0.900063" stroke-linecap="round" stroke-linejoin="round"></path><path d="M9.9705 1.74817H2.1815C1.94252 1.74817 1.74878 1.94191 1.74878 2.18089V9.96989C1.74878 10.2089 1.94252 10.4026 2.1815 10.4026H9.9705C10.2095 10.4026 10.4032 10.2089 10.4032 9.96989V2.18089C10.4032 1.94191 10.2095 1.74817 9.9705 1.74817Z" stroke="black" stroke-width="0.900063" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+                          <span class="text-[8px] md:text-[10px] xl:text-xs font-normal text-[#111827] underline underline-offset-2 leading-tight break-words">Compiling audit-ready dossier</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div class="ih-maiw-chart hidden absolute inset-0 flex items-center justify-center opacity-0 pointer-events-none">
+                      {card.image && (
+                        <img
+                          src={card.image}
+                          alt={card.title}
+                          class="w-full h-auto max-h-[88%] md:max-h-[92%] object-contain rounded-lg block"
+                          loading="lazy"
+                          decoding="async"
+                        />
+                      )}
+                    </div>
+                  </div>
+
+                  <div class="ih-maiw-input-container relative z-20 flex w-full shrink-0 items-center justify-center">
+                    <div class="ih-maiw-input-pill relative flex w-full items-center gap-2 rounded-full border border-[#A6C705]/40 bg-generic-00 pl-3.5 pr-2 py-2.5 md:py-3 shadow-xs">
+                      <svg class="ih-maiw-pill-border pointer-events-none absolute inset-0 h-full w-full overflow-visible" aria-hidden="true">
+                        <defs>
+                          <linearGradient id={`ih-maiw-pill-border-grad-${i}`} x1="0%" y1="0%" x2="100%" y2="0%" gradientUnits="objectBoundingBox">
+                            <stop offset="0%" stop-color="#A6C705" stop-opacity="0.1"></stop>
+                            <stop offset="25%" stop-color="#A6C705" stop-opacity="0.5"></stop>
+                            <stop offset="50%" stop-color="#A6C705" stop-opacity="1"></stop>
+                            <stop offset="100%" stop-color="#A6C705" stop-opacity="1"></stop>
+                          </linearGradient>
+                        </defs>
+                        <path class="ih-maiw-pill-border-path" fill="none" stroke={`url(#ih-maiw-pill-border-grad-${i})`} stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="opacity: 0;"></path>
+                      </svg>
+                      <svg class="shrink-0 text-vault-navy" width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                        <path d="M0.800003 8.80005H16.8" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"></path>
+                        <path d="M8.8 0.800049V16.8" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"></path>
+                      </svg>
+                      <div class="min-w-0 flex-1 relative h-6 flex items-center overflow-hidden">
+                        <span class="ih-maiw-pill-placeholder absolute inset-y-0 left-0 flex items-center font-body text-xs md:text-sm lg:text-[length:var(--fs-body)] text-neutral-400 pointer-events-none">
+                          Ask anything...
+                        </span>
+                        <span class="ih-maiw-pill-typed hidden absolute inset-y-0 left-0 right-0 flex items-center font-body text-sm md:text-sm lg:text-[length:var(--fs-body)] text-vault-navy opacity-0 pointer-events-none font-medium tracking-tight">
+                          <span class="ih-maiw-pill-typed-text truncate block w-full">{card.query || card.claim}</span>
+                        </span>
+                        <span class="ih-maiw-pill-thinking absolute inset-y-0 left-0 flex items-center gap-1.5 font-body text-xs md:text-sm lg:text-[length:var(--fs-body)] text-neutral-500 opacity-0 pointer-events-none font-medium">
+                          <span>Thinking</span>
+                          <span class="inline-flex items-center gap-0.5 ml-0.5">
+                            <span class="inline-block h-1 w-1 rounded-full bg-neutral-400 animate-bounce" style="animation-delay: 0ms;"></span>
+                            <span class="inline-block h-1 w-1 rounded-full bg-neutral-400 animate-bounce" style="animation-delay: 150ms;"></span>
+                            <span class="inline-block h-1 w-1 rounded-full bg-neutral-400 animate-bounce" style="animation-delay: 300ms;"></span>
+                          </span>
+                        </span>
+                      </div>
+                      <button type="button" aria-label="Submit prompt" class="ih-maiw-submit-btn flex h-8 w-8 shrink-0 cursor-pointer items-center justify-center rounded-full border-0 bg-nova-blue">
+                        <svg width="11" height="14" viewBox="0 0 11 14" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                          <path d="M5.22425 0.600025L5.22426 13.4M0.424255 5.40002L5.22425 0.600025L10.0243 5.40002" stroke="white" stroke-width="1.2" stroke-linejoin="round"></path>
+                        </svg>
+                      </button>
+                    </div>
+                  </div>
+
+                  <div class="ih-maiw-cursor pointer-events-none absolute z-30 opacity-0 top-0 left-0">
+                    <img src="https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6ab26584bc5572adf499e114_marker.png" alt="" width="24" height="24" loading="lazy" decoding="async" class="w-6 h-6 object-contain" />
+                  </div>
+                </div>
+              </div>
+            ) : i === 6 ? (
+              <!-- ============================================================
+                   INDEX 6: 180-Day Reversal and Reclaim Agent
+                   Customize this layout specifically for Card 6
+                   ============================================================ -->
+              <div class="ih-maiw-content ih-maiw-layout-6 flex flex-col items-start gap-6 lg:flex-row lg:gap-12">
+                <div class="flex w-full flex-col justify-between gap-6 lg:w-[416px] lg:shrink-0 lg:self-stretch">
+                  <div class="flex flex-col gap-6">
+                    <div>
+                      <div class="mb-6">
+                        {card.icon ? (
+                          <img src={card.icon} alt="" class="h-16 w-16 rounded-lg object-contain" loading="lazy" decoding="async" />
+                        ) : (
+                          <span class="block h-16 w-16 rounded-lg bg-visual-placeholder" aria-hidden="true" />
+                        )}
+                      </div>
+                      <h3 class="m-0 mb-2 pr-12 font-heading font-medium text-vault-navy text-[length:var(--fs-h5)] leading-[length:var(--lh-h5)] tracking-[-0.5px] lg:pr-0">
+                        {card.title}
+                      </h3>
+                      <p class="m-0 font-body font-medium text-nova-blue text-[length:var(--fs-body)] leading-[length:var(--lh-body)]">
+                        {card.claim}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div class="flex flex-col gap-6">
+                    <p class="m-0 font-body font-normal text-neutral-500 text-[length:var(--fs-body)] leading-[length:var(--lh-body)]">
+                      {card.caption}
+                    </p>
+
+                    <div class="flex items-center gap-2">
+                      <button type="button" aria-label="Previous" class="inline-flex cursor-pointer items-center justify-center rounded border border-neutral-300 bg-generic-00 p-2 text-vault-navy transition-colors duration-150 hover:border-nova-blue" data-ih-maiw-prev>
+                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true" focusable="false"><path d="M12 15L7 10L12 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" /></svg>
+                      </button>
+                      <button type="button" aria-label="Next" class="inline-flex cursor-pointer items-center justify-center rounded border border-neutral-300 bg-generic-00 p-2 text-vault-navy transition-colors duration-150 hover:border-nova-blue" data-ih-maiw-next>
+                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true" focusable="false"><path d="M7 5L12 10L7 15" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" /></svg>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Stage / Visual Column (Right) -->
+                <div
+                  class="ih-maiw-stage-wrap relative flex w-full flex-col bg-generic-00 justify-between overflow-hidden rounded-xl border border-[#111827] p-3.5 sm:p-4 md:p-5 aspect-[1280/720] min-h-[320px] md:min-h-[420px] select-none bg-cover bg-center bg-no-repeat lg:w-auto lg:flex-1 cursor-pointer"
+                  style="background-image:url('https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6ab399f1e2c6a1e38c91700f_dots-bg.png');"
+                  title="Click to skip animation"
+                >
+                  <div
+                    class="ih-maiw-glow pointer-events-none absolute inset-0 z-0 opacity-100"
+                    style="background: radial-gradient(ellipse 65% 50% at 50% 50%, rgba(212, 248, 66, 0.22) 0%, rgba(212, 248, 66, 0) 70%);"
+                  ></div>
+                  <div
+                    class="ih-maiw-glow-bottom pointer-events-none absolute inset-x-0 bottom-3 h-50 z-0 opacity-0"
+                    style="background: radial-gradient(ellipse 75% 65% at 50% 92%, rgba(212, 248, 66, 0.14) 0%, rgba(212, 248, 66, 0) 70%);"
+                  ></div>
+
+                  <div class="ih-maiw-center-title pointer-events-none absolute inset-x-0 top-[26%] z-10 flex flex-col items-center justify-center text-center opacity-100 px-4">
+                    <h3 class="m-0 font-heading font-medium text-vault-navy text-base md:text-[length:var(--fs-h6)] leading-[length:var(--lh-h6)]">
+                      What would you like to review?
+                    </h3>
+                  </div>
+
+                  <div class="ih-maiw-top-stage relative z-10 w-full shrink-0 min-h-[42px] flex items-start">
+                    <div class="ih-maiw-bubble hidden absolute right-0 top-0 self-end max-w-fit rounded-2xl border border-dashed border-[#11182726] bg-[#EDEDED] px-3 py-1.5 md:px-4 md:py-2.5 opacity-0 pointer-events-none">
+                      <p class="ih-maiw-bubble-text m-0 font-body text-xs md:text-sm lg:text-base font-normal leading-[1.35] md:leading-[1.4] text-[#111827]">
+                        {card.query || card.claim}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div class="ih-maiw-middle-stage relative z-10 w-full min-h-0 flex-1 flex flex-col items-start justify-start py-1">
+                    <div class="ih-maiw-skeleton hidden absolute inset-x-0 top-0 mt-4 md:mt-8 flex flex-col justify-start gap-3 opacity-0 pointer-events-none">
+                      <div class="flex items-center gap-3 animate-pulse">
+                        <div class="h-3 w-6/12 rounded-full bg-[#E5E7EB]"></div>
+                        <div class="h-3 w-4/12 rounded-full bg-[#E5E7EB]"></div>
+                      </div>
+                      <div class="flex items-center gap-3 animate-pulse">
+                        <div class="h-3 w-3/12 rounded-full bg-[#E5E7EB]"></div>
+                        <div class="h-3 w-5/12 rounded-full bg-[#E5E7EB]"></div>
+                      </div>
+                    </div>
+
+                    <div class="ih-maiw-checklist hidden absolute inset-x-0 top-0 mt-4 md:mt-8 flex items-start justify-start opacity-0 pointer-events-none">
+                      <div class="grid w-full grid-cols-2 gap-x-3.5 sm:gap-x-4 md:gap-x-6 xl:w-fit xl:grid-cols-[max-content_max-content] xl:gap-x-7 gap-y-2 md:gap-y-2.5">
+                        <div class="ih-maiw-check-item flex items-start xl:items-center gap-1 sm:gap-1.5 xl:gap-2 min-w-0 opacity-0">
+                          <svg class="shrink-0 mt-0.5 xl:mt-0" width="10" height="12" viewBox="0 0 10 12" fill="none"><path d="M8.76315 10.9508H0.887604C0.771563 10.9508 0.660276 10.9047 0.578223 10.8227C0.49617 10.7406 0.450073 10.6293 0.450073 10.5133V0.887604C0.450073 0.771563 0.49617 0.660276 0.578223 0.578223C0.660276 0.49617 0.771563 0.450073 0.887604 0.450073H6.13797L9.20068 3.51279V10.5133C9.20068 10.6293 9.15459 10.7406 9.07253 10.8227C8.99048 10.9047 8.87919 10.9508 8.76315 10.9508Z" stroke="black" stroke-width="0.900063" stroke-linecap="round" stroke-linejoin="round"></path><path d="M6.13757 0.450073V3.51279H9.20029" stroke="black" stroke-width="0.900063" stroke-linecap="round" stroke-linejoin="round"></path><path d="M4.60655 8.32565C5.4523 8.32565 6.13791 7.64004 6.13791 6.7943C6.13791 5.94855 5.4523 5.26294 4.60655 5.26294C3.76081 5.26294 3.0752 5.94855 3.0752 6.7943C3.0752 7.64004 3.76081 8.32565 4.60655 8.32565Z" stroke="#5446FF" stroke-width="0.900063" stroke-linecap="round" stroke-linejoin="round"></path><path d="M5.68835 7.87708L6.57435 8.76307" stroke="#5446FF" stroke-width="0.900063" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+                          <span class="text-[8px] md:text-[10px] xl:text-xs font-normal text-[#111827] underline underline-offset-2 leading-tight break-words">Scanning Table-4 & open payments</span>
+                        </div>
+                        <div class="ih-maiw-check-item flex items-start xl:items-center gap-1 sm:gap-1.5 xl:gap-2 min-w-0 opacity-0">
+                          <svg class="shrink-0 mt-0.5 xl:mt-0" width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M7.37441 4.77747H4.77808V7.3738H7.37441V4.77747Z" stroke="#5446FF" stroke-width="0.900063" stroke-linecap="round" stroke-linejoin="round"></path><path d="M9.9705 1.74817H2.1815C1.94252 1.74817 1.74878 1.94191 1.74878 2.18089V9.96989C1.74878 10.2089 1.94252 10.4026 2.1815 10.4026H9.9705C10.2095 10.4026 10.4032 10.2089 10.4032 9.96989V2.18089C10.4032 1.94191 10.2095 1.74817 9.9705 1.74817Z" stroke="black" stroke-width="0.900063" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+                          <span class="text-[8px] md:text-[10px] xl:text-xs font-normal text-[#111827] underline underline-offset-2 leading-tight break-words">Computing Section 16(2)(b) interest</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div class="ih-maiw-chart hidden absolute inset-0 flex items-center justify-center opacity-0 pointer-events-none">
+                      {card.image && (
+                        <img
+                          src={card.image}
+                          alt={card.title}
+                          class="w-full h-auto max-h-[88%] md:max-h-[92%] object-contain rounded-lg block"
+                          loading="lazy"
+                          decoding="async"
+                        />
+                      )}
+                    </div>
+                  </div>
+
+                  <div class="ih-maiw-input-container relative z-20 flex w-full shrink-0 items-center justify-center">
+                    <div class="ih-maiw-input-pill relative flex w-full items-center gap-2 rounded-full border border-[#A6C705]/40 bg-generic-00 pl-3.5 pr-2 py-2.5 md:py-3 shadow-xs">
+                      <svg class="ih-maiw-pill-border pointer-events-none absolute inset-0 h-full w-full overflow-visible" aria-hidden="true">
+                        <defs>
+                          <linearGradient id={`ih-maiw-pill-border-grad-${i}`} x1="0%" y1="0%" x2="100%" y2="0%" gradientUnits="objectBoundingBox">
+                            <stop offset="0%" stop-color="#A6C705" stop-opacity="0.1"></stop>
+                            <stop offset="25%" stop-color="#A6C705" stop-opacity="0.5"></stop>
+                            <stop offset="50%" stop-color="#A6C705" stop-opacity="1"></stop>
+                            <stop offset="100%" stop-color="#A6C705" stop-opacity="1"></stop>
+                          </linearGradient>
+                        </defs>
+                        <path class="ih-maiw-pill-border-path" fill="none" stroke={`url(#ih-maiw-pill-border-grad-${i})`} stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="opacity: 0;"></path>
+                      </svg>
+                      <svg class="shrink-0 text-vault-navy" width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                        <path d="M0.800003 8.80005H16.8" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"></path>
+                        <path d="M8.8 0.800049V16.8" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"></path>
+                      </svg>
+                      <div class="min-w-0 flex-1 relative h-6 flex items-center overflow-hidden">
+                        <span class="ih-maiw-pill-placeholder absolute inset-y-0 left-0 flex items-center font-body text-xs md:text-sm lg:text-[length:var(--fs-body)] text-neutral-400 pointer-events-none">
+                          Ask anything...
+                        </span>
+                        <span class="ih-maiw-pill-typed hidden absolute inset-y-0 left-0 right-0 flex items-center font-body text-sm md:text-sm lg:text-[length:var(--fs-body)] text-vault-navy opacity-0 pointer-events-none font-medium tracking-tight">
+                          <span class="ih-maiw-pill-typed-text truncate block w-full">{card.query || card.claim}</span>
+                        </span>
+                        <span class="ih-maiw-pill-thinking absolute inset-y-0 left-0 flex items-center gap-1.5 font-body text-xs md:text-sm lg:text-[length:var(--fs-body)] text-neutral-500 opacity-0 pointer-events-none font-medium">
+                          <span>Thinking</span>
+                          <span class="inline-flex items-center gap-0.5 ml-0.5">
+                            <span class="inline-block h-1 w-1 rounded-full bg-neutral-400 animate-bounce" style="animation-delay: 0ms;"></span>
+                            <span class="inline-block h-1 w-1 rounded-full bg-neutral-400 animate-bounce" style="animation-delay: 150ms;"></span>
+                            <span class="inline-block h-1 w-1 rounded-full bg-neutral-400 animate-bounce" style="animation-delay: 300ms;"></span>
+                          </span>
+                        </span>
+                      </div>
+                      <button type="button" aria-label="Submit prompt" class="ih-maiw-submit-btn flex h-8 w-8 shrink-0 cursor-pointer items-center justify-center rounded-full border-0 bg-nova-blue">
+                        <svg width="11" height="14" viewBox="0 0 11 14" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                          <path d="M5.22425 0.600025L5.22426 13.4M0.424255 5.40002L5.22425 0.600025L10.0243 5.40002" stroke="white" stroke-width="1.2" stroke-linejoin="round"></path>
+                        </svg>
+                      </button>
+                    </div>
+                  </div>
+
+                  <div class="ih-maiw-cursor pointer-events-none absolute z-30 opacity-0 top-0 left-0">
+                    <img src="https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6ab26584bc5572adf499e114_marker.png" alt="" width="24" height="24" loading="lazy" decoding="async" class="w-6 h-6 object-contain" />
+                  </div>
+                </div>
+              </div>
+            ) : i === 7 ? (
+              <!-- ============================================================
+                   INDEX 7: ERP Writeback Agent
+                   Customize this layout specifically for Card 7
+                   ============================================================ -->
+              <div class="ih-maiw-content ih-maiw-layout-7 flex flex-col items-start gap-6 lg:flex-row lg:gap-12">
+                <div class="flex w-full flex-col justify-between gap-6 lg:w-[416px] lg:shrink-0 lg:self-stretch">
+                  <div class="flex flex-col gap-6">
+                    <div>
+                      <div class="mb-6">
+                        {card.icon ? (
+                          <img src={card.icon} alt="" class="h-16 w-16 rounded-lg object-contain" loading="lazy" decoding="async" />
+                        ) : (
+                          <span class="block h-16 w-16 rounded-lg bg-visual-placeholder" aria-hidden="true" />
+                        )}
+                      </div>
+                      <h3 class="m-0 mb-2 pr-12 font-heading font-medium text-vault-navy text-[length:var(--fs-h5)] leading-[length:var(--lh-h5)] tracking-[-0.5px] lg:pr-0">
+                        {card.title}
+                      </h3>
+                      <p class="m-0 font-body font-medium text-nova-blue text-[length:var(--fs-body)] leading-[length:var(--lh-body)]">
+                        {card.claim}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div class="flex flex-col gap-6">
+                    <p class="m-0 font-body font-normal text-neutral-500 text-[length:var(--fs-body)] leading-[length:var(--lh-body)]">
+                      {card.caption}
+                    </p>
+
+                    <div class="flex items-center gap-2">
+                      <button type="button" aria-label="Previous" class="inline-flex cursor-pointer items-center justify-center rounded border border-neutral-300 bg-generic-00 p-2 text-vault-navy transition-colors duration-150 hover:border-nova-blue" data-ih-maiw-prev>
+                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true" focusable="false"><path d="M12 15L7 10L12 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" /></svg>
+                      </button>
+                      <button type="button" aria-label="Next" class="inline-flex cursor-pointer items-center justify-center rounded border border-neutral-300 bg-generic-00 p-2 text-vault-navy transition-colors duration-150 hover:border-nova-blue" data-ih-maiw-next>
+                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true" focusable="false"><path d="M7 5L12 10L7 15" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" /></svg>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Stage / Visual Column (Right) -->
+                <div
+                  class="ih-maiw-stage-wrap relative flex w-full flex-col bg-generic-00 justify-between overflow-hidden rounded-xl border border-[#111827] p-3.5 sm:p-4 md:p-5 aspect-[1280/720] min-h-[320px] md:min-h-[420px] select-none bg-cover bg-center bg-no-repeat lg:w-auto lg:flex-1 cursor-pointer"
+                  style="background-image:url('https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6ab399f1e2c6a1e38c91700f_dots-bg.png');"
+                  title="Click to skip animation"
+                >
+                  <div
+                    class="ih-maiw-glow pointer-events-none absolute inset-0 z-0 opacity-100"
+                    style="background: radial-gradient(ellipse 65% 50% at 50% 50%, rgba(212, 248, 66, 0.22) 0%, rgba(212, 248, 66, 0) 70%);"
+                  ></div>
+                  <div
+                    class="ih-maiw-glow-bottom pointer-events-none absolute inset-x-0 bottom-3 h-50 z-0 opacity-0"
+                    style="background: radial-gradient(ellipse 75% 65% at 50% 92%, rgba(212, 248, 66, 0.14) 0%, rgba(212, 248, 66, 0) 70%);"
+                  ></div>
+
+                  <div class="ih-maiw-center-title pointer-events-none absolute inset-x-0 top-[26%] z-10 flex flex-col items-center justify-center text-center opacity-100 px-4">
+                    <h3 class="m-0 font-heading font-medium text-vault-navy text-base md:text-[length:var(--fs-h6)] leading-[length:var(--lh-h6)]">
+                      What would you like to review?
+                    </h3>
+                  </div>
+
+                  <div class="ih-maiw-top-stage relative z-10 w-full shrink-0 min-h-[42px] flex items-start">
+                    <div class="ih-maiw-bubble hidden absolute right-0 top-0 self-end max-w-fit rounded-2xl border border-dashed border-[#11182726] bg-[#EDEDED] px-3 py-1.5 md:px-4 md:py-2.5 opacity-0 pointer-events-none">
+                      <p class="ih-maiw-bubble-text m-0 font-body text-xs md:text-sm lg:text-base font-normal leading-[1.35] md:leading-[1.4] text-[#111827]">
+                        {card.query || card.claim}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div class="ih-maiw-middle-stage relative z-10 w-full min-h-0 flex-1 flex flex-col items-start justify-start py-1">
+                    <div class="ih-maiw-skeleton hidden absolute inset-x-0 top-0 mt-4 md:mt-8 flex flex-col justify-start gap-3 opacity-0 pointer-events-none">
+                      <div class="flex items-center gap-3 animate-pulse">
+                        <div class="h-3 w-6/12 rounded-full bg-[#E5E7EB]"></div>
+                        <div class="h-3 w-4/12 rounded-full bg-[#E5E7EB]"></div>
+                      </div>
+                      <div class="flex items-center gap-3 animate-pulse">
+                        <div class="h-3 w-3/12 rounded-full bg-[#E5E7EB]"></div>
+                        <div class="h-3 w-5/12 rounded-full bg-[#E5E7EB]"></div>
+                      </div>
+                    </div>
+
+                    <div class="ih-maiw-checklist hidden absolute inset-x-0 top-0 mt-4 md:mt-8 flex items-start justify-start opacity-0 pointer-events-none">
+                      <div class="grid w-full grid-cols-2 gap-x-3.5 sm:gap-x-4 md:gap-x-6 xl:w-fit xl:grid-cols-[max-content_max-content] xl:gap-x-7 gap-y-2 md:gap-y-2.5">
+                        <div class="ih-maiw-check-item flex items-start xl:items-center gap-1 sm:gap-1.5 xl:gap-2 min-w-0 opacity-0">
+                          <svg class="shrink-0 mt-0.5 xl:mt-0" width="10" height="12" viewBox="0 0 10 12" fill="none"><path d="M8.76315 10.9508H0.887604C0.771563 10.9508 0.660276 10.9047 0.578223 10.8227C0.49617 10.7406 0.450073 10.6293 0.450073 10.5133V0.887604C0.450073 0.771563 0.49617 0.660276 0.578223 0.578223C0.660276 0.49617 0.771563 0.450073 0.887604 0.450073H6.13797L9.20068 3.51279V10.5133C9.20068 10.6293 9.15459 10.7406 9.07253 10.8227C8.99048 10.9047 8.87919 10.9508 8.76315 10.9508Z" stroke="black" stroke-width="0.900063" stroke-linecap="round" stroke-linejoin="round"></path><path d="M6.13757 0.450073V3.51279H9.20029" stroke="black" stroke-width="0.900063" stroke-linecap="round" stroke-linejoin="round"></path><path d="M4.60655 8.32565C5.4523 8.32565 6.13791 7.64004 6.13791 6.7943C6.13791 5.94855 5.4523 5.26294 4.60655 5.26294C3.76081 5.26294 3.0752 5.94855 3.0752 6.7943C3.0752 7.64004 3.76081 8.32565 4.60655 8.32565Z" stroke="#5446FF" stroke-width="0.900063" stroke-linecap="round" stroke-linejoin="round"></path><path d="M5.68835 7.87708L6.57435 8.76307" stroke="#5446FF" stroke-width="0.900063" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+                          <span class="text-[8px] md:text-[10px] xl:text-xs font-normal text-[#111827] underline underline-offset-2 leading-tight break-words">Parsing transformation rules</span>
+                        </div>
+                        <div class="ih-maiw-check-item flex items-start xl:items-center gap-1 sm:gap-1.5 xl:gap-2 min-w-0 opacity-0">
+                          <svg class="shrink-0 mt-0.5 xl:mt-0" width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M7.37441 4.77747H4.77808V7.3738H7.37441V4.77747Z" stroke="#5446FF" stroke-width="0.900063" stroke-linecap="round" stroke-linejoin="round"></path><path d="M9.9705 1.74817H2.1815C1.94252 1.74817 1.74878 1.94191 1.74878 2.18089V9.96989C1.74878 10.2089 1.94252 10.4026 2.1815 10.4026H9.9705C10.2095 10.4026 10.4032 10.2089 10.4032 9.96989V2.18089C10.4032 1.94191 10.2095 1.74817 9.9705 1.74817Z" stroke="black" stroke-width="0.900063" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+                          <span class="text-[8px] md:text-[10px] xl:text-xs font-normal text-[#111827] underline underline-offset-2 leading-tight break-words">Validating automated ERP mapping</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div class="ih-maiw-chart hidden absolute inset-0 flex items-center justify-center opacity-0 pointer-events-none">
+                      {card.image && (
+                        <img
+                          src={card.image}
+                          alt={card.title}
+                          class="w-full h-auto max-h-[88%] md:max-h-[92%] object-contain rounded-lg block"
+                          loading="lazy"
+                          decoding="async"
+                        />
+                      )}
+                    </div>
+                  </div>
+
+                  <div class="ih-maiw-input-container relative z-20 flex w-full shrink-0 items-center justify-center">
+                    <div class="ih-maiw-input-pill relative flex w-full items-center gap-2 rounded-full border border-[#A6C705]/40 bg-generic-00 pl-3.5 pr-2 py-2.5 md:py-3 shadow-xs">
+                      <svg class="ih-maiw-pill-border pointer-events-none absolute inset-0 h-full w-full overflow-visible" aria-hidden="true">
+                        <defs>
+                          <linearGradient id={`ih-maiw-pill-border-grad-${i}`} x1="0%" y1="0%" x2="100%" y2="0%" gradientUnits="objectBoundingBox">
+                            <stop offset="0%" stop-color="#A6C705" stop-opacity="0.1"></stop>
+                            <stop offset="25%" stop-color="#A6C705" stop-opacity="0.5"></stop>
+                            <stop offset="50%" stop-color="#A6C705" stop-opacity="1"></stop>
+                            <stop offset="100%" stop-color="#A6C705" stop-opacity="1"></stop>
+                          </linearGradient>
+                        </defs>
+                        <path class="ih-maiw-pill-border-path" fill="none" stroke={`url(#ih-maiw-pill-border-grad-${i})`} stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="opacity: 0;"></path>
+                      </svg>
+                      <svg class="shrink-0 text-vault-navy" width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                        <path d="M0.800003 8.80005H16.8" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"></path>
+                        <path d="M8.8 0.800049V16.8" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"></path>
+                      </svg>
+                      <div class="min-w-0 flex-1 relative h-6 flex items-center overflow-hidden">
+                        <span class="ih-maiw-pill-placeholder absolute inset-y-0 left-0 flex items-center font-body text-xs md:text-sm lg:text-[length:var(--fs-body)] text-neutral-400 pointer-events-none">
+                          Ask anything...
+                        </span>
+                        <span class="ih-maiw-pill-typed hidden absolute inset-y-0 left-0 right-0 flex items-center font-body text-sm md:text-sm lg:text-[length:var(--fs-body)] text-vault-navy opacity-0 pointer-events-none font-medium tracking-tight">
+                          <span class="ih-maiw-pill-typed-text truncate block w-full">{card.query || card.claim}</span>
+                        </span>
+                        <span class="ih-maiw-pill-thinking absolute inset-y-0 left-0 flex items-center gap-1.5 font-body text-xs md:text-sm lg:text-[length:var(--fs-body)] text-neutral-500 opacity-0 pointer-events-none font-medium">
+                          <span>Thinking</span>
+                          <span class="inline-flex items-center gap-0.5 ml-0.5">
+                            <span class="inline-block h-1 w-1 rounded-full bg-neutral-400 animate-bounce" style="animation-delay: 0ms;"></span>
+                            <span class="inline-block h-1 w-1 rounded-full bg-neutral-400 animate-bounce" style="animation-delay: 150ms;"></span>
+                            <span class="inline-block h-1 w-1 rounded-full bg-neutral-400 animate-bounce" style="animation-delay: 300ms;"></span>
+                          </span>
+                        </span>
+                      </div>
+                      <button type="button" aria-label="Submit prompt" class="ih-maiw-submit-btn flex h-8 w-8 shrink-0 cursor-pointer items-center justify-center rounded-full border-0 bg-nova-blue">
+                        <svg width="11" height="14" viewBox="0 0 11 14" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                          <path d="M5.22425 0.600025L5.22426 13.4M0.424255 5.40002L5.22425 0.600025L10.0243 5.40002" stroke="white" stroke-width="1.2" stroke-linejoin="round"></path>
+                        </svg>
+                      </button>
+                    </div>
+                  </div>
+
+                  <div class="ih-maiw-cursor pointer-events-none absolute z-30 opacity-0 top-0 left-0">
+                    <img src="https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6ab26584bc5572adf499e114_marker.png" alt="" width="24" height="24" loading="lazy" decoding="async" class="w-6 h-6 object-contain" />
+                  </div>
+                </div>
+              </div>
+            ) : i === 8 ? (
+              <!-- ============================================================
+                   INDEX 8: RCM and Ineligible Classification Agent
+                   Customize this layout specifically for Card 8
+                   ============================================================ -->
+              <div class="ih-maiw-content ih-maiw-layout-8 flex flex-col items-start gap-6 lg:flex-row lg:gap-12">
+                <div class="flex w-full flex-col justify-between gap-6 lg:w-[416px] lg:shrink-0 lg:self-stretch">
+                  <div class="flex flex-col gap-6">
+                    <div>
+                      <div class="mb-6">
+                        {card.icon ? (
+                          <img src={card.icon} alt="" class="h-16 w-16 rounded-lg object-contain" loading="lazy" decoding="async" />
+                        ) : (
+                          <span class="block h-16 w-16 rounded-lg bg-visual-placeholder" aria-hidden="true" />
+                        )}
+                      </div>
+                      <h3 class="m-0 mb-2 pr-12 font-heading font-medium text-vault-navy text-[length:var(--fs-h5)] leading-[length:var(--lh-h5)] tracking-[-0.5px] lg:pr-0">
+                        {card.title}
+                      </h3>
+                      <p class="m-0 font-body font-medium text-nova-blue text-[length:var(--fs-body)] leading-[length:var(--lh-body)]">
+                        {card.claim}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div class="flex flex-col gap-6">
+                    <p class="m-0 font-body font-normal text-neutral-500 text-[length:var(--fs-body)] leading-[length:var(--lh-body)]">
+                      {card.caption}
+                    </p>
+
+                    <div class="flex items-center gap-2">
+                      <button type="button" aria-label="Previous" class="inline-flex cursor-pointer items-center justify-center rounded border border-neutral-300 bg-generic-00 p-2 text-vault-navy transition-colors duration-150 hover:border-nova-blue" data-ih-maiw-prev>
+                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true" focusable="false"><path d="M12 15L7 10L12 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" /></svg>
+                      </button>
+                      <button type="button" aria-label="Next" class="inline-flex cursor-pointer items-center justify-center rounded border border-neutral-300 bg-generic-00 p-2 text-vault-navy transition-colors duration-150 hover:border-nova-blue" data-ih-maiw-next>
+                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true" focusable="false"><path d="M7 5L12 10L7 15" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" /></svg>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Stage / Visual Column (Right) -->
+                <div
+                  class="ih-maiw-stage-wrap relative flex w-full flex-col bg-generic-00 justify-between overflow-hidden rounded-xl border border-[#111827] p-3.5 sm:p-4 md:p-5 aspect-[1280/720] min-h-[320px] md:min-h-[420px] select-none bg-cover bg-center bg-no-repeat lg:w-auto lg:flex-1 cursor-pointer"
+                  style="background-image:url('https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6ab399f1e2c6a1e38c91700f_dots-bg.png');"
+                  title="Click to skip animation"
+                >
+                  <div
+                    class="ih-maiw-glow pointer-events-none absolute inset-0 z-0 opacity-100"
+                    style="background: radial-gradient(ellipse 65% 50% at 50% 50%, rgba(212, 248, 66, 0.22) 0%, rgba(212, 248, 66, 0) 70%);"
+                  ></div>
+                  <div
+                    class="ih-maiw-glow-bottom pointer-events-none absolute inset-x-0 bottom-3 h-50 z-0 opacity-0"
+                    style="background: radial-gradient(ellipse 75% 65% at 50% 92%, rgba(212, 248, 66, 0.14) 0%, rgba(212, 248, 66, 0) 70%);"
+                  ></div>
+
+                  <div class="ih-maiw-center-title pointer-events-none absolute inset-x-0 top-[26%] z-10 flex flex-col items-center justify-center text-center opacity-100 px-4">
+                    <h3 class="m-0 font-heading font-medium text-vault-navy text-base md:text-[length:var(--fs-h6)] leading-[length:var(--lh-h6)]">
+                      What would you like to review?
+                    </h3>
+                  </div>
+
+                  <div class="ih-maiw-top-stage relative z-10 w-full shrink-0 min-h-[42px] flex items-start">
+                    <div class="ih-maiw-bubble hidden absolute right-0 top-0 self-end max-w-fit rounded-2xl border border-dashed border-[#11182726] bg-[#EDEDED] px-3 py-1.5 md:px-4 md:py-2.5 opacity-0 pointer-events-none">
+                      <p class="ih-maiw-bubble-text m-0 font-body text-xs md:text-sm lg:text-base font-normal leading-[1.35] md:leading-[1.4] text-[#111827]">
+                        {card.query || card.claim}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div class="ih-maiw-middle-stage relative z-10 w-full min-h-0 flex-1 flex flex-col items-start justify-start py-1">
+                    <div class="ih-maiw-skeleton hidden absolute inset-x-0 top-0 mt-4 md:mt-8 flex flex-col justify-start gap-3 opacity-0 pointer-events-none">
+                      <div class="flex items-center gap-3 animate-pulse">
+                        <div class="h-3 w-6/12 rounded-full bg-[#E5E7EB]"></div>
+                        <div class="h-3 w-4/12 rounded-full bg-[#E5E7EB]"></div>
+                      </div>
+                      <div class="flex items-center gap-3 animate-pulse">
+                        <div class="h-3 w-3/12 rounded-full bg-[#E5E7EB]"></div>
+                        <div class="h-3 w-5/12 rounded-full bg-[#E5E7EB]"></div>
+                      </div>
+                    </div>
+
+                    <div class="ih-maiw-checklist hidden absolute inset-x-0 top-0 mt-4 md:mt-8 flex items-start justify-start opacity-0 pointer-events-none">
+                      <div class="grid w-full grid-cols-2 gap-x-3.5 sm:gap-x-4 md:gap-x-6 xl:w-fit xl:grid-cols-[max-content_max-content] xl:gap-x-7 gap-y-2 md:gap-y-2.5">
+                        <div class="ih-maiw-check-item flex items-start xl:items-center gap-1 sm:gap-1.5 xl:gap-2 min-w-0 opacity-0">
+                          <svg class="shrink-0 mt-0.5 xl:mt-0" width="10" height="12" viewBox="0 0 10 12" fill="none"><path d="M8.76315 10.9508H0.887604C0.771563 10.9508 0.660276 10.9047 0.578223 10.8227C0.49617 10.7406 0.450073 10.6293 0.450073 10.5133V0.887604C0.450073 0.771563 0.49617 0.660276 0.578223 0.578223C0.660276 0.49617 0.771563 0.450073 0.887604 0.450073H6.13797L9.20068 3.51279V10.5133C9.20068 10.6293 9.15459 10.7406 9.07253 10.8227C8.99048 10.9047 8.87919 10.9508 8.76315 10.9508Z" stroke="black" stroke-width="0.900063" stroke-linecap="round" stroke-linejoin="round"></path><path d="M6.13757 0.450073V3.51279H9.20029" stroke="black" stroke-width="0.900063" stroke-linecap="round" stroke-linejoin="round"></path><path d="M4.60655 8.32565C5.4523 8.32565 6.13791 7.64004 6.13791 6.7943C6.13791 5.94855 5.4523 5.26294 4.60655 5.26294C3.76081 5.26294 3.0752 5.94855 3.0752 6.7943C3.0752 7.64004 3.76081 8.32565 4.60655 8.32565Z" stroke="#5446FF" stroke-width="0.900063" stroke-linecap="round" stroke-linejoin="round"></path><path d="M5.68835 7.87708L6.57435 8.76307" stroke="#5446FF" stroke-width="0.900063" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+                          <span class="text-[8px] md:text-[10px] xl:text-xs font-normal text-[#111827] underline underline-offset-2 leading-tight break-words">Analyzing ledger codes & commentary</span>
+                        </div>
+                        <div class="ih-maiw-check-item flex items-start xl:items-center gap-1 sm:gap-1.5 xl:gap-2 min-w-0 opacity-0">
+                          <svg class="shrink-0 mt-0.5 xl:mt-0" width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M7.37441 4.77747H4.77808V7.3738H7.37441V4.77747Z" stroke="#5446FF" stroke-width="0.900063" stroke-linecap="round" stroke-linejoin="round"></path><path d="M9.9705 1.74817H2.1815C1.94252 1.74817 1.74878 1.94191 1.74878 2.18089V9.96989C1.74878 10.2089 1.94252 10.4026 2.1815 10.4026H9.9705C10.2095 10.4026 10.4032 10.2089 10.4032 9.96989V2.18089C10.4032 1.94191 10.2095 1.74817 9.9705 1.74817Z" stroke="black" stroke-width="0.900063" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+                          <span class="text-[8px] md:text-[10px] xl:text-xs font-normal text-[#111827] underline underline-offset-2 leading-tight break-words">Classifying high-confidence ITC queues</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div class="ih-maiw-chart hidden absolute inset-0 flex items-center justify-center opacity-0 pointer-events-none">
+                      {card.image && (
+                        <img
+                          src={card.image}
+                          alt={card.title}
+                          class="w-full h-auto max-h-[88%] md:max-h-[92%] object-contain rounded-lg block"
+                          loading="lazy"
+                          decoding="async"
+                        />
+                      )}
+                    </div>
+                  </div>
+
+                  <div class="ih-maiw-input-container relative z-20 flex w-full shrink-0 items-center justify-center">
+                    <div class="ih-maiw-input-pill relative flex w-full items-center gap-2 rounded-full border border-[#A6C705]/40 bg-generic-00 pl-3.5 pr-2 py-2.5 md:py-3 shadow-xs">
+                      <svg class="ih-maiw-pill-border pointer-events-none absolute inset-0 h-full w-full overflow-visible" aria-hidden="true">
+                        <defs>
+                          <linearGradient id={`ih-maiw-pill-border-grad-${i}`} x1="0%" y1="0%" x2="100%" y2="0%" gradientUnits="objectBoundingBox">
+                            <stop offset="0%" stop-color="#A6C705" stop-opacity="0.1"></stop>
+                            <stop offset="25%" stop-color="#A6C705" stop-opacity="0.5"></stop>
+                            <stop offset="50%" stop-color="#A6C705" stop-opacity="1"></stop>
+                            <stop offset="100%" stop-color="#A6C705" stop-opacity="1"></stop>
+                          </linearGradient>
+                        </defs>
+                        <path class="ih-maiw-pill-border-path" fill="none" stroke={`url(#ih-maiw-pill-border-grad-${i})`} stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="opacity: 0;"></path>
+                      </svg>
+                      <svg class="shrink-0 text-vault-navy" width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                        <path d="M0.800003 8.80005H16.8" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"></path>
+                        <path d="M8.8 0.800049V16.8" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"></path>
+                      </svg>
+                      <div class="min-w-0 flex-1 relative h-6 flex items-center overflow-hidden">
+                        <span class="ih-maiw-pill-placeholder absolute inset-y-0 left-0 flex items-center font-body text-xs md:text-sm lg:text-[length:var(--fs-body)] text-neutral-400 pointer-events-none">
+                          Ask anything...
+                        </span>
+                        <span class="ih-maiw-pill-typed hidden absolute inset-y-0 left-0 right-0 flex items-center font-body text-sm md:text-sm lg:text-[length:var(--fs-body)] text-vault-navy opacity-0 pointer-events-none font-medium tracking-tight">
+                          <span class="ih-maiw-pill-typed-text truncate block w-full">{card.query || card.claim}</span>
+                        </span>
+                        <span class="ih-maiw-pill-thinking absolute inset-y-0 left-0 flex items-center gap-1.5 font-body text-xs md:text-sm lg:text-[length:var(--fs-body)] text-neutral-500 opacity-0 pointer-events-none font-medium">
+                          <span>Thinking</span>
+                          <span class="inline-flex items-center gap-0.5 ml-0.5">
+                            <span class="inline-block h-1 w-1 rounded-full bg-neutral-400 animate-bounce" style="animation-delay: 0ms;"></span>
+                            <span class="inline-block h-1 w-1 rounded-full bg-neutral-400 animate-bounce" style="animation-delay: 150ms;"></span>
+                            <span class="inline-block h-1 w-1 rounded-full bg-neutral-400 animate-bounce" style="animation-delay: 300ms;"></span>
+                          </span>
+                        </span>
+                      </div>
+                      <button type="button" aria-label="Submit prompt" class="ih-maiw-submit-btn flex h-8 w-8 shrink-0 cursor-pointer items-center justify-center rounded-full border-0 bg-nova-blue">
+                        <svg width="11" height="14" viewBox="0 0 11 14" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                          <path d="M5.22425 0.600025L5.22426 13.4M0.424255 5.40002L5.22425 0.600025L10.0243 5.40002" stroke="white" stroke-width="1.2" stroke-linejoin="round"></path>
+                        </svg>
+                      </button>
+                    </div>
+                  </div>
+
+                  <div class="ih-maiw-cursor pointer-events-none absolute z-30 opacity-0 top-0 left-0">
+                    <img src="https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6ab26584bc5572adf499e114_marker.png" alt="" width="24" height="24" loading="lazy" decoding="async" class="w-6 h-6 object-contain" />
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <!-- ============================================================
+                   INDEX 9: Advance Adjustment Agent
+                   Customize this layout specifically for Card 9
+                   ============================================================ -->
+              <div class="ih-maiw-content ih-maiw-layout-9 flex flex-col items-start gap-6 lg:flex-row lg:gap-12">
+                <div class="flex w-full flex-col justify-between gap-6 lg:w-[416px] lg:shrink-0 lg:self-stretch">
+                  <div class="flex flex-col gap-6">
+                    <div>
+                      <div class="mb-6">
+                        {card.icon ? (
+                          <img src={card.icon} alt="" class="h-16 w-16 rounded-lg object-contain" loading="lazy" decoding="async" />
+                        ) : (
+                          <span class="block h-16 w-16 rounded-lg bg-visual-placeholder" aria-hidden="true" />
+                        )}
+                      </div>
+                      <h3 class="m-0 mb-2 pr-12 font-heading font-medium text-vault-navy text-[length:var(--fs-h5)] leading-[length:var(--lh-h5)] tracking-[-0.5px] lg:pr-0">
+                        {card.title}
+                      </h3>
+                      <p class="m-0 font-body font-medium text-nova-blue text-[length:var(--fs-body)] leading-[length:var(--lh-body)]">
+                        {card.claim}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div class="flex flex-col gap-6">
+                    <p class="m-0 font-body font-normal text-neutral-500 text-[length:var(--fs-body)] leading-[length:var(--lh-body)]">
+                      {card.caption}
+                    </p>
+
+                    <div class="flex items-center gap-2">
+                      <button type="button" aria-label="Previous" class="inline-flex cursor-pointer items-center justify-center rounded border border-neutral-300 bg-generic-00 p-2 text-vault-navy transition-colors duration-150 hover:border-nova-blue" data-ih-maiw-prev>
+                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true" focusable="false"><path d="M12 15L7 10L12 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" /></svg>
+                      </button>
+                      <button type="button" aria-label="Next" class="inline-flex cursor-pointer items-center justify-center rounded border border-neutral-300 bg-generic-00 p-2 text-vault-navy transition-colors duration-150 hover:border-nova-blue" data-ih-maiw-next>
+                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true" focusable="false"><path d="M7 5L12 10L7 15" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" /></svg>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Stage / Visual Column (Right) -->
+                <div
+                  class="ih-maiw-stage-wrap relative flex w-full flex-col bg-generic-00 justify-between overflow-hidden rounded-xl border border-[#111827] p-3.5 sm:p-4 md:p-5 aspect-[1280/720] min-h-[320px] md:min-h-[420px] select-none bg-cover bg-center bg-no-repeat lg:w-auto lg:flex-1 cursor-pointer"
+                  style="background-image:url('https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6ab399f1e2c6a1e38c91700f_dots-bg.png');"
+                  title="Click to skip animation"
+                >
+                  <div
+                    class="ih-maiw-glow pointer-events-none absolute inset-0 z-0 opacity-100"
+                    style="background: radial-gradient(ellipse 65% 50% at 50% 50%, rgba(212, 248, 66, 0.22) 0%, rgba(212, 248, 66, 0) 70%);"
+                  ></div>
+                  <div
+                    class="ih-maiw-glow-bottom pointer-events-none absolute inset-x-0 bottom-3 h-50 z-0 opacity-0"
+                    style="background: radial-gradient(ellipse 75% 65% at 50% 92%, rgba(212, 248, 66, 0.14) 0%, rgba(212, 248, 66, 0) 70%);"
+                  ></div>
+
+                  <div class="ih-maiw-center-title pointer-events-none absolute inset-x-0 top-[26%] z-10 flex flex-col items-center justify-center text-center opacity-100 px-4">
+                    <h3 class="m-0 font-heading font-medium text-vault-navy text-base md:text-[length:var(--fs-h6)] leading-[length:var(--lh-h6)]">
+                      What would you like to review?
+                    </h3>
+                  </div>
+
+                  <div class="ih-maiw-top-stage relative z-10 w-full shrink-0 min-h-[42px] flex items-start">
+                    <div class="ih-maiw-bubble hidden absolute right-0 top-0 self-end max-w-fit rounded-2xl border border-dashed border-[#11182726] bg-[#EDEDED] px-3 py-1.5 md:px-4 md:py-2.5 opacity-0 pointer-events-none">
+                      <p class="ih-maiw-bubble-text m-0 font-body text-xs md:text-sm lg:text-base font-normal leading-[1.35] md:leading-[1.4] text-[#111827]">
+                        {card.query || card.claim}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div class="ih-maiw-middle-stage relative z-10 w-full min-h-0 flex-1 flex flex-col items-start justify-start py-1">
+                    <div class="ih-maiw-skeleton hidden absolute inset-x-0 top-0 mt-4 md:mt-8 flex flex-col justify-start gap-3 opacity-0 pointer-events-none">
+                      <div class="flex items-center gap-3 animate-pulse">
+                        <div class="h-3 w-6/12 rounded-full bg-[#E5E7EB]"></div>
+                        <div class="h-3 w-4/12 rounded-full bg-[#E5E7EB]"></div>
+                      </div>
+                      <div class="flex items-center gap-3 animate-pulse">
+                        <div class="h-3 w-3/12 rounded-full bg-[#E5E7EB]"></div>
+                        <div class="h-3 w-5/12 rounded-full bg-[#E5E7EB]"></div>
+                      </div>
+                    </div>
+
+                    <div class="ih-maiw-checklist hidden absolute inset-x-0 top-0 mt-4 md:mt-8 flex items-start justify-start opacity-0 pointer-events-none">
+                      <div class="grid w-full grid-cols-2 gap-x-3.5 sm:gap-x-4 md:gap-x-6 xl:w-fit xl:grid-cols-[max-content_max-content] xl:gap-x-7 gap-y-2 md:gap-y-2.5">
+                        <div class="ih-maiw-check-item flex items-start xl:items-center gap-1 sm:gap-1.5 xl:gap-2 min-w-0 opacity-0">
+                          <svg class="shrink-0 mt-0.5 xl:mt-0" width="10" height="12" viewBox="0 0 10 12" fill="none"><path d="M8.76315 10.9508H0.887604C0.771563 10.9508 0.660276 10.9047 0.578223 10.8227C0.49617 10.7406 0.450073 10.6293 0.450073 10.5133V0.887604C0.450073 0.771563 0.49617 0.660276 0.578223 0.578223C0.660276 0.49617 0.771563 0.450073 0.887604 0.450073H6.13797L9.20068 3.51279V10.5133C9.20068 10.6293 9.15459 10.7406 9.07253 10.8227C8.99048 10.9047 8.87919 10.9508 8.76315 10.9508Z" stroke="black" stroke-width="0.900063" stroke-linecap="round" stroke-linejoin="round"></path><path d="M6.13757 0.450073V3.51279H9.20029" stroke="black" stroke-width="0.900063" stroke-linecap="round" stroke-linejoin="round"></path><path d="M4.60655 8.32565C5.4523 8.32565 6.13791 7.64004 6.13791 6.7943C6.13791 5.94855 5.4523 5.26294 4.60655 5.26294C3.76081 5.26294 3.0752 5.94855 3.0752 6.7943C3.0752 7.64004 3.76081 8.32565 4.60655 8.32565Z" stroke="#5446FF" stroke-width="0.900063" stroke-linecap="round" stroke-linejoin="round"></path><path d="M5.68835 7.87708L6.57435 8.76307" stroke="#5446FF" stroke-width="0.900063" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+                          <span class="text-[8px] md:text-[10px] xl:text-xs font-normal text-[#111827] underline underline-offset-2 leading-tight break-words">Matching advances against invoices</span>
+                        </div>
+                        <div class="ih-maiw-check-item flex items-start xl:items-center gap-1 sm:gap-1.5 xl:gap-2 min-w-0 opacity-0">
+                          <svg class="shrink-0 mt-0.5 xl:mt-0" width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M7.37441 4.77747H4.77808V7.3738H7.37441V4.77747Z" stroke="#5446FF" stroke-width="0.900063" stroke-linecap="round" stroke-linejoin="round"></path><path d="M9.9705 1.74817H2.1815C1.94252 1.74817 1.74878 1.94191 1.74878 2.18089V9.96989C1.74878 10.2089 1.94252 10.4026 2.1815 10.4026H9.9705C10.2095 10.4026 10.4032 10.2089 10.4032 9.96989V2.18089C10.4032 1.94191 10.2095 1.74817 9.9705 1.74817Z" stroke="black" stroke-width="0.900063" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+                          <span class="text-[8px] md:text-[10px] xl:text-xs font-normal text-[#111827] underline underline-offset-2 leading-tight break-words">Generating adjustment recommendations</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div class="ih-maiw-chart hidden absolute inset-0 flex items-center justify-center opacity-0 pointer-events-none">
+                      {card.image && (
+                        <img
+                          src={card.image}
+                          alt={card.title}
+                          class="w-full h-auto max-h-[88%] md:max-h-[92%] object-contain rounded-lg block"
+                          loading="lazy"
+                          decoding="async"
+                        />
+                      )}
+                    </div>
+                  </div>
+
+                  <div class="ih-maiw-input-container relative z-20 flex w-full shrink-0 items-center justify-center">
+                    <div class="ih-maiw-input-pill relative flex w-full items-center gap-2 rounded-full border border-[#A6C705]/40 bg-generic-00 pl-3.5 pr-2 py-2.5 md:py-3 shadow-xs">
+                      <svg class="ih-maiw-pill-border pointer-events-none absolute inset-0 h-full w-full overflow-visible" aria-hidden="true">
+                        <defs>
+                          <linearGradient id={`ih-maiw-pill-border-grad-${i}`} x1="0%" y1="0%" x2="100%" y2="0%" gradientUnits="objectBoundingBox">
+                            <stop offset="0%" stop-color="#A6C705" stop-opacity="0.1"></stop>
+                            <stop offset="25%" stop-color="#A6C705" stop-opacity="0.5"></stop>
+                            <stop offset="50%" stop-color="#A6C705" stop-opacity="1"></stop>
+                            <stop offset="100%" stop-color="#A6C705" stop-opacity="1"></stop>
+                          </linearGradient>
+                        </defs>
+                        <path class="ih-maiw-pill-border-path" fill="none" stroke={`url(#ih-maiw-pill-border-grad-${i})`} stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="opacity: 0;"></path>
+                      </svg>
+                      <svg class="shrink-0 text-vault-navy" width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                        <path d="M0.800003 8.80005H16.8" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"></path>
+                        <path d="M8.8 0.800049V16.8" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"></path>
+                      </svg>
+                      <div class="min-w-0 flex-1 relative h-6 flex items-center overflow-hidden">
+                        <span class="ih-maiw-pill-placeholder absolute inset-y-0 left-0 flex items-center font-body text-xs md:text-sm lg:text-[length:var(--fs-body)] text-neutral-400 pointer-events-none">
+                          Ask anything...
+                        </span>
+                        <span class="ih-maiw-pill-typed hidden absolute inset-y-0 left-0 right-0 flex items-center font-body text-sm md:text-sm lg:text-[length:var(--fs-body)] text-vault-navy opacity-0 pointer-events-none font-medium tracking-tight">
+                          <span class="ih-maiw-pill-typed-text truncate block w-full">{card.query || card.claim}</span>
+                        </span>
+                        <span class="ih-maiw-pill-thinking absolute inset-y-0 left-0 flex items-center gap-1.5 font-body text-xs md:text-sm lg:text-[length:var(--fs-body)] text-neutral-500 opacity-0 pointer-events-none font-medium">
+                          <span>Thinking</span>
+                          <span class="inline-flex items-center gap-0.5 ml-0.5">
+                            <span class="inline-block h-1 w-1 rounded-full bg-neutral-400 animate-bounce" style="animation-delay: 0ms;"></span>
+                            <span class="inline-block h-1 w-1 rounded-full bg-neutral-400 animate-bounce" style="animation-delay: 150ms;"></span>
+                            <span class="inline-block h-1 w-1 rounded-full bg-neutral-400 animate-bounce" style="animation-delay: 300ms;"></span>
+                          </span>
+                        </span>
+                      </div>
+                      <button type="button" aria-label="Submit prompt" class="ih-maiw-submit-btn flex h-8 w-8 shrink-0 cursor-pointer items-center justify-center rounded-full border-0 bg-nova-blue">
+                        <svg width="11" height="14" viewBox="0 0 11 14" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                          <path d="M5.22425 0.600025L5.22426 13.4M0.424255 5.40002L5.22425 0.600025L10.0243 5.40002" stroke="white" stroke-width="1.2" stroke-linejoin="round"></path>
+                        </svg>
+                      </button>
+                    </div>
+                  </div>
+
+                  <div class="ih-maiw-cursor pointer-events-none absolute z-30 opacity-0 top-0 left-0">
+                    <img src="https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6ab26584bc5572adf499e114_marker.png" alt="" width="24" height="24" loading="lazy" decoding="async" class="w-6 h-6 object-contain" />
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        ))
+      }
     </div>
   </div>
 </div>
 
 <style is:global>
+  [data-ih-maiw-overlay-card][hidden] {
+    display: none !important;
+  }
+
   [data-ih-maiw-image][hidden] {
     display: none !important;
+  }
+
+  .ih-maiw-chart.is-revealed {
+    display: flex;
+    opacity: 1;
+    pointer-events: auto;
   }
 
   .ih-maiw-tab {
@@ -537,6 +2137,28 @@ const panels = groups.map((group) => ({
       transition: opacity 0.2s ease;
     }
   }
+
+  /* ===================================================================
+   * PER-CARD OVERLAY STYLES
+   * =================================================================
+   * Each card overlay now has its own JSX block above:
+   *   {i === 0 ? (...) : i === 1 ? (...) : ...}
+   *
+   * And each card has its own layout class:
+   *   .ih-maiw-layout-0 (CFO Dashboard)
+   *   .ih-maiw-layout-1 (Tax Governance)
+   *   .ih-maiw-layout-2 (Audit and Advisory)
+   *   .ih-maiw-layout-3 (Notice Dashboard)
+   *   .ih-maiw-layout-4 (Litigation)
+   *   .ih-maiw-layout-5 (Refund)
+   *   .ih-maiw-layout-6 (180-Day Reversal)
+   *   .ih-maiw-layout-7 (ERP Writeback)
+   *   .ih-maiw-layout-8 (RCM & Ineligible)
+   *   .ih-maiw-layout-9 (Advance Adjustment)
+   *
+   * You can change HTML structure directly in the {i === ?} conditions
+   * above, and/or add specific CSS here.
+   * ================================================================= */
 </style>
 
 <script is:inline>
@@ -633,26 +2255,599 @@ const panels = groups.map((group) => ({
     /* ---- detail overlay ---- */
 
     var panel = overlay.querySelector("[data-ih-maiw-panel-detail]");
+    var overlayCards = overlay.querySelectorAll("[data-ih-maiw-overlay-card]");
     var closeBtn = overlay.querySelector("[data-ih-maiw-close]");
-    var prevBtn = overlay.querySelector("[data-ih-maiw-prev]");
-    var nextBtn = overlay.querySelector("[data-ih-maiw-next]");
-    var heads = overlay.querySelectorAll("[data-ih-maiw-head]");
-    var bodies = overlay.querySelectorAll("[data-ih-maiw-body]");
-    var images = overlay.querySelectorAll("[data-ih-maiw-image]");
-    if (!panel || !heads.length || heads.length !== bodies.length) return;
+    if (!panel || !overlayCards.length) return;
 
-    var count = heads.length;
+    var count = overlayCards.length;
     var current = 0;
     var lastFocused = null;
+
+    /* ---- stage animation logic ---- */
+    var currentTl = null;
+    var activeUpdatePillPath = null;
+
+    function loadGsap(cb) {
+      if (typeof window.gsap !== "undefined") {
+        cb();
+        return;
+      }
+      var s = document.createElement("script");
+      s.src = "https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js";
+      s.onload = cb;
+      document.head.appendChild(s);
+    }
+
+    function isOpen() {
+      return overlay.style.display === "flex";
+    }
+
+    function resetCardStage(card) {
+      if (!card) return;
+      var stage = card.querySelector(".ih-maiw-stage-wrap");
+      if (!stage) return;
+
+      var glow = stage.querySelector(".ih-maiw-glow");
+      var glowBottom = stage.querySelector(".ih-maiw-glow-bottom");
+      var centerTitle = stage.querySelector(".ih-maiw-center-title");
+      var bubble = stage.querySelector(".ih-maiw-bubble");
+      var skeleton = stage.querySelector(".ih-maiw-skeleton");
+      var checklist = stage.querySelector(".ih-maiw-checklist");
+      var checkItems = stage.querySelectorAll(".ih-maiw-check-item");
+      var chart = stage.querySelector(".ih-maiw-chart");
+      var inputPill = stage.querySelector(".ih-maiw-input-pill");
+      var pillPlaceholder = stage.querySelector(".ih-maiw-pill-placeholder");
+      var pillTyped = stage.querySelector(".ih-maiw-pill-typed");
+      var pillTypedText = stage.querySelector(".ih-maiw-pill-typed-text");
+      var pillThinking = stage.querySelector(".ih-maiw-pill-thinking");
+      var cursor = stage.querySelector(".ih-maiw-cursor");
+      var borderPath = stage.querySelector(".ih-maiw-pill-border-path");
+
+      if (chart) {
+        chart.classList.remove("is-revealed");
+        chart.classList.add("hidden");
+        chart.style.display = "none";
+        chart.style.opacity = "0";
+        chart.style.pointerEvents = "none";
+        chart.style.transform = "none";
+      }
+      if (glow) glow.style.opacity = "1";
+      if (glowBottom) glowBottom.style.opacity = "0";
+      if (centerTitle) {
+        centerTitle.style.opacity = "1";
+        centerTitle.style.transform = "none";
+      }
+      if (bubble) {
+        bubble.classList.add("hidden");
+        bubble.style.display = "none";
+        bubble.style.opacity = "0";
+        bubble.style.transform = "none";
+      }
+      if (skeleton) {
+        skeleton.classList.add("hidden");
+        skeleton.style.display = "none";
+        skeleton.style.opacity = "0";
+      }
+      if (checklist) {
+        checklist.classList.add("hidden");
+        checklist.style.display = "none";
+        checklist.style.opacity = "0";
+      }
+      if (checkItems) {
+        checkItems.forEach(function (item) {
+          item.style.opacity = "0";
+          item.style.transform = "none";
+        });
+      }
+      if (pillPlaceholder) {
+        pillPlaceholder.style.display = "flex";
+        pillPlaceholder.style.opacity = "1";
+      }
+      if (pillTyped) {
+        pillTyped.style.display = "none";
+        pillTyped.style.opacity = "0";
+      }
+      if (pillTypedText) {
+        pillTypedText.textContent = "";
+      }
+      if (pillThinking) {
+        pillThinking.style.display = "none";
+        pillThinking.style.opacity = "0";
+      }
+      if (cursor) {
+        cursor.style.opacity = "0";
+        cursor.style.transform = "none";
+      }
+      if (borderPath) {
+        borderPath.style.opacity = "0";
+      }
+      if (inputPill) {
+        inputPill.style.transform = "none";
+      }
+    }
+
+    function playAnimation(index) {
+      if (currentTl) {
+        currentTl.kill();
+        currentTl = null;
+      }
+
+      var activeCard = overlayCards[index];
+      // Only start animation if this card is currently active, overlay is open, and card is not hidden
+      if (!activeCard || activeCard.hidden || !isOpen()) return;
+
+      var stage = activeCard.querySelector(".ih-maiw-stage-wrap");
+      if (!stage) return;
+
+      // Cleanly reset this active card's elements before building the animation
+      resetCardStage(activeCard);
+
+      var glow = stage.querySelector(".ih-maiw-glow");
+      var glowBottom = stage.querySelector(".ih-maiw-glow-bottom");
+      var centerTitle = stage.querySelector(".ih-maiw-center-title");
+      var bubble = stage.querySelector(".ih-maiw-bubble");
+      var bubbleText = stage.querySelector(".ih-maiw-bubble-text");
+      var skeleton = stage.querySelector(".ih-maiw-skeleton");
+      var checklist = stage.querySelector(".ih-maiw-checklist");
+      var checkItems = stage.querySelectorAll(".ih-maiw-check-item");
+      var chart = stage.querySelector(".ih-maiw-chart");
+      var inputPill = stage.querySelector(".ih-maiw-input-pill");
+      var pillPlaceholder = stage.querySelector(".ih-maiw-pill-placeholder");
+      var pillTyped = stage.querySelector(".ih-maiw-pill-typed");
+      var pillTypedText = stage.querySelector(".ih-maiw-pill-typed-text");
+      var pillThinking = stage.querySelector(".ih-maiw-pill-thinking");
+      var submitBtn = stage.querySelector(".ih-maiw-submit-btn");
+      var cursor = stage.querySelector(".ih-maiw-cursor");
+      var borderPath = stage.querySelector(".ih-maiw-pill-border-path");
+
+      // Skip animation on clicking stage
+      stage.onclick = function () {
+        if (currentTl && currentTl.isActive()) {
+          currentTl.seek(currentTl.duration());
+        }
+      };
+
+      // If this card is not an interactive animation stage, reveal its chart/image immediately
+      if (!inputPill || !cursor || !chart) {
+        if (chart) {
+          chart.classList.remove("hidden");
+          chart.classList.add("is-revealed");
+          chart.style.display = "flex";
+          chart.style.opacity = "1";
+        }
+        return;
+      }
+
+      function calcCenterOffset() {
+        var sRect = stage.getBoundingClientRect();
+        var pRect = inputPill.getBoundingClientRect();
+        var stageH = stage.offsetHeight || sRect.height || 420;
+        var pillH = inputPill.offsetHeight || pRect.height || 48;
+        var pillTop = pRect.top - sRect.top;
+        if (!pillTop || pillTop <= 0 || pillTop < stageH * 0.5) {
+          pillTop = stageH - pillH - 24;
+        }
+        var targetCenter = stageH * 0.53 - pillH / 2;
+        return targetCenter - pillTop;
+      }
+
+      function updatePillPath() {
+        if (!borderPath || !inputPill) return 0;
+        var w = inputPill.offsetWidth - 2;
+        var h = inputPill.offsetHeight - 2;
+        var r = h / 2;
+        var x0 = 1;
+        var y0 = 1;
+        var d =
+          "M " +
+          x0 +
+          " " +
+          (y0 + r) +
+          " A " +
+          r +
+          " " +
+          r +
+          " 0 0 1 " +
+          (x0 + r) +
+          " " +
+          y0 +
+          " H " +
+          (x0 + w - r) +
+          " A " +
+          r +
+          " " +
+          r +
+          " 0 0 1 " +
+          (x0 + w) +
+          " " +
+          (y0 + r) +
+          " A " +
+          r +
+          " " +
+          r +
+          " 0 0 1 " +
+          (x0 + w - r) +
+          " " +
+          (y0 + h) +
+          " H " +
+          (x0 + r) +
+          " A " +
+          r +
+          " " +
+          r +
+          " 0 0 1 " +
+          x0 +
+          " " +
+          (y0 + r) +
+          " Z";
+        borderPath.setAttribute("d", d);
+        var len = 0;
+        try {
+          len = borderPath.getTotalLength();
+        } catch (e) {}
+        if (!len || len <= 0) {
+          len = 2 * (w - h) + Math.PI * h;
+        }
+        return len;
+      }
+      activeUpdatePillPath = updatePillPath;
+
+      function getPillPos() {
+        var cRect = stage.getBoundingClientRect();
+        var pRect = inputPill.getBoundingClientRect();
+        var scaleX = cRect.width / (stage.offsetWidth || 1) || 1;
+        var scaleY = cRect.height / (stage.offsetHeight || 1) || 1;
+        return {
+          x:
+            (pRect.left - cRect.left) / scaleX -
+            (stage.clientLeft || 0) +
+            (pRect.width / scaleX) * 0.38,
+          y:
+            (pRect.top - cRect.top) / scaleY -
+            (stage.clientTop || 0) +
+            (pRect.height / scaleY) * 0.58,
+        };
+      }
+
+      function getSubmitBtnPos() {
+        if (!submitBtn) return { x: 0, y: 0 };
+        var cRect = stage.getBoundingClientRect();
+        var bRect = submitBtn.getBoundingClientRect();
+        var scaleX = cRect.width / (stage.offsetWidth || 1) || 1;
+        var scaleY = cRect.height / (stage.offsetHeight || 1) || 1;
+        return {
+          x:
+            (bRect.left - cRect.left) / scaleX -
+            (stage.clientLeft || 0) +
+            (bRect.width / scaleX) * 0.5,
+          y:
+            (bRect.top - cRect.top) / scaleY -
+            (stage.clientTop || 0) +
+            (bRect.height / scaleY) * 0.58,
+        };
+      }
+
+      var query =
+        (bubbleText && bubbleText.textContent && bubbleText.textContent.trim()) ||
+        "Generate monthly CFO summary and variance analysis";
+      if (bubbleText) bubbleText.textContent = query;
+      if (pillTypedText) pillTypedText.textContent = "";
+
+      if (reduceMotion) {
+        if (chart) {
+          chart.classList.remove("hidden");
+          chart.classList.add("is-revealed");
+          chart.style.display = "flex";
+          chart.style.opacity = "1";
+        }
+        if (centerTitle) centerTitle.style.opacity = "0";
+        if (glow) glow.style.opacity = "0";
+        if (glowBottom) glowBottom.style.opacity = "1";
+        if (bubble) bubble.style.display = "none";
+        if (skeleton) skeleton.style.display = "none";
+        if (checklist) checklist.style.display = "none";
+        if (pillPlaceholder) {
+          pillPlaceholder.style.display = "flex";
+          pillPlaceholder.style.opacity = "1";
+        }
+        if (pillTyped) pillTyped.style.display = "none";
+        if (pillThinking) pillThinking.style.display = "none";
+        if (inputPill) inputPill.style.transform = "none";
+        return;
+      }
+
+      var gsap = window.gsap;
+      if (!gsap) {
+        loadGsap(function () {
+          playAnimation(index);
+        });
+        return;
+      }
+
+      var centerOffset = calcCenterOffset();
+      inputPill.style.transform = "translateY(" + centerOffset + "px)";
+
+      var tl = gsap.timeline({
+        defaults: { ease: "power2.inOut" },
+      });
+      currentTl = tl;
+
+      // Initial Frame 1 state
+      var hideElements = [chart, bubble, skeleton, checklist].filter(Boolean);
+      if (hideElements.length) tl.set(hideElements, { display: "none" });
+      if (chart) {
+        chart.classList.remove("is-revealed");
+        chart.classList.add("hidden");
+        tl.set(chart, { opacity: 0, y: 10, display: "none", pointerEvents: "none" });
+      }
+      if (bubble) tl.set(bubble, { opacity: 0, scale: 0.9, y: 8, pointerEvents: "none" });
+      if (skeleton) tl.set(skeleton, { opacity: 0, pointerEvents: "none" });
+      if (checklist) tl.set(checklist, { opacity: 0, pointerEvents: "none" });
+      if (checkItems && checkItems.length) tl.set(checkItems, { opacity: 0, x: -10 });
+      if (borderPath) tl.set(borderPath, { opacity: 0 });
+
+      if (glow) tl.set(glow, { opacity: 1 });
+      if (glowBottom) tl.set(glowBottom, { opacity: 0 });
+      if (centerTitle) tl.set(centerTitle, { opacity: 1, y: 0 });
+      tl.set(inputPill, {
+        y: function () {
+          return centerOffset;
+        },
+      });
+      if (pillPlaceholder) tl.set(pillPlaceholder, { display: "flex", opacity: 1 });
+      if (pillTyped) tl.set(pillTyped, { display: "none", opacity: 0 });
+      if (pillThinking) tl.set(pillThinking, { display: "none", opacity: 0 });
+      if (cursor) {
+        tl.set(cursor, {
+          opacity: 0,
+          x: function () {
+            return stage.offsetWidth * 0.65;
+          },
+          y: function () {
+            return stage.offsetHeight * 0.65;
+          },
+          scale: 1,
+          transformOrigin: "0% 0%",
+        });
+      }
+
+      // Frame 1: Cursor appears & moves to pill
+      if (cursor) {
+        tl.to(cursor, { opacity: 1, duration: 0.35 }, "+=0.2");
+        tl.to(
+          cursor,
+          {
+            x: function () {
+              return getPillPos().x;
+            },
+            y: function () {
+              return getPillPos().y;
+            },
+            duration: 0.7,
+            ease: "power2.out",
+          },
+          "-=0.1",
+        );
+        // Frame 2: Cursor clicks pill, prompt types out
+        tl.to(cursor, { scale: 0.85, duration: 0.12, yoyo: true, repeat: 1 });
+      }
+
+      if (pillTyped) tl.set(pillTyped, { display: "flex" });
+      if (pillPlaceholder) {
+        tl.to(pillPlaceholder, { opacity: 0, duration: 0.15 }, "<+=0.05");
+        tl.set(pillPlaceholder, { display: "none" });
+      }
+      if (pillTyped) tl.to(pillTyped, { opacity: 1, duration: 0.15 }, "<");
+
+      var typingObj = { charIndex: 0 };
+      tl.to(
+        typingObj,
+        {
+          charIndex: query.length,
+          duration: 0.9,
+          ease: "none",
+          onUpdate: function () {
+            if (pillTypedText) {
+              pillTypedText.textContent = query.slice(
+                0,
+                Math.round(typingObj.charIndex),
+              );
+            }
+          },
+        },
+        "<+=0.1",
+      );
+
+      // Cursor moves to submit arrow button
+      if (cursor && submitBtn) {
+        tl.to(
+          cursor,
+          {
+            x: function () {
+              return getSubmitBtnPos().x;
+            },
+            y: function () {
+              return getSubmitBtnPos().y;
+            },
+            duration: 1.1,
+            ease: "power2.inOut",
+          },
+          "+=0.25",
+        );
+        // Click submit button
+        tl.to(
+          cursor,
+          { scale: 0.8, duration: 0.09, ease: "power2.in" },
+          "+=0.15",
+        );
+        tl.to(submitBtn, { scale: 0.78, duration: 0.09, ease: "power2.in" }, "<");
+        tl.to(cursor, { scale: 1, duration: 0.14, ease: "power2.out" });
+        tl.to(
+          submitBtn,
+          { scale: 1, duration: 0.16, ease: "back.out(2.5)" },
+          "<",
+        );
+        tl.to(cursor, { opacity: 0, duration: 0.25 }, "+=0.15");
+      }
+
+      // Pill drops down: center title and center glow fade out, bottom ambient glow fades in
+      if (centerTitle) {
+        tl.to(
+          centerTitle,
+          { opacity: 0, y: -10, duration: 0.45, ease: "power2.in" },
+          "-=0.1",
+        );
+      }
+      if (glow) tl.to(glow, { opacity: 0, duration: 0.45 }, "<");
+      if (glowBottom) {
+        tl.to(
+          glowBottom,
+          { opacity: 1, duration: 0.65, ease: "power2.out" },
+          "<",
+        );
+      }
+      tl.to(inputPill, { y: 0, duration: 0.65, ease: "power3.inOut" }, "<");
+
+      // BORDER LOADER: Draws 1 full round
+      if (borderPath) {
+        tl.add(function () {
+          var borderLen = updatePillPath();
+          gsap.set(borderPath, {
+            strokeDasharray: borderLen,
+            strokeDashoffset: borderLen,
+            opacity: 1,
+          });
+        });
+        tl.addLabel("borderStart");
+        tl.to(
+          borderPath,
+          {
+            strokeDashoffset: 0,
+            duration: 1.3,
+            ease: "power1.inOut",
+          },
+          "borderStart",
+        );
+        tl.to(borderPath, { opacity: 0, duration: 0.2 }, "borderStart+=1.3");
+      } else {
+        tl.addLabel("borderStart");
+      }
+
+      // Reveal message bubble, skeleton, and switch pill to Thinking
+      tl.addLabel("revealPoint", "borderStart+=0.4");
+      if (bubble) tl.set(bubble, { display: "block" }, "revealPoint");
+      if (skeleton) tl.set(skeleton, { display: "flex" }, "revealPoint");
+      if (pillTyped) tl.to(pillTyped, { opacity: 0, duration: 0.12 }, "revealPoint");
+      var toHide = [pillTyped, pillPlaceholder].filter(Boolean);
+      if (toHide.length) tl.set(toHide, { display: "none" }, "revealPoint+=0.12");
+      if (pillThinking) {
+        tl.set(pillThinking, { display: "flex" }, "revealPoint+=0.12");
+        tl.to(pillThinking, { opacity: 1, duration: 0.12 }, "revealPoint+=0.12");
+      }
+      if (bubble) {
+        tl.to(
+          bubble,
+          { opacity: 1, y: 0, scale: 1, duration: 0.28, ease: "back.out(1.5)" },
+          "revealPoint",
+        );
+      }
+      if (skeleton) {
+        tl.to(
+          skeleton,
+          { opacity: 1, y: 0, duration: 0.18, ease: "power2.out" },
+          "revealPoint",
+        );
+      }
+
+      // Frame 4: Skeleton holds, then checklist appears
+      if (skeleton) {
+        tl.to(skeleton, { opacity: 0, duration: 0.25 }, "revealPoint+=1.8");
+        tl.set(skeleton, { display: "none" });
+      }
+      if (checklist) {
+        tl.set(checklist, { display: "flex", opacity: 1 });
+        if (checkItems && checkItems.length) {
+          tl.to(
+            checkItems,
+            {
+              opacity: 1,
+              x: 0,
+              duration: 0.25,
+              stagger: 0.15,
+              ease: "power2.out",
+            },
+            "-=0.05",
+          );
+        }
+      }
+
+      // Hold on checklist (1.8s)
+      tl.to({}, { duration: 1.8 });
+
+      // Frame 5: Bubble & checklist exit, Chart image fades/slides in
+      var exitGroup = [bubble, checklist].filter(Boolean);
+      if (exitGroup.length) {
+        tl.to(exitGroup, {
+          opacity: 0,
+          y: -10,
+          duration: 0.35,
+          ease: "power2.in",
+        });
+        tl.set(exitGroup, {
+          display: "none",
+          opacity: 0,
+          pointerEvents: "none",
+        });
+      }
+
+      if (chart) {
+        tl.add(function () {
+          chart.classList.remove("hidden");
+          chart.classList.add("is-revealed");
+        });
+        tl.set(chart, { display: "flex" });
+      }
+
+      if (pillThinking) {
+        tl.to(pillThinking, { opacity: 0, duration: 0.2 }, "<");
+        tl.set(pillThinking, { display: "none" });
+      }
+      if (pillTyped) tl.set(pillTyped, { display: "none", opacity: 0 });
+      if (pillPlaceholder) {
+        tl.set(pillPlaceholder, { display: "flex" });
+        tl.to(pillPlaceholder, { opacity: 1, duration: 0.25 }, "<+=0.1");
+      }
+      tl.add(function () {
+        if (pillTypedText) pillTypedText.textContent = "";
+      });
+
+      if (chart) {
+        tl.to(
+          chart,
+          {
+            opacity: 1,
+            y: 0,
+            duration: 0.55,
+            ease: "power2.out",
+            pointerEvents: "auto",
+          },
+          "<+=0.1",
+        );
+      }
+    }
+
+    window.addEventListener("resize", function () {
+      if (activeUpdatePillPath) activeUpdatePillPath();
+    });
 
     // The chevrons walk the card's OWN team, not all eleven — the overlay was
     // opened from a filtered grid, so stepping into a team whose pill is not
     // lit would be a jump with nothing on screen to explain it.
     function teamOf(index) {
-      var group = heads[index].getAttribute("data-ih-maiw-group");
+      var group = overlayCards[index].getAttribute("data-ih-maiw-group");
       var members = [];
       for (var i = 0; i < count; i++) {
-        if (heads[i].getAttribute("data-ih-maiw-group") === group)
+        if (overlayCards[i].getAttribute("data-ih-maiw-group") === group)
           members.push(i);
       }
       return members;
@@ -661,10 +2856,18 @@ const panels = groups.map((group) => ({
     function show(index) {
       current = index;
       for (var i = 0; i < count; i++) {
-        heads[i].hidden = i !== current;
-        bodies[i].hidden = i !== current;
-        if (images[i]) images[i].hidden = i !== current;
+        var isCurr = i === current;
+        overlayCards[i].hidden = !isCurr;
+        if (isCurr) {
+          overlayCards[i].classList.add("is-active");
+          overlayCards[i].setAttribute("data-ih-maiw-active", "true");
+        } else {
+          overlayCards[i].classList.remove("is-active");
+          overlayCards[i].removeAttribute("data-ih-maiw-active");
+          resetCardStage(overlayCards[i]);
+        }
       }
+
       // The panel scrolls on short windows; a card further down the list would
       // otherwise open mid-way through its own copy.
       panel.scrollTop = 0;
@@ -675,7 +2878,11 @@ const panels = groups.map((group) => ({
     function step(delta) {
       var members = teamOf(current);
       var at = members.indexOf(current);
-      show(members[(at + delta + members.length) % members.length]);
+      var nextIdx = members[(at + delta + members.length) % members.length];
+      show(nextIdx);
+      requestAnimationFrame(function () {
+        playAnimation(nextIdx);
+      });
     }
 
     function open(index, opener) {
@@ -685,17 +2892,25 @@ const panels = groups.map((group) => ({
       overlay.setAttribute("aria-hidden", "false");
       document.body.style.overflow = "hidden";
       if (closeBtn) closeBtn.focus();
+      requestAnimationFrame(function () {
+        playAnimation(index);
+      });
     }
 
     function close() {
+      if (currentTl) {
+        currentTl.kill();
+        currentTl = null;
+      }
+      for (var i = 0; i < count; i++) {
+        resetCardStage(overlayCards[i]);
+        overlayCards[i].classList.remove("is-active");
+        overlayCards[i].removeAttribute("data-ih-maiw-active");
+      }
       overlay.style.display = "none";
       overlay.setAttribute("aria-hidden", "true");
       document.body.style.overflow = "";
       if (lastFocused && lastFocused.focus) lastFocused.focus();
-    }
-
-    function isOpen() {
-      return overlay.style.display === "flex";
     }
 
     // Delegated, so it does not matter which Embed mounts first or whether the
@@ -710,17 +2925,20 @@ const panels = groups.map((group) => ({
       );
     });
 
-    if (closeBtn) closeBtn.addEventListener("click", close);
-    if (prevBtn)
-      prevBtn.addEventListener("click", function () {
-        step(-1);
-      });
-    if (nextBtn)
-      nextBtn.addEventListener("click", function () {
-        step(1);
-      });
-
+    // Delegated overlay clicks for close, prev, next buttons
     overlay.addEventListener("click", function (e) {
+      if (e.target.closest("[data-ih-maiw-close]")) {
+        close();
+        return;
+      }
+      if (e.target.closest("[data-ih-maiw-prev]")) {
+        step(-1);
+        return;
+      }
+      if (e.target.closest("[data-ih-maiw-next]")) {
+        step(1);
+        return;
+      }
       if (e.target === overlay) close();
     });
 
