@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Reactive Grid Globe with Clickable Tags</title>
+  <style>
+    body {
+      margin: 0;
+      background: #F2F1F0;
+      overflow: hidden;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      user-select: none;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+    #canvas-container { 
+      width: 100vw; 
+      height: 100vh; 
+      touch-action: none;
+    }
+    
+    #tags-container {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      pointer-events: none; 
+      overflow: hidden;
+      z-index: 10;
+    }
+
+    .country-tag-wrapper {
+      position: absolute;
+      top: 0;
+      left: 0;
+      will-change: transform, opacity;
+      opacity: 0;
+      pointer-events: none;
+      z-index: 5;
+    }
+
+    #tags-container.animated .country-tag-wrapper {
+      transition: opacity 0.25s ease-out;
+    }
+
+    .country-tag-wrapper.visible {
+      opacity: 1;
+    }
+
+    .country-tag-content {
+      background: rgba(255, 255, 255, 0.85);
+      border: 1px solid rgba(84, 70, 255, 0.4);
+      padding: 4.8px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      backdrop-filter: blur(4px);
+      box-shadow: 0 2px 8px rgba(48, 65, 76, 0.1);
+    }
+
+    .country-tag-content img {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 1px solid rgba(0, 0, 0, 0.1);
+      background-color: #eee;
+      display: block;
+    }
+
+    @media (max-width: 600px) {
+      #canvas-container,
+      #tags-container {
+        width: 100%;
+        height: 100%;
+      }
+
+      .country-tag-content {
+        padding: 3.2px;
+      }
+
+      .country-tag-content img {
+        width: 38.4px;
+        height: 38.4px;
+      }
+    }
+  </style>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+</head>
+<body>
+  <div id="canvas-container"></div>
+  <div id="tags-container"></div> 
+
+  <script>
+    const container = document.getElementById('canvas-container');
+    const tagsContainer = document.getElementById('tags-container');
+    
+    let width = window.innerWidth;
+    let height = window.innerHeight;
+    let halfWidth = width * 0.5;
+    let halfHeight = height * 0.5;
+
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(45, width / height, 0.1, 1000);
+    camera.position.set(0, 0, 7.5);
+
+    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false, powerPreference: 'high-performance' });
+    renderer.setClearColor(0xf2f1f0, 1);
+    renderer.setSize(width, height);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    container.appendChild(renderer.domElement);
+
+    const globePivot = new THREE.Group();
+    globePivot.rotation.z = THREE.MathUtils.degToRad(-11);
+    globePivot.rotation.x = THREE.MathUtils.degToRad(12);
+    globePivot.position.x = 0;
+    globePivot.position.y = 0;
+    scene.add(globePivot);
+
+    const globeGroup = new THREE.Group();
+    globeGroup.rotation.y = THREE.MathUtils.degToRad(-60);
+    globePivot.add(globeGroup);
+
+    const GLOBE_RADIUS = 2.2;
+
+    // --- 1. Opaque Inner Core ---
+    const innerCore = new THREE.Mesh(
+      new THREE.SphereGeometry(GLOBE_RADIUS - 0.015, 64, 64),
+      new THREE.MeshBasicMaterial({
+        color: 0xf2f1f0,
+        depthWrite: true,
+        depthTest: true
+      })
+    );
+    innerCore.renderOrder = 0;
+    innerCore.matrixAutoUpdate = false;
+    globeGroup.add(innerCore);
+
+    // --- 2. Custom Orthogonal Wireframe (Optimized: Single Draw Call via LineSegments) ---
+    const gridRadius = GLOBE_RADIUS + 0.03;
+    const wireframeSegments = 64;
+    // 11 latitude circles + 8 longitude circles = 19 circles * 64 segments * 2 points * 3 floats = 7296 floats
+    const wireframePositions = new Float32Array(7296);
+    let wfPtr = 0;
+
+    // Latitude circles
+    for (let i = 1; i < 12; i++) {
+      const phi = (Math.PI * i) / 12;
+      const y = gridRadius * Math.cos(phi);
+      const r = gridRadius * Math.sin(phi);
+      for (let j = 0; j < wireframeSegments; j++) {
+        const t1 = (j / wireframeSegments) * Math.PI * 2;
+        const t2 = ((j + 1) / wireframeSegments) * Math.PI * 2;
+        wireframePositions[wfPtr++] = r * Math.cos(t1);
+        wireframePositions[wfPtr++] = y;
+        wireframePositions[wfPtr++] = r * Math.sin(t1);
+        wireframePositions[wfPtr++] = r * Math.cos(t2);
+        wireframePositions[wfPtr++] = y;
+        wireframePositions[wfPtr++] = r * Math.sin(t2);
+      }
+    }
+
+    // Longitude circles
+    for (let i = 0; i < 8; i++) {
+      const theta = (Math.PI * i) / 8;
+      const cosTheta = Math.cos(theta);
+      const sinTheta = Math.sin(theta);
+      for (let j = 0; j < wireframeSegments; j++) {
+        const t1 = (j / wireframeSegments) * Math.PI * 2;
+        const t2 = ((j + 1) / wireframeSegments) * Math.PI * 2;
+        const x1 = gridRadius * Math.cos(t1);
+        const y1 = gridRadius * Math.sin(t1);
+        const x2 = gridRadius * Math.cos(t2);
+        const y2 = gridRadius * Math.sin(t2);
+        wireframePositions[wfPtr++] = x1 * cosTheta;
+        wireframePositions[wfPtr++] = y1;
+        wireframePositions[wfPtr++] = -x1 * sinTheta;
+        wireframePositions[wfPtr++] = x2 * cosTheta;
+        wireframePositions[wfPtr++] = y2;
+        wireframePositions[wfPtr++] = -x2 * sinTheta;
+      }
+    }
+
+    const wireframeGeo = new THREE.BufferGeometry();
+    wireframeGeo.setAttribute('position', new THREE.BufferAttribute(wireframePositions, 3));
+    const gridMaterial = new THREE.LineBasicMaterial({ color: 0x646867, transparent: true, opacity: 0.32 });
+    const wireframeMesh = new THREE.LineSegments(wireframeGeo, gridMaterial);
+    wireframeMesh.renderOrder = 3;
+    wireframeMesh.matrixAutoUpdate = false;
+    globeGroup.add(wireframeMesh);
+
+    // --- 4. Extruded Dot Matrix Continents (Zero-latency Embedded Bitmask) ---
+    const LAND_MASK_B64 = "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA8T8AAPB7/wEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA4P///7Onz//wAQAAAAAAAAAAAAACAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACP//0///////9nHwAAAAAAAAAA4IkAAADAAQAAAAAAAAAAAAAAAAAAAAAAAAAAkP+9/wP+//////8BAAAAgP8AAAAAAAAAALgLAAAAAAAAAAAAAAAAAAAAAAAAAIAD/PcX8P//////fwAAAAD/AQAAAAAAAAAAAE8BAAAAAAAAAAAAAAAAAAAAAADQAdgB+A/+//////8fAAAAAHwMAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgAcAAAD/Afz///////8BAAAAMAAAAAAAAAAAAADBAQAAAAAAAAAAAAAAAAAAAADwOIY9eIAA8Pr/////fwEAAAAAAAAAAADwBwAAAPH/AwAAAAAAAAAAAAAAAAAAAAA4n7jz/wEAgP////8/AQAAAAAAAAAAwA8AAAD/7/8DAAD45wEAAAAAAAAAAAAAfAAAAAAAAAAA/v////8AAAAAAAAAAADAAQAAwP+ffwIAAAAAAAAAAAAAAAAAAAD8E3g4n3sPAAD8////DgAAAAAAAAAAAHAAYAD////n/+ADAAIAAAAAAAAAAAAAAH5+P3zC8z8AAPz///8BAAAAAAAAAAAAOADwZP7//////wTgBwAAAAAHAAABAAAACPx/gIf3/wMA4P///w0AAAAAAAAAAABwAHyG+///////x///AwAAgAAA8P8AAEAAgP+BD//9DwDw//+/AAAAAAAAsA8AAAAA/P7/////////////BwAAAAD8///H/3/4r+IcOOg/AJj///8DAAAAAMD/fwCAAPj4/v/////////////3z38DwP/////9/x9YANx44B8A4P//PwAAAAAA8P//DwzM+/f9///////////32////x8A/v/////9//f//30Y/wHw//8BAAAAAAD4/99/xP////7//////////////////wHp/////8//////D4D5D/D//wAAAAAAAPz/Hj78//8N///////////////////94f//////j////78JgD8H8P8fALAfAAAA/sffwP///////////////////////8DA9//////////3/z28/wAA/wMA4B8AAAD/w//Y//////////////////////8fAADw//////9//+8/zgDuAcD/AwCAAQAAQP/x/////////////////////////38AAP/////////u3w8gADwAgH8AAAAAAADwf/z5/v//////////////9////////wCA////////j///AwD9AQAA/wAAAAAAAPw/fPv8//////7/////////////sP8DAAD+3/n//9//f/8BAPgHAABwAAAAAAAAfD/8z////////////////////3/IfwAAQPjvAP///////wEA+AcBAAAAAAAAAAD8/wD8////////////////////H2ACAAAA6A8A0P////7/AQD8ngMAAAAAAAAAADw56P7//////////////////wAAOAAAAACAAgDA//////0HAPj/BwAAAAAAAMAAAB/A//////////////////9/AAAeAAAAAMAJAAD+/////zcA8P8PAAAAAAAAwANgHvz//////////////////x8AAD8AAAAAMAAAAPz///v//wGw/w8AAAAAAADAAWAG/P///////////7//////DwCAHwAAAAAEAAAA+v//v///P/z+PwAAAAAAAKgHIAn8//9//////////7////8DAMAfAgAAAAAAAADy////+/8/7v+8AAAAAAAAPA5g9////3//////////3////ycAgAcAAAAAAAAAAOD////H/z/8//8DAAAAAAC4D/z////////////////v/////wGABwAAAAAAAAAAwP///7f/f/z//wMAAAAAAI4//v////////////////v/////AYABAAAAAAAAAACA////////fv9/AAAAAAAAAJ7//////////////////////38CAAAAAAAAAAAAAID////ff///fQgBAAAAAABAwP//////////////7///////fwJAAAAAAAAAAAAAAPv///////8fhAsAAAAAAAD8////v/////////////////9/BwAAAAAAAAAAAAAA9P///3/83/+BHwAAAAAAgP///////////////////////z8BAAAAAAAAAAAAAAD8////H/D/+wAUAAAAAAAA/v///3//////////////////HwEAAAAAAAAAAAAAAPj/////9f//EAAAAAAAAAD8////z/n/+Pf/g/7///////8PAQAAAAAAAAAAAAAA+P////8J//8PAAAAAAAAAPj//f/H+T/48f///////////weAAAAAAAAAAAAAAAD8/////53/nwMAAAAAAAAA+P/x/4PwH/zx////////////AyEAAAAAAAAAAAAAAPz/////vPGHAAAAAAAAADj8huP/A8A//Pv///////////8BDwAAAAAAAAAAAAAA/P////98/gMAAAAAAAAA+H8gh/8BgD/4///P////////H8ADAAAAAAAAAAAAAAD8/////5//AQAAAAAAAAD4fyAe/+EDf/j///////////8HQAAAAAAAAAAAAAAAAPy///////8AAAAAAAAAAPgfIHif+P//+P//////////8wfAAAAAAAAAAAAAAAAA+P//////fwAAAAAAAAAA+A8gAI7////w///////////ZAcAAAAAAAAAAAAAAAAD4//////8vAAAAAAAAAAD4DwAAHv//fvD/////////f4QDwAAAAAAAAAAAAAAAAPD//////w8AAAAAAAAAAPgHAA4M//938P//////////gAdwAAAAAAAAAAAAAAAA4P//////HwAAAAAAAAAA4AH9CAj+/f/x///////v//8HB3AAAAAAAAAAAAAAAADg//////8fAAAAAAAAAAAA8H8AAAD+/////////////wMHfAAAAAAAAAAAAAAAAMD//////w8AAAAAAAAAAOD/fwAAQP7//////////f//AMEPAAAAAAAAAAAAAAAAAP//////BwAAAAAAAAAA4P8/AAAA/v////////////8DAAMAAAAAAAAAAAAAAAAA/P////8BAAAAAAAAAAD4//8BAAD+/f///////////wJwAAAAAAAAAAAAAAAAAAD8/////wAAAAAAAAAAAPz//w8eAP//////////////BxAAAAAAAAAAAAAAAAAAAMz///9/AAAAAAAAAAAA/P//H/4Z//////////////8FAAAAAAAAAAAAAAAAAAAAyP//H3gAAAAAAAAAAAD8////////f////////////wcAAAAAAAAAAAAAAAAAAACQ//9BYAAAAAAAAAAAAP7///////4//v//////////BwAAAAAAAAAAAAAAAAAAACD/fwDAAAAAAAAAAAAE/////////3/8//////////8DAAAAAAAAAAAAAAAAAAAAcP4/AMAAAAAAAAAAAMD//////3/+f/j//////////wMAAAAAAAAAAAAAAAAAAADA/D8AgAAAAAAAAAAA4P////////z/Af//////////AQAAAAAAAAAAAAAAAAAAAID4PwCAAAAAAAAAAADg////////+P9D/P3///////8AAAAAAAAAAAAAAAAAAAAAAPE/AAAEAAAAAAAAAPD////////5/2MAnP//////fwQAAAAAAAAAAAAAAAAAAAAA4j8AAAAAAAAAAAAA+P//////v/H//wGw//////8/BAAAAAAAAAAAAAAAAAAAAADAPwDQAQAAAAAAAAD4////////4///A+D///f//wcAAAAAAAAAAAAAAAAAAAAAAMA/gCAMAAAAAAAAAPz////////n//8DYP9/8P+fAQAAAAAAAAAAAAAAAAAAAAAAwD/gATgAAAAAAAAA+P///////+f//wEA/3/g/wcAAAAAAAAAAAAAAAAAAAAAAADAf+AAAAcAAAAAAAD4////////h///AAD/H8D/xwAAAAAAAAAAAAAAAAAAAAAAAAD/4AAAHwAAAAAAAPj///////+H/38AAP8PwP9nAAAAAAAAAAAAAAAAAAAAAAAAAPz/AAAAAAAAAAAA+P///////x//PwAA/weA/wcADAAAAAAAAAAAAAAAAAAAAAAA8P8AAAAAAAAAAAD4////////H/4PAAD+A4D9DwAMAAAAAAAAAAAAAAAAAAAAAACA/A8AAAAAAAAAAPj///////8f/gcAAP4AAPwfAAYAAAAAAAAAAAAAAAAAAAAAAAD4HwAAAAAAAAAE/P///////z/+AAAA/gAA/D8ABgAAAAAAAAAAAAAAAAAAAAAAAMAfAAAAAAAAAAD4////+////z4AAAD8AAD8PwAcAAAAAAAAAAAAAAAAAAAAAAAAAB8AAAAAAAAAAPj////z////BwAAAPwAAOg/ACQAAAAAAAAAAAAAAAAAAAAAAAAAGgACAAAAAAAA+P////////8BAAAAeAAAiD8AQgAAAAAAAAAAAAAAAAAAAAAAAAAMgB0AAAAAAADw/////////+MBAAB4AAAIHwBoAAAAAAAAAAAAAAAAAAAAAAAAABzg/QcAAAAAAOD//////////wEAAHAAAAgEAFAAAAAAAAAAAAAAAAAAAAAAAAAAIPf/DwAAAAAAwP//////////AQAAMAAACAIAgAAAAAAAAAAAAAAAAAAAAAAAAADA/P8/AAAAAADA//f///////8AAACAAQAYAADQAAAAAAAAAAAAAAAAAAAAAAAAAAD4/38AAAAAAAD//////////wAAAIADABAAAMgAAAAAAAAAAAAAAAAAAAAAAAAAAPj//wAAAAAAAP4//v////9/AAAAAAEAYABgQAAAAAAAAAAAAAAAAAAAAAAAAAAA+P//HwAAAAAAfAf8/////z8AAAAAAADjAOACAAAAAAAAAAAAAAAAAAAAAAAAAAD4//8/AAAAAAAAAOD////9PwAAAAAAAOcA+AABAAAAAAAAAAAAAAAAAAAAAAAAAPj//38AAAAAAAAAwP////0fAAAAAAAAzgB8AAAAAAAAAAAAAAAAAAAAAAAAAAAA/P//fwAAAAAAAADA/////w8AAAAAAADcAX8AAAAAAAAAAAAAAAAAAAAAAAAAAAD8////AAAAAAAAAMD//7//AwAAAAAAADjB/0ACAAAAAAAAAAAAAAAAAAAAAAAAAP////8AAAAAAAAAwP////8BAAAAAAAA8MB/IgIAAAAAAAAAAAAAAAAAAAAAABAA////vwEAAAAAAADA//8f/wAAAAAAAADwwH8AQAAAAAAAAAAAAAAAAAAAAAAAAAD/////HwAAAAAAAMD//5//AAAAAAAAAOiBPx7CAAAAAAAAAAAAAAAAAAAAAAAAAP///9s/AAAAAAAAwP//n38AAAAAAAAA4IE/BwA8AAAAAAAAAAAAAAAAAAAAAAAA///v//8HAAAAAACA///7PwAAAAAAAADABzgPkf8DAAAAAAAAAAAAAAAAAAAAAID//////w8AAAAAAAD///sfAAAAAAAAAIAHAAoA/gcEAAAAAAAAAAAAAAAAAAAAgP//////fwAAAAAAAP7/+z8AAAAAAAAAAAYAEgDwDyQAAAAAAAAAAAAAAAAAAAAA//////9/AAAAAAAA/v//HwAAAAAAAAAAGAAAAPE/AQAAAAAAAAAAAAAAAAAAAAD+//////8AAAAAAAD+//cfAAAAAAAAAAD4BwAA4D8AAAAAAAAAAAAAAAAAAAAAAP7/////fwAAAAAAAPz//x8AAAAAAAAAAAAfQADQYwAFAAAAAAAAAAAAAAAAAAAA/P////9/AAAAAAAA/P//HwAAAAAAAAAAAADAAIBjCAAAAAAAAAAAAAAAAAAAAAD8/////z8AAAAAAAD8//8/AAAAAAAAAAAAACIAAIABAAAAAAAAAAAAAAAAAAAAAPj/////HwAAAAAAAPj//z8AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA+P////8fAAAAAAAA/P//P4AAAAAAAAAAAAAAgAQBAAAAAAAAAAAAAAAAAAAAAADwf////wcAAAAAAAD8//8/gAAAAAAAAAAAAADwBwMAAAAAAAAAAAAAAAAAAAAAAPD/////BwAAAAAAAP7//z7AAAAAAAAAAAAAAPgDAwAAAAAAAAAAAAAAAAAAAAAA4P////8HAAAAAAAA/v//f+ABAAAAAAAAAACA/wEPAAAAAAAAAAAAAAAAAAAAAADA9////wcAAAAAAAD//88/8AEAAAAAAAAAAMD/Bw8AAAAAAAAAAAAAAAAAAAAAAAD/////BwAAAAAAAP///R/8AAAAAAAAAAAA8P+fDwAAAAAAAAAAAAAAAAAAAAAAAP7///8HAAAAAAAA////B/wAAAAAAAAAAADw/78fAAAAYAAAAAAAAAAAAAAAAAAA+P///wcAAAAAAAD+//8DfAAAAAAAAAAAAPj//x8AABAAAAAAAAAAAAAAAAAAAAD4////AwAAAAAAAP7//wF8AAAAAAAAAAAA/P//PwAAAAAAAAAAAAAAAAAAAAAAAPj///8DAAAAAAAA/P//AHwAAAAAAAAAAID///9/AAAAAAAAAAAAAAAAAAAAAAAA+P///wEAAAAAAAD4//8BPgAAAAAAAAAA4P////8AAAgAAAAAAAAAAAAAAAAAAAD4////AAAAAAAAAPj//wE+AAAAAAAAAAD4/////wEAAAAAAAAAAAAAAAAAAAAAAPz//x8AAAAAAAAA+P//ATwAAAAAAAAAAPj/////AwAAAAAAAAAAAAAAAAAAAAAA/P//BwAAAAAAAAD4//8BHAAAAAAAAAAA/P////8HAAAAAAAAAAAAAAAAAAAAAAD8//8DAAAAAAAAAPj/fwAIAAAAAAAAAAD4/////w8AAAAAAAAAAAAAAAAAAAAAAPz//wEAAAAAAAAA8P8/AAAAAAAAAAAAAPz/////DwAAAAAAAAAAAAAAAAAAAAAA/P//AQAAAAAAAADw/z8AAAAAAAAAAAAA+P////8PAAAAAAAAAAAAAAAAAAAAAAD8//8BAAAAAAAAAOD/PwAAAAAAAAAAAAD4/////w8AAAAAAAAAAAAAAAAAAAAAAP7//wAAAAAAAAAAwP8fAAAAAAAAAAAAAPD/////DwAAAAAAAAAAAAAAAAAAAAAA/v9/AAAAAAAAAADA/w8AAAAAAAAAAAAA8P////8PAAAAAAAAAAAAAAAAAAAAAAD+fz8AAAAAAAAAAID/BwAAAAAAAAAAAADg/////w8AAAAAAAAAAAAAAAAAAAAAAP7/HwAAAAAAAAAAgP8DAAAAAAAAAAAAAOD/g///BwAAAAAAAAAAAAAAAAAAAAAA/v8PAAAAAAAAAACA/wEAAAAAAAAAAAAA4D8A//8DAAAAAAAAAAAAAAAAAAAAAAD+/w8AAAAAAAAAAIB3AAAAAAAAAAAAAADwAQDy/wMAAAAAAAAAAAAAAAAAAAAAAP7/AAAAAAAAAAAAAAAAAAAAAAAAAAAAAOAAAOD/AwAAAAAAAAAAAAAAAAAAAAAA//8AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAyP8BAAACAAAAAAAAAAAAAAAAAAD//wEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADA/wEAAAwAAAAAAAAAAAAAAAAAgP//AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAIB/AAAAPAAAAAAAAAAAAAAAAACA/z8AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABAAAAA8AAAAAAAAAAAAAAAAAID/BwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAARAAAABwAAAAAAAAAAAAAAAAAgP8HAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACAAAAAAAAAAAAAAAAACA/wAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAHgAAAADAAAAAAAAAAAAAAAAAAD/AgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAcAAAgAEAAAAAAAAAAAAAAAAAAP8AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADgAAAAAAAAAAAAAAAAAADA/wAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAHgAAAAAAAAAAAAAAAAAAIA/AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAPAAAAAAAAAAAAAAAAAAA4B0AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAADAfwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAOA/AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA4B8AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADgHwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAIAPAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAwA8QAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAIA8AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACAAAAAAAAAAAAAAAAAAAAAAAAAIAFAAAAAAAAAAAAAAAAAAD+AAAAAAD+jz+I+Q8AAAAAAAAAAAAAAAAAAAAAAAAA8AAAAAAAAAAAAAAAAAAAkP9fAAD4/////////w8AAAAAAAAAAAAAAAAAAAAAAADAAgAAAAAAAAAAAAAAAAD///8fwP///////////xoAAAAAAAAAAAAAAAAAAAAAAMYDAAAAAAAAAAAAAACAwf///w/w/////////////wEAAAAAAAAAAAAAAAAAAAAA7gcAAAAAAAAAAHn+wf//////B/7/////////////PwAAAAAAAAAAAAAAAAAAAID/DwAAAAAAADbg//////////+/////////////////DwAAAAAAAAAAAAAA+AAAAM8fAAAAAAAA//////////////////////////////8fAAAAAAAAAAABAAB77gUh+B8AAAAAAPj//////////////////////////////x8AAAAAAAAABHCwAPj/////DwAAAADA////////////////////////////////AAAAAAAAAPD////f+/////8DAAAAAPD//////////////////////////////z8AAAAAAAD+////////////HwAAAACA////////////////////////////////PwAAAAAAgPj/////////f+QfAAAAAPj///////////////////////////////8/AAAAAID///////////8/Hx8AAA+A//////////////////////////////////8AAAAAAP7//////////38AGADwP4D/////////////////////////////////PwAAAAAA4P///////////wcAwP9fAPD///////////////////////////////8HAAAAAAAA//////////////8fAADw/////////////////////////////////wcAAAAAAPz/////////////AQDA////////////////////////////////////HwAAAAAA+P//////////////P///////////////////////////////////////AwAAAADw//////////////////////////////////////////////////////9/AP8/AAD8/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////w==";
+
+    function initContinentDots() {
+      const bin = atob(LAND_MASK_B64);
+      const dotColumns = 376;
+      const dotRows = 188;
+      const dotRadius = GLOBE_RADIUS - 0.01;
+      const positions = [];
+
+      for (let row = 0; row < dotRows; row++) {
+        const v = (row + 0.5) / dotRows;
+        const phi = v * Math.PI;
+        const cosPhi = Math.cos(phi);
+        const sinPhi = Math.sin(phi);
+        const y = dotRadius * cosPhi;
+        const rSinPhi = -dotRadius * sinPhi;
+        const rowOffset = row * dotColumns;
+
+        for (let col = 0; col < dotColumns; col++) {
+          const bitIdx = rowOffset + col;
+          if ((bin.charCodeAt(bitIdx >> 3) & (1 << (bitIdx & 7))) === 0) continue;
+
+          const theta = (col + 0.5) / dotColumns * (Math.PI * 2);
+          positions.push(
+            rSinPhi * Math.cos(theta),
+            y,
+            -rSinPhi * Math.sin(theta)
+          );
+        }
+      }
+
+      const dotCount = positions.length / 3;
+      const dotGeometry = new THREE.CylinderGeometry(0.0112, 0.0112, 0.006, 6);
+      dotGeometry.translate(0, 0.003, 0);
+
+      const extrudedDotMaterial = new THREE.RawShaderMaterial({
+        vertexShader: `
+          precision highp float;
+          uniform mat4 modelViewMatrix;
+          uniform mat4 projectionMatrix;
+          attribute vec3 position;
+          attribute mat4 instanceMatrix;
+          void main() {
+            gl_Position = projectionMatrix * modelViewMatrix * instanceMatrix * vec4(position, 1.0);
+          }
+        `,
+        fragmentShader: `
+          precision mediump float;
+          void main() {
+            gl_FragColor = vec4(0.4196, 0.4471, 0.5020, 1.0);
+          }
+        `
+      });
+
+      const dotMesh = new THREE.InstancedMesh(dotGeometry, extrudedDotMaterial, dotCount);
+      const instanceMatrix = new THREE.Matrix4();
+      const instanceQuaternion = new THREE.Quaternion();
+      const cylinderAxis = new THREE.Vector3(0, 1, 0);
+      const tempPos = new THREE.Vector3();
+      const tempNorm = new THREE.Vector3();
+      const scaleOne = new THREE.Vector3(1, 1, 1);
+
+      for (let i = 0; i < dotCount; i++) {
+        const idx = i * 3;
+        tempPos.set(positions[idx], positions[idx + 1], positions[idx + 2]);
+        tempNorm.copy(tempPos).normalize();
+        instanceQuaternion.setFromUnitVectors(cylinderAxis, tempNorm);
+        instanceMatrix.compose(tempPos, instanceQuaternion, scaleOne);
+        dotMesh.setMatrixAt(i, instanceMatrix);
+      }
+
+      dotMesh.instanceMatrix.setUsage(THREE.StaticDrawUsage);
+      dotMesh.instanceMatrix.needsUpdate = true;
+      dotMesh.matrixAutoUpdate = false;
+      dotMesh.renderOrder = 2;
+      globeGroup.add(dotMesh);
+    }
+    initContinentDots();
+
+    // --- 5. Interactive Country Tags ---
+    const countryData = [
+      { name: "Argentina", code: "ar", lat: -38.4, lon: -63.6 },
+      { name: "Australia", code: "au", lat: -25.2, lon: 133.7 },
+      { name: "Brazil", code: "br", lat: -14.2, lon: -51.9 },
+      { name: "Canada", code: "ca", lat: 56.1, lon: -106.3 },
+      { name: "China", code: "cn", lat: 35.8, lon: 104.1 },
+      { name: "Costa Rica", code: "cr", lat: 9.7, lon: -83.7 },
+      { name: "European Union", code: "eu", lat: 49.5, lon: 12.0 },
+      { name: "Hong Kong", code: "hk", lat: 22.3, lon: 114.1 },
+      { name: "India", code: "in", lat: 20.5, lon: 78.9 },
+      { name: "Israel", code: "il", lat: 31.0, lon: 34.8 },
+      { name: "Japan", code: "jp", lat: 36.2, lon: 138.2 },
+      { name: "Malaysia", code: "my", lat: 4.2, lon: 109.2 },
+      { name: "Mauritius", code: "mu", lat: -20.3, lon: 57.5 },
+      { name: "Mexico", code: "mx", lat: 23.6, lon: -102.5 },
+      { name: "New Zealand", code: "nz", lat: -40.9, lon: 174.8 },
+      { name: "Oman", code: "om", lat: 21.4, lon: 55.9 },
+      { name: "Peru", code: "pe", lat: -9.1, lon: -75.0 },
+      { name: "Philippines", code: "ph", lat: 12.8, lon: 121.7 },
+      { name: "Puerto Rico", code: "pr", lat: 18.2, lon: -66.5 },
+      { name: "Qatar", code: "qa", lat: 25.3, lon: 51.1 },
+      { name: "Russia", code: "ru", lat: 61.5, lon: 105.3 },
+      { name: "Saudi Arabia", code: "sa", lat: 23.8, lon: 45.0 },
+      { name: "Singapore", code: "sg", lat: 1.3, lon: 103.8 },
+      { name: "South Africa", code: "za", lat: -30.5, lon: 22.9 },
+      { name: "South Korea", code: "kr", lat: 35.9, lon: 127.7 },
+      { name: "Taiwan", code: "tw", lat: 23.6, lon: 120.9 },
+      { name: "Turkey", code: "tr", lat: 38.9, lon: 35.2 },
+      { name: "UAE", code: "ae", lat: 23.4, lon: 53.8 },
+      { name: "UK", code: "gb", lat: 55.3, lon: -3.4 },
+      { name: "USA", code: "us", lat: 37.0, lon: -95.7 }
+    ];
+
+    const tagElements = [];
+    const tagsFragment = document.createDocumentFragment();
+
+    countryData.forEach(country => {
+      const wrapper = document.createElement('div');
+      wrapper.className = 'country-tag-wrapper';
+      
+      const content = document.createElement('div');
+      content.className = 'country-tag-content';
+
+      if (country.code) {
+        const flag = document.createElement('img');
+        flag.src = `https://flagcdn.com/w80/${country.code}.png`;
+        flag.alt = country.name;
+        flag.width = 48;
+        flag.height = 48;
+        flag.decoding = 'async';
+        content.appendChild(flag);
+      }
+      wrapper.appendChild(content);
+
+      const phi = (90 - country.lat) * (Math.PI / 180);
+      const theta = (country.lon + 180) * (Math.PI / 180);
+      const r = GLOBE_RADIUS + 0.005;
+      const position = new THREE.Vector3(
+        -r * Math.sin(phi) * Math.cos(theta),
+        r * Math.cos(phi),
+        r * Math.sin(phi) * Math.sin(theta)
+      );
+
+      tagsFragment.appendChild(wrapper);
+      tagElements.push({ position, element: wrapper, isVisible: false });
+    });
+
+    tagsContainer.appendChild(tagsFragment);
+
+    // --- 6. Axis Lines with Arc & Ring Indicators (Optimized Geometry Sharing) ---
+    const axisMat = new THREE.LineBasicMaterial({ color: 0x646867, transparent: true, opacity: 0.45 });
+    const arcMat = new THREE.MeshBasicMaterial({ color: 0x646867, transparent: true, opacity: 0.65 });
+    const arcThickness = 0.00675;
+    const axisGeo = new THREE.BufferGeometry().setFromPoints([
+      new THREE.Vector3(0, -GLOBE_RADIUS * 1.8, 0), new THREE.Vector3(0, GLOBE_RADIUS * 1.5, 0)
+    ]);
+    const axisLine = new THREE.Line(axisGeo, axisMat);
+    axisLine.matrixAutoUpdate = false;
+    globePivot.add(axisLine);
+
+    const arcRadius = 0.65;
+    const arcEndAngle = Math.PI * 1.35; 
+    const innerRingRadius = 0.28;
+    const arcSegments = 48;
+
+    // Shared geometries for top and bottom indicator groups
+    const outerArcPoints = [];
+    const innerArcPoints = [];
+    for (let i = 0; i <= arcSegments; i++) {
+      const theta = (i / arcSegments) * arcEndAngle;
+      outerArcPoints.push(new THREE.Vector3(arcRadius * Math.cos(theta), 0, -arcRadius * Math.sin(theta)));
+      innerArcPoints.push(new THREE.Vector3(innerRingRadius * Math.cos(theta), 0, -innerRingRadius * Math.sin(theta)));
+    }
+    const outerArcGeo = new THREE.TubeGeometry(new THREE.CatmullRomCurve3(outerArcPoints), arcSegments, arcThickness, 8, false);
+    const innerArcGeo = new THREE.TubeGeometry(new THREE.CatmullRomCurve3(innerArcPoints), arcSegments, arcThickness, 8, false);
+
+    const rotatingArcs = [];
+    const synchronizedArcs = [];
+
+    function createRotationIndicators(direction) {
+      const group = new THREE.Group();
+      
+      const arc = new THREE.Mesh(outerArcGeo, arcMat);
+      arc.rotation.y = -Math.PI / 4;
+      arc.position.y = direction === -1 ? -0.06 : 0;
+      rotatingArcs.push(arc);
+      group.add(arc);
+
+      const innerRing = new THREE.Mesh(innerArcGeo, arcMat);
+      innerRing.position.y = -direction * 0.25;
+      synchronizedArcs.push(innerRing);
+      group.add(innerRing);
+
+      group.position.y = direction * GLOBE_RADIUS * 1.5 + (direction === 1 ? -0.6 : 0.23);
+      group.rotation.x = direction === -1 ? THREE.MathUtils.degToRad(-45) : 0;
+      return group;
+    }
+
+    globePivot.add(createRotationIndicators(1));
+    globePivot.add(createRotationIndicators(-1));
+
+    // --- 7. Lighting ---
+    scene.add(new THREE.AmbientLight(0xffffff, 0.9));
+
+    // --- 8. Animation Loop (Exact 16s Sync With Rendered Video, Zero GC) ---
+    const tagWorldPos = new THREE.Vector3();
+    const rotationClock = new THREE.Clock();
+    const LOOP_DURATION = 16;
+    const globeRotationSpeed = (Math.PI * 2) / LOOP_DURATION; // ~0.3927 rad/s (16s per full rotation)
+    const arcSpeed = globeRotationSpeed * 2;                  // ~0.7854 rad/s (2x speed, 8s per rotation)
+    const syncSpeed = globeRotationSpeed * 4;                 // ~1.5708 rad/s (4x speed, 4s per rotation)
+    const VISIBILITY_Z_THRESHOLD = 0.852; // Analytic threshold: dot product >= 0.1 towards camera at z=7.5
+
+    function updateTagPositions() {
+      const mWorld = globeGroup.matrixWorld;
+
+      for (let i = 0; i < tagElements.length; i++) {
+        const tag = tagElements[i];
+        tagWorldPos.copy(tag.position).applyMatrix4(mWorld);
+
+        const isVisible = tagWorldPos.z >= VISIBILITY_Z_THRESHOLD;
+        if (tag.isVisible !== isVisible) {
+          tag.isVisible = isVisible;
+          tag.element.classList.toggle('visible', isVisible);
+        }
+
+        if (isVisible) {
+          tagWorldPos.project(camera);
+          const x = tagWorldPos.x * halfWidth + halfWidth;
+          const y = tagWorldPos.y * -halfHeight + halfHeight;
+          const px = ((x * 10 + 0.5) | 0) * 0.1;
+          const py = ((y * 10 + 0.5) | 0) * 0.1;
+
+          if (tag.px !== px || tag.py !== py) {
+            tag.px = px;
+            tag.py = py;
+            tag.element.style.transform = `translate3d(${px}px, ${py}px, 0) translate(-50%, -50%)`;
+          }
+        }
+      }
+    }
+
+    // Pre-calculate matrices and render initial frame 0 immediately so browser matches video poster identically
+    camera.updateMatrixWorld(true);
+    globeGroup.updateMatrixWorld(true);
+    renderer.render(scene, camera);
+    updateTagPositions();
+
+    // Enable smooth fade transitions for tags crossing horizon after the initial frame
+    requestAnimationFrame(() => {
+      tagsContainer.classList.add('animated');
+    });
+
+    let animationFrameId;
+    function animate() {
+      if (window.__isRenderingVideo) return;
+      animationFrameId = requestAnimationFrame(animate);
+      const deltaTime = Math.min(rotationClock.getDelta(), 0.05);
+
+      globeGroup.rotation.y += globeRotationSpeed * deltaTime;
+      
+      const arcDelta = arcSpeed * deltaTime;
+      for (let i = 0; i < rotatingArcs.length; i++) {
+        rotatingArcs[i].rotation.y += arcDelta;
+      }
+
+      const syncDelta = syncSpeed * deltaTime;
+      for (let i = 0; i < synchronizedArcs.length; i++) {
+        synchronizedArcs[i].rotation.y += syncDelta;
+      }
+
+      globeGroup.updateMatrixWorld();
+      renderer.render(scene, camera);
+      updateTagPositions();
+    }
+    animate();
+
+    // Deterministic frame renderer for seamless video export
+    const initialGlobeAngle = THREE.MathUtils.degToRad(-60);
+    window.__renderLoopFrame = function(progress) {
+      if (!window.__videoStyleInjected) {
+        window.__videoStyleInjected = true;
+        const s = document.createElement('style');
+        s.textContent = '.country-tag-wrapper { transition: none !important; } .country-tag-wrapper.visible { opacity: 1 !important; }';
+        document.head.appendChild(s);
+      }
+
+      globeGroup.rotation.y = initialGlobeAngle + progress * Math.PI * 2;
+
+      for (let i = 0; i < rotatingArcs.length; i++) {
+        rotatingArcs[i].rotation.y = -Math.PI / 4 + progress * Math.PI * 4;
+      }
+      for (let i = 0; i < synchronizedArcs.length; i++) {
+        synchronizedArcs[i].rotation.y = progress * Math.PI * 8;
+      }
+
+      // Render 3D scene first so camera.matrixWorldInverse and world matrices are fully computed
+      globeGroup.updateMatrixWorld();
+      renderer.render(scene, camera);
+      updateTagPositions();
+    };
+
+    // --- 9. Responsive Resize Handling ---
+    window.addEventListener('resize', () => {
+      width = window.innerWidth;
+      height = window.innerHeight;
+      halfWidth = width * 0.5;
+      halfHeight = height * 0.5;
+
+      camera.aspect = width / height;
+      camera.updateProjectionMatrix();
+
+      renderer.setSize(width, height);
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    });
+  </script>
+</body>
+</html>
