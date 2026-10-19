@@ -27,6 +27,7 @@ interface Props {
     pull?: number;
     fadeRadius?: number;
     titlePrefix?: string;
+    titleMid?: string;
     titleHighlight?: string;
     titleSuffix?: string;
     description?: string;
@@ -50,11 +51,19 @@ const {
     cursorRadius = 320,
     pull = 14,
     fadeRadius = 40,
-    titlePrefix = "The mandate",
-    titleHighlight = "Changes.",
-    titleSuffix = "Delivery doesn't.",
-    description = "Global e-invoicing succeeds by understanding how mandates diverge, overcoming delivery roadblocks, and owning it after go-live in every market.",
+    titlePrefix = "Every deployment, the",
+    titleMid = "same",
+    titleHighlight = "Standard",
+    titleSuffix = "of delivery",
+    description = "Go live without the fire drills, supported by a team with implementation and compliance expertise, built across global deployments.",
 } = Astro.props;
+
+let prefixText = titlePrefix;
+let midText = titleMid;
+if (prefixText.endsWith(" same")) {
+    prefixText = prefixText.slice(0, -" same".length);
+    midText = "same";
+}
 ---
 
 <section
@@ -94,17 +103,17 @@ const {
 
                 <!-- Headline -->
                 <h2
-                    class="text-[length:var(--fs-h1)] lg:text-[length:var(--fs-display-sm)] xl:text-[length:var(--fs-display-xl)] leading-[length:var(--lh-h1)] lg:leading-[length:var(--lh-display-sm)] xl:leading-[length:var(--lh-display-xl)] max-w-220 text-generic-100 font-semibold font-heading mb-4 m-0 text-center"
+                    class="de-hero-title text-[length:var(--fs-h1)] lg:text-[length:var(--fs-display-sm)] xl:text-[length:var(--fs-display-xl)] leading-[var(--lh-h1)] lg:leading-[var(--lh-display-sm)] xl:leading-[var(--lh-display-xl)] max-w-[1160px] tracking-[-1px] text-text-default font-semibold font-heading mb-4 m-0 text-center"
                 >
-                    {titlePrefix}
-                    {
+                    {prefixText}
+                    <br class="hidden md:block" />
+                    {midText && `${midText} `}{
                         titleHighlight && (
-                            <span class="text-generic-100 bg-flux-lime px-2.5 py-1 rounded-lg">
-                                {titleHighlight}
+                            <span class="de-hero-mark text-generic-100 bg-flux-lime py-1 px-[13px] rounded-xl inline-block align-baseline">
+                                {titleHighlight.trim()}
                             </span>
                         )
-                    }
-                    {titleSuffix}
+                    }{" "}{titleSuffix}
                 </h2>
 
                 <!-- Description -->
@@ -147,3 +156,32 @@ const {
         }
     };
 </script>
+
+<style is:global>
+    /* Ensure the 88px line-height from tokens is strictly applied */
+    .de-hero-title {
+        line-height: var(--lh-h1);
+    }
+    @media (min-width: 1024px) {
+        .de-hero-title {
+            line-height: var(--lh-display-sm);
+        }
+    }
+    @media (min-width: 1280px) {
+        .de-hero-title {
+            line-height: var(--lh-display-xl); /* 88px */
+        }
+    }
+
+    /* Flux Lime highlight pill matching design system specs */
+    .de-hero-mark {
+        display: inline-block;
+        background-color: var(--color-flux-lime);
+        padding: 4px 13px;
+        -webkit-box-decoration-break: clone;
+        box-decoration-break: clone;
+        border-radius: 12px;
+        vertical-align: baseline;
+        line-height: inherit;
+    }
+</style>

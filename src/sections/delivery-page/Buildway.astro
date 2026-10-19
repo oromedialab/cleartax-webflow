@@ -22,13 +22,13 @@ const loadContent = [
             >When something goes wrong</h2>
         </div>
 
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-20 items-center mx-auto">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-20 items-start mx-auto">
             <!-- Left Side: Tabs -->
             <div class="lg:col-span-5 flex flex-col space-y-1 relative" id="buildway-tabs">
                 {
                     loadContent.map((item, i) => (
-                        <div class="de-buildway-item flex flex-col cursor-pointer group" data-index={i}>
-                            <h3 class="de-buildway-title font-heading text-[24px] leading-[length:var(--lh-h4)] font-medium text-text-default py-4 transition-all duration-300 group-hover:text-primary-600">{item.title}</h3>
+                        <div class={`de-buildway-item flex flex-col cursor-pointer group ${i === 0 ? 'active' : ''}`} data-index={i}>
+                            <h3 class="de-buildway-title font-heading text-[length:var(--fs-h5)] leading-[length:var(--lh-h5)] group-[.active]:text-[length:var(--fs-h3)] group-[.active]:leading-[length:var(--lh-h3)] font-medium text-text-default py-4 transition-all duration-300 group-hover:text-primary-600">{item.title}</h3>
                             
                             <div class="de-buildway-desc overflow-hidden max-w-132 transition-all duration-500 ease-in-out" style="max-height: 0px; opacity: 0;">
                                 <p class="font-body text-[length:var(--fs-body)] leading-[length:var(--lh-body)] text-[#6B7280CC] font-normal pb-6">{item.desc}</p>
@@ -46,17 +46,17 @@ const loadContent = [
                 }
             </div>
 
-            <!-- Right Side: Sliding Visuals -->
-            <div class="lg:col-span-7 w-full flex justify-center lg:justify-end">
-                <div class="relative w-full max-w-[548px] h-[314px] rounded-2xl overflow-hidden">
-                    <div id="de-buildway-slider" class="flex w-full h-full gap-4 transition-transform duration-700 ease-in-out">
-                        {
-                            loadContent.map((_, i) => (
-                                <div class="w-full max-w-[548px] shrink-0 h-full bg-visual-placeholder flex items-center justify-center">
-                                </div>
-                            ))
-                        }
-                    </div>
+            <!-- Right Side: Visual -->
+            <div class="lg:col-span-7 w-full flex justify-center lg:justify-end self-start">
+                <div class="relative w-full max-w-[548px] h-[314px] overflow-hidden flex items-center justify-center">
+                    <img 
+                        src="https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6ad5b408d131b1b7d7e6b761_img-icon.png" 
+                        alt="img-icon"
+                        width="548"
+                        height="314"
+                        loading="lazy"
+                        class="w-full h-full object-contain pointer-events-none select-none"
+                    />
                 </div>
             </div>
         </div>
@@ -67,8 +67,7 @@ const loadContent = [
 <script is:inline>
 document.addEventListener('DOMContentLoaded', () => {
     const items = document.querySelectorAll('.de-buildway-item');
-    const slider = document.getElementById('de-buildway-slider');
-    if (!items.length || !slider) return;
+    if (!items.length) return;
 
     let currentIndex = 0;
     let timer = null;
@@ -76,22 +75,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const activateTab = (index, instant = false) => {
         currentIndex = index;
-        
-        // Slide right panel (100% width + 16px gap per index)
-        slider.style.transform = `translateX(calc(-${index * 100}% - ${index * 16}px))`;
 
         items.forEach((item, i) => {
             const desc = item.querySelector('.de-buildway-desc');
             const progress = item.querySelector('.de-buildway-progress');
-            const title = item.querySelector('.de-buildway-title');
             
             if (i === index) {
                 // Active state
+                item.classList.add('active');
                 desc.style.maxHeight = desc.scrollHeight + 'px';
                 desc.style.opacity = '1';
-                
-                title.classList.remove('text-[24px]');
-                title.classList.add('text-[32px]');
                 
                 // Reset progress line to 0, then animate to 100%
                 progress.style.transition = 'none';
@@ -106,11 +99,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             } else {
                 // Inactive state
+                item.classList.remove('active');
                 desc.style.maxHeight = '0px';
                 desc.style.opacity = '0';
-
-                title.classList.remove('text-[32px]');
-                title.classList.add('text-[24px]');
                 
                 // Keep the progress line filled for past items, empty for future items
                 progress.style.transition = 'width 0.3s ease';
