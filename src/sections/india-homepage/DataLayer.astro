@@ -227,14 +227,17 @@ const stages = [
         </p>
       </div>
 
-      <!-- Diagram -->
+      <!-- Diagram. Always a column — Your Books, the diagram, then Yours Taxes
+           stacked, at every width, not just below lg. See the note on the
+           diagram wrapper for what that simplified once the row's
+           items-stretch requirement went away. -->
       <div
-        class="relative flex w-full items-stretch gap-10 max-lg:flex-col max-lg:items-center max-lg:gap-8"
+        class="relative flex w-full flex-col items-center gap-8"
         data-ih-lit
       >
         <span class="ih-dl-centre" aria-hidden="true"></span>
         <div
-          class="flex flex-1 flex-col items-center gap-6 rounded-xl border border-[#CCCCCC] bg-generic-00 p-6 max-lg:w-full max-lg:max-w-[420px] lg:min-w-0"
+          class="flex w-full max-w-[420px] flex-col items-center gap-6 rounded-xl border border-[#CCCCCC] bg-generic-00 p-6"
         >
           <h3
             class="m-0 font-heading font-medium text-vault-navy text-[length:var(--fs-h6)] leading-[length:var(--lh-h6)]"
@@ -295,10 +298,45 @@ const stages = [
              Reversing the sweep reversed the unwind for free — the outer edges
              now arrive last and so let go first, and the platform, which leads
              going in, is the last thing to drop back to grey. -->
+        <!-- ROW TO COLUMN, hexagon kept upright. Now that Books/diagram/Taxes
+             is always a column, the fans turn 90° (Tailwind's `rotate-90`, on
+             the <svg> only) and stack above/below the hexagon instead of
+             sitting either side of it — the hexagon itself is never rotated.
+             `i*COL_PITCH` (each fan's own local x-axis) lands on the screen's
+             y-axis either way, so the OUTERMOST, TALLEST column (i=0,
+             furthest from the platform) still ends up furthest from the
+             platform: at the top of the top fan, at the bottom of the bottom
+             one. Nothing about the sweep's geometry or timing changes — the
+             frontmatter's distances and rings are computed in each fan's own
+             local coordinates, which a `rotate-90` on the finished SVG
+             doesn't touch.
+
+             Each fan's SVG keeps its drawn FAN_W×FAN_H box for its own
+             layout (every cx/cy inside it is still right), but turned 90° it
+             PAINTS as FAN_H×FAN_W — so it is wrapped in a sizing div of that
+             swapped size, which is what the flex column actually reserves
+             space for. The platform box gets an explicit `h-[382px]` it
+             didn't carry in the row version: there, the row's own
+             `items-stretch` (borrowed from the taller cards either side)
+             gave it enough height for the hexagon to clear without asking;
+             there is no such sibling here, so it is stated directly. 382 is
+             the hexagon's own full height, so it renders with zero overhang
+             top and bottom, same as the 51px gutter leaves zero overhang
+             either side.
+
+             `-scale` and `-fixed` below are the same two-level scale-to-fit
+             as before, just re-based on the new 334×884 footprint — see
+             the note by `ih-dl-diagram-scale` in the styles. `-stretch` is
+             just the centring wrapper, capped at the same 420px as the two
+             cards. -->
         <div
-          class="flex shrink-0 items-center gap-[51px] max-lg:hidden"
-          style={`--ih-dl-max:${MAX_T.toFixed(3)}s`}
+          class="ih-dl-diagram-stretch flex w-full max-w-[420px] items-center justify-center"
         >
+          <div class="ih-dl-diagram-scale w-full max-w-[334px] aspect-[334/884]">
+            <div
+              class="ih-dl-diagram-fixed flex w-[334px] h-[884px] flex-col items-center gap-[51px]"
+              style={`--ih-dl-max:${MAX_T.toFixed(3)}s`}
+            >
           <!-- Index 0 is the OUTERMOST column of this fan, which makes it the
                furthest from the platform and so the LAST to turn. The right fan
                is reversed, so its own outermost column is the last in the array
@@ -319,29 +357,34 @@ const stages = [
                The circles carry no class — with this many of them a class
                attribute each would be kilobytes of the Embed budget for nothing
                a descendant selector cannot already say. -->
-          <svg
-            class="ih-dl-dots block shrink-0"
-            width={FAN_W}
-            height={FAN_H}
-            viewBox={`0 0 ${FAN_W} ${FAN_H}`}
-            aria-hidden="true"
+          <div
+            class="flex shrink-0 items-center justify-center"
+            style={`width:${FAN_H}px;height:${FAN_W}px`}
           >
-            {
-              dotColumns.flatMap((h, i) =>
-                Array.from({ length: dotsIn(h) }, (_, k) => (
-                  <circle
-                    cx={i * COL_PITCH + DOT / 2}
-                    cy={dotY(h, k)}
-                    r={DOT / 2}
-                    style={`--ih-dl-t:${dotT(i, h, k)}s`}
-                  />
-                )),
-              )
-            }
-          </svg>
+            <svg
+              class="ih-dl-dots block shrink-0 rotate-90"
+              width={FAN_W}
+              height={FAN_H}
+              viewBox={`0 0 ${FAN_W} ${FAN_H}`}
+              aria-hidden="true"
+            >
+              {
+                dotColumns.flatMap((h, i) =>
+                  Array.from({ length: dotsIn(h) }, (_, k) => (
+                    <circle
+                      cx={i * COL_PITCH + DOT / 2}
+                      cy={dotY(h, k)}
+                      r={DOT / 2}
+                      style={`--ih-dl-t:${dotT(i, h, k)}s`}
+                    />
+                  )),
+                )
+              }
+            </svg>
+          </div>
 
           <div
-            class="relative flex w-[280px] shrink-0 items-center justify-center"
+            class="relative flex h-[382px] w-[280px] shrink-0 items-center justify-center"
           >
             <!-- Figma's own path data, nested by translate rather than redrawn:
                  334.283x382.284, 316.963x362.147 and 297.913x340.382, each
@@ -398,14 +441,22 @@ const stages = [
           <!-- Reversed, so index 0 is the column nearest the platform and index
                7 is this fan's outer edge. The sweep orders are therefore the
                mirror of the left fan's, which is what makes the two run toward
-               each other rather than both left to right. -->
-          <svg
-            class="ih-dl-dots block shrink-0"
-            width={FAN_W}
-            height={FAN_H}
-            viewBox={`0 0 ${FAN_W} ${FAN_H}`}
-            aria-hidden="true"
+               each other rather than both left to right. Rotated the same
+               direction as the top fan, which — because this one's local x
+               is already mirrored by the reversed array — lands its own
+               nearest-the-platform end at the TOP of its box, against the
+               hexagon, and its outermost end at the very bottom. -->
+          <div
+            class="flex shrink-0 items-center justify-center"
+            style={`width:${FAN_H}px;height:${FAN_W}px`}
           >
+            <svg
+              class="ih-dl-dots block shrink-0 rotate-90"
+              width={FAN_W}
+              height={FAN_H}
+              viewBox={`0 0 ${FAN_W} ${FAN_H}`}
+              aria-hidden="true"
+            >
             {
               [...dotColumns]
                 .reverse()
@@ -421,10 +472,13 @@ const stages = [
                 )
             }
           </svg>
+            </div>
+            </div>
+          </div>
         </div>
 
         <div
-          class="flex flex-1 flex-col items-center gap-6 rounded-xl border border-[#CCCCCC] bg-generic-00 p-6 max-lg:w-full max-lg:max-w-[420px] lg:min-w-0"
+          class="flex w-full max-w-[420px] flex-col items-center gap-6 rounded-xl border border-[#CCCCCC] bg-generic-00 p-6"
         >
           <h3
             class="m-0 font-heading font-medium text-vault-navy text-[length:var(--fs-h6)] leading-[length:var(--lh-h6)]"
@@ -434,7 +488,7 @@ const stages = [
           <div class="flex w-full flex-1 flex-col gap-2">
             {
               portals.map((tile) => (
-                <div class="flex h-14 flex-1 items-center justify-center rounded-lg border border-[#CCCCCC] px-3">
+                <div class="flex h-14 flex-1 items-center justify-center rounded-lg border border-[#CCCCCC] p-3">
                   {tile.src ? (
                     <img
                       src={tile.src}
@@ -524,6 +578,32 @@ const stages = [
      #A6C705 is NOT Flux Lime (#C8F006) and must not become it. The brand allows
      one instance of Flux Lime per screen and this page already spends it on the
      hero's headline mark. */
+  /* `-fixed`'s OWN children are what rotate (each fan's <svg>, via Tailwind's
+     `rotate-90` — the hexagon stays upright, see the markup). `-fixed` itself
+     is never rotated, only scaled, exactly like the row version was: it is
+     pinned at its real 334×884 — the two rotated fans (FAN_H×FAN_W each) plus
+     the 382-tall platform box plus two 51px gutters, stacked — and `-scale`
+     is a plain box with that SAME aspect ratio (`aspect-[334/884]` on the
+     markup) whose width is free to shrink. The two track exactly because
+     both read off `-scale`'s own width, so there is nothing to clip —
+     `overflow: hidden` is a safety margin for sub-pixel rounding, not a crop.
+     `min(1, …)` stops it scaling UP past its design size if `-scale` is ever
+     wider than 334px.
+
+     Nothing about the sweep's geometry or timing changes here either way —
+     every distance and ring in the frontmatter is computed in each fan's own
+     local coordinates, which neither the per-fan rotation nor this outer
+     scale touches. */
+  .ih-dl-diagram-scale {
+    container-type: inline-size;
+    overflow: hidden;
+  }
+
+  .ih-dl-diagram-fixed {
+    transform-origin: top left;
+    transform: scale(min(1, calc(100cqw / 334px)));
+  }
+
   .ih-dl-dots circle {
     fill: #a6c705;
 
