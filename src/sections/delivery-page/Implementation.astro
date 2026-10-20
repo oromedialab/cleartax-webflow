@@ -62,8 +62,7 @@ const steps: StepItem[] = [
             <!-- Desktop Horizontal Background Line (passes through centers of the boxes) -->
             <div
                 id="de-desktop-line-container"
-                class="hidden md:block absolute h-[2px] z-0 pointer-events-none rounded-full overflow-hidden"
-                style="top: 76px; left: 76px; right: 152px;"
+                class="hidden md:block absolute h-[2px] z-0 pointer-events-none rounded-full overflow-hidden max-w-none"
             >
                 <!-- Base Gray Line -->
                 <div class="absolute inset-0 w-full h-full bg-[#E5E7EB] rounded-full"></div>
@@ -132,6 +131,10 @@ const steps: StepItem[] = [
 </section>
 
 <style is:global>
+    #de-desktop-line-container {
+        max-width: none !important;
+    }
+
     @media (min-width: 768px) {
         #de-desktop-line-container {
             display: block !important;
@@ -170,7 +173,30 @@ const steps: StepItem[] = [
 
         if (!stepItems.length) return;
 
-        // Dynamically align horizontal line through centers of first and last box across all screen sizes
+        // Compute element offsets in layout CSS space (unaffected by body zoom or zoom discrepancies)
+        const getOffsetToAncestor = (el, ancestor) => {
+            let x = 0;
+            let y = 0;
+            let curr = el;
+            while (curr && curr !== ancestor && curr !== document.body) {
+                x += curr.offsetLeft;
+                y += curr.offsetTop;
+                curr = curr.offsetParent;
+            }
+            if (x > 0 || curr === ancestor) {
+                return { x, y };
+            }
+            // Fallback: getBoundingClientRect normalised against body zoom factor (--page-zoom in shared.css)
+            const elRect = el.getBoundingClientRect();
+            const ancRect = ancestor.getBoundingClientRect();
+            const rawZoom = parseFloat(window.getComputedStyle(document.body).zoom) || 1;
+            return {
+                x: (elRect.left - ancRect.left) / rawZoom,
+                y: (elRect.top - ancRect.top) / rawZoom,
+            };
+        };
+
+        // Align horizontal line precisely through centers of first and last box across all screen sizes
         const updateDesktopLinePosition = () => {
             if (!desktopLineContainer || window.innerWidth < 768) return;
             const timelineContainer = desktopLineContainer.parentElement;
@@ -178,15 +204,14 @@ const steps: StepItem[] = [
             const lastBox = stepItems[stepItems.length - 1]?.querySelector(".step-box");
             if (!timelineContainer || !firstBox || !lastBox) return;
 
-            const containerRect = timelineContainer.getBoundingClientRect();
-            const firstRect = firstBox.getBoundingClientRect();
-            const lastRect = lastBox.getBoundingClientRect();
+            const firstPos = getOffsetToAncestor(firstBox, timelineContainer);
+            const lastPos = getOffsetToAncestor(lastBox, timelineContainer);
 
-            if (firstRect.width === 0 || lastRect.width === 0) return;
+            if (firstBox.offsetWidth === 0 || lastBox.offsetWidth === 0) return;
 
-            const startX = firstRect.left + firstRect.width / 2 - containerRect.left;
-            const endX = lastRect.left + lastRect.width / 2 - containerRect.left;
-            const topY = firstRect.top + firstRect.height / 2 - containerRect.top;
+            const startX = firstPos.x + firstBox.offsetWidth / 2;
+            const endX = lastPos.x + lastBox.offsetWidth / 2;
+            const topY = firstPos.y + firstBox.offsetHeight / 2;
 
             desktopLineContainer.style.top = `${topY}px`;
             desktopLineContainer.style.left = `${startX}px`;
@@ -226,21 +251,20 @@ const steps: StepItem[] = [
             });
         };
 
-        let loopTimeout = null;
         let activeTimeouts = [];
         let isUserInteracting = false;
+        let hasAnimated = false;
 
         const clearAllTimeouts = () => {
             activeTimeouts.forEach(clearTimeout);
             activeTimeouts = [];
-            if (loopTimeout) {
-                clearTimeout(loopTimeout);
-                loopTimeout = null;
-            }
         };
 
-        // Runs sequential animation from Step 1 all the way to Step 5
+        // Runs sequential animation ONCE from Step 1 all the way to Step 5 (NO LOOP)
         const runFullSequence = () => {
+            if (hasAnimated) return;
+            hasAnimated = true;
+
             if (reduceMotion) {
                 if (desktopLine) {
                     desktopLine.style.opacity = "1";
@@ -254,111 +278,83 @@ const steps: StepItem[] = [
                 return;
             }
 
-            if (isUserInteracting) return;
             clearAllTimeouts();
 
-            // Smooth fade reset of lines back to start
+            // Initial state at Step 1
             if (desktopLine) {
-                desktopLine.style.transition = "opacity 300ms ease";
-                desktopLine.style.opacity = "0";
+                desktopLine.style.transition = "none";
+                desktopLine.style.width = "0%";
+                void desktopLine.offsetWidth;
+                desktopLine.style.opacity = "1";
             }
             mobileLines.forEach((l) => {
-                l.style.transition = "opacity 300ms ease";
-                l.style.opacity = "0";
+                l.style.transition = "none";
+                l.style.height = "0%";
+                void l.offsetWidth;
+                l.style.transition = "opacity 250ms ease";
+                l.style.opacity = "1";
             });
+            updatePills(0);
 
-            activeTimeouts.push(
-                setTimeout(() => {
-                    if (isUserInteracting) return;
+            // Begin stepping smoothly
+            const stepDuration = 650; // smooth glide per step
+            const stepGapPause = 350; // pause between milestones
+            let currentDelay = 200;
 
-                    if (desktopLine) {
-                        desktopLine.style.transition = "none";
-                        desktopLine.style.width = "0%";
-                        void desktopLine.offsetWidth;
-                        desktopLine.style.transition = "opacity 250ms ease";
-                        desktopLine.style.opacity = "1";
-                    }
-                    mobileLines.forEach((l) => {
-                        l.style.transition = "none";
-                        l.style.height = "0%";
-                        void l.offsetWidth;
-                        l.style.transition = "opacity 250ms ease";
-                        l.style.opacity = "1";
-                    });
-                    updatePills(0);
+            for (let i = 0; i < 4; i++) {
+                const stepIdx = i;
+                const nextStepIdx = i + 1;
+                const targetPercentage = (nextStepIdx / 4) * 100;
 
-                    // Begin stepping smoothly
-                    const stepDuration = 700; // smooth 700ms glide per step
-                    const stepGapPause = 450; // comfortable, natural pause between milestones
-                    let currentDelay = 200;
+                activeTimeouts.push(
+                    setTimeout(() => {
+                        if (isUserInteracting) return;
 
-                    for (let i = 0; i < 4; i++) {
-                        const stepIdx = i;
-                        const nextStepIdx = i + 1;
-                        const targetPercentage = (nextStepIdx / 4) * 100;
+                        // Animate desktop line smoothly
+                        if (desktopLine) {
+                            desktopLine.style.transition = `width ${stepDuration}ms cubic-bezier(0.25, 1, 0.5, 1)`;
+                            desktopLine.style.width = `${targetPercentage}%`;
+                        }
 
+                        // Animate mobile vertical line segment smoothly
+                        if (mobileLines[stepIdx]) {
+                            mobileLines[stepIdx].style.transition = `height ${stepDuration}ms cubic-bezier(0.25, 1, 0.5, 1)`;
+                            mobileLines[stepIdx].style.height = "100%";
+                        }
+
+                        // When line reaches milestone:
                         activeTimeouts.push(
                             setTimeout(() => {
                                 if (isUserInteracting) return;
-
-                                // Animate desktop line smoothly
-                                if (desktopLine) {
-                                    desktopLine.style.transition = `width ${stepDuration}ms cubic-bezier(0.25, 1, 0.5, 1)`;
-                                    desktopLine.style.width = `${targetPercentage}%`;
-                                }
-
-                                // Animate mobile vertical line segment smoothly
-                                if (mobileLines[stepIdx]) {
-                                    mobileLines[stepIdx].style.transition = `height ${stepDuration}ms cubic-bezier(0.25, 1, 0.5, 1)`;
-                                    mobileLines[stepIdx].style.height = "100%";
-                                }
-
-                                // When line reaches milestone:
-                                activeTimeouts.push(
-                                    setTimeout(() => {
-                                        if (isUserInteracting) return;
-
-                                        updatePills(nextStepIdx);
-
-                                        // If reached the final step (Box 5 / index 4), pause for 4s then smoothly loop
-                                        if (nextStepIdx === 4) {
-                                            loopTimeout = setTimeout(() => {
-                                                if (!isUserInteracting) {
-                                                    runFullSequence();
-                                                }
-                                            }, 4000);
-                                        }
-                                    }, stepDuration)
-                                );
-                            }, currentDelay)
+                                updatePills(nextStepIdx);
+                            }, stepDuration)
                         );
+                    }, currentDelay)
+                );
 
-                        currentDelay += stepDuration + stepGapPause;
-                    }
-                }, 300)
-            );
+                currentDelay += stepDuration + stepGapPause;
+            }
         };
 
-        // Trigger when scrolled into view
-        let hasTriggered = false;
+        // Trigger strictly ONCE when scrolled into view
         if ("IntersectionObserver" in window) {
             const observer = new IntersectionObserver(
                 (entries) => {
                     entries.forEach((entry) => {
-                        if (entry.isIntersecting && !hasTriggered) {
-                            hasTriggered = true;
-                            setTimeout(runFullSequence, 200);
+                        if (entry.isIntersecting && !hasAnimated) {
+                            observer.disconnect();
+                            setTimeout(runFullSequence, 150);
                         }
                     });
                 },
-                { threshold: 0.15 }
+                { threshold: 0.2 }
             );
             observer.observe(section);
         } else {
             runFullSequence();
         }
 
-        // Click handler for any step item to manually navigate
+        // Click handler for any step item to manually navigate (no loop restart)
         const handleStepClick = (targetIndex) => {
             isUserInteracting = true;
             clearAllTimeouts();
@@ -382,12 +378,6 @@ const steps: StepItem[] = [
             });
 
             updatePills(targetIndex);
-
-            // Resume loop after 6s of inactivity
-            loopTimeout = setTimeout(() => {
-                isUserInteracting = false;
-                runFullSequence();
-            }, 6000);
         };
 
         stepItems.forEach((item, idx) => {
