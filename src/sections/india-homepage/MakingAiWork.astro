@@ -53,6 +53,14 @@ interface Card {
   /** Optional prompt typed out in the bottom input pill. Defaults to query. */
   typedQuery?: string;
   resultHeading?: string;
+  /** Initial placeholder text shown in the input pill. Defaults to "Ask anything". */
+  initialPlaceholder?: string;
+  /** First status text shown while skeleton is visible. */
+  statusText1?: string;
+  /** Second status text shown while checklist is visible. */
+  statusText2?: string;
+  /** Placeholder text shown when final result appears. */
+  finalPlaceholder?: string;
   /** The Nova Blue one-liner under the title in the overlay. */
   claim: string;
   caption: string;
@@ -80,22 +88,29 @@ const groups: Group[] = [
     cards: [
       {
         title: "CFO Dashboard Agent",
-        claim: "Walk into the monthly review with insights, not numbers.",
-        query: "Board meeting next month. Any compliance risk likely before then?",
-        resultHeading: "here’s what holds up and what needs a board line",
+        claim: "Turn tax data into clear business insights.",
+        query: "Did we pay tax in cash this month? Did we use all our credit?",
+        resultHeading: "Cash used, and credit left unused",
+        statusText1: "Reading tax settlements...",
+        statusText2: "Analyzing cash and unused credit...",
+        finalPlaceholder: "Ask about cash and credit...",
         icon: "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6abb81d24cbe5f2136a1a893_ai-icon-1.png",
         image:
-          "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6ad0c097a38114b75867f1b4_chart-1.png",
+          "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6ad0c0d6259045960b7213ac_chart-9.png",
         caption:
-          "Builds the CFO presentation from your data, in the format and narrative the tax team controls.",
+          "Get a ready-to-use view of key movements, risks and opportunities for every CFO conversation.",
       },
       {
         title: "Tax Governance Agent",
         claim: "An objective read on where you stand, not a self-assessment",
-        query: "Before this month’s pack goes to the CA firm - what would they flag?",
+        query: "Board meeting next month. Any compliance risk likely before then?",
+        resultHeading: "here’s what holds up and what needs a board line",
+        statusText1: "Reading filings...",
+        statusText2: "Analyzing...",
+        finalPlaceholder: "Ask anything...",
         icon: "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6abb821559914c7b687369a7_ai-icon2.png",
         image:
-          "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6ad0c09e440668f84e79a408_chart-2.png",
+          "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6ad0c097a38114b75867f1b4_chart-1.png",
         caption:
           "Scores six dimensions: reconciliation health, ITC quality, notice exposure, invoice rejection rates, Table-4 accuracy and vendor compliance, with independent commentary on each, benchmarked against industry peers",
       },
@@ -104,22 +119,28 @@ const groups: Group[] = [
         claim:
           "The monthly CA audit, on every entity, without adding headcount",
         query: "Before this month’s pack goes to the CA firm - what would they flag?",
-        typedQuery: "Which invoices cross 180 days this month?",
+        statusText1: "Thinking...",
+        statusText2: "Analyzing...",
+        finalPlaceholder: "Ask anything...",
         icon: "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6abb82364712c77d3ad13d11_ai-icon-3.png",
         image:
-          "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6ad0c0a5231ffb954300911c_chart-3.png",
+          "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6ad0c09e440668f84e79a408_chart-2.png",
         caption:
           "Maps your GL, assess completeness, calculate an independent position and compare it to what you filed. Maps findings to known notice patterns to score risk.",
       },
       {
         title: "Notice Dashboard Agent",
-        claim: "Notice tracking through your lens, not a generic dashboard",
-        query: "Post November writebacks to SAP.",
+        claim: "Stay on top of your tax notices.",
+        query: "Show open notices the way we track them.",
+        initialPlaceholder: "Search notices...",
+        statusText1: "Mapping notice stages...",
+        statusText2: "Prioritizing and building the view...",
+        finalPlaceholder: "Search notices...",
         icon: "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6abb823b7c5a09e10a549d4f_ai-icon-4.png",
         image:
-          "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6ad0c0aa562de4fba48e12c8_chart-4.png",
+          "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6ad0c0bf67ba56b6bce0e7be_chart-7.png",
         caption:
-          "Combines ClearTax notice data with your own tracking rules. You define your own controls.",
+          "See what's open, what needs action, and where things stand across business units.",
       },
     ],
   },
@@ -131,32 +152,41 @@ const groups: Group[] = [
         title: "Litigation Agent",
         icon: "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6abb8242335ac8a6e3350503_ai-icon-5.png",
         image:
-          "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6ad0c0b1250a0da3dbb373e0_chart-5.png",
+          "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6ad0c0c60721bdf80cec31af_chart-8.png",
         claim:
-          "Every notice type answered with the transactions behind it, inside the deadline",
-        query: "Draft notice response with line-item transaction trail",
+          "Manage tax disputes with all the right evidence.",
+        query: "Draft the reply for notice DIN-2811.",
+        initialPlaceholder: "Draft a notice reply...",
+        statusText1: "Checking notice and evidence...",
+        statusText2: "Drafting the reply...",
+        finalPlaceholder: "Draft a notice reply...",
         caption:
-          "Drafts from the actual records: invoice, line item, date, counterparty, GSTIN and the rule in force on that date. At-scale reconciliation, case law from verified databases.",
+          "Get a complete, source-linked response package with supporting documents and annexures, ready for review.",
       },
       {
         title: "Refund Agent",
         icon: "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6abb82478a474f0459c88db6_ai-icon-6.png",
         image:
-          "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6ad0c0b6658e3765d9aec9d4_chart-6.png",
-        claim: "The bottleneck is data preparation, not filing",
-        query: "Prepare complete refund dossier and justification trail",
+          "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6ad0c0dddc63355f520ca3f9_chart-10.png",
+        claim: "Know what tax refunds you can recover.",
+        query: "Prepare the Q2 refund draft.",
+        initialPlaceholder: "Prepare a refund draft...",
+        statusText1: "Calculating refund eligibility...",
+        statusText2: "Running offline utility → JSON...",
+        finalPlaceholder: "Prepare a refund draft...",
         caption:
-          "Reads your specific scenario, whether inverted duty, excess payment or unutilised balance, and prepares a complete dossier: refund quantum, supporting data and justification trail.",
+          "Get the refund amount, supporting data and justification in one place, without hours of manual preparation.",
       },
       {
         title: "180-Day Reversal and Reclaim Agent",
         icon: "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6abb8676075549fbc89fb389_ai-icon-7.png",
         image:
           "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6ad0c0bf67ba56b6bce0e7be_chart-7.png",
-        claim: "Section 16(2)(b), computed per document",
+        claim: "Track vendor payments and their tax impact.",
+        typedQuery: "Which invoices cross 180 days this month?",
         query: "Calculate Section 16(2)(b) reversals and eligible reclaims",
         caption:
-          "Takes your Table-4 data and open payments report from SAP or your ERP, identifies documents needing reversal, eligible for reclaim and falling due next month, and calculates reversal and interest per document",
+          "Know which invoices need ITC reversal, which are eligible for reclaim and what is coming due",
       },
       {
         title: "ERP Writeback Agent",
@@ -485,7 +515,7 @@ const panels = groups.map((group) => ({
                     <h3
                       class="m-0 font-heading font-medium text-vault-navy text-base md:text-[length:var(--fs-h6)] leading-[length:var(--lh-h6)]"
                     >
-                      What would you like to review?
+                      What would you like to understand?
                     </h3>
                   </div>
 
@@ -500,7 +530,7 @@ const panels = groups.map((group) => ({
                         class="ih-maiw-bubble-text m-0 font-body text-[10px] md:text-xs lg:text-sm xl:text-[16px] font-normal leading-[1.35] md:leading-[1.7] lg:leading-[1.5] text-[#111827]"
                         data-query={card.query}
                       >
-                        {card.query || "Board meeting next month. Any compliance risk likely before then?"}
+                        {card.query || "Did we pay tax in cash this month? Did we use all our credit??"}
                       </p>
                     </div>
 
@@ -510,7 +540,7 @@ const panels = groups.map((group) => ({
                       <span
                         class="font-body font-medium text-xs md:text-sm lg:text-[length:var(--fs-body)] text-[#111827] leading-tight"
                       >
-                        {card.resultHeading || "here’s what holds up and what needs a board line"}
+                        {card.resultHeading || "Cash used, and credit left unused"}
                       </span>
                     </div>
                   </div>
@@ -543,29 +573,29 @@ const panels = groups.map((group) => ({
                         <!-- Item 1 (Col 1, Row 1 on desktop; Row 1 on mobile) -->
                         <div class="ih-maiw-check-item col-start-1 sm:row-start-1 flex items-center gap-1.5 sm:gap-1 md:gap-1.5 xl:gap-2 min-w-0 opacity-0">
                           <img src="https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6ad1c662b91ef9913bf8a199_checklist-1-1.png" alt="checklist" width="12" height="15" class="h-3 sm:h-2.5 md:h-3 lg:h-3 xl:h-[15px] w-auto shrink-0 object-contain">
-                          <span class="text-[10px] min-[380px]:text-[11px] sm:text-[9.5px] md:text-[10px] lg:text-[9.5px] xl:text-[13px] font-normal text-[#111827] underline underline-offset-[2px] xl:underline-offset-[3px] decoration-1 decoration-[#111827]/80 leading-none whitespace-nowrap">12 months of filings + 2B reconciliation</span>
+                          <span class="text-[10px] min-[380px]:text-[11px] sm:text-[9.5px] md:text-[10px] lg:text-[9.5px] xl:text-[13px] font-normal text-[#111827] underline underline-offset-[2px] xl:underline-offset-[3px] decoration-1 decoration-[#111827]/80 leading-none whitespace-nowrap">Reading GSTR-3B across 41 GSTINs</span>
                         </div>
                         <!-- Item 2 (Col 2, Row 1 on desktop; Row 2 on mobile) -->
                         <div class="ih-maiw-check-item col-start-1 sm:col-start-2 sm:row-start-1 flex items-center gap-1.5 sm:gap-1 md:gap-1.5 xl:gap-2 min-w-0 opacity-0">
                           <img src="https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6ad1c667a6af7f9a939f4d1d_checklist-1-2.png" alt="checklist-2" width="14" height="14" class="h-3 sm:h-2.5 md:h-3 lg:h-3 xl:h-[15px] w-auto shrink-0 object-contain">
-                          <span class="text-[10px] min-[380px]:text-[11px] sm:text-[9.5px] md:text-[10px] lg:text-[9.5px] xl:text-[13px] font-normal text-[#111827] underline underline-offset-[2px] xl:underline-offset-[3px] decoration-1 decoration-[#111827]/80 leading-none whitespace-nowrap">Notice register — 310 cases, 18 GSTINs</span>
+                          <span class="text-[10px] min-[380px]:text-[11px] sm:text-[9.5px] md:text-[10px] lg:text-[9.5px] xl:text-[13px] font-normal text-[#111827] underline underline-offset-[2px] xl:underline-offset-[3px] decoration-1 decoration-[#111827]/80 leading-none whitespace-nowrap">Splitting credit- and cash-funded liability</span>
                         </div>
                         <!-- Item 3 (Col 1, Row 2 on desktop; Row 3 on mobile) -->
                         <div class="ih-maiw-check-item col-start-1 sm:row-start-2 flex items-center gap-1.5 sm:gap-1 md:gap-1.5 xl:gap-2 min-w-0 opacity-0">
                           <img src="https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6ad1c66cb1caeb82a7499f88_checklist-1-3.png" alt="checklist-3" width="16" height="16" class="h-3.5 sm:h-3 md:h-3.5 lg:h-3.5 xl:h-[16px] w-auto shrink-0 object-contain">
-                          <span class="text-[10px] min-[380px]:text-[11px] sm:text-[9.5px] md:text-[10px] lg:text-[9.5px] xl:text-[13px] font-normal text-[#111827] underline underline-offset-[2px] xl:underline-offset-[3px] decoration-1 decoration-[#111827]/80 leading-none whitespace-nowrap">Settled hygiene vs live exposure</span>
+                          <span class="text-[10px] min-[380px]:text-[11px] sm:text-[9.5px] md:text-[10px] lg:text-[9.5px] xl:text-[13px] font-normal text-[#111827] underline underline-offset-[2px] xl:underline-offset-[3px] decoration-1 decoration-[#111827]/80 leading-none whitespace-nowrap">Matching GSTR-2B to purchase register</span>
                         </div>
-                        <!-- Item 4 (Col 1, Row 3 on desktop; Row 4 on mobile) -->
-                        <div class="ih-maiw-check-item col-start-1 sm:row-start-3 flex items-center gap-1.5 sm:gap-1 md:gap-1.5 xl:gap-2 min-w-0 opacity-0">
+                        <!-- Item 4 (Col 2, Row 2 on desktop; Row 4 on mobile) -->
+                        <div class="ih-maiw-check-item col-start-1 sm:col-start-2 sm:row-start-2 flex items-center gap-1.5 sm:gap-1 md:gap-1.5 xl:gap-2 min-w-0 opacity-0">
                           <img src="https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6ad1c6716ae44fb179c3f880_checklist-1-4.png" alt="checklist-4" width="14" height="14" class="h-3 sm:h-2.5 md:h-3 lg:h-3 xl:h-[15px] w-auto shrink-0 object-contain">
-                          <span class="text-[10px] min-[380px]:text-[11px] sm:text-[9.5px] md:text-[10px] lg:text-[9.5px] xl:text-[13px] font-normal text-[#111827] underline underline-offset-[2px] xl:underline-offset-[3px] decoration-1 decoration-[#111827]/80 leading-none whitespace-nowrap">What holds up vs needs a board line</span>
+                          <span class="text-[10px] min-[380px]:text-[11px] sm:text-[9.5px] md:text-[10px] lg:text-[9.5px] xl:text-[13px] font-normal text-[#111827] underline underline-offset-[2px] xl:underline-offset-[3px] decoration-1 decoration-[#111827]/80 leading-none whitespace-nowrap">Ranking unclaimed credit by block reason</span>
                         </div>
                       </div>
                     </div>
 
                     <!-- Frame 5: Final Result (Chart Image) -->
                     <div
-                      class="ih-maiw-chart ih-maiw-result hidden absolute inset-x-0 top-0 pt-1.5 md:pt-2 flex items-start justify-center max-w-[615px] w-full mx-auto opacity-0 pointer-events-none"
+                      class="ih-maiw-chart ih-maiw-result hidden absolute inset-x-0 top-0 pt-1.5 md:pt-0 flex items-start justify-center max-w-[615px] w-full mx-auto opacity-0 pointer-events-none"
                     >
                       {card.image && (
                         <img
@@ -648,6 +678,8 @@ const panels = groups.map((group) => ({
                       >
                         <span
                           class="ih-maiw-pill-placeholder absolute inset-y-0 left-0 flex items-center font-body text-xs md:text-sm lg:text-[length:var(--fs-body)] text-neutral-400 pointer-events-none"
+                          data-initial-placeholder="Ask anything"
+                          data-final-placeholder={card.finalPlaceholder || "Ask about cash and credit..."}
                         >
                           Ask anything
                         </span>
@@ -662,13 +694,10 @@ const panels = groups.map((group) => ({
                         </span>
                         <span
                           class="ih-maiw-pill-thinking absolute inset-y-0 left-0 flex items-center gap-1.5 font-body text-xs md:text-sm lg:text-[length:var(--fs-body)] text-neutral-500 opacity-0 pointer-events-none font-medium"
+                          data-status-1={card.statusText1 || "Reading tax settlements..."}
+                          data-status-2={card.statusText2 || "Analyzing cash and unused credit..."}
                         >
-                          <span>Reading files</span>
-                          <span class="inline-flex items-center gap-0.5 ml-0.5">
-                            <span class="inline-block h-1 w-1 rounded-full bg-neutral-400 animate-bounce" style="animation-delay: 0ms;"></span>
-                            <span class="inline-block h-1 w-1 rounded-full bg-neutral-400 animate-bounce" style="animation-delay: 150ms;"></span>
-                            <span class="inline-block h-1 w-1 rounded-full bg-neutral-400 animate-bounce" style="animation-delay: 300ms;"></span>
-                          </span>
+                          <span class="ih-maiw-pill-status-text">{card.statusText1 || "Reading tax settlements..."}</span>
                         </span>
                       </div>
 
@@ -840,31 +869,18 @@ const panels = groups.map((group) => ({
                         class="ih-maiw-bubble-text m-0 font-body text-[10px] md:text-xs lg:text-sm xl:text-[16px] font-normal leading-[1.35] md:leading-[1.7] lg:leading-[1.5] text-[#111827]"
                         data-query={card.query}
                       >
-                        {card.query || "Run objective six-dimension governance audit across entities"}
+                        {card.query || "Board meeting next month. Any compliance risk likely before then?"}
                       </p>
                     </div>
 
                     <div
                       class="ih-maiw-result-heading hidden absolute inset-x-0 bottom-3 max-w-[615px] w-full mx-auto flex items-end justify-start opacity-0 pointer-events-none"
                     >
-                      <div class="flex items-center gap-4 sm:gap-6">
-                        <div class="flex items-center gap-1.5 sm:gap-2">
-                          <img src="https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6ad60dee285501752247d595_checklist-2-1.png" alt="checklist" width="12" height="14" class="h-3 sm:h-2.5 md:h-3 lg:h-3 xl:h-[15px] w-auto shrink-0 object-contain">
-                          <span
-                            class="font-body font-medium text-xs md:text-sm lg:text-[length:var(--fs-body)] text-[#111827] leading-tight"
-                          >
-                            Five reporting layers
-                          </span>
-                        </div>
-                        <div class="flex items-center gap-1.5 sm:gap-2">
-                          <img src="https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6ad60df30a329f1b5f8c00a8_checklist-2-2.png" alt="checklist" width="15" height="15" class="h-3 sm:h-2.5 md:h-3 lg:h-3 xl:h-[15px] w-auto shrink-0 object-contain">
-                          <span
-                            class="font-body font-medium text-xs md:text-sm lg:text-[length:var(--fs-body)] text-[#111827] leading-tight"
-                          >
-                            Two flagged
-                          </span>
-                        </div>
-                      </div>
+                      <span
+                        class="font-body font-medium text-xs md:text-sm lg:text-[length:var(--fs-body)] text-[#111827] leading-tight"
+                      >
+                        {card.resultHeading || "here’s what holds up and what needs a board line"}
+                      </span>
                     </div>
                   </div>
 
@@ -896,22 +912,22 @@ const panels = groups.map((group) => ({
                         <!-- Item 1 (Col 1, Row 1 on desktop; Row 1 on mobile) -->
                         <div class="ih-maiw-check-item col-start-1 sm:row-start-1 flex items-center gap-1.5 sm:gap-1 md:gap-1.5 xl:gap-2 min-w-0 opacity-0">
                           <img src="https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6ad1c662b91ef9913bf8a199_checklist-1-1.png" alt="checklist" width="12" height="15" class="h-3 sm:h-2.5 md:h-3 lg:h-3 xl:h-[15px] w-auto shrink-0 object-contain">
-                          <span class="text-[10px] min-[380px]:text-[11px] sm:text-[9.5px] md:text-[10px] lg:text-[9.5px] xl:text-[11.5px] 2xl:text-[12.5px] font-normal text-[#111827] underline underline-offset-[2px] xl:underline-offset-[3px] decoration-1 decoration-[#111827]/80 leading-none whitespace-nowrap">Mapping the GL structure — 214 tax ledgers</span>
+                          <span class="text-[10px] min-[380px]:text-[11px] sm:text-[9.5px] md:text-[10px] lg:text-[9.5px] xl:text-[11.5px] 2xl:text-[12.5px] font-normal text-[#111827] underline underline-offset-[2px] xl:underline-offset-[3px] decoration-1 decoration-[#111827]/80 leading-none whitespace-nowrap">12 months of filings + 2B reconciliation</span>
                         </div>
                         <!-- Item 2 (Col 2, Row 1 on desktop; Row 2 on mobile) -->
                         <div class="ih-maiw-check-item col-start-1 sm:col-start-2 sm:row-start-1 flex items-center gap-1.5 sm:gap-1 md:gap-1.5 xl:gap-2 min-w-0 opacity-0">
                           <img src="https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6ad1c667a6af7f9a939f4d1d_checklist-1-2.png" alt="checklist-2" width="14" height="14" class="h-3 sm:h-2.5 md:h-3 lg:h-3 xl:h-[15px] w-auto shrink-0 object-contain">
-                          <span class="text-[10px] min-[380px]:text-[11px] sm:text-[9.5px] md:text-[10px] lg:text-[9.5px] xl:text-[11.5px] 2xl:text-[12.5px] font-normal text-[#111827] underline underline-offset-[2px] xl:underline-offset-[3px] decoration-1 decoration-[#111827]/80 leading-none whitespace-nowrap">Assessing each reporting layer on its own</span>
+                          <span class="text-[10px] min-[380px]:text-[11px] sm:text-[9.5px] md:text-[10px] lg:text-[9.5px] xl:text-[11.5px] 2xl:text-[12.5px] font-normal text-[#111827] underline underline-offset-[2px] xl:underline-offset-[3px] decoration-1 decoration-[#111827]/80 leading-none whitespace-nowrap">Notice register — 310 cases, 18 GSTINs</span>
                         </div>
                         <!-- Item 3 (Col 1 to 2, Row 2 on desktop; Row 3 on mobile) -->
                         <div class="ih-maiw-check-item col-start-1 sm:col-span-2 sm:row-start-2 flex items-center gap-1.5 sm:gap-1 md:gap-1.5 xl:gap-2 min-w-0 opacity-0">
                           <img src="https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6ad1c66cb1caeb82a7499f88_checklist-1-3.png" alt="checklist-3" width="16" height="16" class="h-3.5 sm:h-3 md:h-3.5 lg:h-3.5 xl:h-[16px] w-auto shrink-0 object-contain">
-                          <span class="text-[10px] min-[380px]:text-[11px] sm:text-[9.5px] md:text-[10px] lg:text-[9.5px] xl:text-[11.5px] 2xl:text-[12.5px] font-normal text-[#111827] underline underline-offset-[2px] xl:underline-offset-[3px] decoration-1 decoration-[#111827]/80 leading-none whitespace-nowrap">Reconciling GL → e-invoice → e-way bill → GSTR-1 → 3B</span>
+                          <span class="text-[10px] min-[380px]:text-[11px] sm:text-[9.5px] md:text-[10px] lg:text-[9.5px] xl:text-[11.5px] 2xl:text-[12.5px] font-normal text-[#111827] underline underline-offset-[2px] xl:underline-offset-[3px] decoration-1 decoration-[#111827]/80 leading-none whitespace-nowrap">Settled hygiene vs live exposure</span>
                         </div>
                         <!-- Item 4 (Col 1, Row 3 on desktop; Row 4 on mobile) -->
                         <div class="ih-maiw-check-item col-start-1 sm:row-start-3 flex items-center gap-1.5 sm:gap-1 md:gap-1.5 xl:gap-2 min-w-0 opacity-0">
                           <img src="https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6ad1c6716ae44fb179c3f880_checklist-1-4.png" alt="checklist-4" width="14" height="14" class="h-3 sm:h-2.5 md:h-3 lg:h-3 xl:h-[15px] w-auto shrink-0 object-contain">
-                          <span class="text-[10px] min-[380px]:text-[11px] sm:text-[9.5px] md:text-[10px] lg:text-[9.5px] xl:text-[11.5px] 2xl:text-[12.5px] font-normal text-[#111827] underline underline-offset-[2px] xl:underline-offset-[3px] decoration-1 decoration-[#111827]/80 leading-none whitespace-nowrap">Matching findings to notice patterns</span>
+                          <span class="text-[10px] min-[380px]:text-[11px] sm:text-[9.5px] md:text-[10px] lg:text-[9.5px] xl:text-[11.5px] 2xl:text-[12.5px] font-normal text-[#111827] underline underline-offset-[2px] xl:underline-offset-[3px] decoration-1 decoration-[#111827]/80 leading-none whitespace-nowrap">What holds up vs needs a board line</span>
                         </div>
                       </div>
                     </div>
@@ -997,6 +1013,8 @@ const panels = groups.map((group) => ({
                       >
                         <span
                           class="ih-maiw-pill-placeholder absolute inset-y-0 left-0 flex items-center font-body text-xs md:text-sm lg:text-[length:var(--fs-body)] text-neutral-400 pointer-events-none"
+                          data-initial-placeholder="Ask anything"
+                          data-final-placeholder={card.finalPlaceholder || "Ask anything..."}
                         >
                           Ask anything
                         </span>
@@ -1012,19 +1030,10 @@ const panels = groups.map((group) => ({
                         </span>
                         <span
                           class="ih-maiw-pill-thinking absolute inset-y-0 left-0 flex items-center gap-1.5 font-body text-xs md:text-sm lg:text-[length:var(--fs-body)] text-neutral-500 opacity-0 pointer-events-none font-medium"
+                          data-status-1={card.statusText1 || "Reading filings..."}
+                          data-status-2={card.statusText2 || "Analyzing..."}
                         >
-                          <span>Reading files</span>
-                          <span class="inline-flex items-center gap-0.5 ml-0.5">
-                            <span
-                              class="inline-block h-1 w-1 rounded-full bg-neutral-400 animate-bounce"
-                              style="animation-delay: 0ms;"></span>
-                            <span
-                              class="inline-block h-1 w-1 rounded-full bg-neutral-400 animate-bounce"
-                              style="animation-delay: 150ms;"></span>
-                            <span
-                              class="inline-block h-1 w-1 rounded-full bg-neutral-400 animate-bounce"
-                              style="animation-delay: 300ms;"></span>
-                          </span>
+                          <span class="ih-maiw-pill-status-text">{card.statusText1 || "Reading filings..."}</span>
                         </span>
                       </div>
                       <button
@@ -1194,23 +1203,31 @@ const panels = groups.map((group) => ({
                         class="ih-maiw-bubble-text m-0 font-body text-[10px] md:text-xs lg:text-sm xl:text-[16px] font-normal leading-[1.35] md:leading-[1.7] lg:leading-[1.5] text-[#111827]"
                         data-query={card.query}
                       >
-                        {card.query || "Map GL balances and calculate independent tax position"}
+                        {card.query || "Before this month’s pack goes to the CA firm - what would they flag?"}
                       </p>
                     </div>
 
                     <div
-                      class="ih-maiw-result-heading hidden absolute inset-x-0 bottom-3 max-w-[615px] w-full mx-auto flex flex-col items-start justify-start opacity-0 pointer-events-none"
+                      class="ih-maiw-result-heading hidden absolute inset-x-0 bottom-3 max-w-[615px] w-full mx-auto flex items-end justify-start opacity-0 pointer-events-none"
                     >
-                      <span
-                        class="font-body font-medium text-xs md:text-sm lg:text-[length:var(--fs-body)] text-[#111827] leading-tight"
-                      >
-                        {card.resultHeading || "Open unpaid invoices by age. ITC ₹Cr"}
-                      </span>
-                       <span
-                        class="font-body font-normal text-xs md:text-sm text-[#111827]/60 leading-tight"
-                      >
-                        {card.resultHeading || "Table-4x vendor open payments"}
-                      </span>
+                      <div class="flex items-center gap-4 sm:gap-6">
+                        <div class="flex items-center gap-1.5 sm:gap-2">
+                          <img src="https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6ad60dee285501752247d595_checklist-2-1.png" alt="checklist" width="12" height="14" class="h-3 sm:h-2.5 md:h-3 lg:h-3 xl:h-[15px] w-auto shrink-0 object-contain">
+                          <span
+                            class="font-body font-medium text-xs md:text-sm lg:text-[length:var(--fs-body)] text-[#111827] leading-tight"
+                          >
+                            Five reporting layers
+                          </span>
+                        </div>
+                        <div class="flex items-center gap-1.5 sm:gap-2">
+                          <img src="https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6ad60df30a329f1b5f8c00a8_checklist-2-2.png" alt="checklist" width="15" height="15" class="h-3 sm:h-2.5 md:h-3 lg:h-3 xl:h-[15px] w-auto shrink-0 object-contain">
+                          <span
+                            class="font-body font-medium text-xs md:text-sm lg:text-[length:var(--fs-body)] text-[#111827] leading-tight"
+                          >
+                            Two flagged
+                          </span>
+                        </div>
+                      </div>
                     </div>
                   </div>
 
@@ -1237,27 +1254,27 @@ const panels = groups.map((group) => ({
                       class="ih-maiw-checklist hidden absolute inset-x-0 top-0 mt-2.5 sm:mt-3 md:mt-10 xl:mt-8 flex items-start justify-start opacity-0 pointer-events-none max-w-full"
                     >
                       <div
-                        class="grid w-fit max-w-full grid-cols-1 sm:grid-cols-[max-content_max-content] sm:gap-x-3 md:gap-x-4 lg:gap-x-4 xl:gap-x-10 gap-y-2 sm:gap-y-2 md:gap-y-2.5 xl:gap-y-3.5"
+                        class="grid w-fit max-w-full grid-cols-1 sm:grid-cols-[max-content_max-content] sm:gap-x-3 md:gap-x-4 lg:gap-x-4 xl:gap-x-6 gap-y-2 sm:gap-y-2 md:gap-y-2.5 xl:gap-y-3"
                       >
                         <!-- Item 1 (Col 1, Row 1 on desktop; Row 1 on mobile) -->
-                        <div class="ih-maiw-check-item col-start-1 sm:col-start-1 sm:row-start-1 flex items-center gap-1.5 sm:gap-1 md:gap-1.5 xl:gap-2 min-w-0 opacity-0">
+                        <div class="ih-maiw-check-item col-start-1 sm:row-start-1 flex items-center gap-1.5 sm:gap-1 md:gap-1.5 xl:gap-2 min-w-0 opacity-0">
                           <img src="https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6ad1c662b91ef9913bf8a199_checklist-1-1.png" alt="checklist" width="12" height="15" class="h-3 sm:h-2.5 md:h-3 lg:h-3 xl:h-[15px] w-auto shrink-0 object-contain">
-                          <span class="text-[10px] min-[380px]:text-[11px] sm:text-[9.5px] md:text-[10px] lg:text-[9.5px] xl:text-[13px] font-normal text-[#111827] underline underline-offset-[2px] xl:underline-offset-[3px] decoration-1 decoration-[#111827]/80 leading-none whitespace-nowrap">Matching 18,240 documents to claim months</span>
+                          <span class="text-[10px] min-[380px]:text-[11px] sm:text-[9.5px] md:text-[10px] lg:text-[9.5px] xl:text-[13px] font-normal text-[#111827] underline underline-offset-[2px] xl:underline-offset-[3px] decoration-1 decoration-[#111827]/80 leading-none whitespace-nowrap">Mapping the GL structure — 214 tax ledgers</span>
                         </div>
                         <!-- Item 2 (Col 2, Row 1 on desktop; Row 2 on mobile) -->
                         <div class="ih-maiw-check-item col-start-1 sm:col-start-2 sm:row-start-1 flex items-center gap-1.5 sm:gap-1 md:gap-1.5 xl:gap-2 min-w-0 opacity-0">
                           <img src="https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6ad1c667a6af7f9a939f4d1d_checklist-1-2.png" alt="checklist-2" width="14" height="14" class="h-3 sm:h-2.5 md:h-3 lg:h-3 xl:h-[15px] w-auto shrink-0 object-contain">
-                          <span class="text-[10px] min-[380px]:text-[11px] sm:text-[9.5px] md:text-[10px] lg:text-[9.5px] xl:text-[13px] font-normal text-[#111827] underline underline-offset-[2px] xl:underline-offset-[3px] decoration-1 decoration-[#111827]/80 leading-none whitespace-nowrap">Computing interest per document</span>
+                          <span class="text-[10px] min-[380px]:text-[11px] sm:text-[9.5px] md:text-[10px] lg:text-[9.5px] xl:text-[13px] font-normal text-[#111827] underline underline-offset-[2px] xl:underline-offset-[3px] decoration-1 decoration-[#111827]/80 leading-none whitespace-nowrap">Assessing each reporting layer on its own</span>
                         </div>
-                        <!-- Item 3 (Col 1, Row 2 on desktop; Row 3 on mobile) -->
-                        <div class="ih-maiw-check-item col-start-1 sm:col-start-1 sm:row-start-2 flex items-center gap-1.5 sm:gap-1 md:gap-1.5 xl:gap-2 min-w-0 opacity-0">
+                        <!-- Item 3 (Col 1 to 2, Row 2 on desktop; Row 3 on mobile) -->
+                        <div class="ih-maiw-check-item col-start-1 sm:col-span-2 sm:row-start-2 flex items-center gap-1.5 sm:gap-1 md:gap-1.5 xl:gap-2 min-w-0 opacity-0">
                           <img src="https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6ad1c66cb1caeb82a7499f88_checklist-1-3.png" alt="checklist-3" width="16" height="16" class="h-3.5 sm:h-3 md:h-3.5 lg:h-3.5 xl:h-[16px] w-auto shrink-0 object-contain">
-                          <span class="text-[10px] min-[380px]:text-[11px] sm:text-[9.5px] md:text-[10px] lg:text-[9.5px] xl:text-[13px] font-normal text-[#111827] underline underline-offset-[2px] xl:underline-offset-[3px] decoration-1 decoration-[#111827]/80 leading-none whitespace-nowrap">Ingesting Table-4 + vendor open payments</span>
+                          <span class="text-[10px] min-[380px]:text-[11px] sm:text-[9.5px] md:text-[10px] lg:text-[9.5px] xl:text-[13px] font-normal text-[#111827] underline underline-offset-[2px] xl:underline-offset-[3px] decoration-1 decoration-[#111827]/80 leading-none whitespace-nowrap">Reconciling GL → e-invoice → e-way bill → GSTR-1 → 3B</span>
                         </div>
-                        <!-- Item 4 (Col 2, Row 2 on desktop; Row 4 on mobile) -->
-                        <div class="ih-maiw-check-item col-start-1 sm:col-start-2 sm:row-start-2 flex items-center gap-1.5 sm:gap-1 md:gap-1.5 xl:gap-2 min-w-0 opacity-0">
+                        <!-- Item 4 (Col 1, Row 3 on desktop; Row 4 on mobile) -->
+                        <div class="ih-maiw-check-item col-start-1 sm:row-start-3 flex items-center gap-1.5 sm:gap-1 md:gap-1.5 xl:gap-2 min-w-0 opacity-0">
                           <img src="https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6ad1c6716ae44fb179c3f880_checklist-1-4.png" alt="checklist-4" width="14" height="14" class="h-3 sm:h-2.5 md:h-3 lg:h-3 xl:h-[15px] w-auto shrink-0 object-contain">
-                          <span class="text-[10px] min-[380px]:text-[11px] sm:text-[9.5px] md:text-[10px] lg:text-[9.5px] xl:text-[13px] font-normal text-[#111827] underline underline-offset-[2px] xl:underline-offset-[3px] decoration-1 decoration-[#111827]/80 leading-none whitespace-nowrap">Staging the Excel for approval</span>
+                          <span class="text-[10px] min-[380px]:text-[11px] sm:text-[9.5px] md:text-[10px] lg:text-[9.5px] xl:text-[13px] font-normal text-[#111827] underline underline-offset-[2px] xl:underline-offset-[3px] decoration-1 decoration-[#111827]/80 leading-none whitespace-nowrap">- Matching findings to notice patterns</span>
                         </div>
                       </div>
                     </div>
@@ -1343,6 +1360,8 @@ const panels = groups.map((group) => ({
                       >
                         <span
                           class="ih-maiw-pill-placeholder absolute inset-y-0 left-0 flex items-center font-body text-xs md:text-sm lg:text-[length:var(--fs-body)] text-neutral-400 pointer-events-none"
+                          data-initial-placeholder="Ask anything"
+                          data-final-placeholder={card.finalPlaceholder || "Ask anything..."}
                         >
                           Ask anything
                         </span>
@@ -1358,19 +1377,10 @@ const panels = groups.map((group) => ({
                         </span>
                         <span
                           class="ih-maiw-pill-thinking absolute inset-y-0 left-0 flex items-center gap-1.5 font-body text-xs md:text-sm lg:text-[length:var(--fs-body)] text-neutral-500 opacity-0 pointer-events-none font-medium"
+                          data-status-1={card.statusText1 || "Thinking..."}
+                          data-status-2={card.statusText2 || "Analyzing..."}
                         >
-                          <span>Reading files</span>
-                          <span class="inline-flex items-center gap-0.5 ml-0.5">
-                            <span
-                              class="inline-block h-1 w-1 rounded-full bg-neutral-400 animate-bounce"
-                              style="animation-delay: 0ms;"></span>
-                            <span
-                              class="inline-block h-1 w-1 rounded-full bg-neutral-400 animate-bounce"
-                              style="animation-delay: 150ms;"></span>
-                            <span
-                              class="inline-block h-1 w-1 rounded-full bg-neutral-400 animate-bounce"
-                              style="animation-delay: 300ms;"></span>
-                          </span>
+                          <span class="ih-maiw-pill-status-text">{card.statusText1 || "Thinking..."}</span>
                         </span>
                       </div>
                       <button
@@ -1525,7 +1535,7 @@ const panels = groups.map((group) => ({
                     <h3
                       class="m-0 font-heading font-medium text-vault-navy text-base md:text-[length:var(--fs-h6)] leading-[length:var(--lh-h6)]"
                     >
-                      What would you like to analyze?
+                      What would you like to review?
                     </h3>
                   </div>
 
@@ -1540,17 +1550,22 @@ const panels = groups.map((group) => ({
                         class="ih-maiw-bubble-text m-0 font-body text-[10px] md:text-xs lg:text-sm xl:text-[16px] font-normal leading-[1.35] md:leading-[1.7] lg:leading-[1.5] text-[#111827]"
                         data-query={card.query}
                       >
-                        {card.query || "Track active notices and evaluate exposure by entity"}
+                        {card.query || "Show open notices the way we track them."}
                       </p>
                     </div>
 
                     <div
-                      class="ih-maiw-result-heading hidden absolute inset-x-0 bottom-3 max-w-[615px] w-full mx-auto flex items-end justify-start opacity-0 pointer-events-none"
+                      class="ih-maiw-result-heading hidden absolute inset-x-0 bottom-2 max-w-[615px] w-full mx-auto flex flex-col items-start justify-start opacity-0 pointer-events-none"
                     >
                       <span
                         class="font-body font-medium text-xs md:text-sm lg:text-[length:var(--fs-body)] text-[#111827] leading-tight"
                       >
-                        {card.resultHeading || "active notice register & exposure by entity"}
+                        {card.resultHeading || "Open notices · business unit × stage"}
+                      </span>
+                      <span
+                        class="font-body font-normal text-xs md:text-sm text-[#111827]/60 leading-tight"
+                      >
+                        {card.resultHeading || "63 open · 60 closed this financial year"}
                       </span>
                     </div>
                   </div>
@@ -1582,23 +1597,23 @@ const panels = groups.map((group) => ({
                       >
                         <!-- Item 1 (Col 1, Row 1 on desktop; Row 1 on mobile) -->
                         <div class="ih-maiw-check-item col-start-1 sm:row-start-1 flex items-center gap-1.5 sm:gap-1 md:gap-1.5 xl:gap-2 min-w-0 opacity-0">
-                          <img src="https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6ad1c662b91ef9913bf8a199_checklist-1-1.png" alt="checklist" width="12" height="15" class="h-3 sm:h-2.5 md:h-3 lg:h-3 xl:h-[15px] w-auto shrink-0 object-contain">
-                          <span class="text-[10px] min-[380px]:text-[11px] sm:text-[9.5px] md:text-[10px] lg:text-[9.5px] xl:text-[13px] font-normal text-[#111827] underline underline-offset-[2px] xl:underline-offset-[3px] decoration-1 decoration-[#111827]/80 leading-none whitespace-nowrap">Aggregating notice records</span>
+                          <img src="https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6ad743c68975426b7498dc7a_checklist-4-1.png" alt="checklist" width="14" height="14" class="h-3 sm:h-2.5 md:h-3 lg:h-3 xl:h-[15px] w-auto shrink-0 object-contain">
+                          <span class="text-[10px] min-[380px]:text-[11px] sm:text-[9.5px] md:text-[10px] lg:text-[9.5px] xl:text-[13px] font-normal text-[#111827] underline underline-offset-[2px] xl:underline-offset-[3px] decoration-1 decoration-[#111827]/80 leading-none whitespace-nowrap">Pulling 63 open notices across 41 GSTINs</span>
                         </div>
                         <!-- Item 2 (Col 2, Row 1 on desktop; Row 2 on mobile) -->
                         <div class="ih-maiw-check-item col-start-1 sm:col-start-2 sm:row-start-1 flex items-center gap-1.5 sm:gap-1 md:gap-1.5 xl:gap-2 min-w-0 opacity-0">
-                          <img src="https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6ad1c667a6af7f9a939f4d1d_checklist-1-2.png" alt="checklist-2" width="14" height="14" class="h-3 sm:h-2.5 md:h-3 lg:h-3 xl:h-[15px] w-auto shrink-0 object-contain">
-                          <span class="text-[10px] min-[380px]:text-[11px] sm:text-[9.5px] md:text-[10px] lg:text-[9.5px] xl:text-[13px] font-normal text-[#111827] underline underline-offset-[2px] xl:underline-offset-[3px] decoration-1 decoration-[#111827]/80 leading-none whitespace-nowrap">Applying custom tracking rules</span>
+                          <img src="https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6ad743d6e8b4d475c21ec9be_checklist-4-2.png" alt="checklist-2" width="14" height="14" class="h-3 sm:h-2.5 md:h-3 lg:h-3 xl:h-[15px] w-auto shrink-0 object-contain">
+                          <span class="text-[10px] min-[380px]:text-[11px] sm:text-[9.5px] md:text-[10px] lg:text-[9.5px] xl:text-[13px] font-normal text-[#111827] underline underline-offset-[2px] xl:underline-offset-[3px] decoration-1 decoration-[#111827]/80 leading-none whitespace-nowrap">Merging offline tracker — 12 not on portal</span>
                         </div>
                         <!-- Item 3 (Col 1, Row 2 on desktop; Row 3 on mobile) -->
                         <div class="ih-maiw-check-item col-start-1 sm:row-start-2 flex items-center gap-1.5 sm:gap-1 md:gap-1.5 xl:gap-2 min-w-0 opacity-0">
-                          <img src="https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6ad1c66cb1caeb82a7499f88_checklist-1-3.png" alt="checklist-3" width="16" height="16" class="h-3.5 sm:h-3 md:h-3.5 lg:h-3.5 xl:h-[16px] w-auto shrink-0 object-contain">
-                          <span class="text-[10px] min-[380px]:text-[11px] sm:text-[9.5px] md:text-[10px] lg:text-[9.5px] xl:text-[13px] font-normal text-[#111827] underline underline-offset-[2px] xl:underline-offset-[3px] decoration-1 decoration-[#111827]/80 leading-none whitespace-nowrap">Evaluating exposure by entity</span>
+                          <img src="https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6ad743df8c6362f7b4adc1b7_checklist-4-3.png" alt="checklist-3" width="14" height="14" class="h-3.5 sm:h-3 md:h-3.5 lg:h-3.5 xl:h-[16px] w-auto shrink-0 object-contain">
+                          <span class="text-[10px] min-[380px]:text-[11px] sm:text-[9.5px] md:text-[10px] lg:text-[9.5px] xl:text-[13px] font-normal text-[#111827] underline underline-offset-[2px] xl:underline-offset-[3px] decoration-1 decoration-[#111827]/80 leading-none whitespace-nowrap">Weighting: demand × stage × hearing</span>
                         </div>
-                        <!-- Item 4 (Col 1, Row 3 on desktop; Row 4 on mobile) -->
-                        <div class="ih-maiw-check-item col-start-1 sm:row-start-3 flex items-center gap-1.5 sm:gap-1 md:gap-1.5 xl:gap-2 min-w-0 opacity-0">
-                          <img src="https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6ad1c6716ae44fb179c3f880_checklist-1-4.png" alt="checklist-4" width="14" height="14" class="h-3 sm:h-2.5 md:h-3 lg:h-3 xl:h-[15px] w-auto shrink-0 object-contain">
-                          <span class="text-[10px] min-[380px]:text-[11px] sm:text-[9.5px] md:text-[10px] lg:text-[9.5px] xl:text-[13px] font-normal text-[#111827] underline underline-offset-[2px] xl:underline-offset-[3px] decoration-1 decoration-[#111827]/80 leading-none whitespace-nowrap">Notice patterns risk classification</span>
+                        <!-- Item 4 (Col 2, Row 2 on desktop; Row 4 on mobile) -->
+                        <div class="ih-maiw-check-item col-start-1 sm:col-start-2 sm:row-start-2 flex items-center gap-1.5 sm:gap-1 md:gap-1.5 xl:gap-2 min-w-0 opacity-0">
+                          <img src="https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6ad743e6762c6c9b50878746_checklist-4-4.png" alt="checklist-4" width="14" height="14" class="h-3 sm:h-2.5 md:h-3 lg:h-3 xl:h-[15px] w-auto shrink-0 object-contain">
+                          <span class="text-[10px] min-[380px]:text-[11px] sm:text-[9.5px] md:text-[10px] lg:text-[9.5px] xl:text-[13px] font-normal text-[#111827] underline underline-offset-[2px] xl:underline-offset-[3px] decoration-1 decoration-[#111827]/80 leading-none whitespace-nowrap">Building the CFO view</span>
                         </div>
                       </div>
                     </div>
@@ -1684,8 +1699,10 @@ const panels = groups.map((group) => ({
                       >
                         <span
                           class="ih-maiw-pill-placeholder absolute inset-y-0 left-0 flex items-center font-body text-xs md:text-sm lg:text-[length:var(--fs-body)] text-neutral-400 pointer-events-none"
+                          data-initial-placeholder={card.initialPlaceholder || "Search notices..."}
+                          data-final-placeholder={card.finalPlaceholder || "Search notices..."}
                         >
-                          Ask anything
+                          {card.initialPlaceholder || "Search notices..."}
                         </span>
                         <span
                           class="ih-maiw-pill-typed hidden absolute inset-y-0 left-0 right-0 flex items-center font-body text-xs md:text-sm lg:text-[length:var(--fs-body)] text-vault-navy opacity-0 pointer-events-none font-medium tracking-tight"
@@ -1699,19 +1716,10 @@ const panels = groups.map((group) => ({
                         </span>
                         <span
                           class="ih-maiw-pill-thinking absolute inset-y-0 left-0 flex items-center gap-1.5 font-body text-xs md:text-sm lg:text-[length:var(--fs-body)] text-neutral-500 opacity-0 pointer-events-none font-medium"
+                          data-status-1={card.statusText1 || "Mapping notice stages..."}
+                          data-status-2={card.statusText2 || "Prioritizing and building the view..."}
                         >
-                          <span>Reading files</span>
-                          <span class="inline-flex items-center gap-0.5 ml-0.5">
-                            <span
-                              class="inline-block h-1 w-1 rounded-full bg-neutral-400 animate-bounce"
-                              style="animation-delay: 0ms;"></span>
-                            <span
-                              class="inline-block h-1 w-1 rounded-full bg-neutral-400 animate-bounce"
-                              style="animation-delay: 150ms;"></span>
-                            <span
-                              class="inline-block h-1 w-1 rounded-full bg-neutral-400 animate-bounce"
-                              style="animation-delay: 300ms;"></span>
-                          </span>
+                          <span class="ih-maiw-pill-status-text">{card.statusText1 || "Mapping notice stages..."}</span>
                         </span>
                       </div>
                       <button
@@ -1881,17 +1889,22 @@ const panels = groups.map((group) => ({
                         class="ih-maiw-bubble-text m-0 font-body text-[10px] md:text-xs lg:text-sm xl:text-[16px] font-normal leading-[1.35] md:leading-[1.7] lg:leading-[1.5] text-[#111827]"
                         data-query={card.query}
                       >
-                        {card.query || "Draft notice response with line-item transaction trail"}
+                        {card.query || "Draft the reply for notice DIN-2811."}
                       </p>
                     </div>
 
                     <div
-                      class="ih-maiw-result-heading hidden absolute inset-x-0 bottom-3 max-w-[615px] w-full mx-auto flex items-end justify-start opacity-0 pointer-events-none"
+                      class="ih-maiw-result-heading hidden absolute inset-x-0 bottom-2 max-w-[615px] w-full mx-auto flex flex-col items-start justify-start opacity-0 pointer-events-none"
                     >
                       <span
                         class="font-body font-medium text-xs md:text-sm lg:text-[length:var(--fs-body)] text-[#111827] leading-tight"
                       >
-                        {card.resultHeading || "substantiated response dossier & transaction trail"}
+                        {card.resultHeading || "Reply package · ready for review"}
+                      </span>
+                      <span
+                        class="font-body font-normal text-xs md:text-sm text-[#111827]/60 leading-tight"
+                      >
+                        {card.resultHeading || "Section 73 · demand ₹4.2 Cr"}
                       </span>
                     </div>
                   </div>
@@ -1923,23 +1936,23 @@ const panels = groups.map((group) => ({
                       >
                         <!-- Item 1 (Col 1, Row 1 on desktop; Row 1 on mobile) -->
                         <div class="ih-maiw-check-item col-start-1 sm:row-start-1 flex items-center gap-1.5 sm:gap-1 md:gap-1.5 xl:gap-2 min-w-0 opacity-0">
-                          <img src="https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6ad1c662b91ef9913bf8a199_checklist-1-1.png" alt="checklist" width="12" height="15" class="h-3 sm:h-2.5 md:h-3 lg:h-3 xl:h-[15px] w-auto shrink-0 object-contain">
-                          <span class="text-[10px] min-[380px]:text-[11px] sm:text-[9.5px] md:text-[10px] lg:text-[9.5px] xl:text-[13px] font-normal text-[#111827] underline underline-offset-[2px] xl:underline-offset-[3px] decoration-1 decoration-[#111827]/80 leading-none whitespace-nowrap">Reconciling invoice line items</span>
+                          <img src="https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6ad749b271ca8756d824485e_checklist-5-1.png" alt="checklist" width="12" height="15" class="h-3 sm:h-2.5 md:h-3 lg:h-3 xl:h-[15px] w-auto shrink-0 object-contain">
+                          <span class="text-[10px] min-[380px]:text-[11px] sm:text-[9.5px] md:text-[10px] lg:text-[9.5px] xl:text-[13px] font-normal text-[#111827] underline underline-offset-[2px] xl:underline-offset-[3px] decoration-1 decoration-[#111827]/80 leading-none whitespace-nowrap">Classifying GSTR-1 vs GSTR-3B discrepancy</span>
                         </div>
                         <!-- Item 2 (Col 2, Row 1 on desktop; Row 2 on mobile) -->
                         <div class="ih-maiw-check-item col-start-1 sm:col-start-2 sm:row-start-1 flex items-center gap-1.5 sm:gap-1 md:gap-1.5 xl:gap-2 min-w-0 opacity-0">
-                          <img src="https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6ad1c667a6af7f9a939f4d1d_checklist-1-2.png" alt="checklist-2" width="14" height="14" class="h-3 sm:h-2.5 md:h-3 lg:h-3 xl:h-[15px] w-auto shrink-0 object-contain">
-                          <span class="text-[10px] min-[380px]:text-[11px] sm:text-[9.5px] md:text-[10px] lg:text-[9.5px] xl:text-[13px] font-normal text-[#111827] underline underline-offset-[2px] xl:underline-offset-[3px] decoration-1 decoration-[#111827]/80 leading-none whitespace-nowrap">Cross-referencing verified case law</span>
+                          <img src="https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6ad749ba4de6b5b17f9e4467_checklist-5-2.png" alt="checklist-2" width="14" height="14" class="h-3 sm:h-2.5 md:h-3 lg:h-3 xl:h-[15px] w-auto shrink-0 object-contain">
+                          <span class="text-[10px] min-[380px]:text-[11px] sm:text-[9.5px] md:text-[10px] lg:text-[9.5px] xl:text-[13px] font-normal text-[#111827] underline underline-offset-[2px] xl:underline-offset-[3px] decoration-1 decoration-[#111827]/80 leading-none whitespace-nowrap">Retrieving FY 2023-24 records from Vault</span>
                         </div>
                         <!-- Item 3 (Col 1, Row 2 on desktop; Row 3 on mobile) -->
                         <div class="ih-maiw-check-item col-start-1 sm:row-start-2 flex items-center gap-1.5 sm:gap-1 md:gap-1.5 xl:gap-2 min-w-0 opacity-0">
-                          <img src="https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6ad1c66cb1caeb82a7499f88_checklist-1-3.png" alt="checklist-3" width="16" height="16" class="h-3.5 sm:h-3 md:h-3.5 lg:h-3.5 xl:h-[16px] w-auto shrink-0 object-contain">
-                          <span class="text-[10px] min-[380px]:text-[11px] sm:text-[9.5px] md:text-[10px] lg:text-[9.5px] xl:text-[13px] font-normal text-[#111827] underline underline-offset-[2px] xl:underline-offset-[3px] decoration-1 decoration-[#111827]/80 leading-none whitespace-nowrap">Rule-in-force verification</span>
+                          <img src="https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6ad749c171ca8756d824531b_checklist-5-3.png" alt="checklist-3" width="16" height="16" class="h-3.5 sm:h-3 md:h-3.5 lg:h-3.5 xl:h-[16px] w-auto shrink-0 object-contain">
+                          <span class="text-[10px] min-[380px]:text-[11px] sm:text-[9.5px] md:text-[10px] lg:text-[9.5px] xl:text-[13px] font-normal text-[#111827] underline underline-offset-[2px] xl:underline-offset-[3px] decoration-1 decoration-[#111827]/80 leading-none whitespace-nowrap">Checking validity — within limitation period</span>
                         </div>
-                        <!-- Item 4 (Col 1, Row 3 on desktop; Row 4 on mobile) -->
-                        <div class="ih-maiw-check-item col-start-1 sm:row-start-3 flex items-center gap-1.5 sm:gap-1 md:gap-1.5 xl:gap-2 min-w-0 opacity-0">
-                          <img src="https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6ad1c6716ae44fb179c3f880_checklist-1-4.png" alt="checklist-4" width="14" height="14" class="h-3 sm:h-2.5 md:h-3 lg:h-3 xl:h-[15px] w-auto shrink-0 object-contain">
-                          <span class="text-[10px] min-[380px]:text-[11px] sm:text-[9.5px] md:text-[10px] lg:text-[9.5px] xl:text-[13px] font-normal text-[#111827] underline underline-offset-[2px] xl:underline-offset-[3px] decoration-1 decoration-[#111827]/80 leading-none whitespace-nowrap">Drafting line-item transaction trail</span>
+                        <!-- Item 4 (Col 2, Row 2 on desktop; Row 4 on mobile) -->
+                        <div class="ih-maiw-check-item col-start-1 sm:col-start-2 sm:row-start-2 flex items-center gap-1.5 sm:gap-1 md:gap-1.5 xl:gap-2 min-w-0 opacity-0">
+                          <img src="https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6ad749c72e5b39f62834dfe8_checklist-5-4.png" alt="checklist-4" width="14" height="14" class="h-3 sm:h-2.5 md:h-3 lg:h-3 xl:h-[15px] w-auto shrink-0 object-contain">
+                          <span class="text-[10px] min-[380px]:text-[11px] sm:text-[9.5px] md:text-[10px] lg:text-[9.5px] xl:text-[13px] font-normal text-[#111827] underline underline-offset-[2px] xl:underline-offset-[3px] decoration-1 decoration-[#111827]/80 leading-none whitespace-nowrap">Drafting the reply · 4 precedents found</span>
                         </div>
                       </div>
                     </div>
@@ -2025,8 +2038,10 @@ const panels = groups.map((group) => ({
                       >
                         <span
                           class="ih-maiw-pill-placeholder absolute inset-y-0 left-0 flex items-center font-body text-xs md:text-sm lg:text-[length:var(--fs-body)] text-neutral-400 pointer-events-none"
+                          data-initial-placeholder={card.initialPlaceholder || "Draft a notice reply..."}
+                          data-final-placeholder={card.finalPlaceholder || "Draft a notice reply..."}
                         >
-                          Ask anything
+                          {card.initialPlaceholder || "Draft a notice reply..."}
                         </span>
                         <span
                           class="ih-maiw-pill-typed hidden absolute inset-y-0 left-0 right-0 flex items-center font-body text-xs md:text-sm lg:text-[length:var(--fs-body)] text-vault-navy opacity-0 pointer-events-none font-medium tracking-tight"
@@ -2040,19 +2055,10 @@ const panels = groups.map((group) => ({
                         </span>
                         <span
                           class="ih-maiw-pill-thinking absolute inset-y-0 left-0 flex items-center gap-1.5 font-body text-xs md:text-sm lg:text-[length:var(--fs-body)] text-neutral-500 opacity-0 pointer-events-none font-medium"
+                          data-status-1={card.statusText1 || "Checking notice and evidence..."}
+                          data-status-2={card.statusText2 || "Drafting the reply..."}
                         >
-                          <span>Reading files</span>
-                          <span class="inline-flex items-center gap-0.5 ml-0.5">
-                            <span
-                              class="inline-block h-1 w-1 rounded-full bg-neutral-400 animate-bounce"
-                              style="animation-delay: 0ms;"></span>
-                            <span
-                              class="inline-block h-1 w-1 rounded-full bg-neutral-400 animate-bounce"
-                              style="animation-delay: 150ms;"></span>
-                            <span
-                              class="inline-block h-1 w-1 rounded-full bg-neutral-400 animate-bounce"
-                              style="animation-delay: 300ms;"></span>
-                          </span>
+                          <span class="ih-maiw-pill-status-text">{card.statusText1 || "Checking notice and evidence..."}</span>
                         </span>
                       </div>
                       <button
@@ -2207,7 +2213,7 @@ const panels = groups.map((group) => ({
                     <h3
                       class="m-0 font-heading font-medium text-vault-navy text-base md:text-[length:var(--fs-h6)] leading-[length:var(--lh-h6)]"
                     >
-                      What would you like to review?
+                      What refund would you like to prepare?
                     </h3>
                   </div>
 
@@ -2222,17 +2228,22 @@ const panels = groups.map((group) => ({
                         class="ih-maiw-bubble-text m-0 font-body text-[10px] md:text-xs lg:text-sm xl:text-[16px] font-normal leading-[1.35] md:leading-[1.7] lg:leading-[1.5] text-[#111827]"
                         data-query={card.query}
                       >
-                        {card.query || "Prepare complete refund dossier and justification trail"}
+                        {card.query || "Prepare the Q2 refund draft."}
                       </p>
                     </div>
 
                     <div
-                      class="ih-maiw-result-heading hidden absolute inset-x-0 bottom-3 max-w-[615px] w-full mx-auto flex items-end justify-start opacity-0 pointer-events-none"
+                      class="ih-maiw-result-heading hidden absolute inset-x-0 bottom-2 max-w-[615px] w-full mx-auto flex flex-col items-start justify-start opacity-0 pointer-events-none"
                     >
                       <span
                         class="font-body font-medium text-xs md:text-sm lg:text-[length:var(--fs-body)] text-[#111827] leading-tight"
                       >
-                        {card.resultHeading || "refund dossier & justification trail breakdown"}
+                        {card.resultHeading || "Refund draft ready to file · ₹69.3 Cr"}
+                      </span>
+                      <span
+                        class="font-body font-normal text-xs md:text-sm text-[#111827]/60 leading-tight"
+                      >
+                        {card.resultHeading || "Statement 3 · department utility JSON · RFD-01"}
                       </span>
                     </div>
                   </div>
@@ -2265,22 +2276,22 @@ const panels = groups.map((group) => ({
                         <!-- Item 1 (Col 1, Row 1 on desktop; Row 1 on mobile) -->
                         <div class="ih-maiw-check-item col-start-1 sm:row-start-1 flex items-center gap-1.5 sm:gap-1 md:gap-1.5 xl:gap-2 min-w-0 opacity-0">
                           <img src="https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6ad1c662b91ef9913bf8a199_checklist-1-1.png" alt="checklist" width="12" height="15" class="h-3 sm:h-2.5 md:h-3 lg:h-3 xl:h-[15px] w-auto shrink-0 object-contain">
-                          <span class="text-[10px] min-[380px]:text-[11px] sm:text-[9.5px] md:text-[10px] lg:text-[9.5px] xl:text-[13px] font-normal text-[#111827] underline underline-offset-[2px] xl:underline-offset-[3px] decoration-1 decoration-[#111827]/80 leading-none whitespace-nowrap">Analysing duty & balance scenarios</span>
+                          <span class="text-[10px] min-[380px]:text-[11px] sm:text-[9.5px] md:text-[10px] lg:text-[9.5px] xl:text-[13px] font-normal text-[#111827] underline underline-offset-[2px] xl:underline-offset-[3px] decoration-1 decoration-[#111827]/80 leading-none whitespace-nowrap">Classifying refund scenarios per GSTIN</span>
                         </div>
                         <!-- Item 2 (Col 2, Row 1 on desktop; Row 2 on mobile) -->
                         <div class="ih-maiw-check-item col-start-1 sm:col-start-2 sm:row-start-1 flex items-center gap-1.5 sm:gap-1 md:gap-1.5 xl:gap-2 min-w-0 opacity-0">
                           <img src="https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6ad1c667a6af7f9a939f4d1d_checklist-1-2.png" alt="checklist-2" width="14" height="14" class="h-3 sm:h-2.5 md:h-3 lg:h-3 xl:h-[15px] w-auto shrink-0 object-contain">
-                          <span class="text-[10px] min-[380px]:text-[11px] sm:text-[9.5px] md:text-[10px] lg:text-[9.5px] xl:text-[13px] font-normal text-[#111827] underline underline-offset-[2px] xl:underline-offset-[3px] decoration-1 decoration-[#111827]/80 leading-none whitespace-nowrap">Compiling audit-ready dossier</span>
+                          <span class="text-[10px] min-[380px]:text-[11px] sm:text-[9.5px] md:text-[10px] lg:text-[9.5px] xl:text-[13px] font-normal text-[#111827] underline underline-offset-[2px] xl:underline-offset-[3px] decoration-1 decoration-[#111827]/80 leading-none whitespace-nowrap">Computing quantum per the GSTN formula</span>
                         </div>
                         <!-- Item 3 (Col 1, Row 2 on desktop; Row 3 on mobile) -->
                         <div class="ih-maiw-check-item col-start-1 sm:row-start-2 flex items-center gap-1.5 sm:gap-1 md:gap-1.5 xl:gap-2 min-w-0 opacity-0">
                           <img src="https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6ad1c66cb1caeb82a7499f88_checklist-1-3.png" alt="checklist-3" width="16" height="16" class="h-3.5 sm:h-3 md:h-3.5 lg:h-3.5 xl:h-[16px] w-auto shrink-0 object-contain">
-                          <span class="text-[10px] min-[380px]:text-[11px] sm:text-[9.5px] md:text-[10px] lg:text-[9.5px] xl:text-[13px] font-normal text-[#111827] underline underline-offset-[2px] xl:underline-offset-[3px] decoration-1 decoration-[#111827]/80 leading-none whitespace-nowrap">Validating supporting transactions</span>
+                          <span class="text-[10px] min-[380px]:text-[11px] sm:text-[9.5px] md:text-[10px] lg:text-[9.5px] xl:text-[13px] font-normal text-[#111827] underline underline-offset-[2px] xl:underline-offset-[3px] decoration-1 decoration-[#111827]/80 leading-none whitespace-nowrap">Filling Statement 3 — 4,860 invoices traced</span>
                         </div>
-                        <!-- Item 4 (Col 1, Row 3 on desktop; Row 4 on mobile) -->
-                        <div class="ih-maiw-check-item col-start-1 sm:row-start-3 flex items-center gap-1.5 sm:gap-1 md:gap-1.5 xl:gap-2 min-w-0 opacity-0">
+                        <!-- Item 4 (Col 2, Row 2 on desktop; Row 4 on mobile) -->
+                        <div class="ih-maiw-check-item col-start-1 sm:col-start-2 sm:row-start-2 flex items-center gap-1.5 sm:gap-1 md:gap-1.5 xl:gap-2 min-w-0 opacity-0">
                           <img src="https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6ad1c6716ae44fb179c3f880_checklist-1-4.png" alt="checklist-4" width="14" height="14" class="h-3 sm:h-2.5 md:h-3 lg:h-3 xl:h-[15px] w-auto shrink-0 object-contain">
-                          <span class="text-[10px] min-[380px]:text-[11px] sm:text-[9.5px] md:text-[10px] lg:text-[9.5px] xl:text-[13px] font-normal text-[#111827] underline underline-offset-[2px] xl:underline-offset-[3px] decoration-1 decoration-[#111827]/80 leading-none whitespace-nowrap">Calculating refund quantum</span>
+                          <span class="text-[10px] min-[380px]:text-[11px] sm:text-[9.5px] md:text-[10px] lg:text-[9.5px] xl:text-[13px] font-normal text-[#111827] underline underline-offset-[2px] xl:underline-offset-[3px] decoration-1 decoration-[#111827]/80 leading-none whitespace-nowrap">Running the department offline utility → JSON</span>
                         </div>
                       </div>
                     </div>
@@ -2366,8 +2377,10 @@ const panels = groups.map((group) => ({
                       >
                         <span
                           class="ih-maiw-pill-placeholder absolute inset-y-0 left-0 flex items-center font-body text-xs md:text-sm lg:text-[length:var(--fs-body)] text-neutral-400 pointer-events-none"
+                          data-initial-placeholder={card.initialPlaceholder || "Prepare a refund draft..."}
+                          data-final-placeholder={card.finalPlaceholder || "Prepare a refund draft..."}
                         >
-                          Ask anything
+                          {card.initialPlaceholder || "Prepare a refund draft..."}
                         </span>
                         <span
                           class="ih-maiw-pill-typed hidden absolute inset-y-0 left-0 right-0 flex items-center font-body text-xs md:text-sm lg:text-[length:var(--fs-body)] text-vault-navy opacity-0 pointer-events-none font-medium tracking-tight"
@@ -2381,19 +2394,10 @@ const panels = groups.map((group) => ({
                         </span>
                         <span
                           class="ih-maiw-pill-thinking absolute inset-y-0 left-0 flex items-center gap-1.5 font-body text-xs md:text-sm lg:text-[length:var(--fs-body)] text-neutral-500 opacity-0 pointer-events-none font-medium"
+                          data-status-1={card.statusText1 || "Calculating refund eligibility..."}
+                          data-status-2={card.statusText2 || "Running offline utility → JSON..."}
                         >
-                          <span>Reading files</span>
-                          <span class="inline-flex items-center gap-0.5 ml-0.5">
-                            <span
-                              class="inline-block h-1 w-1 rounded-full bg-neutral-400 animate-bounce"
-                              style="animation-delay: 0ms;"></span>
-                            <span
-                              class="inline-block h-1 w-1 rounded-full bg-neutral-400 animate-bounce"
-                              style="animation-delay: 150ms;"></span>
-                            <span
-                              class="inline-block h-1 w-1 rounded-full bg-neutral-400 animate-bounce"
-                              style="animation-delay: 300ms;"></span>
-                          </span>
+                          <span class="ih-maiw-pill-status-text">{card.statusText1 || "Calculating refund eligibility..."}</span>
                         </span>
                       </div>
                       <button
@@ -2548,7 +2552,7 @@ const panels = groups.map((group) => ({
                     <h3
                       class="m-0 font-heading font-medium text-vault-navy text-base md:text-[length:var(--fs-h6)] leading-[length:var(--lh-h6)]"
                     >
-                      What would you like to review?
+                      What would you like to analyze?
                     </h3>
                   </div>
 
@@ -4108,6 +4112,8 @@ const panels = groups.map((group) => ({
         });
       }
       if (pillPlaceholder) {
+        var initialPh = pillPlaceholder.getAttribute("data-initial-placeholder") || "Ask anything";
+        pillPlaceholder.textContent = initialPh;
         pillPlaceholder.style.display = "flex";
         pillPlaceholder.style.opacity = "1";
       }
@@ -4121,8 +4127,9 @@ const panels = groups.map((group) => ({
       if (pillThinking) {
         pillThinking.style.display = "none";
         pillThinking.style.opacity = "0";
-        var resetStatusSpan = pillThinking.querySelector("span:first-child");
-        if (resetStatusSpan) resetStatusSpan.textContent = "Reading files";
+        var resetStatusSpan = pillThinking.querySelector(".ih-maiw-pill-status-text") || pillThinking.querySelector("span:first-child");
+        var initialStatus = pillThinking.getAttribute("data-status-1") || (resetStatusSpan ? resetStatusSpan.textContent : "Reading files");
+        if (resetStatusSpan) resetStatusSpan.textContent = initialStatus;
       }
       if (cursor) {
         cursor.style.opacity = "0";
@@ -4168,7 +4175,11 @@ const panels = groups.map((group) => ({
       var pillTyped = stage.querySelector(".ih-maiw-pill-typed");
       var pillTypedText = stage.querySelector(".ih-maiw-pill-typed-text");
       var pillThinking = stage.querySelector(".ih-maiw-pill-thinking");
-      var pillStatusText = pillThinking ? pillThinking.querySelector("span:first-child") : null;
+      var pillStatusText = pillThinking ? (pillThinking.querySelector(".ih-maiw-pill-status-text") || pillThinking.querySelector("span:first-child")) : null;
+      var status1 = pillThinking ? (pillThinking.getAttribute("data-status-1") || (pillStatusText ? pillStatusText.textContent : "Reading files")) : "Reading files";
+      var status2 = pillThinking ? (pillThinking.getAttribute("data-status-2") || "Analyzing") : "Analyzing";
+      var initialPh = pillPlaceholder ? (pillPlaceholder.getAttribute("data-initial-placeholder") || "Ask anything") : "Ask anything";
+      var finalPh = pillPlaceholder ? (pillPlaceholder.getAttribute("data-final-placeholder") || initialPh) : initialPh;
       var submitBtn = stage.querySelector(".ih-maiw-submit-btn");
       var cursor = stage.querySelector(".ih-maiw-cursor");
       var borderPath = stage.querySelector(".ih-maiw-pill-border-path");
@@ -4178,6 +4189,7 @@ const panels = groups.map((group) => ({
         if (currentTl && currentTl.isActive()) {
           currentTl.seek(currentTl.duration());
           if (inputPill) inputPill.style.maxWidth = "100%";
+          if (pillPlaceholder) pillPlaceholder.textContent = finalPh;
           updatePillPath();
         }
       };
@@ -4350,6 +4362,7 @@ const panels = groups.map((group) => ({
         if (skeleton) skeleton.style.display = "none";
         if (checklist) checklist.style.display = "none";
         if (pillPlaceholder) {
+          pillPlaceholder.textContent = finalPh;
           pillPlaceholder.style.display = "flex";
           pillPlaceholder.style.opacity = "1";
         }
@@ -4575,6 +4588,9 @@ const panels = groups.map((group) => ({
       var toHide = [pillTyped, pillPlaceholder].filter(Boolean);
       if (toHide.length) tl.set(toHide, { display: "none" }, "revealPoint+=0.12");
       if (pillThinking) {
+        tl.add(function () {
+          if (pillStatusText) pillStatusText.textContent = status1;
+        }, "revealPoint+=0.12");
         tl.set(pillThinking, { display: "flex" }, "revealPoint+=0.12");
         tl.to(pillThinking, { opacity: 1, duration: 0.12 }, "revealPoint+=0.12");
       }
@@ -4593,7 +4609,7 @@ const panels = groups.map((group) => ({
         );
       }
 
-      // Frame 4: Skeleton holds, then checklist appears & status transitions to "Analyzing..."
+      // Frame 4: Skeleton holds, then checklist appears & status transitions to status 2
       if (skeleton) {
         tl.to(skeleton, { opacity: 0, duration: 0.25 }, "revealPoint+=1.8");
         tl.set(skeleton, { display: "none" });
@@ -4601,7 +4617,7 @@ const panels = groups.map((group) => ({
       if (pillThinking && pillStatusText) {
         tl.to(pillThinking, { opacity: 0, duration: 0.15 }, "revealPoint+=1.8");
         tl.add(function () {
-          if (pillStatusText) pillStatusText.textContent = "Analyzing";
+          if (pillStatusText) pillStatusText.textContent = status2;
         }, "revealPoint+=1.95");
         tl.to(pillThinking, { opacity: 1, duration: 0.15 }, "revealPoint+=1.95");
       }
@@ -4663,6 +4679,9 @@ const panels = groups.map((group) => ({
       }
       if (pillTyped) tl.set(pillTyped, { display: "none", opacity: 0 });
       if (pillPlaceholder) {
+        tl.add(function () {
+          if (pillPlaceholder) pillPlaceholder.textContent = finalPh;
+        }, "<");
         tl.set(pillPlaceholder, { display: "flex" });
         tl.to(pillPlaceholder, { opacity: 1, duration: 0.25 }, "<+=0.1");
       }
