@@ -132,17 +132,45 @@ const steps: StepItem[] = [
 
 <style is:global>
     #de-desktop-line-container {
-        max-width: none !important;
+        position: absolute;
+        height: 2px;
+        z-index: 0;
+        pointer-events: none;
+        border-radius: 9999px;
+        overflow: hidden;
     }
 
     @media (min-width: 768px) {
         #de-desktop-line-container {
             display: block !important;
+            top: 50px;
+            left: 42.5px;
+            right: 42.5px;
+            width: calc(100% - 85px) !important;
         }
         .de-mobile-connector-wrapper {
             display: none !important;
         }
     }
+
+    @media (min-width: 1024px) {
+        #de-desktop-line-container {
+            top: 62px;
+            left: 52px;
+            right: 52px;
+            width: calc(100% - 104px) !important;
+        }
+    }
+
+    @media (min-width: 1280px) {
+        #de-desktop-line-container {
+            top: 76px;
+            left: 76px;
+            right: 76px;
+            width: calc(100% - 152px) !important;
+        }
+    }
+
     @media (max-width: 767.98px) {
         #de-desktop-line-container {
             display: none !important;
@@ -166,59 +194,11 @@ const steps: StepItem[] = [
         if (!section) return;
 
         const desktopLine = document.getElementById("de-progress-line-desktop");
-        const desktopLineContainer = document.getElementById("de-desktop-line-container") || (desktopLine ? desktopLine.parentElement : null);
         const mobileLines = Array.from(section.querySelectorAll(".step-progress-line-mobile"));
         const stepItems = Array.from(section.querySelectorAll(".step-item"));
         const pills = Array.from(section.querySelectorAll(".step-pill"));
 
         if (!stepItems.length) return;
-
-        // Align horizontal line precisely through centers of first and last box across all screen sizes
-        const updateDesktopLinePosition = () => {
-            if (!desktopLineContainer || window.innerWidth < 768) return;
-            const timelineContainer = desktopLineContainer.parentElement;
-            const firstBox = stepItems[0]?.querySelector(".step-box");
-            const lastBox = stepItems[stepItems.length - 1]?.querySelector(".step-box");
-            if (!timelineContainer || !firstBox || !lastBox) return;
-
-            const containerRect = timelineContainer.getBoundingClientRect();
-            const firstRect = firstBox.getBoundingClientRect();
-            const lastRect = lastBox.getBoundingClientRect();
-
-            if (firstRect.width === 0 || lastRect.width === 0) return;
-
-            // In shared.css, body has `zoom: var(--page-zoom, 1)` (0.85 on tablet/laptop).
-            // getBoundingClientRect returns physical viewport pixels.
-            // Dividing by body zoom converts physical pixels into the document's zoomed CSS layout units,
-            // ensuring the rendered line matches the true distance to Box 5 with 100% precision.
-            const rawZoom = parseFloat(window.getComputedStyle(document.body).zoom) || 1;
-
-            const startX = (firstRect.left + firstRect.width / 2 - containerRect.left) / rawZoom;
-            const endX = (lastRect.left + lastRect.width / 2 - containerRect.left) / rawZoom;
-            const topY = (firstRect.top + firstRect.height / 2 - containerRect.top) / rawZoom;
-
-            desktopLineContainer.style.top = `${topY}px`;
-            desktopLineContainer.style.left = `${startX}px`;
-            desktopLineContainer.style.width = `${endX - startX}px`;
-            desktopLineContainer.style.right = "auto";
-        };
-
-        // Recalculate on layout ready, images load, and window events
-        updateDesktopLinePosition();
-        requestAnimationFrame(updateDesktopLinePosition);
-        setTimeout(updateDesktopLinePosition, 100);
-        setTimeout(updateDesktopLinePosition, 400);
-
-        window.addEventListener("resize", updateDesktopLinePosition);
-        window.addEventListener("load", updateDesktopLinePosition);
-
-        // Also update if images in the boxes finish loading
-        stepItems.forEach((item) => {
-            const img = item.querySelector("img");
-            if (img && !img.complete) {
-                img.addEventListener("load", updateDesktopLinePosition);
-            }
-        });
 
         const reduceMotion =
             window.matchMedia &&
