@@ -113,7 +113,7 @@ const steps: StepItem[] = [
 
                             <!-- Mobile Vertical Connector Line (between steps in column flow) -->
                             {i < steps.length - 1 && (
-                                <div class="md:hidden flex items-center justify-center h-8 w-full -my-3 z-0">
+                                <div class="de-mobile-connector-wrapper md:hidden flex items-center justify-center h-8 w-full -my-3 z-0">
                                     <div class="w-[2px] h-full bg-[#E5E7EB] relative overflow-hidden rounded-full">
                                         <div
                                             class="step-progress-line-mobile absolute top-0 left-0 w-full bg-[#5446FF] origin-top rounded-full will-change-[height,opacity]"
@@ -132,6 +132,23 @@ const steps: StepItem[] = [
 </section>
 
 <style is:global>
+    @media (min-width: 768px) {
+        #de-desktop-line-container {
+            display: block !important;
+        }
+        .de-mobile-connector-wrapper {
+            display: none !important;
+        }
+    }
+    @media (max-width: 767.98px) {
+        #de-desktop-line-container {
+            display: none !important;
+        }
+        .de-mobile-connector-wrapper {
+            display: flex !important;
+        }
+    }
+
     @media (prefers-reduced-motion: reduce) {
         #de-progress-line-desktop,
         .step-progress-line-mobile {
@@ -141,7 +158,7 @@ const steps: StepItem[] = [
 </style>
 
 <script is:inline>
-    document.addEventListener("DOMContentLoaded", () => {
+    const initImplementation = () => {
         const section = document.getElementById("de-implementation-section");
         if (!section) return;
 
@@ -165,6 +182,8 @@ const steps: StepItem[] = [
             const firstRect = firstBox.getBoundingClientRect();
             const lastRect = lastBox.getBoundingClientRect();
 
+            if (firstRect.width === 0 || lastRect.width === 0) return;
+
             const startX = firstRect.left + firstRect.width / 2 - containerRect.left;
             const endX = lastRect.left + lastRect.width / 2 - containerRect.left;
             const topY = firstRect.top + firstRect.height / 2 - containerRect.top;
@@ -175,9 +194,22 @@ const steps: StepItem[] = [
             desktopLineContainer.style.right = "auto";
         };
 
+        // Recalculate on layout ready, images load, and window events
         updateDesktopLinePosition();
+        requestAnimationFrame(updateDesktopLinePosition);
+        setTimeout(updateDesktopLinePosition, 100);
+        setTimeout(updateDesktopLinePosition, 400);
+
         window.addEventListener("resize", updateDesktopLinePosition);
         window.addEventListener("load", updateDesktopLinePosition);
+
+        // Also update if images in the boxes finish loading
+        stepItems.forEach((item) => {
+            const img = item.querySelector("img");
+            if (img && !img.complete) {
+                img.addEventListener("load", updateDesktopLinePosition);
+            }
+        });
 
         const reduceMotion =
             window.matchMedia &&
@@ -361,5 +393,11 @@ const steps: StepItem[] = [
         stepItems.forEach((item, idx) => {
             item.addEventListener("click", () => handleStepClick(idx));
         });
-    });
+    };
+
+    if (document.readyState === "loading") {
+        document.addEventListener("DOMContentLoaded", initImplementation);
+    } else {
+        initImplementation();
+    }
 </script>
