@@ -173,29 +173,6 @@ const steps: StepItem[] = [
 
         if (!stepItems.length) return;
 
-        // Compute element offsets in layout CSS space (unaffected by body zoom or zoom discrepancies)
-        const getOffsetToAncestor = (el, ancestor) => {
-            let x = 0;
-            let y = 0;
-            let curr = el;
-            while (curr && curr !== ancestor && curr !== document.body) {
-                x += curr.offsetLeft;
-                y += curr.offsetTop;
-                curr = curr.offsetParent;
-            }
-            if (x > 0 || curr === ancestor) {
-                return { x, y };
-            }
-            // Fallback: getBoundingClientRect normalised against body zoom factor (--page-zoom in shared.css)
-            const elRect = el.getBoundingClientRect();
-            const ancRect = ancestor.getBoundingClientRect();
-            const rawZoom = parseFloat(window.getComputedStyle(document.body).zoom) || 1;
-            return {
-                x: (elRect.left - ancRect.left) / rawZoom,
-                y: (elRect.top - ancRect.top) / rawZoom,
-            };
-        };
-
         // Align horizontal line precisely through centers of first and last box across all screen sizes
         const updateDesktopLinePosition = () => {
             if (!desktopLineContainer || window.innerWidth < 768) return;
@@ -204,14 +181,21 @@ const steps: StepItem[] = [
             const lastBox = stepItems[stepItems.length - 1]?.querySelector(".step-box");
             if (!timelineContainer || !firstBox || !lastBox) return;
 
-            const firstPos = getOffsetToAncestor(firstBox, timelineContainer);
-            const lastPos = getOffsetToAncestor(lastBox, timelineContainer);
+            const containerRect = timelineContainer.getBoundingClientRect();
+            const firstRect = firstBox.getBoundingClientRect();
+            const lastRect = lastBox.getBoundingClientRect();
 
-            if (firstBox.offsetWidth === 0 || lastBox.offsetWidth === 0) return;
+            if (firstRect.width === 0 || lastRect.width === 0) return;
 
-            const startX = firstPos.x + firstBox.offsetWidth / 2;
-            const endX = lastPos.x + lastBox.offsetWidth / 2;
-            const topY = firstPos.y + firstBox.offsetHeight / 2;
+            // In shared.css, body has `zoom: var(--page-zoom, 1)` (0.85 on tablet/laptop).
+            // getBoundingClientRect returns physical viewport pixels.
+            // Dividing by body zoom converts physical pixels into the document's zoomed CSS layout units,
+            // ensuring the rendered line matches the true distance to Box 5 with 100% precision.
+            const rawZoom = parseFloat(window.getComputedStyle(document.body).zoom) || 1;
+
+            const startX = (firstRect.left + firstRect.width / 2 - containerRect.left) / rawZoom;
+            const endX = (lastRect.left + lastRect.width / 2 - containerRect.left) / rawZoom;
+            const topY = (firstRect.top + firstRect.height / 2 - containerRect.top) / rawZoom;
 
             desktopLineContainer.style.top = `${topY}px`;
             desktopLineContainer.style.left = `${startX}px`;
