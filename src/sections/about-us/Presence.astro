@@ -128,7 +128,7 @@ const countries: Country[] = [
                             >
                         </p>
                         <p
-                            class="m-0 font-body font-normal text-neutral-500 text-[length:var(--fs-body-lg)] leading-[length:var(--lh-body-lg)]"
+                            class="m-0 font-body font-bold text-neutral-500 text-[length:var(--fs-body-lg)] leading-[length:var(--lh-body-lg)]"
                         >
                             {subLead}
                         </p>
@@ -176,7 +176,10 @@ const countries: Country[] = [
                     decoding="async"
                     class="au-presence-globe-poster absolute left-[7.88%] top-[-6.59%] h-[113.18%] w-[84.24%] max-w-none object-contain"
                 />
-                <div class="au-presence-globe-stage absolute inset-0" aria-hidden="true">
+                <div
+                    class="au-presence-globe-stage absolute inset-0"
+                    aria-hidden="true"
+                >
                     <div class="au-presence-globe-canvas"></div>
                     <div class="au-presence-globe-tags"></div>
                 </div>
@@ -236,7 +239,8 @@ const countries: Country[] = [
         will-change: transform, opacity;
     }
 
-    .au-presence-globe-tags.au-presence-globe-animated .au-presence-globe-tag-wrapper {
+    .au-presence-globe-tags.au-presence-globe-animated
+        .au-presence-globe-tag-wrapper {
         transition: opacity 0.25s ease-out;
     }
 
@@ -362,7 +366,10 @@ const countries: Country[] = [
 
                 for (var col = 0; col < dotColumns; col++) {
                     var bitIdx = rowOffset + col;
-                    if ((bin.charCodeAt(bitIdx >> 3) & (1 << (bitIdx & 7))) === 0)
+                    if (
+                        (bin.charCodeAt(bitIdx >> 3) & (1 << (bitIdx & 7))) ===
+                        0
+                    )
                         continue;
 
                     var theta = ((col + 0.5) / dotColumns) * (Math.PI * 2);
@@ -375,7 +382,12 @@ const countries: Country[] = [
             }
 
             var dotCount = positions.length / 3;
-            var dotGeometry = new THREE.CylinderGeometry(0.0112, 0.0112, 0.006, 6);
+            var dotGeometry = new THREE.CylinderGeometry(
+                0.0112,
+                0.0112,
+                0.006,
+                6,
+            );
             dotGeometry.translate(0, 0.003, 0);
 
             var extrudedDotMaterial = new THREE.RawShaderMaterial({
@@ -409,7 +421,11 @@ const countries: Country[] = [
 
             for (var i = 0; i < dotCount; i++) {
                 var idx = i * 3;
-                tempPos.set(positions[idx], positions[idx + 1], positions[idx + 2]);
+                tempPos.set(
+                    positions[idx],
+                    positions[idx + 1],
+                    positions[idx + 2],
+                );
                 tempNorm.copy(tempPos).normalize();
                 instanceQuaternion.setFromUnitVectors(cylinderAxis, tempNorm);
                 instanceMatrix.compose(tempPos, instanceQuaternion, scaleOne);
@@ -437,7 +453,12 @@ const countries: Country[] = [
             var halfHeight = height * 0.5;
 
             var scene = new THREE.Scene();
-            var camera = new THREE.PerspectiveCamera(45, width / height, 0.1, 1000);
+            var camera = new THREE.PerspectiveCamera(
+                45,
+                width / height,
+                0.1,
+                1000,
+            );
             camera.position.set(0, 0, 7.5);
 
             var renderer;
@@ -529,7 +550,10 @@ const countries: Country[] = [
                 transparent: true,
                 opacity: 0.32,
             });
-            var wireframeMesh = new THREE.LineSegments(wireframeGeo, gridMaterial);
+            var wireframeMesh = new THREE.LineSegments(
+                wireframeGeo,
+                gridMaterial,
+            );
             wireframeMesh.renderOrder = 3;
             wireframeMesh.matrixAutoUpdate = false;
             globeGroup.add(wireframeMesh);
@@ -548,7 +572,8 @@ const countries: Country[] = [
 
                 if (country.code) {
                     var flag = document.createElement("img");
-                    flag.src = "https://flagcdn.com/w80/" + country.code + ".png";
+                    flag.src =
+                        "https://flagcdn.com/w80/" + country.code + ".png";
                     flag.alt = country.name;
                     flag.width = 28;
                     flag.height = 28;
@@ -568,7 +593,11 @@ const countries: Country[] = [
                 );
 
                 tagsFragment.appendChild(wrapper);
-                tagElements.push({ position: position, element: wrapper, isVisible: false });
+                tagElements.push({
+                    position: position,
+                    element: wrapper,
+                    isVisible: false,
+                });
             });
 
             tagsMount.appendChild(tagsFragment);
@@ -648,7 +677,8 @@ const countries: Country[] = [
                 group.add(innerRing);
 
                 group.position.y =
-                    direction * GLOBE_RADIUS * 1.5 + (direction === 1 ? -0.6 : 0.23);
+                    direction * GLOBE_RADIUS * 1.5 +
+                    (direction === 1 ? -0.6 : 0.23);
                 group.rotation.x =
                     direction === -1 ? THREE.MathUtils.degToRad(-45) : 0;
                 return group;
@@ -694,7 +724,11 @@ const countries: Country[] = [
                             tag.px = px;
                             tag.py = py;
                             tag.element.style.transform =
-                                "translate3d(" + px + "px, " + py + "px, 0) translate(-50%, -50%)";
+                                "translate3d(" +
+                                px +
+                                "px, " +
+                                py +
+                                "px, 0) translate(-50%, -50%)";
                         }
                     }
                 }
@@ -750,7 +784,9 @@ const countries: Country[] = [
                     camera.updateProjectionMatrix();
 
                     renderer.setSize(width, height);
-                    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+                    renderer.setPixelRatio(
+                        Math.min(window.devicePixelRatio, 2),
+                    );
                 });
                 resizeObserver.observe(canvasMount);
             }
@@ -761,7 +797,10 @@ const countries: Country[] = [
             if (!root || root.dataset.globeReady) return;
             root.dataset.globeReady = "true";
 
-            if (!("IntersectionObserver" in window) || !window.WebGLRenderingContext) {
+            if (
+                !("IntersectionObserver" in window) ||
+                !window.WebGLRenderingContext
+            ) {
                 return;
             }
 
