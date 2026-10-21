@@ -70,6 +70,9 @@ const dotPeriod = 26;
 function dotsForHeight(height: number) {
   return Array.from({ length: Math.round(height / dotPeriod) + 1 });
 }
+
+const mobileTopDotRows = [9, 7, 5, 3];
+const mobileBottomDotRows = [3, 5, 7, 9];
 ---
 
 <section class="bg-generic-00 max-lg:py-16 lg:py-20">
@@ -128,10 +131,11 @@ function dotsForHeight(height: number) {
       </div>
 
       <div
-        class="flex flex-1 items-center justify-center gap-6 self-stretch py-8 lg:py-0"
+        class="flex flex-1 items-center justify-center gap-6 self-stretch lg:py-8 xl:py-0"
       >
+        <!-- Desktop Left Dots -->
         <div
-          class="flex shrink-0 items-center gap-6 max-lg:hidden"
+          class="hidden xl:flex shrink-0 items-center gap-6"
           aria-hidden="true"
         >
           {
@@ -147,24 +151,63 @@ function dotsForHeight(height: number) {
             ))
           }
         </div>
-        <div class="flex shrink-0 flex-col items-center gap-1">
-          <p
-            class="m-0 font-body text-vault-navy text-[length:var(--fs-body-lg)] leading-[length:var(--lh-body-lg)]"
+
+        <!-- Center: Logo with Responsive Top and Bottom Dots -->
+        <div class="flex flex-col items-center gap-4 sm:gap-5">
+          <!-- Responsive Top Dots: 4 rows tapering down toward logo (9 -> 7 -> 5 -> 3) -->
+          <div
+            class="flex xl:hidden flex-col items-center gap-3.5"
+            aria-hidden="true"
           >
-            Clarity AI
-          </p>
-          <img
-            src="https://assets1.cleartax-cdn.com/finfo/wg-utils/retool/d9f36ac3-77a9-40c6-94fc-20c2e3855457.svg"
-            alt="ClearTax"
-            width="151"
-            height="32"
-            class="h-8 w-auto"
-            loading="lazy"
-            decoding="async"
-          />
+            {
+              mobileTopDotRows.map((count) => (
+                <div class="flex items-center justify-center gap-[22px]">
+                  {Array.from({ length: count }).map(() => (
+                    <span class="h-1 w-1 shrink-0 rounded-full bg-flux-lime" />
+                  ))}
+                </div>
+              ))
+            }
+          </div>
+
+          <!-- Logo & Title -->
+          <div class="flex shrink-0 flex-col items-center gap-1">
+            <p
+              class="m-0 font-body text-vault-navy text-[length:var(--fs-body-lg)] leading-[length:var(--lh-body-lg)]"
+            >
+              Clarity AI
+            </p>
+            <img
+              src="https://assets1.cleartax-cdn.com/finfo/wg-utils/retool/d9f36ac3-77a9-40c6-94fc-20c2e3855457.svg"
+              alt="ClearTax"
+              width="151"
+              height="32"
+              class="h-8 w-auto"
+              loading="lazy"
+              decoding="async"
+            />
+          </div>
+
+          <!-- Responsive Bottom Dots: 4 rows tapering down away from logo (3 -> 5 -> 7 -> 9) -->
+          <div
+            class="flex xl:hidden flex-col items-center gap-3.5"
+            aria-hidden="true"
+          >
+            {
+              mobileBottomDotRows.map((count) => (
+                <div class="flex items-center justify-center gap-[22px]">
+                  {Array.from({ length: count }).map(() => (
+                    <span class="h-1 w-1 shrink-0 rounded-full bg-flux-lime" />
+                  ))}
+                </div>
+              ))
+            }
+          </div>
         </div>
+
+        <!-- Desktop Right Dots -->
         <div
-          class="flex shrink-0 items-center gap-6 max-lg:hidden"
+          class="hidden xl:flex shrink-0 items-center gap-6"
           aria-hidden="true"
         >
           {
