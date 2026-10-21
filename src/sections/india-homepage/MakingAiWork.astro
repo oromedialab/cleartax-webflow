@@ -4295,12 +4295,23 @@ const panels = groups.map((group) => ({
         var pRect = inputPill.getBoundingClientRect();
         var stageH = stage.offsetHeight || sRect.height || 420;
         var pillH = inputPill.offsetHeight || pRect.height || 48;
+        var titleRect = centerTitle ? centerTitle.getBoundingClientRect() : null;
+        var titleBottom = titleRect ? titleRect.bottom - sRect.top : stageH * 0.26 + 32;
+
         var pillTop = pRect.top - sRect.top;
         if (!pillTop || pillTop <= 0 || pillTop < stageH * 0.5) {
-          pillTop = stageH - pillH - 24;
+          pillTop = stageH - pillH - (stageH < 640 ? 16 : 24);
         }
-        var targetCenter = stageH * 0.53 - pillH / 2;
-        return targetCenter - pillTop;
+
+        var gap = stageH < 380 ? 20 : 28;
+        var targetTop = titleBottom + gap;
+
+        var maxTargetTop = stageH * 0.58 - pillH / 2;
+        if (targetTop > maxTargetTop) {
+          targetTop = maxTargetTop;
+        }
+
+        return targetTop - pillTop;
       }
 
       function updatePillPath() {
@@ -4460,13 +4471,13 @@ const panels = groups.map((group) => ({
         return;
       }
 
-      var centerOffset = calcCenterOffset();
-
       // Measure coordinates at docked bottom position (maxWidth 100%, y 0)
       inputPill.style.maxWidth = "100%";
       inputPill.style.transform = "none";
       var bottomPillPos = getPillPos();
       var bottomSubmitPos = getSubmitBtnPos();
+
+      var centerOffset = calcCenterOffset();
 
       // Reset to centered position for Frame 1
       inputPill.style.maxWidth = "480px";
@@ -4793,8 +4804,17 @@ const panels = groups.map((group) => ({
       }
     }
 
+    var resizeTimer = null;
     window.addEventListener("resize", function () {
       if (activeUpdatePillPath) activeUpdatePillPath();
+      if (isOpen()) {
+        clearTimeout(resizeTimer);
+        resizeTimer = setTimeout(function () {
+          if (isOpen()) {
+            playAnimation(current);
+          }
+        }, 150);
+      }
     });
 
     // The chevrons walk the card's OWN team, not all eleven — the overlay was
