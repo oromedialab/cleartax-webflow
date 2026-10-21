@@ -227,24 +227,22 @@ const stages = [
         </p>
       </div>
 
-      <!-- Diagram. Always a column — Your Books, the diagram, then Yours Taxes
-           stacked, at every width, not just below lg. See the note on the
-           diagram wrapper for what that simplified once the row's
-           items-stretch requirement went away. -->
+      <!-- Diagram: Horizontal row on desktop (Your Books, diagram, Yours Taxes side-by-side),
+           stacked on smaller screens. -->
       <div
-        class="relative flex w-full flex-col items-center gap-8"
+        class="relative flex w-full flex-col items-center gap-8 lg:flex-row lg:items-stretch lg:justify-between"
         data-ih-lit
       >
         <span class="ih-dl-centre" aria-hidden="true"></span>
         <div
-          class="flex w-full max-w-[420px] flex-col items-center gap-6 rounded-xl border border-[#CCCCCC] bg-generic-00 p-6"
+          class="flex w-full max-w-[420px] flex-col items-center gap-6 rounded-xl border border-[#CCCCCC] bg-generic-00 p-6 lg:w-[214px] lg:max-w-none lg:shrink-0"
         >
           <h3
             class="m-0 font-heading font-medium text-vault-navy text-[length:var(--fs-h6)] leading-[length:var(--lh-h6)]"
           >
             Your Books
           </h3>
-          <div class="flex w-full flex-col gap-2">
+          <div class="flex w-full flex-1 flex-col justify-between gap-2">
             {
               books.map((tile) => (
                 <div class="flex h-14 items-center justify-center rounded-lg border border-[#CCCCCC] px-3">
@@ -284,208 +282,128 @@ const stages = [
           </div>
         </div>
 
-        <!-- gap-[51px] is Figma's, and it is measured to the 280px content box,
-             not to the hexagon. The hexagon is 334px wide and centred in that
-             box, so it overhangs 27px each side and the dots clear its edge by
-             the 24px the rest of the diagram is spaced on. At gap-6 the fans
-             ran into the hexagon's side. -->
-        <!-- --ih-dl-max is the last moment in the whole sweep, and it lives here
-             because both fans and the hexagon need it: the resting rules derive
-             each element's OUT delay as (max − its own), which is what makes
-             leaving the exact reverse of arriving without a second value per
-             dot. One number on the strip instead of a hundred and thirty-three.
-
-             Reversing the sweep reversed the unwind for free — the outer edges
-             now arrive last and so let go first, and the platform, which leads
-             going in, is the last thing to drop back to grey. -->
-        <!-- ROW TO COLUMN, hexagon kept upright. Now that Books/diagram/Taxes
-             is always a column, the fans turn 90° (Tailwind's `rotate-90`, on
-             the <svg> only) and stack above/below the hexagon instead of
-             sitting either side of it — the hexagon itself is never rotated.
-             `i*COL_PITCH` (each fan's own local x-axis) lands on the screen's
-             y-axis either way, so the OUTERMOST, TALLEST column (i=0,
-             furthest from the platform) still ends up furthest from the
-             platform: at the top of the top fan, at the bottom of the bottom
-             one. Nothing about the sweep's geometry or timing changes — the
-             frontmatter's distances and rings are computed in each fan's own
-             local coordinates, which a `rotate-90` on the finished SVG
-             doesn't touch.
-
-             Each fan's SVG keeps its drawn FAN_W×FAN_H box for its own
-             layout (every cx/cy inside it is still right), but turned 90° it
-             PAINTS as FAN_H×FAN_W — so it is wrapped in a sizing div of that
-             swapped size, which is what the flex column actually reserves
-             space for. The platform box gets an explicit `h-[382px]` it
-             didn't carry in the row version: there, the row's own
-             `items-stretch` (borrowed from the taller cards either side)
-             gave it enough height for the hexagon to clear without asking;
-             there is no such sibling here, so it is stated directly. 382 is
-             the hexagon's own full height, so it renders with zero overhang
-             top and bottom, same as the 51px gutter leaves zero overhang
-             either side.
-
-             `-scale` and `-fixed` below are the same two-level scale-to-fit
-             as before, just re-based on the new 334×884 footprint — see
-             the note by `ih-dl-diagram-scale` in the styles. `-stretch` is
-             just the centring wrapper, capped at the same 420px as the two
-             cards. -->
+        <!-- Centre: Diagram (Left fan, Hexagon platform, Right fan) -->
         <div
-          class="ih-dl-diagram-stretch flex w-full max-w-[420px] items-center justify-center"
+          class="ih-dl-diagram-stretch flex w-full max-w-[420px] lg:max-w-[782px] items-center justify-center lg:flex-1 lg:self-center"
         >
-          <div class="ih-dl-diagram-scale w-full max-w-[334px] aspect-[334/884]">
+          <div class="ih-dl-diagram-scale w-full">
             <div
-              class="ih-dl-diagram-fixed flex w-[334px] h-[884px] flex-col items-center gap-[51px]"
+              class="ih-dl-diagram-fixed"
               style={`--ih-dl-max:${MAX_T.toFixed(3)}s`}
             >
-          <!-- Index 0 is the OUTERMOST column of this fan, which makes it the
-               furthest from the platform and so the LAST to turn. The right fan
-               is reversed, so its own outermost column is the last in the array
-               — see there. Both fans read the same rings, so both open outward
-               at the same moment.
-
-               ONE SVG PER FAN, not a hundred and thirty-two boxes. Each dot has
-               to be its own element to carry its own moment in the sweep, and as
-               CSS boxes that broke under the 0.85 body zoom: a box's paint rect
-               is snapped to whole device pixels and each is snapped on its own,
-               so 4px dots became 3.4px at sixteen different subpixel offsets and
-               rendered at visibly different sizes. SVG geometry is rasterised as
-               paths and is not snapped, so every dot antialiases identically.
-
-               At zoom 1 nothing changes: every cx and cy below lands on a whole
-               number, so the circles are as crisp as the boxes were.
-
-               The circles carry no class — with this many of them a class
-               attribute each would be kilobytes of the Embed budget for nothing
-               a descendant selector cannot already say. -->
-          <div
-            class="flex shrink-0 items-center justify-center"
-            style={`width:${FAN_H}px;height:${FAN_W}px`}
-          >
-            <svg
-              class="ih-dl-dots block shrink-0 rotate-90"
-              width={FAN_W}
-              height={FAN_H}
-              viewBox={`0 0 ${FAN_W} ${FAN_H}`}
-              aria-hidden="true"
-            >
-              {
-                dotColumns.flatMap((h, i) =>
-                  Array.from({ length: dotsIn(h) }, (_, k) => (
-                    <circle
-                      cx={i * COL_PITCH + DOT / 2}
-                      cy={dotY(h, k)}
-                      r={DOT / 2}
-                      style={`--ih-dl-t:${dotT(i, h, k)}s`}
-                    />
-                  )),
-                )
-              }
-            </svg>
-          </div>
-
-          <div
-            class="relative flex h-[382px] w-[280px] shrink-0 items-center justify-center"
-          >
-            <!-- Figma's own path data, nested by translate rather than redrawn:
-                 334.283x382.284, 316.963x362.147 and 297.913x340.382, each
-                 centred in the outermost box. All three are unfilled — the
-                 innermost carried a white fill before, which read the same on
-                 this white section but would not on any other. -->
-            <!-- Zero: the platform turns FIRST and the fans leave it a beat
-                 later, because it is the source the colour spreads from. Its
-                 OUT delay derives to --ih-dl-max, the largest there is, so it is
-                 also the last thing to drop back — first to arrive, last to let
-                 go, which is the mirror of what the outer edges do. -->
-            <svg
-              style={`--ih-dl-t:${HEX_T.toFixed(3)}s`}
-              class="ih-dl-hex absolute left-1/2 top-1/2 h-[382px] w-[334px] -translate-x-1/2 -translate-y-1/2"
-              viewBox="0 0 334.283 382.284"
-              fill="none"
-              aria-hidden="true"
-            >
-              <path
-                d="M161.266 1.82426C164.902 -0.274626 169.381 -0.27452 173.016 1.82426L328.158 91.3955C331.793 93.4945 334.033 97.3735 334.033 101.571V280.713C334.033 284.911 331.793 288.79 328.158 290.889L173.016 380.46C169.381 382.559 164.902 382.559 161.266 380.46L6.12456 290.889C2.48933 288.79 0.249557 284.911 0.249557 280.713V101.571C0.249557 97.3736 2.48937 93.4945 6.12456 91.3955L161.266 1.82426Z"
-                stroke="#999999"
-                stroke-width="0.5"
-                opacity="0.4"></path>
-              <path
-                transform="translate(8.66 10.069)"
-                d="M152.51 2.09966C156.205 -0.0335411 160.758 -0.0335416 164.453 2.09966L310.492 86.4161C314.186 88.5493 316.462 92.4915 316.462 96.7579V265.39C316.462 269.656 314.186 273.598 310.492 275.731L164.453 360.048C160.758 362.181 156.205 362.181 152.51 360.048L6.47115 275.731C2.77635 273.598 0.500465 269.656 0.500443 265.39V96.7579C0.500443 92.4915 2.77633 88.5493 6.47115 86.4161L152.51 2.09966Z"
-                stroke="#999999"
-                opacity="0.5"></path>
-              <path
-                transform="translate(18.185 20.951)"
-                d="M143.485 2.21632C146.871 0.261517 151.042 0.261518 154.428 2.21632L291.691 81.4644C295.077 83.4193 297.162 87.0329 297.162 90.9429V249.439C297.162 253.349 295.077 256.963 291.691 258.917L154.428 338.166C151.042 340.12 146.871 340.12 143.485 338.166L6.222 258.917C2.8359 256.963 0.75032 253.349 0.75032 249.439V90.9429C0.75032 87.0329 2.8359 83.4193 6.222 81.4644L143.485 2.21632Z"
-                stroke="#999999"
-                stroke-width="1.5"></path>
-            </svg>
-
-            <div class="relative z-10 flex flex-col items-center gap-3">
-              <p
-                class="m-0 text-center font-body font-medium text-vault-navy text-[22px] leading-[34px]"
+              <!-- Left / Top Fan: hidden on mobile (< 768px), rotated on iPad (768-1023px), normal on desktop (1024px+) -->
+              <div
+                class="ih-dl-fan-wrap ih-dl-fan-1-wrap shrink-0 items-center justify-center hidden md:flex"
               >
-                Compliance<br />Data Platform
-              </p>
-              <div class="flex w-full flex-col gap-2.5">
-                {
-                  platformPills.map((pill) => (
-                    <span class="flex items-center justify-center rounded-3xl border border-neutral-200 bg-generic-00 py-1.5 px-3 text-center font-body text-[length:var(--fs-label)] leading-[length:var(--lh-label)] font-medium text-nova-blue">
-                      {pill}
-                    </span>
-                  ))
-                }
+                <svg
+                  class="ih-dl-dots ih-dl-fan-1 block shrink-0"
+                  width={FAN_W}
+                  height={FAN_H}
+                  viewBox={`0 0 ${FAN_W} ${FAN_H}`}
+                  aria-hidden="true"
+                >
+                  {
+                    dotColumns.flatMap((h, i) =>
+                      Array.from({ length: dotsIn(h) }, (_, k) => (
+                        <circle
+                          cx={i * COL_PITCH + DOT / 2}
+                          cy={dotY(h, k)}
+                          r={DOT / 2}
+                          style={`--ih-dl-t:${dotT(i, h, k)}s`}
+                        />
+                      )),
+                    )
+                  }
+                </svg>
               </div>
-            </div>
-          </div>
 
-          <!-- Reversed, so index 0 is the column nearest the platform and index
-               7 is this fan's outer edge. The sweep orders are therefore the
-               mirror of the left fan's, which is what makes the two run toward
-               each other rather than both left to right. Rotated the same
-               direction as the top fan, which — because this one's local x
-               is already mirrored by the reversed array — lands its own
-               nearest-the-platform end at the TOP of its box, against the
-               hexagon, and its outermost end at the very bottom. -->
-          <div
-            class="flex shrink-0 items-center justify-center"
-            style={`width:${FAN_H}px;height:${FAN_W}px`}
-          >
-            <svg
-              class="ih-dl-dots block shrink-0 rotate-90"
-              width={FAN_W}
-              height={FAN_H}
-              viewBox={`0 0 ${FAN_W} ${FAN_H}`}
-              aria-hidden="true"
-            >
-            {
-              [...dotColumns]
-                .reverse()
-                .flatMap((h, i) =>
-                  Array.from({ length: dotsIn(h) }, (_, k) => (
-                    <circle
-                      cx={i * COL_PITCH + DOT / 2}
-                      cy={dotY(h, k)}
-                      r={DOT / 2}
-                      style={`--ih-dl-t:${dotT(LAST - i, h, k)}s`}
-                    />
-                  )),
-                )
-            }
-          </svg>
-            </div>
+              <!-- Platform: 280px content box, 334px hexagon centred (27px overhang each side) -->
+              <div
+                class="relative flex h-[382px] w-[280px] shrink-0 items-center justify-center"
+              >
+                <svg
+                  style={`--ih-dl-t:${HEX_T.toFixed(3)}s`}
+                  class="ih-dl-hex absolute left-1/2 top-1/2 h-[382px] w-[334px] -translate-x-1/2 -translate-y-1/2"
+                  viewBox="0 0 334.283 382.284"
+                  fill="none"
+                  aria-hidden="true"
+                >
+                  <path
+                    d="M161.266 1.82426C164.902 -0.274626 169.381 -0.27452 173.016 1.82426L328.158 91.3955C331.793 93.4945 334.033 97.3735 334.033 101.571V280.713C334.033 284.911 331.793 288.79 328.158 290.889L173.016 380.46C169.381 382.559 164.902 382.559 161.266 380.46L6.12456 290.889C2.48933 288.79 0.249557 284.911 0.249557 280.713V101.571C0.249557 97.3736 2.48937 93.4945 6.12456 91.3955L161.266 1.82426Z"
+                    stroke="#999999"
+                    stroke-width="0.5"
+                    opacity="0.4"></path>
+                  <path
+                    transform="translate(8.66 10.069)"
+                    d="M152.51 2.09966C156.205 -0.0335411 160.758 -0.0335416 164.453 2.09966L310.492 86.4161C314.186 88.5493 316.462 92.4915 316.462 96.7579V265.39C316.462 269.656 314.186 273.598 310.492 275.731L164.453 360.048C160.758 362.181 156.205 362.181 152.51 360.048L6.47115 275.731C2.77635 273.598 0.500465 269.656 0.500443 265.39V96.7579C0.500443 92.4915 2.77633 88.5493 6.47115 86.4161L152.51 2.09966Z"
+                    stroke="#999999"
+                    opacity="0.5"></path>
+                  <path
+                    transform="translate(18.185 20.951)"
+                    d="M143.485 2.21632C146.871 0.261517 151.042 0.261518 154.428 2.21632L291.691 81.4644C295.077 83.4193 297.162 87.0329 297.162 90.9429V249.439C297.162 253.349 295.077 256.963 291.691 258.917L154.428 338.166C151.042 340.12 146.871 340.12 143.485 338.166L6.222 258.917C2.8359 256.963 0.75032 253.349 0.75032 249.439V90.9429C0.75032 87.0329 2.8359 83.4193 6.222 81.4644L143.485 2.21632Z"
+                    stroke="#999999"
+                    stroke-width="1.5"></path>
+                </svg>
+
+                <div class="relative z-10 flex flex-col items-center gap-3">
+                  <p
+                    class="m-0 text-center font-body font-medium text-vault-navy text-[22px] leading-[34px]"
+                  >
+                    Compliance<br />Data Platform
+                  </p>
+                  <div class="flex w-full flex-col gap-2.5">
+                    {
+                      platformPills.map((pill) => (
+                        <span class="flex items-center justify-center rounded-3xl border border-neutral-200 bg-generic-00 py-1.5 px-3 text-center font-body text-[length:var(--fs-label)] leading-[length:var(--lh-label)] font-medium text-nova-blue">
+                          {pill}
+                        </span>
+                      ))
+                    }
+                  </div>
+                </div>
+              </div>
+
+              <!-- Right / Bottom Fan: hidden on mobile (< 768px), rotated on iPad (768-1023px), normal on desktop (1024px+) -->
+              <div
+                class="ih-dl-fan-wrap ih-dl-fan-2-wrap shrink-0 items-center justify-center hidden md:flex"
+              >
+                <svg
+                  class="ih-dl-dots ih-dl-fan-2 block shrink-0"
+                  width={FAN_W}
+                  height={FAN_H}
+                  viewBox={`0 0 ${FAN_W} ${FAN_H}`}
+                  aria-hidden="true"
+                >
+                  {
+                    [...dotColumns]
+                      .reverse()
+                      .flatMap((h, i) =>
+                        Array.from({ length: dotsIn(h) }, (_, k) => (
+                          <circle
+                            cx={i * COL_PITCH + DOT / 2}
+                            cy={dotY(h, k)}
+                            r={DOT / 2}
+                            style={`--ih-dl-t:${dotT(LAST - i, h, k)}s`}
+                          />
+                        )),
+                      )
+                  }
+                </svg>
+              </div>
             </div>
           </div>
         </div>
 
+        <!-- Right: Yours Taxes -->
         <div
-          class="flex w-full max-w-[420px] flex-col items-center gap-6 rounded-xl border border-[#CCCCCC] bg-generic-00 p-6"
+          class="flex w-full max-w-[420px] flex-col items-center gap-6 rounded-xl border border-[#CCCCCC] bg-generic-00 p-6 lg:w-[214px] lg:max-w-none lg:shrink-0"
         >
           <h3
             class="m-0 font-heading font-medium text-vault-navy text-[length:var(--fs-h6)] leading-[length:var(--lh-h6)]"
           >
             Yours Taxes
           </h3>
-          <div class="flex w-full flex-1 flex-col gap-2">
+          <div class="flex w-full flex-1 flex-col justify-between gap-2">
             {
               portals.map((tile) => (
                 <div class="flex h-14 flex-1 items-center justify-center rounded-lg border border-[#CCCCCC] p-3">
@@ -601,7 +519,79 @@ const stages = [
 
   .ih-dl-diagram-fixed {
     transform-origin: top left;
-    transform: scale(min(1, calc(100cqw / 334px)));
+  }
+
+  /* Mobile (< 768px): Dots hidden, compact hexagon platform centered */
+  @media (max-width: 767.98px) {
+    .ih-dl-diagram-scale {
+      max-width: 334px;
+      aspect-ratio: 334 / 382;
+      margin: 0 auto;
+    }
+    .ih-dl-diagram-fixed {
+      width: 334px;
+      height: 382px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      transform: scale(min(1, calc(100cqw / 334px)));
+    }
+  }
+
+  /* iPad / Tablet (768px – 1023.98px): Vertical stacked column with rotated 90deg dots */
+  @media (min-width: 768px) and (max-width: 1023.98px) {
+    .ih-dl-fan-wrap {
+      width: 290px;
+      height: 200px;
+    }
+    .ih-dl-fan-1,
+    .ih-dl-fan-2 {
+      transform: rotate(90deg);
+      transform-origin: center center;
+    }
+    .ih-dl-diagram-scale {
+      max-width: 334px;
+      aspect-ratio: 334 / 884;
+      margin: 0 auto;
+    }
+    .ih-dl-diagram-fixed {
+      width: 334px;
+      height: 884px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-between;
+      gap: 51px;
+      transform: scale(min(1, calc(100cqw / 334px)));
+    }
+  }
+
+  /* Desktop (>= 1024px): Full horizontal row layout with cards and dots side-by-side */
+  @media (min-width: 1024px) {
+    .ih-dl-fan-wrap {
+      width: 200px;
+      height: 290px;
+    }
+    .ih-dl-fan-1,
+    .ih-dl-fan-2 {
+      transform: none;
+    }
+    .ih-dl-diagram-scale {
+      max-width: 782px;
+      aspect-ratio: 782 / 382;
+      margin: 0;
+    }
+    .ih-dl-diagram-fixed {
+      width: 782px;
+      height: 382px;
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      justify-content: space-between;
+      gap: 51px;
+      transform: scale(min(1, calc(100cqw / 782px)));
+    }
   }
 
   .ih-dl-dots circle {
