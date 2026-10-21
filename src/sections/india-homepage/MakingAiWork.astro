@@ -3841,22 +3841,8 @@ const panels = groups.map((group) => ({
     pointer-events: auto;
   }
 
-  .ih-maiw-input-pill {
-    width: 100%;
-    max-width: 480px;
-    margin-left: auto;
-    margin-right: auto;
-    overflow: visible !important;
-  }
-
   .ih-maiw-pill-border {
-    position: absolute !important;
-    top: -4px !important;
-    left: -4px !important;
-    width: calc(100% + 8px) !important;
-    height: calc(100% + 8px) !important;
     overflow: visible !important;
-    pointer-events: none;
   }
 
   .ih-maiw-chart img {
@@ -4327,16 +4313,11 @@ const panels = groups.map((group) => ({
 
       function updatePillPath() {
         if (!borderPath || !inputPill) return 0;
-        var rect = inputPill.getBoundingClientRect();
-        var fullW = rect.width || inputPill.offsetWidth || 480;
-        var fullH = rect.height || inputPill.offsetHeight || 48;
-        var pad = 3;
-        var strokeW = 2;
-        var x0 = pad + strokeW / 2;
-        var y0 = pad + strokeW / 2;
-        var w = Math.max(10, fullW - strokeW);
-        var h = Math.max(10, fullH - strokeW);
+        var w = inputPill.offsetWidth - 2;
+        var h = inputPill.offsetHeight - 2;
         var r = h / 2;
+        var x0 = 1;
+        var y0 = 1;
         var d =
           "M " +
           x0 +
@@ -4663,18 +4644,14 @@ const panels = groups.map((group) => ({
         tl.add(function () {
           var borderLen = updatePillPath();
           gsap.set(borderPath, {
-            strokeDasharray: borderLen + " " + borderLen,
+            strokeDasharray: borderLen,
             strokeDashoffset: borderLen,
             opacity: 1,
           });
-        }, "borderStart");
-        tl.fromTo(
+        });
+        tl.addLabel("borderStart");
+        tl.to(
           borderPath,
-          {
-            strokeDashoffset: function () {
-              return updatePillPath();
-            },
-          },
           {
             strokeDashoffset: 0,
             duration: 1.3,
