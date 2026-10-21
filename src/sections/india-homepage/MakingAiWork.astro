@@ -4035,11 +4035,21 @@ const panels = groups.map((group) => ({
 
     /* ---- auto-heal checklists split across Webflow embed boundaries ---- */
     function healChecklists() {
-      // Remove any orphaned text spans that Webflow dropped outside items due to embed splits
+      // Remove any orphaned text spans or stray check-items that Webflow dropped outside grid due to embed splits
       var allSpans = overlay.querySelectorAll("span.underline");
       allSpans.forEach(function (sp) {
         if (!sp.closest(".ih-maiw-check-item")) {
           sp.remove();
+        }
+      });
+      overlay.querySelectorAll("[data-ih-maiw-overlay-card]").forEach(function (card) {
+        var grid = card.querySelector(".ih-maiw-checklist .grid");
+        if (grid) {
+          card.querySelectorAll(".ih-maiw-check-item").forEach(function (item) {
+            if (item.parentNode !== grid) {
+              item.remove();
+            }
+          });
         }
       });
 
@@ -4300,10 +4310,13 @@ const panels = groups.map((group) => ({
           pillTop = stageH - pillH - (stageH < 640 ? 16 : 24);
         }
 
-        var gap = Math.max(30, Math.min(62, Math.round(stageH * 0.14)));
+        var isBelowDesktop = window.innerWidth < 1200 || stageH < 440;
+        var gap = isBelowDesktop
+          ? Math.max(22, Math.min(38, Math.round(stageH * 0.095)))
+          : Math.max(30, Math.min(54, Math.round(stageH * 0.125)));
         var targetTop = titleBottom + gap;
 
-        var maxTargetTop = stageH * 0.58 - pillH / 2;
+        var maxTargetTop = (isBelowDesktop ? stageH * 0.525 : stageH * 0.56) - pillH / 2;
         if (targetTop > maxTargetTop) {
           targetTop = maxTargetTop;
         }
