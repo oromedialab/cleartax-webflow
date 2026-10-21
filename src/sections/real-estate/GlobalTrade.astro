@@ -8,35 +8,42 @@
  * cases from the source doc.
  */
 interface TradeCard {
+  icon: string;
   title: string;
   text: string;
 }
 
 const cards: TradeCard[] = [
   {
+    icon: "/images/retail-consumer/glob-1.png",
     title: "One property sale can have multiple tax rates on the same invoice",
     text: "Tax category codes are assigned and validated at line level, never rolled up to the invoice. Exempt lines auto-match to the correct exemption reason at master-data load.",
   },
   {
+    icon: "/images/retail-consumer/glob-2.png",
     title: "Off-plan sales are billed in stages, and credit notes are common",
     text: "Instalment schedules auto-generate a compliant e-invoice at each milestone trigger, with the tax point set to the contractual event. Post-transmission amendment is blocked.",
   },
   {
+    icon: "/images/retail-consumer/glob-3.png",
     title:
       "Long-term leases create recurring invoices across every payment cycle",
     text: "Each periodic invoice generates from the lease master rather than the finance calendar, tagged as a continuous supply with the tax point set to the instalment due date.",
   },
   {
+    icon: "/images/retail-consumer/glob-4.png",
     title:
       "Transfers between group entities still require valid invoices at arm's length",
     text: "A live entity register maps every vehicle and joint venture against VAT-group membership, so the engine knows in real time whether a transfer is disregarded or invoiceable.",
   },
   {
+    icon: "/images/retail-consumer/glob-5.png",
     title:
       "Retention is held back on every invoice but must still appear as a separate line",
     text: "Retention is structured as a distinct, correctly classified line item on every interim bill, never a bottom-line deduction. Unapproved variations are blocked from invoice generation.",
   },
   {
+    icon: "/images/retail-consumer/glob-6.png",
     title: "Property records outlive every other tax document",
     text: "The archive stores the structured document at line level for the longest window that applies in each market, exportable in open UBL or the original national format at any time.",
   },
@@ -59,18 +66,28 @@ const cards: TradeCard[] = [
       <div class="flex flex-col gap-12">
         <div class="w-full h-auto">
           <div
-            class="trade-track flex items-start gap-12 w-max transition-transform duration-[250ms] ease-out will-change-transform"
+            class="trade-track relative flex items-start gap-12 w-max transition-transform duration-[250ms] ease-out will-change-transform"
             data-trade-track
           >
             {
-              cards.map((card) => (
-                <div class="trade-card flex flex-col gap-6 shrink-0 w-[85vw] sm:w-105 lg:w-[560px] select-none">
-                  <div class="trade-card-img aspect-[1280/720] w-full bg-visual-placeholder rounded-lg pointer-events-none" />
-                  <div class="flex flex-col gap-4 pointer-events-none">
-                    <p class="trade-card-title m-0 font-heading font-medium text-vault-navy text-[length:var(--fs-h5)] leading-[length:var(--lh-h5)] tracking-[-0.5px]">
+              cards.map((card, index) => (
+                <div
+                  class={`trade-card flex flex-col shrink-0 w-[85vw] sm:w-[480px] lg:w-[560px] max-sm:h-[340px] md:h-[310px] lg:h-[330px] rounded-xl border border-neutral-200 bg-generic-00 p-5 lg:p-6 select-none ${index === 0 ? "is-reached" : ""}`}
+                >
+                  <img
+                    src={card.icon}
+                    alt=""
+                    width="64"
+                    height="64"
+                    class="w-16 h-16 shrink-0 object-contain pointer-events-none mb-6"
+                    loading="lazy"
+                    decoding="async"
+                  />
+                  <div class="flex flex-col max-w-[422px] pointer-events-none">
+                    <p class="trade-card-title m-0 font-heading font-medium text-text-default text-xl lg:text-[24px] leading-[1.33] tracking-[-0.5px] mb-3 lg:mb-4">
                       {card.title}
                     </p>
-                    <p class="trade-card-desc m-0 font-body text-neutral-500 text-[length:var(--fs-body-lg)] leading-[length:var(--lh-body-lg)]">
+                    <p class="trade-card-desc m-0 font-body text-[#6B7280] text-base lg:text-lg leading-normal">
                       {card.text}
                     </p>
                   </div>
@@ -107,6 +124,8 @@ const cards: TradeCard[] = [
         const fill = container.querySelector("[data-trade-fill]");
         if (!track || !section) return;
 
+        const cards = track.querySelectorAll(".trade-card");
+
         const getHeaderHeight = () => {
           const header = document.querySelector("header, .navbar, .w-nav");
           return header ? header.offsetHeight : 80;
@@ -115,6 +134,8 @@ const cards: TradeCard[] = [
         let maxTranslate = 0;
         let totalScrollable = 0;
         let stickyTop = 0;
+        let cardOffsets = [];
+        let totalTrackWidth = 0;
 
         const updateMeasurements = () => {
           const sectionHeight = section.offsetHeight;
@@ -141,6 +162,9 @@ const cards: TradeCard[] = [
           container.style.height = `${maxTranslate + windowHeight}px`;
           totalScrollable =
             container.getBoundingClientRect().height - sectionHeight;
+
+          totalTrackWidth = track.scrollWidth;
+          cardOffsets = Array.from(cards).map((c) => c.offsetLeft);
         };
 
         updateMeasurements();
@@ -168,6 +192,19 @@ const cards: TradeCard[] = [
 
             if (fill) {
               fill.style.width = `${progress * 100}%`;
+            }
+
+            if (cards.length && totalTrackWidth > 0) {
+              const currentFilledDistance = progress * totalTrackWidth;
+              cards.forEach((cardEl, i) => {
+                if (i === 0) {
+                  cardEl.classList.add("is-reached");
+                  return;
+                }
+                const isReached =
+                  currentFilledDistance >= (cardOffsets[i] || 0) - 2;
+                cardEl.classList.toggle("is-reached", isReached);
+              });
             }
 
             ticking = false;
@@ -202,3 +239,18 @@ const cards: TradeCard[] = [
     }
   })();
 </script>
+
+<style is:global>
+  .trade-card-title,
+  .trade-card-desc {
+    transition: opacity 300ms ease;
+  }
+  .trade-card:not(.is-reached) .trade-card-title,
+  .trade-card:not(.is-reached) .trade-card-desc {
+    opacity: 0.4;
+  }
+  .trade-card.is-reached .trade-card-title,
+  .trade-card.is-reached .trade-card-desc {
+    opacity: 1;
+  }
+</style>

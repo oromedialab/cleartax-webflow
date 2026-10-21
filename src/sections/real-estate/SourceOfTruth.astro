@@ -36,6 +36,27 @@ import FlowCanvas, {
   type FlowWire,
 } from "./FlowCanvas.astro";
 
+const FLOW_COLOR: Record<string, string> = {
+  purple: "bg-[#5446FF]",
+  orange: "bg-[#F97316]",
+  green: "bg-[#10B981]",
+  grey: "bg-[#6B7280]",
+};
+
+const erpChecklist = [
+  "Output tax (commercial supply)",
+  "Residential relief (exempt or zero)",
+  "Reverse charge (where it applies)",
+  "Input tax recovery",
+  "Archival & validation per market",
+];
+
+const receives = [
+  { tag: "purple", label: "Output VAT / GST" },
+  { tag: "orange", label: "Reverse charge" },
+  { tag: "green", label: "Input VAT • GL" },
+];
+
 // Row gap is 40px (not the original 24px) ONLY directly above a
 // `directToGL` card — that's the room FlowCanvas.astro's floating "Direct →
 // GL" badge needs to clear both the card above it (8px) and its own top
@@ -289,7 +310,7 @@ const marketplaceWires: FlowWire[] = [
 <section class="bg-generic-00 border-t border-neutral-200 py-16 lg:py-20">
   <div class="max-w-[var(--container-max)] w-full mx-auto px-4 md:px-6">
     <div class="rounded-xl border border-neutral-200 p-6 lg:p-8">
-      <div class="flex items-center justify-between gap-4 mb-12">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8 md:mb-12">
         <h2
           class="m-0 font-heading font-medium text-vault-navy text-[length:var(--fs-h1)] leading-[length:var(--lh-h1)] tracking-[-0.5px] text-balance"
         >
@@ -318,7 +339,7 @@ const marketplaceWires: FlowWire[] = [
         </div>
       </div>
 
-      <div class="sot-stage relative w-full" data-sot-stage>
+      <div class="sot-stage relative w-full hidden md:block" data-sot-stage>
         <div
           class="sot-track absolute top-0 left-0"
           style={`width:${CANVAS_W}px;height:${CANVAS_H}px;`}
@@ -343,6 +364,282 @@ const marketplaceWires: FlowWire[] = [
             wires={marketplaceWires}
           />
         </div>
+      </div>
+
+      <!-- Mobile Flow Layout (< 768px, matching mobile design reference) -->
+      <div class="block md:hidden">
+        {
+          [
+            {
+              id: "channels",
+              active: true,
+              sourcesLabel: "SOURCES",
+              sourceCards: channelsSources,
+              billingCards: channelsBilling,
+            },
+            {
+              id: "marketplaces",
+              active: false,
+              sourcesLabel: "CONSTRUCTION & PROCUREMENT",
+              sourceCards: marketplaceSources,
+              billingCards: marketplaceBilling,
+            },
+          ].map((panel) => (
+            <div
+              class:list={["flex flex-col", !panel.active && "hidden"]}
+              data-sot-mobile-panel={panel.id}
+            >
+              <!-- 1. Sources Column -->
+              <div class="flex flex-col">
+                <p class="m-0 font-body font-semibold text-vault-navy text-xs tracking-[1px] uppercase mb-3">
+                  {panel.sourcesLabel}
+                </p>
+                <div class="flex flex-col gap-3">
+                  {panel.sourceCards.map((c) => (
+                    <div class="flex gap-4 rounded-xl border border-neutral-200 bg-generic-00 p-4">
+                      <span class={`w-1 shrink-0 rounded-lg ${FLOW_COLOR[c.tag]}`} />
+                      <div class="flex flex-col gap-1.5">
+                        <p class="m-0 font-body font-semibold text-vault-navy text-base leading-snug">
+                          {c.title}
+                        </p>
+                        <p class="m-0 font-body text-neutral-500 text-xs sm:text-sm leading-relaxed whitespace-pre-line">
+                          {c.desc}
+                        </p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <!-- Connector 1: Sources -> Billing -->
+              <div class="flex justify-center py-3" data-sot-conn="1">
+                <svg width="14" height="38" viewBox="0 0 14 38" fill="none" class="overflow-visible" aria-hidden="true">
+                  <line
+                    x1="7"
+                    y1="0"
+                    x2="7"
+                    y2="28"
+                    stroke="#5446FF"
+                    stroke-width="2"
+                    stroke-dasharray="5 4"
+                    stroke-linecap="round"
+                    data-sot-mobile-line
+                  />
+                  <path
+                    d="M3.5 24L7 31L10.5 24"
+                    stroke="#5446FF"
+                    stroke-width="1.8"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  />
+                </svg>
+              </div>
+
+              <!-- 2. Billing / Tax-Doc Column -->
+              <div class="flex flex-col">
+                <p class="m-0 font-body font-semibold text-vault-navy text-xs tracking-[1px] uppercase mb-3">
+                  BILLING / TAX-DOC
+                </p>
+                <div class="flex flex-col gap-3">
+                  {panel.billingCards.map((c) => (
+                    <div class="flex gap-4 rounded-xl border border-neutral-200 bg-generic-00 p-4">
+                      <span class={`w-1 shrink-0 rounded-lg ${FLOW_COLOR[c.tag]}`} />
+                      <div class="flex flex-col gap-1.5">
+                        <p class="m-0 font-body font-semibold text-vault-navy text-base leading-snug">
+                          {c.title}
+                        </p>
+                        <p class="m-0 font-body text-neutral-500 text-xs sm:text-sm leading-relaxed whitespace-pre-line">
+                          {c.desc}
+                        </p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <!-- Connector 2: Billing -> ERP GL + Middleware Badge -->
+              <div class="flex items-center gap-3.5 my-3" data-sot-conn="2">
+                <div class="flex flex-col items-center pl-7 sm:pl-8">
+                  <svg width="14" height="36" viewBox="0 0 14 36" fill="none" class="overflow-visible" aria-hidden="true">
+                    <line
+                      x1="7"
+                      y1="0"
+                      x2="7"
+                      y2="26"
+                      stroke="#5446FF"
+                      stroke-width="2"
+                      stroke-dasharray="5 4"
+                      stroke-linecap="round"
+                      data-sot-mobile-line
+                    />
+                    <path
+                      d="M3.5 22L7 29L10.5 22"
+                      stroke="#5446FF"
+                      stroke-width="1.8"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    />
+                  </svg>
+                </div>
+                <div class="relative inline-flex items-center justify-center rounded-xl border border-dashed border-success-500 bg-generic-00 px-3.5 py-1.5">
+                  <p class="m-0 font-body font-medium text-success-600 text-xs sm:text-sm whitespace-nowrap">
+                    Middleware · feed as required
+                  </p>
+                </div>
+              </div>
+
+              <!-- 3. ERP · GL Column -->
+              <div class="flex flex-col">
+                <p class="m-0 font-body font-medium text-nova-blue text-xs tracking-wider uppercase mb-3">
+                  ERP · GL
+                </p>
+                <div class="flex gap-4 rounded-xl border border-neutral-200 bg-generic-00 p-4">
+                  <span class="w-1 shrink-0 rounded-lg bg-nova-blue" />
+                  <div class="flex flex-col gap-3 flex-1">
+                    <div class="flex flex-col gap-1">
+                      <p class="m-0 font-body font-semibold text-vault-navy text-base leading-snug">
+                        ERP GL
+                      </p>
+                      <p class="m-0 font-body text-neutral-500 text-xs sm:text-sm">
+                        SAP · Oracle · Dynamics 365
+                      </p>
+                    </div>
+                    <ul class="m-0 flex flex-col gap-2 list-none p-0 mt-1">
+                      {erpChecklist.map((item) => (
+                        <li class="flex items-center gap-2 font-body text-neutral-500 text-xs sm:text-sm">
+                          <svg
+                            width="16"
+                            height="16"
+                            viewBox="0 0 16 16"
+                            fill="none"
+                            class="shrink-0"
+                            aria-hidden="true"
+                          >
+                            <circle cx="8" cy="8" r="8" fill="#5446FF" />
+                            <path
+                              d="M4.5 8.2 6.8 10.5 11.5 5.5"
+                              stroke="white"
+                              stroke-width="1.3"
+                              stroke-linecap="round"
+                              stroke-linejoin="round"
+                            />
+                          </svg>
+                          <span>{item}</span>
+                        </li>
+                      ))}
+                    </ul>
+                    <div class="h-px w-full bg-neutral-200 my-1" />
+                    <p class="m-0 font-body font-medium text-nova-blue text-[11px] sm:text-xs tracking-wide uppercase">
+                      THE CONSTANT NODE - EVERY TXN SETTLES HERE
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Connector 3: ERP GL -> cleartax (3 vertical arrows: blue, orange, green) -->
+              <div class="flex items-center justify-center gap-2.5 py-3" data-sot-conn="3">
+                <!-- Blue Arrow -->
+                <svg width="12" height="36" viewBox="0 0 12 36" fill="none" class="overflow-visible" aria-hidden="true">
+                  <line
+                    x1="6"
+                    y1="0"
+                    x2="6"
+                    y2="26"
+                    stroke="#5446FF"
+                    stroke-width="2"
+                    stroke-dasharray="5 4"
+                    stroke-linecap="round"
+                    data-sot-mobile-line
+                  />
+                  <path
+                    d="M2.5 22L6 29L9.5 22"
+                    stroke="#5446FF"
+                    stroke-width="1.8"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  />
+                </svg>
+                <!-- Orange Arrow -->
+                <svg width="12" height="36" viewBox="0 0 12 36" fill="none" class="overflow-visible" aria-hidden="true">
+                  <line
+                    x1="6"
+                    y1="0"
+                    x2="6"
+                    y2="26"
+                    stroke="#F59E0B"
+                    stroke-width="2"
+                    stroke-dasharray="5 4"
+                    stroke-linecap="round"
+                    data-sot-mobile-line
+                  />
+                  <path
+                    d="M2.5 22L6 29L9.5 22"
+                    stroke="#F59E0B"
+                    stroke-width="1.8"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  />
+                </svg>
+                <!-- Green Arrow -->
+                <svg width="12" height="36" viewBox="0 0 12 36" fill="none" class="overflow-visible" aria-hidden="true">
+                  <line
+                    x1="6"
+                    y1="0"
+                    x2="6"
+                    y2="26"
+                    stroke="#10B981"
+                    stroke-width="2"
+                    stroke-dasharray="5 4"
+                    stroke-linecap="round"
+                    data-sot-mobile-line
+                  />
+                  <path
+                    d="M2.5 22L6 29L9.5 22"
+                    stroke="#10B981"
+                    stroke-width="1.8"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  />
+                </svg>
+              </div>
+
+              <!-- 4. cleartax Multi-Mandate Engine Card -->
+              <div class="flex flex-col gap-4 rounded-xl border-2 border-neutral-400 bg-generic-00 p-5">
+                <div class="flex flex-col gap-1.5">
+                  <p class="m-0 font-heading font-semibold text-vault-navy text-2xl tracking-tight">
+                    cleartax
+                  </p>
+                  <p class="m-0 font-body font-semibold text-nova-blue text-base">
+                    multi-mandate engine
+                  </p>
+                </div>
+                <div class="h-px w-full bg-neutral-200" />
+                <div class="flex flex-col gap-2.5">
+                  <p class="m-0 font-body font-semibold text-vault-navy text-xs tracking-wider uppercase">
+                    RECEIVES
+                  </p>
+                  <ul class="m-0 flex flex-col gap-2.5 list-none p-0">
+                    {receives.map((r) => (
+                      <li class="flex items-center gap-2.5 font-body text-neutral-600 text-xs sm:text-sm">
+                        <span class={`h-3.5 w-3.5 shrink-0 rounded-xs ${FLOW_COLOR[r.tag]}`} />
+                        <span>{r.label}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+                <div class="h-px w-full bg-neutral-200" />
+                <div class="flex flex-col gap-1">
+                  <p class="m-0 font-body font-semibold text-vault-navy text-xs sm:text-sm">
+                    Single source of tax truth
+                  </p>
+                  <p class="m-0 font-body text-neutral-500 text-xs sm:text-sm leading-relaxed whitespace-pre-line">
+                    {"- Audit-proof\n- Reconciled\n- Archived"}
+                  </p>
+                </div>
+              </div>
+            </div>
+          ))
+        }
       </div>
     </div>
   </div>
@@ -579,6 +876,66 @@ const marketplaceWires: FlowWire[] = [
       }
     }
 
+    function animateMobileLines(panel) {
+      if (!panel || panel.dataset.sotAnimated === "true") return;
+      panel.dataset.sotAnimated = "true";
+      if (prefersReducedMotion) return;
+
+      const gsap = window.gsap;
+      if (!gsap) return;
+
+      const lines = Array.from(panel.querySelectorAll("[data-sot-mobile-line]"));
+      if (!lines.length) return;
+
+      lines.forEach((line) => {
+        const y1 = Number(line.getAttribute("y1"));
+        const y2 = Number(line.getAttribute("y2"));
+        line.dataset.finalY2 = String(y2);
+        gsap.set(line, { attr: { y2: y1 } });
+      });
+
+      const tl = gsap.timeline({ delay: 0.15 });
+
+      // Group 1: Connector 1 (Sources -> Billing)
+      const conn1 = panel.querySelector("[data-sot-conn='1'] [data-sot-mobile-line]");
+      if (conn1) {
+        tl.to(conn1, {
+          attr: { y2: Number(conn1.dataset.finalY2) },
+          duration: 0.35,
+          ease: EASE,
+        });
+      }
+
+      // Group 2: Connector 2 (Billing -> ERP GL)
+      const conn2 = panel.querySelector("[data-sot-conn='2'] [data-sot-mobile-line]");
+      if (conn2) {
+        tl.to(
+          conn2,
+          {
+            attr: { y2: Number(conn2.dataset.finalY2) },
+            duration: 0.35,
+            ease: EASE,
+          },
+          "+=0.1",
+        );
+      }
+
+      // Group 3: Connector 3 (ERP GL -> cleartax: 3 arrows)
+      const conn3 = panel.querySelectorAll("[data-sot-conn='3'] [data-sot-mobile-line]");
+      if (conn3.length) {
+        tl.to(
+          conn3,
+          {
+            attr: { y2: (i, target) => Number(target.dataset.finalY2) },
+            duration: 0.35,
+            stagger: 0.08,
+            ease: EASE,
+          },
+          "+=0.1",
+        );
+      }
+    }
+
     document.querySelectorAll("[data-sot-stage]").forEach((stage) => {
       const track = stage.querySelector("[data-sot-track]");
       if (!track) return;
@@ -586,6 +943,7 @@ const marketplaceWires: FlowWire[] = [
       const designHeight = track.offsetHeight;
 
       const resize = () => {
+        if (!stage.offsetParent) return;
         const scale = stage.clientWidth / designWidth;
         track.style.transform = `scale(${scale})`;
         track.style.transformOrigin = "top left";
@@ -595,26 +953,36 @@ const marketplaceWires: FlowWire[] = [
       window.addEventListener("resize", resize);
       resize();
 
-      const tabsRoot = stage.parentElement.querySelector("[data-sot-tabs]");
+      const cardContainer = stage.parentElement;
+      const tabsRoot = cardContainer.querySelector("[data-sot-tabs]");
       const tabs = tabsRoot ? tabsRoot.querySelectorAll("[data-sot-tab]") : [];
       const panels = track.querySelectorAll("[data-sot-panel]");
+      const mobilePanels = cardContainer.querySelectorAll("[data-sot-mobile-panel]");
 
       let hasEnteredView = false;
       const activePanel = () =>
         Array.from(panels).find((p) => !p.classList.contains("hidden"));
+      const activeMobilePanel = () =>
+        Array.from(mobilePanels).find((p) => !p.classList.contains("hidden"));
 
       const observer = new IntersectionObserver(
         (entries) => {
           entries.forEach((entry) => {
             if (!entry.isIntersecting) return;
             hasEnteredView = true;
-            loadGsap(() => animatePanel(activePanel()));
+            loadGsap(() => {
+              if (window.innerWidth >= 768) {
+                animatePanel(activePanel());
+              } else {
+                animateMobileLines(activeMobilePanel());
+              }
+            });
             observer.disconnect();
           });
         },
-        { threshold: 0.2 },
+        { threshold: 0.15 },
       );
-      observer.observe(stage);
+      observer.observe(cardContainer);
 
       tabs.forEach((tab) => {
         tab.addEventListener("click", () => {
@@ -628,10 +996,21 @@ const marketplaceWires: FlowWire[] = [
               p.getAttribute("data-sot-panel") !== key,
             ),
           );
-          // If the diagram was already visible before this switch, the
-          // panel being switched TO has never had its own draw-in — play it
-          // now instead of leaving it permanently hidden mid-animation.
-          if (hasEnteredView) loadGsap(() => animatePanel(activePanel()));
+          mobilePanels.forEach((p) =>
+            p.classList.toggle(
+              "hidden",
+              p.getAttribute("data-sot-mobile-panel") !== key,
+            ),
+          );
+          if (hasEnteredView) {
+            loadGsap(() => {
+              if (window.innerWidth >= 768) {
+                animatePanel(activePanel());
+              } else {
+                animateMobileLines(activeMobilePanel());
+              }
+            });
+          }
         });
       });
     });

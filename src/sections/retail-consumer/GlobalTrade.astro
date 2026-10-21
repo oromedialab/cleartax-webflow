@@ -13,35 +13,42 @@
  * affordance of its own.
  */
 interface TradeCard {
+  icon: string;
   title: string;
   text: string;
 }
 
 const cards: TradeCard[] = [
   {
+    icon: "/images/retail-consumer/glob-1.png",
     title: "The checkout must decide B2B or B2C before the invoice is issued",
     text: "ClearTax sits between the POS and every tax authority, branches B2B from B2C automatically, captures the buyer tax ID at swipe, and applies each country's model.",
   },
   {
+    icon: "/images/retail-consumer/glob-2.png",
     title:
       "A single receipt can carry four different tax treatments at line level",
     text: "Every SKU is validated against the code list of each country you sell in, with rate as well as category checked before issuance, so misclassified items never reach a gateway.",
   },
   {
+    icon: "/images/retail-consumer/glob-3.png",
     title:
       "Returns and refunds require a credit note tied to the original invoice",
     text: "Every credit note auto-links to its parent document ID, each POS return reason maps to the correct national code, and a ten-year retrieval index is held.",
   },
   {
+    icon: "/images/retail-consumer/glob-4.png",
     title: "Marketplaces self-bill on behalf of sellers — at enormous scale",
     text: "The marketplace SDK generates 12,000+ type-389 invoices in a single batch API call and validates every seller tax ID against the national registry pre-submission.",
   },
   {
+    icon: "/images/retail-consumer/glob-5.png",
     title:
       "Duty-free sales carry no tax — but only if the exit conditions are met",
     text: "Boarding-pass details are captured at swipe and attached as evidence via BT-125, with the line tagged BT-151 = G, clearing 4,500 daily transactions with the evidence chain intact.",
   },
   {
+    icon: "/images/retail-consumer/glob-6.png",
     title:
       "Franchisors can issue one consolidated invoice across all franchisee activity",
     text: "Delivery data from your POS or WMS aggregates into one summary invoice per franchisee per period, each delivery preserved as a distinct line, meeting each country's aggregation rules.",
@@ -65,18 +72,28 @@ const cards: TradeCard[] = [
       <div class="flex flex-col gap-12">
         <div class="w-full h-auto">
           <div
-            class="trade-track flex items-start gap-12 w-max transition-transform duration-[250ms] ease-out will-change-transform"
+            class="trade-track relative flex items-start gap-12 w-max transition-transform duration-[250ms] ease-out will-change-transform"
             data-trade-track
           >
             {
-              cards.map((card) => (
-                <div class="trade-card flex flex-col gap-6 shrink-0 w-[85vw] sm:w-105 lg:w-[560px] select-none">
-                  <div class="trade-card-img aspect-[1280/720] w-full bg-visual-placeholder rounded-lg pointer-events-none" />
-                  <div class="flex flex-col gap-4 pointer-events-none">
-                    <p class="trade-card-title m-0 font-heading font-medium text-vault-navy text-[length:var(--fs-h5)] leading-[length:var(--lh-h5)] tracking-[-0.5px]">
+              cards.map((card, index) => (
+                <div
+                  class={`trade-card flex flex-col shrink-0 w-[85vw] sm:w-[480px] lg:w-[560px] max-sm:h-[340px] md:h-[310px] lg:h-[330px] rounded-xl border border-neutral-200 bg-generic-00 p-5 lg:p-6 select-none ${index === 0 ? "is-reached" : ""}`}
+                >
+                  <img
+                    src={card.icon}
+                    alt=""
+                    width="64"
+                    height="64"
+                    class="w-16 h-16 shrink-0 object-contain pointer-events-none mb-6"
+                    loading="lazy"
+                    decoding="async"
+                  />
+                  <div class="flex flex-col max-w-[422px] pointer-events-none">
+                    <p class="trade-card-title m-0 font-heading font-medium text-text-default text-xl lg:text-[24px] leading-[1.33] tracking-[-0.5px] mb-3 lg:mb-4">
                       {card.title}
                     </p>
-                    <p class="trade-card-desc m-0 font-body text-neutral-500 text-[length:var(--fs-body-lg)] leading-[length:var(--lh-body-lg)]">
+                    <p class="trade-card-desc m-0 font-body text-[#6B7280] text-base lg:text-lg leading-normal">
                       {card.text}
                     </p>
                   </div>
@@ -113,6 +130,8 @@ const cards: TradeCard[] = [
         const fill = container.querySelector("[data-trade-fill]");
         if (!track || !section) return;
 
+        const cards = track.querySelectorAll(".trade-card");
+
         const getHeaderHeight = () => {
           const header = document.querySelector("header, .navbar, .w-nav");
           return header ? header.offsetHeight : 80;
@@ -121,6 +140,8 @@ const cards: TradeCard[] = [
         let maxTranslate = 0;
         let totalScrollable = 0;
         let stickyTop = 0;
+        let cardOffsets = [];
+        let totalTrackWidth = 0;
 
         const updateMeasurements = () => {
           const sectionHeight = section.offsetHeight;
@@ -147,6 +168,9 @@ const cards: TradeCard[] = [
           container.style.height = `${maxTranslate + windowHeight}px`;
           totalScrollable =
             container.getBoundingClientRect().height - sectionHeight;
+
+          totalTrackWidth = track.scrollWidth;
+          cardOffsets = Array.from(cards).map((c) => c.offsetLeft);
         };
 
         updateMeasurements();
@@ -174,6 +198,19 @@ const cards: TradeCard[] = [
 
             if (fill) {
               fill.style.width = `${progress * 100}%`;
+            }
+
+            if (cards.length && totalTrackWidth > 0) {
+              const currentFilledDistance = progress * totalTrackWidth;
+              cards.forEach((cardEl, i) => {
+                if (i === 0) {
+                  cardEl.classList.add("is-reached");
+                  return;
+                }
+                const isReached =
+                  currentFilledDistance >= (cardOffsets[i] || 0) - 2;
+                cardEl.classList.toggle("is-reached", isReached);
+              });
             }
 
             ticking = false;
@@ -208,3 +245,18 @@ const cards: TradeCard[] = [
     }
   })();
 </script>
+
+<style is:global>
+  .trade-card-title,
+  .trade-card-desc {
+    transition: opacity 300ms ease;
+  }
+  .trade-card:not(.is-reached) .trade-card-title,
+  .trade-card:not(.is-reached) .trade-card-desc {
+    opacity: 0.4;
+  }
+  .trade-card.is-reached .trade-card-title,
+  .trade-card.is-reached .trade-card-desc {
+    opacity: 1;
+  }
+</style>
