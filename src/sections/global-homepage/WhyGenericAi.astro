@@ -3350,6 +3350,30 @@ html.w-mod-touch * {
     }
   }
 
+  .gh-ct-card0-top-stage,
+  .gh-ct-card1-top-stage,
+  .gh-ct-card2-top-stage,
+  .gh-ct-card3-top-stage,
+  .gh-ct-card4-top-stage {
+    margin-bottom: auto !important;
+  }
+
+  .gh-ct-card0-bottom-stage,
+  .gh-ct-card1-bottom-stage,
+  .gh-ct-card2-bottom-stage,
+  .gh-ct-card3-bottom-stage,
+  .gh-ct-card4-bottom-stage {
+    margin-top: auto !important;
+  }
+
+  .gh-why-animation-card-0,
+  .gh-why-animation-card-1,
+  .gh-why-animation-card-2,
+  .gh-why-animation-card-3,
+  .gh-why-animation-card-4 {
+    justify-content: flex-end !important;
+  }
+
   /* Ensure 5th card chart image and elements are strictly hidden until Frame 5 animation reveals them */
   .gh-card4-chart:not(.is-revealed),
   .gh-card4-chart:not(.is-revealed) .gh-card4-chart-header,
@@ -3584,10 +3608,23 @@ html.w-mod-touch * {
         for (let i = 0; i < 5; i++) {
           // 1. Ensure bottom-stage contains both spinner and input-box so spinner isn't spaced to center by justify-between
           const animCard = document.querySelector(`.gh-why-animation-card-${i}`);
+          const topStage = animCard ? animCard.querySelector(`.gh-ct-card${i}-top-stage`) : document.querySelector(`.gh-ct-card${i}-top-stage`);
           const bottomStage = animCard ? animCard.querySelector(`.gh-ct-card${i}-bottom-stage`) : document.querySelector(`.gh-ct-card${i}-bottom-stage`);
           const spinner = document.querySelector(`.gh-ct-card${i}-spinner`);
           const inputBox = document.querySelector(`.gh-ct-card${i}-input-box`);
+          if (animCard) {
+            animCard.style.justifyContent = "flex-end";
+            animCard.querySelectorAll(":scope > .w-embed").forEach((we) => {
+              if (!we.textContent.trim() && !we.querySelector("div, button, svg, span, p")) {
+                we.remove();
+              }
+            });
+          }
+          if (topStage) {
+            topStage.style.setProperty("margin-bottom", "auto", "important");
+          }
           if (bottomStage) {
+            bottomStage.style.setProperty("margin-top", "auto", "important");
             if (spinner && !bottomStage.contains(spinner)) {
               bottomStage.insertBefore(spinner, bottomStage.firstChild);
             }
@@ -3665,9 +3702,18 @@ html.w-mod-touch * {
               ctTyped.dataset.cached = "true";
               ctTyped.textContent = "";
             }
+            if (i === 0) {
+              const ctInputTyped = document.querySelector(".gh-ct-card0-input-typed");
+              if (ctInputTyped && ctTyped && !ctInputTyped.contains(ctTyped)) {
+                ctInputTyped.appendChild(ctTyped);
+              }
+            } else {
+              if (ctTextWrap && ctTyped && !ctTextWrap.contains(ctTyped)) {
+                ctTextWrap.appendChild(ctTyped);
+              }
+            }
             if (ctTextWrap) {
               if (ctPlaceholder && !ctTextWrap.contains(ctPlaceholder)) ctTextWrap.appendChild(ctPlaceholder);
-              if (ctTyped && !ctTextWrap.contains(ctTyped)) ctTextWrap.appendChild(ctTyped);
               if (ctThinking && !ctTextWrap.contains(ctThinking)) ctTextWrap.appendChild(ctThinking);
             }
             if (ctSubmitBtn && !ctRow.contains(ctSubmitBtn)) {
@@ -4671,7 +4717,7 @@ html.w-mod-touch * {
         tl.to(pillPlaceholder, { opacity: 0, duration: 0.15 }, "<+=0.04");
         tl.set(pillPlaceholder, { display: "none" });
         if (inputTyped) {
-          tl.set(inputTyped, { display: "block", height: "auto", minHeight: "40px", opacity: 1 }, "<");
+          tl.set(inputTyped, { display: "block", height: "auto", minHeight: "auto", opacity: 1 }, "<");
         }
 
         // Text prompt types out character by character
