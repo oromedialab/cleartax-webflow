@@ -909,7 +909,13 @@ function toBlocks(items: NavChild[]): Block[] {
         .querySelector("[data-sub-trigger]")
         ?.addEventListener("click", (e) => {
           e.preventDefault();
-          setSubOpen(item, !item.classList.contains("open"));
+          const willOpen = !item.classList.contains("open");
+          if (willOpen) {
+            subItems.forEach((other) => {
+              if (other !== item) setSubOpen(other, false);
+            });
+          }
+          setSubOpen(item, willOpen);
         });
     });
 
@@ -928,7 +934,13 @@ function toBlocks(items: NavChild[]): Block[] {
       item
         .querySelector("[data-top-trigger]")
         ?.addEventListener("click", () => {
-          setTopOpen(item, !item.classList.contains("open"));
+          const willOpen = !item.classList.contains("open");
+          if (willOpen) {
+            topItems.forEach((other) => {
+              if (other !== item) setTopOpen(other, false);
+            });
+          }
+          setTopOpen(item, willOpen);
         });
     });
 

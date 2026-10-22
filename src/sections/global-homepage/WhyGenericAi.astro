@@ -3350,6 +3350,15 @@ html.w-mod-touch * {
     }
   }
 
+  .gh-ct-card0-spinner:not(.is-active),
+  .gh-ct-card1-spinner:not(.is-active),
+  .gh-ct-card2-spinner:not(.is-active),
+  .gh-ct-card3-spinner:not(.is-active),
+  .gh-ct-card4-spinner:not(.is-active) {
+    display: none !important;
+    opacity: 0 !important;
+  }
+
   .gh-ct-card0-top-stage,
   .gh-ct-card1-top-stage,
   .gh-ct-card2-top-stage,
@@ -3363,6 +3372,14 @@ html.w-mod-touch * {
   .gh-ct-card2-bottom-stage,
   .gh-ct-card3-bottom-stage,
   .gh-ct-card4-bottom-stage {
+    margin-top: auto !important;
+  }
+
+  .gh-card0-input-container,
+  .gh-card1-input-container,
+  .gh-card2-input-container,
+  .gh-card3-input-container,
+  .gh-card4-input-container {
     margin-top: auto !important;
   }
 
@@ -3625,8 +3642,13 @@ html.w-mod-touch * {
           }
           if (bottomStage) {
             bottomStage.style.setProperty("margin-top", "auto", "important");
-            if (spinner && !bottomStage.contains(spinner)) {
-              bottomStage.insertBefore(spinner, bottomStage.firstChild);
+            if (spinner) {
+              spinner.classList.remove("is-active");
+              spinner.style.display = "none";
+              spinner.style.opacity = "0";
+              if (!bottomStage.contains(spinner)) {
+                bottomStage.insertBefore(spinner, bottomStage.firstChild);
+              }
             }
             if (inputBox && !bottomStage.contains(inputBox)) {
               bottomStage.appendChild(inputBox);
@@ -3672,7 +3694,22 @@ html.w-mod-touch * {
           }
 
           const pill = document.querySelector(`.gh-card${i}-input-pill`);
+          const inputContainer = document.querySelector(`.gh-card${i}-input-container`);
           const submitBtn = document.querySelector(`.gh-card${i}-submit-btn`);
+
+          // Ensure ClearTax inputContainer and pill are kept cleanly inside genCard
+          if (genCard) {
+            if (inputContainer && !genCard.contains(inputContainer)) {
+              genCard.appendChild(inputContainer);
+            } else if (pill && !genCard.contains(pill)) {
+              if (inputContainer) {
+                inputContainer.appendChild(pill);
+              } else {
+                genCard.appendChild(pill);
+              }
+            }
+          }
+
           if (pill) {
             const textWrap = pill.querySelector(".min-w-0.flex-1");
             const placeholder = document.querySelector(`.gh-card${i}-pill-placeholder`);
@@ -4565,6 +4602,9 @@ html.w-mod-touch * {
         });
 
         // Frame 1: Initial state
+        tl.add(() => {
+          if (spinner) spinner.classList.remove("is-active");
+        });
         tl.set([resultGroup, sentGroup, sentBubble, spinner].filter(Boolean), { display: "none" });
         tl.set(resultGroup, { opacity: 0, pointerEvents: "none" });
         tl.set(resultHeader, { opacity: 0, y: 6 });
@@ -4824,6 +4864,9 @@ html.w-mod-touch * {
         );
 
         // Spinner ("Analyzing uploaded file…") fades in
+        tl.add(() => {
+          if (spinner) spinner.classList.add("is-active");
+        });
         tl.set(spinner, { display: "flex" });
         tl.to(
           spinner,
@@ -4920,6 +4963,7 @@ html.w-mod-touch * {
         );
         tl.set([sentGroup, sentBubble, spinner].filter(Boolean), { display: "none", opacity: 0, pointerEvents: "none" });
         tl.add(() => {
+          if (spinner) spinner.classList.remove("is-active");
           if (sentGroup) sentGroup.classList.add("hidden");
           if (sentBubble) sentBubble.classList.add("hidden");
           if (resultGroup) resultGroup.classList.remove("hidden");
