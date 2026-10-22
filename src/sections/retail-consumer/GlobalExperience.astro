@@ -41,39 +41,51 @@ const items: MandateItem[] = [
           Global experience,<br />mandate after mandate.
         </h2>
 
-        <div class="flex flex-col gap-12" data-mandate-root>
+        <div class="flex flex-col relative" data-mandate-root>
           {
             items.map((item, i) => (
-              <button
-                type="button"
+              <div
                 class:list={[
-                  "mandate-item flex flex-col gap-4 text-left bg-transparent border-0 p-0 cursor-pointer font-[inherit]",
-                  i === 0 && "mandate-open",
+                  "mandate-item flex flex-col cursor-pointer group",
+                  i === 0 && "active",
                 ]}
                 data-mandate-item
+                data-index={i}
               >
-                <div class="flex flex-col gap-3">
-                  <p class="m-0 font-heading font-medium text-vault-navy text-[length:var(--fs-h5)] leading-[length:var(--lh-h5)] tracking-[-0.5px]">
-                    {item.title}
-                  </p>
-                  <p class="mandate-stat m-0 font-heading font-medium text-vault-navy text-[length:var(--fs-h6)] leading-[length:var(--lh-h6)] tracking-[-0.5px] overflow-hidden">
-                    {item.stat}
-                  </p>
+                <h3 class="mandate-title font-heading text-[length:var(--fs-h5)] leading-[length:var(--lh-h5)] font-medium m-0 text-neutral-500 group-[.active]:text-vault-navy opacity-60 group-[.active]:opacity-100 pt-2 pb-1 transition-all duration-300">
+                  {item.title}
+                </h3>
+
+                <div
+                  class="mandate-desc overflow-hidden max-w-105 transition-all duration-500 ease-in-out"
+                  style={i === 0 ? "max-height: 160px; opacity: 1;" : "max-height: 0px; opacity: 0;"}
+                >
+                  <div class="flex flex-col gap-2 pt-2 pb-3.5">
+                    <p class="mandate-stat m-0 font-heading font-medium text-vault-navy text-[length:var(--fs-h6)] leading-[length:var(--lh-h6)] tracking-[-0.5px]">
+                      {item.stat}
+                    </p>
+                    <p class="mandate-text m-0 font-body text-neutral-500 text-[length:var(--fs-body-lg)] leading-[length:var(--lh-body-lg)] max-lg:max-w-full">
+                      {item.text}
+                    </p>
+                  </div>
                 </div>
-                <p class="mandate-text m-0 font-body text-neutral-500 text-[length:var(--fs-body-lg)] leading-[length:var(--lh-body-lg)] max-w-105 overflow-hidden">
-                  {item.text}
-                </p>
-                <div class="relative h-1 w-full rounded-lg bg-neutral-300 overflow-hidden">
-                  <div class="mandate-bar absolute inset-y-0 left-0 rounded-lg bg-nova-blue" />
+
+                <!-- Progress line loader -->
+                <div class="relative w-full h-[2px] bg-neutral-200 mt-3 mb-5 rounded-full overflow-hidden">
+                  <!-- Active blue line (fills up) -->
+                  <div
+                    class="mandate-progress absolute left-0 top-0 h-full bg-nova-blue rounded-full transition-none"
+                    style="width: 0%;"
+                  />
                 </div>
-              </button>
+              </div>
             ))
           }
         </div>
       </div>
 
       <div
-        class="relative aspect-square lg:aspect-[624/574] w-full"
+        class="relative aspect-square lg:aspect-[624/520] w-full"
         data-mandate-thumbs
       >
         {
@@ -101,38 +113,9 @@ const items: MandateItem[] = [
   </div>
 </section>
 
-<style is:global>
-  .mandate-stat,
-  .mandate-text {
-    max-height: 0;
-    opacity: 0;
-    transition:
-      max-height 300ms ease,
-      opacity 200ms ease;
-  }
-  .mandate-item.mandate-open .mandate-stat {
-    max-height: 40px;
-    opacity: 1;
-  }
-  .mandate-item.mandate-open .mandate-text {
-    max-height: 110px;
-    opacity: 1;
-    transition:
-      max-height 300ms ease,
-      opacity 300ms ease 100ms;
-  }
-  .mandate-item:not(.mandate-open) .mandate-item-title-only {
-    opacity: 0.5;
-  }
-  .mandate-item .mandate-bar {
-    width: 0%;
-  }
-</style>
-
 <script is:inline>
-  (function () {
-    var DURATION = 4000;
-
+(() => {
+  const init = () => {
     document.querySelectorAll("[data-mandate-root]").forEach((root) => {
       const items = Array.from(root.querySelectorAll("[data-mandate-item]"));
       const section = root.closest("section");
@@ -141,19 +124,46 @@ const items: MandateItem[] = [
         : [];
       if (!items.length) return;
 
-      let activeIndex = -1;
+      let currentIndex = 0;
       let timer = null;
+      const duration = 5000;
 
-      function activate(index) {
-        activeIndex = index;
+      const activateTab = (index, instant = false) => {
+        currentIndex = index;
 
         items.forEach((item, i) => {
-          item.classList.toggle("mandate-open", i === index);
+          const desc = item.querySelector(".mandate-desc");
+          const progress = item.querySelector(".mandate-progress");
 
-          const bar = item.querySelector(".mandate-bar");
-          if (!bar) return;
-          bar.style.transition = "none";
-          bar.style.width = "0%";
+          if (i === index) {
+            item.classList.add("active");
+            if (desc) {
+              desc.style.maxHeight = desc.scrollHeight + "px";
+              desc.style.opacity = "1";
+            }
+
+            if (progress) {
+              progress.style.transition = "none";
+              progress.style.width = "0%";
+              void progress.offsetWidth;
+
+              if (!instant) {
+                progress.style.transition = `width ${duration}ms linear`;
+                progress.style.width = "100%";
+              }
+            }
+          } else {
+            item.classList.remove("active");
+            if (desc) {
+              desc.style.maxHeight = "0px";
+              desc.style.opacity = "0";
+            }
+
+            if (progress) {
+              progress.style.transition = "width 0.2s ease";
+              progress.style.width = "0%";
+            }
+          }
         });
 
         panels.forEach((panel, i) => {
@@ -162,32 +172,42 @@ const items: MandateItem[] = [
           panel.classList.toggle("opacity-0", !active);
           panel.setAttribute("aria-hidden", active ? "false" : "true");
         });
+      };
 
-        const activeBar = items[index].querySelector(".mandate-bar");
-        if (activeBar) {
-          // Force a reflow so the 0% reset above is committed before the
-          // fill transition starts, otherwise the browser coalesces both
-          // style writes and the bar jumps straight to 100%.
-          void activeBar.offsetWidth;
-          activeBar.style.transition = `width ${DURATION}ms linear`;
-          activeBar.style.width = "100%";
-        }
-      }
+      const nextTab = () => {
+        const next = (currentIndex + 1) % items.length;
+        activateTab(next);
+      };
 
-      function goTo(index) {
-        if (timer) clearTimeout(timer);
-        activate(index);
-        timer = setTimeout(() => goTo((index + 1) % items.length), DURATION);
-      }
+      const startTimer = () => {
+        clearInterval(timer);
+        activateTab(currentIndex);
+        timer = setInterval(nextTab, duration);
+      };
 
       items.forEach((item, i) => {
         item.addEventListener("click", () => {
-          if (i === activeIndex) return;
-          goTo(i);
+          clearInterval(timer);
+          activateTab(i);
+          timer = setInterval(nextTab, duration);
         });
       });
 
-      goTo(0);
+      window.addEventListener("resize", () => {
+        const activeDesc = items[currentIndex]?.querySelector(".mandate-desc");
+        if (activeDesc) {
+          activeDesc.style.maxHeight = activeDesc.scrollHeight + "px";
+        }
+      });
+
+      startTimer();
     });
-  })();
+  };
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", init);
+  } else {
+    init();
+  }
+})();
 </script>
