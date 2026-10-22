@@ -105,6 +105,10 @@ const shareLinks = [
    The recording is reached from the play control drawn over the thumbnail
    instead, which is the only affordance that changes between the two states. */
 const ctaLabel = 'Register now';
+
+/* Only webinars are online; every other event is in person. Drives the
+   breadcrumb label and the body heading, as the Webflow template does. */
+const online = event.type === 'Online';
 ---
 
 <!doctype html>
@@ -216,7 +220,7 @@ const ctaLabel = 'Register now';
       <header>
         <nav aria-label="Breadcrumb">
           <ol>
-            <li><a href="/events">Webinars</a></li>
+            <li><a href="/events">{online ? 'Webinars' : 'Events'}</a></li>
             <li aria-current="page">{event.title}</li>
           </ol>
         </nav>
@@ -333,7 +337,7 @@ const ctaLabel = 'Register now';
       </aside>
 
       <article>
-        <h2>{upcoming ? 'About the Webinar' : 'About the session'}</h2>
+        <h2>{!upcoming ? 'About the session' : online ? 'About the Webinar' : 'About the Event'}</h2>
         <p>{event.summary ?? `${event.title}. ${event.date}, ${event.time} — ${event.location}.`}</p>
 
         {
