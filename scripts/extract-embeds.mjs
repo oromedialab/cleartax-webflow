@@ -102,6 +102,8 @@ function minify(css) {
  */
 function findSafeBoundaries(html) {
   const boundaries = [0];
+  const depthAt = new Map([[0, 0]]);
+  let depth = 0;
   const n = html.length;
   let i = 0;
   while (i < n) {
@@ -136,33 +138,63 @@ function findSafeBoundaries(html) {
         j = closeIdx === -1 ? n : closeIdx + closeTag.length;
       }
     }
+    const raw = html.slice(i, j);
+    const isVoid = VOID_TAGS.has(tagName) || raw.trimEnd().endsWith('/>');
+    if (tagName && !isVoid && tagName !== 'script' && tagName !== 'style') {
+      depth += raw.startsWith('</') ? -1 : 1;
+    }
     i = j;
     boundaries.push(i);
+    depthAt.set(i, depth);
   }
   if (boundaries[boundaries.length - 1] !== n) boundaries.push(n);
+  boundaries.depthAt = depthAt;
   return boundaries;
 }
 
-/** Greedily chunks html at safe boundaries, each chunk <= limit chars. */
+const VOID_TAGS = new Set(['area', 'base', 'br', 'col', 'embed', 'hr', 'img', 'input', 'link', 'meta', 'source', 'track', 'wbr']);
+
+/**
+ * Greedily chunks html, each chunk <= limit chars, cutting only where no
+ * element is left open. Webflow parses every Embed on its own and auto-closes
+ * whatever is still open at its end, so a cut inside an element wraps the
+ * remainder of that element in the wrong parent. dist/preview concatenates the
+ * parts first, which hides the damage. If a single top-level piece is bigger
+ * than the limit there is no clean cut; fall back to the nearest tag boundary
+ * and warn.
+ */
 function splitHtml(html, limit) {
-  const boundaries = findSafeBoundaries(html);
+  const all = findSafeBoundaries(html);
+  const closed = all.filter((b) => all.depthAt.get(b) === 0 || b === html.length);
   const parts = [];
   let start = 0;
-  let bi = 0;
   while (start < html.length) {
-    while (bi < boundaries.length && boundaries[bi] <= start) bi++;
     let chosen = -1;
-    let k = bi;
-    while (k < boundaries.length && boundaries[k] - start <= limit) {
-      chosen = boundaries[k];
-      k++;
+    for (const b of closed) {
+      if (b <= start) continue;
+      if (b - start > limit) break;
+      chosen = b;
     }
-    if (chosen === -1) chosen = boundaries[bi] ?? html.length;
+    if (chosen === -1) {
+      const next = all.find((b) => b > start && all.depthAt.get(b) === 0);
+      const over = (next ?? html.length) - start;
+      console.warn(`[extract-embeds] WARNING: a top-level piece is ${over} chars (> ${limit}); cutting inside an element. Webflow will mis-nest this split — break the piece up in source.`);
+      chosen = splitHtmlUnsafe(html, start, limit, all);
+    }
     parts.push(html.slice(start, chosen));
     start = chosen;
-    bi = k;
   }
   return parts;
+}
+
+function splitHtmlUnsafe(html, start, limit, boundaries) {
+  let chosen = -1;
+  for (const b of boundaries) {
+    if (b <= start) continue;
+    if (b - start > limit) break;
+    chosen = b;
+  }
+  return chosen === -1 ? (boundaries.find((b) => b > start) ?? html.length) : chosen;
 }
 
 /**

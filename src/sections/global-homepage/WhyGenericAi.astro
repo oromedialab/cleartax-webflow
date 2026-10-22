@@ -85,8 +85,11 @@ html.w-mod-touch * {
   margin-bottom: 0;
 }
 </style>
-<section class="bg-generic-00 py-16 md:py-20">
-  <div class="max-w-[var(--container-max)] w-full mx-auto px-4 md:px-6">
+{/* No wrapper elements here. Webflow parses every Embed on its own and closes
+    any element left open at the end of one, so a section split across Embeds
+    must be made of complete top-level pieces: the header, one wrapper per card,
+    the tail spacer. The section > container > #gh-why-stack wrapper those pieces
+    live in is built at runtime by assembleWhyStack() in the first script. */}
     <!-- Scroll-away header — gives the stack the full viewport. Used on mobile
          AND on any short window; see .gh-why-header-* in the style block. -->
     <div
@@ -104,10 +107,6 @@ html.w-mod-touch * {
       </p>
     </div>
 
-    <div
-      id="gh-why-stack"
-      class="gh-why-stack mx-auto flex w-full flex-col gap-[30vh] md:gap-[50vh]"
-    >
       {
         cards.map((card, i) => (
           <div
@@ -3134,10 +3133,7 @@ html.w-mod-touch * {
       }
 
       <!-- Tail room so the last card can finish sticking before the next section -->
-      <div style="height: 80px;"></div>
-    </div>
-  </div>
-</section>
+      <div class="gh-why-tail" style="height: 80px;"></div>
 
 <style is:global>
   /* Which header shows is a question of available HEIGHT, not just width, so it
@@ -3417,6 +3413,49 @@ html.w-mod-touch * {
     }
   }
 </style>
+
+<script is:inline>
+  (() => {
+    // The Embeds deliver the header, five card wrappers and the tail spacer as
+    // loose siblings (see the note at the top of the markup). Wrap them in the
+    // section > container > stack structure the layout CSS and the sticky
+    // script expect. Runs once, before anything looks up #gh-why-stack.
+    (function assembleWhyStack() {
+      if (document.getElementById("gh-why-stack")) return;
+      const header = document.querySelector(".gh-why-header-flow");
+      const stickies = Array.from(document.querySelectorAll(".gh-why-sticky"));
+      const tail = document.querySelector(".gh-why-tail");
+      if (!header || !stickies.length) return;
+
+      const holderOf = (el) => {
+        const w = el.parentElement;
+        return w && w.classList.contains("w-embed") ? w : el;
+      };
+      const pieces = [header, ...stickies, tail].filter(Boolean);
+      const holders = pieces.map(holderOf);
+
+      const section = document.createElement("section");
+      section.className = "gh-why bg-generic-00 py-16 md:py-20";
+      const container = document.createElement("div");
+      container.className = "max-w-[var(--container-max)] w-full mx-auto px-4 md:px-6";
+      const stack = document.createElement("div");
+      stack.id = "gh-why-stack";
+      stack.className = "gh-why-stack mx-auto flex w-full flex-col gap-[30vh] md:gap-[50vh]";
+
+      holders[0].parentNode.insertBefore(section, holders[0]);
+      section.appendChild(container);
+      container.appendChild(header);
+      container.appendChild(stack);
+      stickies.forEach((el) => stack.appendChild(el));
+      if (tail) stack.appendChild(tail);
+
+      // Emptied Embed shells would otherwise leave stray gaps in the page.
+      holders.forEach((h) => {
+        if (h !== header && h.classList.contains("w-embed") && !h.firstElementChild) h.remove();
+      });
+    })();
+  })();
+</script>
 
 <script is:inline>
   (() => {
