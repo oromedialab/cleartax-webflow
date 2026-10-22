@@ -433,15 +433,24 @@ const panels = groups.map((group) => ({
     </button>
 
     <!-- Overlay Cards: Each index has its own layout condition (i === 0 ? ... : i === 1 ? ...), exactly like WhyGenericAi -->
-    <div class="ih-maiw-overlay-cards-container w-full">
-      {
+    <div class="ih-maiw-overlay-cards-container w-full"></div>
+  </div>
+</div>
+
+{/* The cards are top-level siblings of the overlay shell, not its children.
+    Webflow parses every Embed on its own and closes whatever is still open at
+    the end of one, so an overlay holding every card cannot be split across
+    Embeds. The first script below moves them into the overlay. All are
+    `hidden` here so a failed move leaves nothing on the page; the script
+    reveals card 0, as the nested markup used to. */}
+{
         flat.map(({ card, group }, i) => (
           <div
             class={`ih-maiw-overlay-card ih-maiw-overlay-card-${i} w-full`}
             data-ih-maiw-overlay-card
             data-ih-maiw-index={i}
             data-ih-maiw-group={group}
-            hidden={i !== 0}
+            hidden
           >
             {i === 0 ? (
               <!-- ============================================================
@@ -4002,9 +4011,6 @@ const panels = groups.map((group) => ({
           </div>
         ))
       }
-    </div>
-  </div>
-</div>
 
 <style is:global>
   /* Laptop screen size ONLY (1024px to 1279px) — NOT iPad (< 1024px), NOT Desktop (>= 1280px).
@@ -4151,6 +4157,23 @@ const panels = groups.map((group) => ({
 </style>
 
 <script is:inline>
+  (function () {
+    var overlay = document.getElementById("ih-maiw-overlay");
+    var box = overlay && overlay.querySelector(".ih-maiw-overlay-cards-container");
+    if (!box) return;
+    Array.prototype.slice.call(document.querySelectorAll("[data-ih-maiw-overlay-card]")).forEach(function (card) {
+      if (overlay.contains(card)) return;
+      var holder = card.parentElement;
+      box.appendChild(card);
+      // Emptied Embed shell would otherwise leave a stray gap in the page.
+      if (holder && holder.classList.contains("w-embed") && !holder.firstElementChild) holder.remove();
+    });
+    var first = box.querySelector('[data-ih-maiw-index="0"]');
+    if (first) first.hidden = false;
+  })();
+</script>
+
+<script is:inline>
   /* Pills filter the grid; a card opens the detail overlay, and the chevrons
      walk that card's own team without closing. */
   (function () {
@@ -4251,179 +4274,6 @@ const panels = groups.map((group) => ({
     var count = overlayCards.length;
     var current = 0;
     var lastFocused = null;
-
-    /* ---- auto-heal checklists split across Webflow embed boundaries ---- */
-    function healChecklists() {
-      // Remove any orphaned text spans or stray check-items that Webflow dropped outside grid due to embed splits
-      var allSpans = overlay.querySelectorAll("span.underline");
-      allSpans.forEach(function (sp) {
-        if (!sp.closest(".ih-maiw-check-item")) {
-          sp.remove();
-        }
-      });
-      overlay.querySelectorAll("[data-ih-maiw-overlay-card]").forEach(function (card) {
-        var grid = card.querySelector(".ih-maiw-checklist .grid");
-        if (grid) {
-          card.querySelectorAll(".ih-maiw-check-item").forEach(function (item) {
-            if (item.parentNode !== grid) {
-              item.remove();
-            }
-          });
-          card.querySelectorAll('img[src*="checklist-"]').forEach(function (img) {
-            if (img.closest(".ih-maiw-result-heading")) return;
-            if (!img.closest(".grid")) {
-              img.remove();
-            }
-          });
-        }
-      });
-
-      // 1. Repair Card 2 (Audit and Advisory Agent) checklist layout & text
-      var card2 = overlay.querySelector('[data-ih-maiw-index="2"]');
-      if (card2) {
-        var grid2 = card2.querySelector(".ih-maiw-checklist .grid");
-        if (grid2) {
-          grid2.innerHTML =
-            '<div class="ih-maiw-check-item col-start-1 sm:row-start-1 flex items-center gap-1.5 sm:gap-1 md:gap-1.5 xl:gap-2 min-w-0 opacity-0">' +
-              '<img src="https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6ad1c662b91ef9913bf8a199_checklist-1-1.png" alt="checklist" width="12" height="15" class="h-3 sm:h-2.5 md:h-3 lg:h-3 xl:h-[15px] w-auto shrink-0 object-contain">' +
-              '<span class="text-[10px] min-[380px]:text-[11px] sm:text-[9.5px] md:text-[10px] lg:text-[9.5px] xl:text-[13px] font-normal text-[#111827] underline underline-offset-[2px] xl:underline-offset-[3px] decoration-1 decoration-[#111827]/80 leading-none whitespace-nowrap">Mapping the GL structure — 214 tax ledgers</span>' +
-            '</div>' +
-            '<div class="ih-maiw-check-item col-start-1 sm:col-start-2 sm:row-start-1 flex items-center gap-1.5 sm:gap-1 md:gap-1.5 xl:gap-2 min-w-0 opacity-0">' +
-              '<img src="https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6ad1c667a6af7f9a939f4d1d_checklist-1-2.png" alt="checklist-2" width="14" height="14" class="h-3 sm:h-2.5 md:h-3 lg:h-3 xl:h-[15px] w-auto shrink-0 object-contain">' +
-              '<span class="text-[10px] min-[380px]:text-[11px] sm:text-[9.5px] md:text-[10px] lg:text-[9.5px] xl:text-[13px] font-normal text-[#111827] underline underline-offset-[2px] xl:underline-offset-[3px] decoration-1 decoration-[#111827]/80 leading-none whitespace-nowrap">Assessing each reporting layer on its own</span>' +
-            '</div>' +
-            '<div class="ih-maiw-check-item col-start-1 sm:col-span-2 sm:row-start-2 flex items-center gap-1.5 sm:gap-1 md:gap-1.5 xl:gap-2 min-w-0 opacity-0">' +
-              '<img src="https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6ad1c66cb1caeb82a7499f88_checklist-1-3.png" alt="checklist-3" width="16" height="16" class="h-3.5 sm:h-3 md:h-3.5 lg:h-3.5 xl:h-[16px] w-auto shrink-0 object-contain">' +
-              '<span class="text-[10px] min-[380px]:text-[11px] sm:text-[9.5px] md:text-[10px] lg:text-[9.5px] xl:text-[13px] font-normal text-[#111827] underline underline-offset-[2px] xl:underline-offset-[3px] decoration-1 decoration-[#111827]/80 leading-none whitespace-nowrap">Reconciling GL → e-invoice → e-way bill → GSTR-1 → 3B</span>' +
-            '</div>' +
-            '<div class="ih-maiw-check-item col-start-1 sm:row-start-3 flex items-center gap-1.5 sm:gap-1 md:gap-1.5 xl:gap-2 min-w-0 opacity-0">' +
-              '<img src="https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6ad1c6716ae44fb179c3f880_checklist-1-4.png" alt="checklist-4" width="14" height="14" class="h-3 sm:h-2.5 md:h-3 lg:h-3 xl:h-[15px] w-auto shrink-0 object-contain">' +
-              '<span class="text-[10px] min-[380px]:text-[11px] sm:text-[9.5px] md:text-[10px] lg:text-[9.5px] xl:text-[13px] font-normal text-[#111827] underline underline-offset-[2px] xl:underline-offset-[3px] decoration-1 decoration-[#111827]/80 leading-none whitespace-nowrap">- Matching findings to notice patterns</span>' +
-            '</div>';
-        }
-        var resultHeading2 = card2.querySelector(".ih-maiw-result-heading");
-        if (resultHeading2 && !resultHeading2.querySelector("img")) {
-          resultHeading2.innerHTML =
-            '<div class="flex items-center gap-4 sm:gap-6">' +
-              '<div class="flex items-center gap-1.5 sm:gap-2">' +
-                '<img src="https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6ad60dee285501752247d595_checklist-2-1.png" alt="checklist" width="12" height="14" class="h-3 sm:h-2.5 md:h-3 lg:h-3 xl:h-[15px] w-auto shrink-0 object-contain">' +
-                '<span class="font-body font-medium text-xs md:text-sm lg:text-[length:var(--fs-body)] text-[#111827] leading-tight">Five reporting layers</span>' +
-              '</div>' +
-              '<div class="flex items-center gap-1.5 sm:gap-2">' +
-                '<img src="https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6ad60df30a329f1b5f8c00a8_checklist-2-2.png" alt="checklist" width="15" height="15" class="h-3 sm:h-2.5 md:h-3 lg:h-3 xl:h-[15px] w-auto shrink-0 object-contain">' +
-                '<span class="font-body font-medium text-xs md:text-sm lg:text-[length:var(--fs-body)] text-[#111827] leading-tight">Two flagged</span>' +
-              '</div>' +
-            '</div>';
-        }
-      }
-
-      // 2. Repair Card 6 (180-Day Reversal and Reclaim Agent) checklist layout & text
-      var card6 = overlay.querySelector('[data-ih-maiw-index="6"]');
-      if (card6) {
-        var grid6 = card6.querySelector(".ih-maiw-checklist .grid");
-        if (grid6) {
-          grid6.innerHTML =
-            '<div class="ih-maiw-check-item col-start-1 sm:row-start-1 flex items-center gap-1.5 sm:gap-1 md:gap-1.5 xl:gap-2 min-w-0 opacity-0">' +
-              '<img src="https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6ad1c662b91ef9913bf8a199_checklist-1-1.png" alt="checklist" width="12" height="15" class="h-3 sm:h-2.5 md:h-3 lg:h-3 xl:h-[15px] w-auto shrink-0 object-contain">' +
-              '<span class="text-[10px] min-[380px]:text-[11px] sm:text-[9.5px] md:text-[10px] lg:text-[9.5px] xl:text-[13px] font-normal text-[#111827] underline underline-offset-[2px] xl:underline-offset-[3px] decoration-1 decoration-[#111827]/80 leading-none whitespace-nowrap">Matching 18,240 documents to claim months</span>' +
-            '</div>' +
-            '<div class="ih-maiw-check-item col-start-1 sm:col-start-2 sm:row-start-1 flex items-center gap-1.5 sm:gap-1 md:gap-1.5 xl:gap-2 min-w-0 opacity-0">' +
-              '<img src="https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6ad1c667a6af7f9a939f4d1d_checklist-1-2.png" alt="checklist-2" width="14" height="14" class="h-3 sm:h-2.5 md:h-3 lg:h-3 xl:h-[15px] w-auto shrink-0 object-contain">' +
-              '<span class="text-[10px] min-[380px]:text-[11px] sm:text-[9.5px] md:text-[10px] lg:text-[9.5px] xl:text-[13px] font-normal text-[#111827] underline underline-offset-[2px] xl:underline-offset-[3px] decoration-1 decoration-[#111827]/80 leading-none whitespace-nowrap">Computing interest per document</span>' +
-            '</div>' +
-            '<div class="ih-maiw-check-item col-start-1 sm:row-start-2 flex items-center gap-1.5 sm:gap-1 md:gap-1.5 xl:gap-2 min-w-0 opacity-0">' +
-              '<img src="https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6ad1c66cb1caeb82a7499f88_checklist-1-3.png" alt="checklist-3" width="16" height="16" class="h-3.5 sm:h-3 md:h-3.5 lg:h-3.5 xl:h-[16px] w-auto shrink-0 object-contain">' +
-              '<span class="text-[10px] min-[380px]:text-[11px] sm:text-[9.5px] md:text-[10px] lg:text-[9.5px] xl:text-[13px] font-normal text-[#111827] underline underline-offset-[2px] xl:underline-offset-[3px] decoration-1 decoration-[#111827]/80 leading-none whitespace-nowrap">Ingesting Table-4 + vendor open payments</span>' +
-            '</div>' +
-            '<div class="ih-maiw-check-item col-start-1 sm:col-start-2 sm:row-start-2 flex items-center gap-1.5 sm:gap-1 md:gap-1.5 xl:gap-2 min-w-0 opacity-0">' +
-              '<img src="https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6ad1c6716ae44fb179c3f880_checklist-1-4.png" alt="checklist-4" width="14" height="14" class="h-3 sm:h-2.5 md:h-3 lg:h-3 xl:h-[15px] w-auto shrink-0 object-contain">' +
-              '<span class="text-[10px] min-[380px]:text-[11px] sm:text-[9.5px] md:text-[10px] lg:text-[9.5px] xl:text-[13px] font-normal text-[#111827] underline underline-offset-[2px] xl:underline-offset-[3px] decoration-1 decoration-[#111827]/80 leading-none whitespace-nowrap">Staging the Excel for approval</span>' +
-            '</div>';
-        }
-      }
-
-      // 3. Repair Card 9 (Advance Adjustment Agent) checklist layout & text
-      var card9 = overlay.querySelector('[data-ih-maiw-index="9"]');
-      if (card9) {
-        var grid9 = card9.querySelector(".ih-maiw-checklist .grid");
-        if (grid9) {
-          grid9.innerHTML =
-            '<div class="ih-maiw-check-item col-start-1 sm:row-start-1 flex items-center gap-1.5 sm:gap-1 md:gap-1.5 xl:gap-2 min-w-0 opacity-0">' +
-              '<img src="https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6ad76ab09778821204701e8c_checklist-10-1.png" alt="checklist" width="12" height="15" class="h-3 sm:h-2.5 md:h-3 lg:h-3 xl:h-[15px] w-auto shrink-0 object-contain">' +
-              '<span class="text-[10px] min-[380px]:text-[11px] sm:text-[9.5px] md:text-[10px] lg:text-[9.5px] xl:text-[13px] font-normal text-[#111827] underline underline-offset-[2px] xl:underline-offset-[3px] decoration-1 decoration-[#111827]/80 leading-none whitespace-nowrap">Tracking 1,462 advance receipts</span>' +
-            '</div>' +
-            '<div class="ih-maiw-check-item col-start-1 sm:col-start-2 sm:row-start-1 flex items-center gap-1.5 sm:gap-1 md:gap-1.5 xl:gap-2 min-w-0 opacity-0">' +
-              '<img src="https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6ad76ab5e55362bd202f2b65_checklist-10-2.png" alt="checklist-2" width="14" height="14" class="h-3 sm:h-2.5 md:h-3 lg:h-3 xl:h-[15px] w-auto shrink-0 object-contain">' +
-              '<span class="text-[10px] min-[380px]:text-[11px] sm:text-[9.5px] md:text-[10px] lg:text-[9.5px] xl:text-[13px] font-normal text-[#111827] underline underline-offset-[2px] xl:underline-offset-[3px] decoration-1 decoration-[#111827]/80 leading-none whitespace-nowrap">Matching against final invoices issued</span>' +
-            '</div>' +
-            '<div class="ih-maiw-check-item col-start-1 sm:row-start-2 flex items-center gap-1.5 sm:gap-1 md:gap-1.5 xl:gap-2 min-w-0 opacity-0">' +
-              '<img src="https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6ad76abcaa2b733f4087fc9e_checklist-10-3.png" alt="checklist-3" width="16" height="16" class="h-3.5 sm:h-3 md:h-3.5 lg:h-3.5 xl:h-[16px] w-auto shrink-0 object-contain">' +
-              '<span class="text-[10px] min-[380px]:text-[11px] sm:text-[9.5px] md:text-[10px] lg:text-[9.5px] xl:text-[13px] font-normal text-[#111827] underline underline-offset-[2px] xl:underline-offset-[3px] decoration-1 decoration-[#111827]/80 leading-none whitespace-nowrap">Flagging partial and unmatched advances</span>' +
-            '</div>' +
-            '<div class="ih-maiw-check-item col-start-1 sm:col-start-2 sm:row-start-2 flex items-center gap-1.5 sm:gap-1 md:gap-1.5 xl:gap-2 min-w-0 opacity-0">' +
-              '<img src="https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6ad76ac4ca67b89404452d67_checklist-10-4.png" alt="checklist-4" width="14" height="14" class="h-3 sm:h-2.5 md:h-3 lg:h-3 xl:h-[15px] w-auto shrink-0 object-contain">' +
-              '<span class="text-[10px] min-[380px]:text-[11px] sm:text-[9.5px] md:text-[10px] lg:text-[9.5px] xl:text-[13px] font-normal text-[#111827] underline underline-offset-[2px] xl:underline-offset-[3px] decoration-1 decoration-[#111827]/80 leading-none whitespace-nowrap">Generating adjustment entries</span>' +
-            '</div>';
-        }
-        card9.querySelectorAll('img[src*="checklist-10-"]').forEach(function (img) {
-          if (!img.closest(".grid")) {
-            img.remove();
-          }
-        });
-      }
-
-      // 4. Repair Card 5 (Refund Agent) pill text container if severed by embed split
-      var card5 = overlay.querySelector('[data-ih-maiw-index="5"]');
-      if (card5) {
-        var pill5 = card5.querySelector(".ih-maiw-input-pill");
-        if (pill5) {
-          var pChild5 = pill5.firstChild;
-          while (pChild5) {
-            var pNext5 = pChild5.nextSibling;
-            if (pChild5.nodeType === Node.TEXT_NODE && pChild5.textContent.trim().length > 0) {
-              pChild5.remove();
-            }
-            pChild5 = pNext5;
-          }
-          var textCont5 = pill5.querySelector(".min-w-0.flex-1");
-          if (textCont5) {
-            var typedQuery5 = "Prepare the Q2 refund draft.";
-            var initPh5 = "Prepare a refund draft...";
-            textCont5.innerHTML =
-              '<span class="ih-maiw-pill-placeholder absolute inset-y-0 left-0 flex items-center font-body text-xs md:text-sm lg:text-[length:var(--fs-body)] text-neutral-400 pointer-events-none" data-initial-placeholder="' + initPh5 + '" data-final-placeholder="' + initPh5 + '">' +
-                initPh5 +
-              '</span>' +
-              '<span class="ih-maiw-pill-typed hidden absolute inset-y-0 left-0 right-0 flex items-center font-body text-xs md:text-sm lg:text-[length:var(--fs-body)] text-vault-navy opacity-0 pointer-events-none font-medium tracking-tight" style="display:none;opacity:0;">' +
-                '<span class="ih-maiw-pill-typed-text truncate block w-full" data-typed-query="' + typedQuery5 + '"></span>' +
-              '</span>';
-          }
-        }
-      }
-
-      // 5. Clean stray text nodes from input pills across all cards
-      overlay.querySelectorAll(".ih-maiw-input-pill").forEach(function (pill) {
-        var child = pill.firstChild;
-        while (child) {
-          var next = child.nextSibling;
-          if (child.nodeType === Node.TEXT_NODE && child.textContent.trim().length > 0) {
-            child.remove();
-          }
-          child = next;
-        }
-        var textContainer = pill.querySelector(".min-w-0.flex-1");
-        if (textContainer) {
-          var tChild = textContainer.firstChild;
-          while (tChild) {
-            var tNext = tChild.nextSibling;
-            if (tChild.nodeType === Node.TEXT_NODE && tChild.textContent.trim().length > 0) {
-              tChild.remove();
-            }
-            tChild = tNext;
-          }
-        }
-      });
-    }
-    healChecklists();
 
     /* ---- stage animation logic ---- */
     var currentTl = null;
@@ -5228,7 +5078,6 @@ const panels = groups.map((group) => ({
 
     function show(index) {
       current = index;
-      healChecklists();
       for (var i = 0; i < count; i++) {
         var isCurr = i === current;
         overlayCards[i].hidden = !isCurr;
