@@ -3379,28 +3379,26 @@ html.w-mod-touch * {
 
 <script is:inline>
   (() => {
-    function initWhyGenericSection() {
-      let genericCard0Complete = false;
-      let genericCard1Complete = false;
-      const genericCardComplete = [false, false, false, false, false];
+    window.__ghWhy = window.__ghWhy || {};
+    window.__ghWhy.genericCardComplete = [false, false, false, false, false];
 
-      window.addEventListener("gh-card0-generic-complete", () => {
-        genericCard0Complete = true;
-        genericCardComplete[0] = true;
-      });
-      window.addEventListener("gh-card1-generic-complete", () => {
-        genericCard1Complete = true;
-        genericCardComplete[1] = true;
-      });
-      window.addEventListener("gh-card2-generic-complete", () => {
-        genericCardComplete[2] = true;
-      });
-      window.addEventListener("gh-card3-generic-complete", () => {
-        genericCardComplete[3] = true;
-      });
-      window.addEventListener("gh-card4-generic-complete", () => {
-        genericCardComplete[4] = true;
-      });
+    window.addEventListener("gh-card0-generic-complete", () => {
+      window.__ghWhy.genericCardComplete[0] = true;
+    });
+    window.addEventListener("gh-card1-generic-complete", () => {
+      window.__ghWhy.genericCardComplete[1] = true;
+    });
+    window.addEventListener("gh-card2-generic-complete", () => {
+      window.__ghWhy.genericCardComplete[2] = true;
+    });
+    window.addEventListener("gh-card3-generic-complete", () => {
+      window.__ghWhy.genericCardComplete[3] = true;
+    });
+    window.addEventListener("gh-card4-generic-complete", () => {
+      window.__ghWhy.genericCardComplete[4] = true;
+    });
+
+    function initWhyGenericSection() {
 
       // Webflow Embed Stitcher:
       // When publishing in Webflow, the build splits across Embed elements.
@@ -4290,9 +4288,9 @@ html.w-mod-touch * {
             ease: "power2.out",
             pointerEvents: "auto",
             onComplete: () => {
-              genericCardComplete[idx] = true;
-              if (idx === 0) genericCard0Complete = true;
-              if (idx === 1) genericCard1Complete = true;
+              if (window.__ghWhy && window.__ghWhy.genericCardComplete) {
+                window.__ghWhy.genericCardComplete[idx] = true;
+              }
               window.dispatchEvent(new CustomEvent(`gh-card${idx}-generic-complete`));
             },
           },
@@ -4334,6 +4332,29 @@ html.w-mod-touch * {
         startGsap();
       }
     }
+
+    window.__ghWhy.initGenericCardFlow = initGenericCardFlow;
+    window.__ghWhy.stitchWebflowEmbeds = stitchWebflowEmbeds;
+    window.__ghWhy.stitchCard4Dom = stitchCard4Dom;
+    window.__ghWhy.restoreCard4SvgPaths = restoreCard4SvgPaths;
+  }
+
+  initWhyGenericSection();
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", () => {
+      window.dispatchEvent(new Event("resize"));
+    }, { once: true });
+  }
+})();
+</script>
+
+<script is:inline>
+  (() => {
+    const stitchWebflowEmbeds = () => {
+      if (window.__ghWhy && window.__ghWhy.stitchWebflowEmbeds) {
+        window.__ghWhy.stitchWebflowEmbeds();
+      }
+    };
 
     // --- CLEARTAX CARDS GSAP ANIMATION SEQUENCE ---
     function initClearTaxCardFlow(idx) {
@@ -4803,10 +4824,11 @@ html.w-mod-touch * {
 
         // Hold on Frame 3 (Analyzing uploaded file) and wait until corresponding generic animation completes!
         tl.add(() => {
+          const state = window.__ghWhy && window.__ghWhy.genericCardComplete;
           const isComplete =
-            genericCardComplete[idx] ||
-            (idx === 0 && genericCard0Complete) ||
-            (idx === 1 && genericCard1Complete);
+            (state && state[idx]) ||
+            (idx === 0 && state && state[0]) ||
+            (idx === 1 && state && state[1]);
 
           if (!isComplete) {
             tl.pause();
@@ -4899,7 +4921,9 @@ html.w-mod-touch * {
 
     function initAllCardFlows() {
       for (let i = 0; i < 5; i++) {
-        initGenericCardFlow(i);
+        if (window.__ghWhy && window.__ghWhy.initGenericCardFlow) {
+          window.__ghWhy.initGenericCardFlow(i);
+        }
         initClearTaxCardFlow(i);
       }
     }
@@ -4930,13 +4954,5 @@ html.w-mod-touch * {
     } else {
       setTimeout(initAllCardFlows, 1500);
     }
-  }
-
-  initWhyGenericSection();
-  if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", () => {
-      window.dispatchEvent(new Event("resize"));
-    }, { once: true });
-  }
-})();
+  })();
 </script>
