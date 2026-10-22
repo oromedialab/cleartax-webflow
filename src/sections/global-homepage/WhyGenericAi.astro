@@ -3493,33 +3493,44 @@ html.w-mod-touch * {
               </svg>
               GENERIC AI`;
             }
+          } else {
+            genericBadge = document.createElement("div");
+            genericBadge.className = "flex items-center justify-start md:col-start-1 md:row-start-1 mb-3 md:mb-2";
+            genericBadge.innerHTML = `<span class="inline-flex items-center gap-1.5 border border-neutral-200 rounded-xl bg-generic-00 px-3 py-1.5 font-body text-[14px] font-medium uppercase text-neutral-700 select-none">
+              <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M11.0482 11.0482L9.17549 16.1986C9.13177 16.3164 9.05304 16.418 8.94988 16.4898C8.84673 16.5615 8.72409 16.6 8.59844 16.6C8.47279 16.6 8.35014 16.5615 8.24699 16.4898C8.14383 16.418 8.06511 16.3164 8.02138 16.1986L6.15172 11.0482L1.00131 9.17549C0.88351 9.13177 0.781916 9.05304 0.710173 8.94988C0.63843 8.84673 0.599976 8.72409 0.599976 8.59844C0.599976 8.47279 0.63843 8.35015 0.710173 8.24699C0.781916 8.14383 0.88351 8.06511 1.00131 8.02138L6.15172 6.15172L8.02446 1.00131C8.06818 0.88351 8.14691 0.781916 8.25007 0.710173C8.35322 0.63843 8.47586 0.599976 8.60151 0.599976C8.72716 0.599976 8.84981 0.63843 8.95296 0.710173C9.05612 0.781916 9.13485 0.88351 9.17857 1.00131L11.0513 6.15172L16.2017 8.02446C16.3195 8.06818 16.4211 8.14691 16.4929 8.25007C16.5646 8.35322 16.6031 8.47586 16.6031 8.60151C16.6031 8.72717 16.5646 8.84981 16.4929 8.95296C16.4211 9.05612 16.3195 9.13485 16.2017 9.17857L11.0482 11.0482Z" stroke="#374151" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+              GENERIC AI
+            </span>`;
+            grid5.insertBefore(genericBadge, grid5.firstChild);
           }
 
-          // Clean up any stray text node or element containing "GENERIC AI" outside the badge
+          // Clean up any stray element containing "GENERIC AI" other than genericBadge itself
           Array.from(sticky5.querySelectorAll("*")).forEach((el) => {
             if (
+              el !== genericBadge &&
+              !genericBadge.contains(el) &&
               el.tagName !== "STYLE" &&
               el.tagName !== "SCRIPT" &&
-              !grid5.contains(el) &&
-              el !== grid5 &&
-              !el.contains(grid5)
+              el.children.length === 0 &&
+              el.textContent.trim() === "GENERIC AI"
             ) {
-              if (
-                el.textContent.trim() === "GENERIC AI" ||
-                (el.textContent.includes("GENERIC AI") && !el.querySelector(".gh-why-card-grid"))
-              ) {
-                el.remove();
-              }
+              el.remove();
             }
           });
-          const whyCard5 = sticky5.querySelector(".gh-why-card");
-          if (whyCard5) {
-            Array.from(whyCard5.childNodes).forEach((node) => {
-              if (node.nodeType === Node.TEXT_NODE && node.textContent.includes("GENERIC AI")) {
-                node.textContent = "";
+          // Also scrub any loose text nodes containing "GENERIC AI" anywhere outside genericBadge
+          const walkTextNodes = (root) => {
+            Array.from(root.childNodes).forEach((node) => {
+              if (node.nodeType === Node.TEXT_NODE) {
+                if (node.textContent.includes("GENERIC AI") && (!genericBadge || !genericBadge.contains(node))) {
+                  node.textContent = "";
+                }
+              } else if (node.nodeType === Node.ELEMENT_NODE && node !== genericBadge && !genericBadge.contains(node)) {
+                walkTextNodes(node);
               }
             });
-          }
+          };
+          walkTextNodes(sticky5);
 
           if (ctCard4 && !grid5.contains(ctCard4)) {
             grid5.appendChild(ctCard4);
@@ -3645,11 +3656,18 @@ html.w-mod-touch * {
           if (ctPill) {
             const ctTextWrap = ctPill.querySelector(".min-w-0.flex-1");
             const ctPlaceholder = document.querySelector(`.gh-ct-card${i}-pill-placeholder`);
+            const ctTyped = document.querySelector(`.gh-ct-card${i}-typed-text`);
             const ctThinking = document.querySelector(`.gh-ct-card${i}-pill-thinking`);
             const ctSubmitBtn = document.querySelector(`.gh-ct-card${i}-submit-btn`);
             const ctRow = ctPill.querySelector(".flex.w-full.items-center.gap-2") || ctPill;
+            if (ctTyped && !ctTyped.dataset.cached) {
+              ctTyped.dataset.text = ctTyped.textContent.trim();
+              ctTyped.dataset.cached = "true";
+              ctTyped.textContent = "";
+            }
             if (ctTextWrap) {
               if (ctPlaceholder && !ctTextWrap.contains(ctPlaceholder)) ctTextWrap.appendChild(ctPlaceholder);
+              if (ctTyped && !ctTextWrap.contains(ctTyped)) ctTextWrap.appendChild(ctTyped);
               if (ctThinking && !ctTextWrap.contains(ctThinking)) ctTextWrap.appendChild(ctThinking);
             }
             if (ctSubmitBtn && !ctRow.contains(ctSubmitBtn)) {
@@ -4384,8 +4402,8 @@ html.w-mod-touch * {
 
       const chipsToAnimate = inputChips.length > 0 ? Array.from(inputChips) : (inputChip ? [inputChip] : []);
 
-      const queryText = (typedText && typedText.textContent.trim())
-        ? typedText.textContent.trim().replace(/\s+/g, " ")
+      const queryText = (typedText && (typedText.dataset.text || typedText.textContent.trim()))
+        ? (typedText.dataset.text || typedText.textContent.trim()).replace(/\s+/g, " ")
         : (idx === 1
             ? "Flag unusual transactions across invoices, contracts & shipping."
             : (idx === 2
