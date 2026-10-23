@@ -38,6 +38,7 @@ const modalBlurb = "Tell us a little about you and we will be in touch.";
         aria-modal="true"
         aria-labelledby="gh-demo-title"
         aria-hidden="true"
+        inert
         class="fixed inset-0 z-[2000] hidden items-center justify-center bg-generic-100/70 p-4 backdrop-blur-sm"
     >
         <div
@@ -196,6 +197,7 @@ const modalBlurb = "Tell us a little about you and we will be in touch.";
             // click focuses an anchor, and on close focus has to land somewhere
             // predictable rather than on the document root.
             lastFocused = opener || document.activeElement;
+            modal.removeAttribute("inert");
             modal.style.display = "flex";
             modal.setAttribute("aria-hidden", "false");
             document.body.style.overflow = "hidden";
@@ -206,6 +208,7 @@ const modalBlurb = "Tell us a little about you and we will be in touch.";
         function closeModal() {
             modal.style.display = "none";
             modal.setAttribute("aria-hidden", "true");
+            modal.setAttribute("inert", "");
             document.body.style.overflow = "";
             if (lastFocused && lastFocused.focus) lastFocused.focus();
         }
