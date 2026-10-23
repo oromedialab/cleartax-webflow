@@ -2,28 +2,23 @@
 /**
  * Past event grid + Load more — Figma node 14777:27048.
  *
+ * CMS-DRIVEN. The cards are no longer written into this Embed. In Webflow a
+ * hidden Collection List (class `ct-ev-past-source`, filtered to
+ * Is Upcoming = off) holds one `.ct-ev-data` Div per event, with its fields in
+ * custom attributes and the thumbnail in an Image carrying `ct-f-thumbnail`.
+ * The script below turns each into the card the static version drew, then runs
+ * the same filter / sort / search / Load more as before.
+ *
  * This section owns the behaviour; the controls it reads live in
  * `Filters.astro`, a separate Embed, so the script binds its listeners on
  * `document` instead of on the form: delegation makes the wiring independent of
  * which Embed Webflow renders first, and of whether the filter bar is present
- * at all. That section also carries the heading this grid sits under.
+ * at all.
  *
- * Content comes from `pastEvents` in `src/data/events.ts`. The upcoming block
- * above reads a different array, so nothing can appear in both.
- *
- * `image: ''` falls back to the Figma "Visual Placeholder" tint.
+ * Attributes read from each `.ct-ev-data`:
+ *   data-name  data-slug  data-type  data-country  data-date  data-display-time
+ *   data-location  data-speaker-1-name  data-speaker-2-name  data-speaker-3-name
  */
-/* Cards link to the detail route, NOT to `event.href`. `href` is still the
-   recording link — the detail page's CTA is what uses it now. Going through
-   `eventPath` means a card can only ever point at a slug
-   `events/[slug].astro` has generated a page for. */
-import { pastEvents, eventPath } from "../../data/events";
-
-const chipClass =
-  "inline-flex items-center gap-2 rounded-lg bg-neutral-100 px-3 py-1.5 font-body font-medium text-neutral-700 text-[length:var(--fs-label)] leading-[var(--lh-label)]";
-
-const metaClass =
-  "flex items-center gap-2 font-body font-normal text-neutral-500 text-[length:var(--fs-body-sm)] leading-[var(--lh-body-sm)] m-0";
 ---
 
 <section class="bg-generic-00 py-12 md:pt-20 md:pb-10" data-ev-grid-root>
@@ -71,108 +66,6 @@ const metaClass =
         class="grid w-full grid-cols-1 gap-x-8 gap-y-20 sm:grid-cols-2 lg:grid-cols-3"
         data-ev-grid
       >
-        {
-          pastEvents.map((event, index) => (
-            <a
-              href={eventPath(event.slug)}
-              data-ev-card
-              data-type={event.type}
-              data-country={event.country}
-              data-datetime={event.datetime}
-              data-search={`${event.title} ${event.speakers.join(" ")} ${event.type} ${event.country} ${event.location}`.toLowerCase()}
-              class="group flex flex-col gap-6 self-start rounded-xl no-underline"
-            >
-              <div class="relative aspect-video w-full overflow-hidden rounded-xl border border-ledger-300 bg-visual-placeholder">
-                {event.image && (
-                  <img
-                    src={event.image}
-                    alt={event.title}
-                    width="1280"
-                    height="720"
-                    loading={index < 3 ? "eager" : "lazy"}
-                    decoding="async"
-                    class="h-full w-full object-cover"
-                  />
-                )}
-
-                <span class="absolute left-4 top-4 flex flex-wrap items-center gap-2">
-                  <span class={`${chipClass} border border-ledger-300`}>
-                    <svg
-                      width="16"
-                      height="16"
-                      class="shrink-0"
-                      aria-hidden="true"
-                      focusable="false"
-                    >
-                      <use
-                        href={
-                          event.type === "Online"
-                            ? "#ct-ev-card-globe"
-                            : "#ct-ev-card-user"
-                        }
-                      />
-                    </svg>
-                    {event.type}
-                  </span>
-                </span>
-
-                <span class="absolute right-4 top-4 flex h-8 w-8 items-center justify-center rounded-lg bg-ledger-white text-vault-navy transition-colors duration-200 group-hover:bg-nova-blue group-hover:text-ledger-white">
-                  <svg
-                    width="16"
-                    height="16"
-                    aria-hidden="true"
-                    focusable="false"
-                  >
-                    <use href="#ct-ev-card-arrow" />
-                  </svg>
-                </span>
-
-                <span class="absolute bottom-4 left-4 right-4 flex flex-wrap gap-2">
-                  <span class={chipClass}>{event.speakers[0]}</span>
-                </span>
-              </div>
-
-              <div class="flex flex-col gap-3">
-                {/* Clamped so a long title can't leave one card in the row
-                    taller than its neighbours. */}
-                <h3 class="line-clamp-2 font-body font-medium text-vault-navy text-[length:var(--fs-label-lg)] leading-[var(--lh-label-lg)] tracking-[var(--tracking-body)] m-0 transition-colors duration-200 group-hover:text-nova-blue">
-                  {event.title}
-                </h3>
-
-                <div class="flex items-center gap-3">
-                  <p class={metaClass}>
-                    <svg
-                      width="20"
-                      height="20"
-                      class="shrink-0"
-                      aria-hidden="true"
-                      focusable="false"
-                    >
-                      <use href="#ct-ev-card-calendar" />
-                    </svg>
-                    <time datetime={event.datetime}>{event.date}</time>
-                  </p>
-                  <span
-                    class="h-4 w-px shrink-0 rounded-full bg-ledger-300"
-                    aria-hidden="true"
-                  />
-                  <p class={metaClass}>
-                    <svg
-                      width="20"
-                      height="20"
-                      class="shrink-0"
-                      aria-hidden="true"
-                      focusable="false"
-                    >
-                      <use href="#ct-ev-card-clock" />
-                    </svg>
-                    {event.time}
-                  </p>
-                </div>
-              </div>
-            </a>
-          ))
-        }
       </div>
 
       {
@@ -201,17 +94,118 @@ const metaClass =
   </div>
 </section>
 
+<style is:global>
+  /* The Webflow Collection List that feeds this grid. Hidden by class so it
+     never renders where it sits on the page. */
+  .ct-ev-past-source {
+    display: none;
+  }
+</style>
+
 <script is:inline>
   (function () {
     var root = document.querySelector("[data-ev-grid-root]");
     if (!root) return;
 
     var grid = root.querySelector("[data-ev-grid]");
-    var cards = Array.prototype.slice.call(
-      root.querySelectorAll("[data-ev-card]"),
-    );
+    // Filled by build() once the page is ready.
+    var cards = [];
     var moreBtn = root.querySelector("[data-ev-load-more]");
     var empty = root.querySelector("[data-ev-empty]");
+
+
+    var CHIP =
+      "inline-flex items-center gap-2 rounded-lg bg-neutral-100 px-3 py-1.5 font-body font-medium text-neutral-700 text-[length:var(--fs-label)] leading-[var(--lh-label)]";
+    var META =
+      "flex items-center gap-2 font-body font-normal text-neutral-500 text-[length:var(--fs-body-sm)] leading-[var(--lh-body-sm)] m-0";
+    var MONTHS = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+
+    function ready(fn) {
+      if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", fn);
+      else fn();
+    }
+
+    function esc(s) {
+      return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+    }
+
+    function parseDate(s) {
+      if (!s) return null;
+      var m = s.match(/^(\d{4})-(\d{2})-(\d{2})/);
+      var d = m ? new Date(+m[1], +m[2] - 1, +m[3]) : new Date(s);
+      return isNaN(d.getTime()) ? null : d;
+    }
+
+    function pad(n) {
+      return (n < 10 ? "0" : "") + n;
+    }
+
+    function svg(id) {
+      return '<svg width="16" height="16" class="shrink-0" aria-hidden="true" focusable="false"><use href="#' + id + '"></use></svg>';
+    }
+
+    function svg20(id) {
+      return '<svg width="20" height="20" class="shrink-0" aria-hidden="true" focusable="false"><use href="#' + id + '"></use></svg>';
+    }
+
+    function card(e, index) {
+      var meta = '<p class="' + META + '">' + svg20("ct-ev-card-calendar") + '<time datetime="' + esc(e.iso) + '">' + esc(e.dateText) + "</time></p>";
+      if (e.time) {
+        meta += '<span class="h-4 w-px shrink-0 rounded-full bg-ledger-300" aria-hidden="true"></span><p class="' + META + '">' + svg20("ct-ev-card-clock") + esc(e.time) + "</p>";
+      }
+      var search = [e.name, e.speakers.join(" "), e.type, e.country, e.location].join(" ").toLowerCase();
+      return (
+        '<a href="' + esc(e.href) + '" data-ev-card data-type="' + esc(e.canonicalType) + '" data-country="' + esc(e.country) + '" data-datetime="' + esc(e.iso) + '" data-search="' + esc(search) + '" class="group flex flex-col gap-6 self-start rounded-xl no-underline">' +
+          '<div class="relative aspect-video w-full overflow-hidden rounded-xl border border-ledger-300 bg-visual-placeholder">' +
+            (e.image ? '<img src="' + esc(e.image) + '" alt="' + esc(e.name) + '" width="1280" height="720" loading="' + (index < 3 ? "eager" : "lazy") + '" decoding="async" class="h-full w-full object-cover" />' : "") +
+            '<span class="absolute left-4 top-4 flex flex-wrap items-center gap-2">' +
+              (e.type ? '<span class="' + CHIP + ' border border-ledger-300">' + svg(e.online ? "ct-ev-card-globe" : "ct-ev-card-user") + esc(e.canonicalType) + "</span>" : "") +
+            "</span>" +
+            '<span class="absolute right-4 top-4 flex h-8 w-8 items-center justify-center rounded-lg bg-ledger-white text-vault-navy transition-colors duration-200 group-hover:bg-nova-blue group-hover:text-ledger-white">' + svg("ct-ev-card-arrow") + "</span>" +
+            (e.speakers[0] ? '<span class="absolute bottom-4 left-4 right-4 flex flex-wrap gap-2"><span class="' + CHIP + '">' + esc(e.speakers[0]) + "</span></span>" : "") +
+          "</div>" +
+          '<div class="flex flex-col gap-3">' +
+            '<h3 class="line-clamp-2 font-body font-medium text-vault-navy text-[length:var(--fs-label-lg)] leading-[var(--lh-label-lg)] tracking-[var(--tracking-body)] m-0 transition-colors duration-200 group-hover:text-nova-blue">' + esc(e.name) + "</h3>" +
+            '<div class="flex items-center gap-3">' + meta + "</div>" +
+          "</div>" +
+        "</a>"
+      );
+    }
+
+    // Reads the hidden Collection List and writes one card per event into the grid.
+    function build() {
+      var base = location.pathname.replace(/\/$/, "");
+      var nodes = document.querySelectorAll(".ct-ev-past-source .ct-ev-data");
+      var items = [];
+      Array.prototype.forEach.call(nodes, function (node) {
+        function a(k) {
+          return (node.getAttribute("data-" + k) || "").trim();
+        }
+        if (!a("name") || !a("slug")) return;
+        var img = node.querySelector(".ct-f-thumbnail");
+        var d = parseDate(a("date"));
+        var online = /webinar|online/i.test(a("type"));
+        items.push({
+          name: a("name"),
+          href: base + "/" + a("slug"),
+          online: online,
+          type: a("type"),
+          // The Type filter compares against exactly these two labels.
+          canonicalType: a("type") ? (online ? "Online" : "In person") : "",
+          country: a("country"),
+          dateText: d ? MONTHS[d.getMonth()] + " " + d.getDate() + ", " + d.getFullYear() : a("date"),
+          iso: d ? d.getFullYear() + "-" + pad(d.getMonth() + 1) + "-" + pad(d.getDate()) : "",
+          time: a("display-time"),
+          location: a("location"),
+          speakers: [a("speaker-1-name"), a("speaker-2-name"), a("speaker-3-name")].filter(Boolean),
+          image: img ? img.getAttribute("src") || "" : "",
+        });
+      });
+      if (grid) {
+        grid.innerHTML = items.map(card).join("");
+        cards = Array.prototype.slice.call(grid.querySelectorAll("[data-ev-card]"));
+      }
+    }
 
     var PAGE_SIZE = 9;
     var shown = PAGE_SIZE;
@@ -315,9 +309,11 @@ const metaClass =
       }
     });
 
-    render();
-    if (document.readyState === "loading") {
-      document.addEventListener("DOMContentLoaded", render);
-    }
+    // The Collection List may sit below this Embed, so build once the page is
+    // parsed and render straight after.
+    ready(function () {
+      build();
+      render();
+    });
   })();
 </script>

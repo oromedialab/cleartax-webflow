@@ -2,65 +2,34 @@
 /**
  * "Our upcoming webinars & events" — Figma node 14777:26976.
  *
- * One bordered panel holding a section head, a lead event on the left and a
- * scrolling rail of the rest on the right. Content comes from `upcomingEvents`
- * in `src/data/events.ts`; the lead is the first entry and the rail is
- * everything after it, so reordering that array is the editorial control.
+ * CMS-DRIVEN. This section no longer carries any event content. In Webflow a
+ * hidden Collection List (class `ct-ev-upcoming-source`, filtered to
+ * Is Upcoming = on) holds one `.ct-ev-data` Div per event, with the fields in
+ * custom attributes (`data-name`, `data-slug`, `data-date` ...) and the
+ * thumbnail in an Image carrying the class `ct-f-thumbnail`. The script below
+ * reads those items, sorts them soonest first, makes the first one the lead
+ * card and puts the rest in the scrolling rail — the same markup and classes
+ * the static version drew, so the design is unchanged.
  *
- * THE RAIL SCROLLS, IT DOES NOT PAGE. Figma draws a scrollbar and a gradient
- * that clips the first and last rows mid-card, which is the design telling you
- * it is a plain overflow region rather than a carousel — so it is one, and the
- * section needs no script at all. The stepper and the "Load more" button in the
- * frame are both hidden there; they are not built.
+ * With no items the whole section stays hidden, so a page with no upcoming
+ * events simply has no empty bordered panel.
  *
- * THE FADES ARE OVERLAYS, NOT A MASK ON THE SCROLLER. Figma has them as a
- * "Gradient - overlay" frame sitting above the list, and that is also the only
- * version that works: masking the scroll container fades its scrollbar along
- * with its content, and the scrollbar is the thing telling you there is more to
- * see. Two absolutely-positioned gradients stop short of the scrollbar instead.
+ * Attributes read from each `.ct-ev-data`:
+ *   data-name  data-slug  data-type  data-country  data-date  data-display-time
+ *   data-location  data-speaker-1-name  data-speaker-2-name  data-speaker-3-name
+ *   data-popular ("yes" when the Popular switch is on)
  *
- * `image: ''` renders the Figma "Visual Placeholder" tint on its own, which is
- * what the mockup shows. Drop in a Webflow asset URL to replace it — never a
- * `data:` URI, that alone can blow the 50 KB Embed budget.
+ * THE RAIL SCROLLS, IT DOES NOT PAGE, and the fades are overlays rather than a
+ * mask on the scroller — see the notes on the scroll hint at the bottom.
  */
-/* Cards link to the detail route, NOT to `event.href`. `href` is still the
-   registration / recording link — the detail page's "Register now" button is
-   what uses it now. Going through `eventPath` means a card can only ever point
-   at a slug `events/[slug].astro` has generated a page for. */
-import { upcomingEvents, eventPath } from "../../data/events";
-
 const heading = "Our upcoming webinars & events";
 const subheading =
   "Stay ahead with expert-led sessions designed for enterprise leaders";
 const ctaLabel = "Sign up to discover our upcoming sessions";
 const ctaHref = "https://www.cleartax.com/contact-us";
-
-const lead = upcomingEvents[0];
-const rail = upcomingEvents.slice(1);
-
-/* Two speaker chips over the lead image; everyone else rolls into the "+N"
-   chip beside them. Names here run long ("Vivek Menon, Solutions Architect"),
-   and at three chips a row of them wraps onto a second line that then collides
-   with the image's bottom edge. The count is the knob — `extraSpeakers` follows
-   it, so changing this number is the only edit needed. */
-const SPEAKERS_SHOWN = 2;
-const leadSpeakers = lead.speakers.slice(0, SPEAKERS_SHOWN);
-const extraSpeakers = lead.speakers.length - leadSpeakers.length;
-
-/* Over the lead image: the type chip is outlined, speaker chips are not. */
-const chipClass =
-  "inline-flex items-center gap-2 rounded-lg bg-neutral-100 px-3 py-1.5 font-body font-medium text-neutral-700 text-[length:var(--fs-label)] leading-[var(--lh-label)]";
-const chipOutlined = `${chipClass} border border-ledger-300`;
-
-/* On rail cards everything is a size down — 12px type in a 4px-radius chip. */
-const railChip =
-  "inline-flex items-center gap-1 rounded border border-ledger-300 bg-neutral-100 px-1.5 py-0.5 font-body font-medium text-neutral-700 text-[length:var(--fs-label-sm)] leading-[var(--lh-label-sm)]";
-
-const metaClass =
-  "flex items-center gap-2 font-body font-normal text-neutral-500 text-[length:var(--fs-body-sm)] leading-[var(--lh-body-sm)] m-0";
 ---
 
-<section class="bg-generic-00 py-12 md:py-20">
+<section class="bg-generic-00 py-12 md:py-20" data-ev-upcoming-root style="display: none">
   <!-- Icon sprite: defined once, referenced by the lead card and every rail
        row. Keeps the pasted Embed small — the globe path alone is ~700
        characters and this section draws it up to five times. -->
@@ -137,128 +106,8 @@ const metaClass =
       <div
         class="mt-8 grid grid-cols-1 items-start gap-8 lg:grid-cols-[689fr_507fr]"
       >
-        <!-- Lead event -->
-        <a
-          href={eventPath(lead.slug)}
-          class="group flex flex-col gap-6 no-underline"
-        >
-          <div
-            class="relative aspect-video w-full overflow-hidden rounded-xl border border-ledger-300 bg-visual-placeholder"
-          >
-            {
-              lead.image && (
-                <img
-                  src={lead.image}
-                  alt={lead.title}
-                  width="1280"
-                  height="720"
-                  loading="eager"
-                  decoding="async"
-                  class="h-full w-full object-cover"
-                />
-              )
-            }
-
-            <span
-              class="absolute left-5 top-5 flex flex-wrap items-center gap-2"
-            >
-              <!-- FLUX LIME, AND NOT THE ONLY ONE ON THIS SCREEN — the rail's
-                   "Popular" chip is lime too. docs/brand/colour.md says one
-                   instance per screen; Figma 14777:26976 draws both, so the
-                   design is followed here and the conflict is left visible
-                   rather than silently resolved. If the rule wins, this badge
-                   is the one to keep: it marks the lead session, where the
-                   accent is doing the most work. -->
-              <span
-                class="rounded-lg bg-flux-lime px-3 py-1.5 font-body font-medium text-vault-navy text-[length:var(--fs-label)] leading-[var(--lh-label)]"
-              >
-                Upcoming
-              </span>
-              <span class={chipOutlined}>
-                <svg
-                  width="16"
-                  height="16"
-                  class="shrink-0"
-                  aria-hidden="true"
-                  focusable="false"
-                  ><use
-                    href={lead.type === "Online"
-                      ? "#ct-ev-up-globe"
-                      : "#ct-ev-up-user"}></use></svg
-                >
-                {lead.type}
-              </span>
-            </span>
-
-            <span
-              class="absolute right-5 top-5 flex h-10 w-10 items-center justify-center rounded-lg bg-ledger-white text-vault-navy transition-colors duration-200 group-hover:bg-nova-blue group-hover:text-ledger-white"
-            >
-              <svg width="20" height="20" aria-hidden="true" focusable="false"
-                ><use href="#ct-ev-up-arrow"></use></svg
-              >
-            </span>
-
-            <span class="absolute bottom-5 left-5 right-5 flex flex-wrap gap-2">
-              {
-                leadSpeakers.map((speaker) => (
-                  <span class={chipClass}>{speaker}</span>
-                ))
-              }
-              {
-                extraSpeakers > 0 && (
-                  <span class={chipClass}>+{extraSpeakers}</span>
-                )
-              }
-            </span>
-          </div>
-
-          <div class="flex flex-col gap-4">
-            <h3
-              class="font-heading font-medium text-vault-navy text-[length:var(--fs-h3)] leading-[var(--lh-h3)] tracking-[var(--tracking-heading)] m-0 transition-colors duration-200 group-hover:text-nova-blue"
-            >
-              {lead.title}
-            </h3>
-
-            <div class="flex flex-wrap items-center gap-3">
-              <p class={metaClass}>
-                <svg
-                  width="20"
-                  height="20"
-                  class="shrink-0"
-                  aria-hidden="true"
-                  focusable="false"><use href="#ct-ev-up-calendar"></use></svg
-                >
-                <time datetime={lead.datetime}>{lead.date}</time>
-              </p>
-              <span
-                class="h-4 w-px shrink-0 rounded-full bg-ledger-300"
-                aria-hidden="true"></span>
-              <p class={metaClass}>
-                <svg
-                  width="20"
-                  height="20"
-                  class="shrink-0"
-                  aria-hidden="true"
-                  focusable="false"><use href="#ct-ev-up-clock"></use></svg
-                >
-                {lead.time}
-              </p>
-              <span
-                class="h-4 w-px shrink-0 rounded-full bg-ledger-300"
-                aria-hidden="true"></span>
-              <p class={metaClass}>
-                <svg
-                  width="20"
-                  height="20"
-                  class="shrink-0"
-                  aria-hidden="true"
-                  focusable="false"><use href="#ct-ev-up-pin"></use></svg
-                >
-                {lead.location}
-              </p>
-            </div>
-          </div>
-        </a>
+        <!-- Lead event, filled by the script -->
+        <div data-ev-lead></div>
 
         <!-- Rail. The wrapper is the positioning context for the two fades; the
              scroller inside owns the overflow so they never move with it. -->
@@ -267,123 +116,6 @@ const metaClass =
             class="ev-rail flex max-h-[535px] flex-col gap-6 overflow-y-auto py-8 pr-4"
             data-ev-rail
           >
-            {
-              rail.map((event) => (
-                <a
-                  href={eventPath(event.slug)}
-                  class="group flex items-center gap-6 no-underline"
-                >
-                  <span class="relative block h-[116px] w-[140px] shrink-0 overflow-hidden rounded-lg border border-ledger-300 bg-visual-placeholder sm:w-[206px]">
-                    {event.image && (
-                      <img
-                        src={event.image}
-                        alt={event.title}
-                        width="1280"
-                        height="720"
-                        loading="lazy"
-                        decoding="async"
-                        class="h-full w-full object-cover"
-                      />
-                    )}
-
-                    {/* Hover affordance. The lead card wears its arrow
-                        permanently because it has the room; a 116px rail
-                        thumbnail does not, so the arrow only appears over the
-                        image on hover. Kept in the SAME white chip as the lead
-                        rather than as a bare glyph: the placeholder is a flat
-                        tint today, but once real `image` URLs land a navy arrow
-                        drawn straight onto a photo is a coin toss to read.
-
-                        `group-focus-visible` as well as `group-hover` — the row
-                        is a link, so keyboard users reach it and get nothing
-                        from hover. `pointer-events-none` keeps the overlay out
-                        of the anchor's own hit test. */}
-                    <span class="pointer-events-none absolute inset-0 flex items-center justify-center opacity-0 transition-opacity duration-200 group-hover:opacity-100 group-focus-visible:opacity-100">
-                      <span class="flex h-9 w-9 items-center justify-center text-vault-navy">
-                        <svg
-                          width="20"
-                          height="20"
-                          aria-hidden="true"
-                          focusable="false"
-                        >
-                          <use href="#ct-ev-up-arrow" />
-                        </svg>
-                      </span>
-                    </span>
-                  </span>
-
-                  <span class="flex min-w-0 flex-1 flex-col gap-3">
-                    <span class="flex flex-col gap-2">
-                      {/* Clamped: the rail column is narrow and a third line on
-                          one row would push the whole list out of step. */}
-                      <span class="line-clamp-2 font-body font-medium text-vault-navy text-[length:var(--fs-label-lg)] leading-[var(--lh-label-lg)] transition-colors duration-200 group-hover:text-nova-blue">
-                        {event.title}
-                      </span>
-                      <span class="truncate font-body font-normal text-neutral-500 text-[length:var(--fs-body-sm)] leading-[var(--lh-body-sm)]">
-                        {event.speakers[0]}
-                      </span>
-                    </span>
-
-                    <span class="flex flex-wrap items-center gap-2 font-body font-normal text-neutral-500 text-[length:var(--fs-body-sm)] leading-[var(--lh-body-sm)]">
-                      <span class="flex items-center gap-2">
-                        <svg
-                          width="20"
-                          height="20"
-                          class="shrink-0"
-                          aria-hidden="true"
-                          focusable="false"
-                        >
-                          <use href="#ct-ev-up-calendar" />
-                        </svg>
-                        <time datetime={event.datetime}>{event.date}</time>
-                      </span>
-                      <span
-                        class="h-4 w-px shrink-0 rounded-full bg-ledger-300"
-                        aria-hidden="true"
-                      />
-                      <span class="flex items-center gap-2">
-                        <svg
-                          width="20"
-                          height="20"
-                          class="shrink-0"
-                          aria-hidden="true"
-                          focusable="false"
-                        >
-                          <use href="#ct-ev-up-clock" />
-                        </svg>
-                        {event.time}
-                      </span>
-                    </span>
-
-                    <span class="flex flex-wrap items-center gap-1">
-                      <span class={railChip}>
-                        <svg
-                          width="16"
-                          height="16"
-                          class="shrink-0"
-                          aria-hidden="true"
-                          focusable="false"
-                        >
-                          <use
-                            href={
-                              event.type === "Online"
-                                ? "#ct-ev-up-globe"
-                                : "#ct-ev-up-user"
-                            }
-                          />
-                        </svg>
-                        {event.type}
-                      </span>
-                      {event.popular && (
-                        <span class="inline-flex items-center rounded bg-flux-lime px-1.5 py-0.5 font-body font-medium text-neutral-700 text-[length:var(--fs-label-sm)] leading-[var(--lh-label-sm)]">
-                          Popular
-                        </span>
-                      )}
-                    </span>
-                  </span>
-                </a>
-              ))
-            }
           </div>
 
           <!-- The fades. `right-4` clears the scrollbar gutter so the thumb
@@ -439,7 +171,153 @@ const metaClass =
     background: var(--color-ledger-300, #d7d0d1);
     border-radius: 999px;
   }
+
+  /* The Webflow Collection List that feeds this section. Hidden by class so it
+     never renders where it sits on the page. */
+  .ct-ev-upcoming-source {
+    display: none;
+  }
 </style>
+
+<script is:inline>
+  /* Builds the lead card and the rail from the hidden Collection List. Runs on
+     DOMContentLoaded so the list can sit anywhere on the page, above or below
+     this Embed. */
+  (function () {
+    var CHIP =
+      "inline-flex items-center gap-2 rounded-lg bg-neutral-100 px-3 py-1.5 font-body font-medium text-neutral-700 text-[length:var(--fs-label)] leading-[var(--lh-label)]";
+    var CHIP_OUTLINED = CHIP + " border border-ledger-300";
+    var RAIL_CHIP =
+      "inline-flex items-center gap-1 rounded border border-ledger-300 bg-neutral-100 px-1.5 py-0.5 font-body font-medium text-neutral-700 text-[length:var(--fs-label-sm)] leading-[var(--lh-label-sm)]";
+    var META =
+      "flex items-center gap-2 font-body font-normal text-neutral-500 text-[length:var(--fs-body-sm)] leading-[var(--lh-body-sm)] m-0";
+    var DIVIDER =
+      '<span class="h-4 w-px shrink-0 rounded-full bg-ledger-300" aria-hidden="true"></span>';
+    var MONTHS = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+
+    function ready(fn) {
+      if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", fn);
+      else fn();
+    }
+
+    function esc(s) {
+      return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+    }
+
+    function parseDate(s) {
+      if (!s) return null;
+      var m = s.match(/^(\d{4})-(\d{2})-(\d{2})/);
+      var d = m ? new Date(+m[1], +m[2] - 1, +m[3]) : new Date(s);
+      return isNaN(d.getTime()) ? null : d;
+    }
+
+    function pad(n) {
+      return (n < 10 ? "0" : "") + n;
+    }
+
+    function svg(size, id, extra) {
+      return '<svg width="' + size + '" height="' + size + '" class="' + (extra || "shrink-0") + '" aria-hidden="true" focusable="false"><use href="#' + id + '"></use></svg>';
+    }
+
+    function read() {
+      var base = location.pathname.replace(/\/$/, "");
+      var nodes = document.querySelectorAll(".ct-ev-upcoming-source .ct-ev-data");
+      var items = [];
+      Array.prototype.forEach.call(nodes, function (node) {
+        function a(k) {
+          return (node.getAttribute("data-" + k) || "").trim();
+        }
+        if (!a("name") || !a("slug")) return;
+        var img = node.querySelector(".ct-f-thumbnail");
+        var d = parseDate(a("date"));
+        items.push({
+          name: a("name"),
+          href: base + "/" + a("slug"),
+          online: /webinar|online/i.test(a("type")),
+          type: a("type"),
+          date: d,
+          dateText: d ? MONTHS[d.getMonth()] + " " + d.getDate() + ", " + d.getFullYear() : a("date"),
+          iso: d ? d.getFullYear() + "-" + pad(d.getMonth() + 1) + "-" + pad(d.getDate()) : "",
+          time: a("display-time"),
+          location: a("location"),
+          speakers: [a("speaker-1-name"), a("speaker-2-name"), a("speaker-3-name")].filter(Boolean),
+          popular: /^(yes|true|1|on)$/i.test(a("popular")),
+          image: img ? img.getAttribute("src") || "" : "",
+        });
+      });
+      // Soonest first; an event with no date goes last.
+      items.sort(function (x, y) {
+        if (!x.date && !y.date) return 0;
+        if (!x.date) return 1;
+        if (!y.date) return -1;
+        return x.date - y.date;
+      });
+      return items;
+    }
+
+    function lead(e) {
+      var shown = e.speakers.slice(0, 2);
+      var chips = shown.map(function (n) { return '<span class="' + CHIP + '">' + esc(n) + "</span>"; }).join("");
+      if (e.speakers.length > shown.length) chips += '<span class="' + CHIP + '">+' + (e.speakers.length - shown.length) + "</span>";
+      var meta = ['<p class="' + META + '">' + svg(20, "ct-ev-up-calendar") + '<time datetime="' + esc(e.iso) + '">' + esc(e.dateText) + "</time></p>"];
+      if (e.time) meta.push('<p class="' + META + '">' + svg(20, "ct-ev-up-clock") + esc(e.time) + "</p>");
+      if (e.location) meta.push('<p class="' + META + '">' + svg(20, "ct-ev-up-pin") + esc(e.location) + "</p>");
+      return (
+        '<a href="' + esc(e.href) + '" class="group flex flex-col gap-6 no-underline">' +
+          '<div class="relative aspect-video w-full overflow-hidden rounded-xl border border-ledger-300 bg-visual-placeholder">' +
+            (e.image ? '<img src="' + esc(e.image) + '" alt="' + esc(e.name) + '" width="1280" height="720" loading="eager" decoding="async" class="h-full w-full object-cover" />' : "") +
+            '<span class="absolute left-5 top-5 flex flex-wrap items-center gap-2">' +
+              '<span class="rounded-lg bg-flux-lime px-3 py-1.5 font-body font-medium text-vault-navy text-[length:var(--fs-label)] leading-[var(--lh-label)]">Upcoming</span>' +
+              (e.type ? '<span class="' + CHIP_OUTLINED + '">' + svg(16, e.online ? "ct-ev-up-globe" : "ct-ev-up-user") + esc(e.type) + "</span>" : "") +
+            "</span>" +
+            '<span class="absolute right-5 top-5 flex h-10 w-10 items-center justify-center rounded-lg bg-ledger-white text-vault-navy transition-colors duration-200 group-hover:bg-nova-blue group-hover:text-ledger-white">' + svg(20, "ct-ev-up-arrow", "") + "</span>" +
+            (chips ? '<span class="absolute bottom-5 left-5 right-5 flex flex-wrap gap-2">' + chips + "</span>" : "") +
+          "</div>" +
+          '<div class="flex flex-col gap-4">' +
+            '<h3 class="font-heading font-medium text-vault-navy text-[length:var(--fs-h3)] leading-[var(--lh-h3)] tracking-[var(--tracking-heading)] m-0 transition-colors duration-200 group-hover:text-nova-blue">' + esc(e.name) + "</h3>" +
+            '<div class="flex flex-wrap items-center gap-3">' + meta.join(DIVIDER) + "</div>" +
+          "</div>" +
+        "</a>"
+      );
+    }
+
+    function row(e) {
+      var meta = ['<span class="flex items-center gap-2">' + svg(20, "ct-ev-up-calendar") + '<time datetime="' + esc(e.iso) + '">' + esc(e.dateText) + "</time></span>"];
+      if (e.time) meta.push('<span class="flex items-center gap-2">' + svg(20, "ct-ev-up-clock") + esc(e.time) + "</span>");
+      return (
+        '<a href="' + esc(e.href) + '" class="group flex items-center gap-6 no-underline">' +
+          '<span class="relative block h-[116px] w-[140px] shrink-0 overflow-hidden rounded-lg border border-ledger-300 bg-visual-placeholder sm:w-[206px]">' +
+            (e.image ? '<img src="' + esc(e.image) + '" alt="' + esc(e.name) + '" width="1280" height="720" loading="lazy" decoding="async" class="h-full w-full object-cover" />' : "") +
+            '<span class="pointer-events-none absolute inset-0 flex items-center justify-center opacity-0 transition-opacity duration-200 group-hover:opacity-100 group-focus-visible:opacity-100">' +
+              '<span class="flex h-9 w-9 items-center justify-center text-vault-navy">' + svg(20, "ct-ev-up-arrow", "") + "</span>" +
+            "</span>" +
+          "</span>" +
+          '<span class="flex min-w-0 flex-1 flex-col gap-3">' +
+            '<span class="flex flex-col gap-2">' +
+              '<span class="line-clamp-2 font-body font-medium text-vault-navy text-[length:var(--fs-label-lg)] leading-[var(--lh-label-lg)] transition-colors duration-200 group-hover:text-nova-blue">' + esc(e.name) + "</span>" +
+              (e.speakers[0] ? '<span class="truncate font-body font-normal text-neutral-500 text-[length:var(--fs-body-sm)] leading-[var(--lh-body-sm)]">' + esc(e.speakers[0]) + "</span>" : "") +
+            "</span>" +
+            '<span class="flex flex-wrap items-center gap-2 font-body font-normal text-neutral-500 text-[length:var(--fs-body-sm)] leading-[var(--lh-body-sm)]">' + meta.join(DIVIDER) + "</span>" +
+            '<span class="flex flex-wrap items-center gap-1">' +
+              (e.type ? '<span class="' + RAIL_CHIP + '">' + svg(16, e.online ? "ct-ev-up-globe" : "ct-ev-up-user") + esc(e.type) + "</span>" : "") +
+              (e.popular ? '<span class="inline-flex items-center rounded bg-flux-lime px-1.5 py-0.5 font-body font-medium text-neutral-700 text-[length:var(--fs-label-sm)] leading-[var(--lh-label-sm)]">Popular</span>' : "") +
+            "</span>" +
+          "</span>" +
+        "</a>"
+      );
+    }
+
+    ready(function () {
+      var root = document.querySelector("[data-ev-upcoming-root]");
+      if (!root) return;
+      var items = read();
+      if (!items.length) return; // nothing upcoming: the panel stays hidden
+      root.querySelector("[data-ev-lead]").innerHTML = lead(items[0]);
+      root.querySelector("[data-ev-rail]").innerHTML = items.slice(1).map(row).join("");
+      root.style.display = "";
+    });
+  })();
+</script>
 
 <script is:inline>
   /* Scroll hint — plays ONCE, the first time the rail is on screen.
@@ -465,6 +343,8 @@ const metaClass =
      - starts when the rail enters the viewport, not at DOMContentLoaded, so a
        reader who lands further down the page has not already missed it. */
   (function () {
+    // Registered after the builder above, so on DOMContentLoaded the rail has
+    // its rows by the time this measures whether it overflows.
     if (document.readyState === "loading") {
       document.addEventListener("DOMContentLoaded", init);
     } else {
