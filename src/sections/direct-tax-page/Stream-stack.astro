@@ -222,56 +222,56 @@ const cardsData = [
                                                 <!-- Floating App Badges Layer -->
                                                 <div class="gl-app-icons-container absolute inset-x-0 top-0 h-[65%] pointer-events-none z-10" style="overflow:visible;">
                                                     <!-- Icon 1: Purple Sunburst (Top-left) -->
-                                                    <div class="gl-app-badge absolute left-[10%] top-[2%]">
+                                                    <div class="gl-app-badge absolute left-[10%] top-[2%] opacity-0">
                                                         <img src="/images/direct-tax-page/animate-1-2.png" alt="App" class="gl-icon-img block" />
                                                     </div>
 
                                                     <!-- Icon 2: Infor (Top-center) -->
-                                                    <div class="gl-app-badge absolute left-[43%] top-[8%]">
+                                                    <div class="gl-app-badge absolute left-[43%] top-[8%] opacity-0">
                                                         <img src="/images/direct-tax-page/animate-1-3.png" alt="Infor" class="gl-icon-img block" />
                                                     </div>
 
                                                     <!-- Icon 3: Blue Wedge (Top-right) -->
-                                                    <div class="gl-app-badge absolute right-[8%] top-0">
+                                                    <div class="gl-app-badge absolute right-[8%] top-0 opacity-0">
                                                         <img src="/images/direct-tax-page/animate-1-4.png" alt="App" class="gl-icon-img block" />
                                                     </div>
 
                                                     <!-- Icon 4: Dynamics 365 (Mid-left) -->
-                                                    <div class="gl-app-badge absolute left-[30%] top-[48%]">
+                                                    <div class="gl-app-badge absolute left-[30%] top-[48%] opacity-0">
                                                         <img src="/images/direct-tax-page/animate-1-6.png" alt="Dynamics" class="gl-icon-img block" />
                                                     </div>
 
                                                     <!-- Icon 5: Workday (Mid-right) -->
-                                                    <div class="gl-app-badge absolute right-[23%] top-[37%]">
+                                                    <div class="gl-app-badge absolute right-[23%] top-[37%] opacity-0">
                                                         <img src="/images/direct-tax-page/animate-1-5.png" alt="Workday" class="gl-icon-img block" />
                                                     </div>
 
                                                     <!-- Icon 6: Microsoft (Folder mouth, center) -->
-                                                    <div class="gl-app-badge absolute left-[44%] top-[83%] z-10">
+                                                    <div class="gl-app-badge absolute left-[44%] top-[83%] z-10 opacity-0">
                                                         <img src="/images/direct-tax-page/animate-1-7.png" alt="Microsoft" class="gl-icon-img block" />
                                                     </div>
 
                                                     <!-- Icon 7: Oracle (Folder mouth, left) -->
-                                                    <div class="gl-app-badge absolute left-[35%] top-[88%] z-10">
+                                                    <div class="gl-app-badge absolute left-[34%] top-[87%] z-10 opacity-0">
                                                         <img src="/images/direct-tax-page/animate-1-8.png" alt="Oracle" class="gl-icon-img block" />
                                                     </div>
 
                                                     <!-- Icon 8: App (Inside folder, right) -->
-                                                    <div class="gl-app-badge absolute right-[29%] top-[100%] z-10">
+                                                    <div class="gl-app-badge absolute right-[29%] top-[100%] z-10 opacity-0">
                                                         <img src="/images/direct-tax-page/animate-1-10.png" alt="App" class="gl-icon-img block blur-[2px] opacity-90" />
                                                     </div>
                                                 </div>
 
                                                 <!-- Folder Graphics Container -->
                                                 <div class="gl-folder-wrapper relative w-[120px] sm:w-[132px] aspect-[4/3] flex items-center justify-center pointer-events-none">
-                                                    <!-- Folder 1: Empty Folder (Exact counterpart to animate-1-9) -->
+                                                    <!-- Open Folder -->
                                                     <img
                                                         src="/images/direct-tax-page/animate-1-1.png"
-                                                        alt="Empty Folder"
+                                                        alt="Open Folder"
                                                         class="gl-folder-empty absolute inset-0 w-full h-full object-contain transition-opacity duration-300"
                                                     />
 
-                                                    <!-- Folder 2: Packed Folder with Apps Inside (Exact counterpart to animate-1-1) -->
+                                                    <!-- Packed Folder with Apps Inside -->
                                                     <img
                                                         src="/images/direct-tax-page/animate-1-9.png"
                                                         alt="Packed Folder"
@@ -282,12 +282,12 @@ const cardsData = [
                                             </div>
 
                                             <!-- ============================================== -->
-                                            <!-- STAGE 2.5: BIG FOLDER (animation-1-11.png)     -->
+                                            <!-- STAGE 2.5: BIG FOLDER (animation-1-12.png)     -->
                                             <!-- ============================================== -->
-                                            <div class="gl-stage-big-folder absolute inset-0 z-10 flex items-center justify-center p-3 sm:p-5 opacity-0 pointer-events-none transition-all duration-500">
-                                                <div class="relative w-[210px] sm:w-[250px] aspect-[4/3] flex items-center justify-center">
+                                            <div class="gl-stage-big-folder absolute inset-0 z-10 flex items-center justify-center pointer-events-none opacity-0">
+                                                <div class="gl-big-folder-wrapper relative w-[264px] h-[204px] flex items-center justify-center">
                                                     <img
-                                                        src="/images/direct-tax-page/animation-1-11.png"
+                                                        src="/images/direct-tax-page/animation-1-12.png"
                                                         alt="Expanded Folder"
                                                         class="gl-big-folder-img w-full h-full object-contain"
                                                     />
@@ -705,12 +705,13 @@ const cardsData = [
             var folderWrapper = canvas.querySelector(".gl-folder-wrapper");
 
             var stageBigFolder = canvas.querySelector(".gl-stage-big-folder");
+            var bigFolderWrapper = canvas.querySelector(".gl-big-folder-wrapper") || (stageBigFolder ? stageBigFolder.querySelector("div") : null);
             var bigFolderImg = canvas.querySelector(".gl-big-folder-img");
 
             var stageGrid = canvas.querySelector(".gl-stage-grid");
             var gridTiles = Array.from(canvas.querySelectorAll(".gl-stage-grid .gl-tile"));
 
-            if (!badges.length || !folderPacked || !folderWrapper) return;
+            if (!badges.length || !folderWrapper) return;
 
             var emptyFolderElements = folderEmpty ? [folderEmpty] : [folderBack, folderFront].filter(Boolean);
             var iconImgs = badges.map(function (b) { return b.querySelector("img"); });
@@ -747,235 +748,314 @@ const cardsData = [
                     currentTl.kill();
                 }
 
-                // Reset all states initially
+                // Reset all states initially: Open folder visible alone, icons hidden below with scale
                 var PACKED_SCALE = 1.15;
                 var PACKED_Y = 2;
-                gsap.set(badges, { x: 0, y: 0, opacity: 1, scale: 1, rotation: 0, clearProps: "transform,filter" });
-                gsap.set(iconImgs, { scale: 1, clearProps: "transform,filter" });
+                gsap.set(badges, { x: 0, y: 30, opacity: 0, scale: 0.35, rotation: function(i) { return i % 2 === 0 ? -12 : 12; }, clearProps: "filter" });
+                gsap.set(iconImgs, { scale: 1, clearProps: "filter" });
                 if (stageFolder) gsap.set(stageFolder, { opacity: 1, scale: 1 });
                 gsap.set(emptyFolderElements, { opacity: 1, scale: 1, clearProps: "transform" });
-                gsap.set(folderPacked, { opacity: 0, scale: PACKED_SCALE, y: PACKED_Y });
+                if (folderPacked) gsap.set(folderPacked, { opacity: 0, scale: PACKED_SCALE, y: PACKED_Y });
 
                 if (stageBigFolder) {
-                    gsap.set(stageBigFolder, { opacity: 0 });
-                    if (bigFolderImg) gsap.set(bigFolderImg, { scale: 0.92 });
+                    gsap.set(stageBigFolder, { opacity: 0, scale: 1 });
+                    if (bigFolderWrapper) gsap.set(bigFolderWrapper, { x: 0, y: 0, scale: 1, rotation: 0, clearProps: "transform" });
                 }
 
                 if (stageGrid) {
-                    gsap.set(stageGrid, { opacity: 0, scale: 0.95 });
-                    if (gridTiles.length) gsap.set(gridTiles, { opacity: 1, scale: 1 });
+                    gsap.set(stageGrid, { opacity: 0, scale: 1 });
+                    if (gridTiles.length) gsap.set(gridTiles, { opacity: 0, scale: 0.3 });
                 }
 
-                var tl = gsap.timeline({ delay: 0.5 });
+                var tl = gsap.timeline({ delay: 0.2 });
                 currentTl = tl;
 
                 // ----------------------------------------------------
+                // STAGE 0: Open folder sits alone, then icons spring
+                // up organically into orbit with tactile physics
+                // ----------------------------------------------------
+                var appearStart = 0.35;
+                badges.forEach(function (badge, i) {
+                    tl.to(badge, {
+                        opacity: i === 7 ? 0.9 : 1,
+                        y: 0,
+                        scale: 1,
+                        rotation: i % 2 === 0 ? -2 : 2,
+                        duration: 0.52,
+                        ease: "back.out(1.8)",
+                    }, appearStart + i * 0.08);
+                });
+
+                // Idle floating breath while hovering above the folder
+                var floatStart = appearStart + badges.length * 0.08 + 0.15;
+                badges.forEach(function (badge, i) {
+                    tl.to(badge, {
+                        y: i % 2 === 0 ? -6 : 6,
+                        duration: 0.55,
+                        ease: "sine.inOut",
+                        yoyo: true,
+                        repeat: 1,
+                    }, floatStart + i * 0.04);
+                });
+
+                var dropStart = floatStart + 0.9;
+
+                // ----------------------------------------------------
                 // STAGE 1: Mouth badges (Oracle, Microsoft, App)
-                // drop into the folder mouth and vanish inside
+                // tumble and shrink into the depth of the mouth
                 // ----------------------------------------------------
                 var mouthIndices = [6, 5, 7];
                 mouthIndices.forEach(function (idx, i) {
                     if (!badges[idx]) return;
                     var drop = getThrowTarget(badges[idx], idx);
-                    var tStart = 0.2 + i * 0.08;
-                    var dur = 0.28;
+                    var tStart = dropStart + i * 0.1;
+                    var dur = 0.32;
 
                     tl.to(badges[idx], {
                         x: drop.dx,
-                        y: drop.dy + 8,
+                        y: drop.dy + 14,
+                        scale: 0.2,
+                        rotation: idx % 2 === 0 ? -18 : 18,
                         duration: dur,
                         ease: "power2.in",
                     }, tStart);
 
-                    tl.to(iconImgs[idx], {
-                        scale: 0.78,
-                        duration: dur,
-                        ease: "power2.in",
-                    }, tStart);
-
-                    // Disappear as it enters the folder mouth
                     tl.to(badges[idx], {
                         opacity: 0,
-                        duration: 0.1,
+                        duration: 0.08,
                         ease: "power1.in",
-                    }, tStart + dur - 0.08);
+                    }, tStart + dur - 0.06);
+
+                    // Folder squashes on catch
+                    tl.to(emptyFolderElements, {
+                        scaleX: 1.03,
+                        scaleY: 0.97,
+                        duration: 0.08,
+                        yoyo: true,
+                        repeat: 1,
+                        ease: "power1.inOut",
+                    }, tStart + dur - 0.04);
                 });
 
                 // ----------------------------------------------------
                 // STAGE 2: Mid-tier badges (Dynamics 365 & Workday)
-                // get thrown down towards the folder mouth and vanish
+                // accelerate down, rotate, and plunge deep into folder
                 // ----------------------------------------------------
                 var midIndices = [3, 4];
                 midIndices.forEach(function (idx, i) {
                     if (!badges[idx]) return;
                     var drop = getThrowTarget(badges[idx], idx);
-                    var tStart = 0.5 + i * 0.12;
-                    var dur = 0.44;
+                    var tStart = dropStart + 0.35 + i * 0.14;
+                    var dur = 0.46;
 
                     tl.to(badges[idx], {
                         x: drop.dx,
-                        y: drop.dy + 10,
+                        y: drop.dy + 16,
+                        scale: 0.18,
+                        rotation: idx % 2 === 0 ? 22 : -22,
                         duration: dur,
                         ease: "power2.in",
                     }, tStart);
 
-                    tl.to(iconImgs[idx], {
-                        scale: 0.72,
-                        duration: dur,
-                        ease: "power2.in",
-                    }, tStart);
-
-                    // Disappear as it reaches folder opening ("dont show it")
                     tl.to(badges[idx], {
                         opacity: 0,
-                        duration: 0.1,
+                        duration: 0.08,
                         ease: "power1.in",
-                    }, tStart + dur - 0.08);
+                    }, tStart + dur - 0.06);
                 });
 
-                // Folder reacts with a slight catch bounce as mid apps land
+                // Folder catches mid-tier apps with a satisfying bounce
                 tl.to(emptyFolderElements, {
-                    scaleX: 1.02,
-                    scaleY: 0.98,
-                    duration: 0.07,
+                    scaleX: 1.05,
+                    scaleY: 0.95,
+                    duration: 0.1,
                     yoyo: true,
                     repeat: 1,
                     ease: "power1.inOut",
-                }, 0.98);
+                }, dropStart + 0.88);
 
                 // ----------------------------------------------------
                 // STAGE 3: Top-tier badges (Infor, Sunburst, Blue Wedge)
-                // get thrown down from top towards the folder mouth
+                // swoop down from the top arc into the mouth
                 // ----------------------------------------------------
                 var topIndices = [1, 0, 2];
                 topIndices.forEach(function (idx, i) {
                     if (!badges[idx]) return;
                     var drop = getThrowTarget(badges[idx], idx);
-                    var tStart = 0.88 + i * 0.12;
+                    var tStart = dropStart + 0.72 + i * 0.12;
                     var dur = 0.52;
 
                     tl.to(badges[idx], {
                         x: drop.dx,
-                        y: drop.dy + 12,
+                        y: drop.dy + 18,
+                        scale: 0.15,
+                        rotation: idx % 2 === 0 ? -25 : 25,
                         duration: dur,
                         ease: "power2.in",
                     }, tStart);
 
-                    tl.to(iconImgs[idx], {
-                        scale: 0.7,
-                        duration: dur,
-                        ease: "power2.in",
-                    }, tStart);
-
-                    // Disappear right as it plunges into folder opening
                     tl.to(badges[idx], {
                         opacity: 0,
-                        duration: 0.1,
+                        duration: 0.08,
                         ease: "power1.in",
-                    }, tStart + dur - 0.08);
+                    }, tStart + dur - 0.06);
                 });
 
                 // ----------------------------------------------------
-                // STAGE 4: All apps thrown in! Folder catches them &
-                // seamlessly fades in to the packed folder (animate-1-9.png)
+                // STAGE 4: All apps caught! Folder absorbs impact with
+                // an organic squeeze & pop into packed folder
                 // ----------------------------------------------------
-                var packedTime = 1.55;
+                var packedTime = dropStart + 1.45;
 
-                // Packed folder fades in smoothly
-                tl.to(folderPacked, {
-                    opacity: 1,
-                    duration: 0.35,
-                    ease: "power1.inOut",
+                // Folder dips with weight impact
+                tl.to(folderWrapper, {
+                    scaleX: 1.07,
+                    scaleY: 0.93,
+                    y: 4,
+                    duration: 0.12,
+                    ease: "power2.in",
                 }, packedTime);
 
-                // Empty folder fades out behind it simultaneously
-                tl.to(emptyFolderElements, {
-                    opacity: 0,
-                    duration: 0.35,
-                    ease: "power1.inOut",
-                }, packedTime);
+                // Transformation occurs inside the impact
+                if (folderPacked) {
+                    tl.to(folderPacked, {
+                        opacity: 1,
+                        duration: 0.18,
+                        ease: "power1.inOut",
+                    }, packedTime + 0.06);
 
-                // Subtle tactile catch bounce on folderWrapper so both folders stay locked together
-                tl.fromTo(folderWrapper, {
-                    scale: 0.98,
-                }, {
-                    scale: 1,
-                    duration: 0.35,
-                    ease: "back.out(1.4)",
-                }, packedTime);
+                    tl.to(emptyFolderElements, {
+                        opacity: 0,
+                        duration: 0.18,
+                        ease: "power1.inOut",
+                    }, packedTime + 0.06);
+                }
 
-                // Ensure all individual badges are hidden
+                // Elastic rebound
+                tl.to(folderWrapper, {
+                    scaleX: 1,
+                    scaleY: 1,
+                    y: 0,
+                    duration: 0.45,
+                    ease: "elastic.out(1.2, 0.45)",
+                }, packedTime + 0.12);
+
                 tl.set(badges, { opacity: 0 }, packedTime + 0.1);
 
                 // ----------------------------------------------------
-                // STAGE 4.5: TRANSITION TO BIG FOLDER (animation-1-11.png)
+                // STAGE 4.5: TRANSITION TO BIG FOLDER (animation-1-12.png)
+                // Glides upward with smooth momentum into center (264w x 204h)
                 // ----------------------------------------------------
-                var bigFolderTime = 2.45;
+                var bigFolderTime = packedTime + 0.85;
 
-                if (stageBigFolder && stageFolder) {
-                    // Small folder stage smoothly zooms slightly and fades out
+                if (stageBigFolder && stageFolder && bigFolderWrapper && folderWrapper) {
+                    var folderRect = folderWrapper.getBoundingClientRect();
+                    var bigRect = bigFolderWrapper.getBoundingClientRect();
+
+                    var startDy = (folderRect.top + folderRect.height / 2) - (bigRect.top + bigRect.height / 2);
+                    var startDx = (folderRect.left + folderRect.width / 2) - (bigRect.left + bigRect.width / 2);
+                    var startScale = folderRect.width / (bigRect.width || 264);
+
+                    // Anticipation squeeze on small folder
+                    tl.to(stageFolder, {
+                        scale: 0.96,
+                        duration: 0.1,
+                        ease: "power1.in",
+                    }, bigFolderTime - 0.1);
+
+                    // Handover seamlessly
                     tl.to(stageFolder, {
                         opacity: 0,
-                        scale: 0.95,
-                        duration: 0.4,
-                        ease: "power2.inOut",
+                        duration: 0.08,
+                        ease: "power1.out",
                     }, bigFolderTime);
 
-                    // Big folder stage fades in and scales smoothly into the center
-                    tl.to(stageBigFolder, {
+                    tl.set(stageBigFolder, {
                         opacity: 1,
-                        duration: 0.45,
-                        ease: "power2.out",
-                    }, bigFolderTime + 0.08);
+                        scale: 1,
+                    }, bigFolderTime);
 
-                    if (bigFolderImg) {
-                        tl.fromTo(bigFolderImg, {
-                            scale: 0.88,
-                        }, {
-                            scale: 1,
-                            duration: 0.5,
-                            ease: "back.out(1.3)",
-                        }, bigFolderTime + 0.08);
-                    }
+                    tl.set(bigFolderWrapper, {
+                        x: startDx,
+                        y: startDy,
+                        scale: startScale,
+                        rotation: -2,
+                    }, bigFolderTime);
+
+                    // Buoyant, momentum-driven glide to center
+                    tl.to(bigFolderWrapper, {
+                        x: 0,
+                        y: 0,
+                        scale: 1,
+                        rotation: 0,
+                        duration: 0.85,
+                        ease: "power3.out",
+                    }, bigFolderTime + 0.02);
                 }
 
                 // ----------------------------------------------------
                 // STAGE 5: BIG FOLDER TRANSITIONS TO 3x3 PURPLE GRID
+                // Big folder shrinks inward as 9 tiles ripple from center
                 // ----------------------------------------------------
-                var gridTime = 3.9;
+                var gridTime = bigFolderTime + 1.5;
 
                 if (stageBigFolder) {
                     tl.to(stageBigFolder, {
                         opacity: 0,
-                        scale: 1.04,
-                        duration: 0.38,
+                        scale: 0.88,
+                        duration: 0.32,
                         ease: "power2.in",
                     }, gridTime);
                 }
 
                 if (stageGrid) {
-                    tl.to(stageGrid, {
-                        opacity: 1,
-                        scale: 1,
-                        duration: 0.45,
-                        ease: "power2.out",
-                    }, gridTime + 0.15);
+                    tl.set(stageGrid, { opacity: 1, scale: 1 }, gridTime + 0.08);
+
+                    if (gridTiles.length) {
+                        tl.fromTo(gridTiles, {
+                            scale: 0.25,
+                            opacity: 0,
+                        }, {
+                            scale: 1,
+                            opacity: 1,
+                            duration: 0.42,
+                            stagger: {
+                                grid: [3, 3],
+                                from: "center",
+                                amount: 0.2,
+                            },
+                            ease: "back.out(1.8)",
+                        }, gridTime + 0.08);
+                    }
                 }
 
                 // ----------------------------------------------------
                 // STAGE 6: Hold 3x3 purple grid state
                 // ----------------------------------------------------
-                var holdEnd = 6.8;
+                var holdEnd = gridTime + 2.8;
 
                 // ----------------------------------------------------
-                // STAGE 7: Smooth reset back to initial floating state
+                // STAGE 7: Smooth reset back to initial open folder state
                 // ----------------------------------------------------
                 if (stageGrid) {
+                    if (gridTiles.length) {
+                        tl.to(gridTiles, {
+                            scale: 0.7,
+                            opacity: 0,
+                            duration: 0.28,
+                            stagger: {
+                                grid: [3, 3],
+                                from: "edges",
+                                amount: 0.12,
+                            },
+                            ease: "power2.in",
+                        }, holdEnd);
+                    }
                     tl.to(stageGrid, {
                         opacity: 0,
-                        duration: 0.4,
+                        duration: 0.35,
                         ease: "power2.inOut",
-                    }, holdEnd);
+                    }, holdEnd + 0.12);
                 }
 
                 if (stageFolder) {
@@ -984,38 +1064,26 @@ const cardsData = [
                         scale: 1,
                         duration: 0.4,
                         ease: "power2.inOut",
-                    }, holdEnd + 0.2);
+                    }, holdEnd + 0.22);
                 }
 
-                tl.to(folderPacked, {
-                    opacity: 0,
-                    duration: 0.3,
-                    ease: "power2.inOut",
-                }, holdEnd + 0.2);
+                if (stageBigFolder) {
+                    tl.set(stageBigFolder, { opacity: 0, scale: 1 }, holdEnd + 0.22);
+                }
+                if (bigFolderWrapper) {
+                    tl.set(bigFolderWrapper, { x: 0, y: 0, scale: 1, rotation: 0 }, holdEnd + 0.22);
+                }
 
-                tl.to(emptyFolderElements, {
-                    opacity: 1,
-                    duration: 0.3,
-                    ease: "power2.inOut",
-                }, holdEnd + 0.2);
+                if (folderPacked) {
+                    tl.set(folderPacked, { opacity: 0 }, holdEnd + 0.22);
+                    tl.set(emptyFolderElements, { opacity: 1 }, holdEnd + 0.22);
+                }
 
-                var resetBadgeTime = holdEnd + 0.35;
-                tl.set(badges, { x: 0, y: 0, rotation: 0, opacity: 0, clearProps: "filter" }, resetBadgeTime);
-                tl.set(iconImgs, { scale: 1, clearProps: "filter" }, resetBadgeTime);
+                var totalDuration = holdEnd + 0.75;
 
-                badges.forEach(function (badge, i) {
-                    tl.to(badge, {
-                        opacity: i === 7 ? 0.9 : 1,
-                        duration: 0.32,
-                        ease: "power1.out",
-                    }, resetBadgeTime + 0.04 + i * 0.05);
-                });
-
-                var totalDuration = resetBadgeTime + badges.length * 0.05 + 0.45;
-
-                // Loop cleanly
+                // Loop cleanly — next loop starts with open folder alone, then icons spring into view
                 tl.call(function () {
-                    setTimeout(buildTimeline, 800);
+                    setTimeout(buildTimeline, 500);
                 }, null, totalDuration);
 
                 return tl;
