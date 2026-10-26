@@ -30,12 +30,12 @@
    The embed script is NOT loaded on page load: it is injected the first time the
    modal opens, so this Embed stays self-contained in Webflow and visitors who
    never click pay nothing. */
-const hubspotPortalId = '245744706';
-const hubspotFormId = '5c52d4ba-5345-413a-b3cd-0ccec450aa30';
-const hubspotRegion = 'na2';
+const hubspotPortalId = "245744706";
+const hubspotFormId = "5c52d4ba-5345-413a-b3cd-0ccec450aa30";
+const hubspotRegion = "na2";
 
-const modalTitle = 'Book a demo';
-const modalBlurb = 'Tell us a little about you and we will be in touch.';
+const modalTitle = "Book a demo";
+const modalBlurb = "Tell us a little about you and we will be in touch.";
 ---
 
 <div id="au-demo-root">
@@ -108,15 +108,15 @@ const modalBlurb = 'Tell us a little about you and we will be in touch.';
   /* Book a demo → HubSpot form in a modal. The embed script is fetched on the
      first open, not on page load. */
   (function () {
-    var root = document.getElementById('au-demo-root');
+    var root = document.getElementById("au-demo-root");
     if (!root) return;
 
-    var modal = root.querySelector('[data-demo-modal]');
-    var mount = root.querySelector('#au-demo-hs-form');
+    var modal = root.querySelector("[data-demo-modal]");
+    var mount = root.querySelector("#au-demo-hs-form");
     if (!modal || !mount) return;
 
     var panel = modal.firstElementChild;
-    var closeBtn = modal.querySelector('[data-demo-close]');
+    var closeBtn = modal.querySelector("[data-demo-close]");
 
     var lastFocused = null;
     var scriptRequested = false;
@@ -127,19 +127,26 @@ const modalBlurb = 'Tell us a little about you and we will be in touch.';
       formCreated = true;
 
       window.hbspt.forms.create({
-        portalId: mount.getAttribute('data-portal-id'),
-        formId: mount.getAttribute('data-form-id'),
-        region: mount.getAttribute('data-region') || 'na2',
-        target: '#au-demo-hs-form',
+        portalId: mount.getAttribute("data-portal-id"),
+        formId: mount.getAttribute("data-form-id"),
+        region: mount.getAttribute("data-region") || "na2",
+        target: "#au-demo-hs-form",
         onFormReady: function ($form) {
-          var loading = mount.querySelector('[data-demo-loading]');
-          if (loading && loading.parentNode) loading.parentNode.removeChild(loading);
+          var loading = mount.querySelector("[data-demo-loading]");
+          if (loading && loading.parentNode)
+            loading.parentNode.removeChild(loading);
 
           // Carry campaign attribution through, same as the site's other forms.
           var formEl = $form && $form[0] ? $form[0] : $form;
           if (!formEl || !formEl.querySelector) return;
           var params = new URLSearchParams(window.location.search);
-          var utms = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 'utm_content'];
+          var utms = [
+            "utm_source",
+            "utm_medium",
+            "utm_campaign",
+            "utm_term",
+            "utm_content",
+          ];
           for (var i = 0; i < utms.length; i++) {
             var value = params.get(utms[i]);
             if (!value) continue;
@@ -164,13 +171,13 @@ const modalBlurb = 'Tell us a little about you and we will be in touch.';
       // a second.
       var loader = document.querySelector('script[src*="hsforms.net"]');
       if (!loader) {
-        loader = document.createElement('script');
-        loader.src = 'https://js-na2.hsforms.net/forms/embed/v2.js';
-        loader.charset = 'utf-8';
+        loader = document.createElement("script");
+        loader.src = "https://js-na2.hsforms.net/forms/embed/v2.js";
+        loader.charset = "utf-8";
         loader.async = true;
         document.head.appendChild(loader);
       }
-      loader.addEventListener('load', createForm);
+      loader.addEventListener("load", createForm);
 
       // Backstop: a cached loader may have fired `load` before we listened.
       var tries = 0;
@@ -194,52 +201,52 @@ const modalBlurb = 'Tell us a little about you and we will be in touch.';
       // click focuses an anchor, and on close focus has to land somewhere
       // predictable rather than on the document root.
       lastFocused = opener || document.activeElement;
-      modal.style.display = 'flex';
-      modal.setAttribute('aria-hidden', 'false');
-      document.body.style.overflow = 'hidden';
+      modal.style.display = "flex";
+      modal.setAttribute("aria-hidden", "false");
+      document.body.style.overflow = "hidden";
       loadHubspot();
       if (closeBtn) closeBtn.focus();
     }
 
     function closeModal() {
-      modal.style.display = 'none';
-      modal.setAttribute('aria-hidden', 'true');
-      document.body.style.overflow = '';
+      modal.style.display = "none";
+      modal.setAttribute("aria-hidden", "true");
+      document.body.style.overflow = "";
       if (lastFocused && lastFocused.focus) lastFocused.focus();
     }
 
     function isOpen() {
-      return modal.style.display === 'flex';
+      return modal.style.display === "flex";
     }
 
     // Delegated, so it does not matter which Embed mounts first or whether the
     // opener existed when this ran.
-    document.addEventListener('click', function (e) {
+    document.addEventListener("click", function (e) {
       if (!e.target.closest) return;
-      var opener = e.target.closest('[data-demo-open]');
+      var opener = e.target.closest("[data-demo-open]");
       if (!opener) return;
       openModal(e, opener);
     });
 
-    if (closeBtn) closeBtn.addEventListener('click', closeModal);
+    if (closeBtn) closeBtn.addEventListener("click", closeModal);
 
-    modal.addEventListener('click', function (e) {
+    modal.addEventListener("click", function (e) {
       if (e.target === modal) closeModal();
     });
 
-    document.addEventListener('keydown', function (e) {
+    document.addEventListener("keydown", function (e) {
       if (!isOpen()) return;
 
-      if (e.key === 'Escape') {
+      if (e.key === "Escape") {
         closeModal();
         return;
       }
 
       // Keep Tab inside the dialog — `aria-modal` claims the rest is inert, so
       // focus must not walk out into the page behind it.
-      if (e.key !== 'Tab' || !panel) return;
+      if (e.key !== "Tab" || !panel) return;
       var focusable = panel.querySelectorAll(
-        'a[href], button:not([disabled]), input:not([disabled]):not([type="hidden"]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
+        'a[href], button:not([disabled]), input:not([disabled]):not([type="hidden"]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])',
       );
       if (!focusable.length) return;
       var first = focusable[0];
@@ -298,7 +305,9 @@ const modalBlurb = 'Tell us a little about you and we will be in touch.';
     font-size: var(--fs-body-sm) !important;
     color: var(--color-vault-navy) !important;
     box-shadow: 0 1px 1px rgba(16, 24, 40, 0.04) !important;
-    transition: border-color var(--transition-fast), box-shadow var(--transition-fast) !important;
+    transition:
+      border-color var(--transition-fast),
+      box-shadow var(--transition-fast) !important;
   }
   .au-demo-hs-form input::placeholder,
   .au-demo-hs-form textarea::placeholder {
@@ -330,6 +339,48 @@ const modalBlurb = 'Tell us a little about you and we will be in touch.';
   }
   .au-demo-hs-form fieldset .hs-form-field {
     flex: 1 !important;
+  }
+  .au-demo-hs-form .hs_phone .input {
+    width: 100% !important;
+    margin-right: 0 !important;
+  }
+  /* Override HubSpot's injected fieldset.form-columns-1 .hs-input { width: 95% } specifically on the phone container */
+  .au-demo-hs-form fieldset.form-columns-1 .hs-fieldtype-intl-phone.hs-input,
+  .au-demo-hs-form fieldset.form-columns-1 .hs-fieldtype-intl-phone,
+  .au-demo-hs-form .hs-fieldtype-intl-phone.hs-input,
+  .au-demo-hs-form .hs-fieldtype-intl-phone,
+  .au-demo-hs-form .hs_phone .input > .hs-input:has(select) {
+    display: flex !important;
+    flex-direction: row !important;
+    gap: 8px !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: none !important;
+    background: transparent !important;
+    height: auto !important;
+    box-shadow: none !important;
+    box-sizing: border-box !important;
+    align-items: center !important;
+  }
+  .au-demo-hs-form .hs-fieldtype-intl-phone select,
+  .au-demo-hs-form .hs_phone select,
+  .au-demo-hs-form .hs_mobilephone select {
+    width: 130px !important;
+    min-width: 100px !important;
+    max-width: 38% !important;
+    flex-shrink: 0 !important;
+    appearance: auto !important;
+    cursor: pointer !important;
+  }
+  .au-demo-hs-form .hs-fieldtype-intl-phone input[type="tel"],
+  .au-demo-hs-form .hs-fieldtype-intl-phone input,
+  .au-demo-hs-form .hs_phone input[type="tel"],
+  .au-demo-hs-form .hs_mobilephone input[type="tel"] {
+    flex: 1 1 auto !important;
+    width: 100% !important;
+    min-width: 0 !important;
   }
   .au-demo-hs-form .hs-form-booleancheckbox label,
   .au-demo-hs-form .legal-consent-container label {
