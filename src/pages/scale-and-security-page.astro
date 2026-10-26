@@ -86,20 +86,26 @@ import Footer from "../sections/scale-and-security-page/Footer.astro";
       fetchpriority="high"
     />
 
-    <!-- Deferred script loader for performance -->
+    <!-- 1. Usercentrics CMP — loads immediately, before anything else -->
     <script is:inline>
       (function () {
-        let scriptsLoaded = false;
-        function loadHeavyScripts() {
-          if (scriptsLoaded) return;
-          scriptsLoaded = true;
+        var blockScript = document.createElement("script");
+        blockScript.src = "https://web.cmp.usercentrics.eu/modules/autoblocker.js";
+        document.head.appendChild(blockScript);
 
-          // Remove event listeners
-          triggerEvents.forEach((e) =>
-            window.removeEventListener(e, loadHeavyScripts, { passive: true }),
-          );
+        var cmpScript = document.createElement("script");
+        cmpScript.id = "usercentrics-cmp";
+        cmpScript.src = "https://web.cmp.usercentrics.eu/ui/loader.js";
+        cmpScript.setAttribute("data-settings-id", "utqqyaEbvbzrTk");
+        cmpScript.async = true;
+        document.head.appendChild(cmpScript);
+      })();
+    </script>
 
-          // Load Google Tag Manager
+    <!-- 2. GTM — loads only after the visitor responds to the consent banner -->
+    <script is:inline>
+      (function () {
+        function loadGTM() {
           (function (w, d, s, l, i) {
             w[l] = w[l] || [];
             w[l].push({ "gtm.start": new Date().getTime(), event: "gtm.js" });
@@ -110,76 +116,16 @@ import Footer from "../sections/scale-and-security-page/Footer.astro";
             j.src = "https://www.googletagmanager.com/gtm.js?id=" + i + dl;
             f.parentNode.insertBefore(j, f);
           })(window, document, "script", "dataLayer", "GTM-P5NDQXGH");
-
-          // Load Usercentrics autoblocker
-          var blockScript = document.createElement("script");
-          blockScript.src =
-            "https://web.cmp.usercentrics.eu/modules/autoblocker.js";
-          document.head.appendChild(blockScript);
-
-          // Load Usercentrics loader
-          var cmpScript = document.createElement("script");
-          cmpScript.id = "usercentrics-cmp";
-          cmpScript.src = "https://web.cmp.usercentrics.eu/ui/loader.js";
-          cmpScript.setAttribute("data-settings-id", "utqqyaEbvbzrTk");
-          cmpScript.async = true;
-          document.head.appendChild(cmpScript);
         }
 
-        const triggerEvents = [
-          "mouseover",
-          "mouseenter",
-          "mousemove",
-          "touchstart",
-          "scroll",
-          "keydown",
-        ];
-        triggerEvents.forEach((e) =>
-          window.addEventListener(e, loadHeavyScripts, { passive: true }),
-        );
-
-        // Safety timeout to ensure scripts load even without interaction (e.g. for crawlers)
-        setTimeout(loadHeavyScripts, 4000);
-
-        // Clean URL hash on anchor link clicks & initial landing
-        const setupHashCleaner = () => {
-          try {
-            document.querySelectorAll('a[href^="#"]').forEach((anchor) => {
-              anchor.addEventListener("click", function (e) {
-                const targetId = this.getAttribute("href");
-                if (targetId === "#") return;
-                const targetElement = document.querySelector(targetId);
-                if (targetElement) {
-                  e.preventDefault();
-                  targetElement.scrollIntoView({ behavior: "smooth" });
-                  history.pushState(
-                    null,
-                    document.title,
-                    window.location.pathname + window.location.search,
-                  );
-                }
-              });
-            });
-
-            if (window.location.hash) {
-              setTimeout(() => {
-                history.replaceState(
-                  null,
-                  document.title,
-                  window.location.pathname + window.location.search,
-                );
-              }, 1000);
-            }
-          } catch (e) {
-            console.error("Anchor hash handler failed", e);
+        window.addEventListener("UC_UI_CMP_EVENT", function (event) {
+          if (
+            event.detail &&
+            ["ACCEPT_ALL", "DENY_ALL", "SAVE"].indexOf(event.detail.type) !== -1
+          ) {
+            loadGTM();
           }
-        };
-
-        if (document.readyState === "loading") {
-          document.addEventListener("DOMContentLoaded", setupHashCleaner);
-        } else {
-          setupHashCleaner();
-        }
+        });
       })();
     </script>
     <!-- Preconnect to HubSpot CDNs -->
