@@ -20,7 +20,7 @@
  * around it happens to load. The npm `swiper` dependency is no use for the same
  * reason, since nothing bundles an embed.
  *
- * Tiles are the Figma "Visual Placeholder" tint; no photography exists yet.
+ * Tiles are team photos from the Webflow asset CDN (`TILES` below).
  *
  * Button styling comes from `.cp-btn` in Hero.astro — both embeds land on the
  * same Webflow page, so restating the rule here would be dead bytes against the
@@ -38,7 +38,17 @@ const CTA_HREF = "https://clear.darwinbox.in/ms/candidatev2/main/careers/home";
  * cover the column once. They are identical placeholders so the repetition is
  * invisible; with real photography this is how many slots there are to fill.
  */
-const TILE_COUNT = 8;
+const B = "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/";
+const TILES: string[] = [
+  `${B}6adb4e411172d09e55293aa7_image%2025285.png`,
+  `${B}6adb4e41b609365b5bd09253_image%2025286.png`,
+  `${B}6adb4e415ebea7fda2e12fa2_image%2025287.png`,
+  `${B}6adb4e412872eeb634872a97_image%2025288.png`,
+  `${B}6adb4e4154a94392637a6927_image%2025289.png`,
+  `${B}6adb4e413b28c72573c44fd8_image%2025273.png`,
+  `${B}6adb4e41ed5cad3df9271d70_image%2025280.png`,
+  `${B}6adb4e41939c14c377e444ce_image%2025272.png`,
+];
 ---
 
 <link
@@ -81,8 +91,16 @@ const TILE_COUNT = 8;
         <div class="swiper cp-join-swiper">
           <div class="swiper-wrapper">
             {
-              Array.from({ length: TILE_COUNT }).map(() => (
-                <div class="swiper-slide cp-join-slide" />
+              TILES.map((image) => (
+                <div class="swiper-slide cp-join-slide">
+                  <img
+                    src={image}
+                    alt=""
+                    loading="lazy"
+                    decoding="async"
+                    class="h-full w-full object-cover"
+                  />
+                </div>
               ))
             }
           </div>
@@ -116,6 +134,7 @@ const TILE_COUNT = 8;
     width: var(--cp-tile-w);
     height: var(--cp-tile-h);
     border-radius: 8px;
+    overflow: hidden;
     background: var(--color-visual-placeholder, #e8ffe1);
   }
 
