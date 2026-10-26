@@ -9,8 +9,9 @@
  * one page uses it, and a primitive would add a file that no second page will
  * ever call while still shipping its CSS into both embeds.
  *
- * Cards are `self-start` so a short one does not stretch to its row's height —
- * the mock draws them ragged-bottom, not equal-height.
+ * Every card is the same height: title and excerpt are clamped to two lines and
+ * reserve both (`min-h-14` / `min-h-12`), so a one-line title cannot shorten a
+ * card. The mock draws them ragged-bottom; equal height was asked for instead.
  */
 
 interface Perspective {
@@ -21,15 +22,31 @@ interface Perspective {
   href?: string;
 }
 
-/* Straight from the mock. Cards 4-6 repeat card 3 there; they are kept as drawn
-   so the grid matches, and are one-line swaps once the real pieces are picked. */
+/* Merged from clear.in/s/press ("Leadership perspectives" and "Industry news"),
+   newest first. Excerpts are short summaries, not quotes. Industry-news items
+   whose source page listed a mismatched link are left without an `href`. */
 const perspectives: Perspective[] = [
+  {
+    date: "8 September, 2026",
+    source: "Times of Oman",
+    title: "April 2027 is closer than it looks: What Oman's businesses must do now",
+    excerpt: "ClearTax founder Archit Gupta urges Omani businesses to start data, systems and compliance preparation for e-invoicing now.",
+    href: "https://timesofoman.com/article/176660-april-2027-is-closer-than-it-looks-what-omans-businesses-must-do-now",
+  },
+  {
+    date: "23 June, 2026",
+    source: "Tahawul Tech",
+    title: "UAE firms should move from e-invoicing awareness to action, says ClearTax Founder",
+    excerpt: "Archit Gupta urges UAE businesses to move beyond awareness and prepare systems and teams before the 2027 requirement.",
+    href: "https://www.tahawultech.com/region/middle-east/uae-firms-should-move-from-e-invoicing-awareness-to-action-says-cleartax-founder/",
+  },
   {
     date: "18 April, 2023",
     source: "The Economic Times",
     title: "Rising complications for corporates in ITC claims under GST",
     excerpt:
       "The changes in ITC rules have added responsibilities on businesses to reconcile and communicate with vendors more often...",
+    href: "https://economictimes.indiatimes.com/news/company/corporate-trends/rising-complications-for-corporates-in-itc-claims-under-gst/articleshow/99585912.cms",
   },
   {
     date: "16 April, 2023",
@@ -37,6 +54,7 @@ const perspectives: Perspective[] = [
     title: "Crypto taxation in India: What NRIs needs to know",
     excerpt:
       "India has clarified the tax implications of Virtual Digital Assets (VDAs), including cryptocurrencies and non-fungible tokens, brought under...",
+    href: "https://economictimes.indiatimes.com/nri/invest/crypto-taxation-in-india-what-nris-needs-to-know/articleshow/99531108.cms",
   },
   {
     date: "15 April, 2023",
@@ -45,32 +63,83 @@ const perspectives: Perspective[] = [
       "Clear takes an ambitious leap to build a connected finance ecosystem",
     excerpt:
       "Clear's founder-CEO, Archit Gupta, outlines how clear is attempting to create a connected finance ecosystem that will help organizations...",
+    href: "https://cio.economictimes.indiatimes.com/news/next-gen-technologies/clear-takes-an-ambitious-leap-to-build-a-connected-finance-ecosystem/99507474",
   },
   {
-    date: "15 April, 2023",
-    source: "ET CIO",
-    title:
-      "Clear takes an ambitious leap to build a connected finance ecosystem",
-    excerpt:
-      "Clear's founder-CEO, Archit Gupta, outlines how clear is attempting to create a connected finance ecosystem that will help organizations...",
+    date: "3 April, 2023",
+    source: "News18",
+    title: "These 5 GST changes have become applicable from April 1",
+    excerpt: "A rundown of the GST changes that took effect on April 1.",
+    href: "https://www.news18.com/business/tax/these-5-gst-changes-have-become-applicable-from-april-1-check-details-7452337.html",
   },
   {
-    date: "15 April, 2023",
-    source: "ET CIO",
+    date: "22 March, 2023",
+    source: "ET CFO",
     title:
-      "Clear takes an ambitious leap to build a connected finance ecosystem",
-    excerpt:
-      "Clear's founder-CEO, Archit Gupta, outlines how clear is attempting to create a connected finance ecosystem that will help organizations...",
+      "Being agile and transformative should be the DNA of every CFO to stay relevant",
+    excerpt: "On the agility and transformation CFOs need to stay relevant.",
+    href: "https://cfo.economictimes.indiatimes.com/news/leadership/being-agile-and-transformative-should-be-the-dna-of-every-cfo-to-stay-relevant/98916151",
   },
   {
-    date: "15 April, 2023",
-    source: "ET CIO",
+    date: "5 March, 2023",
+    source: "Mint",
+    title: "How Archit Gupta of Clear files his tax returns",
+    excerpt: "A profile of how Clear's founder files his own taxes.",
+    href: "https://www.livemint.com/money/personal-finance/how-archit-gupta-of-clear-files-his-tax-returns-11678006802776.html",
+  },
+  {
+    date: "17 February, 2023",
+    source: "Arab News",
+    title: "Saudi cloud adoption and Clear's expansion",
+    excerpt: "On cloud adoption in Saudi Arabia and Clear's expansion there.",
+    href: "https://www.arabnews.com/node/2252971/business-economy",
+  },
+  {
+    date: "12 October, 2021",
+    source: "The Economic Times",
+    title: "E-invoicing and supply chains",
+    excerpt: "How e-invoicing affects supply chains.",
+  },
+  {
+    date: "4 July, 2021",
+    source: "Financial Express",
     title:
-      "Clear takes an ambitious leap to build a connected finance ecosystem",
-    excerpt:
-      "Clear's founder-CEO, Archit Gupta, outlines how clear is attempting to create a connected finance ecosystem that will help organizations...",
+      "Should cryptocurrencies like Bitcoin, Dogecoin, Shiba Inu be a part of your portfolio? Experts speak",
+    excerpt: "Experts weigh in on holding cryptocurrencies in a portfolio.",
+    href: "https://www.financialexpress.com/money/should-cryptocurrencies-like-bitcoin-dogecoin-shiba-inu-be-a-part-of-your-portfolio-experts-speak/2266462/",
+  },
+  {
+    date: "16 June, 2021",
+    source: "Mint",
+    title: "E-way bills signal likely pickup in GST receipts from July",
+    excerpt: "What e-way bills indicate for GST collections.",
+    href: "https://www.livemint.com/news/india/eway-bills-signal-likely-pickup-in-gst-receipts-from-july-11623784210839.html",
+  },
+  {
+    date: "15 June, 2021",
+    source: "Mint",
+    title: "Know how you can claim tax deductions on donations via crowdfunding platforms",
+    excerpt: "Tax deductions on crowdfunding donations.",
+    href: "https://www.livemint.com/money/personal-finance/know-how-you-can-claim-tax-deductions-on-donations-via-crowdfunding-platforms-11623667319560.html",
+  },
+  {
+    date: "15 June, 2021",
+    source: "Mint",
+    title: "How to resolve family finances when an earning member dies",
+    excerpt: "Settling family finances after an earning member dies.",
+    href: "https://www.livemint.com/money/personal-finance/how-to-resolve-family-finances-when-an-earning-member-dies-11623696504895.html",
+  },
+  {
+    date: "7 June, 2021",
+    source: "CNBC TV18",
+    title: "How to avoid TDS on EPF withdrawal",
+    excerpt: "Ways to avoid TDS on EPF withdrawals.",
+    href: "https://www.cnbctv18.com/personal-finance/how-to-avoid-tds-on-epf-withdrawal-9568941.htm",
   },
 ];
+
+/* Cards shown before "Load more", and how many each click adds. */
+const batch = 6;
 ---
 
 <section id="press-leadership" class="bg-generic-00 py-12 lg:py-20">
@@ -82,12 +151,19 @@ const perspectives: Perspective[] = [
         Leadership perspectives
       </h2>
 
-      <div class="grid w-full grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
+      <div
+        data-lead-grid
+        data-batch={batch}
+        class="grid w-full grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3"
+      >
         {
           perspectives.map((item) => (
             <a
               href={item.href || undefined}
-              class="flex flex-col gap-4 self-start rounded-xl border border-neutral-300 bg-generic-00 p-6 no-underline hover:border-nova-blue transition-all ease-in-out duration-150 cursor-pointer"
+              target={item.href ? "_blank" : undefined}
+              rel={item.href ? "noopener noreferrer" : undefined}
+              data-lead-card
+              class="flex flex-col gap-4 rounded-xl border border-neutral-300 bg-generic-00 p-6 no-underline hover:border-nova-blue transition-all ease-in-out duration-150 cursor-pointer"
             >
               <span class="font-body font-normal text-neutral-500 text-[length:var(--fs-body)] leading-[var(--lh-body)]">
                 {item.date}
@@ -96,14 +172,14 @@ const perspectives: Perspective[] = [
                 <span class="font-body font-semibold uppercase text-nova-blue text-[length:var(--fs-body-sm)] leading-[var(--lh-body-sm)] tracking-[var(--tracking-overline)]">
                   {item.source}
                 </span>
-                <span class="font-body font-semibold text-vault-navy text-[length:var(--fs-body-lg)] leading-[var(--lh-body-lg)]">
+                <span class="line-clamp-2 min-h-14 font-body font-semibold text-vault-navy text-[length:var(--fs-body-lg)] leading-[var(--lh-body-lg)]">
                   {item.title}
                 </span>
                 {/* Clamped so a long excerpt can't leave one card in the row
                     taller than its neighbours. `line-clamp-*` sets
                     `display: -webkit-box`, which is what lets it work on a
                     span. */}
-                <span class="line-clamp-3 font-body font-normal text-neutral-500 text-[length:var(--fs-body)] leading-[var(--lh-body)]">
+                <span class="line-clamp-2 min-h-12 font-body font-normal text-neutral-500 text-[length:var(--fs-body)] leading-[var(--lh-body)]">
                   {item.excerpt}
                 </span>
               </div>
@@ -112,12 +188,52 @@ const perspectives: Perspective[] = [
         }
       </div>
 
-      <a
-        href="https://www.cleartax.com/electronic-invoicing#country-select"
-        class="inline-flex h-10 items-center justify-center gap-2 rounded-lg border border-neutral-200 bg-generic-00 px-4 py-2.5 font-body font-medium text-neutral-700 text-[length:var(--fs-label)] leading-[var(--lh-label)] no-underline shadow-[0px_1px_2px_0px_rgba(16,24,40,0.04)] transition-all ease-in-out duration-150 hover:border-neutral-400 hover:bg-neutral-50"
+      <button
+        type="button"
+        data-lead-more
+        class="inline-flex h-10 cursor-pointer items-center justify-center gap-2 rounded-lg border border-neutral-200 bg-generic-00 px-4 py-2.5 font-body font-medium text-neutral-700 text-[length:var(--fs-label)] leading-[var(--lh-label)] no-underline shadow-[0px_1px_2px_0px_rgba(16,24,40,0.04)] transition-all ease-in-out duration-150 hover:border-neutral-400 hover:bg-neutral-50"
       >
-        Learn more
-      </a>
+        Load more
+      </button>
     </div>
   </div>
 </section>
+
+<style is:global>
+  /* `hidden` alone loses to the `flex` / `inline-flex` utilities on these. */
+  [data-lead-card][hidden],
+  [data-lead-more][hidden] {
+    display: none;
+  }
+</style>
+
+<script is:inline>
+  (function () {
+    function initPressLeadership() {
+      var root = document.getElementById("press-leadership");
+      if (!root || root.dataset.leadReady) return;
+      root.dataset.leadReady = "true";
+      var grid = root.querySelector("[data-lead-grid]");
+      var more = root.querySelector("[data-lead-more]");
+      var cards = grid.querySelectorAll("[data-lead-card]");
+      var batch = parseInt(grid.getAttribute("data-batch"), 10) || 6;
+      var shown = batch;
+      // `hidden` attribute, so with no script every card still shows.
+      function render() {
+        for (var i = 0; i < cards.length; i++) cards[i].hidden = i >= shown;
+        more.hidden = shown >= cards.length;
+      }
+      more.addEventListener("click", function () {
+        shown += batch;
+        render();
+      });
+      render();
+    }
+
+    if (document.readyState === "loading") {
+      document.addEventListener("DOMContentLoaded", initPressLeadership);
+    } else {
+      initPressLeadership();
+    }
+  })();
+</script>

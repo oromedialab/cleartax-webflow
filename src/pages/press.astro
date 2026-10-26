@@ -18,7 +18,6 @@ import "../styles/.build/press.css";
 import Navbar from "../sections/press/Navbar.astro";
 import Hero from "../sections/press/Hero.astro";
 import Leadership from "../sections/press/Leadership.astro";
-import Cta from "../sections/press/Cta.astro";
 import Footer from "../sections/press/Footer.astro";
 ---
 
@@ -27,7 +26,7 @@ import Footer from "../sections/press/Footer.astro";
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>ClearTax — Newsroom</title>
+    <title>ClearTax — Press</title>
     <meta
       name="description"
       content="The latest stories, press coverage, and media resources from ClearTax — the compliance infrastructure behind enterprises across 50+ countries."
@@ -77,20 +76,27 @@ import Footer from "../sections/press/Footer.astro";
       fetchpriority="high"
     />
 
-    <!-- Deferred script loader for performance -->
+    <!-- 1. Usercentrics CMP — loads immediately, before anything else -->
     <script is:inline>
       (function () {
-        let scriptsLoaded = false;
-        function loadHeavyScripts() {
-          if (scriptsLoaded) return;
-          scriptsLoaded = true;
+        var blockScript = document.createElement("script");
+        blockScript.src =
+          "https://web.cmp.usercentrics.eu/modules/autoblocker.js";
+        document.head.appendChild(blockScript);
 
-          // Remove event listeners
-          triggerEvents.forEach((e) =>
-            window.removeEventListener(e, loadHeavyScripts, { passive: true }),
-          );
+        var cmpScript = document.createElement("script");
+        cmpScript.id = "usercentrics-cmp";
+        cmpScript.src = "https://web.cmp.usercentrics.eu/ui/loader.js";
+        cmpScript.setAttribute("data-settings-id", "utqqyaEbvbzrTk");
+        cmpScript.async = true;
+        document.head.appendChild(cmpScript);
+      })();
+    </script>
 
-          // Load Google Tag Manager
+    <!-- 2. GTM — loads only after the visitor responds to the consent banner -->
+    <script is:inline>
+      (function () {
+        function loadGTM() {
           (function (w, d, s, l, i) {
             w[l] = w[l] || [];
             w[l].push({ "gtm.start": new Date().getTime(), event: "gtm.js" });
@@ -101,38 +107,22 @@ import Footer from "../sections/press/Footer.astro";
             j.src = "https://www.googletagmanager.com/gtm.js?id=" + i + dl;
             f.parentNode.insertBefore(j, f);
           })(window, document, "script", "dataLayer", "GTM-P5NDQXGH");
-
-          // Load Usercentrics autoblocker
-          var blockScript = document.createElement("script");
-          blockScript.src =
-            "https://web.cmp.usercentrics.eu/modules/autoblocker.js";
-          document.head.appendChild(blockScript);
-
-          // Load Usercentrics loader
-          var cmpScript = document.createElement("script");
-          cmpScript.id = "usercentrics-cmp";
-          cmpScript.src = "https://web.cmp.usercentrics.eu/ui/loader.js";
-          cmpScript.setAttribute("data-settings-id", "utqqyaEbvbzrTk");
-          cmpScript.async = true;
-          document.head.appendChild(cmpScript);
         }
 
-        const triggerEvents = [
-          "mouseover",
-          "mouseenter",
-          "mousemove",
-          "touchstart",
-          "scroll",
-          "keydown",
-        ];
-        triggerEvents.forEach((e) =>
-          window.addEventListener(e, loadHeavyScripts, { passive: true }),
-        );
+        window.addEventListener("UC_UI_CMP_EVENT", function (event) {
+          if (
+            event.detail &&
+            ["ACCEPT_ALL", "DENY_ALL", "SAVE"].indexOf(event.detail.type) !== -1
+          ) {
+            loadGTM();
+          }
+        });
+      })();
+    </script>
 
-        // Safety timeout to ensure scripts load even without interaction (e.g. for crawlers)
-        setTimeout(loadHeavyScripts, 4000);
-
-        // Clean URL hash on anchor link clicks & initial landing
+    <!-- Clean URL hash on anchor link clicks & initial landing -->
+    <script is:inline>
+      (function () {
         const setupHashCleaner = () => {
           try {
             document.querySelectorAll('a[href^="#"]').forEach((anchor) => {
@@ -187,7 +177,6 @@ import Footer from "../sections/press/Footer.astro";
     <Navbar />
     <Hero />
     <Leadership />
-    <Cta />
     <Footer />
   </body>
 </html>
