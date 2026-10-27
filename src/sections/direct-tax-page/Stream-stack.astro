@@ -263,7 +263,7 @@ const cardsData = [
                                                 </div>
 
                                                 <!-- Folder Graphics Container -->
-                                                <div class="gl-folder-wrapper relative w-[110px] sm:w-[124px] aspect-[4/3] flex items-center justify-center pointer-events-none mt-12 sm:mt-14">
+                                                <div class="gl-folder-wrapper relative w-[110px] sm:w-[124px] aspect-[4/3] flex items-center justify-center pointer-events-none mt-20 sm:mt-24 md:mt-32 lg:mt-36">
                                                     <!-- Open Folder -->
                                                     <img
                                                         src="https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6ac883395e13eb23819b497c_animate-1-1.png"
@@ -1181,6 +1181,14 @@ const cardsData = [
                     if (bigFolderWrapper) gsap.set(bigFolderWrapper, { x: 0, y: 0, scale: 1, rotation: 0, clearProps: "transform" });
                 }
 
+                // Smooth morph geometry: accurately measures delta X, delta Y, and scale
+                // between the downward small packed folder and the centered big folder
+                var smallRect = folderWrapper.getBoundingClientRect();
+                var bigRect = bigFolderWrapper ? bigFolderWrapper.getBoundingClientRect() : null;
+                var morphDX = (bigRect && smallRect) ? (smallRect.left + smallRect.width / 2) - (bigRect.left + bigRect.width / 2) : 0;
+                var morphDY = (bigRect && smallRect) ? (smallRect.top + smallRect.height / 2) - (bigRect.top + bigRect.height / 2) : 0;
+                var morphScale = (bigRect && smallRect && bigRect.width > 0) ? (smallRect.width / bigRect.width) : 0.58;
+
                 if (stageGrid) {
                     gsap.set(stageGrid, { opacity: 0, scale: 1 });
                     if (gridTiles.length) gsap.set(gridTiles, { x: 0, y: 0, opacity: 0, scale: 0.25 });
@@ -1321,29 +1329,29 @@ const cardsData = [
                 // STAGE 4: All apps caught! Folder absorbs impact with
                 // an organic squeeze & pop into packed folder
                 // ----------------------------------------------------
-                var packedTime = dropStart + 1.45;
+                var packedTime = dropStart + 1.5;
 
                 // Folder dips with weight impact
                 tl.to(folderWrapper, {
                     scaleX: 1.07,
                     scaleY: 0.93,
                     y: 4,
-                    duration: 0.12,
-                    ease: "power2.in",
+                    duration: 0.14,
+                    ease: "sine.in",
                 }, packedTime);
 
                 // Transformation occurs inside the impact
                 if (folderPacked) {
                     tl.to(folderPacked, {
                         opacity: 1,
-                        duration: 0.18,
-                        ease: "power1.inOut",
+                        duration: 0.22,
+                        ease: "sine.inOut",
                     }, packedTime + 0.06);
 
                     tl.to(emptyFolderElements, {
                         opacity: 0,
-                        duration: 0.18,
-                        ease: "power1.inOut",
+                        duration: 0.22,
+                        ease: "sine.inOut",
                     }, packedTime + 0.06);
                 }
 
@@ -1352,47 +1360,47 @@ const cardsData = [
                     scaleX: 1,
                     scaleY: 1,
                     y: 0,
-                    duration: 0.45,
-                    ease: "elastic.out(1.2, 0.45)",
-                }, packedTime + 0.12);
+                    duration: 0.5,
+                    ease: "elastic.out(1.1, 0.45)",
+                }, packedTime + 0.14);
 
-                tl.set(badges, { opacity: 0 }, packedTime + 0.1);
+                tl.set(badges, { opacity: 0 }, packedTime + 0.12);
 
                 // ----------------------------------------------------
                 // STAGE 4.5: TRANSITION TO BIG FOLDER (animation-1-12.png)
-                // Expands and stays in the dead-center of the canvas
+                // Smooth morph: grows & glides from the small packed folder
+                // at the bottom into the centered big folder
                 // ----------------------------------------------------
-                var bigFolderTime = packedTime + 0.85;
+                var bigFolderTime = packedTime + 1.15;
+                var morphDur = 0.85;
 
                 if (stageBigFolder && stageFolder && bigFolderWrapper && folderWrapper) {
-                    // Small folder scales down slightly as it hands over
+                    // Small folder crossfades as big folder expands from its exact coordinates
                     tl.to(stageFolder, {
-                        scale: 0.92,
                         opacity: 0,
-                        duration: 0.2,
-                        ease: "power2.in",
-                    }, bigFolderTime - 0.1);
+                        duration: 0.3,
+                        ease: "sine.inOut",
+                    }, bigFolderTime);
 
-                    // Big folder expands in-place right in the center!
                     tl.set(stageBigFolder, {
                         opacity: 1,
                         scale: 1,
                     }, bigFolderTime);
 
                     tl.fromTo(bigFolderWrapper, {
-                        x: 0,
-                        y: 0,
-                        scale: 0.72,
-                        opacity: 0,
-                        rotation: -1,
+                        x: morphDX,
+                        y: morphDY,
+                        scale: morphScale,
+                        opacity: 1,
+                        rotation: 0,
                     }, {
                         x: 0,
                         y: 0,
                         scale: 1,
                         opacity: 1,
                         rotation: 0,
-                        duration: 0.45,
-                        ease: "back.out(1.4)",
+                        duration: morphDur,
+                        ease: "sine.inOut",
                     }, bigFolderTime);
                 }
 
@@ -1400,14 +1408,14 @@ const cardsData = [
                 // STAGE 5: BIG FOLDER TRANSITIONS TO 3x3 PURPLE GRID
                 // Big folder shrinks inward as 9 tiles ripple from center
                 // ----------------------------------------------------
-                var gridTime = bigFolderTime + 1.5;
+                var gridTime = bigFolderTime + morphDur + 1.25;
 
                 if (stageBigFolder) {
                     tl.to(stageBigFolder, {
                         opacity: 0,
-                        scale: 0.88,
-                        duration: 0.32,
-                        ease: "power2.in",
+                        scale: 0.9,
+                        duration: 0.42,
+                        ease: "sine.inOut",
                     }, gridTime);
                 }
 
@@ -1421,74 +1429,73 @@ const cardsData = [
                         tl.fromTo(gridTiles, {
                             x: 0,
                             y: 0,
-                            scale: 0.25,
+                            scale: 0.28,
                             opacity: 0,
                         }, {
                             scale: 1,
                             opacity: 1,
-                            duration: 0.42,
+                            duration: 0.48,
                             stagger: {
                                 grid: [3, 3],
                                 from: "center",
-                                amount: 0.2,
+                                amount: 0.22,
                             },
-                            ease: "power2.out",
+                            ease: "sine.out",
                         }, gridTime + 0.08);
                     }
 
                     // ----------------------------------------------------
                     // STAGE 6: 3x3 SHIFTS TO 2x2 (SYMMETRICAL CONVERGENCE)
                     // 5 cross tiles fade out, 4 corner tiles converge into center
-                    // (Zero diagonal sliding, perfectly centered 2x2 grid)
                     // ----------------------------------------------------
-                    var shiftTo2x2Start = gridTime + 0.08 + 0.42 + 0.85;
-                    var shiftDur = 0.45;
+                    var shiftTo2x2Start = gridTime + 0.08 + 0.48 + 1.1;
+                    var shiftDur = 0.58;
 
                     var crossTiles = [tile2, tile4, tile5, tile6, tile8].filter(Boolean);
                     if (crossTiles.length) {
                         tl.to(crossTiles, {
                             opacity: 0,
                             scale: 0.5,
-                            duration: 0.32,
-                            ease: "power2.out",
+                            duration: 0.38,
+                            ease: "sine.inOut",
                         }, shiftTo2x2Start);
                     }
 
                     // Symmetrical convergence: all 4 corners glide inward to form a centered 2x2
-                    if (tile1) tl.to(tile1, { x: 41, y: 41, duration: shiftDur, ease: "power2.inOut" }, shiftTo2x2Start);
-                    if (tile3) tl.to(tile3, { x: -41, y: 41, duration: shiftDur, ease: "power2.inOut" }, shiftTo2x2Start);
-                    if (tile7) tl.to(tile7, { x: 41, y: -41, duration: shiftDur, ease: "power2.inOut" }, shiftTo2x2Start);
-                    if (tile9) tl.to(tile9, { x: -41, y: -41, duration: shiftDur, ease: "power2.inOut" }, shiftTo2x2Start);
+                    if (tile1) tl.to(tile1, { x: 41, y: 41, duration: shiftDur, ease: "sine.inOut" }, shiftTo2x2Start);
+                    if (tile3) tl.to(tile3, { x: -41, y: 41, duration: shiftDur, ease: "sine.inOut" }, shiftTo2x2Start);
+                    if (tile7) tl.to(tile7, { x: 41, y: -41, duration: shiftDur, ease: "sine.inOut" }, shiftTo2x2Start);
+                    if (tile9) tl.to(tile9, { x: -41, y: -41, duration: shiftDur, ease: "sine.inOut" }, shiftTo2x2Start);
 
                     // ----------------------------------------------------
                     // STAGE 6B: 2x2 PURPLE GRID HOLDS, THEN CROSSFADES TO CARDS
                     // ----------------------------------------------------
-                    var hold2x2End = shiftTo2x2Start + shiftDur + 0.75;
+                    var hold2x2End = shiftTo2x2Start + shiftDur + 0.95;
 
                     var cornerTiles = [tile1, tile3, tile7, tile9].filter(Boolean);
                     if (cornerTiles.length) {
                         tl.to(cornerTiles, {
                             opacity: 0,
                             scale: 0.94,
-                            duration: 0.32,
-                            ease: "power2.out",
+                            duration: 0.38,
+                            ease: "sine.inOut",
                         }, hold2x2End);
                     }
 
                     tl.to(stageGrid, {
                         opacity: 0,
                         scale: 0.94,
-                        duration: 0.32,
-                        ease: "power2.out",
+                        duration: 0.38,
+                        ease: "sine.inOut",
                     }, hold2x2End);
 
                     if (stageCards) {
-                        tl.set(stageCards, { opacity: 1 }, hold2x2End + 0.06);
+                        tl.set(stageCards, { opacity: 1 }, hold2x2End + 0.08);
 
                         // ----------------------------------------------------
                         // STAGE 7: 2x2 WHOLE PLAIN CARDS SHOW ONE BY ONE
                         // ----------------------------------------------------
-                        var cardsStartTime = hold2x2End + 0.10;
+                        var cardsStartTime = hold2x2End + 0.12;
                         var plainCards = [card1, card2, card3, card4].filter(Boolean);
 
                         plainCards.forEach(function (card, idx) {
@@ -1498,21 +1505,17 @@ const cardsData = [
                             }, {
                                 opacity: 1,
                                 scale: 1,
-                                duration: 0.35,
-                                ease: "power2.out",
+                                duration: 0.42,
+                                ease: "sine.out",
                             }, cardsStartTime + idx * 0.12);
                         });
 
                         // ----------------------------------------------------
                         // STAGE 7B: CONTENT POURS IN ONE BY ONE & MIN-H ADAPTS
-                        // Card 1: min-h-[160px], flex-grow: 1.45
-                        // Card 2: min-h-[120px], flex-grow: 0.8
-                        // Card 3: min-h-[120px], flex-grow: 0.8
-                        // Card 4: min-h-[160px], flex-grow: 1.45
                         // ----------------------------------------------------
-                        var pourStart = cardsStartTime + (plainCards.length * 0.12) + 0.25;
-                        var pourDur = 0.40;
-                        var pourStep = 0.32;
+                        var pourStart = cardsStartTime + (plainCards.length * 0.12) + 0.3;
+                        var pourDur = 0.48;
+                        var pourStep = 0.36;
 
                         // Card 1: Credit Amount content pours in + min-h expands to 160px
                         if (cardContent1) {
@@ -1523,7 +1526,7 @@ const cardsData = [
                                 opacity: 1,
                                 y: 0,
                                 duration: pourDur,
-                                ease: "power2.out",
+                                ease: "sine.out",
                             }, pourStart);
                         }
                         if (card1) {
@@ -1531,7 +1534,7 @@ const cardsData = [
                                 minHeight: 0,
                                 flex: "1.15 1 0%",
                                 duration: pourDur,
-                                ease: "power2.out",
+                                ease: "sine.inOut",
                             }, pourStart);
                         }
 
@@ -1545,7 +1548,7 @@ const cardsData = [
                                 opacity: 1,
                                 y: 0,
                                 duration: pourDur,
-                                ease: "power2.out",
+                                ease: "sine.out",
                             }, pour2);
                         }
                         if (card2) {
@@ -1553,7 +1556,7 @@ const cardsData = [
                                 minHeight: 0,
                                 flex: "0.9 1 0%",
                                 duration: pourDur,
-                                ease: "power2.out",
+                                ease: "sine.inOut",
                             }, pour2);
                         }
 
@@ -1567,7 +1570,7 @@ const cardsData = [
                                 opacity: 1,
                                 y: 0,
                                 duration: pourDur,
-                                ease: "power2.out",
+                                ease: "sine.out",
                             }, pour3);
                         }
                         if (card3) {
@@ -1575,7 +1578,7 @@ const cardsData = [
                                 minHeight: 0,
                                 flex: "0.9 1 0%",
                                 duration: pourDur,
-                                ease: "power2.out",
+                                ease: "sine.inOut",
                             }, pour3);
                         }
 
@@ -1589,7 +1592,7 @@ const cardsData = [
                                 opacity: 1,
                                 y: 0,
                                 duration: pourDur,
-                                ease: "power2.out",
+                                ease: "sine.out",
                             }, pour4);
                         }
                         if (card4) {
@@ -1597,7 +1600,7 @@ const cardsData = [
                                 minHeight: 0,
                                 flex: "1.15 1 0%",
                                 duration: pourDur,
-                                ease: "power2.out",
+                                ease: "sine.inOut",
                             }, pour4);
                         }
                     }
@@ -1606,14 +1609,14 @@ const cardsData = [
                 // ----------------------------------------------------
                 // STAGE 8: Hold final complete cards state, then reset
                 // ----------------------------------------------------
-                var finalHoldEnd = (stageCards && card4) ? (pour4 + pourDur + 3.0) : (gridTime + 2.8);
+                var finalHoldEnd = (stageCards && card4) ? (pour4 + pourDur + 3.2) : (gridTime + 2.8);
 
                 if (stageCards) {
                     tl.to(stageCards, {
                         opacity: 0,
                         scale: 0.95,
-                        duration: 0.5,
-                        ease: "power2.inOut",
+                        duration: 0.55,
+                        ease: "sine.inOut",
                     }, finalHoldEnd);
                 }
 
@@ -1621,8 +1624,8 @@ const cardsData = [
                     tl.to(stageFolder, {
                         opacity: 1,
                         scale: 1,
-                        duration: 0.5,
-                        ease: "power2.inOut",
+                        duration: 0.55,
+                        ease: "sine.inOut",
                     }, finalHoldEnd + 0.25);
                 }
 
@@ -1797,22 +1800,23 @@ const cardsData = [
                     }, cutCardStart);
                 }
 
-                // Hold big file for ~0.8s, then fade out
-                var cutCardHoldEnd = cutCardStart + 0.45 + 0.8;
+                // Hold big file for ~1.0s, then smoothly fade out
+                var cutCardHoldEnd = cutCardStart + 0.45 + 1.0;
+                var cutCardFadeDuration = 0.55;
                 if (stageCutCard) {
                     tl.to(stageCutCard, {
                         opacity: 0,
-                        scale: 0.94,
-                        duration: 0.32,
-                        ease: "power2.in",
+                        scale: 0.92,
+                        duration: cutCardFadeDuration,
+                        ease: "sine.inOut",
                     }, cutCardHoldEnd);
                 }
 
                 // ----------------------------------------------------
-                // STAGE 3: "stats card slide one after one two card then another one comes from bottom and take one by one and then all 4 card remains and then from bottom left card comes in"
+                // STAGE 3: Cards arrive from each direction AFTER center card fades out
                 // ----------------------------------------------------
                 if (stageCards) {
-                    var cardsStartTime = cutCardHoldEnd + 0.35;
+                    var cardsStartTime = cutCardHoldEnd + cutCardFadeDuration + 0.22;
                     tl.set(stageCards, { opacity: 1 }, cardsStartTime);
 
                     // ----------------------------------------------------
@@ -1829,13 +1833,13 @@ const cardsData = [
                             x: 0,
                             y: centerOffsetY,
                             scale: 1,
-                            duration: 0.45,
-                            ease: "power2.out",
+                            duration: 0.52,
+                            ease: "sine.out",
                         }, cardsStartTime);
                     }
 
                     if (card2) {
-                        // Smooth continuous glide starting just after Card 1 (no double-stop/stutter)
+                        // Smooth continuous glide starting just after Card 1
                         tl.fromTo(card2, {
                             opacity: 0,
                             x: 85,
@@ -1846,27 +1850,27 @@ const cardsData = [
                             x: 0,
                             y: centerOffsetY,
                             scale: 1,
-                            duration: 0.54,
-                            ease: "power2.out",
-                        }, cardsStartTime + 0.08);
+                            duration: 0.58,
+                            ease: "sine.out",
+                        }, cardsStartTime + 0.10);
                     }
 
                     // ----------------------------------------------------
                     // FRAME 3 & 4: Top cards move to top, Card 4 rises from bottom
                     // ----------------------------------------------------
-                    // Hold Frame 2 briefly so both cards are cleanly seen in center
-                    var frame2Hold = 0.45;
-                    var moveToTopTime = cardsStartTime + 0.08 + 0.54 + frame2Hold;
+                    // Hold Frame 2 so both cards are cleanly settled in center
+                    var frame2Hold = 0.55;
+                    var moveToTopTime = cardsStartTime + 0.10 + 0.58 + frame2Hold;
 
-                    // Cards 1 & 2 move from vertical center to top (y: 62 -> 0)
+                    // Cards 1 & 2 move from vertical center to top (y: centerOffsetY -> 0)
                     tl.to([card1, card2].filter(Boolean), {
                         y: 0,
-                        duration: 0.46,
-                        ease: "power2.inOut",
+                        duration: 0.52,
+                        ease: "sine.inOut",
                     }, moveToTopTime);
 
                     // Frame 3: Under Card 2, Card 4 (calculator) rises from bottom
-                    var card4EntryTime = moveToTopTime + 0.06;
+                    var card4EntryTime = moveToTopTime + 0.12;
                     if (card4) {
                         tl.fromTo(card4, {
                             opacity: 0,
@@ -1876,106 +1880,114 @@ const cardsData = [
                             opacity: 1,
                             y: 0,
                             scale: 1,
-                            duration: 0.46,
-                            ease: "power2.out",
+                            duration: 0.52,
+                            ease: "sine.out",
                         }, card4EntryTime);
                     }
 
                     // Frame 4: Top cards & Card 4 in position, Card 3 floats in from bottom-left
-                    var card3EntryTime = card4EntryTime + 0.46 + 0.08;
+                    var card3EntryTime = card4EntryTime + 0.52 + 0.14;
                     if (card3) {
                         tl.fromTo(card3, {
                             opacity: 0,
-                            x: -35,
-                            y: 35,
+                            x: -45,
+                            y: 45,
                             scale: 0.96,
                         }, {
                             opacity: 1,
                             x: 0,
                             y: 0,
                             scale: 1,
-                            duration: 0.42,
-                            ease: "power2.out",
+                            duration: 0.50,
+                            ease: "sine.out",
                         }, card3EntryTime);
                     }
 
                     // ----------------------------------------------------
-                    // FRAME 5: Card 3 lands, all 4 cards in place, Card 1 fades out
+                    // FRAME 5: Card 3 lands, all 4 cards in place, Card 1 fades out first, THEN resolved fills in
                     // ----------------------------------------------------
-                    var allCardsHoldEnd = card3EntryTime + 0.42 + 0.35;
+                    var allCardsHoldEnd = card3EntryTime + 0.50 + 0.70;
+                    var fadeOutDur = 0.38;
+
+                    var card1FadeTime = allCardsHoldEnd;
+                    var card1ResolvedStartTime = card1FadeTime + fadeOutDur + 0.08;
+                    var card1ResolveDuration = 0.45;
 
                     if (card1Initial && card1Resolved) {
                         tl.to(card1Initial, {
                             opacity: 0,
-                            y: 15,
-                            duration: 0.28,
-                            ease: "power2.in",
-                        }, allCardsHoldEnd);
+                            y: 12,
+                            duration: fadeOutDur,
+                            ease: "sine.inOut",
+                        }, card1FadeTime);
 
-                        // ----------------------------------------------------
-                        // FRAME 6: New Card 1 arrives from top, Card 2 fades out
-                        // ----------------------------------------------------
+                        // FRAME 6: New Card 1 arrives from top AFTER initial fades out
                         tl.fromTo(card1Resolved, {
                             opacity: 0,
-                            y: -40,
+                            y: -35,
                         }, {
                             opacity: 1,
                             y: 0,
-                            duration: 0.38,
-                            ease: "power2.out",
-                        }, allCardsHoldEnd + 0.12);
+                            duration: card1ResolveDuration,
+                            ease: "sine.out",
+                        }, card1ResolvedStartTime);
                     }
 
-                    var card2FadeTime = allCardsHoldEnd + 0.12 + 0.38 + 0.28;
+                    // Card 2 starts fading out WHILE Card 1 resolved is sliding in to fill its spot
+                    var card2FadeTime = card1ResolvedStartTime + 0.05;
+                    var card2ResolvedStartTime = card2FadeTime + fadeOutDur + 0.08;
+                    var card2ResolveDuration = 0.45;
+
                     if (card2Initial && card2Resolved) {
                         tl.to(card2Initial, {
                             opacity: 0,
-                            y: 15,
-                            duration: 0.28,
-                            ease: "power2.in",
+                            y: 12,
+                            duration: fadeOutDur,
+                            ease: "sine.inOut",
                         }, card2FadeTime);
 
-                        // ----------------------------------------------------
-                        // FRAME 7: New Card 2 arrives from top, Card 4 initial fades out
-                        // ----------------------------------------------------
+                        // FRAME 7: New Card 2 arrives from top AFTER initial fades out
                         tl.fromTo(card2Resolved, {
                             opacity: 0,
-                            y: -40,
+                            y: -35,
                         }, {
                             opacity: 1,
                             y: 0,
-                            duration: 0.38,
-                            ease: "power2.out",
-                        }, card2FadeTime + 0.12);
+                            duration: card2ResolveDuration,
+                            ease: "sine.out",
+                        }, card2ResolvedStartTime);
                     }
 
-                    var card4FadeTime = card2FadeTime + 0.12 + 0.38 + 0.28;
+                    // Card 4 starts fading out WHILE Card 2 resolved is sliding in to fill its spot
+                    var card4FadeTime = card2ResolvedStartTime + 0.05;
+                    var card4ResolvedStartTime = card4FadeTime + fadeOutDur + 0.08;
+                    var card4ResolveDuration = 0.48;
+
                     if (card4Initial && card4Resolved) {
                         tl.to(card4Initial, {
                             opacity: 0,
-                            x: -25,
-                            duration: 0.28,
-                            ease: "power2.in",
+                            x: -20,
+                            duration: fadeOutDur,
+                            ease: "sine.inOut",
                         }, card4FadeTime);
 
-                        // ----------------------------------------------------
-                        // FRAME 8: New Card 4 arrives from right side (all 4 resolved)
-                        // ----------------------------------------------------
+                        // FRAME 8: New Card 4 arrives from right side AFTER initial fades out
                         tl.fromTo(card4Resolved, {
                             opacity: 0,
-                            x: 45,
+                            x: 40,
                         }, {
                             opacity: 1,
                             x: 0,
-                            duration: 0.4,
-                            ease: "power2.out",
-                        }, card4FadeTime + 0.12);
+                            duration: card4ResolveDuration,
+                            ease: "sine.out",
+                        }, card4ResolvedStartTime);
                     }
 
                     // ----------------------------------------------------
                     // Final Hold & Loop Reset
                     // ----------------------------------------------------
-                    var finalHoldEnd = card4FadeTime + 0.12 + 0.4 + 3.0;
+                    var card4ResolveEnd = card4ResolvedStartTime + card4ResolveDuration;
+                    var finalHoldEnd = card4ResolveEnd + 3.2;
 
                     tl.to(stageCards, {
                         opacity: 0,
