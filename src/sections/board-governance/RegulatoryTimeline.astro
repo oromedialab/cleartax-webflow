@@ -20,6 +20,7 @@ interface Product {
   overline: string;
   name: string;
   text: string;
+  image: string;
 }
 
 const products: Product[] = [
@@ -27,16 +28,22 @@ const products: Product[] = [
     overline: "01. For the secretarial team",
     name: "BLISS",
     text: "Agendas, minutes, registers and returns; automated to the Companies Act, 2013 and SEBI LODR.",
+    image:
+      "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6ae07a9326e9ab93326b8f9f_board-1.png",
   },
   {
     overline: "02. For directors",
     name: "BLISSDOCS",
     text: "The full board pack on every director's device. Secure, current, and revocable.",
+    image:
+      "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6ae07a9aad42f0f8882a1a44_board-2.png",
   },
   {
     overline: "03. For the compliance function",
     name: "Clear Compass",
     text: "Every obligation across 800+ laws and 20,000+ compliances, with AI validating every proof.",
+    image:
+      "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6ae07a9e26e9ab93326b93e1_board-3.png",
   },
 ];
 ---
@@ -94,17 +101,28 @@ const products: Product[] = [
         }
       </div>
 
-      <div class="relative aspect-video w-full" data-rt-panels>
+      <div
+        class="relative aspect-square lg:aspect-[816/459] w-full"
+        data-mandate-thumbs
+      >
         {
-          products.map((_, i) => (
+          products.map((item, i) => (
             <div
               class:list={[
-                "absolute inset-0 rounded-xl bg-visual-placeholder transition-opacity duration-300",
+                "absolute inset-0 rounded-lg overflow-hidden transition-opacity duration-300 flex items-center justify-center",
                 i === 0 ? "opacity-100" : "opacity-0",
               ]}
               data-rt-panel
               aria-hidden={i !== 0}
-            />
+            >
+              <img
+                src={item.image}
+                alt={item.text}
+                class="w-full h-full object-contain rounded-lg"
+                loading={i === 0 ? "eager" : "lazy"}
+                decoding="async"
+              />
+            </div>
           ))
         }
       </div>
