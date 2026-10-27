@@ -126,7 +126,7 @@ const THEIRS = "General AI assistants";
         </h2>
 
         <div
-          class="flex w-full items-center justify-between rounded-t-xl border border-[#CCCCCC] px-6 py-6"
+          class="hidden lg:flex w-full items-center justify-between rounded-t-xl border border-[#CCCCCC] px-6 py-6"
         >
           <p
             class="m-0 font-heading font-medium text-nova-blue text-[length:var(--fs-h6)] leading-[length:var(--lh-body-lg)]"
@@ -145,8 +145,11 @@ const THEIRS = "General AI assistants";
            `position: sticky` on the block above, and this is the element that
            would do it. Nothing needs clipping anyway — the rows carry no
            background of their own, so the rounded border has nothing to cut.
-           `border-t-0` because the labels box above already drew that edge. -->
-      <div class="w-full rounded-b-xl border border-t-0 border-[#CCCCCC]">
+           On mobile the top labels box is hidden, so this takes full rounded-xl
+           and full border. On desktop (lg:) it takes rounded-b-xl and border-t-0. -->
+      <div
+        class="w-full rounded-xl lg:rounded-t-none lg:rounded-b-xl border border-[#CCCCCC] lg:border-t-0"
+      >
         {
           rows.map((row, i) => (
             <>
@@ -162,7 +165,7 @@ const THEIRS = "General AI assistants";
               )}
 
               <div class="flex items-center gap-6 p-6 max-lg:flex-col max-lg:items-stretch">
-                <div class="flex min-w-0 flex-1 flex-col gap-2">
+                <div class="flex min-w-0 flex-1 flex-col gap-2 lg:order-1">
                   <span class="font-body font-medium uppercase tracking-[1px] text-nova-blue text-[length:var(--fs-label-sm)] leading-[length:var(--lh-label-sm)] lg:hidden">
                     {OURS}
                   </span>
@@ -174,22 +177,22 @@ const THEIRS = "General AI assistants";
                   </p>
                 </div>
 
-                <img
-                  src={row.image}
-                  alt={row.title}
-                  class="size-40 shrink-0 rounded-xl object-contain max-lg:size-24 max-lg:self-center"
-                  loading="lazy"
-                  decoding="async"
-                />
-
-                <div class="flex min-w-0 flex-1 flex-col gap-2">
-                  <span class="font-body font-medium uppercase tracking-[1px] text-neutral-500 text-[length:var(--fs-label-sm)] leading-[length:var(--lh-label-sm)] lg:hidden">
+                <div class="flex min-w-0 flex-1 flex-col gap-2 lg:order-3">
+                  <span class="font-body font-medium uppercase tracking-[1px] text-nova-blue text-[length:var(--fs-label-sm)] leading-[length:var(--lh-label-sm)] lg:hidden">
                     {THEIRS}
                   </span>
                   <p class="m-0 font-body text-neutral-500 text-[length:var(--fs-body)] leading-[length:var(--lh-body)] lg:text-right">
                     {row.generic}
                   </p>
                 </div>
+
+                <img
+                  src={row.image}
+                  alt={row.title}
+                  class="size-40 shrink-0 rounded-xl object-contain max-lg:size-24 max-lg:self-center lg:order-2"
+                  loading="lazy"
+                  decoding="async"
+                />
               </div>
             </>
           ))
