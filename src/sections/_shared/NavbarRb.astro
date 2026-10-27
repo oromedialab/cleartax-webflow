@@ -18,12 +18,14 @@
 export interface NavChild {
   label: string;
   href?: string;
-  children?: { label: string; href: string }[];
+  target?: string;
+  children?: { label: string; href: string; target?: string }[];
 }
 
 export interface NavLink {
   label: string;
   href?: string;
+  target?: string;
   dropdown?: NavChild[];
 }
 
@@ -428,6 +430,8 @@ function toBlocks(items: NavChild[]): Block[] {
                                     <li>
                                       <a
                                         href={d.href}
+                                        target={d.target}
+                                        rel={d.target === "_blank" ? "noopener noreferrer" : undefined}
                                         class="block no-underline font-medium font-body text-neutral-500 text-[length:var(--fs-body-lg)] leading-[length:var(--lh-body-lg)] transition-colors hover:text-nova-blue"
                                       >
                                         {d.label}
@@ -516,6 +520,8 @@ function toBlocks(items: NavChild[]): Block[] {
                                           <li>
                                             <a
                                               href={c.href}
+                                              target={c.target}
+                                              rel={c.target === "_blank" ? "noopener noreferrer" : undefined}
                                               class="block no-underline font-body text-neutral-500 text-[length:var(--fs-body-lg)] leading-[length:var(--lh-body-lg)] transition-colors hover:text-nova-blue"
                                             >
                                               {c.label}
@@ -571,6 +577,8 @@ function toBlocks(items: NavChild[]): Block[] {
                               <li>
                                 <a
                                   href={l.href}
+                                  target={l.target}
+                                  rel={l.target === "_blank" ? "noopener noreferrer" : undefined}
                                   class="block no-underline font-medium font-body text-neutral-500 text-[length:var(--fs-body-lg)] leading-[length:var(--lh-body-lg)] transition-colors hover:text-nova-blue"
                                 >
                                   {l.label}
