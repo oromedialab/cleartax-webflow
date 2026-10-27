@@ -88,104 +88,48 @@ import DemoModal from "../sections/spain-regional/DemoModal.astro";
       fetchpriority="high"
     />
 
-    <!-- Usercentrics CMP loads immediately (not deferred) so the consent
-         banner and autoblocker are in place before other scripts run. -->
-    <script is:inline>
-      (function () {
-        var blockScript = document.createElement("script");
-        blockScript.src =
-          "https://web.cmp.usercentrics.eu/modules/autoblocker.js";
-        document.head.appendChild(blockScript);
+      <!-- 1. Usercentrics CMP — loads immediately, before anything else -->
+        <script is:inline>
+        (function () {
+            var blockScript = document.createElement("script");
+            blockScript.src = "https://web.cmp.usercentrics.eu/modules/autoblocker.js";
+            document.head.appendChild(blockScript);
 
-        var cmpScript = document.createElement("script");
-        cmpScript.id = "usercentrics-cmp";
-        cmpScript.src = "https://web.cmp.usercentrics.eu/ui/loader.js";
-        cmpScript.setAttribute("data-settings-id", "utqqyaEbvbzrTk");
-        cmpScript.async = true;
-        document.head.appendChild(cmpScript);
-      })();
-    </script>
+            var cmpScript = document.createElement("script");
+            cmpScript.id = "usercentrics-cmp";
+            cmpScript.src = "https://web.cmp.usercentrics.eu/ui/loader.js";
+            cmpScript.setAttribute("data-settings-id", "utqqyaEbvbzrTk");
+            cmpScript.async = true;
+            document.head.appendChild(cmpScript);
+        })();
+        </script>
 
-    <!-- Deferred script loader for performance -->
-    <script is:inline>
-      (function () {
-        let scriptsLoaded = false;
-        function loadHeavyScripts() {
-          if (scriptsLoaded) return;
-          scriptsLoaded = true;
-
-          triggerEvents.forEach((e) =>
-            window.removeEventListener(e, loadHeavyScripts, { passive: true }),
-          );
-
-          // Google Tag Manager
-          (function (w, d, s, l, i) {
-            w[l] = w[l] || [];
-            w[l].push({ "gtm.start": new Date().getTime(), event: "gtm.js" });
-            var f = d.getElementsByTagName(s)[0],
-              j = d.createElement(s),
-              dl = l != "dataLayer" ? "&l=" + l : "";
-            j.async = true;
-            j.src = "https://www.googletagmanager.com/gtm.js?id=" + i + dl;
-            f.parentNode.insertBefore(j, f);
-          })(window, document, "script", "dataLayer", "GTM-P5NDQXGH");
-        }
-
-        const triggerEvents = [
-          "mouseover",
-          "mouseenter",
-          "mousemove",
-          "touchstart",
-          "scroll",
-          "keydown",
-        ];
-        triggerEvents.forEach((e) =>
-          window.addEventListener(e, loadHeavyScripts, { passive: true }),
-        );
-
-        // Safety timeout so crawlers still get the scripts without interaction.
-        setTimeout(loadHeavyScripts, 4000);
-
-        const setupHashCleaner = () => {
-          try {
-            document.querySelectorAll('a[href^="#"]').forEach((anchor) => {
-              anchor.addEventListener("click", function (e) {
-                const targetId = this.getAttribute("href");
-                if (targetId === "#") return;
-                const targetElement = document.querySelector(targetId);
-                if (targetElement) {
-                  e.preventDefault();
-                  targetElement.scrollIntoView({ behavior: "smooth" });
-                  history.pushState(
-                    null,
-                    document.title,
-                    window.location.pathname + window.location.search,
-                  );
-                }
-              });
-            });
-
-            if (window.location.hash) {
-              setTimeout(() => {
-                history.replaceState(
-                  null,
-                  document.title,
-                  window.location.pathname + window.location.search,
-                );
-              }, 1000);
+        <!-- 2. GTM — loads only after the visitor responds to the consent banner -->
+        <script is:inline>
+        (function () {
+            function loadGTM() {
+            (function (w, d, s, l, i) {
+                w[l] = w[l] || [];
+                w[l].push({ "gtm.start": new Date().getTime(), event: "gtm.js" });
+                var f = d.getElementsByTagName(s)[0],
+                j = d.createElement(s),
+                dl = l != "dataLayer" ? "&l=" + l : "";
+                j.async = true;
+                j.src = "https://www.googletagmanager.com/gtm.js?id=" + i + dl;
+                f.parentNode.insertBefore(j, f);
+            })(window, document, "script", "dataLayer", "GTM-P5NDQXGH");
             }
-          } catch (e) {
-            console.error("Anchor hash handler failed", e);
-          }
-        };
 
-        if (document.readyState === "loading") {
-          document.addEventListener("DOMContentLoaded", setupHashCleaner);
-        } else {
-          setupHashCleaner();
-        }
-      })();
-    </script>
+            window.addEventListener("UC_UI_CMP_EVENT", function (event) {
+            if (
+                event.detail &&
+                ["ACCEPT_ALL", "DENY_ALL", "SAVE"].indexOf(event.detail.type) !== -1
+            ) {
+                loadGTM();
+            }
+            });
+        })();
+        </script>
 
     <link rel="preconnect" href="https://js-na2.hsforms.net" />
     <link rel="preconnect" href="https://forms.hsforms.com" />
