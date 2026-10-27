@@ -77,6 +77,47 @@ import DemoModal from "../sections/global-homepage/DemoModal.astro";
       fetchpriority="high"
     />
 
+    <!-- 0. Region swap — Indian-timezone visitors get /home-in at this same URL.
+         Pastes into Webflow page custom code (head), not an Embed. See docs/region-swap.md -->
+    <script is:inline>
+    (function () {
+      var tz = "";
+      try { tz = Intl.DateTimeFormat().resolvedOptions().timeZone || ""; } catch (e) {}
+      if (tz !== "Asia/Kolkata" && tz !== "Asia/Calcutta") return; // everyone else: Global, no delay
+
+      var hide = document.createElement("style");
+      hide.textContent = "html{visibility:hidden}";
+      document.head.appendChild(hide);
+      var reveal = function () { if (hide.parentNode) hide.parentNode.removeChild(hide); };
+      var failsafe = setTimeout(reveal, 3000); // any failure: show Global
+
+      var KEY = "ct-home-in", TTL = 600000; // reuse the fetched India page for 10 min
+      var swap = function (html) {
+        clearTimeout(failsafe);
+        document.open();
+        document.write(html); // same-origin, our own page; India page re-runs its own head scripts
+        document.close();
+      };
+
+      try {
+        var c = JSON.parse(localStorage.getItem(KEY));
+        if (c && c.h && Date.now() - c.t < TTL) return setTimeout(function () { swap(c.h); }, 0); // repeat visit: no network wait
+      } catch (e) {}
+
+      fetch("/home-in", { credentials: "omit" })
+        .then(function (r) {
+          if (!r.ok) throw new Error("status " + r.status);
+          return r.text();
+        })
+        .then(function (html) {
+          if (html.indexOf("<body") === -1) throw new Error("bad page");
+          try { localStorage.setItem(KEY, JSON.stringify({ t: Date.now(), h: html })); } catch (e) {}
+          swap(html);
+        })
+        .catch(reveal);
+    })();
+    </script>
+
     <!-- 1. Usercentrics CMP — loads immediately, before anything else -->
     <script is:inline>
       (function () {
