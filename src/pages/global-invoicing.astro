@@ -32,35 +32,6 @@ import Footer from "../sections/global-invoicing/Footer.astro";
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <!--
-      Usercentrics CMP loads immediately — not gated behind the interaction-or-
-      timeout bucket further down. Two reasons: the autoblocker only blocks
-      trackers it loads ahead of, so it has to precede GTM; and gating it meant
-      its consent banner painted 4s+ into page life after its own chain of ~10
-      sequential script loads, and — since a lab run never "interacts" — kept
-      getting picked up as a later, larger LCP candidate. PageSpeed flagged this
-      exact element ("privacy-text") with an 8,080ms render delay, which is most
-      of the mobile LCP budget. GTM and everything it fires (ads/analytics/FB/
-      Bing/Clarity) stay deferred below; none of that paints visible content.
-    -->
-    <!-- The autoblocker's own config fetch cascades into this usercentrics.eu
-         sub-origin — preconnecting lets the browser open the connection while
-         the first autoblocker.js request is still in flight, instead of
-         serially after it finishes. app.usercentrics.eu and
-         uct.service.usercentrics.eu were here too, but a later PageSpeed run
-         flagged both "Unused preconnect" (the cascade never actually reaches
-         them in the lab window) and flagged the page for having too many
-         preconnects overall — removed rather than paying for connections
-         that don't get used. -->
-    <link rel="preconnect" href="https://consent-api.service.consent.usercentrics.eu" />
-    <script src="https://web.cmp.usercentrics.eu/modules/autoblocker.js"></script>
-    <script
-      is:inline
-      id="usercentrics-cmp"
-      src="https://web.cmp.usercentrics.eu/ui/loader.js"
-      data-settings-id="utqqyaEbvbzrTk"
-      async
-    ></script>
     <title>Global E-Invoicing Compliance Software | ClearTax</title>
     <meta
       name="description"
@@ -141,20 +112,26 @@ import Footer from "../sections/global-invoicing/Footer.astro";
         href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Inter+Tight:wght@400;500;600;700&display=swap"
       />
     </noscript>
-    <!-- Deferred script loader for performance -->
+    <!-- 1. Usercentrics CMP — loads immediately, before anything else -->
     <script is:inline>
       (function () {
-        let scriptsLoaded = false;
-        function loadHeavyScripts() {
-          if (scriptsLoaded) return;
-          scriptsLoaded = true;
+        var blockScript = document.createElement("script");
+        blockScript.src = "https://web.cmp.usercentrics.eu/modules/autoblocker.js";
+        document.head.appendChild(blockScript);
 
-          // Remove event listeners
-          triggerEvents.forEach((e) =>
-            window.removeEventListener(e, loadHeavyScripts, { passive: true }),
-          );
+        var cmpScript = document.createElement("script");
+        cmpScript.id = "usercentrics-cmp";
+        cmpScript.src = "https://web.cmp.usercentrics.eu/ui/loader.js";
+        cmpScript.setAttribute("data-settings-id", "utqqyaEbvbzrTk");
+        cmpScript.async = true;
+        document.head.appendChild(cmpScript);
+      })();
+    </script>
 
-          // Load Google Tag Manager
+    <!-- 2. GTM — loads only after the visitor responds to the consent banner -->
+    <script is:inline>
+      (function () {
+        function loadGTM() {
           (function (w, d, s, l, i) {
             w[l] = w[l] || [];
             w[l].push({ "gtm.start": new Date().getTime(), event: "gtm.js" });
@@ -165,30 +142,22 @@ import Footer from "../sections/global-invoicing/Footer.astro";
             j.src = "https://www.googletagmanager.com/gtm.js?id=" + i + dl;
             f.parentNode.insertBefore(j, f);
           })(window, document, "script", "dataLayer", "GTM-P5NDQXGH");
-
-          // Load the HubSpot forms SDK (~330KB across its own sub-requests) —
-          // ContactFormRb already polls for window.hbspt and listens for this
-          // script's load event, so it's safe to arrive this late.
-          var hsScript = document.createElement("script");
-          hsScript.src = "https://js-na2.hsforms.net/forms/embed/v2.js";
-          document.head.appendChild(hsScript);
         }
 
-        const triggerEvents = [
-          "mouseover",
-          "mouseenter",
-          "mousemove",
-          "touchstart",
-          "scroll",
-          "keydown",
-        ];
-        triggerEvents.forEach((e) =>
-          window.addEventListener(e, loadHeavyScripts, { passive: true }),
-        );
+        window.addEventListener("UC_UI_CMP_EVENT", function (event) {
+          if (
+            event.detail &&
+            ["ACCEPT_ALL", "DENY_ALL", "SAVE"].indexOf(event.detail.type) !== -1
+          ) {
+            loadGTM();
+          }
+        });
+      })();
+    </script>
 
-        // Safety timeout to ensure scripts load even without interaction (e.g. for crawlers)
-        setTimeout(loadHeavyScripts, 4000);
-
+    <!-- Anchor links: smooth scroll and clean the URL hash -->
+    <script is:inline>
+      (function () {
         // Clean URL hash on anchor link clicks & initial landing
         const setupHashCleaner = () => {
           try {
@@ -230,6 +199,14 @@ import Footer from "../sections/global-invoicing/Footer.astro";
         }
       })();
     </script>
+    <!-- Preconnect to HubSpot CDNs -->
+    <link rel="preconnect" href="https://js-na2.hsforms.net" />
+    <link rel="preconnect" href="https://forms.hsforms.com" />
+    <link rel="preconnect" href="https://forms-na2.hsforms.com" />
+
+    <!-- HubSpot Embed Script -->
+    <script is:inline src="https://js-na2.hsforms.net/forms/embed/v2.js"
+    ></script>
   </head>
   <body class="bg-generic-00">
     <!-- Google Tag Manager (noscript) -->
