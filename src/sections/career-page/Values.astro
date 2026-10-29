@@ -38,9 +38,9 @@
  * IMPORTANT: no ancestor of `.cp-value-row` may set `overflow` to anything but
  * `visible`, or `position: sticky` silently stops working.
  *
- * Below md the rows go static and stack vertically (words above the card), with
- * no fan — a 480px card pinned under the navbar leaves no room for the words on
- * a phone, and a fan in a plain vertical list just reads as broken alignment.
+ * Below md the same pinned pile runs, but the words keep their original
+ * phone order, left word above the card and right word below it (fixed-height slots, see WORDS_STACK in the script) and the card is narrowed so
+ * the fan stays inside the screen.
  */
 interface Value {
   /** Word(s) that fly in from the left. */
@@ -150,22 +150,31 @@ const values: Value[] = [
     );
     display: flex;
     flex-direction: column;
-    gap: 4rem;
+    /* Scroll travel between pins. Each value needs a beat fully visible
+       before the next starts crowding it. */
+    gap: 55vh;
   }
 
+  /* Phones: same pinned pile as desktop, words stacked ABOVE the card. The rows
+     are fixed-height tracks (left word sits on the card side of its slot, right
+     word hangs from the top of its own) so every row's card lands on exactly the
+     same spot — the script's WORDS_STACK must match 2.25rem + 2.25rem + the gaps. */
   .cp-value-row {
+    position: sticky;
+    top: var(--nav-clear, 112px);
     display: grid;
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: 2.25rem auto 2.25rem;
     justify-items: center;
-    align-items: center;
-    gap: 1.5rem;
+    row-gap: 1rem;
   }
 
   .cp-value-word {
     margin: 0;
     font-family: var(--font-heading);
     font-weight: var(--font-weight-medium, 500);
-    font-size: clamp(1.75rem, 3.4vw, 2.975rem); /* 28px → 47.6px per Figma */
+    /* Phones: 24px so the longest phrase fits one line in its slot. */
+    font-size: 1.5rem;
     line-height: 1.143; /* 54.4 / 47.6 */
     letter-spacing: -0.425px;
     color: var(--color-generic-100, #000);
@@ -194,9 +203,14 @@ const values: Value[] = [
     transform-origin: center center;
     will-change: transform, opacity;
     /* Entrance only, on phones: rise and settle. The fan is desktop-only. */
-    transform: translateY(calc((1 - var(--cp-in, 1)) * 32px))
-      scale(calc(0.96 + 0.04 * var(--cp-in, 1)));
-    opacity: var(--cp-in, 1);
+    transform: translateX(
+        calc(var(--cp-card) * 0.055 * var(--cp-depth, 0) * var(--cp-fan, 1))
+      )
+      translateY(calc((1 - var(--cp-in, 1)) * 64px))
+      rotate(calc(var(--cp-depth, 0) * var(--cp-fan, 1) * 1.2deg))
+      scale(calc(1 - 0.06 * var(--cp-depth, 0)))
+      scale(calc(0.94 + 0.06 * var(--cp-in, 1)));
+    opacity: calc(var(--cp-in, 1) * (1 - 0.05 * var(--cp-depth, 0)));
     /* Short enough not to lag the scroll, long enough to smooth the steps
        between rAF samples — a scroll wheel delivers coarse jumps, and without
        this the pile re-poses in visible increments instead of gliding. */
@@ -214,114 +228,89 @@ const values: Value[] = [
   }
 
   .cp-values-tail {
-    height: 2rem;
+    height: 30vh;
   }
 
-  /* ---- Pinned regime: the pile ------------------------------------------ */
+  /* The title rides above the pile instead of scrolling away with it.
+
+     Needs the opaque background AND the z-index: the rows below carry z-index
+     1–5 and `.cp-values-track` creates no stacking context of its own (no
+     transform, no opacity, no z-index), so without 10 here the last card
+     would slide over the type as it unsticks at the end of the section.
+
+     `top` is a floor only — the script overwrites it so the title and the
+     pile centre together as one block. */
+  .cp-values-title {
+    position: sticky;
+    top: var(--nav-clear, 112px);
+    z-index: 10;
+    background: var(--color-generic-00, #fff);
+    padding-block: 8px;
+  }
+
+  /* Phone word placement: left word on the lower edge of its slot so it hugs the
+     right word, right word from the top of its own slot. */
+  .cp-value-word--left {
+    --cp-dir: -24px;
+    grid-row: 1;
+    align-self: end;
+  }
+
+  .cp-value-word--right {
+    --cp-dir: 24px;
+    grid-row: 3;
+    align-self: start;
+  }
+
+  .cp-value-card {
+    grid-row: 2;
+  }
+
+  .cp-value-word {
+    max-width: 100%;
+    transform: translate3d(
+      calc((1 - var(--cp-v, 1)) * var(--cp-dir, 0px)),
+      0,
+      0
+    );
+    transition:
+      opacity 140ms linear,
+      transform 220ms cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  /* Which way each card is pushed as it gets buried. Alternating by position
+     rather than by depth, so neighbours in the pile always fan opposite ways
+     and no two cards can end up stacked on the same side.
+
+     Named `--cp-fan`, not `--cp-dir`: the words use `--cp-dir` for their slide
+     offset, and that one is a LENGTH while this is a unitless sign. */
+  .cp-value-row:nth-child(odd) .cp-value-card {
+    --cp-fan: -1;
+  }
+
+  .cp-value-row:nth-child(even) .cp-value-card {
+    --cp-fan: 1;
+  }
+
+  /* ---- Desktop layout: words flank the card ------------------------------ */
   @media (min-width: 768px) {
-    .cp-values-track {
-      /* Scroll travel between pins. Each value needs a beat fully visible
-         before the next starts crowding it. */
-      gap: 55vh;
-    }
-
-    /* The title rides above the pile instead of scrolling away with it. Only in
-       the pinned regime — below md the cards are a plain vertical list, and a
-       bar eating 60px of a phone screen for the whole section buys nothing.
-
-       Needs the opaque background AND the z-index: the rows below carry z-index
-       1–5 and `.cp-values-track` creates no stacking context of its own (no
-       transform, no opacity, no z-index), so without 10 here the last card
-       would slide over the type as it unsticks at the end of the section.
-
-       `top` is a floor only — the script overwrites it so the title and the
-       pile centre together as one block. */
-    .cp-values-title {
-      position: sticky;
-      top: var(--nav-clear, 112px);
-      z-index: 10;
-      background: var(--color-generic-00, #fff);
-      padding-block: 8px;
-    }
-
     .cp-value-row {
-      position: sticky;
-      /* Floor only. The script centres the group in what is left of the
-         viewport under the navbar and writes the real offset to `style.top` —
-         it has to know that number anyway to work out how far a row still has
-         to travel, and measuring it is more reliable than parsing it back out
-         of getComputedStyle. */
-      top: var(--nav-clear, 112px);
       grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+      grid-template-rows: auto;
+      align-items: center;
       gap: 0 80px;
-    }
-
-    /* Which way each card is pushed as it gets buried. Alternating by position
-       rather than by depth, so neighbours in the pile always fan opposite ways
-       and no two cards can end up stacked on the same side.
-
-       Named `--cp-fan`, not `--cp-dir`: the words below already use `--cp-dir`
-       for their slide offset, and that one is a LENGTH while this is a unitless
-       sign. They sit on sibling elements so nothing inherits across, but one
-       name meaning two types is a trap worth not setting. */
-    .cp-value-row:nth-child(odd) .cp-value-card {
-      --cp-fan: -1;
-    }
-
-    .cp-value-row:nth-child(even) .cp-value-card {
-      --cp-fan: 1;
-    }
-
-    /* THE PILE GEOMETRY. Four properties move together, and the ratios between
-       them are what makes this read as a deck rather than as clutter.
-
-       SCALE RECESSION IS THE LOAD-BEARING ONE. Without it every card is the
-       same size, so a tilted card's corners poke out above and below the one in
-       front and the top edge of the pile goes ragged. Shrinking 6% per level of
-       depth keeps every buried card INSIDE the top card vertically, so the
-       stack can only spread sideways. That is what a pile of photos does.
-
-       Half-extent from centre at the tightest geometry (480px card, 1280px
-       container), per level of depth:
-
-         depth      0     1     2     3     4
-         sideways 240   257   273   288   303 px
-         vertical 240   230   220   209   197 px
-
-       An even ~16px step sideways, so each card peeks by the same amount as the
-       one in front of it; the outermost still clears the 320px where the word
-       column starts. Every vertical figure is inside 240 — that is the tidiness.
-
-       Offsets are a fraction of --cp-card, never fixed px, so the fan holds its
-       proportions as the card clamps down on smaller screens. translateX is
-       applied BEFORE the scales, so offsets are not shrunk along with the card.
-       Raising 0.055, 1.2deg, or DEPTH_CAP in the script walks the pile under the
-       headline text — re-check the table above if you touch any of them. */
-    .cp-value-card {
-      transform: translateX(
-          calc(var(--cp-card) * 0.055 * var(--cp-depth, 0) * var(--cp-fan, 1))
-        )
-        translateY(calc((1 - var(--cp-in, 1)) * 64px))
-        rotate(calc(var(--cp-depth, 0) * var(--cp-fan, 1) * 1.2deg))
-        scale(calc(1 - 0.06 * var(--cp-depth, 0)))
-        scale(calc(0.94 + 0.06 * var(--cp-in, 1)));
-      /* Buried cards sit back a little so the live one reads as the subject. */
-      opacity: calc(var(--cp-in, 1) * (1 - 0.05 * var(--cp-depth, 0)));
     }
 
     .cp-value-word {
       max-width: 340px;
-      transform: translate3d(
-        calc((1 - var(--cp-v, 1)) * var(--cp-dir, 0px)),
-        0,
-        0
-      );
-      /* Shorter than the card's: the words cross-fade against each other, and a
-         long tail here would put the outgoing and incoming phrase on screen
-         together, which is the ghosting the 1.8x handover exists to avoid. */
-      transition:
-        opacity 140ms linear,
-        transform 220ms cubic-bezier(0.22, 1, 0.36, 1);
+      font-size: clamp(1.75rem, 3.4vw, 2.975rem); /* 28px → 47.6px per Figma */
+    }
+
+    .cp-value-word--left,
+    .cp-value-word--right,
+    .cp-value-card {
+      grid-row: 1;
+      align-self: center;
     }
 
     .cp-value-word--left {
@@ -336,12 +325,9 @@ const values: Value[] = [
       text-align: left;
     }
 
-    .cp-values-tail {
-      height: 30vh;
-    }
   }
 
-  /* ---- Static regime: phones, and anyone who asked for less motion ------- */
+  /* ---- Static regime: anyone who asked for less motion ------- */
   @media (prefers-reduced-motion: reduce) {
     .cp-values-track {
       gap: 4rem !important;
@@ -408,6 +394,13 @@ const values: Value[] = [
       var MIN_CARD = 240;
       var MAX_CARD = 480;
       var BOTTOM_SLACK = 24;
+      // Phones only: the words sit above the card in two fixed slots.
+      // 2.25rem + 2.25rem + two 1rem row gaps = 72px + 32px, at 16px/rem.
+      var WORDS_STACK = 104;
+      var PHONE_MIN_CARD = 200;
+      // Share of the track the card may take on a phone, leaving the rest for
+      // the fan (4 levels x 5.5% each side of the card).
+      var PHONE_CARD_SHARE = 0.66;
 
       // TWO UNITS. getBoundingClientRect() and window.innerHeight are RENDERED
       // px — what is on the glass. Anything written to `style.top` is CSS px.
@@ -455,7 +448,12 @@ const values: Value[] = [
         var titleHeight = pinnedTitle
           ? title.getBoundingClientRect().height / zoom
           : 0;
-        var lead = titleHeight ? titleHeight + TITLE_GAP : 0;
+        var phone = !(
+          window.matchMedia && window.matchMedia("(min-width: 768px)").matches
+        );
+        var lead =
+          (titleHeight ? titleHeight + TITLE_GAP : 0) +
+          (phone ? WORDS_STACK : 0);
 
         // Everything below is CSS px. window.innerHeight is rendered px.
         var viewportCss = window.innerHeight / zoom;
@@ -472,13 +470,14 @@ const values: Value[] = [
         // box-sizing is border-box site-wide (shared.css), so the card is
         // exactly --cp-card square — no need to measure it back.
         var cardSize = Math.max(
-          MIN_CARD,
+          phone ? PHONE_MIN_CARD : MIN_CARD,
           Math.min(
             MAX_CARD,
             viewportCss - navClear - lead - BOTTOM_SLACK,
             // Keep the words a usable column: 0.375 of the track leaves ~320px
-            // a side at the 1280px container the mocks are drawn to.
-            trackWidthCss * 0.375,
+            // a side at the 1280px container the mocks are drawn to. On a phone
+            // the words are above, so the limit is the fan's side room instead.
+            trackWidthCss * (phone ? PHONE_CARD_SHARE : 0.375),
           ),
         );
         track.style.setProperty("--cp-card", cardSize + "px");
@@ -494,7 +493,9 @@ const values: Value[] = [
         );
         if (pinnedTitle) title.style.top = groupTop + "px";
 
-        pinTop = groupTop + lead;
+        // The words live INSIDE the row, so they are not part of the offset the
+        // row pins at — only the title above it is.
+        pinTop = groupTop + (lead - (phone ? WORDS_STACK : 0));
 
         rows.forEach(function (row) {
           // A no-op while the rows are static (phones), where there is no pin.
