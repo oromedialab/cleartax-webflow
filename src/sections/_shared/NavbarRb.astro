@@ -490,6 +490,8 @@ function toBlocks(items: NavChild[]): Block[] {
                                   <button
                                     type="button"
                                     data-sub-trigger
+                                    data-href={block.item.href}
+                                    data-target={block.item.target}
                                     aria-expanded="false"
                                     class="flex items-center gap-2 p-0 m-0 bg-transparent border-0 cursor-pointer text-left font-medium font-body text-neutral-500 text-[length:var(--fs-body-lg)] leading-[length:var(--lh-body-lg)] transition-colors hover:text-nova-blue"
                                   >
@@ -940,18 +942,35 @@ function toBlocks(items: NavChild[]): Block[] {
     // No pin bookkeeping either: with nothing opening on hover, a click can
     // always just toggle.
     subItems.forEach((item) => {
-      item
-        .querySelector("[data-sub-trigger]")
-        ?.addEventListener("click", (e) => {
-          e.preventDefault();
-          const willOpen = !item.classList.contains("open");
-          if (willOpen) {
-            subItems.forEach((other) => {
-              if (other !== item) setSubOpen(other, false);
-            });
+      const trigger = item.querySelector("[data-sub-trigger]");
+      trigger?.addEventListener("click", (e) => {
+        e.preventDefault();
+        const isOpen = item.classList.contains("open");
+        const href = trigger.getAttribute("data-href");
+
+        // If already open and has an href, navigate on second click
+        if (isOpen && href) {
+          const target = trigger.getAttribute("data-target") || "_self";
+          const link = document.createElement("a");
+          link.href = href;
+          link.target = target;
+          if (target === "_blank") {
+            link.rel = "noopener noreferrer";
           }
-          setSubOpen(item, willOpen);
-        });
+          document.body.appendChild(link);
+          link.click();
+          link.remove();
+          return;
+        }
+
+        const willOpen = !isOpen;
+        if (willOpen) {
+          subItems.forEach((other) => {
+            if (other !== item) setSubOpen(other, false);
+          });
+        }
+        setSubOpen(item, willOpen);
+      });
     });
 
     // Same click-only treatment for the four top-level groups. At lg+ the
