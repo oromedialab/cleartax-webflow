@@ -86,12 +86,58 @@ const modalBlurb = 'Tell us a little about you and we will be in touch.';
         data-form-id={hubspotFormId}
         data-region={hubspotRegion}
       >
-        <p
+        <!-- Form Skeleton Loader -->
+        <div
           data-demo-loading
-          class="m-0 font-body font-normal text-neutral-500 text-[length:var(--fs-body-sm)] leading-[var(--lh-body-sm)]"
+          class="ih-demo-skeleton"
+          aria-busy="true"
+          aria-label="Loading form"
         >
-          Loading form…
-        </p>
+          <!-- Row 1: First Name & Last Name -->
+          <div class="ih-demo-skeleton-row">
+            <div>
+              <div class="ih-demo-skeleton-label ih-demo-shimmer" style="width: 76px;"></div>
+              <div class="ih-demo-skeleton-input ih-demo-shimmer"></div>
+            </div>
+            <div>
+              <div class="ih-demo-skeleton-label ih-demo-shimmer" style="width: 76px;"></div>
+              <div class="ih-demo-skeleton-input ih-demo-shimmer"></div>
+            </div>
+          </div>
+
+          <!-- Row 2: Work Email -->
+          <div>
+            <div class="ih-demo-skeleton-label ih-demo-shimmer" style="width: 88px;"></div>
+            <div class="ih-demo-skeleton-input ih-demo-shimmer"></div>
+          </div>
+
+          <!-- Row 3: Phone Number (Country code select + phone input) -->
+          <div>
+            <div class="ih-demo-skeleton-label ih-demo-shimmer" style="width: 104px;"></div>
+            <div class="ih-demo-skeleton-phone">
+              <div class="ih-demo-skeleton-phone-code ih-demo-shimmer"></div>
+              <div class="ih-demo-skeleton-input ih-demo-shimmer"></div>
+            </div>
+          </div>
+
+          <!-- Row 4: Company Name -->
+          <div>
+            <div class="ih-demo-skeleton-label ih-demo-shimmer" style="width: 112px;"></div>
+            <div class="ih-demo-skeleton-input ih-demo-shimmer"></div>
+          </div>
+
+          <!-- Row 5: Consent Checkbox -->
+          <div class="ih-demo-skeleton-consent">
+            <div class="ih-demo-skeleton-checkbox ih-demo-shimmer"></div>
+            <div class="ih-demo-skeleton-consent-text">
+              <div class="ih-demo-skeleton-text-line ih-demo-shimmer" style="width: 100%;"></div>
+              <div class="ih-demo-skeleton-text-line ih-demo-shimmer" style="width: 65%;"></div>
+            </div>
+          </div>
+
+          <!-- Row 6: Submit Button -->
+          <div class="ih-demo-skeleton-button ih-demo-shimmer"></div>
+        </div>
       </div>
     </div>
   </div>
@@ -441,5 +487,118 @@ const modalBlurb = 'Tell us a little about you and we will be in touch.';
   .ih-demo-hs-form fieldset:has([class*="hs_utm_"]),
   .ih-demo-hs-form .hs-form-field[style*="display: none"] {
     display: none !important;
+  }
+
+  /* Form skeleton loader */
+  .ih-demo-skeleton {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    width: 100%;
+  }
+  .ih-demo-skeleton-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+  @media (max-width: 639px) {
+    .ih-demo-skeleton-row {
+      grid-template-columns: 1fr;
+    }
+  }
+  .ih-demo-skeleton-label {
+    height: 14px;
+    background: rgba(0, 0, 0, 0.08);
+    border-radius: 4px;
+    margin-bottom: var(--spacing-x-sm);
+  }
+  .ih-demo-skeleton-input {
+    height: 40px;
+    background: rgba(0, 0, 0, 0.03);
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    border-radius: var(--spacing-x-sm);
+    width: 100%;
+    box-sizing: border-box;
+  }
+  .ih-demo-skeleton-phone {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    width: 100%;
+  }
+  .ih-demo-skeleton-phone-code {
+    width: 130px;
+    min-width: 100px;
+    max-width: 38%;
+    height: 40px;
+    flex-shrink: 0;
+    background: rgba(0, 0, 0, 0.03);
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    border-radius: var(--spacing-x-sm);
+    box-sizing: border-box;
+  }
+  .ih-demo-skeleton-consent {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--spacing-x-sm);
+    margin-top: 2px;
+  }
+  .ih-demo-skeleton-checkbox {
+    width: 20px;
+    height: 20px;
+    flex-shrink: 0;
+    margin-top: 2px;
+    background: rgba(0, 0, 0, 0.08);
+    border-radius: 4px;
+  }
+  .ih-demo-skeleton-consent-text {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding-top: 4px;
+  }
+  .ih-demo-skeleton-text-line {
+    height: 10px;
+    background: rgba(0, 0, 0, 0.06);
+    border-radius: 4px;
+  }
+  .ih-demo-skeleton-button {
+    height: 44px;
+    width: 100%;
+    background: rgba(84, 70, 255, 0.25);
+    border-radius: var(--spacing-x-sm);
+    margin-top: var(--spacing-xx-sm);
+  }
+  .ih-demo-shimmer {
+    position: relative;
+    overflow: hidden;
+  }
+  .ih-demo-shimmer::after {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    transform: translateX(-100%);
+    background-image: linear-gradient(
+      90deg,
+      rgba(255, 255, 255, 0) 0%,
+      rgba(255, 255, 255, 0.6) 20%,
+      rgba(255, 255, 255, 0.6) 60%,
+      rgba(255, 255, 255, 0) 100%
+    );
+    animation: ih-demo-shimmer-anim 1.6s infinite;
+    content: "";
+  }
+  @keyframes ih-demo-shimmer-anim {
+    100% {
+      transform: translateX(100%);
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .ih-demo-shimmer::after {
+      animation: none !important;
+    }
   }
 </style>

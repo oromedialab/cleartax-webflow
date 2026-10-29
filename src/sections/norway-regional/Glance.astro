@@ -10,9 +10,9 @@
  * by hairlines. Each row is the shared "Timeline" component (Figma node
  * 16433:24519) used standalone, not inside a scroll-pinned stack.
  *
- * Scroll-scale focus effect ported from `france-product/RegulatoryTimeline.astro`:
- * the row nearest the vertical centre of the viewport sits at full opacity
- * and scale(1); every other row rests at 50% opacity and scale(0.95).
+ * Scroll-opacity focus effect ported from `france-product/RegulatoryTimeline.astro`:
+ * the row nearest the vertical centre of the viewport sits at full opacity;
+ * every other row rests at 50% opacity.
  * Mechanics (thin-band IntersectionObserver picking the closest row to the
  * centre line) are copied verbatim from that file — see its docblock for the
  * long-form rationale, originally from `global-homepage/Proven.astro`.
@@ -72,7 +72,7 @@ const rows: Row[] = [
                 {row.label}
               </span>
             </div>
-            <p class="m-0 font-body text-[length:var(--fs-body)] leading-[length:var(--lh-body)] text-neutral-500 md:flex-1">
+            <p class="m-0 font-body text-[length:var(--fs-body)] leading-[length:var(--lh-body)] text-neutral-500 md:flex-1 max-w-[640px]">
               {row.desc}
             </p>
           </div>
@@ -83,17 +83,15 @@ const rows: Row[] = [
 </section>
 
 <style is:global>
-  /* Resting rows sit at 50% opacity; the row nearest the viewport's vertical
-     centre is promoted to full opacity by the script below. */
+  /* Rows start dimmed; the row nearest the viewport's vertical centre is
+     promoted to full opacity by the script below. */
   .no-glance-row {
     opacity: 0.5;
-    scale: 0.95;
-    transition: all 0.35s ease-in-out;
+    transition: opacity 0.35s ease-in-out;
   }
 
   .no-glance-row.is-centered {
     opacity: 1;
-    scale: 1;
   }
 </style>
 
