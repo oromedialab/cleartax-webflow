@@ -135,15 +135,19 @@ a{color:inherit;text-decoration:none}
 .idc-wrap{width:100%;max-width:var(--container-max);margin-inline:auto;padding-inline:16px}
 @media(min-width:768px){.idc-wrap{padding-inline:24px}}
 .idc-pad{padding-block:64px}@media(min-width:1024px){.idc-pad{padding-block:96px}}
-.idc-h1{margin:0;font-family:var(--font-heading);font-weight:600;letter-spacing:-1px;
+.idc-h1{margin:0;font-family:var(--font-heading);font-weight:600;letter-spacing:-0.01em;
   font-size:var(--fs-h1);line-height:var(--lh-h1);color:var(--palette-vault-navy);max-width:16ch}
 @media(min-width:768px){.idc-h1{font-size:48px;line-height:54px}}
-@media(min-width:1024px){.idc-h1{font-size:58px;line-height:62px}}
+@media(min-width:1024px){.idc-h1{font-size:58px;line-height:66px}}
 .idc-h2{margin:0;font-family:var(--font-heading);font-weight:500;letter-spacing:-.5px;
   font-size:var(--fs-h1);line-height:var(--lh-h1);color:var(--palette-vault-navy)}
 .idc-sub{margin:0;font-family:var(--font-body);font-size:20px;line-height:30px;color:var(--palette-neutral-500)}
 .idc-body{margin:0;font-family:var(--font-body);font-size:17px;line-height:28px;color:var(--palette-neutral-500)}
 .idc-mark{background:#c8f006;padding:0 .08em;-webkit-box-decoration-break:clone;box-decoration-break:clone;border-radius:10px}
+/* Hero title: paint the highlight behind the whole heading so the descender of "gap" is not covered by it. */
+.idc-h1{isolation:isolate}
+.idc-h1 .idc-mark{position:relative;display:inline-block;background:none;padding:0 .08em}
+.idc-h1 .idc-mark::before{content:"";position:absolute;inset:0;background:#c8f006;border-radius:10px;z-index:-1}
 .idc-btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border-radius:8px;
   border:1px solid var(--palette-nova-blue);background:var(--palette-nova-blue);padding:15px 24px;
   font-family:var(--font-body);font-size:16px;line-height:18px;font-weight:500;color:var(--palette-nova-50);
@@ -160,6 +164,18 @@ a{color:inherit;text-decoration:none}
 .idc-pill{display:inline-flex;align-items:center;gap:12px;margin:0 0 20px;padding:8px 18px;background:#fff;border:1px solid var(--palette-neutral-300);border-radius:9999px}
 .idc-pill .idc-idc{font-size:17px}
 .idc-pill img{display:block;height:20px;width:auto}
+.idc-agenda{max-width:1040px;margin-inline:auto;border:1px solid var(--palette-neutral-300);border-radius:16px;overflow:hidden;background:#fff}
+.idc-ag-row{display:grid;grid-template-columns:1fr;gap:6px;padding:20px 24px;border-top:1px solid var(--palette-neutral-300)}
+.idc-ag-head{display:none;background:#fafaf9;border-top:0;padding-block:14px;font-family:var(--font-heading);font-weight:600;font-size:13px;letter-spacing:.08em;text-transform:uppercase;color:var(--palette-neutral-500)}
+.idc-ag-row:nth-child(2){border-top:0}
+.idc-ag-time{font-family:var(--font-heading);font-weight:600;font-size:15px;color:var(--palette-nova-blue)}
+.idc-ag-title{margin:0;font-family:var(--font-heading);font-weight:600;font-size:17px;line-height:26px;color:var(--palette-vault-navy)}
+.idc-ag-spk{margin:2px 0 0;font-family:var(--font-body);font-size:14px;line-height:22px;color:var(--palette-neutral-500)}
+.idc-ag-desc{margin:0;font-family:var(--font-body);font-size:15px;line-height:24px;color:var(--palette-neutral-500)}
+@media(min-width:900px){
+  .idc-ag-row{grid-template-columns:140px minmax(0,1.1fr) minmax(0,1.2fr);gap:32px;align-items:start}
+  .idc-ag-head{display:grid}
+}
 .idc-x{font-family:var(--font-body);font-size:14px;color:var(--palette-neutral-300)}
 .idc-idc{font-family:var(--font-heading);font-weight:700;font-size:19px;letter-spacing:.02em;color:var(--palette-vault-navy)}
 
@@ -172,6 +188,8 @@ a{color:inherit;text-decoration:none}
   padding:132px 0 72px}
 @media(min-width:1024px){.idc-hero-in{grid-template-columns:1.15fr .85fr;gap:64px;padding:180px 0 120px}}
 .idc-when{display:flex;flex-wrap:wrap;gap:10px;margin-top:28px}
+.idc-who{margin:24px 0 0;padding-left:16px;border-left:3px solid #c8f006;font-family:var(--font-body);font-size:15px;line-height:24px;color:var(--palette-neutral-500)}
+.idc-who b{display:block;margin-bottom:2px;font-family:var(--font-heading);font-weight:600;font-size:13px;letter-spacing:.08em;text-transform:uppercase;color:var(--palette-vault-navy)}
 .idc-chip{display:inline-flex;align-items:center;gap:8px;background:#fff;border:1px solid var(--palette-neutral-300);
   border-radius:8px;padding:10px 16px;font-family:var(--font-heading);font-weight:600;font-size:15px;color:var(--palette-vault-navy)}
 .idc-chip i{width:7px;height:7px;border-radius:50%;background:#c8f006;flex:none}
@@ -511,8 +529,7 @@ if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => fitC
     <div class="idc-hero-in">
       <div>
         <div class="idc-pill">
-          <!-- LOGO IDC: no se ha facilitado el archivo. Sustituir este texto por el logotipo oficial de IDC. -->
-          <span class="idc-idc">IDC</span>
+          <img alt="IDC" src="https://cdn.prod.website-files.com/6141e3720a248d2024615d96/6ae43bb6d9c97bfeac2facdf_International_Data_Corporation_logo_(2025).svg" height="20" width="64">
           <span class="idc-x" aria-hidden="true">&times;</span>
           <img alt="ClearTax" src="https://cdn.prod.website-files.com/6093bce33d9b4bae841b04e3/69dfcff6071b983201f5f097_logo-cleartax.svg" height="20" width="94">
         </div>
@@ -524,6 +541,8 @@ if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => fitC
           <span class="idc-chip"><i aria-hidden="true"></i>11:00&ndash;12:00 CET</span>
           <span class="idc-chip"><i aria-hidden="true"></i>Live online</span>
         </div>
+
+        <p class="idc-who"><b>Who should attend</b>For CFOs, financial controllers, and heads of AP and tax at multi-entity enterprises.</p>
 
         <div class="idc-strip">
           <span class="idc-strip-faces">
@@ -590,8 +609,21 @@ if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => fitC
   <div class="idc-wrap">
     <h2 class="idc-h2 text-center" style="margin-bottom:48px">Speakers</h2>
     <div class="idc-spks">
-<article class="idc-spk"><img class="idc-face" src="https://cdn.prod.website-files.com/6141e3720a248d2024615d96/6ae1a1565ce560024d75a608_BoLykkegaard.png" alt=""><div><h3>Bo Lykkegaard</h3><p class="idc-spk-role">Research Director &middot; <span>IDC</span></p><p class="idc-spk-bio">Bo Lykkegaard is associate vice president for the enterprise-software-related expertise centers in Europe. His team focuses on the $172 billion European software market, specifically on business applications, customer experience, business analytics, and artificial intelligence.</p></div></article>
-<article class="idc-spk"><img class="idc-face" src="https://cdn.prod.website-files.com/6141e3720a248d2024615d96/6ae34097dc3d4a38c7fdcb98_DSC09301.jpg" alt=""><div><h3>Srivatsan Chari</h3><p class="idc-spk-role">Co-founder &middot; <span>ClearTax</span></p><p class="idc-spk-bio">Srivatsan co-founded ClearTax in 2011 and now leads its AI work in finance. He pioneers use cases from accounts payable to tax automation &ndash; all built on structured finance data.</p></div></article>
+<article class="idc-spk"><img class="idc-face" src="https://cdn.prod.website-files.com/6141e3720a248d2024615d96/6ae1a1565ce560024d75a608_BoLykkegaard.png" alt=""><div><h3>Bo Lykkegaard</h3><p class="idc-spk-role">Research Director &middot; <span>IDC</span></p><p class="idc-spk-bio">Bo leads the enterprise software expertise centers in Europe. His team covers the $172 billion European software market &ndash; from business applications and customer experience to analytics and AI.</p></div></article>
+<article class="idc-spk"><img class="idc-face" src="https://cdn.prod.website-files.com/6141e3720a248d2024615d96/6ae34097dc3d4a38c7fdcb98_DSC09301.jpg" alt=""><div><h3>Srivatsan Chari</h3><p class="idc-spk-role">Co-founder &middot; <span>ClearTax</span></p><p class="idc-spk-bio">Srivatsan co-founded ClearTax in 2011 and now leads its AI work in finance. He pioneers AI use cases from accounts payable to tax automation &ndash; all built on structured finance data.</p></div></article>
+    </div>
+  </div>
+</section>
+
+<!-- ══════ AGENDA ══════ -->
+<section class="idc-pad" style="background:#fff">
+  <div class="idc-wrap">
+    <h2 class="idc-h2 text-center" style="margin-bottom:48px">Agenda</h2>
+    <div class="idc-agenda">
+      <div class="idc-ag-row idc-ag-head" aria-hidden="true"><span>Time</span><span>Session</span><span>What you&rsquo;ll hear</span></div>
+      <div class="idc-ag-row"><span class="idc-ag-time">11:00&ndash;11:25</span><div><h3 class="idc-ag-title">Where finance AI stands today</h3><p class="idc-ag-spk">Bo Lykkegaard, IDC</p></div><p class="idc-ag-desc">New research on how finance teams use AI – and where most pilots stall.</p></div>
+      <div class="idc-ag-row"><span class="idc-ag-time">11:20&ndash;11:40</span><div><h3 class="idc-ag-title">From e-invoices to AI: a customer story</h3><p class="idc-ag-spk">Srivatsan Chari, ClearTax</p></div><p class="idc-ag-desc">How one enterprise turned compliance data into a finance-owned AI foundation.</p></div>
+      <div class="idc-ag-row"><span class="idc-ag-time">11:45&ndash;12:00</span><div><h3 class="idc-ag-title">Live Q&amp;A</h3><p class="idc-ag-spk">Both speakers</p></div><p class="idc-ag-desc">Bring your questions on data readiness, trust and first use cases.</p></div>
     </div>
   </div>
 </section>
