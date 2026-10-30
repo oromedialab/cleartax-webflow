@@ -54,7 +54,7 @@ const features: FeatureItem[] = [
                     
                     <!-- Left Column: Icon & Title -->
                     <div class="md:col-span-6 flex items-center gap-5 sm:gap-6">
-                        <div class={`w-10 h-10 rounded-lg shrink-0 ${item.iconBg || 'bg-visual-placeholder'}`} />
+                        <div class={`uae-asp-icon w-10 h-10 rounded-lg shrink-0 ${item.iconBg || 'bg-visual-placeholder'}`} />
                         <h3 class="text-[length:var(--fs-h5)] leading-[length:var(--lh-h5)] font-medium text-vault-navy font-heading">
                             {item.title}
                         </h3>
@@ -77,11 +77,25 @@ const features: FeatureItem[] = [
 <style is:global>
     .uae-asp-row {
         opacity: 0.5;
-        transition: opacity 0.35s ease-in-out;
+        transition:
+            opacity 0.35s ease-in-out,
+            transform 0.35s ease-in-out;
     }
 
     .uae-asp-row.is-centered {
         opacity: 1;
+    }
+
+    .uae-asp-row.is-scaled {
+        transform: scale(1.02);
+    }
+
+    .uae-asp-icon {
+        transition: transform 0.35s ease-in-out;
+    }
+
+    .uae-asp-row.is-scaled .uae-asp-icon {
+        transform: scale(1.125);
     }
 </style>
 
@@ -120,9 +134,9 @@ const features: FeatureItem[] = [
             });
 
             if (!best || best === centered) return;
-            if (centered) centered.classList.remove("is-centered");
+            if (centered) centered.classList.remove("is-centered", "is-scaled");
             centered = best;
-            centered.classList.add("is-centered");
+            centered.classList.add("is-centered", "is-scaled");
         };
 
         const centerObserver = new IntersectionObserver(

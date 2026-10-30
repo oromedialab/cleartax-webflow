@@ -17,29 +17,32 @@
  * centre line) are copied verbatim from that file — see its docblock for the
  * long-form rationale, originally from `global-homepage/Proven.astro`.
  *
- * The icon placeholder is an empty `#E8FFE1`-tinted box in the Figma (no
- * fill asset) — reproduced as a flat tinted block rather than invented
- * iconography.
+ * The row icons use the matching Norway regional icon assets.
  */
 interface Row {
+  icon: string;
   label: string;
   desc: string;
 }
 
 const rows: Row[] = [
   {
+    icon: "/images/norway-regional/icon-1.png",
     label: "Transmission model",
     desc: "Post-audit. Invoices delivered directly to buyers — no BIR clearance required.",
   },
   {
+    icon: "/images/norway-regional/icon-2.png",
     label: "Scope",
     desc: "From 1 January 2027, bookkeeping-obliged businesses must issue structured electronic invoices for sales to other bookkeeping-obliged businesses. Digital bookkeeping and e-invoice reception will follow by January 2030, subject to the transitional rules.",
   },
   {
+    icon: "/images/norway-regional/icon-3.png",
     label: "Invoice Format",
     desc: "The B2B law requires a structured electronic sales document suitable for automated processing. EHF Fakturering 3.0 and Peppol BIS Billing 3.0 are established formats under Norway's public-procurement rules; detailed format requirements for the new B2B obligation are to be set in regulations.",
   },
   {
+    icon: "/images/norway-regional/icon-4.png",
     label: "Check Your Recipient's eligibility",
     desc: "Check whether your buyer is subject to Norwegian bookkeeping obligations and can receive structured e-invoices. ELMA registration is relevant to EHF/Peppol delivery, but does not treat absence from ELMA as an automatic legal exemption from the 2027 issuing rule without checking the applicable transitional rules.",
   },
@@ -64,9 +67,13 @@ const rows: Row[] = [
             ]}
           >
             <div class="flex shrink-0 items-center gap-6 md:max-w-[434px] flex-1">
-              <span
-                class="h-11 w-11 shrink-0 rounded-xl bg-[#e8ffe1]"
+              <img
+                src={row.icon}
+                width="64"
+                height="64"
+                alt=""
                 aria-hidden="true"
+                class="no-glance-icon h-[64px] w-[64px] shrink-0 object-contain"
               />
               <span class="font-heading text-[length:var(--fs-h5)] leading-[length:var(--lh-h5)] font-medium text-vault-navy">
                 {row.label}
@@ -87,11 +94,25 @@ const rows: Row[] = [
      promoted to full opacity by the script below. */
   .no-glance-row {
     opacity: 0.5;
-    transition: opacity 0.35s ease-in-out;
+    transition:
+      opacity 0.35s ease-in-out,
+      transform 0.35s ease-in-out;
   }
 
   .no-glance-row.is-centered {
     opacity: 1;
+  }
+
+  .no-glance-row.is-scaled {
+    transform: scale(1.02);
+  }
+
+  .no-glance-icon {
+    transition: transform 0.35s ease-in-out;
+  }
+
+  .no-glance-row.is-scaled .no-glance-icon {
+    transform: scale(1.125);
   }
 </style>
 
@@ -141,9 +162,11 @@ const rows: Row[] = [
       });
 
       if (!best || best === centred) return;
-      if (centred) centred.classList.remove("is-centered");
+      if (centred) {
+        centred.classList.remove("is-centered", "is-scaled");
+      }
       centred = best;
-      centred.classList.add("is-centered");
+      centred.classList.add("is-centered", "is-scaled");
     };
 
     const centreObserver = new IntersectionObserver(
