@@ -1,0 +1,496 @@
+---
+import { record } from "astro:schema";
+
+/**
+ * "Clarity AI by ClearTax empowers finance to build with AI" — Figma node
+ * 13049:22786.
+ *
+ * Three numbered steps threaded by a vertical progress rail. The Figma ships
+ * this as two variants, state "1" and state "3": in state 1 only the first card
+ * is focused and the rail is part-filled in Nova Blue; in state 3 all three are
+ * focused, the rail is full and turns Flux Lime, and the closing pill fades in.
+ * Both are reproduced as one scroll-driven progression, with one deliberate
+ * departure: the CARD FOCUS TRACKS THE SCROLL BOTH WAYS rather than latching.
+ * A card takes the Nova Blue border while it is the one being read and gives it
+ * back on the way past, so exactly one card is focused at a time and scrolling
+ * up genuinely reverses. State 3's "all three focused at once" is therefore not
+ * reachable — that was the latch, and a latch left every border blue on the way
+ * back while the rail and pill (recomputed per frame) had already unwound.
+ * The rail filling and its flip to Flux Lime still reproduce state 3 exactly.
+ *
+ * Without JS every card renders in its resting border and the rail sits empty;
+ * the content is unaffected.
+ */
+interface Row {
+  title: string;
+  desc: string;
+  icon: string;
+}
+
+interface Step {
+  n: string;
+  title: string;
+  lede: string;
+  chips?: string[];
+  rows?: Row[];
+  image: string;
+}
+
+const steps: Step[] = [
+  {
+    n: "1",
+    title: "Business systems",
+    lede: "Every system you run, always current",
+    chips: [
+      "ERP",
+      "POS",
+      "OMS",
+      "WMS",
+      "Customer data lakes",
+      "Government systems",
+      "Banking & payments",
+      "Documents & mail",
+    ],
+    image:
+      "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6aabb3adaa0f699ef856878e_clarity-ai-1.png",
+  },
+  {
+    n: "2",
+    title: "Financial context",
+    lede: "Layer which delivers trusted output",
+    rows: [
+      {
+        title: "Linked records",
+        desc: "Every system joined at transaction level",
+        icon: "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6abb7ced05dd0270683954ca_n-icon-1.png",
+      },
+      {
+        title: "Statutory logic",
+        desc: "Rates, classification and filing rules, across 50+ countries",
+        icon: "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6abb7cf59c4de7b498d145f8_n-icon-2.png",
+      },
+      {
+        title: "Your logic",
+        desc: "GL structure, credit notes, vendor and item definitions",
+        icon: "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6abb7cfd7c5a09e10a50f40f_n-icon-3.png",
+      },
+      {
+        title: "Institutional memory",
+        desc: "Every investigation and the decision it led to",
+        icon: "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6abb7d0359914c7b686fc901_n-icon-4.png",
+      },
+    ],
+    image:
+      "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6aabb3aa6a134e4f661d9e61_clarity-ai-2.png",
+  },
+  {
+    n: "3",
+    title: "Studios & surfaces",
+    lede: "Where you and the agents work",
+    rows: [
+      {
+        title: "CFO Studio",
+        desc: "Insights beyond your usual dashboards",
+        icon: "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6abb7d0bdedc5ac37d663042_n-icon-5.png",
+      },
+      {
+        title: "Agent Studio",
+        desc: "AI agents that automate tasks",
+        icon: "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6abb7d121837f340fa0cd392_n-icon-6.png",
+      },
+      {
+        title: "Your current AI LLM",
+        desc: "Connect your Claude, Codex, Copilot or Gemini accounts.",
+        icon: "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6abb7d28ab4c3aa8375ea41e_n-icon-7.png",
+      },
+    ],
+    image:
+      "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6aabb3aa8d06601035531c26_clarity-ai-3.png",
+  },
+];
+---
+
+<section class="bg-generic-00 max-lg:py-12 lg:py-20" data-gh-clarity>
+  <div class="max-w-[var(--container-max)] w-full mx-auto px-4 md:px-6">
+    <div class="flex flex-col items-center gap-12">
+      <h2
+        class="m-0 text-center font-heading font-medium text-vault-navy text-[length:var(--fs-h1)] leading-[length:var(--lh-h1)] tracking-[-0.5px]"
+      >
+        Clarity AI by ClearTax empowers finance to build with AI
+      </h2>
+
+      <div class="relative w-full">
+        <!-- Progress rail. Sits behind the rows, centred on the column gap.
+             -bottom-12 cancels the gap-12 between this wrapper and the closing
+             pill, so the rail runs all the way down and meets the top edge of
+             the box instead of stopping short at the last card. -->
+        <div
+          class="gh-clarity-rail absolute -bottom-12 top-0 left-1/2 hidden w-1.5 -translate-x-1/2 overflow-hidden rounded-t-full bg-[#EFEFEF] lg:block"
+          aria-hidden="true"
+        >
+          <div
+            class="gh-clarity-fill absolute inset-x-0 top-0 h-0 rounded-2xl bg-nova-blue"
+          >
+          </div>
+        </div>
+
+        <div class="relative flex flex-col gap-12">
+          {
+            steps.map((step, i) => (
+              <div
+                class="max-lg:flex max-lg:flex-col max-lg:gap-6 lg:grid lg:grid-cols-2 lg:items-center lg:gap-20"
+                data-gh-step
+                data-step-index={i}
+              >
+                {/* A 2-col GRID at lg, and neither column carries a width.
+                    The rail is pinned at left-1/2, so the column gap has to sit
+                    at exactly 50% or the line reads off centre. It did before:
+                    a fixed w-[600px] card that was allowed to shrink beside a
+                    shrink-0 image moved the gap left by 24px under 1328px, and
+                    even as two flex-1 children the pair still resolved 601/599.
+                    Grid columns are exact halves by definition, so the gap
+                    centre and the rail land on the same pixel at every width.
+
+                    box-border on the card keeps its border inside that column:
+                    these bundles carry no preflight, and .is-active takes the
+                    border from 1px to 2px, which would otherwise nudge the row
+                    every time a card latched. */}
+                <div class="gh-clarity-card box-border flex flex-col justify-between self-stretch overflow-hidden rounded-xl border border-[#CCCCCC] bg-generic-00 max-lg:w-full lg:min-w-0">
+                  <div class="flex flex-col gap-6 border-b border-[#CCCCCC] p-6">
+                    <div class="flex flex-col gap-4">
+                      <span class="inline-flex h-[30px] w-[30px] items-center justify-center rounded-lg border border-[#C3C7CD] bg-[#FBFBFC] text-[length:var(--fs-label-sm)] leading-[length:var(--lh-label-sm)] font-medium text-[#5B6068] font-body">
+                        {step.n}
+                      </span>
+                      <div class="flex flex-col gap-1.5">
+                        <h3 class="m-0 font-heading font-medium text-vault-navy text-[length:var(--fs-h6)] leading-[length:var(--lh-h6)]">
+                          {step.title}
+                        </h3>
+                        <p class="m-0 font-body text-neutral-500 text-[length:var(--fs-body)] leading-[length:var(--lh-body)]">
+                          {step.lede}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="px-6 py-8">
+                    {step.chips && (
+                      <div class="flex flex-wrap items-start gap-2">
+                        {step.chips.map((c) => (
+                          <span class="inline-flex h-12 items-center justify-center rounded-lg border border-neutral-200 px-3 py-1.5 text-center text-[length:var(--fs-label)] leading-[length:var(--lh-label)] font-medium text-neutral-700 font-body">
+                            {c}
+                          </span>
+                        ))}
+                      </div>
+                    )}
+
+                    {step.rows && (
+                      <div class="flex flex-col gap-6">
+                        {step.rows.map((r, ri) => (
+                          <>
+                            {ri > 0 && (
+                              <div
+                                class="h-px w-full bg-[#F2F1F0]"
+                                aria-hidden="true"
+                              />
+                            )}
+                            <div class="flex items-start gap-4">
+                              <div class="max-w-12 w-full">
+                                <img
+                                  src={r.icon}
+                                  alt={r.title}
+                                  class="h-full w-full object-contain"
+                                />
+                              </div>
+                              <div class="flex min-w-0 flex-1 flex-col gap-2">
+                                <p class="m-0 font-body font-medium text-vault-navy text-[length:var(--fs-label)] leading-[length:var(--lh-body-sm)]">
+                                  {r.title}
+                                </p>
+                                <p class="m-0 font-body text-neutral-500 text-[length:var(--fs-label)] leading-[length:var(--lh-body-sm)]">
+                                  {r.desc}
+                                </p>
+                              </div>
+                            </div>
+                          </>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                <div class="max-w-213 w-full">
+                  <img
+                    src={step.image}
+                    alt={step.title}
+                    class="object-contain h-full w-full"
+                  />
+                </div>
+              </div>
+            ))
+          }
+        </div>
+      </div>
+
+      <!-- Closing pill -->
+      <div
+        class="gh-clarity-pill flex w-full items-center justify-center gap-6 rounded-lg border-4 border-current p-6 max-md:flex-col max-md:gap-4"
+      >
+        <span class="gh-clarity-dots flex-1 max-md:hidden" aria-hidden="true"
+        ></span>
+        <!-- Explicitly Vault Navy, so it does NOT inherit the pill's colour.
+             The border and dots go #EFEFEF -> Flux Lime; the sentence stays
+             black throughout and has to opt out of that. -->
+        <p
+          class="m-0 text-center font-heading font-medium text-vault-navy text-[length:var(--fs-h6)] leading-[length:var(--lh-h6)]"
+        >
+          Give the model a foundation, and it stops guessing
+        </p>
+        <span class="gh-clarity-dots flex-1 max-md:hidden" aria-hidden="true"
+        ></span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style is:global>
+  /* Three colours, in order: the unfilled track is Neutral 500, the progress
+     fills over it in Nova Blue, and the whole line turns Flux Lime once it is
+     full — the Figma's state-3 treatment.
+
+     Only background-color is eased. Height is deliberately not: it is rewritten
+     every frame while the rail is on screen, so easing it would make the bar lag
+     behind the scroll rather than track it. */
+  .gh-clarity-fill {
+    transition: background-color 0.45s ease;
+  }
+
+  /* Rail full → flip to Flux Lime. The fill's rounded bottom is its travelling
+     head, which is right mid-scroll but lets the grey track show through the
+     corners once the line has to meet the pill's border flush, so the cap is
+     squared off at the same moment. */
+  [data-gh-clarity].is-complete .gh-clarity-fill {
+    background-color: var(--color-flux-lime);
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+  }
+
+  .gh-clarity-card {
+    transition:
+      border-color 0.35s ease,
+      box-shadow 0.35s ease;
+  }
+
+  [data-gh-step].is-active .gh-clarity-card {
+    border-color: var(--color-nova-blue);
+    border-width: 2px;
+  }
+
+  /* The closing pill waits its turn. Inactive it is entirely #EFEFEF — the same
+     grey as the rail's unfilled track, so it reads as the far end of the line
+     rather than a separate element — and it takes the Flux Lime at the moment
+     the rail finishes and meets its top edge. The line arriving is what lights
+     the box up.
+
+     One `color` drives the frame: the border is border-current and the dots
+     paint their gradient from currentColor, so a single transition moves both
+     together. It has to work this way — `color` is transitionable, a
+     background-image is not, so a dot gradient with a fixed colour stop would
+     snap while the border eased. The sentence itself opts out with an explicit
+     text-vault-navy and stays black the whole way through. */
+  .gh-clarity-pill {
+    color: #efefef;
+    transition: color 0.45s ease;
+  }
+
+  [data-gh-clarity].is-complete .gh-clarity-pill,
+  .gh-clarity-pill.is-active {
+    color: var(--color-flux-lime);
+  }
+
+  /* The dot rails flanking the closing line (Figma 14489:12089).
+     Spec is a 3.88px circle every 25.22px — 3.88 dot + 21.34 gap — in the
+     pill's own colour, which is why this tiles `currentColor` rather than
+     shipping the exported SVG: 28 static <img> dots could not follow the
+     #EFEFEF -> Flux Lime transition the pill drives.
+
+     No fixed width — `flex-1` in the markup mirrors the design's flex-[1_0_0]
+     rails, so both sides absorb whatever the full-width pill leaves either
+     side of the sentence and a wider pill simply gets more dots.
+
+     The dot sits at the LEADING edge of each tile, not centred in it, so the
+     run starts flush against the sentence exactly as the design's justify-start
+     does. Centring it would inset every rail by half a gap at both ends. */
+  .gh-clarity-dots {
+    display: block;
+    height: 3.88px;
+    background-image: radial-gradient(
+      circle at 1.94px 50%,
+      currentColor 1.94px,
+      transparent 2px
+    );
+    background-size: 25.22px 3.88px;
+    background-repeat: repeat-x;
+  }
+
+  /* Left rail is justify-end in the design: the run ends flush against the
+     sentence and any remainder falls at the outer edge. Mirror the tile and
+     anchor it right, so the two rails stay symmetrical about the sentence. */
+  .gh-clarity-pill .gh-clarity-dots:first-child {
+    background-image: radial-gradient(
+      circle at calc(100% - 1.94px) 50%,
+      currentColor 1.94px,
+      transparent 2px
+    );
+    background-position: right center;
+  }
+</style>
+
+<script is:inline>
+  (function () {
+    const root = document.querySelector("[data-gh-clarity]");
+    if (!root) return;
+
+    const steps = Array.from(root.querySelectorAll("[data-gh-step]"));
+    const rail = root.querySelector(".gh-clarity-rail");
+    const fill = root.querySelector(".gh-clarity-fill");
+    if (!steps.length) return;
+
+    if (!("IntersectionObserver" in window)) {
+      steps.forEach((s) => s.classList.add("is-active"));
+      root.classList.add("is-complete");
+      if (fill) fill.style.height = "100%";
+      return;
+    }
+
+    // ---- Cards -----------------------------------------------------------
+    // Tracks BOTH ways: a step takes the Nova Blue border while it is the one
+    // being read and returns to its resting grey on the way back up.
+    //
+    // This used to latch on first crossing, on the reading that Figma's state 3
+    // is an end state. It was the only thing here that behaved that way — the
+    // rail and the closing pill are recomputed from the rect on every frame in
+    // draw(), so they already unwound while the borders stayed blue. Scrolling
+    // back therefore left every card focused at once, which is not a state the
+    // design has.
+    //
+    // The observation band is the middle 10% of the viewport, which on any
+    // normal window is taller than the 48px gap between cards — so at a handover
+    // both neighbours overlap the band briefly rather than leaving a frame with
+    // nothing focused at all.
+    const stepObserver = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          entry.target.classList.toggle("is-active", entry.isIntersecting);
+        });
+      },
+      // Fires when the step crosses the vertical middle of the viewport.
+      { rootMargin: "-45% 0px -45% 0px", threshold: 0 },
+    );
+
+    steps.forEach((s) => stepObserver.observe(s));
+
+    // ---- Closing Pill ----------------------------------------------------
+    // When the closing pill scrolls into view (particularly on iPad/mobile
+    // where the vertical rail is hidden), light up its Flux Lime green border.
+    const pill = root.querySelector(".gh-clarity-pill");
+    if (pill) {
+      const pillObserver = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            entry.target.classList.toggle("is-active", entry.isIntersecting);
+          });
+        },
+        { rootMargin: "-15% 0px -15% 0px", threshold: 0 },
+      );
+      pillObserver.observe(pill);
+    }
+
+    // ---- Rail ------------------------------------------------------------
+    // A progress bar has to answer "how far", which is a continuous question —
+    // IntersectionObserver only ever answers "has it crossed", so it cannot
+    // drive the height directly. It is used as the ON/OFF switch instead: a
+    // second observer starts a measuring loop when the rail comes on screen and
+    // stops it when it leaves. Nothing is measured while the section is out of
+    // view, and the page carries no scroll listener at all.
+    if (!rail || !fill) return;
+
+    // TWO UNITS, and they are not the same one under `zoom`.
+    // getBoundingClientRect() and window.innerHeight are RENDERED pixels — what
+    // is actually on the glass. A length written to `style` is a CSS pixel, and
+    // shared.css puts `zoom` on the `body` element between tablet and 1440px, so a CSS pixel
+    // renders smaller than one of those. Measuring in rendered px and writing
+    // the same number back as CSS px drew the rail short by exactly the zoom
+    // factor, which is why the line stopped tracking the scroll position.
+    //
+    // Walked rather than read off the `body` element, because zoom multiplies down the tree
+    // and this has to survive a zoomed ancestor anywhere above the rail.
+    const zoomFactor = () => {
+      let z = 1;
+      for (let n = rail; n && n.nodeType === 1; n = n.parentElement) {
+        const v = parseFloat(getComputedStyle(n).zoom);
+        // Unsupported -> NaN, unset -> 1. Both mean "no scaling here".
+        if (v && v !== 1) z *= v;
+      }
+      return z;
+    };
+
+    // Cached: the walk is a handful of getComputedStyle calls and this runs on
+    // every animation frame. Only a resize can change it — including crossing
+    // the 1440px bound where the zoom switches off.
+    let zoom = zoomFactor();
+    window.addEventListener("resize", () => {
+      zoom = zoomFactor();
+      last = -1; // force the next frame to rewrite at the new scale
+    });
+
+    let running = false;
+    let frame = 0;
+    let last = -1;
+
+    const draw = () => {
+      const r = rail.getBoundingClientRect();
+
+      // The progress marker is the middle of the viewport, so the rail is
+      // filled to exactly the point being read — and it tracks scrolling up as
+      // well as down. Rendered px on both sides of the comparison.
+      const filled = Math.min(
+        r.height,
+        Math.max(0, window.innerHeight / 2 - r.top),
+      );
+
+      // Skip the write when the value has not moved, so an idle tab in view
+      // costs a rect read and nothing else.
+      if (filled !== last) {
+        last = filled;
+        // Back into CSS px on the way out, so it RENDERS at `filled`.
+        fill.style.height = filled / zoom + "px";
+        // Both rendered px, so this one needs no conversion. 1px of slack so the
+        // flip to Flux Lime does not chatter at the end.
+        root.classList.toggle(
+          "is-complete",
+          r.height > 0 && filled >= r.height - 1,
+        );
+      }
+
+      if (running) frame = requestAnimationFrame(draw);
+    };
+
+    const railObserver = new IntersectionObserver(
+      (entries) => {
+        const visible = entries.some((e) => e.isIntersecting);
+        if (visible === running) return;
+        running = visible;
+        if (running) {
+          frame = requestAnimationFrame(draw);
+        } else {
+          cancelAnimationFrame(frame);
+          // One last pass so the rail settles at full or empty rather than
+          // freezing wherever the final frame happened to land.
+          draw();
+        }
+      },
+      { threshold: 0 },
+    );
+
+    railObserver.observe(rail);
+  })();
+</script>

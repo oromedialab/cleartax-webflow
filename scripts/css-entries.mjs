@@ -44,6 +44,7 @@ export const PAGE_TARGETS = [
   { name: 'v1-global-invoicing-wip', input: 'src/styles/v1-global-invoicing-wip.css', page: 'src/pages/v1-global-invoicing-wip.astro' },
   { name: 'delivery-page', input: 'src/styles/delivery-page.css', page: 'src/pages/delivery-page.astro' },
   { name: 'global-homepage', input: 'src/styles/global-homepage.css', page: 'src/pages/global-homepage.astro' },
+  { name: 'global-homepage-v2', input: 'src/styles/global-homepage-v2.css', page: 'src/pages/global-homepage-v2.astro' },
   { name: 'india-homepage', input: 'src/styles/india-homepage.css', page: 'src/pages/india-homepage.astro' },
   { name: 'integration-page', input: 'src/styles/integration-page.css', page: 'src/pages/integration-page.astro' },
   { name: 'france-regional', input: 'src/styles/france-regional.css', page: 'src/pages/france-regional.astro' },
