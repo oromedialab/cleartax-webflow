@@ -19,32 +19,39 @@
 interface PlatformCard {
   heading: string;
   body: string;
+  icon: string;
 }
 
 const cards: PlatformCard[] = [
   {
     heading: "AI-driven integration",
     body: "Autonomous mapping of your ERP data model. Pre-built connectors for SAP R3/HANA/ECC, Oracle, MS Dynamics 365, and 50 others. Go from kick-off to live invoices in 8–1",
+    icon: "/images/france-product/icon-1.png",
   },
   {
     heading: "One integration, 40+ countries",
     body: "Integrate once. When Belgium (2026), Germany (2027), or Spain (2027) mandates arrive, unlock them instantly — no new ERP work. Your IT team touches it once, ever.",
+    icon: "/images/france-product/icon-2.png",
   },
   {
     heading: "Real-time MIS dashboard",
     body: "Every invoice status, error rate, and lifecycle event in a single view. One-click drill-down into failures with guided corrective workflows. Nothing misses your finance team.",
+    icon: "/images/france-product/icon-3.png",
   },
   {
     heading: "AI-powered reconciliation",
     body: "Automatically matches e-invoice data against your ERP general ledger. Surfaces discrepancies before DGFiP's own audits — eliminating the VAT-gap notices that hit 90% of businesses post-mandate.",
+    icon: "/images/france-product/icon-4.png",
   },
   {
     heading: "24×7 dedicated support",
     body: "A named French-speaking customer success manager. In-house tax compliance experts on call. In-product ticketing with a 3-tiered escalation matrix — no outsourced helpdesk, ever.",
+    icon: "/images/france-product/icon-5.png",
   },
   {
     heading: "Future-proof by design",
     body: "Regulatory amendments — new fields, format updates, DGFiP changes — are absorbed by our cloud layer. No ERP changes, no re-integration cycles, no IT surprises when the rules shift.",
+    icon: "/images/france-product/icon-6.png",
   },
 ];
 ---
@@ -82,9 +89,13 @@ const cards: PlatformCard[] = [
             data-fp-platform-open
             data-fp-platform-index={i}
           >
-            <span
-              class="block h-14 w-14 shrink-0 rounded-lg bg-visual-placeholder"
+            <img
+              src={card.icon}
+              width="56"
+              height="56"
+              alt=""
               aria-hidden="true"
+              class="h-[56px] w-[56px] shrink-0 object-contain"
             />
             <span class="min-w-0 flex-1 font-heading font-medium text-vault-navy text-[length:var(--fs-h6)] leading-[length:var(--lh-h6)]">
               {card.heading}
@@ -172,9 +183,24 @@ const cards: PlatformCard[] = [
         class="flex w-full flex-col justify-between gap-6 lg:w-[416px] lg:shrink-0 lg:self-stretch"
       >
         <div class="flex flex-col gap-6">
-          <span
-            class="block h-16 w-16 shrink-0 rounded-lg bg-visual-placeholder"
-            aria-hidden="true"></span>
+          <div class="h-16 w-16 shrink-0">
+            {
+              cards.map((card, i) => (
+                <img
+                  src={card.icon}
+                  alt=""
+                  width="64"
+                  height="64"
+                  class="h-16 w-16 rounded-lg object-contain"
+                  style={i === 0 ? "display: block;" : "display: none;"}
+                  hidden={i !== 0}
+                  data-fp-platform-icon
+                  loading="lazy"
+                  decoding="async"
+                />
+              ))
+            }
+          </div>
           <div id="fp-platform-overlay-title">
             {
               cards.map((card, i) => (
@@ -278,6 +304,7 @@ const cards: PlatformCard[] = [
     var nextBtn = overlay.querySelector("[data-fp-platform-next]");
     var headings = overlay.querySelectorAll("[data-fp-platform-heading]");
     var bodies = overlay.querySelectorAll("[data-fp-platform-body]");
+    var icons = overlay.querySelectorAll("[data-fp-platform-icon]");
     if (!panel || !headings.length || headings.length !== bodies.length) return;
 
     var count = headings.length;
@@ -289,6 +316,10 @@ const cards: PlatformCard[] = [
       for (var i = 0; i < count; i++) {
         headings[i].hidden = i !== current;
         bodies[i].hidden = i !== current;
+        if (icons[i]) {
+          icons[i].hidden = i !== current;
+          icons[i].style.display = i === current ? "block" : "none";
+        }
       }
       panel.scrollTop = 0;
     }
