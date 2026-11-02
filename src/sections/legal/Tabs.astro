@@ -1,0 +1,88 @@
+---
+/**
+ * Legal tab bar — sits between the hero and the agreements, inside the
+ * content area, and owns the switching logic. Each agreement is two embeds
+ * (Mssa1/2, Isa1/2) whose <section>s carry `data-legal-panel="mssa|isa"`; the
+ * script shows the active doc's panels and hides the rest, so the tabs only
+ * work once all four embeds are on the page. The first tab is open by default.
+ *
+ * Tab switching is click-driven, not hash-driven: each button calls
+ * `legalTab(id)`, defined here, so this embed must be on the page. The
+ * contents-list links in Mssa1/Isa1 are self-contained inline scrollIntoView
+ * calls — they only ever target the agreement that is already open.
+ */
+const tabs = [
+  { id: "mssa", label: "Master subscription and services agreement" },
+  { id: "isa", label: "Integration services agreement" },
+];
+---
+
+<section class="bg-generic-00 pt-4 max-lg:pt-0">
+  <div class="container mx-auto">
+    <div
+      role="tablist"
+      aria-label="Agreements"
+      class="mx-auto grid max-w-[880px] gap-1 rounded-2xl border border-ledger-200 bg-ledger-50 p-1 sm:grid-cols-2"
+    >
+      {
+        tabs.map((t, i) => (
+          <button
+            type="button"
+            role="tab"
+            id={`legal-tab-${t.id}`}
+            data-legal-tab={t.id}
+            onclick={`legalTab('${t.id}')`}
+            aria-selected={i === 0 ? "true" : "false"}
+            class="cursor-pointer rounded-xl border-0 bg-transparent px-5 py-3 font-body font-medium text-neutral-600 text-[length:var(--fs-label)] leading-[length:var(--lh-label)] hover:text-vault-navy aria-selected:bg-vault-navy aria-selected:text-white aria-selected:hover:text-white"
+          >
+            {t.label}
+          </button>
+        ))
+      }
+    </div>
+  </div>
+</section>
+
+<script is:inline>
+  (function () {
+    function show(id) {
+      document.querySelectorAll("[data-legal-tab]").forEach(function (t) {
+        t.setAttribute(
+          "aria-selected",
+          t.getAttribute("data-legal-tab") === id ? "true" : "false"
+        );
+      });
+      document.querySelectorAll("[data-legal-panel]").forEach(function (p) {
+        p.hidden = p.getAttribute("data-legal-panel") !== id;
+      });
+    }
+
+    // Swapping two very different heights in one frame drags the scroll
+    // position with it and reads as a flicker. Pin the tab bar to where it was
+    // on screen, then fade the incoming panels in.
+    window.legalTab = function (id) {
+      var bar = document.getElementById("legal-tab-" + id);
+      if (!bar || bar.getAttribute("aria-selected") === "true") return;
+      var before = bar.getBoundingClientRect().top;
+      show(id);
+      window.scrollBy(0, bar.getBoundingClientRect().top - before);
+      if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+      document
+        .querySelectorAll('[data-legal-panel="' + id + '"]')
+        .forEach(function (p) {
+          p.animate([{ opacity: 0 }, { opacity: 1 }], {
+            duration: 200,
+            easing: "ease-out",
+          });
+        });
+    };
+
+    function init() {
+      var first = document.querySelector("[data-legal-tab]");
+      if (first) show(first.getAttribute("data-legal-tab"));
+    }
+    if (document.readyState === "loading")
+      document.addEventListener("DOMContentLoaded", init);
+    else init();
+  })();
+</script>

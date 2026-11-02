@@ -1,0 +1,134 @@
+---
+/**
+ * Legal — the two customer agreements published at https://www.clear.in/s/legal,
+ * rebuilt in brand v2. Head plumbing (favicons, font links, deferred
+ * GTM/Usercentrics loader) is the same block every v2 page carries, copied from
+ * src/pages/trust-centre.astro. Navbar and Footer are thin wrappers over the
+ * `_shared` *Rb primitives; Tabs is its own embed and each agreement is two (Mssa1/2, Isa1/2)
+ * because one block would exceed Webflow's ~50 KB Embed cap.
+ *
+ * No fonts.css import — Brand v2 loads Inter Tight + Google Sans from Google
+ * Fonts via the <link> in the head.
+ */
+import "../styles/shared.css";
+import "../styles/.build/legal.css";
+
+import Navbar from "../sections/legal/Navbar.astro";
+import Hero from "../sections/legal/Hero.astro";
+import Tabs from "../sections/legal/Tabs.astro";
+import Mssa1 from "../sections/legal/Mssa1.astro";
+import Mssa2 from "../sections/legal/Mssa2.astro";
+import Isa1 from "../sections/legal/Isa1.astro";
+import Isa2 from "../sections/legal/Isa2.astro";
+import Footer from "../sections/legal/Footer.astro";
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ClearTax — Legal</title>
+    <meta
+      name="description"
+      content="ClearTax legal agreements: the Master Subscription and Services Agreement and the Integration Services Agreement."
+    />
+    <link
+      rel="shortcut icon"
+      type="image/png"
+      href="https://cdn.prod.website-files.com/63ede4a3da6dbd6b05c4612f/63ede4a3da6dbd7162c46439_32by32.png"
+    />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="32x32"
+      href="https://cdn.prod.website-files.com/63ede4a3da6dbd6b05c4612f/63ede4a3da6dbd7162c46439_32by32.png"
+    />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="256x256"
+      href="https://cdn.prod.website-files.com/63ede4a3da6dbd6b05c4612f/63ede4a3da6dbd8997c46450_256by256.png"
+    />
+    <link
+      rel="apple-touch-icon"
+      href="https://cdn.prod.website-files.com/63ede4a3da6dbd6b05c4612f/63ede4a3da6dbd8997c46450_256by256.png"
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <!-- Preload critical above-the-fold assets -->
+    <link
+      rel="preload"
+      href="https://cdn.prod.website-files.com/6093bce33d9b4bae841b04e3/69dfcff6071b983201f5f097_logo-cleartax.svg"
+      as="image"
+      type="image/svg+xml"
+      fetchpriority="high"
+    />
+
+   <!-- 1. Usercentrics CMP — loads immediately, before anything else -->
+    <script is:inline>
+      (function () {
+        var blockScript = document.createElement("script");
+        blockScript.src = "https://web.cmp.usercentrics.eu/modules/autoblocker.js";
+        document.head.appendChild(blockScript);
+
+        var cmpScript = document.createElement("script");
+        cmpScript.id = "usercentrics-cmp";
+        cmpScript.src = "https://web.cmp.usercentrics.eu/ui/loader.js";
+        cmpScript.setAttribute("data-settings-id", "utqqyaEbvbzrTk");
+        cmpScript.async = true;
+        document.head.appendChild(cmpScript);
+      })();
+    </script>
+
+    <!-- 2. GTM — loads only after the visitor responds to the consent banner -->
+    <script is:inline>
+      (function () {
+        function loadGTM() {
+          (function (w, d, s, l, i) {
+            w[l] = w[l] || [];
+            w[l].push({ "gtm.start": new Date().getTime(), event: "gtm.js" });
+            var f = d.getElementsByTagName(s)[0],
+              j = d.createElement(s),
+              dl = l != "dataLayer" ? "&l=" + l : "";
+            j.async = true;
+            j.src = "https://www.googletagmanager.com/gtm.js?id=" + i + dl;
+            f.parentNode.insertBefore(j, f);
+          })(window, document, "script", "dataLayer", "GTM-P5NDQXGH");
+        }
+
+        window.addEventListener("UC_UI_CMP_EVENT", function (event) {
+          if (
+            event.detail &&
+            ["ACCEPT_ALL", "DENY_ALL", "SAVE"].indexOf(event.detail.type) !== -1
+          ) {
+            loadGTM();
+          }
+        });
+      })();
+    </script>
+  </head>
+  <body class="bg-generic-00">
+    <!-- Google Tag Manager (noscript) -->
+    <noscript
+      ><iframe
+        src="https://www.googletagmanager.com/ns.html?id=GTM-P5NDQXGH"
+        height="0"
+        width="0"
+        style="display:none;visibility:hidden"></iframe></noscript
+    >
+    <!-- End Google Tag Manager (noscript) -->
+    <Navbar />
+    <Hero />
+    <Tabs />
+    <Mssa1 />
+    <Mssa2 />
+    <Isa1 />
+    <Isa2 />
+    <Footer />
+  </body>
+</html>
