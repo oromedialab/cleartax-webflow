@@ -4,8 +4,9 @@
  *
  * 2x2 grid of 4 cards:
  * - Top 2 cards (card 0 and card 1) are open by default.
- * - Cards in each row stretch to equal height (items-stretch).
- * - Clicking a card toggles its paragraph open/closed.
+ * - Bottom cards start closed and only open when clicked.
+ * - Each card sizes independently to its own content (items-start).
+ * - Clicking a card toggles only that card open/closed without stretching adjacent cards.
  * - Plus icon smoothly rotates to an "x" (45deg) when open.
  * - Single outer border (neutral-300) wraps the entire card.
  * - No extra inner border on button or content.
@@ -67,13 +68,13 @@ const cards: SupportCard[] = [
         {
             /* 2x2 grid: keeps top row cards equal height and bottom row cards horizontally aligned */
         }
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 items-stretch">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
             {
                 cards.map((card, i) => {
                     const isDefaultOpen = i === 0 || i === 1;
                     return (
                         <div
-                            class="group/card flex flex-col rounded-xl border border-neutral-300 bg-generic-00 overflow-hidden h-full"
+                            class="group/card flex flex-col rounded-xl border border-neutral-300 bg-generic-00 overflow-hidden"
                             data-au-glance-card={i}
                         >
                             <button
@@ -126,7 +127,7 @@ const cards: SupportCard[] = [
                                 </svg>
                             </button>
                             <div
-                                class="grid overflow-hidden transition-[grid-template-rows,opacity] duration-300 ease-out flex-1 border-0"
+                                class="grid overflow-hidden transition-[grid-template-rows,opacity] duration-300 ease-out border-0"
                                 style={
                                     isDefaultOpen
                                         ? "grid-template-rows: 1fr; opacity: 1;"
