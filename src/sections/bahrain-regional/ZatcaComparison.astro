@@ -1,0 +1,98 @@
+---
+/**
+ * "How Bahrain's mandate compares to Saudi Arabia's ZATCA" — Figma node
+ * 5811:45174 ("Fold 16").
+ *
+ * Two full-width outlined panels: "What's similar to KSA" (lime bullets) and
+ * "Where Bahrain differs" (blue bullets). Each lists its bullets in two
+ * columns on desktop. The Figma gives the panels fixed heights (398 / 310);
+ * they size to content here so nothing clips when copy changes.
+ *
+ * The 64px squares are the Figma's unfilled icon placeholders — swap for
+ * Webflow-hosted assets once the icons exist, never a `data:` URI.
+ */
+interface Panel {
+  title: string;
+  dot: string;
+  items: string[];
+}
+
+const panels: Panel[] = [
+  {
+    title: "What's similar to KSA",
+    dot: "bg-lime-600",
+    items: [
+      "Same Standard vs Simplified split — Standard goes through clearance, Simplified is reported post-exchange, just like ZATCA Phase 2.",
+      "Real-time clearance model for B2B, identical in principle to ZATCA Phase 2.",
+      "QR code mandatory on all e-invoices, Standard and Simplified alike.",
+      "A single central government platform validates and routes every invoice, like Fatoora.",
+      "A phased rollout — Pilot Readiness followed by Pilot Rollout — mirrors ZATCA's own phased launch.",
+      "B2B, B2C and (likely) B2G are all expected to fall under one mandate.",
+      "A regulator-provided sandbox for pre-integration testing, just like ZATCA's.",
+    ],
+  },
+  {
+    title: "Where Bahrain differs",
+    dot: "bg-nova-blue",
+    items: [
+      "No data residency restriction: invoice data can be processed and stored outside Bahrain.",
+      "A solution provider that isn't itself VAT-registered can onboard one VAT-registered client to develop against the NBR sandbox.",
+      "Several technical specifics — the Simplified invoice threshold, the printable PDF's exact field list, and Arabic-language requirements — are still pending publication by NBR.",
+    ],
+  },
+];
+---
+
+<section class="bg-generic-00 py-12 lg:py-20">
+  <div class="container mx-auto">
+    <div class="flex flex-col items-center gap-12">
+      <div class="flex flex-col items-center gap-4 text-center">
+        <h2
+          class="m-0 font-heading font-medium text-vault-navy text-[length:var(--fs-h1)] leading-[length:var(--lh-h1)] tracking-[-0.5px]"
+        >
+          How Bahrain's mandate compares to Saudi Arabia's ZATCA
+        </h2>
+        <p
+          class="m-0 max-w-[755px] font-body text-neutral-500 text-[length:var(--fs-body-lg)] leading-[length:var(--lh-body-lg)]"
+        >
+          ClearTax has cleared over 400M invoices through ZATCA in Saudi Arabia.
+          Bahrain's model runs on the same core principles, with a few
+          meaningful differences worth planning around.
+        </p>
+      </div>
+
+      <div class="flex w-full flex-col gap-6">
+        {
+          panels.map((panel) => (
+            <div class="flex flex-col gap-8 rounded-xl border border-neutral-300 p-8">
+              <div class="flex items-center gap-5">
+                <span
+                  class="block h-16 w-16 shrink-0 rounded-lg bg-visual-placeholder"
+                  aria-hidden="true"
+                />
+                <h3 class="m-0 font-heading font-medium text-vault-navy text-[length:var(--fs-h5)] leading-[length:var(--lh-h5)]">
+                  {panel.title}
+                </h3>
+              </div>
+              <ul class="m-0 grid list-none grid-cols-1 gap-5 p-0 lg:grid-cols-2 lg:gap-x-5">
+                {
+                  panel.items.map((item) => (
+                    <li class="flex items-start gap-4">
+                      <span
+                        class:list={["mt-2 block h-2 w-2 shrink-0 rounded-full", panel.dot]}
+                        aria-hidden="true"
+                      />
+                      <span class="font-body text-neutral-500 text-[length:var(--fs-body)] leading-[length:var(--lh-body)]">
+                        {item}
+                      </span>
+                    </li>
+                  ))
+                }
+              </ul>
+            </div>
+          ))
+        }
+      </div>
+    </div>
+  </div>
+</section>

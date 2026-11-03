@@ -1,0 +1,208 @@
+---
+/**
+ * "Built to keep you compliant, productive and covered" — Figma node
+ * 18261:64837 ("Fold 15").
+ *
+ * Three outlined cards, each a title + image holder on the left and a divided
+ * list of four points on the right. The cards pin and stack as you scroll,
+ * the same implementation as `spain-regional/Glance.astro` (itself from
+ * `global-homepage/WhyGenericAi.astro`):
+ *
+ *   - Two layers per card. The OUTER wrapper (`.bh-benefits-sticky`) is what
+ *     `position: sticky` acts on and is NEVER transformed. The INNER card
+ *     (`.bh-benefits-card`) is the only thing JS scales.
+ *   - Each wrapper sticks 16px below the previous one, with a rising z-index.
+ *   - A card shrinks as the next one closes in, 3% per card back from the
+ *     front: 0.94 / 0.97 / 1.00 for these three cards.
+ *
+ * IMPORTANT: no ancestor of a `.bh-benefits-sticky` may set `overflow` to
+ * anything but `visible` — that silently kills `position: sticky`.
+ *
+ * The 216px holders are the Figma's unfilled image placeholders — swap for
+ * Webflow-hosted assets once the visuals exist, never a `data:` URI.
+ */
+interface Group {
+  title: string;
+  points: string[];
+}
+
+const groups: Group[] = [
+  {
+    title: "Ensure compliance",
+    points: [
+      "150+ smart data validations against NBR's schema and business rules",
+      "Real-time clearance for B2B, 24-hour reporting for B2C",
+      "Generate and report invoices from in-store POS even without internet",
+      "Compliant PDF/A-3 with embedded XML; QR code, UUID, hash and cryptographic stamp included",
+    ],
+  },
+  {
+    title: "Maximise productivity",
+    points: [
+      "Automated error handling with alerts, correction guidance and bulk resubmission built in",
+      "MIS dashboards & reports for full visibility into every invoice generated",
+      "Auto-retries on transient NBR platform failures, so nothing gets stuck",
+      "Minimal ERP/POS changes; ClearTax APIs sit as middleware over your existing systems",
+    ],
+  },
+  {
+    title: "Clear assurance",
+    points: [
+      "24/7 dedicated support for every technical and compliance question",
+      "Always current with NBR's evolving technical spec",
+      "Data archival aligned to NBR's requirements, with full audit trail",
+      "Arabic support via ClearTax's Translation API, once NBR confirms mandatory fields",
+    ],
+  },
+];
+---
+
+<section class="bg-generic-00 py-12 lg:py-20">
+  <div class="container mx-auto">
+    <div class="flex flex-col items-center gap-12">
+      <h2
+        class="m-0 max-w-[887px] text-center font-heading font-medium text-vault-navy text-[length:var(--fs-h1)] leading-[length:var(--lh-h1)] tracking-[-0.5px]"
+      >
+        Built to keep you compliant, productive and covered
+      </h2>
+
+      <div
+        id="bh-benefits-stack"
+        class="bh-benefits-stack flex w-full flex-col gap-[30vh] lg:gap-[45vh]"
+      >
+        {
+          groups.map((group, i) => (
+            <div
+              class="bh-benefits-sticky sticky"
+              style={`top:calc(var(--nav-clear, 112px) + ${i * 16}px);z-index:${i};`}
+            >
+              <article
+                class="bh-benefits-card grid grid-cols-1 gap-8 rounded-xl border border-neutral-300 bg-generic-00 p-6 will-change-transform lg:grid-cols-[400px_1fr] lg:items-end lg:gap-12"
+                style="transform-origin: top center;"
+              >
+                <div class="flex flex-col gap-12">
+                  <h3 class="m-0 font-heading font-medium text-vault-navy text-[length:var(--fs-h2)] leading-[length:var(--lh-h2)]">
+                    {group.title}
+                  </h3>
+                  <div
+                    class="h-[216px] w-full rounded-lg bg-visual-placeholder"
+                    aria-hidden="true"
+                  />
+                </div>
+                <ul class="m-0 flex list-none flex-col gap-5 p-0">
+                  {
+                    group.points.map((point, j) => (
+                      <li
+                        class:list={[
+                          "font-body text-neutral-500 text-[length:var(--fs-body)] leading-[length:var(--lh-body)]",
+                          j < group.points.length - 1 &&
+                            "border-b border-neutral-200 pb-5",
+                        ]}
+                      >
+                        {point}
+                      </li>
+                    ))
+                  }
+                </ul>
+              </article>
+            </div>
+          ))
+        }
+
+        <!-- Tail room so the last card can finish sticking before the next section -->
+        <div style="height: 80px;"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style is:global>
+  /* Sticky and the scroll-driven shrink are both enhancements. Switched off,
+     the cards read as a plain evenly spaced stack. */
+  @media (prefers-reduced-motion: reduce) {
+    .bh-benefits-stack {
+      gap: 1.5rem !important;
+    }
+    .bh-benefits-sticky {
+      position: static !important;
+    }
+    .bh-benefits-card {
+      transform: none !important;
+    }
+  }
+</style>
+
+<script is:inline>
+  /* Sticky stack scroll choreography — identical to `spain-regional/Glance.astro`;
+     see that file for the derivation. */
+  document.addEventListener("DOMContentLoaded", () => {
+    const stack = document.getElementById("bh-benefits-stack");
+    if (!stack) return;
+
+    const outers = Array.from(stack.querySelectorAll(".bh-benefits-sticky"));
+    const inners = Array.from(stack.querySelectorAll(".bh-benefits-card"));
+    if (!outers.length || outers.length !== inners.length) return;
+
+    const reduceMotion =
+      window.matchMedia &&
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (reduceMotion) return;
+
+    const REVEAL_DISTANCE = 260;
+    const SCALE_STEP = 0.03;
+    const targetScaleFor = (i) => 1 - (inners.length - 1 - i) * SCALE_STEP;
+
+    const zoomFactor = () => {
+      let z = 1;
+      for (let n = stack; n && n.nodeType === 1; n = n.parentElement) {
+        const v = parseFloat(getComputedStyle(n).zoom);
+        if (v && v !== 1) z *= v;
+      }
+      return z;
+    };
+
+    let zoom = zoomFactor();
+    let ticking = false;
+
+    const update = () => {
+      const tops = outers.map((el) => el.getBoundingClientRect().top);
+
+      inners.forEach((inner, i) => {
+        if (i === inners.length - 1) {
+          inner.style.transform = "scale(1)";
+          return;
+        }
+
+        const nextStickyTopPx =
+          (parseFloat(getComputedStyle(outers[i + 1]).top) || 0) * zoom;
+        const distanceToStick = tops[i + 1] - nextStickyTopPx;
+
+        const progress = Math.min(
+          1,
+          Math.max(0, 1 - distanceToStick / REVEAL_DISTANCE),
+        );
+        const scale = 1 - progress * (1 - targetScaleFor(i));
+        inner.style.transform = `scale(${scale.toFixed(4)})`;
+      });
+
+      ticking = false;
+    };
+
+    const onScroll = () => {
+      if (ticking) return;
+      ticking = true;
+      requestAnimationFrame(update);
+    };
+
+    const handleLayoutShift = () => {
+      zoom = zoomFactor();
+      update();
+    };
+
+    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", handleLayoutShift);
+    window.addEventListener("load", handleLayoutShift, { once: true });
+
+    update();
+  });
+</script>

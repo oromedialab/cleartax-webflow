@@ -1,0 +1,106 @@
+---
+/**
+ * "One integration. Every NBR requirement covered." — Figma node 18261:65015
+ * ("Fold 8 alt").
+ *
+ * One large outlined panel: centred title and intro, then eight capability
+ * rows — icon placeholder + name on the left, a muted description on the
+ * right (547px column on desktop), a 2px divider between rows. Same row shape
+ * as `Phases.astro`. The Figma positions every row absolutely; this uses a
+ * normal grid so a longer description pushes the rows below it down instead
+ * of overlapping them.
+ *
+ * The 40px squares are the Figma's unfilled icon placeholders — swap for
+ * Webflow-hosted assets once the icons exist, never a `data:` URI.
+ */
+interface Row {
+  heading: string;
+  body: string;
+}
+
+const rows: Row[] = [
+  {
+    heading: "Data validation",
+    body: "Pre-submission checks against NBR's schema and business rules.",
+  },
+  {
+    heading: "e-Invoice data enrichment",
+    body: "Auto-fills and computes missing fields from your existing invoice data.",
+  },
+  {
+    heading: "NBR interaction",
+    body: "Real-time clearance and reporting, with auto-retries on transient failures.",
+  },
+  {
+    heading: "PDF invoice generation",
+    body: "Compliant printable rendering with embedded QR code.",
+  },
+  {
+    heading: "Email e-invoice",
+    body: "Automated delivery of the cleared invoice to your buyer.",
+  },
+  {
+    heading: "Data archival & reports",
+    body: "Long-term storage with full audit trail and MIS reporting.",
+  },
+  {
+    heading: "Translation API",
+    body: "Arabic support, add-on, once NBR confirms mandatory fields.",
+  },
+  {
+    heading: "Offline B2C solution",
+    body: "Local agent for POS environments — sign, queue and sync when back online.",
+  },
+];
+---
+
+<section class="bg-generic-00 py-12 lg:py-20">
+  <div class="container mx-auto">
+    <div
+      class="rounded-xl border border-neutral-300 px-5 pb-8 pt-6 lg:px-[30px] lg:pb-12"
+    >
+      <div class="mb-8 flex flex-col items-center gap-4 text-center lg:mb-12">
+        <h2
+          class="m-0 font-heading font-medium text-vault-navy text-[length:var(--fs-h1)] leading-[length:var(--lh-h1)] tracking-[-0.5px]"
+        >
+          One integration. Every NBR requirement covered.
+        </h2>
+        <p
+          class="m-0 max-w-[666px] font-body text-neutral-500 text-[length:var(--fs-body-lg)] leading-[length:var(--lh-body-lg)]"
+        >
+          ClearTax's cloud platform sits between your ERP/POS and the NBR
+          central platform, handling validation, clearance and archival
+          end-to-end.
+        </p>
+      </div>
+
+      <div class="flex flex-col">
+        {
+          rows.map((row, i) => (
+            <div
+              class:list={[
+                "grid grid-cols-1 gap-4 py-9 lg:grid-cols-[1fr_547px] lg:items-center lg:gap-8",
+                i < rows.length - 1 && "border-b-2 border-[var(--border-divider,#f2f1f0)]",
+                i === 0 && "pt-0",
+                i === rows.length - 1 && "pb-0",
+              ]}
+            >
+              <div class="flex items-center gap-6">
+                <span
+                  class="block h-10 w-10 shrink-0 rounded-md bg-visual-placeholder"
+                  aria-hidden="true"
+                />
+                <h3 class="m-0 font-heading font-medium text-vault-navy text-[length:var(--fs-h5)] leading-[length:var(--lh-h5)]">
+                  {row.heading}
+                </h3>
+              </div>
+              <p class="m-0 font-body text-neutral-500/80 text-[length:var(--fs-body)] leading-[length:var(--lh-body)]">
+                {row.body}
+              </p>
+            </div>
+          ))
+        }
+      </div>
+    </div>
+  </div>
+</section>

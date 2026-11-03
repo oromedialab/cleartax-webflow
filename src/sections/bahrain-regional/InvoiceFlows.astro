@@ -1,0 +1,121 @@
+---
+/**
+ * "Two invoice flows. One platform." — Figma node 5255:14885 ("Fold 11").
+ *
+ * Two side-by-side cards (B2B clearance, B2C reporting), each an overline,
+ * title, intro and a bulleted step list. The Figma also lays a faint dot grid
+ * behind the cards; reproduced as a CSS radial-gradient (`.bh-flows-dots`)
+ * instead of the exported SVG mask, which would add a second asset to paste.
+ */
+interface Flow {
+  overline: string;
+  title: string;
+  intro: string;
+  steps: string[];
+}
+
+const flows: Flow[] = [
+  {
+    overline: "B2B · Standard e-invoices",
+    title: "Cleared before the buyer sees it",
+    intro:
+      "Business-to-business invoices are sent to NBR for real-time validation and clearance BEFORE they reach the buyer.",
+    steps: [
+      "Your ERP/POS generates the invoice; ClearTax pulls the data via API.",
+      "ClearTax builds an NBR-compliant UBL/XML/JSON invoice.",
+      "The invoice is sent to NBR's clearing system in real time.",
+      "NBR clears it and returns a cryptographic stamp and QR code.",
+      "ClearTax generates the compliant PDF/A-3 with the cleared XML embedded.",
+      "The cleared invoice is shared with your buyer, and archived automatically.",
+    ],
+  },
+  {
+    overline: "B2C · Simplified e-invoices",
+    title: "Issued first, reported within 24 hours",
+    intro:
+      "Consumer-facing invoices go to the buyer immediately, then get reported to NBR within 24 hours of generation.",
+    steps: [
+      "Your ERP/POS generates the invoice at the point of sale.",
+      "ClearTax generates the UUID, previous-invoice hash, and QR code with a cryptographic stamp.",
+      "The e-invoice is shared with the buyer instantly.",
+      "ClearTax reports the invoice to NBR within the 24-hour window.",
+      "NBR acknowledges receipt; ClearTax stores the record.",
+      "Works offline too — ClearTax's local agent queues and syncs invoices from in-store POS the moment connectivity is back.",
+    ],
+  },
+];
+---
+
+<section class="bg-generic-00 py-12 lg:py-20">
+  <div class="container mx-auto">
+    <div class="flex flex-col items-center gap-10">
+      <div class="flex flex-col items-center gap-4 text-center">
+        <h2
+          class="m-0 font-heading font-medium text-vault-navy text-[length:var(--fs-h1)] leading-[length:var(--lh-h1)] tracking-[-0.5px]"
+        >
+          Two invoice flows. One platform.
+        </h2>
+        <p
+          class="m-0 max-w-[666px] font-body text-neutral-500 text-[length:var(--fs-body-lg)] leading-[length:var(--lh-body-lg)]"
+        >
+          Every VAT-liable sales transaction has to flow through the NBR central
+          platform, but how it gets there depends on whether it's a B2B or B2C
+          sale.
+        </p>
+      </div>
+
+      <div class="relative w-full">
+        <div class="bh-flows-dots pointer-events-none absolute inset-0 max-lg:hidden" aria-hidden="true"></div>
+        <div class="relative grid grid-cols-1 gap-6 lg:grid-cols-2">
+          {
+            flows.map((flow) => (
+              <article class="flex flex-col gap-8 rounded-xl border border-neutral-300 bg-generic-00 p-6 shadow-[0_1px_1.5px_rgba(0,0,0,0.1),0_1px_1px_rgba(0,0,0,0.1)]">
+                <div class="flex flex-col gap-4">
+                  <p class="m-0 font-body font-semibold uppercase text-nova-blue text-[length:var(--fs-label)] leading-[length:var(--lh-label)] tracking-[var(--tracking-overline)]">
+                    {flow.overline}
+                  </p>
+                  <div class="flex flex-col gap-2">
+                    <h3 class="m-0 font-heading font-medium text-vault-navy text-[length:var(--fs-h5)] leading-[length:var(--lh-h5)]">
+                      {flow.title}
+                    </h3>
+                    <p class="m-0 font-body text-neutral-500 text-[length:var(--fs-body-lg)] leading-[length:var(--lh-body-lg)]">
+                      {flow.intro}
+                    </p>
+                  </div>
+                </div>
+                <ul class="m-0 flex list-none flex-col gap-6 p-0">
+                  {
+                    flow.steps.map((step) => (
+                      <li class="flex items-start gap-4">
+                        <span
+                          class="mt-2 block h-2 w-2 shrink-0 rounded-full bg-nova-blue"
+                          aria-hidden="true"
+                        />
+                        <span class="font-body text-neutral-500 text-[length:var(--fs-body)] leading-[length:var(--lh-body)]">
+                          {step}
+                        </span>
+                      </li>
+                    ))
+                  }
+                </ul>
+              </article>
+            ))
+          }
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style is:global>
+  /* Faint dot grid behind the cards, fading out toward the edges. */
+  .bh-flows-dots {
+    top: -33px;
+    bottom: -33px;
+    background-image: radial-gradient(circle, #d1d5db 1px, transparent 1.5px);
+    background-size: 12px 12px;
+    -webkit-mask-image: radial-gradient(ellipse at center, #000 30%, transparent 75%);
+    mask-image: radial-gradient(ellipse at center, #000 30%, transparent 75%);
+    opacity: 0.6;
+  }
+</style>

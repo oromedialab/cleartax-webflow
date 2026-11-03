@@ -1,0 +1,92 @@
+---
+/**
+ * "Who has to generate e-invoices in Bahrain?" — Figma node 5255:15073 ("Fold 3").
+ *
+ * Three-row rollout timeline: icon placeholder + phase on the left, a bold
+ * lead line and a muted paragraph on the right, divider between rows. Same
+ * row shape as `oman-regional/MandateGlance.astro`.
+ *
+ * TODO CONTENT: the Figma copy for "Pilot phase" describes Slovakia's 5-corner
+ * Peppol CTC model, not Bahrain's. It is reproduced verbatim from the design
+ * and needs correcting by whoever owns the copy before this ships.
+ *
+ * The 40px squares are the Figma's unfilled icon placeholders. Swap for
+ * Webflow-hosted assets once the icons exist — never a `data:` URI.
+ */
+interface Row {
+  heading: string;
+  lead: string;
+  body: string;
+}
+
+const rows: Row[] = [
+  {
+    heading: "Pilot phase",
+    lead: "Selected participants, live now.",
+    body: "Slovakia has a 5-corner Peppol CTC model. Invoices flow C1→C2→C3→C4. Tax data is reported to the authority within 5 days. ClearTax e-invoicing solution acts as the certified compliance layer on both the seller's and the buyer's side.",
+  },
+  {
+    heading: "Integration deadline",
+    lead: "Connect to NBR's platform by Sep 2026.",
+    body: "Every pilot participant — whether integrating in-house or via a third party like ClearTax — is expected to be live on the NBR central platform by September 2026.",
+  },
+  {
+    heading: "Post-pilot",
+    lead: "All VAT-registered taxpayers, dates TBD.",
+    body: "Once the pilot concludes, NBR will extend e-invoicing to every VAT-registered business in Bahrain. Exact rollout dates and segmentation are still to be announced.",
+  },
+];
+---
+
+<section class="bg-generic-00 py-12 lg:py-20">
+  <div class="container mx-auto">
+    <div class="flex flex-col gap-12">
+      <div class="flex flex-col items-center gap-4 text-center">
+        <h2
+          class="m-0 font-heading font-medium text-vault-navy text-[length:var(--fs-h1)] leading-[length:var(--lh-h1)] tracking-[-0.5px]"
+        >
+          Who has to generate e-invoices in Bahrain?
+        </h2>
+        <p
+          class="m-0 max-w-[538px] font-body text-neutral-500 text-[length:var(--fs-body-lg)] leading-[length:var(--lh-body-lg)]"
+        >
+          The National Bureau for Revenue (NBR) is rolling out the mandate in
+          stages rather than all at once.
+        </p>
+      </div>
+
+      <div class="flex flex-col">
+        {
+          rows.map((row, i) => (
+            <div
+              class:list={[
+                "grid grid-cols-1 gap-4 py-9 lg:grid-cols-[1fr_597px] lg:items-center lg:gap-8",
+                i < rows.length - 1 && "border-b-2 border-[var(--border-divider,#f2f1f0)]",
+                i === 0 && "pt-0",
+                i === rows.length - 1 && "pb-0",
+              ]}
+            >
+              <div class="flex items-center gap-6">
+                <span
+                  class="block h-10 w-10 shrink-0 rounded-md bg-visual-placeholder"
+                  aria-hidden="true"
+                />
+                <p class="m-0 font-heading font-medium text-vault-navy text-[length:var(--fs-h5)] leading-[length:var(--lh-h5)]">
+                  {row.heading}
+                </p>
+              </div>
+              <div class="flex flex-col gap-2">
+                <p class="m-0 font-body font-medium text-neutral-700 text-[length:var(--fs-body)] leading-[length:var(--lh-body)]">
+                  {row.lead}
+                </p>
+                <p class="m-0 font-body text-neutral-500/80 text-[length:var(--fs-body)] leading-[length:var(--lh-body)]">
+                  {row.body}
+                </p>
+              </div>
+            </div>
+          ))
+        }
+      </div>
+    </div>
+  </div>
+</section>

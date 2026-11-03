@@ -1,0 +1,95 @@
+---
+/**
+ * "The data NBR expects on every e-invoice" — Figma node 5401:46445 ("Fold 13").
+ *
+ * Three equal outlined cards, each an icon placeholder + title and a bulleted
+ * list. The 32px squares are the Figma's unfilled icon placeholders — swap for
+ * Webflow-hosted assets once the icons exist, never a `data:` URI.
+ */
+interface Card {
+  title: string;
+  items: string[];
+}
+
+const cards: Card[] = [
+  {
+    title: "Invoice & party details",
+    items: [
+      "Invoice number, date, type (Standard/Simplified) and currency.",
+      "Seller's VAT registration number (TRN), legal name and address.",
+      "Buyer's TRN and details for Standard (B2B) invoices.",
+    ],
+  },
+  {
+    title: "Line items & tax",
+    items: [
+      "Line-level goods/services detail; quantity, unit price, item classification.",
+      "Tax totals and subtotals at category level.",
+      "Discounts and charges at line-item and invoice level.",
+      "Final taxable amount, tax, total invoice and payable amounts.",
+    ],
+  },
+  {
+    title: "Printable & digital rendering",
+    items: [
+      "QR code mandatory on every printable/PDF rendering.",
+      "Structured UBL/XML/JSON per NBR's technical specification.",
+      "Simplified invoice threshold and full visible-field list, to be confirmed by NBR.",
+    ],
+  },
+];
+---
+
+<section class="bg-generic-00 py-12 lg:py-[100px]">
+  <div class="container mx-auto">
+    <div class="flex flex-col items-center gap-12">
+      <div class="flex flex-col items-center gap-4 text-center">
+        <h2
+          class="m-0 font-heading font-medium text-vault-navy text-[length:var(--fs-h1)] leading-[length:var(--lh-h1)] tracking-[-0.5px]"
+        >
+          The data NBR expects on every e-invoice
+        </h2>
+        <p
+          class="m-0 max-w-[666px] font-body text-neutral-500 text-[length:var(--fs-body-lg)] leading-[length:var(--lh-body-lg)]"
+        >
+          Credit and debit notes follow the same structured format, and every
+          Standard and Simplified invoice must include a QR code, including the
+          printable PDF.
+        </p>
+      </div>
+
+      <div class="grid w-full grid-cols-1 gap-6 lg:grid-cols-3">
+        {
+          cards.map((card) => (
+            <div class="flex flex-col gap-8 rounded-xl border border-neutral-300 p-8">
+              <div class="flex items-center gap-4">
+                <span
+                  class="block h-8 w-8 shrink-0 rounded bg-visual-placeholder"
+                  aria-hidden="true"
+                />
+                <h3 class="m-0 font-heading font-normal text-vault-navy text-[length:var(--fs-h5)] leading-[length:var(--lh-h5)]">
+                  {card.title}
+                </h3>
+              </div>
+              <ul class="m-0 flex list-none flex-col gap-6 p-0">
+                {
+                  card.items.map((item) => (
+                    <li class="flex items-start gap-3">
+                      <span
+                        class="mt-2 block h-2 w-2 shrink-0 rounded-full bg-nova-blue"
+                        aria-hidden="true"
+                      />
+                      <span class="font-body text-neutral-500 text-[length:var(--fs-body)] leading-[length:var(--lh-body)]">
+                        {item}
+                      </span>
+                    </li>
+                  ))
+                }
+              </ul>
+            </div>
+          ))
+        }
+      </div>
+    </div>
+  </div>
+</section>
