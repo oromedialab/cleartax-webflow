@@ -1,0 +1,99 @@
+---
+/**
+ * "What's Changing in Slovakia's B2B E-Invoicing" — Figma node 18270:57778
+ * ("Fold 2").
+ *
+ * Left: heading, intro and a staircase of dots (8 / 16 / 24 / 24 dots on a 26px
+ * pitch — the Figma exports it as three vector blocks, here it is four rows of
+ * a repeating radial gradient). Right: three dated rows, each an 80px icon
+ * placeholder beside a lead and a muted line, with a hairline between rows.
+ *
+ * The 80px squares are the Figma's unfilled icon placeholders — swap for
+ * Webflow-hosted assets once the icons exist, never a `data:` URI.
+ */
+interface Row {
+  lead: string;
+  body: string;
+}
+
+const rows: Row[] = [
+  {
+    lead: "1 Jan 2027",
+    body: "Receiving structured e-invoices becomes mandatory for domestic B2B and B2G",
+  },
+  {
+    lead: "No threshold",
+    body: "Every VAT-registered entity is in scope from day one",
+  },
+  {
+    lead: "1 Jul 2030",
+    body: "Cross-border reporting expands under ViDA",
+  },
+];
+
+/** Dots per row of the staircase, top to bottom. */
+const dotRows = [8, 16, 24, 24];
+---
+
+<section class="bg-generic-00 py-12 lg:py-[100px]">
+  <div class="container mx-auto">
+    <div class="grid grid-cols-1 items-center gap-12 lg:grid-cols-2 lg:gap-20">
+      <div class="flex flex-col gap-12 lg:gap-[110px]">
+        <div class="flex flex-col gap-6">
+          <h2
+            class="m-0 max-w-[561px] font-heading font-medium text-vault-navy text-[length:var(--fs-h1)] leading-[length:var(--lh-h1)] tracking-[-0.76px]"
+          >
+            What’s Changing in Slovakia’s B2B E-Invoicing
+          </h2>
+          <p
+            class="m-0 max-w-[800px] font-body text-vault-navy/70 text-[length:var(--fs-body)] leading-[length:var(--lh-body)]"
+          >
+            A voluntary pilot phase of e-invoicing has been in practice for
+            interested businesses since May 2026. Now, from January 2027,
+            structured e-invoicing and near real-time digital reporting become
+            mandatory for domestic B2B and B2G transactions alike.
+          </p>
+        </div>
+
+        <div class="hidden flex-col gap-[22px] lg:flex" aria-hidden="true">
+          {
+            dotRows.map((n) => (
+              <div
+                class="h-1 bg-[radial-gradient(circle_at_2px_2px,var(--color-nova-blue)_2px,transparent_2.4px)] bg-[length:26px_4px]"
+                style={`width:${n * 26}px;`}
+              />
+            ))
+          }
+        </div>
+      </div>
+
+      <div class="flex flex-col">
+        {
+          rows.map((row, i) => (
+            <div
+              class:list={[
+                "flex items-center gap-8 py-10",
+                i === 0 && "pt-0",
+                i === rows.length - 1 && "pb-0",
+                i < rows.length - 1 && "border-b border-neutral-300",
+              ]}
+            >
+              <span
+                class="block h-20 w-20 shrink-0 rounded-lg bg-visual-placeholder"
+                aria-hidden="true"
+              />
+              <div class="flex min-w-0 flex-1 flex-col gap-2">
+                <p class="m-0 font-heading font-medium text-vault-navy text-[length:var(--fs-h5)] leading-[length:var(--lh-h5)] tracking-[-0.5px]">
+                  {row.lead}
+                </p>
+                <p class="m-0 font-body text-vault-navy/70 text-[length:var(--fs-body)] leading-[length:var(--lh-body)]">
+                  {row.body}
+                </p>
+              </div>
+            </div>
+          ))
+        }
+      </div>
+    </div>
+  </div>
+</section>
