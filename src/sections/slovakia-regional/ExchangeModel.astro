@@ -1,0 +1,216 @@
+---
+/**
+ * "Slovakia E-Invoicing Exchange Model" — Figma node 18270:57934
+ * ("Fold 12 – Slovakia exchange model (diagram)").
+ *
+ * The 5-corner Peppol diagram, drawn as live markup rather than an exported
+ * image so the copy stays editable and no asset is pasted. Everything sits on
+ * a fixed 1232 × 416 board (the card's 1280px minus 24px padding either side),
+ * absolutely positioned at the Figma's coordinates; connectors are one inline
+ * SVG underneath, flow labels and cards sit on top with a white ground so they
+ * cut the dashed lines the way the design does.
+ *
+ *   C1 Seller ⇄ C2 ClearTax ⇄ (Peppol) ⇄ C3 ClearTax ⇄ C4 Buyer
+ *   C2 and C3 each report the Tax Data Document to C5 Finance Authority.
+ *
+ * The board does not reflow. Below `lg` it scrolls sideways inside the card,
+ * which keeps every connector aligned; the Figma has no mobile frame for it.
+ *
+ * Colours are literals on purpose: the Figma's emerald (#10b981) is a
+ * "(not in use)" token and has no brand-v2 equivalent. Ids are `sk-` prefixed.
+ */
+interface Corner {
+  corner: string;
+  name: string;
+  sub?: string;
+  /** Left / top on the board, and width. */
+  x: number;
+  y: number;
+  w: number;
+  accent: "blue" | "green";
+}
+
+const corners: Corner[] = [
+  { corner: "Corner 1", name: "Seller", x: 0, y: 0, w: 233, accent: "blue" },
+  { corner: "Corner 4", name: "Buyer", x: 0, y: 288, w: 233, accent: "blue" },
+  {
+    corner: "Corner 2",
+    name: "ClearTax",
+    sub: "Seller’s service provider",
+    x: 516,
+    y: 0,
+    w: 300,
+    accent: "green",
+  },
+  {
+    corner: "Corner 3",
+    name: "ClearTax",
+    sub: "Buyer’s service provider",
+    x: 516,
+    y: 288,
+    w: 300,
+    accent: "green",
+  },
+];
+---
+
+<section class="bg-generic-00 py-12 lg:py-20">
+  <div class="container mx-auto">
+    <div
+      class="rounded-xl border border-neutral-300 px-6 pt-6 pb-8 flex flex-col gap-12"
+    >
+      <h2
+        class="m-0 font-heading font-medium text-vault-navy text-[length:var(--fs-h1)] leading-[length:var(--lh-h1)] tracking-[-0.5px]"
+      >
+        Slovakia E-Invoicing Exchange Model
+      </h2>
+
+      <div class="overflow-x-auto">
+        <div
+          id="sk-exchange-board"
+          class="relative mx-auto h-[416px] w-[1232px] font-body"
+          role="img"
+          aria-label="Slovakia 5-corner exchange model: the seller (corner 1) sends invoice data to ClearTax as the seller's service provider (corner 2). It travels over the Peppol network to ClearTax as the buyer's service provider (corner 3) and on to the buyer (corner 4). Corners 2 and 3 each send the tax data document to the Finance Authority (corner 5) and receive a response message."
+        >
+          <!-- Connectors -->
+          <svg
+            class="absolute inset-0 h-full w-full"
+            viewBox="0 0 1232 416"
+            fill="none"
+            aria-hidden="true"
+          >
+            <g stroke-width="1.5" stroke-dasharray="4 4" stroke-linecap="round">
+              <!-- Seller ⇄ C2 -->
+              <path d="M234 58 H516" stroke="#5446ff"></path>
+              <path d="M234 81 H516" stroke="#9ca3af"></path>
+              <!-- Buyer ⇄ C3 -->
+              <path d="M234 344 H516" stroke="#9ca3af"></path>
+              <path d="M234 367 H516" stroke="#5446ff"></path>
+              <!-- C2 ⇄ C5 -->
+              <path d="M816 54 H1142 Q1154 54 1154 66 V118" stroke="#10b981"></path>
+              <path d="M816 74 H1120 Q1132 74 1132 86 V118" stroke="#9ca3af"></path>
+              <!-- C3 ⇄ C5 -->
+              <path d="M816 341 H1119 Q1131 341 1131 329 V298" stroke="#10b981"></path>
+              <path d="M816 361 H1142 Q1154 361 1154 349 V298" stroke="#9ca3af"></path>
+              <!-- Acknowledgement: C3 up to C2, C2 down to C3 -->
+              <path d="M558 288 V129" stroke="#10b981"></path>
+              <path d="M773 129 V287" stroke="#10b981"></path>
+            </g>
+            <g
+              stroke="#10b981"
+              stroke-width="1.5"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path d="M553 135 L558 129 L563 135"></path>
+              <path d="M768 281 L773 287 L778 281"></path>
+            </g>
+          </svg>
+
+          <!-- Corner cards -->
+          {
+            corners.map((c) => (
+              <div
+                class="absolute flex h-32 items-center gap-[13px] overflow-hidden rounded-lg border border-neutral-300 bg-generic-00 p-6"
+                style={`left:${c.x}px;top:${c.y}px;width:${c.w}px;`}
+              >
+                <span
+                  class:list={[
+                    "h-full w-1 shrink-0 rounded-lg",
+                    c.accent === "blue" ? "bg-nova-blue" : "bg-[#10b981]",
+                  ]}
+                  aria-hidden="true"
+                />
+                <div class="flex min-w-0 flex-1 flex-col gap-1">
+                  <p class="m-0 font-body font-medium uppercase text-neutral-500 text-[length:var(--fs-label-sm)] leading-4 tracking-[0.6px]">
+                    {c.corner}
+                  </p>
+                  <p class="m-0 font-body font-semibold text-vault-navy text-[length:var(--fs-body-lg)] leading-7">
+                    {c.name}
+                  </p>
+                  {c.sub && (
+                    <p class="m-0 font-body text-neutral-500 text-[length:var(--fs-body-sm)] leading-5">
+                      {c.sub}
+                    </p>
+                  )}
+                </div>
+              </div>
+            ))
+          }
+
+          <!-- Corner 5 -->
+          <div
+            class="absolute flex h-[180px] w-[174px] flex-col justify-between overflow-hidden rounded-lg border border-[#9ca3af] bg-generic-00 p-6"
+            style="left:1054px;top:118px;"
+          >
+            <div class="flex flex-col gap-6">
+              <p class="m-0 font-body font-semibold uppercase text-nova-blue text-[length:var(--fs-body)] leading-6 tracking-[0.6px]">
+                Corner 5
+              </p>
+              <span class="block h-0.5 w-full rounded-full bg-[#ecebe9]" aria-hidden="true"></span>
+            </div>
+            <p class="m-0 w-[126px] font-body font-semibold text-vault-navy text-[length:var(--fs-body-lg)] leading-7">
+              Finance Authority
+            </p>
+          </div>
+
+          <!-- Flow labels -->
+          <div
+            class="absolute flex flex-col items-center gap-1 rounded-md bg-generic-00 px-2 py-1.5 font-body font-medium uppercase text-[length:var(--fs-label-sm)] leading-5 whitespace-nowrap"
+            style="left:309px;top:40px;"
+          >
+            <span class="text-nova-blue">Invoice data →</span>
+            <span class="text-neutral-500">← Response</span>
+          </div>
+          <div
+            class="absolute flex flex-col items-center gap-1 rounded-md bg-generic-00 px-2 py-1.5 font-body font-medium uppercase text-[length:var(--fs-label-sm)] leading-5 whitespace-nowrap"
+            style="left:275px;top:328px;"
+          >
+            <span class="text-neutral-500">← Delivery confirmation</span>
+            <span class="text-nova-blue">Invoice data →</span>
+          </div>
+          <div
+            class="absolute flex flex-col items-center gap-1 rounded-md bg-generic-00 px-2 py-1.5 font-body font-medium uppercase text-[length:var(--fs-label-sm)] leading-4 tracking-[0.3px] whitespace-nowrap"
+            style="left:892px;top:40px;"
+          >
+            <span class="text-[#10b981]">Tax data document →</span>
+            <span class="text-neutral-500">← Response message</span>
+          </div>
+          <div
+            class="absolute flex flex-col items-center gap-1 rounded-md bg-generic-00 px-2 py-1.5 font-body font-medium uppercase text-[length:var(--fs-label-sm)] leading-4 tracking-[0.3px] whitespace-nowrap"
+            style="left:892px;top:328px;"
+          >
+            <span class="text-[#10b981]">Tax data document →</span>
+            <span class="text-neutral-500">← Response message</span>
+          </div>
+
+          <!-- Acknowledgement pill -->
+          <div
+            class="absolute flex w-[169px] items-center justify-center rounded-xl border-2 border-dashed border-[#10b981] bg-generic-00 px-3 py-2"
+            style="left:581px;top:185px;"
+          >
+            <span class="font-body font-medium text-[#059669] text-[length:var(--fs-body)] leading-6 whitespace-nowrap">
+              Acknowledgement
+            </span>
+          </div>
+
+          <!-- Peppol network -->
+          <div
+            class="absolute flex w-[145px] flex-col items-center gap-2 bg-generic-00 px-3 py-2"
+            style="left:825px;top:146px;"
+          >
+            <img
+              class="max-w-15 w-full object-contain"
+              src="https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6ae9ac0741c278990fdd5b3d_peppol.png"
+              alt=""
+              aria-hidden="true"
+            />
+            <span class="font-body font-medium text-black text-[length:var(--fs-body)] leading-6 whitespace-nowrap">
+              Peppol network
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

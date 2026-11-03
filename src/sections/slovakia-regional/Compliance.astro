@@ -1,0 +1,223 @@
+---
+/**
+ * "Slovakia E-Invoicing Compliance Without the ERP Overhaul" — Figma node
+ * 18270:58008 ("Fold 5").
+ *
+ * Six 628px outlined cards in one row that runs off the right edge of the
+ * frame. Same mechanism as `integration-page/ERPintegration.astro`: the section
+ * sticks under the navbar while the page scrolls, and vertical scroll progress
+ * is translated into a horizontal shift of the card track. The outer
+ * `.sk-compliance-sticky` is given a height of (track overflow + viewport) by
+ * the script, which is what buys the scroll distance.
+ *
+ * IMPORTANT: no ancestor of `.sk-compliance-sticky` may set `overflow` to
+ * anything but `visible` — that silently kills `position: sticky`.
+ *
+ * The cards bleed to the viewport's right edge (the section clips, the
+ * container does not), while the first card lines up with the container's left
+ * edge, as in the Figma.
+ *
+ * The 320px holders are the Figma's unfilled image placeholders — swap for
+ * Webflow-hosted assets once the visuals exist, never a `data:` URI.
+ */
+interface Card {
+  title: string;
+  body: string;
+}
+
+const cards: Card[] = [
+  {
+    title: "Connect once. Stay compliant.",
+    body: "ClearTax connects to your existing ERP without any rebuild and keeps you compliant with Slovakia's e-invoicing ecosystem.",
+  },
+  {
+    title: "Create & exchange compliant e-invoices",
+    body: "Generate invoices in the required structured format on your ERP and billing systems. And send or receive them through Peppol, which is the required certified delivery infrastructure.",
+  },
+  {
+    title: "Validate before sending",
+    body: "Validation of the invoices is required against applicable Slovak and Peppol validation rules before transmission.",
+  },
+  {
+    title: "Automate tax reporting",
+    body: "Transmit the required invoice data to the Slovak Financial Administration through the compliant reporting workflow.",
+  },
+  {
+    title: "Track invoice status",
+    body: "Monitor invoice creation, validation, transmission, delivery and reporting from one place.",
+  },
+  {
+    title: "Keep your ERP unchanged",
+    body: "Centralise country-specific compliance outside your ERP while keeping your core finance systems intact.",
+  },
+];
+---
+
+<div class="sk-compliance-sticky">
+  <section
+    class="sticky top-0 flex min-h-[calc(100vh-80px)] flex-col justify-center overflow-hidden bg-[#fefefe] py-12 md:py-16 xl:py-20"
+  >
+    <div class="container mx-auto">
+      <div class="sk-compliance-header mx-auto mb-8 flex flex-col items-center gap-4 text-center md:mb-12">
+        <h2
+          class="m-0 max-w-[640px] font-heading font-medium text-vault-navy text-[length:var(--fs-h2)] leading-[length:var(--lh-h2)] tracking-[-0.5px] md:text-[length:var(--fs-h1)] md:leading-[length:var(--lh-h1)]"
+        >
+          Slovakia E-Invoicing Compliance Without the ERP Overhaul
+        </h2>
+        <p
+          class="m-0 max-w-[739px] font-body text-neutral-500 text-[length:var(--fs-body)] leading-[length:var(--lh-body)] md:text-[length:var(--fs-body-lg)] md:leading-[length:var(--lh-body-lg)]"
+        >
+          Slovakia's Financial Administration specifies Peppol BIS as the
+          standardised format based on EN 16931 and requires businesses to
+          select a certified delivery service provider.
+        </p>
+      </div>
+
+      <div class="h-auto w-full">
+        <div
+          class="sk-compliance-track flex w-max items-stretch gap-6 transition-transform duration-[250ms] ease-out will-change-transform"
+        >
+          {
+            cards.map((card) => (
+              <article class="sk-compliance-card flex h-[460px] w-[calc(100vw-32px)] shrink-0 select-none flex-col gap-6 rounded-xl border-2 border-neutral-300 bg-generic-00 p-6 sm:h-[480px] sm:w-[500px] sm:p-7 md:w-[560px] lg:h-[540px] lg:w-[628px] lg:p-8">
+                <h3 class="sk-compliance-title pointer-events-none m-0 font-heading font-medium text-vault-navy text-[length:var(--fs-h5)] leading-[length:var(--lh-h5)] tracking-[-0.5px]">
+                  {card.title}
+                </h3>
+                <div
+                  class="pointer-events-none h-[200px] w-full shrink-0 rounded-lg bg-visual-placeholder sm:h-[220px] lg:h-[320px]"
+                  aria-hidden="true"
+                />
+                <p class="sk-compliance-desc pointer-events-none m-0 mt-auto font-body text-neutral-500 text-[length:var(--fs-body)] leading-[length:var(--lh-body)]">
+                  {card.body}
+                </p>
+              </article>
+            ))
+          }
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<style is:global>
+  /* Short viewports: the sticky frame has to fit under the navbar, so the
+     cards and the section padding give a little back. */
+  @media (max-height: 750px) {
+    .sk-compliance-sticky section {
+      padding-top: 1.25rem !important;
+      padding-bottom: 1.25rem !important;
+    }
+    .sk-compliance-header {
+      margin-bottom: 1rem !important;
+    }
+    .sk-compliance-card {
+      height: 420px !important;
+      padding: 1.25rem !important;
+      max-width: calc(100vw - 32px) !important;
+    }
+    .sk-compliance-card > div {
+      height: 180px !important;
+    }
+    @media (min-width: 768px) {
+      .sk-compliance-card {
+        width: 520px !important;
+        height: 460px !important;
+      }
+    }
+    .sk-compliance-desc {
+      font-size: var(--fs-body-sm, 14px) !important;
+      line-height: var(--lh-body-sm, 20px) !important;
+    }
+  }
+</style>
+
+<script is:inline>
+  document.addEventListener("DOMContentLoaded", () => {
+    const containers = document.querySelectorAll(".sk-compliance-sticky");
+    if (!containers.length) return;
+
+    containers.forEach((container) => {
+      const track = container.querySelector(".sk-compliance-track");
+      const section = container.querySelector("section");
+      if (!track || !section) return;
+
+      const getHeaderHeight = () => {
+        const header = document.querySelector("header, .navbar, .w-nav");
+        return header ? header.offsetHeight : 80;
+      };
+
+      let maxTranslate = 0;
+      let totalScrollable = 0;
+      let stickyTop = 0;
+
+      const updateMeasurements = () => {
+        const sectionHeight = section.offsetHeight;
+        const windowHeight = window.innerHeight;
+        const headerHeight = getHeaderHeight();
+
+        const trackOffset =
+          track.parentElement.getBoundingClientRect().top -
+          section.getBoundingClientRect().top;
+        const trackHeight = track.offsetHeight;
+        const availableSpace = windowHeight - headerHeight;
+
+        const idealTrackTop =
+          headerHeight + Math.max(40, (availableSpace - trackHeight) / 2);
+        const calculatedTop = idealTrackTop - trackOffset;
+
+        // Flush under the header when sticky, so large screens show no gap.
+        stickyTop = Math.min(headerHeight, calculatedTop);
+        section.style.top = `${stickyTop}px`;
+
+        const containerWidth = track.parentElement.getBoundingClientRect().width;
+        maxTranslate = Math.max(0, track.scrollWidth - containerWidth);
+        container.style.height = `${maxTranslate + windowHeight}px`;
+        totalScrollable = container.getBoundingClientRect().height - sectionHeight;
+      };
+
+      updateMeasurements();
+
+      if (window.ResizeObserver) {
+        const ro = new ResizeObserver(updateMeasurements);
+        ro.observe(section);
+        ro.observe(track);
+      }
+      window.addEventListener("resize", updateMeasurements);
+
+      let ticking = false;
+
+      const handleScroll = () => {
+        if (ticking) return;
+        ticking = true;
+        window.requestAnimationFrame(() => {
+          const scrolledDistance = Math.max(
+            0,
+            stickyTop - container.getBoundingClientRect().top,
+          );
+          let progress = totalScrollable > 0 ? scrolledDistance / totalScrollable : 0;
+          progress = Math.max(0, Math.min(1, progress));
+
+          track.style.transform = `translate3d(-${progress * maxTranslate}px, 0, 0)`;
+          ticking = false;
+        });
+      };
+
+      // Only listen to scroll while the section is near the viewport.
+      const observer = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              window.addEventListener("scroll", handleScroll, { passive: true });
+              handleScroll();
+            } else {
+              window.removeEventListener("scroll", handleScroll);
+            }
+          });
+        },
+        { rootMargin: "100% 0px 100% 0px" },
+      );
+
+      observer.observe(container);
+    });
+  });
+</script>
