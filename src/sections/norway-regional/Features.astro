@@ -4,32 +4,19 @@
  * 17103:85017 ("Fold 9").
  *
  * A 2-column grid of 5 feature cards, the last spanning both columns. Each
- * card is a button that opens ONE overlay dialog showing that card's heading
- * and body copy, with prev/next chevrons to walk the other four without
- * closing — same mechanics as `france-regional/Supports.astro`, minus the
- * icon elements: this section has no per-feature icon or image art, so the
- * overlay carries a single static `bg-visual-placeholder` visual rather than
- * one swapped per card (every card's placeholder looks identical, so there's
- * nothing to swap).
+ * card is an accordion that expands inline to reveal an image placeholder
+ * and body text. First 4 cards sit in a 2×2 grid at equal size; the 5th
+ * card spans both columns at full width.
  *
- * The overlay renders the layout ONCE and swaps only the heading/body text
- * that differs per card — they sit in the DOM with `hidden` on all but the
- * active one, same as Supports.astro, for the same reason: repeating the
- * whole panel five times would ship five copies of the chevrons and close
- * control for no gain, and every byte here is a Webflow Embed byte.
- *
- * Modal mechanics: display is swapped INLINE rather than by toggling a
- * `hidden` class, because the utilities pasted into Webflow are unlayered
- * and `flex` vs `hidden` on one element would race on source order. The
- * per-card headings and bodies use the `hidden` ATTRIBUTE instead, which is
- * safe there only because those elements carry no display utility of their
- * own — don't add one.
+ * All cards are collapsed by default. Clicking a card toggles it open/closed.
+ * The plus icon rotates to a minus when open.
  *
  * Ids are `no-features-` prefixed: embeds share one namespace per page.
  */
 interface Feature {
   title: string;
   body: string;
+  image: string;
   span2?: boolean;
 }
 
@@ -37,22 +24,32 @@ const features: Feature[] = [
   {
     title: "Seamless ERP & POS Integration",
     body: "Connect any ERP or POS system in only a few days. You keep your existing stack; ClearTax handles the compliance layer on top.",
+    image:
+      "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6ae9865ef1894de3a776ffcf_feature-1.png",
   },
   {
     title: "Real-Time Error Alerts & Unified Dashboards",
     body: "Catch a malformed invoice before it becomes a rejected one. Every business team - finance, IT, AP, AR - works off the same status view.",
+    image:
+      "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6ae9866c0a73c6b53bde2d50_feature-2.png",
   },
   {
     title: "Automatic ELMA & Peppol Directory Checks",
     body: "Know before you send whether your buyer can legally receive an EHF invoice, instead of finding out from a bounced delivery.",
+    image:
+      "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6ae98675d702368c975e5d65_feature-3.png",
   },
   {
     title: "Smart Error Correction & VAT Reconciliation",
     body: "Stay ahead of government notices with built-in error correction and VAT reconciliation, reducing the manual chase before it starts.",
+    image:
+      "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6ae9867c0a0b6b2d26791706_feature-4.png",
   },
   {
     title: "One-Time Integration, Ongoing Compliance",
     body: "As Norway's rules evolve – 2027 issuance, 2030 reception, SAF-T updates; ClearTax absorbs the change. Your integration doesn't need to.",
+    image:
+      "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6ae9868493d429752b796da0_feature-5.png",
     span2: true,
   },
 ];
@@ -60,7 +57,9 @@ const features: Feature[] = [
 
 <section class="bg-generic-00 py-16 lg:py-20">
   <div class="w-full max-w-[var(--container-max)] mx-auto px-4 md:px-6">
-    <div class="mx-auto mb-8 flex flex-col items-center gap-4 text-center lg:mb-12">
+    <div
+      class="mx-auto mb-8 flex flex-col items-center gap-4 text-center lg:mb-12"
+    >
       <h2
         class="m-0 max-w-[620px] font-heading font-medium text-vault-navy text-[length:var(--fs-h1)] leading-[length:var(--lh-h1)] tracking-[-0.5px]"
       >
@@ -76,299 +75,311 @@ const features: Feature[] = [
       </p>
     </div>
 
-    <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
-      {
-        features.map((f, i) => (
-          <button
-            type="button"
-            class:list={[
-              "group flex w-full cursor-pointer items-center justify-between gap-6 rounded-xl border border-neutral-300 bg-generic-00 p-6 text-left transition-all duration-150 ease-in-out hover:border-nova-blue",
-              f.span2 && "md:col-span-2",
-            ]}
-            aria-haspopup="dialog"
-            data-no-features-open
-            data-no-features-index={i}
-          >
-            <span class="font-heading text-[length:var(--fs-h6)] leading-[length:var(--lh-h6)] font-medium text-vault-navy">
-              {f.title}
-            </span>
-            <svg
-              width="24"
-              height="24"
-              viewBox="0 0 24 24"
-              fill="none"
-              class="shrink-0 text-vault-navy transition-colors duration-150 ease-in-out group-hover:text-nova-blue"
-              aria-hidden="true"
-              focusable="false"
-            >
-              <path
-                d="M12 5V19M5 12H19"
-                stroke="currentColor"
-                stroke-width="1.5"
-                stroke-linecap="round"
-                stroke-linejoin="round"></path>
-            </svg>
-          </button>
-        ))
-      }
+    {
+      /* Two independent columns so expanding one card doesn't push the adjacent column */
+    }
+    <div class="flex flex-col gap-6 md:flex-row">
+      {/* Left column: cards 0, 2 */}
+      <div class="flex flex-1 flex-col gap-6">
+        {
+          features
+            .filter((f) => !f.span2)
+            .filter((_, idx) => idx % 2 === 0)
+            .map((f) => {
+              const i = features.indexOf(f);
+              return (
+                <div class="flex flex-col" data-no-features-card={i}>
+                  <button
+                    type="button"
+                    class="group flex w-full cursor-pointer items-center justify-between gap-6 rounded-xl border border-neutral-300 bg-generic-00 p-6 text-left transition-all duration-150 ease-in-out"
+                    data-no-features-toggle={i}
+                  >
+                    <span class="font-heading text-[length:var(--fs-h6)] leading-[length:var(--lh-h6)] font-medium text-vault-navy">
+                      {f.title}
+                    </span>
+                    <svg
+                      width="24"
+                      height="24"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      class="shrink-0 text-vault-navy transition-colors duration-150 ease-in-out"
+                      aria-hidden="true"
+                      focusable="false"
+                      data-no-features-icon={i}
+                    >
+                      <path
+                        d="M5 12H19"
+                        stroke="currentColor"
+                        stroke-width="1.5"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                      />
+                      <path
+                        d="M12 5V19"
+                        stroke="currentColor"
+                        stroke-width="1.5"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        data-no-features-vertical={i}
+                      />
+                    </svg>
+                  </button>
+                  <div
+                    class="grid overflow-hidden rounded-b-xl border border-t-0 border-neutral-300 bg-generic-00 transition-[grid-template-rows,opacity,border-color] duration-300 ease-in-out"
+                    style="grid-template-rows: 0fr; opacity: 0; border-color: transparent;"
+                    data-no-features-content={i}
+                  >
+                    <div class="overflow-hidden">
+                      <div class="p-6 pt-0">
+                        <div class="mt-4 w-full">
+                          <img
+                            src={f.image}
+                            alt={f.title}
+                            class="aspect-[574/323] w-full rounded-lg bg-visual-placeholder object-cover"
+                            loading="lazy"
+                          />
+                        </div>
+                        <p class="m-0 mt-4 font-body font-normal text-neutral-500 text-[length:var(--fs-body)] leading-[length:var(--lh-body)]">
+                          {f.body}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              );
+            })
+        }
+      </div>
+      {/* Right column: cards 1, 3 */}
+      <div class="flex flex-1 flex-col gap-6">
+        {
+          features
+            .filter((f) => !f.span2)
+            .filter((_, idx) => idx % 2 === 1)
+            .map((f) => {
+              const i = features.indexOf(f);
+              return (
+                <div class="flex flex-col" data-no-features-card={i}>
+                  <button
+                    type="button"
+                    class="group flex w-full cursor-pointer items-center justify-between gap-6 rounded-xl border border-neutral-300 bg-generic-00 p-6 text-left transition-all duration-150 ease-in-out"
+                    data-no-features-toggle={i}
+                  >
+                    <span class="font-heading text-[length:var(--fs-h6)] leading-[length:var(--lh-h6)] font-medium text-vault-navy">
+                      {f.title}
+                    </span>
+                    <svg
+                      width="24"
+                      height="24"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      class="shrink-0 text-vault-navy transition-colors duration-150 ease-in-out"
+                      aria-hidden="true"
+                      focusable="false"
+                      data-no-features-icon={i}
+                    >
+                      <path
+                        d="M5 12H19"
+                        stroke="currentColor"
+                        stroke-width="1.5"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                      />
+                      <path
+                        d="M12 5V19"
+                        stroke="currentColor"
+                        stroke-width="1.5"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        data-no-features-vertical={i}
+                      />
+                    </svg>
+                  </button>
+                  <div
+                    class="grid overflow-hidden rounded-b-xl border border-t-0 border-neutral-300 bg-generic-00 transition-[grid-template-rows,opacity,border-color] duration-300 ease-in-out"
+                    style="grid-template-rows: 0fr; opacity: 0; border-color: transparent;"
+                    data-no-features-content={i}
+                  >
+                    <div class="overflow-hidden">
+                      <div class="p-6 pt-0">
+                        <div class="mt-4 w-full">
+                          <img
+                            src={f.image}
+                            alt={f.title}
+                            class="aspect-[574/323] w-full rounded-lg bg-visual-placeholder object-cover"
+                            loading="lazy"
+                          />
+                        </div>
+                        <p class="m-0 mt-4 font-body font-normal text-neutral-500 text-[length:var(--fs-body)] leading-[length:var(--lh-body)]">
+                          {f.body}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              );
+            })
+        }
+      </div>
     </div>
+    {/* Last card — full width */}
+    {
+      features
+        .filter((f) => f.span2)
+        .map((f) => {
+          const i = features.indexOf(f);
+          return (
+            <div class="mt-6 flex flex-col" data-no-features-card={i}>
+              <button
+                type="button"
+                class="group flex w-full cursor-pointer items-center justify-between gap-6 rounded-xl border border-neutral-300 bg-generic-00 p-6 text-left transition-all duration-150 ease-in-out"
+                data-no-features-toggle={i}
+              >
+                <span class="font-heading text-[length:var(--fs-h6)] leading-[length:var(--lh-h6)] font-medium text-vault-navy">
+                  {f.title}
+                </span>
+                <svg
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  class="shrink-0 text-vault-navy transition-colors duration-150 ease-in-out"
+                  aria-hidden="true"
+                  focusable="false"
+                  data-no-features-icon={i}
+                >
+                  <path
+                    d="M5 12H19"
+                    stroke="currentColor"
+                    stroke-width="1.5"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  />
+                  <path
+                    d="M12 5V19"
+                    stroke="currentColor"
+                    stroke-width="1.5"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    data-no-features-vertical={i}
+                  />
+                </svg>
+              </button>
+              <div
+                class="grid overflow-hidden rounded-b-xl border border-t-0 border-neutral-300 bg-generic-00 transition-[grid-template-rows,opacity,border-color] duration-300 ease-in-out"
+                style="grid-template-rows: 0fr; opacity: 0; border-color: transparent;"
+                data-no-features-content={i}
+              >
+                <div class="overflow-hidden">
+                  <div class="p-6 pt-0">
+                    <div class="mt-4 w-full">
+                      <img
+                        src={f.image}
+                        alt={f.title}
+                        class="aspect-[574/323] w-full rounded-lg bg-visual-placeholder object-cover"
+                        loading="lazy"
+                      />
+                    </div>
+                    <p class="m-0 mt-4 font-body font-normal text-neutral-500 text-[length:var(--fs-body)] leading-[length:var(--lh-body)]">
+                      {f.body}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          );
+        })
+    }
   </div>
 </section>
 
-<!-- Detail overlay. Lives outside the section's container so the scrim covers
-     the viewport rather than the 1280px column. -->
-<div
-  id="no-features-overlay"
-  role="dialog"
-  aria-modal="true"
-  aria-labelledby="no-features-overlay-title"
-  aria-hidden="true"
-  class="fixed inset-0 z-[2000] hidden items-center justify-center bg-generic-100/70 p-4 backdrop-blur-sm"
->
-  <div
-    class="relative max-h-[90vh] w-full max-w-[1280px] overflow-y-auto rounded-xl border-2 border-[#CCCCCC] bg-generic-00 p-6"
-    data-no-features-panel
-  >
-    <button
-      type="button"
-      aria-label="Close"
-      class="absolute right-6 top-6 z-10 inline-flex h-10 w-10 cursor-pointer items-center justify-center rounded-lg border-0 bg-transparent p-0 text-vault-navy transition-opacity duration-150 hover:opacity-70 lg:right-11 lg:top-11"
-      data-no-features-close
-    >
-      <svg
-        width="40"
-        height="40"
-        viewBox="0 0 40 40"
-        fill="none"
-        class="rotate-45"
-        aria-hidden="true"
-        focusable="false"
-      >
-        <path
-          d="M20 10V30"
-          stroke="currentColor"
-          stroke-width="1.5"
-          stroke-linecap="round"
-          stroke-linejoin="round"></path>
-        <path
-          d="M30 20L10 20"
-          stroke="currentColor"
-          stroke-width="1.5"
-          stroke-linecap="round"
-          stroke-linejoin="round"></path>
-      </svg>
-    </button>
-
-    <div class="flex flex-col items-start gap-6 lg:flex-row lg:gap-12">
-      <div
-        class="flex w-full flex-col justify-between gap-6 lg:w-[416px] lg:shrink-0 lg:self-stretch"
-      >
-        <div id="no-features-overlay-title">
-          {
-            features.map((f, i) => (
-              <h3
-                class="m-0 pr-12 font-heading font-medium text-vault-navy text-[length:var(--fs-h5)] leading-[length:var(--lh-h5)] tracking-[-0.5px] lg:pr-0"
-                hidden={i !== 0}
-                data-no-features-heading
-              >
-                {f.title}
-              </h3>
-            ))
-          }
-        </div>
-
-        <div class="flex flex-col gap-6">
-          <div>
-            {
-              features.map((f, i) => (
-                <p
-                  class="m-0 font-body font-normal text-neutral-500 text-[length:var(--fs-body)] leading-[length:var(--lh-body)]"
-                  hidden={i !== 0}
-                  data-no-features-body
-                >
-                  {f.body}
-                </p>
-              ))
-            }
-          </div>
-
-          <div class="flex items-center gap-2">
-            <button
-              type="button"
-              aria-label="Previous"
-              aria-controls="no-features-overlay-title"
-              class="inline-flex cursor-pointer items-center justify-center rounded border border-neutral-300 bg-generic-00 p-2 text-vault-navy transition-colors duration-150 hover:border-nova-blue"
-              data-no-features-prev
-            >
-              <svg
-                width="20"
-                height="20"
-                viewBox="0 0 20 20"
-                fill="none"
-                aria-hidden="true"
-                focusable="false"
-              >
-                <path
-                  d="M12 15L7 10L12 5"
-                  stroke="currentColor"
-                  stroke-width="1.5"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"></path>
-              </svg>
-            </button>
-            <button
-              type="button"
-              aria-label="Next"
-              aria-controls="no-features-overlay-title"
-              class="inline-flex cursor-pointer items-center justify-center rounded border border-neutral-300 bg-generic-00 p-2 text-vault-navy transition-colors duration-150 hover:border-nova-blue"
-              data-no-features-next
-            >
-              <svg
-                width="20"
-                height="20"
-                viewBox="0 0 20 20"
-                fill="none"
-                aria-hidden="true"
-                focusable="false"
-              >
-                <path
-                  d="M7 5L12 10L7 15"
-                  stroke="currentColor"
-                  stroke-width="1.5"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"></path>
-              </svg>
-            </button>
-          </div>
-        </div>
-      </div>
-
-      <!-- Every card's visual is the same unfilled placeholder (no per-feature
-           art in the Figma), so unlike Supports.astro's per-card images this
-           needs no swapping — one static block for all five. -->
-      <div class="w-full">
-        <div class="aspect-[760/428] w-full rounded-lg bg-visual-placeholder" />
-      </div>
-    </div>
-  </div>
-</div>
-
 <script is:inline>
-  /* Card -> detail overlay, with the chevrons walking the five without closing. */
+  /* Smooth accordion toggle for feature cards. */
   (function () {
-    var overlay = document.getElementById("no-features-overlay");
-    if (!overlay) return;
+    var cards = document.querySelectorAll("[data-no-features-card]");
+    if (!cards.length) return;
 
-    var panel = overlay.querySelector("[data-no-features-panel]");
-    var closeBtn = overlay.querySelector("[data-no-features-close]");
-    var prevBtn = overlay.querySelector("[data-no-features-prev]");
-    var nextBtn = overlay.querySelector("[data-no-features-next]");
-    var headings = overlay.querySelectorAll("[data-no-features-heading]");
-    var bodies = overlay.querySelectorAll("[data-no-features-body]");
-    if (!panel || !headings.length || headings.length !== bodies.length) return;
+    function closeCard(index) {
+      var content = document.querySelector(
+        '[data-no-features-content="' + index + '"]',
+      );
+      var btn = document.querySelector(
+        '[data-no-features-toggle="' + index + '"]',
+      );
+      var vertical = document.querySelector(
+        '[data-no-features-vertical="' + index + '"]',
+      );
+      var icon = document.querySelector(
+        '[data-no-features-icon="' + index + '"]',
+      );
+      if (!content || content.getAttribute("data-open") !== "true") return;
+      content.style.gridTemplateRows = "0fr";
+      content.style.opacity = "0";
+      content.style.borderColor = "transparent";
+      content.setAttribute("data-open", "false");
+      btn.classList.remove("rounded-b-none", "border-b-0");
+      if (vertical) vertical.style.opacity = "1";
+      if (icon) icon.style.transform = "";
+    }
 
-    var count = headings.length;
-    var current = 0;
-    var lastFocused = null;
-
-    function show(index) {
-      // Wraps both ways, so neither chevron is ever a dead control.
-      current = ((index % count) + count) % count;
-      for (var i = 0; i < count; i++) {
-        headings[i].hidden = i !== current;
-        bodies[i].hidden = i !== current;
+    function closeAllExcept(exceptIndex) {
+      for (var c = 0; c < cards.length; c++) {
+        var idx = cards[c].getAttribute("data-no-features-card");
+        if (idx !== exceptIndex) closeCard(idx);
       }
-      // The panel scrolls on short windows; a card further down the list would
-      // otherwise open mid-way through its own copy.
-      panel.scrollTop = 0;
     }
 
-    // Inline display, not a class swap: the utilities pasted into Webflow are
-    // unlayered, so `flex` and `hidden` on one element would race on source
-    // order. Inline always wins.
-    function open(index, opener) {
-      lastFocused = opener || document.activeElement;
-      show(index);
-      overlay.style.display = "flex";
-      overlay.setAttribute("aria-hidden", "false");
-      document.body.style.overflow = "hidden";
-      if (closeBtn) closeBtn.focus();
+    function toggle(index) {
+      var content = document.querySelector(
+        '[data-no-features-content="' + index + '"]',
+      );
+      var btn = document.querySelector(
+        '[data-no-features-toggle="' + index + '"]',
+      );
+      var vertical = document.querySelector(
+        '[data-no-features-vertical="' + index + '"]',
+      );
+      var icon = document.querySelector(
+        '[data-no-features-icon="' + index + '"]',
+      );
+      if (!content || !btn) return;
+
+      var isOpen = content.getAttribute("data-open") === "true";
+
+      if (isOpen) {
+        closeCard(index);
+      } else {
+        // Close any other open card first
+        closeAllExcept(index);
+        // Open — animate height to auto
+        content.style.gridTemplateRows = "1fr";
+        content.style.opacity = "1";
+        content.style.borderColor = "";
+        content.setAttribute("data-open", "true");
+        btn.classList.add("rounded-b-none", "border-b-0");
+        if (vertical) vertical.style.opacity = "0";
+        if (icon) icon.style.transform = "rotate(180deg)";
+      }
     }
 
-    function close() {
-      overlay.style.display = "none";
-      overlay.setAttribute("aria-hidden", "true");
-      document.body.style.overflow = "";
-      if (lastFocused && lastFocused.focus) lastFocused.focus();
+    // Add transition to vertical bars for smooth plus-to-minus
+    var verticals = document.querySelectorAll("[data-no-features-vertical]");
+    for (var v = 0; v < verticals.length; v++) {
+      verticals[v].style.transition = "opacity 0.3s ease-in-out";
     }
 
-    function isOpen() {
-      return overlay.style.display === "flex";
+    // Add transition to icons for smooth rotation
+    var icons = document.querySelectorAll("[data-no-features-icon]");
+    for (var k = 0; k < icons.length; k++) {
+      icons[k].style.transition = "transform 0.3s ease-in-out";
     }
 
-    // Delegated, so it does not matter which Embed mounts first or whether the
-    // cards existed when this ran.
     document.addEventListener("click", function (e) {
       if (!e.target.closest) return;
-      var opener = e.target.closest("[data-no-features-open]");
-      if (!opener) return;
-      open(
-        parseInt(opener.getAttribute("data-no-features-index"), 10) || 0,
-        opener,
-      );
-    });
-
-    if (closeBtn) closeBtn.addEventListener("click", close);
-    if (prevBtn)
-      prevBtn.addEventListener("click", function () {
-        show(current - 1);
-      });
-    if (nextBtn)
-      nextBtn.addEventListener("click", function () {
-        show(current + 1);
-      });
-
-    overlay.addEventListener("click", function (e) {
-      if (e.target === overlay) close();
-    });
-
-    document.addEventListener("keydown", function (e) {
-      if (!isOpen()) return;
-
-      if (e.key === "Escape") {
-        close();
-        return;
-      }
-
-      // Arrow keys drive the same walk the chevrons do. Nothing inside the
-      // dialog is a native arrow-key control (no radio group, select or text
-      // field), so there is no default behaviour to steal here.
-      if (e.key === "ArrowLeft") {
-        show(current - 1);
-        return;
-      }
-      if (e.key === "ArrowRight") {
-        show(current + 1);
-        return;
-      }
-
-      // Keep Tab inside the dialog — `aria-modal` claims the rest is inert, so
-      // focus must not walk out into the page behind it.
-      if (e.key !== "Tab") return;
-      var focusable = panel.querySelectorAll(
-        'a[href], button:not([disabled]), input:not([disabled]):not([type="hidden"]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])',
-      );
-      if (!focusable.length) return;
-      var first = focusable[0];
-      var last = focusable[focusable.length - 1];
-
-      if (e.shiftKey && document.activeElement === first) {
-        e.preventDefault();
-        last.focus();
-      } else if (!e.shiftKey && document.activeElement === last) {
-        e.preventDefault();
-        first.focus();
-      }
+      var toggleBtn = e.target.closest("[data-no-features-toggle]");
+      if (!toggleBtn) return;
+      var index = toggleBtn.getAttribute("data-no-features-toggle");
+      toggle(index);
     });
   })();
 </script>
