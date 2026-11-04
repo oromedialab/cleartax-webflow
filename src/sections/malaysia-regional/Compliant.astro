@@ -1,0 +1,300 @@
+---
+/**
+ * "Australia e-invoicing at a glance"
+ *
+ * 2x2 grid of 4 cards:
+ * - Top 2 cards (card 0 and card 1) are open by default.
+ * - Bottom cards start closed and only open when clicked.
+ * - Each card sizes independently to its own content (items-start).
+ * - Clicking a card toggles only that card open/closed without stretching adjacent cards.
+ * - Plus icon smoothly rotates to an "x" (45deg) when open.
+ * - Single outer border (neutral-300) wraps the entire card.
+ * - No extra inner border on button or content.
+ * - No blue border on hover or select.
+ *
+ * Ids / data attributes are `au-glance-` prefixed.
+ */
+interface SupportCard {
+    heading: string;
+    body: string;
+    icon: string;
+}
+
+const cards: SupportCard[] = [
+    {
+        heading: "Peppol PINT A-NZ, not PDFs",
+        body: 'An e-invoice is structured data sent from your system to your buyer\'s, not a PDF attached to an email. Since 15 May 2025, PINT A-NZ is the only supported invoice and credit note specification on the Australian Peppol network. A PINT A-NZ e-invoice with all required fields is a valid tax invoice, even without the words "tax invoice."',
+        icon: "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6aeaf1a8e488f686e913307c_icon-1.png",
+    },
+    {
+        heading: "Four-corner Peppol, no government portal",
+        body: "You connect once through an ATO-accredited Peppol Access Point and can then trade with anyone on the network, whatever software they use. Your ABN is your Peppol ID. The ATO governs the network but doesn't see your invoices, and there is no clearance or tax reporting.",
+        icon: "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6aeaf1ac07e61507e445c4b7_icon-2.png",
+    },
+    {
+        heading: "Government buyers are moving first",
+        body: "Non-corporate Commonwealth entities have had to receive e-invoices since July 2022, and e-invoicing is becoming the default in Commonwealth procurement. Agencies are encouraged to make it a contract requirement, so suppliers may be asked to switch at renewal. Most NSW, SA and ACT agencies, many Queensland agencies and 30+ councils can already receive.",
+        icon: "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6aeaf1b09e1e1fe8c1a7ecf1_icon-3.png",
+    },
+    {
+        heading: "Same tax invoice rules, kept for five years",
+        body: "E-invoices must still carry everything a GST tax invoice needs: your identity and ABN, issue date, item descriptions, quantity, price and GST, plus the buyer's identity or ABN for sales of A$1,000 or more. Keep records for at least five years.",
+        icon: "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6aeaf1b45d937d54113570ef_icon-4.png",
+    },
+];
+---
+
+<section class="bg-generic-00 py-16 lg:py-20">
+    <div class="max-w-[var(--container-max)] w-full px-4 md:px-6 mx-auto">
+        <div class="flex flex-col w-full mb-6 lg:mb-12 mx-auto">
+            <h2
+                class="m-0 text-center font-heading font-medium text-vault-navy text-[length:var(--fs-h1)] leading-[length:var(--lh-h1)] tracking-[-0.5px]"
+            >
+                Australia e-invoicing at a glance
+            </h2>
+            <p
+                class="m-0 font-body mt-4 text-neutral-500 text-[length:var(--fs-body-lg)] leading-[length:var(--lh-body-lg)] max-w-288 text-center mx-auto"
+            >
+                Australia uses the ATO-governed Peppol network for direct
+                e-invoicing. While optional for businesses, the Australian
+                Government is making e-invoicing default for procurement:
+                non-corporate Commonwealth entities must receive e-invoices,
+                target 30% Peppol supplier adoption by July 2026, and automate
+                processing by December 2026. Suppliers using e-invoicing receive
+                payment within 5 calendar days.
+            </p>
+        </div>
+
+        {
+            /* 2x2 grid: items-start ensures only the selected/open card expands; closed cards stay compact without empty space */
+        }
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
+            {
+                cards.map((card, i) => {
+                    const isDefaultOpen = i === 0 || i === 1;
+                    return (
+                        <div
+                            class="group/card flex flex-col rounded-xl border border-neutral-300 bg-generic-00 overflow-hidden"
+                            data-au-glance-card={i}
+                        >
+                            <button
+                                type="button"
+                                class={`group flex w-full cursor-pointer items-center justify-between gap-4 md:gap-6 p-6 text-left transition-all duration-150 ease-in-out bg-generic-00 border-0 outline-none focus:outline-none focus:ring-0 ${isDefaultOpen ? "pb-3" : ""}`}
+                                data-au-glance-toggle={i}
+                                aria-expanded={isDefaultOpen ? "true" : "false"}
+                            >
+                                <img
+                                    src={card.icon}
+                                    alt=""
+                                    width="56"
+                                    height="56"
+                                    class="block h-14 w-14 shrink-0 rounded-lg object-contain"
+                                    loading="lazy"
+                                    decoding="async"
+                                />
+                                <span class="min-w-0 flex-1 font-heading font-medium text-vault-navy text-[length:var(--fs-h6)] leading-[length:var(--lh-h6)]">
+                                    {card.heading}
+                                </span>
+                                <svg
+                                    width="24"
+                                    height="24"
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    class="shrink-0 text-vault-navy transition-transform duration-200 ease-in-out"
+                                    aria-hidden="true"
+                                    focusable="false"
+                                    data-au-glance-icon={i}
+                                    style={
+                                        isDefaultOpen
+                                            ? "transform: rotate(45deg);"
+                                            : "transform: rotate(0deg);"
+                                    }
+                                >
+                                    <path
+                                        d="M12 5V19"
+                                        stroke="currentColor"
+                                        stroke-width="1.5"
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                    />
+                                    <path
+                                        d="M5 12H19"
+                                        stroke="currentColor"
+                                        stroke-width="1.5"
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                    />
+                                </svg>
+                            </button>
+                            <div
+                                class="grid overflow-hidden transition-[grid-template-rows,opacity] duration-300 ease-out border-0"
+                                style={
+                                    isDefaultOpen
+                                        ? "grid-template-rows: 1fr; opacity: 1;"
+                                        : "grid-template-rows: 0fr; opacity: 0;"
+                                }
+                                data-au-glance-content={i}
+                                data-open={isDefaultOpen ? "true" : "false"}
+                            >
+                                <div class="overflow-hidden border-0">
+                                    <div class="px-6 pb-6 pt-1">
+                                        <p class="m-0 font-body font-normal text-neutral-500 text-[length:var(--fs-body)] leading-[length:var(--lh-body)] md:min-h-[120px]">
+                                            {card.body}
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    );
+                })
+            }
+        </div>
+    </div>
+</section>
+
+<script is:inline>
+    (function () {
+        function syncRowHeights() {
+            if (window.innerWidth < 768) {
+                for (var i = 0; i < 4; i++) {
+                    var c = document.querySelector(
+                        '[data-au-glance-card="' + i + '"]',
+                    );
+                    if (c) c.style.height = "";
+                }
+                return;
+            }
+
+            var rows = [
+                [0, 1],
+                [2, 3],
+            ];
+
+            rows.forEach(function (pair) {
+                var cardA = document.querySelector(
+                    '[data-au-glance-card="' + pair[0] + '"]',
+                );
+                var cardB = document.querySelector(
+                    '[data-au-glance-card="' + pair[1] + '"]',
+                );
+                var contentA = document.querySelector(
+                    '[data-au-glance-content="' + pair[0] + '"]',
+                );
+                var contentB = document.querySelector(
+                    '[data-au-glance-content="' + pair[1] + '"]',
+                );
+
+                if (!cardA || !cardB || !contentA || !contentB) return;
+
+                var openA = contentA.getAttribute("data-open") === "true";
+                var openB = contentB.getAttribute("data-open") === "true";
+
+                cardA.style.height = "";
+                cardB.style.height = "";
+
+                if (openA && openB) {
+                    var h = Math.max(cardA.offsetHeight, cardB.offsetHeight);
+                    cardA.style.height = h + "px";
+                    cardB.style.height = h + "px";
+                }
+            });
+        }
+
+        function openCard(index) {
+            var content = document.querySelector(
+                '[data-au-glance-content="' + index + '"]',
+            );
+            var btn = document.querySelector(
+                '[data-au-glance-toggle="' + index + '"]',
+            );
+            var icon = document.querySelector(
+                '[data-au-glance-icon="' + index + '"]',
+            );
+            if (!content || !btn) return;
+
+            var num = Number(index);
+            var pairIndex = num % 2 === 0 ? num + 1 : num - 1;
+            var thisCard = document.querySelector(
+                '[data-au-glance-card="' + num + '"]',
+            );
+            var siblingCard = document.querySelector(
+                '[data-au-glance-card="' + pairIndex + '"]',
+            );
+            if (thisCard) thisCard.style.height = "";
+            if (siblingCard) siblingCard.style.height = "";
+
+            content.style.gridTemplateRows = "1fr";
+            content.style.opacity = "1";
+            content.setAttribute("data-open", "true");
+            btn.setAttribute("aria-expanded", "true");
+            btn.classList.add("pb-3");
+            if (icon) icon.style.transform = "rotate(45deg)";
+
+            setTimeout(syncRowHeights, 320);
+        }
+
+        function closeCard(index) {
+            var content = document.querySelector(
+                '[data-au-glance-content="' + index + '"]',
+            );
+            var btn = document.querySelector(
+                '[data-au-glance-toggle="' + index + '"]',
+            );
+            var icon = document.querySelector(
+                '[data-au-glance-icon="' + index + '"]',
+            );
+            if (!content || !btn) return;
+
+            var num = Number(index);
+            var pairIndex = num % 2 === 0 ? num + 1 : num - 1;
+            var thisCard = document.querySelector(
+                '[data-au-glance-card="' + num + '"]',
+            );
+            var siblingCard = document.querySelector(
+                '[data-au-glance-card="' + pairIndex + '"]',
+            );
+            if (thisCard) thisCard.style.height = "";
+            if (siblingCard) siblingCard.style.height = "";
+
+            content.style.gridTemplateRows = "0fr";
+            content.style.opacity = "0";
+            content.setAttribute("data-open", "false");
+            btn.setAttribute("aria-expanded", "false");
+            btn.classList.remove("pb-3");
+            if (icon) icon.style.transform = "rotate(0deg)";
+
+            setTimeout(syncRowHeights, 320);
+        }
+
+        function toggle(index) {
+            var content = document.querySelector(
+                '[data-au-glance-content="' + index + '"]',
+            );
+            if (!content) return;
+
+            var isOpen = content.getAttribute("data-open") === "true";
+
+            if (isOpen) {
+                closeCard(index);
+            } else {
+                openCard(index);
+            }
+        }
+
+        document.addEventListener("click", function (e) {
+            if (!e.target.closest) return;
+            var toggleBtn = e.target.closest("[data-au-glance-toggle]");
+            if (!toggleBtn) return;
+            var index = toggleBtn.getAttribute("data-au-glance-toggle");
+            toggle(index);
+        });
+
+        window.addEventListener("resize", syncRowHeights);
+        if (document.readyState === "loading") {
+            document.addEventListener("DOMContentLoaded", syncRowHeights);
+        } else {
+            syncRowHeights();
+        }
+        window.addEventListener("load", syncRowHeights);
+    })();
+</script>
