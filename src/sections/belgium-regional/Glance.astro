@@ -1,0 +1,379 @@
+---
+/**
+ * "Belgium e-invoicing at a glance" — Figma node 18357:62499. Heading and lede,
+ * then a 2x2 grid of cards that each carry a plus control.
+ *
+ * A card is a button: clicking it opens ONE overlay dialog showing that card's
+ * heading and body, with prev/next chevrons to walk the other three without
+ * closing. Pattern and mechanics copied from `spain-regional/Supports.astro`;
+ * the overlay renders its layout once and swaps only the heading / body /
+ * visual that differ per card.
+ *
+ * The Figma shows the cards collapsed only, so the body copy is lifted from the
+ * FAQ answers on this page — nothing is stated here that the FAQ does not
+ * already say. Review with content before staging.
+ *
+ * The card icons and the overlay visual are unfilled placeholder frames in the
+ * Figma, so they render as `bg-visual-placeholder` (#E8FFE1). Swap for
+ * Webflow-hosted artwork when it lands — never a `data:` URI.
+ *
+ * Ids and data attributes are `be-glance-` prefixed: embeds share one
+ * namespace per page.
+ */
+interface Card {
+  heading: string;
+  body: string;
+}
+
+const cards: Card[] = [
+  {
+    heading: "Peppol BIS 3.0, not PDFs",
+    body: "Invoices must be structured Peppol BIS Billing 3.0 in UBL, compliant with EN 16931. A PDF or paper invoice alone does not meet the requirement.",
+  },
+  {
+    heading: "Send and receive through a Peppol Access Point",
+    body: "Belgium uses a decentralised four-corner Peppol model with no central clearance portal. You connect through a certified Access Point and register in the Peppol directory with your KBO/BCE number.",
+  },
+  {
+    heading: "10-year audit-ready archive",
+    body: "Keep the original structured file for ten years from 1 January of the year after the invoice date, accessible online to FPS Finance from Belgium.",
+  },
+  {
+    heading: "2028: the five-corner model",
+    body: "Belgium proposes near-real-time e-reporting from 1 January 2028. Suppliers and buyers would both report invoice data to FPS Finance over Peppol. Details will follow by Royal Decree.",
+  },
+];
+---
+
+<section class="bg-generic-00 pt-16 pb-12 lg:pt-20">
+  <div
+    class="w-full max-w-[var(--container-max)] mx-auto px-4 md:px-6 flex flex-col items-center gap-12"
+  >
+    <div class="flex flex-col items-center gap-6 text-center">
+      <h2
+        class="m-0 font-heading font-medium text-vault-navy text-[length:var(--fs-h1)] leading-[length:var(--lh-h1)] tracking-[-0.5px]"
+      >
+        Belgium e-invoicing at a glance
+      </h2>
+      <p
+        class="m-0 max-w-[916px] font-body font-normal text-neutral-500 text-[length:var(--fs-body)] lg:text-[length:var(--fs-body-lg)] leading-[length:var(--lh-body)] lg:leading-[length:var(--lh-body-lg)]"
+      >
+        Since 1 January 2026, in-scope domestic B2B invoices between Belgian
+        businesses must generally be issued and received as structured electronic
+        invoices. Belgium is considering near-real-time domestic e-reporting with
+        provisional timing in 2028, but its final rules and technical design should
+        not yet be presented as settled.
+      </p>
+    </div>
+
+    <div class="grid w-full grid-cols-1 gap-5 sm:grid-cols-2 lg:gap-8">
+      {
+        cards.map((card, i) => (
+          <button
+            type="button"
+            class="group m-0 flex w-full cursor-pointer items-center justify-between gap-5 self-start rounded-xl border border-neutral-300 bg-generic-00 p-6 text-left transition-all duration-150 ease-in-out hover:border-nova-blue"
+            aria-haspopup="dialog"
+            data-be-glance-open
+            data-be-glance-index={i}
+          >
+            <span class="h-14 w-14 shrink-0 rounded-lg bg-visual-placeholder" aria-hidden="true" />
+            <span class="min-w-0 flex-1 font-heading font-medium text-vault-navy text-balance max-w-[414px] text-[length:var(--fs-body)] leading-[length:var(--lh-body)] sm:text-[length:var(--fs-h6)] sm:leading-[length:var(--lh-h6)]">
+              {card.heading}
+            </span>
+            <span
+              class="ml-auto flex h-14 w-14 shrink-0 items-center justify-center rounded-lg p-2 text-vault-navy transition-colors duration-150 ease-in-out group-hover:text-nova-blue"
+              aria-hidden="true"
+            >
+              <svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M20 10V30" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                <path d="M30 20L10 20" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+              </svg>
+            </span>
+          </button>
+        ))
+      }
+    </div>
+  </div>
+</section>
+
+<!-- Detail overlay. Lives outside the section's container so the scrim covers
+     the viewport rather than the 1280px column. -->
+<div
+  id="be-glance-overlay"
+  role="dialog"
+  aria-modal="true"
+  aria-labelledby="be-glance-overlay-title"
+  aria-hidden="true"
+  class="fixed inset-0 z-[2000] hidden items-center justify-center bg-generic-100/70 p-4 backdrop-blur-sm"
+>
+  <div
+    class="relative max-h-[90vh] w-full max-w-[1280px] overflow-y-auto rounded-xl border-2 border-[#CCCCCC] bg-generic-00 p-6"
+    data-be-glance-panel
+  >
+    <button
+      type="button"
+      aria-label="Close"
+      class="absolute right-6 top-6 z-10 inline-flex h-10 w-10 cursor-pointer items-center justify-center rounded-lg border-0 bg-transparent p-0 text-vault-navy transition-opacity duration-150 hover:opacity-70 lg:right-11 lg:top-11"
+      data-be-glance-close
+    >
+      <svg
+        width="40"
+        height="40"
+        viewBox="0 0 40 40"
+        fill="none"
+        class="rotate-45"
+        aria-hidden="true"
+        focusable="false"
+      >
+        <path
+          d="M20 10V30"
+          stroke="currentColor"
+          stroke-width="1.5"
+          stroke-linecap="round"
+          stroke-linejoin="round"></path>
+        <path
+          d="M30 20L10 20"
+          stroke="currentColor"
+          stroke-width="1.5"
+          stroke-linecap="round"
+          stroke-linejoin="round"></path>
+      </svg>
+    </button>
+
+    <div class="flex flex-col items-start gap-6 lg:flex-row lg:gap-12">
+      <div
+        class="flex w-full flex-col justify-between gap-6 lg:w-[416px] lg:shrink-0 lg:self-stretch"
+      >
+        <div class="flex flex-col gap-6">
+          <div class="h-16 w-16 shrink-0">
+            {
+              cards.map((card, i) => (
+                <span
+                  class="h-16 w-16 shrink-0 items-center justify-center rounded-lg bg-visual-placeholder"
+                  style={i === 0 ? "display: flex;" : "display: none;"}
+                  hidden={i !== 0}
+                  data-be-glance-icon
+                  aria-hidden="true"
+                >
+                  
+                </span>
+              ))
+            }
+          </div>
+          <div id="be-glance-overlay-title">
+            {
+              cards.map((card, i) => (
+                <h3
+                  class="m-0 pr-12 font-heading font-medium text-vault-navy text-[length:var(--fs-h5)] leading-[length:var(--lh-h5)] tracking-[-0.5px] lg:pr-0"
+                  hidden={i !== 0}
+                  data-be-glance-heading
+                >
+                  {card.heading}
+                </h3>
+              ))
+            }
+          </div>
+        </div>
+
+        <div class="flex flex-col gap-6">
+          <div>
+            {
+              cards.map((card, i) => (
+                <p
+                  class="m-0 font-body font-normal text-neutral-500 text-[length:var(--fs-body)] leading-[length:var(--lh-body)]"
+                  hidden={i !== 0}
+                  data-be-glance-body
+                >
+                  {card.body}
+                </p>
+              ))
+            }
+          </div>
+
+          <div class="flex items-center gap-2">
+            <button
+              type="button"
+              aria-label="Previous"
+              aria-controls="be-glance-overlay-title"
+              class="inline-flex cursor-pointer items-center justify-center rounded border border-neutral-300 bg-generic-00 p-2 text-vault-navy transition-colors duration-150 hover:border-nova-blue"
+              data-be-glance-prev
+            >
+              <svg
+                width="20"
+                height="20"
+                viewBox="0 0 20 20"
+                fill="none"
+                aria-hidden="true"
+                focusable="false"
+              >
+                <path
+                  d="M12 15L7 10L12 5"
+                  stroke="currentColor"
+                  stroke-width="1.5"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"></path>
+              </svg>
+            </button>
+            <button
+              type="button"
+              aria-label="Next"
+              aria-controls="be-glance-overlay-title"
+              class="inline-flex cursor-pointer items-center justify-center rounded border border-neutral-300 bg-generic-00 p-2 text-vault-navy transition-colors duration-150 hover:border-nova-blue"
+              data-be-glance-next
+            >
+              <svg
+                width="20"
+                height="20"
+                viewBox="0 0 20 20"
+                fill="none"
+                aria-hidden="true"
+                focusable="false"
+              >
+                <path
+                  d="M7 5L12 10L7 15"
+                  stroke="currentColor"
+                  stroke-width="1.5"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"></path>
+              </svg>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div
+        class="aspect-[1280/720] w-full rounded-lg overflow-hidden bg-visual-placeholder lg:w-auto lg:flex-1"
+      >
+        {
+          cards.map((card, i) => (
+            <div class="h-full w-full bg-visual-placeholder" style={i === 0 ? "display: block;" : "display: none;"} hidden={i !== 0} data-be-glance-image aria-hidden="true"></div>
+          ))
+        }
+      </div>
+    </div>
+  </div>
+</div>
+
+<style is:global>
+  [data-be-glance-icon][hidden],
+  [data-be-glance-image][hidden] {
+    display: none !important;
+  }
+</style>
+
+<script is:inline>
+  /* Card -> detail overlay, with the chevrons walking the eight without closing. */
+  (function () {
+    var overlay = document.getElementById("be-glance-overlay");
+    if (!overlay) return;
+
+    var panel = overlay.querySelector("[data-be-glance-panel]");
+    var closeBtn = overlay.querySelector("[data-be-glance-close]");
+    var prevBtn = overlay.querySelector("[data-be-glance-prev]");
+    var nextBtn = overlay.querySelector("[data-be-glance-next]");
+    var headings = overlay.querySelectorAll("[data-be-glance-heading]");
+    var bodies = overlay.querySelectorAll("[data-be-glance-body]");
+    var icons = overlay.querySelectorAll("[data-be-glance-icon]");
+    var images = overlay.querySelectorAll("[data-be-glance-image]");
+    if (!panel || !headings.length || headings.length !== bodies.length) return;
+
+    var count = headings.length;
+    var current = 0;
+    var lastFocused = null;
+
+    function show(index) {
+      current = ((index % count) + count) % count;
+      for (var i = 0; i < count; i++) {
+        headings[i].hidden = i !== current;
+        bodies[i].hidden = i !== current;
+        if (icons[i]) {
+          icons[i].hidden = i !== current;
+          icons[i].style.display = i === current ? "flex" : "none";
+        }
+        if (images[i]) {
+          images[i].hidden = i !== current;
+          images[i].style.display = i === current ? "block" : "none";
+        }
+      }
+      panel.scrollTop = 0;
+    }
+
+    function open(index, opener) {
+      lastFocused = opener || document.activeElement;
+      show(index);
+      overlay.style.display = "flex";
+      overlay.setAttribute("aria-hidden", "false");
+      document.body.style.overflow = "hidden";
+      if (closeBtn) closeBtn.focus();
+    }
+
+    function close() {
+      overlay.style.display = "none";
+      overlay.setAttribute("aria-hidden", "true");
+      document.body.style.overflow = "";
+      if (lastFocused && lastFocused.focus) lastFocused.focus();
+    }
+
+    function isOpen() {
+      return overlay.style.display === "flex";
+    }
+
+    document.addEventListener("click", function (e) {
+      if (!e.target.closest) return;
+      var opener = e.target.closest("[data-be-glance-open]");
+      if (!opener) return;
+      open(
+        parseInt(opener.getAttribute("data-be-glance-index"), 10) || 0,
+        opener,
+      );
+    });
+
+    if (closeBtn) closeBtn.addEventListener("click", close);
+    if (prevBtn)
+      prevBtn.addEventListener("click", function () {
+        show(current - 1);
+      });
+    if (nextBtn)
+      nextBtn.addEventListener("click", function () {
+        show(current + 1);
+      });
+
+    overlay.addEventListener("click", function (e) {
+      if (e.target === overlay) close();
+    });
+
+    document.addEventListener("keydown", function (e) {
+      if (!isOpen()) return;
+
+      if (e.key === "Escape") {
+        close();
+        return;
+      }
+
+      if (e.key === "ArrowLeft") {
+        show(current - 1);
+        return;
+      }
+      if (e.key === "ArrowRight") {
+        show(current + 1);
+        return;
+      }
+
+      if (e.key !== "Tab") return;
+      var focusable = panel.querySelectorAll(
+        'a[href], button:not([disabled]), input:not([disabled]):not([type="hidden"]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])',
+      );
+      if (!focusable.length) return;
+      var first = focusable[0];
+      var last = focusable[focusable.length - 1];
+
+      if (e.shiftKey && document.activeElement === first) {
+        e.preventDefault();
+        last.focus();
+      } else if (!e.shiftKey && document.activeElement === last) {
+        e.preventDefault();
+        first.focus();
+      }
+    });
+  })();
+</script>

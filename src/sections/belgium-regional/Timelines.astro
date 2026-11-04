@@ -1,0 +1,123 @@
+---
+/**
+ * "Key timelines" and "What non-compliance costs" — Figma node 18357:62777
+ * (second "Container - Belgium e-invoicing at a glance"). Two bordered tables:
+ * a header row on a divider, then body rows separated by hairlines.
+ *
+ * Each table is a CSS grid, not a `<table>`, so the rows can reflow to stacked
+ * label/value pairs on small screens. Column templates are the Figma's: three
+ * columns for the timeline, a wide + 320px pair for the costs.
+ *
+ * Classes are `be-tl-` prefixed: section CSS is one shared namespace per page.
+ */
+interface Props {}
+
+const timeline = [
+  ["1 Jan 2026", "B2B e-invoicing go-live; PDF no longer valid", "All Belgian VAT-registered businesses"],
+  ["1 Jan – 31 Mar 2026", "Grace period for businesses making good-faith efforts", "All in-scope businesses"],
+  ["1 Apr 2026", "Penalties enforced", "All in-scope businesses"],
+  ["1 Jan 2028", "Near-real-time e-reporting via five-corner model (planned)", "All in-scope businesses"],
+  ["1 Jul 2030", "EU ViDA digital reporting for cross-border B2B", "Businesses trading within the EU"],
+];
+
+const costs: [string, string[]][] = [
+  ["No e-invoice issued = treated as no invoice issued", ["Buyers reject invoices not sent over Peppol"]],
+  [
+    "€1,500 first offence, €3,000 second, €5,000 for each one after",
+    ["A non-compliant invoice can complicate or put the buyer’s VAT deduction at risk"],
+  ],
+  [
+    "Wider VAT Code fines of €50–€5,000 per infraction",
+    [
+      "Payment delays and disputes from wrong formats or missing fields",
+      "A second migration in 2028 if your setup can't handle five-corner reporting",
+    ],
+  ],
+];
+---
+
+<section class="bg-generic-00 be-tl-section pt-12 pb-16 lg:pb-20">
+  <div class="w-full max-w-[var(--container-max)] mx-auto px-4 md:px-6 flex flex-col gap-16 lg:gap-20">
+    <div class="flex flex-col items-center gap-8">
+      <h3 class="m-0 text-center font-heading font-medium text-vault-navy text-[length:var(--fs-h4)] leading-[length:var(--lh-h4)] tracking-[-0.5px]">
+        Key timelines
+      </h3>
+      <div class="w-full overflow-hidden rounded-xl border border-neutral-300">
+        <div class="be-tl-row be-tl-row-3 be-tl-head border-b border-neutral-300 font-heading font-medium text-vault-navy text-[length:var(--fs-h6)] leading-[length:var(--lh-h6)]">
+          <span>Date</span>
+          <span>Milestone</span>
+          <span>Who it applies to</span>
+        </div>
+        {
+          timeline.map(([date, what, who]) => (
+            <div class="be-tl-row be-tl-row-3 be-tl-body">
+              <span class="font-body font-medium text-vault-navy text-[length:var(--fs-body-lg)] leading-[length:var(--lh-body-lg)]">
+                {date}
+              </span>
+              <span class="be-tl-cell">{what}</span>
+              <span class="be-tl-cell">{who}</span>
+            </div>
+          ))
+        }
+      </div>
+    </div>
+
+    <div class="flex flex-col items-center gap-8">
+      <h3 class="m-0 text-center font-heading font-medium text-vault-navy text-[length:var(--fs-h4)] leading-[length:var(--lh-h4)] tracking-[-0.5px]">
+        What non-compliance costs
+      </h3>
+      <div class="w-full overflow-hidden rounded-xl border border-neutral-300">
+        <div class="be-tl-row be-tl-row-2 be-tl-head border-b border-neutral-300 font-heading font-medium text-vault-navy text-[length:var(--fs-h6)] leading-[length:var(--lh-h6)]">
+          <span>Penalties</span>
+          <span>Business risks</span>
+        </div>
+        {
+          costs.map(([penalty, risks]) => (
+            <div class="be-tl-row be-tl-row-2 be-tl-body">
+              <span class="font-body font-medium text-vault-navy text-[length:var(--fs-body-lg)] leading-[length:var(--lh-body-lg)]">
+                {penalty}
+              </span>
+              <span class="be-tl-cell flex flex-col gap-4">
+                {risks.map((r) => (
+                  <span>{r}</span>
+                ))}
+              </span>
+            </div>
+          ))
+        }
+      </div>
+    </div>
+  </div>
+</section>
+
+<style is:global>
+  .be-tl-section {
+    border-bottom: 3px solid var(--palette-ledger-white);
+  }
+  .be-tl-row {
+    display: grid;
+    gap: 8px;
+    padding: 24px;
+  }
+  .be-tl-body + .be-tl-body {
+    border-top: 1px solid var(--palette-ledger-white);
+  }
+  .be-tl-cell {
+    font-family: var(--font-body);
+    font-size: var(--fs-body);
+    line-height: var(--lh-body);
+    color: var(--palette-neutral-500);
+  }
+  @media (min-width: 1024px) {
+    .be-tl-row {
+      column-gap: 48px;
+      align-items: center;
+    }
+    .be-tl-row-3 {
+      grid-template-columns: minmax(0, 1fr) 320px 320px;
+    }
+    .be-tl-row-2 {
+      grid-template-columns: minmax(0, 1fr) 320px;
+    }
+  }
+</style>
