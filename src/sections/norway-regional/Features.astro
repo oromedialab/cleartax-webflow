@@ -80,7 +80,7 @@ const features: Feature[] = [
     }
     <div class="flex flex-col gap-6 md:flex-row">
       {/* Left column: cards 0, 2 */}
-      <div class="flex flex-1 flex-col gap-6">
+      <div class="flex flex-1 flex-col gap-6" data-no-features-column="left">
         {
           features
             .filter((f) => !f.span2)
@@ -151,7 +151,7 @@ const features: Feature[] = [
         }
       </div>
       {/* Right column: cards 1, 3 */}
-      <div class="flex flex-1 flex-col gap-6">
+      <div class="flex flex-1 flex-col gap-6" data-no-features-column="right">
         {
           features
             .filter((f) => !f.span2)
@@ -294,10 +294,40 @@ const features: Feature[] = [
 </section>
 
 <script is:inline>
-  /* Smooth accordion toggle for feature cards. */
+  /* Smooth accordion toggle for feature cards.
+   * Desktop (≥768px): left & right columns are independent accordion groups.
+   *   Cards 0 & 3 open by default.
+   * Mobile (<768px): global single-accordion (unchanged behaviour). */
   (function () {
     var cards = document.querySelectorAll("[data-no-features-card]");
     if (!cards.length) return;
+
+    var desktopMQ = window.matchMedia("(min-width: 768px)");
+
+    /* ---- helpers ---- */
+
+    function getColumnForCard(index) {
+      var card = document.querySelector(
+        '[data-no-features-card="' + index + '"]',
+      );
+      if (!card) return null;
+      var col = card.closest("[data-no-features-column]");
+      return col ? col.getAttribute("data-no-features-column") : null;
+    }
+
+    function getSiblingIndices(column) {
+      if (!column) return [];
+      var col = document.querySelector(
+        '[data-no-features-column="' + column + '"]',
+      );
+      if (!col) return [];
+      var siblings = col.querySelectorAll("[data-no-features-card]");
+      var indices = [];
+      for (var s = 0; s < siblings.length; s++) {
+        indices.push(siblings[s].getAttribute("data-no-features-card"));
+      }
+      return indices;
+    }
 
     function closeCard(index) {
       var content = document.querySelector(
@@ -322,14 +352,7 @@ const features: Feature[] = [
       if (icon) icon.style.transform = "";
     }
 
-    function closeAllExcept(exceptIndex) {
-      for (var c = 0; c < cards.length; c++) {
-        var idx = cards[c].getAttribute("data-no-features-card");
-        if (idx !== exceptIndex) closeCard(idx);
-      }
-    }
-
-    function toggle(index) {
+    function openCard(index) {
       var content = document.querySelector(
         '[data-no-features-content="' + index + '"]',
       );
@@ -343,24 +366,63 @@ const features: Feature[] = [
         '[data-no-features-icon="' + index + '"]',
       );
       if (!content || !btn) return;
+      content.style.gridTemplateRows = "1fr";
+      content.style.opacity = "1";
+      content.style.borderColor = "";
+      content.setAttribute("data-open", "true");
+      btn.classList.add("rounded-b-none", "border-b-0");
+      if (vertical) vertical.style.opacity = "0";
+      if (icon) icon.style.transform = "rotate(180deg)";
+    }
+
+    function closeAllExcept(exceptIndex) {
+      for (var c = 0; c < cards.length; c++) {
+        var idx = cards[c].getAttribute("data-no-features-card");
+        if (idx !== exceptIndex) closeCard(idx);
+      }
+    }
+
+    function closeColumnExcept(column, exceptIndex) {
+      var indices = getSiblingIndices(column);
+      for (var i = 0; i < indices.length; i++) {
+        if (indices[i] !== exceptIndex) closeCard(indices[i]);
+      }
+    }
+
+    /* ---- toggle ---- */
+
+    function toggle(index) {
+      var content = document.querySelector(
+        '[data-no-features-content="' + index + '"]',
+      );
+      var btn = document.querySelector(
+        '[data-no-features-toggle="' + index + '"]',
+      );
+      if (!content || !btn) return;
 
       var isOpen = content.getAttribute("data-open") === "true";
 
       if (isOpen) {
         closeCard(index);
       } else {
-        // Close any other open card first
-        closeAllExcept(index);
-        // Open — animate height to auto
-        content.style.gridTemplateRows = "1fr";
-        content.style.opacity = "1";
-        content.style.borderColor = "";
-        content.setAttribute("data-open", "true");
-        btn.classList.add("rounded-b-none", "border-b-0");
-        if (vertical) vertical.style.opacity = "0";
-        if (icon) icon.style.transform = "rotate(180deg)";
+        if (desktopMQ.matches) {
+          // Desktop: only close cards in the same column (or full-width group)
+          var col = getColumnForCard(index);
+          if (col) {
+            closeColumnExcept(col, index);
+          } else {
+            // Full-width card (card 4) — only close other full-width cards
+            closeCard("4");
+          }
+        } else {
+          // Mobile: global accordion — close everything
+          closeAllExcept(index);
+        }
+        openCard(index);
       }
     }
+
+    /* ---- transitions ---- */
 
     // Add transition to vertical bars for smooth plus-to-minus
     var verticals = document.querySelectorAll("[data-no-features-vertical]");
@@ -374,6 +436,8 @@ const features: Feature[] = [
       icons[k].style.transition = "transform 0.3s ease-in-out";
     }
 
+    /* ---- click handler ---- */
+
     document.addEventListener("click", function (e) {
       if (!e.target.closest) return;
       var toggleBtn = e.target.closest("[data-no-features-toggle]");
@@ -381,5 +445,11 @@ const features: Feature[] = [
       var index = toggleBtn.getAttribute("data-no-features-toggle");
       toggle(index);
     });
+
+    /* ---- desktop default-open: card 0 (left col) & card 3 (right col) ---- */
+    if (desktopMQ.matches) {
+      openCard("0");
+      openCard("3");
+    }
   })();
 </script>
