@@ -3,8 +3,7 @@
  * "Australia e-invoicing at a glance"
  *
  * 2x2 grid of 4 cards:
- * - Top 2 cards (card 0 and card 1) are open by default.
- * - Bottom cards start closed and only open when clicked.
+ * - The first card is open by default; the others open only when clicked.
  * - Each card sizes independently to its own content (items-start).
  * - Clicking a card toggles only that card open/closed without stretching adjacent cards.
  * - Plus icon smoothly rotates to an "x" (45deg) when open.
@@ -16,30 +15,47 @@
  */
 interface SupportCard {
     heading: string;
-    body: string;
-    icon: string;
+    body: string | string[];
 }
 
 const cards: SupportCard[] = [
     {
-        heading: "Peppol PINT A-NZ, not PDFs",
-        body: 'An e-invoice is structured data sent from your system to your buyer\'s, not a PDF attached to an email. Since 15 May 2025, PINT A-NZ is the only supported invoice and credit note specification on the Australian Peppol network. A PINT A-NZ e-invoice with all required fields is a valid tax invoice, even without the words "tax invoice."',
-        icon: "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6aeaf1a8e488f686e913307c_icon-1.png",
+        heading: "Internal assessment",
+        body: [
+            "Confirm each entity's phase and whether the RM3 million exemption applies, including the group, shareholder and related-company tests.",
+            "Map every ERP, billing system, POS and e-commerce channel that issues invoices, plus B2B, B2C and self-billed volumes.",
+            "Review IT and finance bandwidth for integration work",
+        ],
     },
     {
-        heading: "Four-corner Peppol, no government portal",
-        body: "You connect once through an ATO-accredited Peppol Access Point and can then trade with anyone on the network, whatever software they use. Your ABN is your Peppol ID. The ATO governs the network but doesn't see your invoices, and there is no clearance or tax reporting.",
-        icon: "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6aeaf1ac07e61507e445c4b7_icon-2.png",
+        heading: "Platform and vendor shortlisting (RFP)",
+        body: ["Decide on platform type: a MyInvois-only connector, or one vendor for e-invoicing, reconciliation and AP automation.",
+        "Use the RFP checklist and evaluation matrix to shortlist vendors.",
+        "Run demos, sandbox tests and reference checks with Malaysian customers.",
+
+    ],
     },
     {
-        heading: "Government buyers are moving first",
-        body: "Non-corporate Commonwealth entities have had to receive e-invoices since July 2022, and e-invoicing is becoming the default in Commonwealth procurement. Agencies are encouraged to make it a contract requirement, so suppliers may be asked to switch at renewal. Most NSW, SA and ACT agencies, many Queensland agencies and 30+ councils can already receive.",
-        icon: "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6aeaf1b09e1e1fe8c1a7ecf1_icon-3.png",
+        heading: "Compliance readiness review",
+        body: [
+            "Validate the 55 mandatory fields, TINs, classification codes and SST data against your ERP.",
+            "List flows still using consolidation, and plan individual e-invoices for B2B and any transaction above RM10,000.",
+            "Set up self-billing for imports, commissions and other in-scope payments.",
+        ],    
     },
     {
-        heading: "Same tax invoice rules, kept for five years",
-        body: "E-invoices must still carry everything a GST tax invoice needs: your identity and ABN, issue date, item descriptions, quantity, price and GST, plus the buyer's identity or ABN for sales of A$1,000 or more. Keep records for at least five years.",
-        icon: "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6aeaf1b45d937d54113570ef_icon-4.png",
+        heading: "Integration and testing",
+        body: [
+            "Connect your ERP and POS to the platform and to MyInvois, with digital certificates in place.",
+            "Test validation, rejections, cancellations within 72 hours, credit notes and B2C consolidation end to end.",
+        ],    
+    },
+    {
+        heading: "Go-live and monthly reconciliation",
+        body: [
+            "Go live entity by entity and track every rejection on one dashboard.",
+            "Reconcile your books against MyInvois every month, before income tax and SST filings.",
+        ],    
     },
 ];
 ---
@@ -50,28 +66,22 @@ const cards: SupportCard[] = [
             <h2
                 class="m-0 text-center font-heading font-medium text-vault-navy text-[length:var(--fs-h1)] leading-[length:var(--lh-h1)] tracking-[-0.5px]"
             >
-                Australia e-invoicing at a glance
+                Get fully LHDN compliant in 5 steps
             </h2>
             <p
-                class="m-0 font-body mt-4 text-neutral-500 text-[length:var(--fs-body-lg)] leading-[length:var(--lh-body-lg)] max-w-288 text-center mx-auto"
+                class="m-0 max-w-2xl font-body mt-4 text-neutral-500 text-[length:var(--fs-body-lg)] leading-[length:var(--lh-body-lg)] text-center mx-auto"
             >
-                Australia uses the ATO-governed Peppol network for direct
-                e-invoicing. While optional for businesses, the Australian
-                Government is making e-invoicing default for procurement:
-                non-corporate Commonwealth entities must receive e-invoices,
-                target 30% Peppol supplier adoption by July 2026, and automate
-                processing by December 2026. Suppliers using e-invoicing receive
-                payment within 5 calendar days.
+                Already live on MyInvois, or still relying on consolidation? Use these steps to close the gaps before an audit or the end of the relaxation period finds them.
             </p>
         </div>
 
         {
             /* 2x2 grid: items-start ensures only the selected/open card expands; closed cards stay compact without empty space */
         }
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
+        <div class="grid grid-cols-1  gap-6 items-start">
             {
                 cards.map((card, i) => {
-                    const isDefaultOpen = i === 0 || i === 1;
+                    const isDefaultOpen = i === 0;
                     return (
                         <div
                             class="group/card flex flex-col rounded-xl border border-neutral-300 bg-generic-00 overflow-hidden"
@@ -83,15 +93,6 @@ const cards: SupportCard[] = [
                                 data-au-glance-toggle={i}
                                 aria-expanded={isDefaultOpen ? "true" : "false"}
                             >
-                                <img
-                                    src={card.icon}
-                                    alt=""
-                                    width="56"
-                                    height="56"
-                                    class="block h-14 w-14 shrink-0 rounded-lg object-contain"
-                                    loading="lazy"
-                                    decoding="async"
-                                />
                                 <span class="min-w-0 flex-1 font-heading font-medium text-vault-navy text-[length:var(--fs-h6)] leading-[length:var(--lh-h6)]">
                                     {card.heading}
                                 </span>
@@ -138,9 +139,17 @@ const cards: SupportCard[] = [
                             >
                                 <div class="overflow-hidden border-0">
                                     <div class="px-6 pb-6 pt-1">
-                                        <p class="m-0 font-body font-normal text-neutral-500 text-[length:var(--fs-body)] leading-[length:var(--lh-body)] md:min-h-[120px]">
-                                            {card.body}
-                                        </p>
+                                        {
+                                            Array.isArray(card.body) ? (
+                                                <ul class="m-0 list-disc space-y-2 pl-5 font-body font-normal text-neutral-500 text-[length:var(--fs-body)] leading-[length:var(--lh-body)]">
+                                                    {card.body.map((item) => <li>{item}</li>)}
+                                                </ul>
+                                            ) : (
+                                                <p class="m-0 font-body font-normal text-neutral-500 text-[length:var(--fs-body)] leading-[length:var(--lh-body)]">
+                                                    {card.body}
+                                                </p>
+                                            )
+                                        }
                                     </div>
                                 </div>
                             </div>
