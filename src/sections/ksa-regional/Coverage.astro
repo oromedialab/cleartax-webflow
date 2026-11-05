@@ -1,0 +1,166 @@
+---
+/**
+ * "How ClearTax keeps you compliant with ZATCA's e-invoicing mandate" — Figma
+ * node 18377:73253 ("Fold 10"). Eight rows, title + sub-line on the left, the
+ * longer explanation on the right, divided by hairlines.
+ *
+ * Every row is drawn at 50% opacity in the Figma: it is the resting state of a
+ * scroll-spotlight. A small script lifts the row nearest the middle of the
+ * viewport to full opacity as the section scrolls past; without script (or with
+ * reduced motion) all rows stay fully legible.
+ *
+ * The icon squares are unfilled "Visual placeholder" frames in the Figma, so
+ * they render as `bg-visual-placeholder` (#E8FFE1). Swap for Webflow-hosted
+ * artwork when it lands — never a `data:` URI.
+ *
+ * Classes and ids are `ksa-cov-` prefixed: embeds share one namespace per page.
+ */
+interface Row {
+  title: string;
+  lead: string;
+  body: string;
+}
+
+const rows: Row[] = [
+  {
+    title: "Full Phase 1 and Phase 2 coverage",
+    lead: "Clear B2B and B2G invoices in real time and report B2C invoices within 24 hours",
+    body: "with UBL 2.1 XML, QR codes, cryptographic stamps and CSID management handled for you. Credit notes, debit notes and continuous supplies run in the same flow.",
+  },
+  {
+    title: "Built for enterprise volumes",
+    lead: "Generate up to 15,000 e-invoices a minute at a 99.8% success rate.",
+    body: "Month-end peaks, retail sale days and multi-entity groups run without queues or timeouts.",
+  },
+  {
+    title: "Catch errors before ZATCA does",
+    lead: "AI-powered checks validate every mandatory field",
+    body: "VAT code and Arabic value before an invoice is sent. Error alerts, suggested fixes and bulk resubmission clear rejections in minutes, not days.",
+  },
+  {
+    title: "Integrates with any ERP or POS",
+    lead: "2000+ integrations, including SAP, Oracle ERP and Retail, Microsoft Dynamics, Toshiba, LS Retail and Cegid.",
+    body: "Your ERP stays as it is, and an offline POS app keeps unconnected stores compliant.",
+  },
+  {
+    title: "ZATCA updates, handled",
+    lead: "When ZATCA changes its SDK or validation rules, the update ships to you as a cloud release at no extra cost.",
+    body: "You get notified of every change before it affects an invoice.",
+  },
+  {
+    title: "VAT reconciliation, not just e-invoicing",
+    lead: "Match your sales and purchase registers with ZATCA e-invoice data at 95%+ accuracy.",
+    body: "Teams cut post-invoicing work by up to 80% and file VAT returns with fewer surprises.",
+  },
+  {
+    title: "AP automation for incoming e-invoices",
+    lead: "Receive and process supplier e-invoices from Phase 1 and Phase 2 vendors digitally.",
+    body: "Plan payments, cut manual entry and keep input VAT claims clean.",
+  },
+  {
+    title: "KSA now. GCC and 50+ countries next.",
+    lead: "One platform and one API for Saudi Arabia, the UAE mandate and 50+ other countries.",
+    body: "Your KSA team gets 24/7 support, a dedicated success manager and in-house tax experts.",
+  },
+];
+---
+
+<section id="ksa-cov" class="bg-generic-00 py-16 lg:py-20">
+  <div
+    class="w-full max-w-[var(--container-max)] mx-auto px-4 md:px-6 flex flex-col items-center gap-12"
+  >
+    <div class="flex max-w-[626px] flex-col items-center gap-4 text-center">
+      <h2
+        class="m-0 font-heading font-medium text-vault-navy text-[length:var(--fs-h1)] leading-[length:var(--lh-h1)] tracking-[-0.5px]"
+      >
+        How ClearTax keeps you compliant with ZATCA's e-invoicing mandate
+      </h2>
+      <p
+        class="m-0 max-w-[586px] font-body font-normal text-neutral-500 text-[length:var(--fs-body)] lg:text-[length:var(--fs-body-lg)] leading-[length:var(--lh-body)] lg:leading-[length:var(--lh-body-lg)]"
+      >
+        One platform to generate, validate, report and reconcile every invoice in Saudi Arabia, proven on 400 million Phase 2 e-invoices.
+      </p>
+    </div>
+
+    <div class="flex w-full flex-col">
+      {
+        rows.map((r) => (
+          <div class="ksa-cov-row grid grid-cols-1 gap-4 py-6 lg:grid-cols-2 lg:gap-12">
+            <div class="flex items-start gap-4">
+              <span class="size-[53px] shrink-0 rounded-lg bg-visual-placeholder" />
+              <div class="flex flex-col gap-2 text-vault-navy">
+                <h3 class="m-0 font-heading font-medium text-[19px] leading-[26.6px]">
+                  {r.title}
+                </h3>
+                <p class="m-0 font-body text-[13.3px] leading-[19px]">{r.lead}</p>
+              </div>
+            </div>
+            <p class="m-0 self-center font-body text-neutral-500 text-[13.3px] leading-[19px]">
+              {r.body}
+            </p>
+          </div>
+        ))
+      }
+    </div>
+  </div>
+</section>
+
+<style is:global>
+  .ksa-cov-row + .ksa-cov-row {
+    border-top: 1px solid var(--palette-ledger-white);
+  }
+  .ksa-cov-js .ksa-cov-row {
+    opacity: 0.5;
+    scale: 0.95;
+    transition: all 0.3s ease-in-out;
+  }
+  .ksa-cov-js .ksa-cov-row.is-active {
+    opacity: 1;
+    scale: 1;
+    transition: all 0.3s ease-in-out;
+  }
+</style>
+
+<script is:inline>
+  (function () {
+    var section = document.getElementById('ksa-cov');
+    if (!section) return;
+    if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    var rows = section.querySelectorAll('.ksa-cov-row');
+    if (!rows.length) return;
+
+    section.classList.add('ksa-cov-js');
+
+    // The row whose centre is closest to the middle of the viewport is "on".
+    function update() {
+      var mid = window.innerHeight / 2;
+      var best = null;
+      var bestDist = Infinity;
+      rows.forEach(function (row) {
+        var rect = row.getBoundingClientRect();
+        var dist = Math.abs(rect.top + rect.height / 2 - mid);
+        if (dist < bestDist) {
+          bestDist = dist;
+          best = row;
+        }
+      });
+      rows.forEach(function (row) {
+        row.classList.toggle('is-active', row === best);
+      });
+    }
+
+    var ticking = false;
+    function onScroll() {
+      if (ticking) return;
+      ticking = true;
+      requestAnimationFrame(function () {
+        ticking = false;
+        update();
+      });
+    }
+
+    window.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('resize', onScroll);
+    update();
+  })();
+</script>
