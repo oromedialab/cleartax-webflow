@@ -84,13 +84,14 @@ const costs: CostRow[] = [
     <div class="max-w-[var(--container-max)] w-full px-4 md:px-6 mx-auto">
         <div class="w-full mb-16 lg:mb-20">
             <h2
-                class="m-0 font-heading text-center mx-auto font-medium text-vault-navy text-[length:var(--fs-h4)] leading-[length:var(--lh-h4)] tracking-[-0.5px] mb-8"
+                class="m-0 font-heading text-left md:text-center mx-auto font-medium text-vault-navy text-[length:var(--fs-h4)] leading-[length:var(--lh-h4)] tracking-[-0.5px] mb-6 md:mb-8"
             >
                 Key timelines
             </h2>
 
+            {/* Desktop Table */}
             <div
-                class="w-full overflow-x-auto rounded-2xl border border-neutral-300 bg-generic-00"
+                class="hidden md:block w-full overflow-x-auto rounded-2xl border border-neutral-300 bg-generic-00"
             >
                 <table class="w-full min-w-[720px] border-collapse text-left">
                     <thead>
@@ -131,18 +132,58 @@ const costs: CostRow[] = [
                     </tbody>
                 </table>
             </div>
+
+            {/* Mobile View: 2-column combined layout */}
+            <div
+                class="block md:hidden w-full rounded-2xl border border-neutral-300 bg-generic-00 overflow-hidden"
+            >
+                <div
+                    class="border-b border-neutral-200 py-3.5 px-4 flex items-center bg-generic-00"
+                >
+                    <div
+                        class="w-[95px] sm:w-[110px] shrink-0 font-heading font-medium text-vault-navy text-[length:var(--fs-body-sm)] leading-[length:var(--lh-body-sm)]"
+                    >
+                        Date
+                    </div>
+                    <div
+                        class="flex-1 pl-3 sm:pl-4 font-heading font-medium text-vault-navy text-[length:var(--fs-body-sm)] leading-[length:var(--lh-body-sm)]"
+                    >
+                        Milestone &middot; Who it applies to
+                    </div>
+                </div>
+                <div class="divide-y divide-neutral-200">
+                    {
+                        timelines.map((row) => (
+                            <div class="py-4 px-4 flex items-start">
+                                <div class="w-[95px] sm:w-[110px] shrink-0 font-heading font-medium text-vault-navy text-[length:var(--fs-body-sm)] leading-[length:var(--lh-body-sm)]">
+                                    {row.date}
+                                </div>
+                                <div class="flex-1 pl-3 sm:pl-4 flex flex-col gap-1.5">
+                                    <p class="m-0 font-body font-normal text-neutral-500 text-[length:var(--fs-body-sm)] leading-[length:var(--lh-body-sm)]">
+                                        {row.milestone}
+                                    </p>
+                                    <p class="m-0 font-body font-semibold text-vault-navy text-[length:var(--fs-body-sm)] leading-[length:var(--lh-body-sm)]">
+                                        {row.appliesTo}
+                                    </p>
+                                </div>
+                            </div>
+                        ))
+                    }
+                </div>
+            </div>
             <p class="font-heading text-base m-0 mt-2 text-[#6B7280] font-medium leading-normal">Turnover is based on audited revenue for FY2022 for existing businesses.</p>
         </div>
 
         <div class="w-full">
             <h2
-                class="m-0 font-heading font-medium text-center mx-auto text-vault-navy text-[length:var(--fs-h4)] leading-[length:var(--lh-h4)] tracking-[-0.5px] mb-6"
+                class="m-0 font-heading font-medium text-left md:text-center mx-auto text-vault-navy text-[length:var(--fs-h4)] leading-[length:var(--lh-h4)] tracking-[-0.5px] mb-6"
             >
                 What non-compliance costs
             </h2>
 
+            {/* Desktop Table */}
             <div
-                class="w-full overflow-x-auto rounded-2xl border border-neutral-300 bg-generic-00"
+                class="hidden md:block w-full overflow-x-auto rounded-2xl border border-neutral-300 bg-generic-00"
             >
                 <table class="w-full min-w-[640px] border-collapse text-left">
                     <thead>
@@ -175,6 +216,130 @@ const costs: CostRow[] = [
                     </tbody>
                 </table>
             </div>
+
+            {/* Mobile View: Tabs + Bulleted Cards */}
+            <div class="block md:hidden w-full">
+                <div
+                    role="tablist"
+                    aria-label="Non-compliance costs by category"
+                    class="flex bg-neutral-100 p-1.5 rounded-2xl mb-4 gap-1"
+                >
+                    <button
+                        type="button"
+                        role="tab"
+                        id="my-cost-tab-penalties"
+                        aria-selected="true"
+                        aria-controls="my-cost-panel-penalties"
+                        data-my-cost-tab="penalties"
+                        class="flex-1 py-2.5 px-3 rounded-xl text-[length:var(--fs-body-sm)] leading-[length:var(--lh-body-sm)] font-medium transition-all text-center bg-generic-00 border-0 cursor-pointer text-nova-blue"
+                    >
+                        Penalties
+                    </button>
+                    <button
+                        type="button"
+                        role="tab"
+                        id="my-cost-tab-business-risks"
+                        aria-selected="false"
+                        aria-controls="my-cost-panel-business-risks"
+                        data-my-cost-tab="business-risks"
+                        class="flex-1 py-2.5 px-3 rounded-xl text-[length:var(--fs-body-sm)] leading-[length:var(--lh-body-sm)] font-medium transition-all border-0 bg-transparent text-center cursor-pointer text-neutral-700"
+                    >
+                        Business risks
+                    </button>
+                </div>
+
+                <div
+                    role="tabpanel"
+                    id="my-cost-panel-penalties"
+                    aria-labelledby="my-cost-tab-penalties"
+                    data-my-cost-panel="penalties"
+                    class="flex flex-col gap-3"
+                >
+                    {
+                        costs.map((row) => (
+                            <div class="rounded-2xl border border-neutral-300 bg-generic-00 p-4 sm:p-5 flex items-start gap-3">
+                                <span
+                                    class="text-nova-blue font-bold text-base leading-none shrink-0 select-none mt-0.5"
+                                    aria-hidden="true"
+                                >
+                                    &bull;
+                                </span>
+                                <p class="m-0 font-body text-vault-navy text-[length:var(--fs-body-sm)] leading-[length:var(--lh-body-sm)]">
+                                    {row.supplier}
+                                </p>
+                            </div>
+                        ))
+                    }
+                </div>
+
+                <div
+                    role="tabpanel"
+                    id="my-cost-panel-business-risks"
+                    aria-labelledby="my-cost-tab-business-risks"
+                    data-my-cost-panel="business-risks"
+                    class="hidden flex-col gap-3"
+                >
+                    {
+                        costs.map((row) => (
+                            <div class="rounded-2xl border border-neutral-300 bg-generic-00 p-4 sm:p-5 flex items-start gap-3">
+                                <span
+                                    class="text-nova-blue font-bold text-base leading-none shrink-0 select-none mt-0.5"
+                                    aria-hidden="true"
+                                >
+                                    &bull;
+                                </span>
+                                <p class="m-0 font-body text-vault-navy text-[length:var(--fs-body-sm)] leading-[length:var(--lh-body-sm)]">
+                                    {row.buyer}
+                                </p>
+                            </div>
+                        ))
+                    }
+                </div>
+            </div>
         </div>
     </div>
 </section>
+
+<script is:inline>
+    (function () {
+        const tabs = document.querySelectorAll("[data-my-cost-tab]");
+        const panels = document.querySelectorAll("[data-my-cost-panel]");
+
+        tabs.forEach((tab) => {
+            tab.addEventListener("click", () => {
+                const target = tab.getAttribute("data-my-cost-tab");
+
+                tabs.forEach((t) => {
+                    const isSelected =
+                        t.getAttribute("data-my-cost-tab") === target;
+                    t.setAttribute(
+                        "aria-selected",
+                        isSelected ? "true" : "false",
+                    );
+                    if (isSelected) {
+                        t.classList.remove(
+                            "text-neutral-700",
+                            "bg-transparent",
+                        );
+                        t.classList.add("bg-generic-00", "text-nova-blue");
+                    } else {
+                        t.classList.remove("bg-generic-00", "text-nova-blue");
+                        t.classList.add("text-neutral-700", "bg-transparent");
+                    }
+                });
+
+                panels.forEach((panel) => {
+                    const isMatch =
+                        panel.getAttribute("data-my-cost-panel") === target;
+                    if (isMatch) {
+                        panel.classList.remove("hidden");
+                        panel.classList.add("flex");
+                    } else {
+                        panel.classList.remove("flex");
+                        panel.classList.add("hidden");
+                    }
+                });
+            });
+        });
+    })();
+</script>
