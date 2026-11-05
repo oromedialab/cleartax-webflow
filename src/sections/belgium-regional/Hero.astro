@@ -42,10 +42,10 @@ const {
   fadeRadius = 40,
 } = Astro.props;
 
-const badges: string[] = [
-  "Certified Open Peppol Access Point, aligned with FPS Finance requirements",
-  "AI-powered integration with any ERP or POS, live in weeks, not months",
-  "One global e-invoicing API for 50+ country mandates, ViDA aligned",
+const badges: { title: string; sub: string }[] = [
+  { title: "Certified Open Peppol Access Point", sub: "aligned with FPS Finance requirements" },
+  { title: "AI-powered integration", sub: "with any ERP or POS, live in weeks, not months" },
+  { title: "One global e-invoicing API", sub: "for 50+ country mandates, ViDA aligned" },
 ];
 ---
 
@@ -84,7 +84,7 @@ const badges: string[] = [
       <div class="flex flex-col items-center gap-8 w-full">
         <div class="flex flex-col items-center gap-4">
           <p
-            class="m-0 font-body font-semibold uppercase tracking-[1px] text-neutral-500 text-[length:var(--fs-label)] leading-[length:var(--lh-label)]"
+            class="m-0 font-body font-semibold uppercase tracking-[1px] text-neutral-500 text-[length:var(--fs-label)] leading-[length:var(--lh-body-sm)]"
           >
             Belgium B2B e-invoicing mandate · Live since 1 January 2026
           </p>
@@ -95,7 +95,7 @@ const badges: string[] = [
             from the first invoice
           </h1>
           <p
-            class="m-0 font-body text-neutral-500 text-[length:var(--fs-body-lg)] leading-[length:var(--lh-body-lg)] max-w-[760px] text-balance"
+            class="m-0 font-body text-neutral-500 text-[length:var(--fs-body)] leading-[length:var(--lh-body)] max-w-[792px] text-balance"
           >
             Send, receive and archive every B2B invoice in Peppol BIS 3.0, straight
             from your ERP. Stay clear of rejections, fines and lost VAT deductions
@@ -104,16 +104,29 @@ const badges: string[] = [
         </div>
 
         <ul
-          class="m-0 grid w-full max-w-[1008px] list-none grid-cols-1 gap-2 p-0 md:grid-cols-3"
+          class="m-0 flex w-full max-w-[976px] list-none flex-col overflow-hidden rounded-xl border border-neutral-300 bg-generic-00 p-0 md:flex-row"
         >
           {
-            badges.map((text) => (
-              <li class="flex items-center gap-3 rounded-xl p-4 text-left">
-                <span class="size-[37px] shrink-0 rounded-lg bg-visual-placeholder" />
-                <span class="font-body text-vault-navy text-[length:var(--fs-label)] leading-[length:var(--lh-body)]">
-                  {text}
-                </span>
-              </li>
+            badges.map((b, i) => (
+              <>
+                {i > 0 && (
+                  <li
+                    aria-hidden="true"
+                    class="h-px w-auto bg-neutral-100 max-md:mx-4 md:h-[48px] md:w-[2px] md:shrink-0 md:self-center"
+                  />
+                )}
+                <li class="flex flex-1 items-center gap-3 p-4 text-left">
+                  <span class="size-[37px] shrink-0 rounded-lg bg-visual-placeholder" />
+                  <span class="flex flex-col">
+                    <span class="font-body font-medium text-vault-navy text-[length:var(--fs-label)] leading-[length:var(--lh-body-sm)]">
+                      {b.title}
+                    </span>
+                    <span class="font-body text-neutral-500 text-[length:var(--fs-body-xs)] leading-[length:var(--lh-body-xs)]">
+                      {b.sub}
+                    </span>
+                  </span>
+                </li>
+              </>
             ))
           }
         </ul>
