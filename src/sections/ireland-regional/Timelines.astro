@@ -1,0 +1,169 @@
+---
+/**
+ * "Key timelines" and "What non-compliance costs" — Figma node 18377:72815
+ * (second glance container in the KSA frame). Two bordered tables:
+ * a header row on a divider, then body rows separated by hairlines.
+ *
+ * Each table is a CSS grid, not a `<table>`, so the rows can reflow to stacked
+ * label/value pairs on small screens. Column templates are the Figma's: three
+ * columns for the timeline, a wide + 320px pair for the costs.
+ *
+ * Classes are `ksa-tl-` prefixed: section CSS is one shared namespace per page.
+ */
+interface Props {}
+
+const timeline = [
+    [
+        "4 Dec 2021",
+        "Phase 1 (Generation): electronic invoices mandatory",
+        "All resident VAT-registered businesses",
+    ],
+    [
+        "1 Jan 2023",
+        "Phase 2 (Integration) Wave 1",
+        "Revenue above SAR 3 billion",
+    ],
+    ["2023 – 2025", "Waves 2 to 22", "Thresholds lowered based on turnover"],
+    [
+        "31 Mar 2026",
+        "Wave 23 integration deadline",
+        "Revenue above SAR 750,000",
+    ],
+    [
+        "30 Jun 2026",
+        "Wave 24 integration deadline",
+        "Revenue above SAR 375,000",
+    ],
+    [
+        "31 Dec 2026",
+        "Fines cancellation and penalty exemption initiative ends",
+        "Taxpayers with past fines, incl. e-invoicing violations",
+    ],
+    [
+        "1 Feb 2027",
+        "Wave 25 integration deadline",
+        "Revenue above SAR 187,500 in any year from 2022 to 2025",
+    ],
+];
+
+const costs: [string, string[]][] = [
+    [
+        "Fines of up to SAR 50,000 per violation under the VAT regulations",
+        ["Buyers can't claim input VAT on invoices that weren't cleared"],
+    ],
+    [
+        "Escalating fines for repeat violations; can be doubled if repeated within three years",
+        ["Rejected invoices hold up payment and cash flow"],
+    ],
+    [
+        "Separate fines for deleting or altering an issued e-invoice",
+        [
+            "Large customers and government buyers refuse non-compliant suppliers",
+        ],
+    ],
+    [
+        "No new amnesty for obligations due after 30 June 2026",
+        ["Field inspections and audits flag gaps across branches and POS"],
+    ],
+];
+---
+
+<section class="bg-generic-00 ksa-tl-section pt-12 pb-16 lg:pb-20">
+    <div
+        class="w-full max-w-[var(--container-max)] mx-auto px-4 md:px-6 flex flex-col gap-16 lg:gap-20"
+    >
+        <div class="flex flex-col items-center gap-8">
+            <h3
+                class="m-0 text-center font-heading font-medium text-vault-navy text-[length:var(--fs-h4)] leading-[length:var(--lh-h4)] tracking-[-0.5px]"
+            >
+                Key timelines
+            </h3>
+            <div
+                class="w-full overflow-hidden rounded-xl border border-neutral-300"
+            >
+                <div
+                    class="ksa-tl-row ksa-tl-row-3 ksa-tl-head border-b border-neutral-300 font-heading font-medium text-vault-navy text-[length:var(--fs-h6)] leading-[length:var(--lh-h6)]"
+                >
+                    <span>Date</span>
+                    <span>Milestone</span>
+                    <span>Who it applies to</span>
+                </div>
+                {
+                    timeline.map(([date, what, who]) => (
+                        <div class="ksa-tl-row ksa-tl-row-3 ksa-tl-body">
+                            <span class="font-body font-medium text-vault-navy text-[length:var(--fs-body-lg)] leading-[length:var(--lh-body-lg)]">
+                                {date}
+                            </span>
+                            <span class="ksa-tl-cell">{what}</span>
+                            <span class="ksa-tl-cell">{who}</span>
+                        </div>
+                    ))
+                }
+            </div>
+        </div>
+
+        <div class="flex flex-col items-center gap-8">
+            <h3
+                class="m-0 text-center font-heading font-medium text-vault-navy text-[length:var(--fs-h4)] leading-[length:var(--lh-h4)] tracking-[-0.5px]"
+            >
+                What non-compliance costs
+            </h3>
+            <div
+                class="w-full overflow-hidden rounded-xl border border-neutral-300"
+            >
+                <div
+                    class="ksa-tl-row ksa-tl-row-2 ksa-tl-head border-b border-neutral-300 font-heading font-medium text-vault-navy text-[length:var(--fs-h6)] leading-[length:var(--lh-h6)]"
+                >
+                    <span>Penalties</span>
+                    <span>Business risks</span>
+                </div>
+                {
+                    costs.map(([penalty, risks]) => (
+                        <div class="ksa-tl-row ksa-tl-row-2 ksa-tl-body">
+                            <span class="font-body font-medium text-vault-navy text-[length:var(--fs-body-lg)] leading-[length:var(--lh-body-lg)]">
+                                {penalty}
+                            </span>
+                            <span class="ksa-tl-cell flex flex-col gap-4">
+                                {risks.map((r) => (
+                                    <span>{r}</span>
+                                ))}
+                            </span>
+                        </div>
+                    ))
+                }
+            </div>
+        </div>
+    </div>
+</section>
+
+<style is:global>
+    .ksa-tl-section {
+        border-bottom: 3px solid var(--palette-ledger-white);
+    }
+    .ksa-tl-row {
+        display: grid;
+        gap: 8px;
+        padding: 24px;
+    }
+    .ksa-tl-body + .ksa-tl-body {
+        border-top: 1px solid var(--palette-ledger-white);
+    }
+    .ksa-tl-cell {
+        font-family: var(--font-body);
+        font-size: var(--fs-body);
+        line-height: var(--lh-body);
+        color: var(--palette-neutral-500);
+    }
+    @media (min-width: 1024px) {
+        .ksa-tl-row {
+            column-gap: 48px;
+            align-items: center;
+        }
+        .ksa-tl-row-3 {
+            grid-template-columns: minmax(0, 1fr) 320px 320px;
+        }
+        .ksa-tl-row-2 {
+            grid-template-columns: minmax(0, 1fr) 320px;
+        }
+    }
+</style>
