@@ -1,0 +1,172 @@
+---
+/**
+ * "Key timelines" and "What non-compliance costs" — Figma node 18377:72815
+ * (second glance container in the KSA frame). Two bordered tables:
+ * a header row on a divider, then body rows separated by hairlines.
+ *
+ * Each table is a CSS grid, not a `<table>`, so the rows can reflow to stacked
+ * label/value pairs on small screens. Column templates are the Figma's: three
+ * columns for the timeline, a wide + 320px pair for the costs.
+ *
+ * Classes are `ir-tl-` prefixed: section CSS is one shared namespace per page.
+ */
+interface Props {}
+
+const timeline = [
+    [
+        "Apr 2019",
+        "Public bodies must accept EN 16931 e-invoices (B2G)",
+        "Public bodies; voluntary for suppliers",
+    ],
+    [
+        "Oct 2025",
+        "Revenue publishes its eInvoicing implementation roadmap",
+        "All businesses",
+    ],
+    [
+        "10 Feb 2026",
+        "Revenue defines 'large corporate' for Phase One",
+        "LCD-managed businesses",
+    ],
+    [
+        "2026 – 2028",
+        "Legislation, technical specifications and guidance",
+        "All businesses",
+    ],
+    [
+        "1 Nov 2028",
+        "Phase One: domestic B2B e-invoicing and real-time reporting (planned)",
+        "Large corporates managed by Revenue's LCD; all businesses must receive",
+    ],
+    [
+        "1 Nov 2029",
+        "Phase Two: obligation extends (planned)",
+        "All VAT-registered businesses in intra-EU B2B trade",
+    ],
+    [
+        "1 Jul 2030",
+        "EU ViDA digital reporting requirements",
+        "Businesses making cross-border EU B2B supplies",
+    ],
+];
+
+const costs: [string, string[]][] = [
+    [
+        "Fixed penalties of up to €4,000 under current VAT law for invoicing and record-keeping failures",
+        [
+            "Customers can't process invoices sent as PDFs once they move to Peppol",
+        ],
+    ],
+    [
+        "Interest on late VAT of about 0.0274% a day (around 10% a year)",
+        ["Payment delays and disputes from wrong formats or missing fields"],
+    ],
+    [
+        "Tax-geared penalties for incorrect VAT returns",
+        ["Real-time reporting surfaces data errors to Revenue immediately"],
+    ],
+    [
+        "E-invoicing specific penalties to be set in the enabling legislation",
+        [
+            "A second project in 2029 or 2030 if your setup only covers Phase One",
+        ],
+    ],
+];
+---
+
+<section class="bg-generic-00 pt-12 pb-16 lg:pb-20">
+    <div
+        class="w-full max-w-[var(--container-max)] mx-auto px-4 md:px-6 flex flex-col gap-16 lg:gap-20"
+    >
+        <div class="flex flex-col items-center gap-8">
+            <h3
+                class="m-0 text-center font-heading font-medium text-vault-navy text-[length:var(--fs-h4)] leading-[length:var(--lh-h4)] tracking-[-0.5px]"
+            >
+                Key timelines
+            </h3>
+            <div
+                class="w-full overflow-hidden rounded-xl border border-neutral-300"
+            >
+                <div
+                    class="ir-tl-row ir-tl-row-3 ir-tl-head border-b border-neutral-300 font-heading font-medium text-vault-navy text-[length:var(--fs-h6)] leading-[length:var(--lh-h6)]"
+                >
+                    <span>Date</span>
+                    <span>Milestone</span>
+                    <span>Who it applies to</span>
+                </div>
+                {
+                    timeline.map(([date, what, who]) => (
+                        <div class="ir-tl-row ir-tl-row-3 ir-tl-body">
+                            <span class="font-body font-medium text-vault-navy text-[length:var(--fs-body-lg)] leading-[length:var(--lh-body-lg)]">
+                                {date}
+                            </span>
+                            <span class="ir-tl-cell">{what}</span>
+                            <span class="ir-tl-cell">{who}</span>
+                        </div>
+                    ))
+                }
+            </div>
+        </div>
+
+        <div class="flex flex-col items-center gap-8">
+            <h3
+                class="m-0 text-center font-heading font-medium text-vault-navy text-[length:var(--fs-h4)] leading-[length:var(--lh-h4)] tracking-[-0.5px]"
+            >
+                What non-compliance costs
+            </h3>
+            <div
+                class="w-full overflow-hidden rounded-xl border border-neutral-300"
+            >
+                <div
+                    class="ir-tl-row ir-tl-row-2 ir-tl-head border-b border-neutral-300 font-heading font-medium text-vault-navy text-[length:var(--fs-h6)] leading-[length:var(--lh-h6)]"
+                >
+                    <span>Penalties</span>
+                    <span>Business risks</span>
+                </div>
+                {
+                    costs.map(([penalty, risks]) => (
+                        <div class="ir-tl-row ir-tl-row-2 ir-tl-body">
+                            <span class="font-body font-medium text-vault-navy text-[length:var(--fs-body-lg)] leading-[length:var(--lh-body-lg)]">
+                                {penalty}
+                            </span>
+                            <span class="ir-tl-cell flex flex-col gap-4">
+                                {risks.map((r) => (
+                                    <span>{r}</span>
+                                ))}
+                            </span>
+                        </div>
+                    ))
+                }
+            </div>
+        </div>
+    </div>
+</section>
+
+<style is:global>
+    .ir-tl-row {
+        display: grid;
+        gap: 8px;
+        padding: 24px;
+    }
+    .ir-tl-body + .ir-tl-body {
+        border-top: 1px solid var(--palette-ledger-white);
+    }
+    .ir-tl-cell {
+        font-family: var(--font-body);
+        font-size: var(--fs-body);
+        line-height: var(--lh-body);
+        color: var(--palette-neutral-500);
+    }
+    @media (min-width: 1024px) {
+        .ir-tl-row {
+            column-gap: 48px;
+            align-items: center;
+        }
+        .ir-tl-row-3 {
+            grid-template-columns: minmax(0, 1fr) 320px 320px;
+        }
+        .ir-tl-row-2 {
+            grid-template-columns: minmax(0, 1fr) 320px;
+        }
+    }
+</style>
