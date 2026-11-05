@@ -79,6 +79,7 @@ export const PAGE_TARGETS = [
   { name: 'slovakia-regional', input: 'src/styles/slovakia-regional.css', page: 'src/pages/slovakia-regional.astro' },
   { name: 'belgium-regional', input: 'src/styles/belgium-regional.css', page: 'src/pages/belgium-regional.astro' },
   { name: 'australia-regional', input: 'src/styles/australia-regional.css', page: 'src/pages/australia-regional.astro' },
+  { name: 'spain-product', input: 'src/styles/spain-product.css', page: 'src/pages/spain-product.astro' },
   { name: 'spain-regional', input: 'src/styles/spain-regional.css', page: 'src/pages/spain-regional.astro' },
   { name: 'norway-regional', input: 'src/styles/norway-regional.css', page: 'src/pages/norway-regional.astro' },
   { name: 'retail-consumer', input: 'src/styles/retail-consumer.css', page: 'src/pages/retail-consumer.astro' },
