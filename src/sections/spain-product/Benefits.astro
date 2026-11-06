@@ -1,0 +1,185 @@
+---
+const loadContent = [
+    {
+        title: 'Large Spanish businesses',
+        desc: 'Prepare for structured invoice exchange and lifecycle reporting across high-volume finance operations.',
+    },
+    {
+        title: 'Multinational enterprises',
+        desc: 'Coordinate Spanish compliance across multiple legal entities, countries and ERP environments.',
+    },
+    {
+        title: 'Finance and tax teams',
+        desc: 'Improve visibility into invoice statuses, payment reporting, exceptions and evolving compliance requirements',
+    },
+    {
+        title: 'IT and ERP teams',
+        desc: 'Connect existing systems to e-invoicing workflows while keeping country-specific rules outside the core ERP wherever appropriate.',
+    }
+];
+---
+
+<section class="py-16 md:py-20 bg-generic-00">
+    <div class="max-w-[var(--container-max)] w-full mx-auto px-4 md:px-6">
+        <div class="text-center mb-8 md:mb-12">
+            <h2 class="font-heading text-[length:var(--fs-h2)] md:text-[length:var(--fs-h1)] leading-[length:var(--lh-h2)] md:leading-[length:var(--lh-h1)] font-medium max-w-130 mx-auto m-0 text-text-default"
+            >Who Benefits From ClearTax E-Invoicing Software?</h2>
+            <p class="m-0 font-body text-neutral-500 text-[length:var(--fs-body)] leading-[length:var(--lh-body)] max-w-145 mt-4 mx-auto">Built for Spanish Enterprises and International Groups. ClearTax is designed for businesses that need more than a standalone invoicing tool.</p>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-16 lg:items-stretch mx-auto">
+            <!-- Left Side: Tabs -->
+            <div class="lg:col-span-5 flex flex-col justify-center relative" id="sp-buildway-tabs">
+                {
+                    loadContent.map((item, i) => (
+                        <div class={`sp-buildway-item flex flex-col cursor-pointer group ${i === 0 ? 'active' : ''}`} data-index={i}>
+                            <h3 class="sp-buildway-title font-heading text-[length:var(--fs-h5)] leading-[length:var(--lh-h5)] font-medium m-0 text-neutral-500 group-[.active]:text-text-default pt-2 pb-1 transition-colors duration-200">
+                                {item.title}
+                            </h3>
+                            
+                            <div 
+                                class="sp-buildway-desc overflow-hidden max-w-[480px] transition-all duration-500 ease-in-out" 
+                                style={i === 0 ? "max-height: 140px; opacity: 1;" : "max-height: 0px; opacity: 0;"}
+                            >
+                                <p class="font-body text-[length:var(--fs-body)] leading-[length:var(--lh-body)] m-0 text-[#6B7280CC] font-normal pt-3 pb-3.5">
+                                    {item.desc}
+                                </p>
+                            </div>
+                            
+                            <!-- Progress line loader -->
+                            <div class="relative w-full h-[2px] bg-neutral-200 mt-3 mb-5 rounded-full overflow-hidden">
+                                <!-- Active blue line (fills up) -->
+                                <div class="sp-buildway-progress absolute left-0 top-0 h-full bg-nova-blue rounded-full transition-none" style="width: 0%;"></div>
+                            </div>
+                        </div>
+                    ))
+                }
+            </div>
+
+            <!-- Right Side: Visual Slider -->
+            <div class="lg:col-span-7 w-full h-full flex items-stretch">
+                <div class="relative w-full h-full min-h-[300px] lg:min-h-0 aspect-[620/387] lg:aspect-auto rounded-sm overflow-hidden">
+                    <div
+                        id="sp-benefits-track"
+                        class="flex w-full h-full transition-transform duration-500 gap-2 ease-in-out will-change-transform"
+                        style="transform: translateX(0%);"
+                    >
+                        {
+                            loadContent.map((_, i) => (
+                                <div
+                                    class="w-full h-full shrink-0 bg-visual-placeholder"
+                                    data-slide-index={i}
+                                    aria-hidden="true"
+                                />
+                            ))
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</section>
+
+<script is:inline>
+(() => {
+    const init = () => {
+        const tabsContainer = document.getElementById('sp-buildway-tabs');
+        if (!tabsContainer) return;
+        const items = tabsContainer.querySelectorAll('.sp-buildway-item');
+        if (!items.length) return;
+        const track = document.getElementById('sp-benefits-track');
+
+        let currentIndex = 0;
+        let timer = null;
+        const duration = 5000; // 5 seconds per tab
+
+        const activateTab = (index, instant = false) => {
+            currentIndex = index;
+
+            if (track) {
+                const gap = parseFloat(window.getComputedStyle(track).gap) || 0;
+                track.style.transform = `translateX(calc(-${index} * (100% + ${gap}px)))`;
+            }
+
+            items.forEach((item, i) => {
+                const desc = item.querySelector('.sp-buildway-desc');
+                const progress = item.querySelector('.sp-buildway-progress');
+                
+                if (i === index) {
+                    // Active state
+                    item.classList.add('active');
+                    if (desc) {
+                        desc.style.maxHeight = desc.scrollHeight + 'px';
+                        desc.style.opacity = '1';
+                    }
+                    
+                    if (progress) {
+                        // Reset progress line to 0, then animate to 100%
+                        progress.style.transition = 'none';
+                        progress.style.width = '0%';
+                        
+                        // Force reflow to ensure the transition restart works
+                        void progress.offsetWidth;
+                        
+                        if (!instant) {
+                            progress.style.transition = `width ${duration}ms linear`;
+                            progress.style.width = '100%';
+                        }
+                    }
+                } else {
+                    // Inactive state
+                    item.classList.remove('active');
+                    if (desc) {
+                        desc.style.maxHeight = '0px';
+                        desc.style.opacity = '0';
+                    }
+                    
+                    if (progress) {
+                        progress.style.transition = 'width 0.2s ease';
+                        progress.style.width = '0%';
+                    }
+                }
+            });
+        };
+
+        const nextTab = () => {
+            const next = (currentIndex + 1) % items.length;
+            activateTab(next);
+        };
+
+        const startTimer = () => {
+            clearInterval(timer);
+            activateTab(currentIndex);
+            timer = setInterval(nextTab, duration);
+        };
+
+        // Allow user to click to switch tabs manually
+        items.forEach((item, i) => {
+            item.addEventListener('click', () => {
+                clearInterval(timer);
+                activateTab(i);
+                // Restart timer for the new tab
+                timer = setInterval(nextTab, duration);
+            });
+        });
+
+        // Recalculate active description max-height on window resize
+        window.addEventListener('resize', () => {
+            const activeDesc = items[currentIndex]?.querySelector('.sp-buildway-desc');
+            if (activeDesc) {
+                activeDesc.style.maxHeight = activeDesc.scrollHeight + 'px';
+            }
+        });
+
+        // Start auto-play
+        startTimer();
+    };
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', init);
+    } else {
+        init();
+    }
+})();
+</script>
