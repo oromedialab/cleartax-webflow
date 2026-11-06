@@ -16,7 +16,7 @@
  * Figma, so they render as `bg-visual-placeholder` (#E8FFE1). Swap for
  * Webflow-hosted artwork when it lands — never a `data:` URI.
  *
- * Ids and data attributes are `ir-glance-` prefixed: embeds share one
+ * Ids and data attributes are `nl-glance-` prefixed: embeds share one
  * namespace per page.
  */
 interface Card {
@@ -77,8 +77,8 @@ const cards: Card[] = [
                         type="button"
                         class="group m-0 flex h-full w-full cursor-pointer items-center justify-between gap-3 sm:gap-4 md:gap-5 rounded-xl border border-neutral-300 bg-generic-00 p-4 sm:p-5 md:p-6 text-left transition-all duration-150 ease-in-out hover:border-nova-blue"
                         aria-haspopup="dialog"
-                        data-ir-glance-open
-                        data-ir-glance-index={i}
+                        data-nl-glance-open
+                        data-nl-glance-index={i}
                     >
                         <img
                             src={card.img}
@@ -128,22 +128,22 @@ const cards: Card[] = [
 <!-- Detail overlay. Lives outside the section's container so the scrim covers
      the viewport rather than the 1280px column. -->
 <div
-    id="ir-glance-overlay"
+    id="nl-glance-overlay"
     role="dialog"
     aria-modal="true"
-    aria-labelledby="ir-glance-overlay-title"
+    aria-labelledby="nl-glance-overlay-title"
     aria-hidden="true"
     class="fixed inset-0 z-[2000] hidden items-center justify-center bg-generic-100/70 p-4 backdrop-blur-sm"
 >
     <div
         class="relative max-h-[90vh] w-full max-w-[1280px] overflow-y-auto rounded-xl border-2 border-[#CCCCCC] bg-generic-00 p-6"
-        data-ir-glance-panel
+        data-nl-glance-panel
     >
         <button
             type="button"
             aria-label="Close"
             class="absolute right-6 top-6 z-10 inline-flex h-10 w-10 cursor-pointer items-center justify-center rounded-lg border-0 bg-transparent p-0 text-vault-navy transition-opacity duration-150 hover:opacity-70 lg:right-11 lg:top-11"
-            data-ir-glance-close
+            data-nl-glance-close
         >
             <svg
                 width="40"
@@ -189,20 +189,20 @@ const cards: Card[] = [
                                             : "display: none;"
                                     }
                                     hidden={i !== 0}
-                                    data-ir-glance-icon
+                                    data-nl-glance-icon
                                     loading="lazy"
                                     decoding="async"
                                 />
                             ))
                         }
                     </div>
-                    <div id="ir-glance-overlay-title">
+                    <div id="nl-glance-overlay-title">
                         {
                             cards.map((card, i) => (
                                 <h3
                                     class="m-0 pr-12 font-heading font-medium text-vault-navy text-[length:var(--fs-h5)] leading-[length:var(--lh-h5)] tracking-[-0.5px] lg:pr-0"
                                     hidden={i !== 0}
-                                    data-ir-glance-heading
+                                    data-nl-glance-heading
                                 >
                                     {card.heading}
                                 </h3>
@@ -218,7 +218,7 @@ const cards: Card[] = [
                                 <p
                                     class="m-0 font-body font-normal text-neutral-500 text-[length:var(--fs-body)] leading-[length:var(--lh-body)]"
                                     hidden={i !== 0}
-                                    data-ir-glance-body
+                                    data-nl-glance-body
                                 >
                                     {card.body}
                                 </p>
@@ -230,9 +230,9 @@ const cards: Card[] = [
                         <button
                             type="button"
                             aria-label="Previous"
-                            aria-controls="ir-glance-overlay-title"
+                            aria-controls="nl-glance-overlay-title"
                             class="inline-flex cursor-pointer items-center justify-center rounded border border-neutral-300 bg-generic-00 p-2 text-vault-navy transition-colors duration-150 hover:border-nova-blue"
-                            data-ir-glance-prev
+                            data-nl-glance-prev
                         >
                             <svg
                                 width="20"
@@ -253,9 +253,9 @@ const cards: Card[] = [
                         <button
                             type="button"
                             aria-label="Next"
-                            aria-controls="ir-glance-overlay-title"
+                            aria-controls="nl-glance-overlay-title"
                             class="inline-flex cursor-pointer items-center justify-center rounded border border-neutral-300 bg-generic-00 p-2 text-vault-navy transition-colors duration-150 hover:border-nova-blue"
-                            data-ir-glance-next
+                            data-nl-glance-next
                         >
                             <svg
                                 width="20"
@@ -288,7 +288,7 @@ const cards: Card[] = [
                                 i === 0 ? "display: block;" : "display: none;"
                             }
                             hidden={i !== 0}
-                            data-ir-glance-image
+                            data-nl-glance-image
                             aria-hidden="true"
                         />
                     ))
@@ -299,8 +299,8 @@ const cards: Card[] = [
 </div>
 
 <style is:global>
-    [data-ir-glance-icon][hidden],
-    [data-ir-glance-image][hidden] {
+    [data-nl-glance-icon][hidden],
+    [data-nl-glance-image][hidden] {
         display: none !important;
     }
 </style>
@@ -308,17 +308,17 @@ const cards: Card[] = [
 <script is:inline>
     /* Card -> detail overlay, with the chevrons walking the eight without closing. */
     (function () {
-        var overlay = document.getElementById("ir-glance-overlay");
+        var overlay = document.getElementById("nl-glance-overlay");
         if (!overlay) return;
 
-        var panel = overlay.querySelector("[data-ir-glance-panel]");
-        var closeBtn = overlay.querySelector("[data-ir-glance-close]");
-        var prevBtn = overlay.querySelector("[data-ir-glance-prev]");
-        var nextBtn = overlay.querySelector("[data-ir-glance-next]");
-        var headings = overlay.querySelectorAll("[data-ir-glance-heading]");
-        var bodies = overlay.querySelectorAll("[data-ir-glance-body]");
-        var icons = overlay.querySelectorAll("[data-ir-glance-icon]");
-        var images = overlay.querySelectorAll("[data-ir-glance-image]");
+        var panel = overlay.querySelector("[data-nl-glance-panel]");
+        var closeBtn = overlay.querySelector("[data-nl-glance-close]");
+        var prevBtn = overlay.querySelector("[data-nl-glance-prev]");
+        var nextBtn = overlay.querySelector("[data-nl-glance-next]");
+        var headings = overlay.querySelectorAll("[data-nl-glance-heading]");
+        var bodies = overlay.querySelectorAll("[data-nl-glance-body]");
+        var icons = overlay.querySelectorAll("[data-nl-glance-icon]");
+        var images = overlay.querySelectorAll("[data-nl-glance-image]");
         if (!panel || !headings.length || headings.length !== bodies.length)
             return;
 
@@ -365,10 +365,10 @@ const cards: Card[] = [
 
         document.addEventListener("click", function (e) {
             if (!e.target.closest) return;
-            var opener = e.target.closest("[data-ir-glance-open]");
+            var opener = e.target.closest("[data-nl-glance-open]");
             if (!opener) return;
             open(
-                parseInt(opener.getAttribute("data-ir-glance-index"), 10) || 0,
+                parseInt(opener.getAttribute("data-nl-glance-index"), 10) || 0,
                 opener,
             );
         });
