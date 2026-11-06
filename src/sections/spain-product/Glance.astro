@@ -1,0 +1,182 @@
+---
+/**
+ * "Mandate at a Glance." — Spain product page.
+ * Six timeline rows: date with visual placeholder icon on the left, description on the right.
+ *
+ * Every row starts at 50% opacity as part of a scroll spotlight: the row nearest
+ * the vertical centre of the viewport is promoted to full opacity and subtle scale.
+ * Without JavaScript or with prefers-reduced-motion, all rows remain at full opacity.
+ */
+interface Row {
+    date: string;
+    desc: string;
+}
+
+const rows: Row[] = [
+    {
+        date: "6 Oct 2026",
+        desc: "New Ministerial Order enters force - Crea y Crece phase-in clock starts",
+    },
+    {
+        date: "By Aug 2027",
+        desc: "AEAT public e-invoicing platform goes live (at least 2 months before Phase 1)",
+    },
+    {
+        date: "6 Oct 2027",
+        desc: "Phase 1 - Structured e-invoicing + lifecycle reporting mandatory for businesses with turnover >€8M",
+    },
+    {
+        date: "6 Oct 2028",
+        desc: "Phase 2 - Universal issuance. All businesses and professionals obliged.",
+    },
+    {
+        date: "2028",
+        desc: "Proposed timeline for Verifactu becoming mandatory.",
+    },
+    {
+        date: "6 October 2029",
+        desc: "Status-reporting phase for individuals and entities under the income attribution regime.",
+    },
+];
+---
+
+<section id="sp-glance" class="bg-generic-00 py-16 lg:py-20" data-sp-glance>
+    <div
+        class="w-full max-w-[var(--container-max)] mx-auto px-4 md:px-6 flex flex-col items-center gap-12"
+    >
+        <div class="flex flex-col items-center gap-4 text-center">
+            <h2
+                class="m-0 font-heading font-medium text-vault-navy text-[length:var(--fs-h1)] leading-[length:var(--lh-h1)] tracking-[-0.5px]"
+            >
+                Mandate at a Glance.
+            </h2>
+            <p
+                class="m-0 max-w-[710px] font-body font-normal text-neutral-500 text-[length:var(--fs-body)] lg:text-[length:var(--fs-body-lg)] leading-[length:var(--lh-body)] lg:leading-[length:var(--lh-body-lg)]"
+            >
+                The DGFIP mandate rolls out in phases. Large enterprises hit
+                mandatory compliance in September 2026. Implementation takes
+                8–10 weeks — the window is closing.
+            </p>
+        </div>
+
+        <div class="flex w-full flex-col">
+            {
+                rows.map((row, i) => (
+                    <div
+                        class:list={[
+                            "sp-glance-row flex flex-col justify-between gap-4 py-6 md:flex-row md:items-center md:gap-8",
+                            i < rows.length - 1 &&
+                                "border-b border-neutral-200",
+                        ]}
+                    >
+                        <div class="flex shrink-0 items-center gap-6 md:max-w-[434px] flex-1">
+                            <span
+                                class="sp-glance-icon size-[53px] shrink-0 rounded-lg bg-visual-placeholder"
+                                aria-hidden="true"
+                            />
+                            <span class="font-heading text-[length:var(--fs-h5)] leading-[length:var(--lh-h5)] font-medium text-vault-navy">
+                                {row.date}
+                            </span>
+                        </div>
+                        <p class="m-0 font-body text-[length:var(--fs-body)] leading-[length:var(--lh-body)] text-neutral-500 md:flex-1 max-w-[640px]">
+                            {row.desc}
+                        </p>
+                    </div>
+                ))
+            }
+        </div>
+    </div>
+</section>
+
+<style is:global>
+    .sp-glance-row {
+        opacity: 0.5;
+        transition:
+            opacity 0.35s ease-in-out,
+            transform 0.35s ease-in-out;
+    }
+    .sp-glance-row.is-centered {
+        opacity: 1;
+    }
+    .sp-glance-row.is-scaled {
+        transform: scale(1.02);
+    }
+    .sp-glance-icon {
+        transition: transform 0.35s ease-in-out;
+    }
+    .sp-glance-row.is-scaled .sp-glance-icon {
+        transform: scale(1.08);
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        .sp-glance-row {
+            opacity: 1 !important;
+            transform: none !important;
+        }
+    }
+</style>
+
+<script is:inline>
+    (function () {
+        var root = document.querySelector("[data-sp-glance]");
+        if (!root) return;
+        var rows = Array.from(root.querySelectorAll(".sp-glance-row"));
+        if (!rows.length) return;
+
+        if (
+            !("IntersectionObserver" in window) ||
+            (window.matchMedia &&
+                window.matchMedia("(prefers-reduced-motion: reduce)").matches)
+        ) {
+            rows.forEach(function (el) {
+                el.classList.add("is-centered");
+            });
+            return;
+        }
+
+        var centred = null;
+        var inBand = new Set();
+
+        function pick() {
+            if (!inBand.size) return;
+            var middle = window.innerHeight / 2;
+            var best = null;
+            var bestDistance = Infinity;
+
+            inBand.forEach(function (el) {
+                var r = el.getBoundingClientRect();
+                var distance = Math.abs((r.top + r.bottom) / 2 - middle);
+                if (distance < bestDistance) {
+                    bestDistance = distance;
+                    best = el;
+                }
+            });
+
+            if (!best || best === centred) return;
+            if (centred) {
+                centred.classList.remove("is-centered", "is-scaled");
+            }
+            centred = best;
+            centred.classList.add("is-centered", "is-scaled");
+        }
+
+        var centreObserver = new IntersectionObserver(
+            function (entries) {
+                entries.forEach(function (entry) {
+                    if (entry.isIntersecting) inBand.add(entry.target);
+                    else inBand.delete(entry.target);
+                });
+                pick();
+            },
+            { rootMargin: "-49.5% 0px -49.5% 0px", threshold: 0 },
+        );
+
+        rows.forEach(function (row) {
+            centreObserver.observe(row);
+        });
+
+        window.addEventListener("scroll", pick, { passive: true });
+        window.addEventListener("resize", pick);
+        pick();
+    })();
+</script>
