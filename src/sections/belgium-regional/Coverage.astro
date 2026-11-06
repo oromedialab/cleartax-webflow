@@ -19,6 +19,7 @@ interface Row {
   title: string;
   lead: string;
   body: string;
+  icon: string;
 }
 
 const rows: Row[] = [
@@ -26,43 +27,50 @@ const rows: Row[] = [
     title: "Full Belgium mandate coverage",
     lead: "Send and receive Peppol BIS Billing 3.0 invoices and credit notes",
     body: "through ClearTax's Open Peppol Access Point. Self-billing, B2G via Mercurius and 10-year archiving are covered in the same flow.",
+    icon: "/images/belgium-regional/icon-1.png",
   },
   {
     title: "Catch errors before your buyer does",
     lead: "AI-powered checks validate every mandatory field",
     body: "VAT rate and rounding rule before an invoice leaves your ERP. Fewer rejections, faster payments, and no VAT deduction risk for your customers.",
+    icon: "/images/belgium-regional/icon-2.png",
   },
   {
     title: "Ready for 2028, without a second project",
     lead: "When the five-corner model goes live, ClearTax handles reporting to FPS Finance on the platform side.",
     body: "Your ERP stays as it is, and rule changes arrive as cloud updates at no extra cost.",
+    icon: "/images/belgium-regional/icon-3.png",
   },
   {
     title: "Integrates with any ERP or POS",
     lead: "2,500+ integrations across 50+ ERP and POS systems, including SAP, Oracle, Microsoft Dynamics and NetSuite.",
     body: "AI-driven connectors and structured UAT cut onboarding from weeks to days.",
+    icon: "/images/belgium-regional/icon-4.png",
   },
   {
     title: "One dashboard for incoming and outgoing invoices",
     lead: "Track every sent and received invoice, its status and any exception in one view.",
     body: "Finance sees what's stuck and why, before month-end close.",
+    icon: "/images/belgium-regional/icon-5.png",
   },
   {
     title: "Belgium now. ViDA next",
     lead: "One platform and one API for 50+ countries.",
     body: "Your Belgian entities reuse the same integration as France, Germany and the rest of your footprint, ready for EU cross-border reporting from July 2030.",
+    icon: "/images/belgium-regional/icon-6.png",
   },
   {
     title: "Audit-ready books and local support",
     lead: "Automated reconciliation across invoice, books and VAT data keeps your records clean.",
     body: "A dedicated success manager, 750+ integration engineers and in-house tax experts back you from go-live onward, with a team in Brussels.",
+    icon: "/images/belgium-regional/icon-7.png",
   },
 ];
 ---
 
 <section id="be-cov" class="bg-generic-00 py-16 lg:py-20">
   <div
-    class="w-full max-w-[var(--container-max)] mx-auto px-4 md:px-6 flex flex-col items-center gap-12"
+    class="w-full max-w-[var(--container-max)] mx-auto px-4 md:px-6 flex flex-col items-center gap-8 md:gap-12"
   >
     <div class="flex max-w-[626px] flex-col items-center gap-4 text-center">
       <h2
@@ -80,18 +88,27 @@ const rows: Row[] = [
 
     <div class="flex w-full flex-col">
       {
-        rows.map((r) => (
-          <div class="be-cov-row grid grid-cols-1 gap-4 py-6 lg:grid-cols-2 lg:gap-12">
-            <div class="flex items-start gap-4">
-              <span class="size-[53px] shrink-0 rounded-lg bg-visual-placeholder" />
-              <div class="flex flex-col gap-2 text-vault-navy">
-                <h3 class="m-0 font-heading font-medium text-[length:var(--fs-h6)] leading-[length:var(--lh-h6)]">
+        rows.map((r, i) => (
+          <div
+            class:list={[
+              "be-cov-row flex flex-col justify-between gap-2 py-8 md:flex-row md:items-center md:gap-8",
+              i < rows.length - 1 && "border-b border-neutral-200",
+            ]}
+          >
+            <div class="grid shrink-0 grid-cols-[53px_minmax(0,1fr)] items-center lg:items-start gap-x-4 max-w-[590px] flex-1 md:grid-cols-[53px_minmax(0,1fr)]">
+              <img src={r.icon} alt="" class="h-13.25 w-13.25 shrink-0 " />
+              <div class="contents md:flex md:min-w-0 md:flex-col md:gap-[2px]">
+                <h3 class="col-start-2 m-0 font-heading text-lg leading-[1.33] font-medium text-vault-navy">
                   {r.title}
                 </h3>
-                <p class="m-0 font-body text-[length:var(--fs-label)] leading-[20px]">{r.lead}</p>
+                {r.lead && (
+                  <span class="col-span-2 max-sm:mt-4 block font-body text-sm leading-[length:var(--lh-body-lg)] text-neutral-500">
+                    {r.lead}
+                  </span>
+                )}
               </div>
             </div>
-            <p class="m-0 self-center font-body text-neutral-500 text-[length:var(--fs-label)] leading-[20px]">
+            <p class="m-0 font-body text-sm leading-[length:var(--lh-body)] text-neutral-500 md:flex-1 max-w-[456px]">
               {r.body}
             </p>
           </div>
@@ -102,30 +119,31 @@ const rows: Row[] = [
 </section>
 
 <style is:global>
-  .be-cov-row + .be-cov-row {
-    border-top: 1px solid var(--palette-ledger-white);
-  }
   .be-cov-js .be-cov-row {
     opacity: 0.5;
-    scale: 0.95;
-    transition: all 0.3s ease-in-out;
+    transition:
+      opacity 0.35s ease-in-out,
+      transform 0.35s ease-in-out;
   }
   .be-cov-js .be-cov-row.is-active {
     opacity: 1;
-    scale: 1;
-    transition: all 0.3s ease-in-out;
+    transform: scale(1.01);
   }
 </style>
 
 <script is:inline>
   (function () {
-    var section = document.getElementById('be-cov');
+    var section = document.getElementById("be-cov");
     if (!section) return;
-    if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-    var rows = section.querySelectorAll('.be-cov-row');
+    if (
+      window.matchMedia &&
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches
+    )
+      return;
+    var rows = section.querySelectorAll(".be-cov-row");
     if (!rows.length) return;
 
-    section.classList.add('be-cov-js');
+    section.classList.add("be-cov-js");
 
     // The row whose centre is closest to the middle of the viewport is "on".
     function update() {
@@ -141,7 +159,7 @@ const rows: Row[] = [
         }
       });
       rows.forEach(function (row) {
-        row.classList.toggle('is-active', row === best);
+        row.classList.toggle("is-active", row === best);
       });
     }
 
@@ -155,8 +173,8 @@ const rows: Row[] = [
       });
     }
 
-    window.addEventListener('scroll', onScroll, { passive: true });
-    window.addEventListener('resize', onScroll);
+    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", onScroll);
     update();
   })();
 </script>
