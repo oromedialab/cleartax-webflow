@@ -6,7 +6,7 @@
  * overlay dialog showing that card's heading and body, with prev/next chevrons
  * to walk the other seven without closing.
  *
- * Ids and data attributes are `ir-glance-` prefixed: embeds share one
+ * Ids and data attributes are `sp-supports-` prefixed: embeds share one
  * namespace per page.
  */
 interface Card {
@@ -72,8 +72,8 @@ const cards: Card[] = [
                         type="button"
                         class="group m-0 flex h-full w-full cursor-pointer items-center justify-between gap-3 sm:gap-4 md:gap-5 rounded-xl border border-neutral-300 bg-generic-00 p-4 sm:p-5 md:p-6 text-left transition-all duration-150 ease-in-out hover:border-nova-blue"
                         aria-haspopup="dialog"
-                        data-ir-glance-open
-                        data-ir-glance-index={i}
+                        data-sp-supports-open
+                        data-sp-supports-index={i}
                     >
                         <span class="min-w-0 flex-1 font-heading font-medium text-vault-navy text-[length:var(--fs-body)] leading-[length:var(--lh-body)] md:text-[length:var(--fs-body-lg)] md:leading-[length:var(--lh-body-lg)] lg:text-[length:var(--fs-h6)] lg:leading-[length:var(--lh-h6)]">
                             {card.heading}
@@ -114,22 +114,22 @@ const cards: Card[] = [
 <!-- Detail overlay. Lives outside the section's container so the scrim covers
      the viewport rather than the 1280px column. -->
 <div
-    id="ir-glance-overlay"
+    id="sp-supports-overlay"
     role="dialog"
     aria-modal="true"
-    aria-labelledby="ir-glance-overlay-title"
+    aria-labelledby="sp-supports-overlay-title"
     aria-hidden="true"
     class="fixed inset-0 z-[2000] hidden items-center justify-center bg-generic-100/70 p-4 backdrop-blur-sm"
 >
     <div
         class="relative max-h-[90vh] w-full max-w-[500px] overflow-y-auto rounded-xl border-2 border-[#CCCCCC] bg-generic-00 p-6"
-        data-ir-glance-panel
+        data-sp-supports-panel
     >
         <button
             type="button"
             aria-label="Close"
             class="absolute right-6 top-6 z-10 inline-flex h-10 w-10 cursor-pointer items-center justify-center rounded-lg border-0 bg-transparent p-0 text-vault-navy transition-opacity duration-150 hover:opacity-70 lg:right-5 lg:top-5"
-            data-ir-glance-close
+            data-sp-supports-close
         >
             <svg
                 width="40"
@@ -160,7 +160,7 @@ const cards: Card[] = [
                 class="flex w-full flex-col justify-between gap-6 lg:w-[440px] lg:shrink-0 lg:self-stretch"
             >
                 <div class="flex flex-col gap-6">
-                    <div id="ir-glance-overlay-title">
+                    <div id="sp-supports-overlay-title">
                         {
                             cards.map((card, i) => (
                                 <h3
@@ -171,7 +171,7 @@ const cards: Card[] = [
                                             : "display: none;"
                                     }
                                     hidden={i !== 0}
-                                    data-ir-glance-heading
+                                    data-sp-supports-heading
                                 >
                                     {card.heading}
                                 </h3>
@@ -193,7 +193,7 @@ const cards: Card[] = [
                                         : "display: none;"
                                 }
                                 hidden={i !== 0}
-                                data-ir-glance-image
+                                data-sp-supports-image
                                 aria-hidden="true"
                             />
                         ))
@@ -212,7 +212,7 @@ const cards: Card[] = [
                                             : "display: none;"
                                     }
                                     hidden={i !== 0}
-                                    data-ir-glance-body
+                                    data-sp-supports-body
                                     set:html={card.body}
                                 />
                             ))
@@ -225,10 +225,10 @@ const cards: Card[] = [
 </div>
 
 <style is:global>
-    [data-ir-glance-heading][hidden],
-    [data-ir-glance-body][hidden],
-    [data-ir-glance-icon][hidden],
-    [data-ir-glance-image][hidden] {
+    [data-sp-supports-heading][hidden],
+    [data-sp-supports-body][hidden],
+    [data-sp-supports-icon][hidden],
+    [data-sp-supports-image][hidden] {
         display: none !important;
     }
 </style>
@@ -236,17 +236,17 @@ const cards: Card[] = [
 <script is:inline>
     /* Card -> detail overlay, with the chevrons walking the eight without closing. */
     (function () {
-        var overlay = document.getElementById("ir-glance-overlay");
+        var overlay = document.getElementById("sp-supports-overlay");
         if (!overlay) return;
 
-        var panel = overlay.querySelector("[data-ir-glance-panel]");
-        var closeBtn = overlay.querySelector("[data-ir-glance-close]");
-        var prevBtn = overlay.querySelector("[data-ir-glance-prev]");
-        var nextBtn = overlay.querySelector("[data-ir-glance-next]");
-        var headings = overlay.querySelectorAll("[data-ir-glance-heading]");
-        var bodies = overlay.querySelectorAll("[data-ir-glance-body]");
-        var icons = overlay.querySelectorAll("[data-ir-glance-icon]");
-        var images = overlay.querySelectorAll("[data-ir-glance-image]");
+        var panel = overlay.querySelector("[data-sp-supports-panel]");
+        var closeBtn = overlay.querySelector("[data-sp-supports-close]");
+        var prevBtn = overlay.querySelector("[data-sp-supports-prev]");
+        var nextBtn = overlay.querySelector("[data-sp-supports-next]");
+        var headings = overlay.querySelectorAll("[data-sp-supports-heading]");
+        var bodies = overlay.querySelectorAll("[data-sp-supports-body]");
+        var icons = overlay.querySelectorAll("[data-sp-supports-icon]");
+        var images = overlay.querySelectorAll("[data-sp-supports-image]");
         if (!panel || !headings.length || headings.length !== bodies.length)
             return;
 
@@ -295,10 +295,10 @@ const cards: Card[] = [
 
         document.addEventListener("click", function (e) {
             if (!e.target.closest) return;
-            var opener = e.target.closest("[data-ir-glance-open]");
+            var opener = e.target.closest("[data-sp-supports-open]");
             if (!opener) return;
             open(
-                parseInt(opener.getAttribute("data-ir-glance-index"), 10) || 0,
+                parseInt(opener.getAttribute("data-sp-supports-index"), 10) || 0,
                 opener,
             );
         });
