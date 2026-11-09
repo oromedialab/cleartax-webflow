@@ -21,25 +21,51 @@
  */
 interface Card {
   heading: string;
-  body: string;
+  img: string;
+  image?: string;
+  bullets: string[];
 }
 
 const cards: Card[] = [
   {
     heading: "Structured XML, not PDFs",
-    body: "Phase 2 invoices must be generated as structured UBL 2.1 XML with a QR code and cryptographic stamp. A PDF alone does not meet the requirement.",
+    img: "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6aec914d818a73f351a82eae_icon-1.png",
+    image:
+      "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6af18dcb1e3dcbcb1654b45e_ksa-img-1.png",
+    bullets: [
+      "Every tax invoice, credit & debit note must be generated in UBL 2.1 XML (or PDF/A-3 with XML embedded), in Arabic, from a ZATCA-compliant solution.",
+      "Each needs UUID, QR code & a cryptographic stamp & is chained to previous invoice by its hash. Handwritten, Word or Excel invoices are not valid.",
+    ],
   },
   {
     heading: "Clearance for B2B, reporting for B2C",
-    body: "Standard (B2B and B2G) invoices must be cleared by ZATCA in real time before you share them with the buyer. Simplified (B2C) invoices are issued straight away and reported to ZATCA within 24 hours.",
+    img: "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6ac776e909e9bc8ba8a13933_icon-5.png",
+    image:
+      "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6af18dd65b34a2ad9b7a23f2_ksa-img-2.png",
+    bullets: [
+      "Standard (B2B & B2G) invoices go to Fatoora for real-time clearance; ZATCA validates & stamps them before you can share them with your buyer.",
+      "Simplified (B2C) invoices are issued at the till & reported to ZATCA within 24hrs. Invoices that fails is not a valid tax invoice, so your buyer can't claim the input VAT.",
+    ],
   },
   {
     heading: "Onboard every invoicing device",
-    body: "Every system and device that issues invoices needs its own CSID from ZATCA's Fatoora platform, and each CSID must be renewed before it expires.",
+    img: "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6af1752b9ef6174e2d084604_ksa-icon-3.png",
+    image:
+      "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6af18dda6b21085c30567754_ksa-img-3.png",
+    bullets: [
+      "Each ERP, billing system or POS that issues invoices must be onboarded to Fatoora and hold its own Cryptographic Stamp Identifier (CSID).",
+      "Groups with many branches, tills and systems need to onboard, renew and track every one.",
+    ],
   },
   {
     heading: "Keep up with rule changes",
-    body: "ZATCA updates its SDK and validation rules regularly. Invoices that don't follow the latest rules are rejected, so your platform has to ship each change on time.",
+    img: "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6af1752faf24c8e93a253fae_ksa-icon-4.png",
+    image:
+      "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6af18dde364311ae81d80724_ksa-img-4.png",
+    bullets: [
+      "ZATCA updates its SDK & validation rules regularly. Recent changes added B2G invoice flags, continuous-supply identification & mandatory contract ID for B2G invoices (BR-KSA-92).",
+      "Archive every invoice inside Saudi Arabia for at least six years.",
+    ],
   },
 ];
 ---
@@ -67,339 +93,257 @@ const cards: Card[] = [
       </p>
     </div>
 
-    <div class="grid w-full grid-cols-1 gap-5 sm:grid-cols-2 lg:gap-8">
+    <div
+      class="grid w-full max-w-[1280px] mx-auto grid-cols-1 md:grid-cols-2 gap-6 items-start"
+    >
       {
-        cards.map((card, i) => (
-          <button
-            type="button"
-            class="group m-0 flex w-full cursor-pointer items-center justify-between gap-5 self-start rounded-xl border border-neutral-300 bg-generic-00 p-6 text-left transition-all duration-150 ease-in-out hover:border-nova-blue"
-            aria-haspopup="dialog"
-            data-ksa-glance-open
-            data-ksa-glance-index={i}
-          >
-            <span
-              class="h-14 w-14 shrink-0 rounded-lg bg-visual-placeholder"
-              aria-hidden="true"
-            />
-            <span class="min-w-0 flex-1 font-heading font-medium text-vault-navy text-balance max-w-[414px] text-[length:var(--fs-body)] leading-[length:var(--lh-body)] sm:text-[length:var(--fs-h6)] sm:leading-[length:var(--lh-h6)]">
-              {card.heading}
-            </span>
-            <span
-              class="ml-auto flex h-14 w-14 shrink-0 items-center justify-center rounded-lg p-2 text-vault-navy transition-colors duration-150 ease-in-out group-hover:text-nova-blue"
-              aria-hidden="true"
+        cards.map((card, i) => {
+          const isDefaultOpen = i === 0 || i === 1;
+          return (
+            <div
+              class="group/card flex flex-col rounded-xl border border-neutral-300 w-full bg-generic-00 overflow-hidden"
+              data-ksa-glance-card={i}
             >
-              <svg
-                width="40"
-                height="40"
-                viewBox="0 0 40 40"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
+              <button
+                type="button"
+                class={`group flex w-full cursor-pointer items-center justify-between gap-4 p-5 sm:p-6 text-left transition-all duration-150 ease-in-out bg-generic-00 border-0 outline-none focus:outline-none ${isDefaultOpen ? "pb-3 sm:pb-4" : ""}`}
+                data-ksa-glance-toggle={i}
+                aria-expanded={isDefaultOpen ? "true" : "false"}
               >
-                <path
-                  d="M20 10V30"
-                  stroke="currentColor"
-                  stroke-width="1.5"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
+                <img
+                  src={card.img}
+                  alt=""
+                  height="56"
+                  width="56"
+                  loading="lazy"
+                  class="shrink-0 h-14 w-14 object-contain rounded-lg"
                 />
-                <path
-                  d="M30 20L10 20"
-                  stroke="currentColor"
-                  stroke-width="1.5"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                />
-              </svg>
-            </span>
-          </button>
-        ))
+                <span class="min-w-0 flex-1 font-heading font-medium text-vault-navy text-[length:var(--fs-body-lg)] leading-[length:var(--lh-body-lg)]">
+                  {card.heading}
+                </span>
+                <span
+                  class="flex h-10 w-10 sm:h-12 sm:w-12 shrink-0 items-center justify-center rounded-lg text-vault-navy transition-transform duration-200 ease-in-out"
+                  data-ksa-glance-icon={i}
+                  style={
+                    isDefaultOpen
+                      ? "transform: rotate(45deg);"
+                      : "transform: rotate(0deg);"
+                  }
+                  aria-hidden="true"
+                >
+                  <svg
+                    width="24"
+                    height="24"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    class="h-6 w-6 sm:h-7 sm:w-7"
+                    aria-hidden="true"
+                    focusable="false"
+                  >
+                    <path
+                      d="M12 5V19"
+                      stroke="currentColor"
+                      stroke-width="1.5"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    />
+                    <path
+                      d="M5 12H19"
+                      stroke="currentColor"
+                      stroke-width="1.5"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    />
+                  </svg>
+                </span>
+              </button>
+
+              <div
+                class="grid overflow-hidden transition-[grid-template-rows,opacity] duration-300 ease-out border-0 flex-1"
+                style={
+                  isDefaultOpen
+                    ? "grid-template-rows: 1fr; opacity: 1;"
+                    : "grid-template-rows: 0fr; opacity: 0;"
+                }
+                data-ksa-glance-content={i}
+                data-open={isDefaultOpen ? "true" : "false"}
+              >
+                <div class="overflow-hidden border-0 flex flex-col h-full">
+                  <div class="px-5 pb-5 sm:px-6 sm:pb-6 pt-0 flex flex-col gap-4 flex-1">
+                    <div class="w-full aspect-[574/322] overflow-hidden flex items-center justify-center">
+                      {card.image ? (
+                        <img
+                          src={card.image}
+                          alt={card.heading}
+                          class="w-full h-full object-contain"
+                          loading="lazy"
+                        />
+                      ) : (
+                        <div class="w-full h-full bg-visual-placeholder flex items-center justify-center" />
+                      )}
+                    </div>
+
+                    <ul class="m-0 p-0 list-none flex flex-col gap-2.5 pt-1">
+                      {card.bullets.map((bullet) => (
+                        <li class="flex items-start gap-2.5 font-body font-normal text-neutral-500 text-[13px] sm:text-[14px] lg:text-[15px] leading-[20px] sm:leading-[22px]">
+                          <span class="text-neutral-400 select-none text-[18px] leading-[20px] shrink-0">
+                            •
+                          </span>
+                          <span class="flex-1">{bullet}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            </div>
+          );
+        })
       }
     </div>
   </div>
 </section>
 
-<!-- Detail overlay. Lives outside the section's container so the scrim covers
-     the viewport rather than the 1280px column. -->
-<div
-  id="ksa-glance-overlay"
-  role="dialog"
-  aria-modal="true"
-  aria-labelledby="ksa-glance-overlay-title"
-  aria-hidden="true"
-  class="fixed inset-0 z-[2000] hidden items-center justify-center bg-generic-100/70 p-4 backdrop-blur-sm"
->
-  <div
-    class="relative max-h-[90vh] w-full max-w-[1280px] overflow-y-auto rounded-xl border-2 border-[#CCCCCC] bg-generic-00 p-6"
-    data-ksa-glance-panel
-  >
-    <button
-      type="button"
-      aria-label="Close"
-      class="absolute right-6 top-6 z-10 inline-flex h-10 w-10 cursor-pointer items-center justify-center rounded-lg border-0 bg-transparent p-0 text-vault-navy transition-opacity duration-150 hover:opacity-70 lg:right-11 lg:top-11"
-      data-ksa-glance-close
-    >
-      <svg
-        width="40"
-        height="40"
-        viewBox="0 0 40 40"
-        fill="none"
-        class="rotate-45"
-        aria-hidden="true"
-        focusable="false"
-      >
-        <path
-          d="M20 10V30"
-          stroke="currentColor"
-          stroke-width="1.5"
-          stroke-linecap="round"
-          stroke-linejoin="round"></path>
-        <path
-          d="M30 20L10 20"
-          stroke="currentColor"
-          stroke-width="1.5"
-          stroke-linecap="round"
-          stroke-linejoin="round"></path>
-      </svg>
-    </button>
-
-    <div class="flex flex-col items-start gap-6 lg:flex-row lg:gap-12">
-      <div
-        class="flex w-full flex-col justify-between gap-6 lg:w-[416px] lg:shrink-0 lg:self-stretch"
-      >
-        <div class="flex flex-col gap-6">
-          <div class="h-16 w-16 shrink-0">
-            {
-              cards.map((card, i) => (
-                <span
-                  class="h-16 w-16 shrink-0 items-center justify-center rounded-lg bg-visual-placeholder"
-                  style={i === 0 ? "display: flex;" : "display: none;"}
-                  hidden={i !== 0}
-                  data-ksa-glance-icon
-                  aria-hidden="true"
-                ></span>
-              ))
-            }
-          </div>
-          <div id="ksa-glance-overlay-title">
-            {
-              cards.map((card, i) => (
-                <h3
-                  class="m-0 pr-12 font-heading font-medium text-vault-navy text-[length:var(--fs-h5)] leading-[length:var(--lh-h5)] tracking-[-0.5px] lg:pr-0"
-                  hidden={i !== 0}
-                  data-ksa-glance-heading
-                >
-                  {card.heading}
-                </h3>
-              ))
-            }
-          </div>
-        </div>
-
-        <div class="flex flex-col gap-6">
-          <div>
-            {
-              cards.map((card, i) => (
-                <p
-                  class="m-0 font-body font-normal text-neutral-500 text-[length:var(--fs-body)] leading-[length:var(--lh-body)]"
-                  hidden={i !== 0}
-                  data-ksa-glance-body
-                >
-                  {card.body}
-                </p>
-              ))
-            }
-          </div>
-
-          <div class="flex items-center gap-2">
-            <button
-              type="button"
-              aria-label="Previous"
-              aria-controls="ksa-glance-overlay-title"
-              class="inline-flex cursor-pointer items-center justify-center rounded border border-neutral-300 bg-generic-00 p-2 text-vault-navy transition-colors duration-150 hover:border-nova-blue"
-              data-ksa-glance-prev
-            >
-              <svg
-                width="20"
-                height="20"
-                viewBox="0 0 20 20"
-                fill="none"
-                aria-hidden="true"
-                focusable="false"
-              >
-                <path
-                  d="M12 15L7 10L12 5"
-                  stroke="currentColor"
-                  stroke-width="1.5"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"></path>
-              </svg>
-            </button>
-            <button
-              type="button"
-              aria-label="Next"
-              aria-controls="ksa-glance-overlay-title"
-              class="inline-flex cursor-pointer items-center justify-center rounded border border-neutral-300 bg-generic-00 p-2 text-vault-navy transition-colors duration-150 hover:border-nova-blue"
-              data-ksa-glance-next
-            >
-              <svg
-                width="20"
-                height="20"
-                viewBox="0 0 20 20"
-                fill="none"
-                aria-hidden="true"
-                focusable="false"
-              >
-                <path
-                  d="M7 5L12 10L7 15"
-                  stroke="currentColor"
-                  stroke-width="1.5"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"></path>
-              </svg>
-            </button>
-          </div>
-        </div>
-      </div>
-
-      <div
-        class="aspect-[1280/720] w-full rounded-lg overflow-hidden bg-visual-placeholder lg:w-auto lg:flex-1"
-      >
-        {
-          cards.map((card, i) => (
-            <div
-              class="h-full w-full bg-visual-placeholder"
-              style={i === 0 ? "display: block;" : "display: none;"}
-              hidden={i !== 0}
-              data-ksa-glance-image
-              aria-hidden="true"
-            />
-          ))
-        }
-      </div>
-    </div>
-  </div>
-</div>
-
-<style is:global>
-  [data-ksa-glance-icon][hidden],
-  [data-ksa-glance-image][hidden] {
-    display: none !important;
-  }
-</style>
-
 <script is:inline>
-  /* Card -> detail overlay, with the chevrons walking the eight without closing. */
   (function () {
-    var overlay = document.getElementById("ksa-glance-overlay");
-    if (!overlay) return;
-
-    var panel = overlay.querySelector("[data-ksa-glance-panel]");
-    var closeBtn = overlay.querySelector("[data-ksa-glance-close]");
-    var prevBtn = overlay.querySelector("[data-ksa-glance-prev]");
-    var nextBtn = overlay.querySelector("[data-ksa-glance-next]");
-    var headings = overlay.querySelectorAll("[data-ksa-glance-heading]");
-    var bodies = overlay.querySelectorAll("[data-ksa-glance-body]");
-    var icons = overlay.querySelectorAll("[data-ksa-glance-icon]");
-    var images = overlay.querySelectorAll("[data-ksa-glance-image]");
-    if (!panel || !headings.length || headings.length !== bodies.length) return;
-
-    var count = headings.length;
-    var current = 0;
-    var lastFocused = null;
-
-    function show(index) {
-      current = ((index % count) + count) % count;
-      for (var i = 0; i < count; i++) {
-        headings[i].hidden = i !== current;
-        bodies[i].hidden = i !== current;
-        if (icons[i]) {
-          icons[i].hidden = i !== current;
-          icons[i].style.display = i === current ? "flex" : "none";
+    function syncRowHeights() {
+      if (window.innerWidth < 768) {
+        for (var i = 0; i < 4; i++) {
+          var c = document.querySelector('[data-ksa-glance-card="' + i + '"]');
+          if (c) c.style.height = "";
         }
-        if (images[i]) {
-          images[i].hidden = i !== current;
-          images[i].style.display = i === current ? "block" : "none";
-        }
+        return;
       }
-      panel.scrollTop = 0;
+
+      var rows = [
+        [0, 1],
+        [2, 3],
+      ];
+
+      rows.forEach(function (pair) {
+        var cardA = document.querySelector(
+          '[data-ksa-glance-card="' + pair[0] + '"]',
+        );
+        var cardB = document.querySelector(
+          '[data-ksa-glance-card="' + pair[1] + '"]',
+        );
+        var contentA = document.querySelector(
+          '[data-ksa-glance-content="' + pair[0] + '"]',
+        );
+        var contentB = document.querySelector(
+          '[data-ksa-glance-content="' + pair[1] + '"]',
+        );
+
+        if (!cardA || !cardB || !contentA || !contentB) return;
+
+        var openA = contentA.getAttribute("data-open") === "true";
+        var openB = contentB.getAttribute("data-open") === "true";
+
+        cardA.style.height = "";
+        cardB.style.height = "";
+
+        if (openA && openB) {
+          var h = Math.max(cardA.offsetHeight, cardB.offsetHeight);
+          cardA.style.height = h + "px";
+          cardB.style.height = h + "px";
+        }
+      });
     }
 
-    function open(index, opener) {
-      lastFocused = opener || document.activeElement;
-      show(index);
-      overlay.style.display = "flex";
-      overlay.setAttribute("aria-hidden", "false");
-      document.body.style.overflow = "hidden";
-      if (closeBtn) closeBtn.focus();
+    function openCard(index) {
+      var content = document.querySelector(
+        '[data-ksa-glance-content="' + index + '"]',
+      );
+      var btn = document.querySelector(
+        '[data-ksa-glance-toggle="' + index + '"]',
+      );
+      var icon = document.querySelector(
+        '[data-ksa-glance-icon="' + index + '"]',
+      );
+      if (!content || !btn) return;
+
+      var num = Number(index);
+      var pairIndex = num % 2 === 0 ? num + 1 : num - 1;
+      var thisCard = document.querySelector(
+        '[data-ksa-glance-card="' + num + '"]',
+      );
+      var siblingCard = document.querySelector(
+        '[data-ksa-glance-card="' + pairIndex + '"]',
+      );
+      if (thisCard) thisCard.style.height = "";
+      if (siblingCard) siblingCard.style.height = "";
+
+      content.style.gridTemplateRows = "1fr";
+      content.style.opacity = "1";
+      content.setAttribute("data-open", "true");
+      btn.setAttribute("aria-expanded", "true");
+      btn.classList.add("pb-3", "sm:pb-4");
+      if (icon) icon.style.transform = "rotate(45deg)";
+
+      setTimeout(syncRowHeights, 320);
     }
 
-    function close() {
-      overlay.style.display = "none";
-      overlay.setAttribute("aria-hidden", "true");
-      document.body.style.overflow = "";
-      if (lastFocused && lastFocused.focus) lastFocused.focus();
+    function closeCard(index) {
+      var content = document.querySelector(
+        '[data-ksa-glance-content="' + index + '"]',
+      );
+      var btn = document.querySelector(
+        '[data-ksa-glance-toggle="' + index + '"]',
+      );
+      var icon = document.querySelector(
+        '[data-ksa-glance-icon="' + index + '"]',
+      );
+      if (!content || !btn) return;
+
+      var num = Number(index);
+      var pairIndex = num % 2 === 0 ? num + 1 : num - 1;
+      var thisCard = document.querySelector(
+        '[data-ksa-glance-card="' + num + '"]',
+      );
+      var siblingCard = document.querySelector(
+        '[data-ksa-glance-card="' + pairIndex + '"]',
+      );
+      if (thisCard) thisCard.style.height = "";
+      if (siblingCard) siblingCard.style.height = "";
+
+      content.style.gridTemplateRows = "0fr";
+      content.style.opacity = "0";
+      content.setAttribute("data-open", "false");
+      btn.setAttribute("aria-expanded", "false");
+      btn.classList.remove("pb-3", "sm:pb-4");
+      if (icon) icon.style.transform = "rotate(0deg)";
+
+      setTimeout(syncRowHeights, 320);
     }
 
-    function isOpen() {
-      return overlay.style.display === "flex";
+    function toggle(index) {
+      var content = document.querySelector(
+        '[data-ksa-glance-content="' + index + '"]',
+      );
+      if (!content) return;
+
+      var isOpen = content.getAttribute("data-open") === "true";
+      if (isOpen) {
+        closeCard(index);
+      } else {
+        openCard(index);
+      }
     }
 
     document.addEventListener("click", function (e) {
       if (!e.target.closest) return;
-      var opener = e.target.closest("[data-ksa-glance-open]");
-      if (!opener) return;
-      open(
-        parseInt(opener.getAttribute("data-ksa-glance-index"), 10) || 0,
-        opener,
-      );
+      var toggleBtn = e.target.closest("[data-ksa-glance-toggle]");
+      if (!toggleBtn) return;
+      var index = toggleBtn.getAttribute("data-ksa-glance-toggle");
+      toggle(index);
     });
 
-    if (closeBtn) closeBtn.addEventListener("click", close);
-    if (prevBtn)
-      prevBtn.addEventListener("click", function () {
-        show(current - 1);
-      });
-    if (nextBtn)
-      nextBtn.addEventListener("click", function () {
-        show(current + 1);
-      });
-
-    overlay.addEventListener("click", function (e) {
-      if (e.target === overlay) close();
-    });
-
-    document.addEventListener("keydown", function (e) {
-      if (!isOpen()) return;
-
-      if (e.key === "Escape") {
-        close();
-        return;
-      }
-
-      if (e.key === "ArrowLeft") {
-        show(current - 1);
-        return;
-      }
-      if (e.key === "ArrowRight") {
-        show(current + 1);
-        return;
-      }
-
-      if (e.key !== "Tab") return;
-      var focusable = panel.querySelectorAll(
-        'a[href], button:not([disabled]), input:not([disabled]):not([type="hidden"]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])',
-      );
-      if (!focusable.length) return;
-      var first = focusable[0];
-      var last = focusable[focusable.length - 1];
-
-      if (e.shiftKey && document.activeElement === first) {
-        e.preventDefault();
-        last.focus();
-      } else if (!e.shiftKey && document.activeElement === last) {
-        e.preventDefault();
-        first.focus();
-      }
-    });
+    window.addEventListener("resize", syncRowHeights);
+    if (document.readyState === "loading") {
+      document.addEventListener("DOMContentLoaded", syncRowHeights);
+    } else {
+      syncRowHeights();
+    }
+    window.addEventListener("load", syncRowHeights);
   })();
 </script>
