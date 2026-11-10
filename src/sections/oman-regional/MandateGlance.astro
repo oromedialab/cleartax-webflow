@@ -16,39 +16,52 @@
  * these confirmed by legal/compliance before this page ships.
  */
 interface Row {
+  icon: string;
   heading: string;
   body: string;
 }
 
-const rows: Row[] = [
-  {
-    heading: "Transmission model",
-    body: "Invoices are validated and transmitted through an OTA-accredited Access Point before reaching the buyer.",
-  },
-  {
-    heading: "Applicability",
-    body: "Large taxpayers and enterprises using ERP or accounting software are in scope from the initial phase, with rollout extending by taxpayer segment.",
-  },
-  {
-    heading: "Acceptable formats",
-    body: "Structured electronic invoices validated against the PINT OM format — PDFs and scanned copies do not qualify.",
-  },
-  {
-    heading: "Transmission methods",
-    body: "Invoices are transmitted via Peppol-based Access Points connected to OTA's Fawtara platform.",
-  },
-  {
-    heading: "Archival",
-    body: "Issued and received e-invoices must be retained for the period set by Omani tax law.",
-  },
-  {
-    heading: "Penalties",
-    body: "Non-compliance may result in invoice rejection and penalties under OTA regulations; exact enforcement details are to be confirmed.",
-  },
-];
+interface Props {
+  rows?: Row[];
+}
+
+const {
+  rows = [
+    {
+      icon: "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6af3599b30e7b8a2526dc883_om-icon-1.png",
+      heading: "Transmission model",
+      body: "Post-audit. Invoices delivered directly to buyers — no BIR clearance required.",
+    },
+    {
+      icon: "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6af3599e5b8a62b83f8184e4_om-icon-2.png",
+      heading: "Applicability",
+      body: "Large Taxpayers, e-commerce businesses, and any enterprise using ERP or accounting software. In scope regardless of sales volume.",
+    },
+    {
+      icon: "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6af359a73758424cf3121740_om-icon-3.png",
+      heading: "Acceptable formats",
+      body: "JSONs only. PDFs and scanned invoices do not qualify. Digital signature required on every invoice.",
+    },
+    {
+      icon: "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6af359aaaec93305b9ab1c17_om-icon-4.png",
+      heading: "Transmission methods",
+      body: "Sales invoices, official receipts, service billings, credit and debit notes. If any branch is in scope, all locations must comply.",
+    },
+    {
+      icon: "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6af359ae50d8c0d81510ee1f_om-icon-5.png",
+      heading: "Archival",
+      body: "50-100% tax deduction on implementation costs for early adopters. Non-compliance: invoices invalidated, input tax deductions lost.",
+    },
+    {
+      icon: "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6af359b25b8a62b83f818c11_om-icon-6.png",
+      heading: "Penalties",
+      body: "Penalties will be applied according to regulations for non-compliance, with a grace period before enforcement.",
+    },
+  ],
+} = Astro.props;
 ---
 
-<section class="bg-generic-00 py-12 lg:py-20">
+<section id="om-glance" class="bg-generic-00 py-12 lg:py-20">
   <div class="max-w-[var(--container-max)] mx-auto px-6 w-full">
     <div class="flex flex-col gap-12">
       <h2
@@ -57,40 +70,90 @@ const rows: Row[] = [
         Oman E-Invoicing Mandate at a Glance
       </h2>
 
-      <div class="flex flex-col gap-12">
-        <p
-          class="m-0 font-heading font-medium text-vault-navy text-[length:var(--fs-h5)] leading-[length:var(--lh-h5)]"
-        >
-          What you must comply with:
-        </p>
-
-        <div class="flex flex-col">
-          {
-            rows.map((row, i) => (
-              <div
-                class:list={[
-                  "grid grid-cols-1 gap-4 py-8 lg:grid-cols-[1fr_547px] lg:items-center lg:gap-8",
-                  i < rows.length - 1 && "border-b border-[var(--border-divider,#f2f1f0)]",
-                  i === 0 && "pt-0",
-                ]}
-              >
-                <div class="flex items-center gap-6">
-                  <span
-                    class="block h-10 w-10 shrink-0 rounded-[6px] bg-visual-placeholder"
-                    aria-hidden="true"
-                  />
-                  <p class="m-0 font-heading font-medium text-vault-navy text-[length:var(--fs-h5)] leading-[length:var(--lh-h5)]">
-                    {row.heading}
-                  </p>
-                </div>
-                <p class="m-0 font-body text-neutral-500/80 text-[length:var(--fs-body-sm)] leading-[length:var(--lh-body-sm)]">
-                  {row.body}
+      <div class="flex flex-col">
+        {
+          rows.map((row, i) => (
+            <div
+              class:list={[
+                "om-glance-row grid grid-cols-1 gap-4 py-8 lg:grid-cols-[1fr_547px] lg:items-center lg:gap-8",
+                i < rows.length - 1 &&
+                  "border-b border-[var(--border-divider,#f2f1f0)]",
+              ]}
+            >
+              <div class="flex items-center gap-6">
+                <img src={row.icon} alt="" class="h-10 w-10 shrink-0" />
+                <p class="m-0 font-heading font-medium text-vault-navy text-[length:var(--fs-h5)] leading-[length:var(--lh-h5)]">
+                  {row.heading}
                 </p>
               </div>
-            ))
-          }
-        </div>
+              <p class="m-0 font-body text-neutral-500/80 text-[length:var(--fs-body-sm)] leading-[length:var(--lh-body-sm)]">
+                {row.body}
+              </p>
+            </div>
+          ))
+        }
       </div>
     </div>
   </div>
 </section>
+
+<style is:global>
+  .om-glance-js .om-glance-row {
+    opacity: 0.5;
+    scale: 0.95;
+    transition: all 0.3s ease-in-out;
+  }
+  .om-glance-js .om-glance-row.is-active {
+    opacity: 1;
+    scale: 1;
+    transition: all 0.3s ease-in-out;
+  }
+</style>
+
+<script is:inline>
+  (function () {
+    var section = document.getElementById("om-glance");
+    if (!section) return;
+    if (
+      window.matchMedia &&
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches
+    )
+      return;
+    var rows = section.querySelectorAll(".om-glance-row");
+    if (!rows.length) return;
+
+    section.classList.add("om-glance-js");
+
+    // The row whose centre is closest to the middle of the viewport is "on".
+    function update() {
+      var mid = window.innerHeight / 2;
+      var best = null;
+      var bestDist = Infinity;
+      rows.forEach(function (row) {
+        var rect = row.getBoundingClientRect();
+        var dist = Math.abs(rect.top + rect.height / 2 - mid);
+        if (dist < bestDist) {
+          bestDist = dist;
+          best = row;
+        }
+      });
+      rows.forEach(function (row) {
+        row.classList.toggle("is-active", row === best);
+      });
+    }
+
+    var ticking = false;
+    function onScroll() {
+      if (ticking) return;
+      ticking = true;
+      requestAnimationFrame(function () {
+        ticking = false;
+        update();
+      });
+    }
+
+    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", onScroll);
+    update();
+  })();
+</script>
