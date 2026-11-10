@@ -1,0 +1,106 @@
+---
+/**
+ * "Key timelines" — Netherlands regional page.
+ *
+ * One bordered table: a header row on a divider, then body rows separated by hairlines.
+ *
+ * CSS grid so the rows can reflow to stacked label/value pairs on small screens.
+ *
+ * Classes are `nl-tl-` prefixed: section CSS is one shared namespace per page.
+ */
+interface Props {}
+
+const timeline = [
+    [
+        "1 January 2017",
+        "Electronic invoice submission required under new central-government procurement agreements",
+        "Suppliers entering those agreements",
+    ],
+    [
+        "18 April 2019",
+        "Ability to receive and process EN 16931 invoices becomes mandatory",
+        "All contracting authorities",
+    ],
+    [
+        "1 July 2030",
+        "Intra-EU B2B digital reporting and associated e-invoicing under ViDA",
+        "Businesses with transactions within the applicable cross-border scope; EU timetable described in Dutch government guidance",
+    ],
+    [
+        "1 July 2030 — planned",
+        "Domestic B2B e-invoicing",
+        "Businesses within the final Dutch scope, subject to legislation and exclusions",
+    ],
+    [
+        "1 July 2031 — planned",
+        "Domestic digital reporting",
+        "Businesses within the final Dutch scope, subject to legislation and exclusions",
+    ],
+];
+---
+
+<section class="bg-generic-00 pt-12 pb-16 lg:pb-20">
+    <div class="w-full max-w-[var(--container-max)] mx-auto px-4 md:px-6">
+        <div class="flex flex-col items-center">
+            <h3
+                class="m-0 mb-8 text-center font-heading font-medium text-vault-navy text-[length:var(--fs-h4)] leading-[length:var(--lh-h4)] tracking-[-0.5px]"
+            >
+                Key timelines
+            </h3>
+            <div
+                class="w-full overflow-hidden rounded-xl border border-neutral-300"
+            >
+                <div
+                    class="nl-tl-row nl-tl-row-3 nl-tl-head border-b border-neutral-300 font-heading font-medium text-vault-navy text-[length:var(--fs-h6)] leading-[length:var(--lh-h6)]"
+                >
+                    <span>Date</span>
+                    <span>Milestone</span>
+                    <span>Who it concerns</span>
+                </div>
+                {
+                    timeline.map(([date, what, who]) => (
+                        <div class="nl-tl-row nl-tl-row-3 nl-tl-body">
+                            <span class="font-body font-medium text-vault-navy text-[length:var(--fs-body-lg)] leading-[length:var(--lh-body-lg)]">
+                                {date}
+                            </span>
+                            <span class="nl-tl-cell">{what}</span>
+                            <span class="nl-tl-cell">{who}</span>
+                        </div>
+                    ))
+                }
+            </div>
+            <p
+                class="m-0 mt-2 w-full text-left font-body text-neutral-500 text-[length:var(--fs-body)] leading-[length:var(--lh-body)]"
+            >
+                Logius and Rijksoverheid guidance support the historical
+                government milestones and future Dutch policy dates.
+            </p>
+        </div>
+    </div>
+</section>
+
+<style is:global>
+    .nl-tl-row {
+        display: grid;
+        gap: 8px;
+        padding: 24px;
+    }
+    .nl-tl-body + .nl-tl-body {
+        border-top: 1px solid var(--palette-ledger-white);
+    }
+    .nl-tl-cell {
+        font-family: var(--font-body);
+        font-size: var(--fs-body);
+        line-height: var(--lh-body);
+        color: var(--palette-neutral-500);
+    }
+    @media (min-width: 1024px) {
+        .nl-tl-row {
+            column-gap: 48px;
+            align-items: center;
+        }
+        .nl-tl-row-3 {
+            grid-template-columns: 240px minmax(0, 1fr) minmax(0, 1fr);
+        }
+    }
+</style>

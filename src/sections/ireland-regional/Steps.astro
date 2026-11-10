@@ -1,0 +1,200 @@
+---
+/**
+ * "Get fully ZATCA compliant in 5 steps" — Figma node 18377:73108. Heading, lede and
+ * five bordered accordion rows; the first is open in the Figma and carries a
+ * bullet list, the other four show only a title.
+ *
+ * Open/close behaviour is the FAQ's (`_shared/FaqRb.astro`): one row open at a
+ * time, height animated over 320ms. The four closed rows have no body in the
+ * Figma, so they open onto nothing until content supplies it: add a `points`
+ * array to an entry and it renders. Rows without `points` render as plain rows
+ * with no toggle, rather than an empty expander.
+ *
+ * Classes are `ir-steps-` prefixed: section CSS is one shared namespace per page.
+ */
+interface Step {
+    title: string;
+    points?: string[];
+}
+
+const steps: Step[] = [
+    {
+        title: "Internal assessment",
+        points: [
+            "Confirm whether each Irish entity is managed by Revenue's Large Corporates Division, and which ones trade within the EU.",
+            "Map invoice volumes, entities, customers and suppliers, and every ERP or billing system that issues or receives invoices.",
+            "Review IT and finance bandwidth for integration work.",
+        ],
+    },
+    {
+        title: "Platform and vendor shortlisting (RFP)",
+        points: [
+            "Decide on platform type: a Peppol-only connector, or a global vendor with e-invoicing, real-time reporting, VAT and AP automation in one place.",
+            "Use the RFP checklist and evaluation matrix to shortlist vendors.",
+            "Run demos, proof-of-concept tests and reference checks.",
+        ],
+    },
+    {
+        title: "Compliance readiness review",
+        points: [
+            "Validate mandatory EN 16931 and Irish VAT fields against your ERP data, and clean customer and supplier master data.",
+            "Plan for both issuing and receiving, plus near-real-time reporting to Revenue.",
+            "Track Revenue's technical specifications as they're published.",
+        ],
+    },
+    {
+        title: "Integration and testing",
+        points: [
+            "Connect your ERP or accounting system to the platform.",
+            "Test validation, send and receive flows, reporting, error handling and archiving end to end.",
+        ],
+    },
+    {
+        title: "Supplier and customer enablement",
+        points: [
+            "Confirm which trading partners are already on Peppol, in Ireland and abroad.",
+            "Move PDF senders and receivers to Peppol with clear communication and support.",
+        ],
+    },
+];
+---
+
+<section class="bg-generic-00 py-16 lg:py-20">
+    <div
+        class="w-full max-w-[var(--container-max)] mx-auto px-4 md:px-6 flex flex-col items-center gap-12"
+    >
+        <div class="flex flex-col items-center gap-4 text-center">
+            <h2
+                class="m-0 font-heading font-medium max-w-232 text-vault-navy text-[length:var(--fs-h1)] leading-[length:var(--lh-h1)] tracking-[-0.5px]"
+            >
+                Get ready for Ireland's e-invoicing mandate in 5 steps
+            </h2>
+            <p
+                class="m-0 font-body max-w-200 font-normal text-neutral-500 text-[length:var(--fs-body)] lg:text-[length:var(--fs-body-lg)] leading-[length:var(--lh-body)] lg:leading-[length:var(--lh-body-lg)]"
+            >
+                Two years sounds like plenty. ERP changes, vendor selection and
+                supplier onboarding usually take 12 to 18 months, so large
+                corporates should start now.
+            </p>
+        </div>
+
+        <div class="flex w-full flex-col gap-3" data-ir-steps-root>
+            {
+                steps.map((s, i) =>
+                    s.points ? (
+                        <div
+                            class={`ir-steps-item group rounded-xl border border-neutral-300 bg-generic-00 px-6 ${i === 0 ? "ir-steps-open" : ""}`}
+                        >
+                            <button
+                                type="button"
+                                class="ir-steps-trigger flex w-full appearance-none items-center justify-between gap-3 border-0 bg-transparent py-6 text-left cursor-pointer font-body font-medium text-vault-navy text-[length:var(--fs-body)] leading-[length:var(--lh-body)]"
+                                aria-expanded={i === 0 ? "true" : "false"}
+                            >
+                                <span class="min-w-0 flex-1">{s.title}</span>
+                                <svg
+                                    class="size-6 shrink-0 transition-transform duration-300 ease-in-out group-[.ir-steps-open]:rotate-45"
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    stroke-width="1.5"
+                                    stroke-linecap="round"
+                                    aria-hidden="true"
+                                >
+                                    <path d="M12 5v14M5 12h14" />
+                                </svg>
+                            </button>
+                            <div
+                                class={`ir-steps-panel overflow-hidden transition-[height] duration-[320ms] [transition-timing-function:cubic-bezier(.4,0,.2,1)] ${i === 0 ? "h-auto" : "h-0"}`}
+                            >
+                                <ul class="m-0 flex list-disc flex-col gap-3 pb-6 pl-[21px] font-body text-neutral-500 text-[length:var(--fs-label)] leading-[20px]">
+                                    {s.points.map((p) => (
+                                        <li>{p}</li>
+                                    ))}
+                                </ul>
+                            </div>
+                        </div>
+                    ) : (
+                        <div class="flex items-center justify-between gap-3 rounded-xl border border-neutral-300 bg-generic-00 p-6 font-body font-medium text-vault-navy text-[length:var(--fs-body)] leading-[length:var(--lh-body)]">
+                            {s.title}
+                            <svg
+                                class="size-6 shrink-0"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="1.5"
+                                stroke-linecap="round"
+                                aria-hidden="true"
+                            >
+                                <path d="M12 5v14M5 12h14" />
+                            </svg>
+                        </div>
+                    ),
+                )
+            }
+        </div>
+    </div>
+</section>
+
+<script is:inline>
+    /* Same open/close logic as `_shared/FaqRb.astro`: one row open at a time, and
+     the panel's height is animated from 0 to its scrollHeight, then released to
+     `auto` so it can reflow. Scoped to [data-ir-steps-root] so it never touches
+     the FAQ's rows. */
+    (function () {
+        var root = document.querySelector("[data-ir-steps-root]");
+        if (!root) return;
+        var items = root.querySelectorAll(".ir-steps-item");
+
+        function closeItem(item, panel, trigger) {
+            panel.style.height = panel.scrollHeight + "px";
+            requestAnimationFrame(function () {
+                panel.style.height = "0px";
+            });
+            item.classList.remove("ir-steps-open");
+            trigger.setAttribute("aria-expanded", "false");
+        }
+
+        function openItem(item, panel, trigger) {
+            panel.style.height = panel.scrollHeight + "px";
+            item.classList.add("ir-steps-open");
+            trigger.setAttribute("aria-expanded", "true");
+            panel.addEventListener("transitionend", function handler(e) {
+                if (e.propertyName !== "height") return;
+                panel.removeEventListener("transitionend", handler);
+                if (item.classList.contains("ir-steps-open"))
+                    panel.style.height = "auto";
+            });
+        }
+
+        items.forEach(function (item) {
+            var trigger = item.querySelector(".ir-steps-trigger");
+            var panel = item.querySelector(".ir-steps-panel");
+            if (!trigger || !panel) return;
+
+            trigger.addEventListener("click", function () {
+                if (item.classList.contains("ir-steps-open")) {
+                    closeItem(item, panel, trigger);
+                    return;
+                }
+                items.forEach(function (other) {
+                    if (
+                        other === item ||
+                        !other.classList.contains("ir-steps-open")
+                    )
+                        return;
+                    var otherPanel = other.querySelector(".ir-steps-panel");
+                    var otherTrigger =
+                        other.querySelector(".ir-steps-trigger");
+                    if (otherPanel && otherTrigger)
+                        closeItem(other, otherPanel, otherTrigger);
+                });
+                openItem(item, panel, trigger);
+            });
+
+            window.addEventListener("resize", function () {
+                if (item.classList.contains("ir-steps-open"))
+                    panel.style.height = "auto";
+            });
+        });
+    })();
+</script>

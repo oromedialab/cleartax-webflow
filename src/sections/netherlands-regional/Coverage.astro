@@ -1,0 +1,177 @@
+---
+/**
+ * "Evaluate your Netherlands requirements with ClearTax" — Netherlands regional page.
+ * Seven rows, title + sub-line on the left, explanation on the right, divided by hairlines.
+ *
+ * Every row is drawn at 50% opacity: it is the resting state of a
+ * scroll-spotlight. A small script lifts the row nearest the middle of the
+ * viewport to full opacity as the section scrolls past; without script (or with
+ * reduced motion) all rows stay fully legible.
+ *
+ * The icon squares are unfilled "Visual placeholder" frames, so
+ * they render as `bg-visual-placeholder` (#E8FFE1).
+ *
+ * Classes and ids are `nl-cov-` prefixed: embeds share one namespace per page.
+ */
+interface Row {
+    title: string;
+    lead: string;
+    body: string;
+    img?: string;
+}
+
+const rows: Row[] = [
+    {
+        title: "Start with your ERP",
+        lead: "Review your existing systems, data sources and invoice volumes.",
+        body: "Discuss the connection approach and the changes your team would need to make.",
+        img: "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6af15ee67f41c583e7f9a2d9_icon-5.png",
+    },
+    {
+        title: "Scope the right exchange route",
+        lead: "Review the invoice standards and delivery channels",
+        body: "your Dutch customers accept. Confirm which sending and receiving flows are supported for your implementation.",
+        img: "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6af15f6e6e013e591d860ebc_icon-6.png",
+    },
+    {
+        title: "Define validation before delivery",
+        lead: "Assess the checks your workflow needs for invoice data",
+        body: "buyer references and the agreed standard. Clarify how errors would be identified and corrected.",
+        img: "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6aedccd7758a3c30559f9cda_ir-icon-14.png",
+    },
+    {
+        title: "Make invoice status actionable",
+        lead: "Identify the visibility your finance team needs",
+        body: "across outgoing and incoming invoices. Ask which delivery statuses and exception views are available.",
+        img: "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6af15f7e7934ba396fd4afb6_icon-8.png",
+    },
+    {
+        title: "Review your accounts payable workflow",
+        lead: "Explore how structured incoming invoices would fit",
+        body: "your approvals, purchasing controls and accounting processes. Confirm the available automation scope during the demo.",
+        img: "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6af15f8754422ed099448693_icon-9.png",
+    },
+    {
+        title: "Map your wider footprint",
+        lead: "Map your Dutch entity requirements alongside your other markets.",
+        body: "Confirm country coverage, integration reuse and the boundaries of each local solution.",
+        img: "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6af15f8d6e013e591d8615b0_icon-10.png",
+    },
+    {
+        title: "Agree the path to rollout",
+        lead: "Define testing, ownership, support and go-live criteria.",
+        body: "Discuss how proposed Dutch and intra-EU changes would be handled as requirements are finalised.",
+        img: "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6af15f92751e4e2249cc2f44_icon-11.png",
+    },
+];
+---
+
+<section id="nl-cov" class="bg-generic-00 py-16 lg:py-20">
+    <div
+        class="w-full max-w-[var(--container-max)] mx-auto px-4 md:px-6 flex flex-col items-center gap-12"
+    >
+        <div class="flex flex-col items-center gap-4 text-center">
+            <h2
+                class="m-0 max-w-[700px] font-heading font-medium text-vault-navy text-[length:var(--fs-h1)] leading-[length:var(--lh-h1)] tracking-[-0.5px]"
+            >
+                Evaluate your Netherlands requirements with ClearTax
+            </h2>
+            <p
+                class="m-0 max-w-[720px] font-body font-normal text-neutral-500 text-[length:var(--fs-body)] lg:text-[length:var(--fs-body-lg)] leading-[length:var(--lh-body)] lg:leading-[length:var(--lh-body-lg)] text-balance"
+            >
+                Bring your invoice flows to the conversation. Use the demo to
+                assess the integration, exchange and finance-control
+                requirements for your Dutch entities.
+            </p>
+        </div>
+
+        <div class="flex w-full flex-col">
+            {
+                rows.map((r) => (
+                    <div class="nl-cov-row grid grid-cols-1 gap-4 py-6 lg:grid-cols-2 lg:gap-12">
+                        <div class="grid grid-cols-[auto_1fr] gap-x-4 gap-y-2 lg:gap-y-2">
+                            <img
+                                class="size-[56px] shrink-0 rounded-lg self-center lg:self-start lg:row-span-2"
+                                src={r.img}
+                                alt="icons"
+                            />
+                            <h3 class="m-0 font-heading font-medium text-[19px] leading-[26.6px] text-vault-navy self-center lg:self-start max-w-[370px]">
+                                {r.title}
+                            </h3>
+                            <p class="m-0 font-body text-[13.3px] leading-[19px] text-vault-navy col-span-2 lg:col-span-1 lg:col-start-2 max-w-[370px]">
+                                {r.lead}
+                            </p>
+                        </div>
+                        <p class="m-0 self-center font-body text-neutral-500 text-[13.3px] leading-[19px]">
+                            {r.body}
+                        </p>
+                    </div>
+                ))
+            }
+        </div>
+    </div>
+</section>
+
+<style is:global>
+    .nl-cov-row + .nl-cov-row {
+        border-top: 1px solid var(--palette-ledger-white);
+    }
+    .nl-cov-js .nl-cov-row {
+        opacity: 0.5;
+        scale: 0.95;
+        transition: all 0.3s ease-in-out;
+    }
+    .nl-cov-js .nl-cov-row.is-active {
+        opacity: 1;
+        scale: 1;
+        transition: all 0.3s ease-in-out;
+    }
+</style>
+
+<script is:inline>
+    (function () {
+        var section = document.getElementById("nl-cov");
+        if (!section) return;
+        if (
+            window.matchMedia &&
+            window.matchMedia("(prefers-reduced-motion: reduce)").matches
+        )
+            return;
+        var rows = section.querySelectorAll(".nl-cov-row");
+        if (!rows.length) return;
+
+        section.classList.add("nl-cov-js");
+
+        // The row whose centre is closest to the middle of the viewport is "on".
+        function update() {
+            var mid = window.innerHeight / 2;
+            var best = null;
+            var bestDist = Infinity;
+            rows.forEach(function (row) {
+                var rect = row.getBoundingClientRect();
+                var dist = Math.abs(rect.top + rect.height / 2 - mid);
+                if (dist < bestDist) {
+                    bestDist = dist;
+                    best = row;
+                }
+            });
+            rows.forEach(function (row) {
+                row.classList.toggle("is-active", row === best);
+            });
+        }
+
+        var ticking = false;
+        function onScroll() {
+            if (ticking) return;
+            ticking = true;
+            requestAnimationFrame(function () {
+                ticking = false;
+                update();
+            });
+        }
+
+        window.addEventListener("scroll", onScroll, { passive: true });
+        window.addEventListener("resize", onScroll);
+        update();
+    })();
+</script>

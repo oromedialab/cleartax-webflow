@@ -80,10 +80,12 @@ const {
           <h1
             class="m-0 font-heading font-semibold text-vault-navy text-[length:var(--fs-h1)] md:text-[length:var(--fs-display-sm)] lg:text-[length:var(--fs-display-lg)] leading-[length:var(--lh-h1)] md:leading-[length:var(--lh-display-sm)] lg:leading-[length:var(--lh-display-lg)] tracking-[-1px] max-w-[900px] text-balance"
           >
-            Are you prepared for Bahrain's NBR <span class="bh-hero-mark">e-Invoicing mandate?</span>
+            Are you prepared for Bahrain's NBR <span class="bh-hero-mark"
+              >E-Invoicing mandate?</span
+            >
           </h1>
           <p
-            class="m-0 font-body text-neutral-500 text-[length:var(--fs-body-lg)] leading-[length:var(--lh-body-lg)] max-w-[861px]"
+            class="m-0 font-body text-neutral-500 text-[length:var(--fs-body-lg)] leading-[length:var(--lh-body-lg)] max-w-[900px]"
           >
             The National Bureau for Revenue is rolling out mandatory e-invoicing
             for VAT-registered businesses. ClearTax generates, validates and
@@ -98,7 +100,7 @@ const {
       <a
         href="https://www.cleartax.com/contact-us"
         data-demo-open
-        class="inline-flex items-center justify-center gap-2 rounded-lg border border-nova-blue bg-nova-blue px-5 py-3.5 text-[length:var(--fs-label-lg)] leading-[length:var(--lh-label-lg)] font-medium text-nova-50 no-underline transition-all duration-200 hover:bg-generic-00 hover:text-nova-blue"
+        class="inline-flex w-full sm:w-auto items-center justify-center gap-2 rounded-lg border border-nova-blue bg-nova-blue px-10 py-3.5 text-[length:var(--fs-label-lg)] leading-[length:var(--lh-label-lg)] font-medium text-nova-50 no-underline transition-all duration-200 hover:bg-generic-00 hover:text-nova-blue"
       >
         Book a Demo
       </a>
@@ -124,11 +126,11 @@ const {
      the full explanation of the geometry; the numbers here come off the section's
      data-* attributes so there is a single source for each. */
   function initBhHeroGrid() {
-    const section = document.getElementById('bh-hero');
+    const section = document.getElementById("bh-hero");
     if (!section) return;
-    const canvas = document.getElementById('bh-hero-dots');
+    const canvas = document.getElementById("bh-hero-dots");
     if (!canvas || !canvas.getContext) return;
-    const ctx = canvas.getContext('2d');
+    const ctx = canvas.getContext("2d");
 
     function num(name, fallback) {
       const value = parseFloat(section.getAttribute(name));
@@ -136,15 +138,15 @@ const {
     }
 
     const config = {
-      lineWidth: num('data-line-width', 2),
-      gap: num('data-gap', 24),
-      maxLength: num('data-max-length', 6),
-      lengthRadius: num('data-length-radius', 260),
-      tilt: num('data-tilt', 1),
-      baseColor: section.getAttribute('data-base-color') || '#C8F006',
-      cursorRadius: num('data-cursor-radius', 320),
-      pull: num('data-pull', 14),
-      fadeRadius: num('data-fade-radius', 40),
+      lineWidth: num("data-line-width", 2),
+      gap: num("data-gap", 24),
+      maxLength: num("data-max-length", 6),
+      lengthRadius: num("data-length-radius", 260),
+      tilt: num("data-tilt", 1),
+      baseColor: section.getAttribute("data-base-color") || "#C8F006",
+      cursorRadius: num("data-cursor-radius", 320),
+      pull: num("data-pull", 14),
+      fadeRadius: num("data-fade-radius", 40),
       fadeSpeed: 12,
       followSpeed: 7,
       engageSpeed: 4,
@@ -250,7 +252,7 @@ const {
       ctx.clearRect(0, 0, width, height);
       ctx.strokeStyle = config.baseColor;
       ctx.lineWidth = config.lineWidth;
-      ctx.lineCap = 'round'; // so a stroke shrunk to nothing reads as a dot
+      ctx.lineCap = "round"; // so a stroke shrunk to nothing reads as a dot
 
       // Two passes. Only the strokes the cursor is touching have an alpha of
       // their own; the rest of the field goes down as one path in one stroke
@@ -279,13 +281,14 @@ const {
     }
 
     const reduceMotion =
-      window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      window.matchMedia &&
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
     if (reduceMotion) {
       // Static dot grid. No animation loop, no cursor reaction.
       initGrid();
       paint();
-      window.addEventListener('resize', () => {
+      window.addEventListener("resize", () => {
         initGrid();
         paint();
       });
@@ -316,7 +319,8 @@ const {
       speed += (Math.sqrt(travelX * travelX + travelY * travelY) - speed) * 0.5;
       if (speed < 0.01) speed = 0;
 
-      engagement += ((hover ? Math.min(speed / 6, 1) : 0) - engagement) * engageEase;
+      engagement +=
+        ((hover ? Math.min(speed / 6, 1) : 0) - engagement) * engageEase;
       if (engagement < 0.001) engagement = 0;
 
       // A parked cursor still holds the field open, just more gently.
@@ -326,7 +330,8 @@ const {
       const wantY = hover ? mouse.y : height / 2;
       const swungX = wantX - focusX;
       const swungY = wantY - focusY;
-      let swung = swungX > 0.05 || swungX < -0.05 || swungY > 0.05 || swungY < -0.05;
+      let swung =
+        swungX > 0.05 || swungX < -0.05 || swungY > 0.05 || swungY < -0.05;
       if (swung) {
         focusX += swungX * focusEase;
         focusY += swungY * focusEase;
@@ -418,11 +423,11 @@ const {
       requestAnimationFrame(draw);
     }
 
-    window.addEventListener('resize', initGrid);
+    window.addEventListener("resize", initGrid);
     initGrid();
     requestAnimationFrame(draw);
 
-    section.addEventListener('mousemove', (e) => {
+    section.addEventListener("mousemove", (e) => {
       const rect = canvas.getBoundingClientRect();
       const sx = rect.width ? width / rect.width : 1;
       const sy = rect.height ? height / rect.height : 1;
@@ -439,7 +444,7 @@ const {
       mouse.y = ny;
     });
 
-    section.addEventListener('mouseleave', () => {
+    section.addEventListener("mouseleave", () => {
       // Dropping `hover` is what matters: the focus starts its swing back to the
       // centre, the strokes reel in and the pull lets go. Nothing reads the
       // parked coordinates while `hover` is false, and re-entry reseeds them.
@@ -448,8 +453,8 @@ const {
     });
   }
 
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initBhHeroGrid);
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", initBhHeroGrid);
   } else {
     initBhHeroGrid();
   }

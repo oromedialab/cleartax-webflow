@@ -21,6 +21,8 @@ export interface DropdownCardItem {
     title?: string;
     status?: string;
     means?: string;
+    icon?: string;
+    img?: string;
 }
 
 export interface Props {
@@ -97,8 +99,20 @@ const {
                                 aria-expanded="false"
                             >
                                 <div class="flex items-center gap-2.5 min-w-0">
+                                    <img
+                                        class:list={[
+                                            "country-dropdown-selected-icon h-4 w-4 shrink-0 object-contain",
+                                            !items.find((item) => item.label === defaultLabel)?.icon && "hidden",
+                                        ]}
+                                        src={items.find((item) => item.label === defaultLabel)?.icon}
+                                        alt=""
+                                        aria-hidden="true"
+                                    />
                                     <svg
-                                        class="h-4 w-4 shrink-0 text-slate-500"
+                                        class:list={[
+                                            "country-dropdown-default-icon h-4 w-4 shrink-0 text-slate-500",
+                                            items.find((item) => item.label === defaultLabel)?.icon && "hidden",
+                                        ]}
                                         viewBox="0 0 24 24"
                                         fill="none"
                                         stroke="currentColor"
@@ -142,6 +156,7 @@ const {
                                             role="option"
                                             data-value={item.label}
                                             data-index={idx}
+                                            data-icon={item.icon || ""}
                                             aria-selected={
                                                 isSelected ? "true" : "false"
                                             }
@@ -152,24 +167,33 @@ const {
                                                     : "text-neutral-500 bg-generic-00 font-medium",
                                             ]}
                                         >
-                                            <svg
-                                                class="h-4.5 w-4.5 shrink-0"
-                                                viewBox="0 0 24 24"
-                                                fill="none"
-                                                stroke="currentColor"
-                                                stroke-width="1.75"
-                                                stroke-linecap="round"
-                                                stroke-linejoin="round"
-                                                aria-hidden="true"
-                                            >
-                                                <circle
-                                                    cx="12"
-                                                    cy="12"
-                                                    r="10"
+                                            {item.icon ? (
+                                                <img
+                                                    src={item.icon}
+                                                    alt=""
+                                                    aria-hidden="true"
+                                                    class="h-4.5 w-4.5 shrink-0 object-contain"
                                                 />
-                                                <path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20" />
-                                                <path d="M2 12h20" />
-                                            </svg>
+                                            ) : (
+                                                <svg
+                                                    class="h-4.5 w-4.5 shrink-0"
+                                                    viewBox="0 0 24 24"
+                                                    fill="none"
+                                                    stroke="currentColor"
+                                                    stroke-width="1.75"
+                                                    stroke-linecap="round"
+                                                    stroke-linejoin="round"
+                                                    aria-hidden="true"
+                                                >
+                                                    <circle
+                                                        cx="12"
+                                                        cy="12"
+                                                        r="10"
+                                                    />
+                                                    <path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20" />
+                                                    <path d="M2 12h20" />
+                                                </svg>
+                                            )}
                                             <span class="truncate">
                                                 {item.label}
                                             </span>
@@ -209,13 +233,22 @@ const {
                                 >
                                     <article class="flex flex-col items-stretch gap-6 rounded-2xl border border-neutral-200 bg-generic-00 p-4 sm:p-6 lg:flex-row lg:items-stretch lg:gap-10 min-h-[380px] w-full">
                                         <!-- Left Content Column -->
-                                        <div class="flex flex-col justify-between gap-6 lg:max-w-[480px] lg:flex-1">
-                                            <div>
+                                        <div class="flex flex-col justify-between gap-6 lg:max-w-[480px] lg:flex-1 min-w-0">
+                                            <div class="flex flex-row md:flex-col gap-3 items-center md:items-start">
                                                 <!-- Small placeholder icon box -->
-                                                <div
-                                                    class="w-10 h-10 rounded-lg bg-visual-placeholder shrink-0"
-                                                    aria-hidden="true"
-                                                />
+                                                {c.icon ? (
+                                                    <img
+                                                        src={c.icon}
+                                                        alt=""
+                                                        aria-hidden="true"
+                                                        class="w-10 h-10 rounded-lg object-contain shrink-0"
+                                                    />
+                                                ) : (
+                                                    <div
+                                                        class="w-10 h-10 rounded-lg bg-visual-placeholder shrink-0"
+                                                        aria-hidden="true"
+                                                    />
+                                                )}
                                                 <h3 class="m-0 font-heading font-medium text-vault-navy text-[length:var(--fs-h5)] leading-[length:var(--lh-h5)] mt-4">
                                                     {c.title || c.label}
                                                 </h3>
@@ -247,11 +280,25 @@ const {
                                             </div>
                                         </div>
 
-                                        <!-- Right Visual Column (Green Placeholder) -->
-                                        <div
-                                            class="aspect-[16/10] sm:aspect-[16/9] lg:aspect-auto lg:h-full w-full rounded-xl bg-visual-placeholder lg:flex-1 min-h-[260px] lg:min-h-[340px]"
-                                            aria-hidden="true"
-                                        />
+                                        <!-- Right Visual Column -->
+                                        <div class="flex-1 min-w-0 w-full flex items-center justify-center">
+                                            {
+                                                c.img ? (
+                                                    <img
+                                                        src={c.img}
+                                                        alt={c.title || c.label}
+                                                        class="w-full h-auto max-w-[760px] aspect-[760/428] object-contain"
+                                                        loading="lazy"
+                                                        decoding="async"
+                                                    />
+                                                ) : (
+                                                    <div
+                                                        class="w-full aspect-[760/428] bg-visual-placeholder rounded-xl"
+                                                        aria-hidden="true"
+                                                    />
+                                                )
+                                            }
+                                        </div>
                                     </article>
                                 </div>
                             );
@@ -337,6 +384,27 @@ const {
                     .forEach((lbl) => {
                         lbl.textContent = activeCountry;
                     });
+
+                const activeOption = section.querySelector(
+                    `.country-dropdown-option[data-index="${currentIndex}"]`,
+                );
+                const selectedIcon = section.querySelector(
+                    ".country-dropdown-selected-icon",
+                );
+                const defaultIcon = section.querySelector(
+                    ".country-dropdown-default-icon",
+                );
+                const iconSrc = activeOption?.getAttribute("data-icon");
+                if (selectedIcon && defaultIcon) {
+                    if (iconSrc) {
+                        selectedIcon.setAttribute("src", iconSrc);
+                        selectedIcon.classList.remove("hidden");
+                        defaultIcon.classList.add("hidden");
+                    } else {
+                        selectedIcon.classList.add("hidden");
+                        defaultIcon.classList.remove("hidden");
+                    }
+                }
 
                 // Update dropdown options styling and aria-selected state
                 section
