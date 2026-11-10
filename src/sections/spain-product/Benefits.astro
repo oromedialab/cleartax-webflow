@@ -1,5 +1,10 @@
 ---
-const loadContent = [
+interface loadContent {
+    title: string;
+    desc: string;
+    img?: string;
+}
+const loadContent: loadContent[] = [
     {
         title: 'Large Spanish businesses',
         desc: 'Prepare for structured invoice exchange and lifecycle reporting across high-volume finance operations.',
@@ -39,11 +44,28 @@ const loadContent = [
                             
                             <div 
                                 class="sp-buildway-desc overflow-hidden max-w-[480px] transition-all duration-500 ease-in-out" 
-                                style={i === 0 ? "max-height: 140px; opacity: 1;" : "max-height: 0px; opacity: 0;"}
+                                style={i === 0 ? "max-height: 500px; opacity: 1;" : "max-height: 0px; opacity: 0;"}
                             >
                                 <p class="font-body text-[length:var(--fs-body)] leading-[length:var(--lh-body)] m-0 text-[#6B7280CC] font-normal pt-3 pb-3.5">
                                     {item.desc}
                                 </p>
+
+                                <!-- Mobile Visual (appears inside open tab on mobile) -->
+                                <div class="lg:hidden w-full aspect-[620/387] rounded-sm overflow-hidden mb-3">
+                                    {item.img ? (
+                                        <img
+                                            src={item.img}
+                                            alt={item.title}
+                                            class="w-full h-full object-contain pointer-events-none select-none"
+                                            loading="lazy"
+                                        />
+                                    ) : (
+                                        <div
+                                            class="w-full h-full bg-visual-placeholder"
+                                            aria-hidden="true"
+                                        />
+                                    )}
+                                </div>
                             </div>
                             
                             <!-- Progress line loader -->
@@ -56,8 +78,8 @@ const loadContent = [
                 }
             </div>
 
-            <!-- Right Side: Visual Slider -->
-            <div class="lg:col-span-7 w-full h-full flex items-stretch">
+            <!-- Right Side: Visual Slider (Desktop only) -->
+            <div class="hidden lg:flex lg:col-span-7 w-full h-full items-stretch">
                 <div class="relative w-full h-full min-h-[300px] lg:min-h-0 aspect-[620/387] lg:aspect-auto rounded-sm overflow-hidden">
                     <div
                         id="sp-benefits-track"
@@ -65,12 +87,26 @@ const loadContent = [
                         style="transform: translateX(0%);"
                     >
                         {
-                            loadContent.map((_, i) => (
-                                <div
-                                    class="w-full h-full shrink-0 bg-visual-placeholder"
-                                    data-slide-index={i}
-                                    aria-hidden="true"
-                                />
+                            loadContent.map((item, i) => (
+                                item.img ? (
+                                    <div
+                                        class="w-full h-full shrink-0 flex items-center justify-center"
+                                        data-slide-index={i}
+                                    >
+                                        <img
+                                            src={item.img}
+                                            alt={item.title}
+                                            class="w-full h-full object-contain pointer-events-none select-none"
+                                            loading="lazy"
+                                        />
+                                    </div>
+                                ) : (
+                                    <div
+                                        class="w-full h-full shrink-0 bg-visual-placeholder"
+                                        data-slide-index={i}
+                                        aria-hidden="true"
+                                    />
+                                )
                             ))
                         }
                     </div>

@@ -64,7 +64,7 @@ import DemoModal from "../sections/global-homepage/DemoModal.astro";
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Inter+Tight:wght@400;500;600;700&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Inter+Tight:wght@400;500;600;700&display=swap"
       rel="stylesheet"
     />
 
@@ -88,11 +88,13 @@ import DemoModal from "../sections/global-homepage/DemoModal.astro";
       var hide = document.createElement("style");
       hide.textContent = "html{visibility:hidden}";
       document.head.appendChild(hide);
-      var reveal = function () { if (hide.parentNode) hide.parentNode.removeChild(hide); };
-      var failsafe = setTimeout(reveal, 3000); // any failure: show Global
+      var late = false; // Global already revealed: never swap under a visitor who is reading
+      var reveal = function () { late = true; if (hide.parentNode) hide.parentNode.removeChild(hide); };
+      var failsafe = setTimeout(reveal, 2000); // any failure: show Global
 
       var KEY = "ct-home-in", TTL = 600000; // reuse the fetched India page for 10 min
       var swap = function (html) {
+        if (late) return;
         clearTimeout(failsafe);
         document.open();
         document.write(html); // same-origin, our own page; India page re-runs its own head scripts
@@ -104,7 +106,7 @@ import DemoModal from "../sections/global-homepage/DemoModal.astro";
         if (c && c.h && Date.now() - c.t < TTL) return setTimeout(function () { swap(c.h); }, 0); // repeat visit: no network wait
       } catch (e) {}
 
-      fetch("/home-in", { credentials: "omit" })
+      fetch("/home-in", { credentials: "omit", priority: "high" })
         .then(function (r) {
           if (!r.ok) throw new Error("status " + r.status);
           return r.text();
@@ -160,11 +162,8 @@ import DemoModal from "../sections/global-homepage/DemoModal.astro";
         });
       })();
     </script>
-    <link rel="preconnect" href="https://js-na2.hsforms.net" />
-    <link rel="preconnect" href="https://forms.hsforms.com" />
-    <link rel="preconnect" href="https://forms-na2.hsforms.com" />
-    <script is:inline defer src="https://js-na2.hsforms.net/forms/embed/v2.js"
-    ></script>
+    <!-- HubSpot forms v2.js (~198 KB) is NOT loaded here: DemoModal injects it on
+         first open. Do not add it back to the head or page custom code. -->
   </head>
   <body class="bg-white">
     <!-- Google Tag Manager (noscript). Does not ship in any embed — it belongs
