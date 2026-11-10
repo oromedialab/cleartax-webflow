@@ -50,6 +50,7 @@ interface Card {
     claim: string;
     caption: string;
     icon: string;
+    image?: string;
 }
 
 const cards: Card[] = [
@@ -199,7 +200,7 @@ const panels = [
     class="fixed inset-0 z-[2000] hidden items-center justify-center bg-generic-100/70 p-4 backdrop-blur-sm"
 >
     <div
-        class="relative max-h-[90vh] w-full max-w-[1280px] overflow-y-auto rounded-xl border-2 border-[#CCCCCC] bg-generic-00 p-6"
+        class="relative max-h-[90vh] w-full max-w-[630px] overflow-y-auto rounded-xl border-2 border-[#CCCCCC] bg-generic-00 p-6"
         data-ih-maiw-panel-detail
     >
         <!-- Anchored to the PANEL, not to the visual it sits over in the Figma:
@@ -209,7 +210,7 @@ const panels = [
         <button
             type="button"
             aria-label="Close"
-            class="absolute right-6 top-6 z-10 inline-flex h-10 w-10 cursor-pointer items-center justify-center rounded-lg border-0 bg-transparent p-0 text-vault-navy transition-opacity duration-150 hover:opacity-70 lg:right-11 lg:top-11"
+            class="absolute right-6 top-6 z-10 inline-flex h-10 w-10 cursor-pointer items-center justify-center rounded-lg border-0 bg-transparent p-0 text-vault-navy transition-opacity duration-150 hover:opacity-70 lg:right-5 lg:top-5"
             data-ih-maiw-close
         >
             <svg
@@ -236,13 +237,8 @@ const panels = [
             </svg>
         </button>
 
-        <div class="flex flex-col items-start gap-6 lg:flex-row lg:gap-12">
-            <!-- 416px = 1280 panel − 48 padding − 48 gap − the 768px the 16:9 visual
-           takes at the design's 432px height. justify-between is what puts the
-           caption and the chevrons on the visual's bottom edge. -->
-            <div
-                class="flex w-full flex-col justify-between gap-6 lg:w-[416px] lg:shrink-0 lg:self-stretch"
-            >
+        <div class="flex flex-col items-start gap-6">
+            <div class="flex w-full flex-col justify-between gap-6">
                 <div class="flex flex-col gap-6">
                     <div class="h-16 w-16 shrink-0">
                         {
@@ -253,7 +249,11 @@ const panels = [
                                     width="64"
                                     height="64"
                                     class="h-16 w-16 rounded-lg object-contain"
-                                    style={i === 0 ? "display: block;" : "display: none;"}
+                                    style={
+                                        i === 0
+                                            ? "display: block;"
+                                            : "display: none;"
+                                    }
                                     hidden={i !== 0}
                                     data-ih-maiw-icon
                                     loading="lazy"
@@ -273,13 +273,53 @@ const panels = [
                                     <h3 class="m-0 mb-2 pr-12 font-heading font-medium text-vault-navy text-[length:var(--fs-h5)] leading-[length:var(--lh-h5)] tracking-[-0.5px] lg:pr-0">
                                         {card.title}
                                     </h3>
-                                    <p class="m-0 font-body font-medium text-nova-blue text-[length:var(--fs-body)] leading-[length:var(--lh-body)]">
-                                        {card.claim}
-                                    </p>
+                                    {card.claim && (
+                                        <p class="m-0 font-body font-medium text-nova-blue text-[length:var(--fs-body)] leading-[length:var(--lh-body)]">
+                                            {card.claim}
+                                        </p>
+                                    )}
                                 </div>
                             ))
                         }
                     </div>
+                </div>
+
+                <div
+                    class="aspect-[574/323] w-full max-w-[574px] rounded-lg overflow-hidden bg-visual-placeholder mx-auto"
+                >
+                    {
+                        flat.map(({ card }, i) =>
+                            card.image ? (
+                                <img
+                                    src={card.image}
+                                    alt={card.title}
+                                    width="574"
+                                    height="323"
+                                    class="h-full w-full object-contain"
+                                    style={
+                                        i === 0
+                                            ? "display: block;"
+                                            : "display: none;"
+                                    }
+                                    hidden={i !== 0}
+                                    data-ih-maiw-image
+                                    loading="lazy"
+                                />
+                            ) : (
+                                <div
+                                    class="h-full w-full bg-visual-placeholder"
+                                    style={
+                                        i === 0
+                                            ? "display: block;"
+                                            : "display: none;"
+                                    }
+                                    hidden={i !== 0}
+                                    data-ih-maiw-image
+                                    aria-hidden="true"
+                                />
+                            ),
+                        )
+                    }
                 </div>
 
                 <div class="flex flex-col gap-6">
@@ -296,68 +336,20 @@ const panels = [
                             ))
                         }
                     </div>
-
-                    <div class="flex items-center gap-2">
-                        <button
-                            type="button"
-                            aria-label="Previous"
-                            aria-controls="ih-maiw-overlay-title"
-                            class="inline-flex cursor-pointer items-center justify-center rounded border border-neutral-300 bg-generic-00 p-2 text-vault-navy transition-colors duration-150 hover:border-nova-blue"
-                            data-ih-maiw-prev
-                        >
-                            <svg
-                                width="20"
-                                height="20"
-                                viewBox="0 0 20 20"
-                                fill="none"
-                                aria-hidden="true"
-                                focusable="false"
-                            >
-                                <path
-                                    d="M12 15L7 10L12 5"
-                                    stroke="currentColor"
-                                    stroke-width="1.5"
-                                    stroke-linecap="round"
-                                    stroke-linejoin="round"></path>
-                            </svg>
-                        </button>
-                        <button
-                            type="button"
-                            aria-label="Next"
-                            aria-controls="ih-maiw-overlay-title"
-                            class="inline-flex cursor-pointer items-center justify-center rounded border border-neutral-300 bg-generic-00 p-2 text-vault-navy transition-colors duration-150 hover:border-nova-blue"
-                            data-ih-maiw-next
-                        >
-                            <svg
-                                width="20"
-                                height="20"
-                                viewBox="0 0 20 20"
-                                fill="none"
-                                aria-hidden="true"
-                                focusable="false"
-                            >
-                                <path
-                                    d="M7 5L12 10L7 15"
-                                    stroke="currentColor"
-                                    stroke-width="1.5"
-                                    stroke-linecap="round"
-                                    stroke-linejoin="round"></path>
-                            </svg>
-                        </button>
-                    </div>
                 </div>
-            </div>
-
-            <div
-                class="aspect-[1280/720] w-full rounded-lg bg-visual-placeholder lg:w-auto lg:flex-1"
-                aria-hidden="true"
-            >
             </div>
         </div>
     </div>
 </div>
 
-<style is:global></style>
+<style is:global>
+    [data-ih-maiw-head][hidden],
+    [data-ih-maiw-body][hidden],
+    [data-ih-maiw-icon][hidden],
+    [data-ih-maiw-image][hidden] {
+        display: none !important;
+    }
+</style>
 
 <script is:inline>
     /* Pills filter the grid; a card opens the detail overlay, and the chevrons
@@ -379,6 +371,7 @@ const panels = [
         var heads = overlay.querySelectorAll("[data-ih-maiw-head]");
         var bodies = overlay.querySelectorAll("[data-ih-maiw-body]");
         var icons = overlay.querySelectorAll("[data-ih-maiw-icon]");
+        var images = overlay.querySelectorAll("[data-ih-maiw-image]");
         if (!panel || !heads.length || heads.length !== bodies.length) return;
 
         var count = heads.length;
@@ -406,6 +399,10 @@ const panels = [
                 if (icons[i]) {
                     icons[i].hidden = i !== current;
                     icons[i].style.display = i === current ? "block" : "none";
+                }
+                if (images[i]) {
+                    images[i].hidden = i !== current;
+                    images[i].style.display = i === current ? "block" : "none";
                 }
             }
             // The panel scrolls on short windows; a card further down the list would
