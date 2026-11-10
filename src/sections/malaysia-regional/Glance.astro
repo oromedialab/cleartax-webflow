@@ -49,6 +49,7 @@ interface Card {
     /** The Nova Blue one-liner under the title in the overlay. */
     claim: string;
     caption: string;
+    icon: string;
 }
 
 const cards: Card[] = [
@@ -57,24 +58,28 @@ const cards: Card[] = [
         claim: "",
         caption:
             "Every e-invoice is submitted to LHDN's MyInvois system in UBL 2.1 (XML or JSON), with 55 data fields and a digital signature. For API submissions, MyInvois returns a unique ID and validation-link details. The issuer generates the QR code. Only then is it a valid e-invoice to share with your buyer.",
+        icon: "/images/malaysia-regional/e-1.png",
     },
     {
         title: "B2B, B2C, B2G and self-billed ",
         claim: "",
         caption:
             "Invoices, credit notes, debit notes and refund notes all need validation. B2C sales can be consolidated into one monthly e-invoice, due within 7 days of month-end. For payments such as imports, agent commissions and interest, the buyer must issue a self-billed e-invoice.",
+        icon: "/images/malaysia-regional/e-2.png",
     },
     {
         title: "Relaxation ends 31 December 2027",
         claim: "",
         caption:
             "During the relaxation period, eligible businesses can still consolidate transactions, including B2B. After it ends, consolidation is limited to consumer receipts, and any single transaction above RM10,000 needs its own e-invoice. Cancellations are allowed only within 72 hours of validation.",
+        icon: "/images/malaysia-regional/e-3.png",
     },
     {
         title: "Your books must match LHDN's ",
         claim: "",
         caption:
             "LHDN now holds the data for nearly 2 billion e-invoices and can compare it with your income tax and SST returns. Mismatches between your ERP and MyInvois are the new audit risk, so reconcile every month, not at year-end.",
+        icon: "/images/malaysia-regional/e-4.png",
     },
 ];
 
@@ -129,9 +134,10 @@ const panels = [
                             data-ih-maiw-open
                             data-ih-maiw-index={index}
                         >
-                            <span
-                                class="block h-14 w-14 shrink-0 self-stretch rounded-lg bg-visual-placeholder"
-                                aria-hidden="true"
+                            <img
+                                src={card.icon}
+                                alt={card.title}
+                                class="h-14 w-14 shrink-0 object-contain"
                             />
                             <span class="min-w-0 flex-1 font-heading font-medium text-vault-navy text-[length:var(--fs-h6)] leading-[length:var(--lh-h6)]">
                                 {card.title}
@@ -238,9 +244,24 @@ const panels = [
                 class="flex w-full flex-col justify-between gap-6 lg:w-[416px] lg:shrink-0 lg:self-stretch"
             >
                 <div class="flex flex-col gap-6">
-                    <span
-                        class="block h-16 w-16 shrink-0 rounded-lg bg-visual-placeholder"
-                        aria-hidden="true"></span>
+                    <div class="h-16 w-16 shrink-0">
+                        {
+                            flat.map(({ card }, i) => (
+                                <img
+                                    src={card.icon}
+                                    alt=""
+                                    width="64"
+                                    height="64"
+                                    class="h-16 w-16 rounded-lg object-contain"
+                                    style={i === 0 ? "display: block;" : "display: none;"}
+                                    hidden={i !== 0}
+                                    data-ih-maiw-icon
+                                    loading="lazy"
+                                    decoding="async"
+                                />
+                            ))
+                        }
+                    </div>
                     <div id="ih-maiw-overlay-title">
                         {
                             flat.map(({ card, group }, i) => (
@@ -357,6 +378,7 @@ const panels = [
         var nextBtn = overlay.querySelector("[data-ih-maiw-next]");
         var heads = overlay.querySelectorAll("[data-ih-maiw-head]");
         var bodies = overlay.querySelectorAll("[data-ih-maiw-body]");
+        var icons = overlay.querySelectorAll("[data-ih-maiw-icon]");
         if (!panel || !heads.length || heads.length !== bodies.length) return;
 
         var count = heads.length;
@@ -381,6 +403,10 @@ const panels = [
             for (var i = 0; i < count; i++) {
                 heads[i].hidden = i !== current;
                 bodies[i].hidden = i !== current;
+                if (icons[i]) {
+                    icons[i].hidden = i !== current;
+                    icons[i].style.display = i === current ? "block" : "none";
+                }
             }
             // The panel scrolls on short windows; a card further down the list would
             // otherwise open mid-way through its own copy.
