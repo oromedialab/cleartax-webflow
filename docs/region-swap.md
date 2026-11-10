@@ -30,11 +30,13 @@
   var hide = document.createElement("style");
   hide.textContent = "html{visibility:hidden}";
   document.head.appendChild(hide);
-  var reveal = function () { if (hide.parentNode) hide.parentNode.removeChild(hide); };
-  var failsafe = setTimeout(reveal, 3000); // any failure: show Global
+  var late = false; // Global already revealed: never swap under a visitor who is reading
+  var reveal = function () { late = true; if (hide.parentNode) hide.parentNode.removeChild(hide); };
+  var failsafe = setTimeout(reveal, 2000); // any failure: show Global
 
   var KEY = "ct-home-in", TTL = 600000; // reuse the fetched India page for 10 min
   var swap = function (html) {
+    if (late) return;
     clearTimeout(failsafe);
     document.open();
     document.write(html); // same-origin, our own page; India page re-runs its own head scripts
@@ -46,7 +48,7 @@
     if (c && c.h && Date.now() - c.t < TTL) return setTimeout(function () { swap(c.h); }, 0); // repeat visit: no network wait
   } catch (e) {}
 
-  fetch("/home-in", { credentials: "omit" })
+  fetch("/home-in", { credentials: "omit", priority: "high" })
     .then(function (r) {
       if (!r.ok) throw new Error("status " + r.status);
       return r.text();

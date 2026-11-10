@@ -1855,7 +1855,7 @@ html.w-mod-touch * {
                         <img
                           src="https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6ab225ddc46a254d92448aea_charts.png"
                           alt="Open unpaid invoices by age chart"
-                          class="w-full h-auto max-h-[88%] md:max-h-[92%] object-contain rounded-lg block"
+                          loading="lazy" decoding="async" class="w-full h-auto max-h-[88%] md:max-h-[92%] object-contain rounded-lg block"
                         />
                       </div>
                     </div>
@@ -2155,7 +2155,7 @@ html.w-mod-touch * {
                         <img
                           src="https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6ab3cc25e7d1535571d6b74e_listed-stats.png"
                           alt="Flagged transactions review queue"
-                          class="w-full h-full max-h-[249px] object-fill block"
+                          loading="lazy" decoding="async" class="w-full h-full max-h-[249px] object-fill block"
                         />
                       </div>
                     </div>
@@ -2398,7 +2398,7 @@ html.w-mod-touch * {
                         <img
                           src="https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6ab62f97615601a7a629bc22_revenue.png"
                           alt="Flagged transactions review queue"
-                          class="w-full h-full max-h-[249px] object-fill block"
+                          loading="lazy" decoding="async" class="w-full h-full max-h-[249px] object-fill block"
                         />
                       </div>
                     </div>
@@ -2698,7 +2698,7 @@ html.w-mod-touch * {
                         <img
                           src="https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6ab6482158af43048bd6c811_review.png"
                           alt="Flagged transactions review queue"
-                          class="w-full h-full max-h-[249px] object-fill block"
+                          loading="lazy" decoding="async" class="w-full h-full max-h-[249px] object-fill block"
                         />
                       </div>
                     </div>
@@ -2997,7 +2997,7 @@ html.w-mod-touch * {
                         <img
                           src="https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6ab6579339baafb1fa1a60a5_linked.png"
                           alt="Flagged transactions review queue"
-                          class="gh-card4-chart-img w-auto h-auto max-h-full block pointer-events-none"
+                          loading="lazy" decoding="async" class="gh-card4-chart-img w-auto h-auto max-h-full block pointer-events-none"
                         />
                         <div class="gh-card4-bottom-area inline-flex items-center gap-1.5 cursor-pointer opacity-0">
                           <p class="m-0 text-[11px] sm:text-xs md:text-sm font-normal text-text-default underline underline-offset-2 leading-tight md:leading-normal">
@@ -5067,6 +5067,12 @@ html.w-mod-touch * {
     }
 
     function initAllCardFlows() {
+      // Chart frames sit in display:none containers, where loading="lazy" images
+      // never start downloading — they would pop in blank when a frame is
+      // revealed. Force them to fetch now, ahead of the animation.
+      document.querySelectorAll('#gh-why img[loading="lazy"], .gh-why-sticky img[loading="lazy"]').forEach(function (img) {
+        img.loading = "eager";
+      });
       for (let i = 0; i < 5; i++) {
         if (window.__ghWhy && window.__ghWhy.initGenericCardFlow) {
           window.__ghWhy.initGenericCardFlow(i);

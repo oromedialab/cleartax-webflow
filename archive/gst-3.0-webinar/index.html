@@ -1,0 +1,875 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+   
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script>
+    (function () {
+    function setup() {
+    try {
+    document.querySelectorAll('a[href^="#"]').forEach(function (a) {
+    a.addEventListener("click", function (e) {
+    var id = this.getAttribute("href");
+    if (id === "#") return;
+    var t = document.querySelector(id);
+    if (t) { e.preventDefault(); t.scrollIntoView({ behavior: "smooth" }); history.pushState(null, document.title, location.pathname + location.search); }
+    });
+    });
+    } catch (e) {}
+    }
+    if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", setup); else setup();
+    })();
+    </script>
+    <!-- 1. Usercentrics CMP — loads immediately, before anything else -->
+<script>
+  (function () {
+    var blockScript = document.createElement("script");
+    blockScript.src = "https://web.cmp.usercentrics.eu/modules/autoblocker.js";
+    document.head.appendChild(blockScript);
+
+    var cmpScript = document.createElement("script");
+    cmpScript.id = "usercentrics-cmp";
+    cmpScript.src = "https://web.cmp.usercentrics.eu/ui/loader.js";
+    cmpScript.setAttribute("data-settings-id", "utqqyaEbvbzrTk");
+    cmpScript.async = true;
+    document.head.appendChild(cmpScript);
+  })();
+</script>
+
+<!-- 2. GTM — loads only after the visitor responds to the consent banner -->
+<script>
+  (function () {
+    function loadGTM() {
+      (function (w, d, s, l, i) {
+        w[l] = w[l] || [];
+        w[l].push({ "gtm.start": new Date().getTime(), event: "gtm.js" });
+        var f = d.getElementsByTagName(s)[0],
+          j = d.createElement(s),
+          dl = l != "dataLayer" ? "&l=" + l : "";
+        j.async = true;
+        j.src = "https://www.googletagmanager.com/gtm.js?id=" + i + dl;
+        f.parentNode.insertBefore(j, f);
+      })(window, document, "script", "dataLayer", "GTM-P5NDQXGH");
+    }
+
+    window.addEventListener("UC_UI_CMP_EVENT", function (event) {
+      if (
+        event.detail &&
+        ["ACCEPT_ALL", "DENY_ALL", "SAVE"].indexOf(event.detail.type) !== -1
+      ) {
+        loadGTM();
+      }
+    });
+  })();
+</script>
+    <style>:root{--palette-ledger-white:#f2f1f0;--palette-vault-navy:#05022a;--palette-nova-blue:#5446ff;--palette-flux-lime:#c8f006;--palette-navy-50:#e6ecff;--palette-navy-100:#d2dcff;--palette-navy-200:#adbcff;--palette-navy-300:#7c91ff;--palette-navy-400:#2123ff;--palette-navy-500:#2123ff;--palette-navy-600:#1200ff;--palette-navy-700:#1600ff;--palette-navy-800:#1000d9;--palette-navy-900:#0f07a8;--palette-navy-950:#05022a;--palette-ledger-50:#fafaf9;--palette-ledger-100:#f5f5f4;--palette-ledger-200:#e8e3e4;--palette-ledger-300:#d7d0d1;--palette-ledger-400:#aa9c9d;--palette-ledger-500:#7b696a;--palette-ledger-600:#594d4c;--palette-ledger-700:#463a3a;--palette-ledger-800:#2a2325;--palette-ledger-900:#1d1617;--palette-ledger-950:#0d0809;--palette-nova-50:#ecefff;--palette-nova-100:#dde1ff;--palette-nova-200:#c2c8ff;--palette-nova-300:#9ca3ff;--palette-nova-400:#7675ff;--palette-nova-500:#5446ff;--palette-nova-600:#5336f5;--palette-nova-700:#482ad8;--palette-nova-800:#3b25ae;--palette-nova-900:#332689;--palette-nova-950:#1f1650;--palette-lime-50:#fbffe7;--palette-lime-100:#f2ffc5;--palette-lime-200:#e9ff8f;--palette-lime-300:#dcfe4f;--palette-lime-400:#d1f91c;--palette-lime-500:#c8f006;--palette-lime-600:#a4be01;--palette-lime-700:#869405;--palette-lime-800:#70780b;--palette-lime-900:#61660f;--palette-lime-950:#373a04;--palette-neutral-50:#f9fafb;--palette-neutral-100:#f3f4f6;--palette-neutral-200:#e5e7eb;--palette-neutral-300:#d1d5db;--palette-neutral-400:#9ca3af;--palette-neutral-500:#6b7280;--palette-neutral-600:#4b5563;--palette-neutral-700:#374151;--palette-neutral-800:#1f2937;--palette-neutral-900:#111827;--palette-neutral-950:#030712;--palette-slate-50:#f6f7f9;--palette-slate-100:#eceef2;--palette-slate-200:#d5dae2;--palette-slate-300:#b1bac8;--palette-slate-400:#8695aa;--palette-slate-500:#677890;--palette-slate-600:#526077;--palette-slate-700:#434e61;--palette-slate-800:#3a4352;--palette-slate-900:#343a46;--palette-generic-00:#fff;--palette-generic-100:#000;--palette-visual-placeholder:#e8ffe1;--palette-success-50:#f0fdf4;--palette-success-100:#dcfce7;--palette-success-200:#bbf7d0;--palette-success-300:#86efac;--palette-success-400:#4ade80;--palette-success-500:#22c55e;--palette-success-600:#16a34a;--palette-success-700:#15803d;--palette-success-800:#166534;--palette-success-900:#14532d;--palette-success-950:#052e16;--palette-warning-50:#fffbeb;--palette-warning-100:#fef3c7;--palette-warning-200:#fde68a;--palette-warning-300:#fcd24d;--palette-warning-400:#fbbf24;--palette-warning-500:#f59e0b;--palette-warning-600:#d97706;--palette-warning-700:#b45309;--palette-warning-800:#92400e;--palette-warning-900:#78350f;--palette-warning-950:#451a03;--palette-destructive-50:#fef2f2;--palette-destructive-100:#fee2e2;--palette-destructive-200:#fecaca;--palette-destructive-300:#ef4444;--palette-destructive-400:#ef4444;--palette-destructive-500:#ef4444;--palette-destructive-600:#dc2626;--palette-destructive-700:#b91c1c;--palette-destructive-800:#991b1b;--palette-destructive-900:#7f1d1d;--palette-destructive-950:#450a0a;--color-ledger-white:var(--palette-ledger-white);--color-vault-navy:var(--palette-vault-navy);--color-nova-blue:var(--palette-nova-blue);--color-flux-lime:var(--palette-flux-lime);--color-generic-00:var(--palette-generic-00);--color-generic-100:var(--palette-generic-100);--color-visual-placeholder:var(--palette-visual-placeholder);--color-slate-50:var(--palette-slate-50);--color-slate-100:var(--palette-slate-100);--color-slate-200:var(--palette-slate-200);--color-slate-300:var(--palette-slate-300);--color-slate-400:var(--palette-slate-400);--color-slate-500:var(--palette-slate-500);--color-slate-600:var(--palette-slate-600);--color-slate-700:var(--palette-slate-700);--color-slate-800:var(--palette-slate-800);--color-slate-900:var(--palette-slate-900);--color-surface:var(--palette-ledger-white);--color-surface-raised:var(--palette-ledger-50);--color-surface-inverse:var(--palette-vault-navy);--color-text:var(--palette-vault-navy);--color-text-inverse:var(--palette-ledger-white);--color-text-muted:var(--palette-ledger-600);--color-text-link:var(--palette-nova-blue);--color-border:var(--palette-ledger-200);--color-border-inverse:#f2f1f01f;--color-focus:var(--palette-generic-100);--palette-font-heading:"Inter Tight", "Inter", system-ui, sans-serif;--palette-font-body:"Google Sans", "Inter", system-ui, sans-serif;--font-heading:var(--palette-font-heading);--font-body:var(--palette-font-body);--font-weight-normal:400;--font-weight-medium:500;--font-weight-semibold:600;--font-weight-bold:700;--tracking-heading:-.5px;--tracking-body:0;--tracking-overline:1px;--fs-display-xl:80px;--lh-display-xl:88px;--fs-display-lg:52px;--lh-display-lg:56px;--fs-display-sm:44px;--lh-display-sm:48px;--fs-h1-lg:56px;--lh-h1-lg:64px;--fs-h1:40px;--lh-h1:48px;--fs-h2:36px;--lh-h2:44px;--fs-h3:32px;--lh-h3:40px;--fs-h4:28px;--lh-h4:36px;--fs-h5:24px;--lh-h5:32px;--fs-h6:20px;--lh-h6:28px;--fs-body-lg:18px;--lh-body-lg:28px;--fs-body:16px;--lh-body:24px;--fs-body-sm:14px;--lh-body-sm:20px;--fs-body-xs:12px;--lh-body-xs:20px;--fs-label-lg:16px;--lh-label-lg:18px;--fs-label:14px;--lh-label:16px;--fs-label-sm:12px;--lh-label-sm:16px;--fs-label-xs:10px;--lh-label-xs:14px;--spacing-xx-sm:4px;--spacing-x-sm:8px;--spacing-sm:12px;--spacing-md:16px;--spacing-big:20px;--spacing-x-big:24px;--spacing-xx-big:28px;--spacing-xxx-big:32px;--spacing-lg:40px;--spacing-x-lg:48px;--spacing-xx-lg:64px;--spacing-xxx-lg:80px;--spacing-huge:96px;--spacing-x-huge:128px;--spacing-xx-huge:160px;--spacing-xxx-huge:192px;--gutter-mobile:12px;--gutter-tablet:20px;--gutter-desktop:32px;--navbar-height:72px;--container-max:1328px;--transition-fast:.15s ease;--transition-base:.25s ease;--transition-slow:.35s ease}@media not all and (min-width:768px){:root{--fs-h1-lg:48px;--lh-h1-lg:56px;--fs-h1:36px;--lh-h1:44px;--fs-h2:32px;--lh-h2:40px;--fs-h3:28px;--lh-h3:36px;--fs-h4:24px;--lh-h4:32px;--fs-h5:20px;--lh-h5:28px;--fs-h6:18px;--lh-h6:24px}}:root{--color-dark:var(--palette-vault-navy);--color-dark-2:var(--palette-vault-navy);--color-white:var(--palette-ledger-white);--color-offwhite:var(--palette-ledger-white);--color-offwhite2:var(--palette-ledger-50);--color-purple:var(--palette-nova-blue);--color-purple-dark:var(--palette-nova-700);--color-purple-light:var(--palette-nova-400);--color-purple-100:var(--palette-nova-500);--grad-btn:linear-gradient(180deg, var(--palette-nova-500) 0%, var(--palette-nova-700) 100%);--grad-btn-hover:linear-gradient(180deg, var(--palette-nova-400) 0%, var(--palette-nova-600) 100%);--grad-recon:linear-gradient(90deg, var(--palette-nova-700) 0%, var(--palette-nova-400) 100%);--recon-header:linear-gradient(180deg, var(--palette-nova-600) 0%, var(--palette-vault-navy) 100%);--color-yellow:var(--palette-warning-400);--color-green:var(--palette-success-500);--color-pink:var(--palette-nova-blue);--color-violet:var(--palette-nova-400);--color-blue:var(--palette-nova-blue);--color-blue-600:var(--palette-nova-900);--color-violet-100:var(--palette-nova-700);--color-muted:var(--palette-ledger-600);--color-border-dark:var(--color-border-inverse);--color-gray-50:var(--palette-neutral-50);--color-gray-100:var(--palette-neutral-100);--color-gray-200:var(--palette-neutral-200);--color-gray-300:var(--palette-neutral-300);--color-gray-400:var(--palette-neutral-400);--color-gray-500:var(--palette-neutral-500);--color-gray-600:var(--palette-neutral-600);--color-gray-700:var(--palette-neutral-700);--color-gray-800:var(--palette-neutral-800);--font-inter-tight:var(--palette-font-heading);--font-google-sans:var(--palette-font-body);--font-gilroy:var(--palette-font-body);--fs-hero:clamp(40px, 4vw + 1rem, 64px)}*,:before,:after{box-sizing:border-box;margin:0;padding:0}html{scroll-behavior:smooth;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}body{font-family:var(--font-body);font-size:var(--fs-body);line-height:var(--lh-body);font-weight:var(--font-weight-medium);font-optical-sizing:auto;letter-spacing:var(--tracking-body);color:var(--color-text);background-color:var(--color-surface);overflow-x:hidden}h2,h3,h4{font-family:var(--font-heading);letter-spacing:var(--tracking-heading);color:var(--color-text)}a{color:inherit;text-decoration:none}img{max-width:100%;height:auto;display:block}@media (prefers-reduced-motion:reduce){*,:before,:after{scroll-behavior:auto!important;transition-duration:.01ms!important;animation-duration:.01ms!important;animation-iteration-count:1!important}} @layer properties{@supports (((-webkit-hyphens:none)) and (not (margin-trim:inline))) or ((-moz-orient:inline) and (not (color:rgb(from red r g b)))){*,:before,:after,::backdrop{--tw-translate-x:0;--tw-translate-y:0;--tw-translate-z:0;--tw-scale-x:1;--tw-scale-y:1;--tw-scale-z:1;--tw-rotate-x:initial;--tw-rotate-y:initial;--tw-rotate-z:initial;--tw-skew-x:initial;--tw-skew-y:initial;--tw-border-style:solid;--tw-gradient-position:initial;--tw-gradient-from:#0000;--tw-gradient-via:#0000;--tw-gradient-to:#0000;--tw-gradient-stops:initial;--tw-gradient-via-stops:initial;--tw-gradient-from-position:0%;--tw-gradient-via-position:50%;--tw-gradient-to-position:100%;--tw-leading:initial;--tw-font-weight:initial;--tw-tracking:initial;--tw-shadow:0 0 #0000;--tw-shadow-color:initial;--tw-shadow-alpha:100%;--tw-inset-shadow:0 0 #0000;--tw-inset-shadow-color:initial;--tw-inset-shadow-alpha:100%;--tw-ring-color:initial;--tw-ring-shadow:0 0 #0000;--tw-inset-ring-color:initial;--tw-inset-ring-shadow:0 0 #0000;--tw-ring-inset:initial;--tw-ring-offset-width:0px;--tw-ring-offset-color:#fff;--tw-ring-offset-shadow:0 0 #0000;--tw-outline-style:solid;--tw-backdrop-blur:initial;--tw-backdrop-brightness:initial;--tw-backdrop-contrast:initial;--tw-backdrop-grayscale:initial;--tw-backdrop-hue-rotate:initial;--tw-backdrop-invert:initial;--tw-backdrop-opacity:initial;--tw-backdrop-saturate:initial;--tw-backdrop-sepia:initial;--tw-duration:initial;--tw-ease:initial;--tw-content:""}}}@layer theme{:root{--color-gray-500:oklch(55.1% .027 264.364);--color-black:#000;--color-white:#fff;--spacing:.25rem;--container-2xl:42rem;--container-3xl:48rem;--container-4xl:56rem;--container-6xl:72rem;--container-7xl:80rem;--text-sm:.875rem;--text-sm--line-height:calc(1.25 / .875);--text-base:1rem;--text-base--line-height:calc(1.5 / 1);--text-lg:1.125rem;--text-lg--line-height:calc(1.75 / 1.125);--text-xl:1.25rem;--text-xl--line-height:calc(1.75 / 1.25);--text-2xl:1.5rem;--text-2xl--line-height:calc(2 / 1.5);--font-weight-normal:400;--font-weight-medium:500;--font-weight-semibold:600;--leading-normal:1.5;--radius-sm:.25rem;--radius-lg:.5rem;--radius-xl:.75rem;--ease-out:cubic-bezier(0, 0, .2, 1);--ease-in-out:cubic-bezier(.4, 0, .2, 1);--blur-sm:8px;--aspect-video:16 / 9;--default-transition-duration:.15s;--default-transition-timing-function:cubic-bezier(.4, 0, .2, 1);--color-vault-navy:var(--palette-vault-navy);--color-nova-blue:var(--palette-nova-blue)}}.pointer-events-auto{pointer-events:auto}.pointer-events-none{pointer-events:none}.absolute{position:absolute}.fixed{position:fixed}.relative{position:relative}.inset-0{inset:calc(var(--spacing) * 0)}.inset-x-0{inset-inline:calc(var(--spacing) * 0)}.top-4{top:calc(var(--spacing) * 4)}.z-0{z-index:0}.z-10{z-index:10}.z-\[1000\]{z-index:1000}.container{width:100%}@media (min-width:1400px){.container{max-width:1400px}}@media (min-width:40rem){.container{max-width:40rem}}@media (min-width:48rem){.container{max-width:48rem}}@media (min-width:64rem){.container{max-width:64rem}}@media (min-width:80rem){.container{max-width:80rem}}@media (min-width:96rem){.container{max-width:96rem}}.m-0{margin:calc(var(--spacing) * 0)}.container{width:100%;padding-inline:var(--spacing-md);margin-inline:auto}@media (min-width:48rem){.container{padding-inline:var(--spacing-x-big)}}@media (min-width:1400px){.container{max-width:var(--container-max)}}.mx-auto{margin-inline:auto}.mt-8{margin-top:calc(var(--spacing) * 8)}.mb-0{margin-bottom:calc(var(--spacing) * 0)}.mb-2{margin-bottom:calc(var(--spacing) * 2)}.mb-3{margin-bottom:calc(var(--spacing) * 3)}.mb-4{margin-bottom:calc(var(--spacing) * 4)}.mb-8{margin-bottom:calc(var(--spacing) * 8)}.mb-12{margin-bottom:calc(var(--spacing) * 12)}.block{display:block}.flex{display:flex}.grid{display:grid}.hidden{display:none}.inline-flex{display:inline-flex}.size-5{width:calc(var(--spacing) * 5);height:calc(var(--spacing) * 5)}.h-0{height:calc(var(--spacing) * 0)}.h-6{height:calc(var(--spacing) * 6)}.h-12{height:calc(var(--spacing) * 12)}.h-\[26px\]{height:26px}.h-auto{height:auto}.h-full{height:100%}.w-6{width:calc(var(--spacing) * 6)}.w-12{width:calc(var(--spacing) * 12)}.w-39\.5{width:calc(var(--spacing) * 39.5)}.w-40{width:calc(var(--spacing) * 40)}.w-48\.75{width:calc(var(--spacing) * 48.75)}.w-59{width:calc(var(--spacing) * 59)}.w-65{width:calc(var(--spacing) * 65)}.w-\[86px\]{width:86px}.w-full{width:100%}.w-max{width:max-content}.max-w-155{max-width:calc(var(--spacing) * 155)}.max-w-\[var\(--container-max\)\]{max-width:var(--container-max)}.min-w-0{min-width:calc(var(--spacing) * 0)}.flex-1{flex:1}.shrink-0{flex-shrink:0}.origin-left{transform-origin:0}.animate-\[scroll-logos-global_45s_linear_infinite\]{animation:45s linear infinite scroll-logos-global}.cursor-pointer{cursor:pointer}.resize{resize:both}.list-none{list-style-type:none}.appearance-none{appearance:none}.grid-cols-1{grid-template-columns:repeat(1,minmax(0,1fr))}.grid-cols-2{grid-template-columns:repeat(2,minmax(0,1fr))}.grid-rows-\[0fr\]{grid-template-rows:0fr}.flex-col{flex-direction:column}.items-center{align-items:center}.items-start{align-items:flex-start}.justify-between{justify-content:space-between}.justify-center{justify-content:center}.gap-2{gap:calc(var(--spacing) * 2)}.gap-2\.5{gap:calc(var(--spacing) * 2.5)}.gap-3{gap:calc(var(--spacing) * 3)}.gap-4{gap:calc(var(--spacing) * 4)}.gap-6{gap:calc(var(--spacing) * 6)}.gap-12{gap:calc(var(--spacing) * 12)}.gap-16{gap:calc(var(--spacing) * 16)}.gap-x-12\.5{column-gap:calc(var(--spacing) * 12.5)}.gap-y-10{row-gap:calc(var(--spacing) * 10)}.overflow-hidden{overflow:hidden}.rounded-\[12px\]{border-radius:12px}.rounded-lg{border-radius:var(--radius-lg)}.rounded-xl{border-radius:var(--radius-xl)}.border{border-style:var(--tw-border-style);border-width:1px}.border-0{border-style:var(--tw-border-style);border-width:0}.border-t{border-top-style:var(--tw-border-style);border-top-width:1px}.border-navy-400{border-color:var(--palette-navy-400)}.border-neutral-200{border-color:var(--palette-neutral-200)}.border-neutral-300{border-color:var(--palette-neutral-300)}.border-nova-blue{border-color:var(--palette-nova-blue)}.bg-flux-lime{background-color:var(--palette-flux-lime)}.bg-generic-00{background-color:var(--palette-generic-00)}.bg-nova-blue{background-color:var(--palette-nova-blue)}.bg-transparent{background-color:#0000}.bg-vault-navy{background-color:var(--palette-vault-navy)}.bg-white{background-color:var(--color-white)}.bg-gradient-to-t{--tw-gradient-position:to top in oklab;background-image:linear-gradient(var(--tw-gradient-stops))}.from-\[\#F3F1F9\]{--tw-gradient-from:#f3f1f9;--tw-gradient-stops:var(--tw-gradient-via-stops,var(--tw-gradient-position), var(--tw-gradient-from) var(--tw-gradient-from-position), var(--tw-gradient-to) var(--tw-gradient-to-position))}.to-generic-00{--tw-gradient-to:var(--palette-generic-00);--tw-gradient-stops:var(--tw-gradient-via-stops,var(--tw-gradient-position), var(--tw-gradient-from) var(--tw-gradient-from-position), var(--tw-gradient-to) var(--tw-gradient-to-position))}.\[mask-image\:linear-gradient\(to_right\,transparent_0\%\,black_4\%\,black_96\%\,transparent_100\%\)\]{-webkit-mask-image:linear-gradient(90deg,#0000 0%,#000 4% 96%,#0000 100%);mask-image:linear-gradient(90deg,#0000 0%,#000 4% 96%,#0000 100%)}.object-contain{object-fit:contain}.p-0{padding:calc(var(--spacing) * 0)}.p-6{padding:calc(var(--spacing) * 6)}.px-1{padding-inline:calc(var(--spacing) * 1)}.px-4{padding-inline:calc(var(--spacing) * 4)}.px-5{padding-inline:calc(var(--spacing) * 5)}.px-8{padding-inline:calc(var(--spacing) * 8)}.py-2{padding-block:calc(var(--spacing) * 2)}.py-2\.5{padding-block:calc(var(--spacing) * 2.5)}.py-3\.5{padding-block:calc(var(--spacing) * 3.5)}.py-4{padding-block:calc(var(--spacing) * 4)}.py-12{padding-block:calc(var(--spacing) * 12)}.py-16{padding-block:calc(var(--spacing) * 16)}.pt-6{padding-top:calc(var(--spacing) * 6)}.pb-4{padding-bottom:calc(var(--spacing) * 4)}.text-center{text-align:center}.text-left{text-align:left}.font-\[inherit\]{font-family:inherit}.font-body{font-family:var(--palette-font-body)}.font-heading{font-family:var(--palette-font-heading)}.text-base{font-size:var(--text-base);line-height:var(--tw-leading,var(--text-base--line-height))}.text-lg{font-size:var(--text-lg);line-height:var(--tw-leading,var(--text-lg--line-height))}.text-sm{font-size:var(--text-sm);line-height:var(--tw-leading,var(--text-sm--line-height))}.text-xl{font-size:var(--text-xl);line-height:var(--tw-leading,var(--text-xl--line-height))}.text-\[26px\]{font-size:26px}.text-\[28px\]{font-size:28px}.text-\[32px\]{font-size:32px}.leading-\[1\.1\]{--tw-leading:1.1;line-height:1.1}.leading-\[1\.2\]{--tw-leading:1.2;line-height:1.2}.leading-\[1\.6\]{--tw-leading:1.6;line-height:1.6}.leading-\[1\.45\]{--tw-leading:1.45;line-height:1.45}.leading-\[1\.55\]{--tw-leading:1.55;line-height:1.55}.leading-normal{--tw-leading:var(--leading-normal);line-height:var(--leading-normal)}.font-medium{--tw-font-weight:var(--font-weight-medium);font-weight:var(--font-weight-medium)}.font-medium\!{--tw-font-weight:var(--font-weight-medium)!important;font-weight:var(--font-weight-medium)!important}.font-semibold{--tw-font-weight:var(--font-weight-semibold);font-weight:var(--font-weight-semibold)}.tracking-\[-0\.5px\]{--tw-tracking:-.5px;letter-spacing:-.5px}.whitespace-nowrap{white-space:nowrap}.text-\[var\(--color-dark\)\]{color:var(--color-dark)}.text-\[var\(--color-gray-500\)\]{color:var(--color-gray-500)}.text-black{color:var(--color-black)}.text-navy-400{color:var(--palette-navy-400)}.text-neutral-500{color:var(--palette-neutral-500)}.text-nova-50{color:var(--palette-nova-50)}.text-nova-blue{color:var(--palette-nova-blue)}.text-vault-navy{color:var(--palette-vault-navy)}.no-underline{text-decoration-line:none}.mix-blend-multiply{mix-blend-mode:multiply}.shadow-\[0_2px_6px_rgba\(16\,24\,40\,0\.06\)\]{--tw-shadow:0 2px 6px var(--tw-shadow-color,#1018280f);box-shadow:var(--tw-inset-shadow), var(--tw-inset-ring-shadow), var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow)}.shadow-\[0px_2px_6px_rgba\(16\,24\,40\,0\.06\)\]{--tw-shadow:0px 2px 6px var(--tw-shadow-color,#1018280f);box-shadow:var(--tw-inset-shadow), var(--tw-inset-ring-shadow), var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow)}.transition{transition-property:color,background-color,border-color,outline-color,text-decoration-color,fill,stroke,--tw-gradient-from,--tw-gradient-via,--tw-gradient-to,opacity,box-shadow,transform,translate,scale,rotate,filter,-webkit-backdrop-filter,backdrop-filter,display,content-visibility,overlay,pointer-events;transition-timing-function:var(--tw-ease,var(--default-transition-timing-function));transition-duration:var(--tw-duration,var(--default-transition-duration))}.transition-\[grid-template-rows\]{transition-property:grid-template-rows;transition-timing-function:var(--tw-ease,var(--default-transition-timing-function));transition-duration:var(--tw-duration,var(--default-transition-duration))}.transition-\[height\]{transition-property:height;transition-timing-function:var(--tw-ease,var(--default-transition-timing-function));transition-duration:var(--tw-duration,var(--default-transition-duration))}.transition-all{transition-property:all;transition-timing-function:var(--tw-ease,var(--default-transition-timing-function));transition-duration:var(--tw-duration,var(--default-transition-duration))}.transition-colors{transition-property:color,background-color,border-color,outline-color,text-decoration-color,fill,stroke,--tw-gradient-from,--tw-gradient-via,--tw-gradient-to;transition-timing-function:var(--tw-ease,var(--default-transition-timing-function));transition-duration:var(--tw-duration,var(--default-transition-duration))}.transition-opacity{transition-property:opacity;transition-timing-function:var(--tw-ease,var(--default-transition-timing-function));transition-duration:var(--tw-duration,var(--default-transition-duration))}.transition-transform{transition-property:transform,translate,scale,rotate;transition-timing-function:var(--tw-ease,var(--default-transition-timing-function));transition-duration:var(--tw-duration,var(--default-transition-duration))}.duration-150{--tw-duration:.15s;transition-duration:.15s}.duration-200{--tw-duration:.2s;transition-duration:.2s}.duration-300{--tw-duration:.3s;transition-duration:.3s}.duration-\[320ms\]{--tw-duration:.32s;transition-duration:.32s}.ease-\[cubic-bezier\(0\.16\,1\,0\.3\,1\)\]{--tw-ease:cubic-bezier(.16,1,.3,1);transition-timing-function:cubic-bezier(.16,1,.3,1)}.ease-in-out{--tw-ease:var(--ease-in-out);transition-timing-function:var(--ease-in-out)}.\[transition-timing-function\:cubic-bezier\(\.4\,0\,\.2\,1\)\]{transition-timing-function:cubic-bezier(.4,0,.2,1)}.outline-none{--tw-outline-style:none;outline-style:none}.\[-webkit-mask-image\:linear-gradient\(to_right\,transparent_0\%\,black_4\%\,black_96\%\,transparent_100\%\)\]{-webkit-mask-image:linear-gradient(90deg,#0000 0%,#000 4% 96%,#0000 100%)}.\[zoom\:1\.3\]{zoom:1.3}@media (hover:hover){.group-hover\:\[animation-play-state\:paused\]:is(:where(.group):hover *){animation-play-state:paused}}.group-\[\.faq-open\]\:rotate-180:is(:where(.group).faq-open *){rotate:180deg}@media (hover:hover){.hover\:scale-105:hover{--tw-scale-x:105%;--tw-scale-y:105%;--tw-scale-z:105%;scale:var(--tw-scale-x) var(--tw-scale-y)}.hover\:bg-generic-00:hover{background-color:var(--palette-generic-00)}.hover\:bg-slate-50:hover{background-color:var(--palette-slate-50)}.hover\:text-nova-blue:hover{color:var(--palette-nova-blue)}.hover\:text-vault-navy:hover{color:var(--palette-vault-navy)}.hover\:opacity-80:hover{opacity:.8}}@media (prefers-reduced-motion:reduce){.motion-reduce\:animate-none{animation:none}}@media not all and (min-width:64rem){.max-lg\:mb-11{margin-bottom:calc(var(--spacing) * 11)}.max-lg\:h-\[26px\]{height:26px}.max-lg\:w-\[76px\]{width:76px}.max-lg\:gap-16{gap:calc(var(--spacing) * 16)}.max-lg\:text-2xl{font-size:var(--text-2xl);line-height:var(--tw-leading,var(--text-2xl--line-height))}}@media not all and (min-width:40rem){.max-sm\:mb-9{margin-bottom:calc(var(--spacing) * 9)}.max-sm\:h-14{height:calc(var(--spacing) * 14)}.max-sm\:w-\[60px\]{width:60px}.max-sm\:gap-12{gap:calc(var(--spacing) * 12)}.max-sm\:text-xl{font-size:var(--text-xl);line-height:var(--tw-leading,var(--text-xl--line-height))}}@media (min-width:40rem){.sm\:flex-row{flex-direction:row}.sm\:items-center{align-items:center}.sm\:items-end{align-items:flex-end}.sm\:justify-between{justify-content:space-between}.sm\:text-lg{font-size:var(--text-lg);line-height:var(--tw-leading,var(--text-lg--line-height))}.sm\:text-\[32px\]{font-size:32px}.sm\:text-\[36px\]{font-size:36px}}@media (min-width:48rem){.md\:grid-cols-3{grid-template-columns:repeat(3,minmax(0,1fr))}.md\:px-6{padding-inline:calc(var(--spacing) * 6)}}@media (min-width:64rem){.lg\:container{width:100%}@media (min-width:1400px){.lg\:container{max-width:1400px}}@media (min-width:40rem){.lg\:container{max-width:40rem}}@media (min-width:48rem){.lg\:container{max-width:48rem}}@media (min-width:64rem){.lg\:container{max-width:64rem}}@media (min-width:80rem){.lg\:container{max-width:80rem}}@media (min-width:96rem){.lg\:container{max-width:96rem}}.lg\:container{width:100%;padding-inline:var(--spacing-md);margin-inline:auto}@media (min-width:48rem){.lg\:container{padding-inline:var(--spacing-x-big)}}@media (min-width:1400px){.lg\:container{max-width:var(--container-max)}}.lg\:px-6{padding-inline:calc(var(--spacing) * 6)}.lg\:py-20{padding-block:calc(var(--spacing) * 20)}.lg\:text-\[40px\]{font-size:40px}}@media (min-width:80rem){.xl\:grid-cols-5{grid-template-columns:repeat(5,minmax(0,1fr))}}.\[\&_li\]\:mb-2 li{margin-bottom:calc(var(--spacing) * 2)}.\[\&_p\]\:mt-0 p{margin-top:calc(var(--spacing) * 0)}.\[\&_p\]\:mb-3 p{margin-bottom:calc(var(--spacing) * 3)}.\[\&_p\:last-child\]\:mb-0 p:last-child{margin-bottom:calc(var(--spacing) * 0)}.\[\&_strong\]\:text-vault-navy strong{color:var(--palette-vault-navy)}.\[\&_ul\]\:m-0 ul{margin:calc(var(--spacing) * 0)}.\[\&_ul\]\:pl-5 ul{padding-left:calc(var(--spacing) * 5)}@property --tw-translate-x{syntax:"*";inherits:false;initial-value:0}@property --tw-translate-y{syntax:"*";inherits:false;initial-value:0}@property --tw-translate-z{syntax:"*";inherits:false;initial-value:0}@property --tw-scale-x{syntax:"*";inherits:false;initial-value:1}@property --tw-scale-y{syntax:"*";inherits:false;initial-value:1}@property --tw-scale-z{syntax:"*";inherits:false;initial-value:1}@property --tw-rotate-x{syntax:"*";inherits:false}@property --tw-rotate-y{syntax:"*";inherits:false}@property --tw-rotate-z{syntax:"*";inherits:false}@property --tw-skew-x{syntax:"*";inherits:false}@property --tw-skew-y{syntax:"*";inherits:false}@property --tw-border-style{syntax:"*";inherits:false;initial-value:solid}@property --tw-gradient-position{syntax:"*";inherits:false}@property --tw-gradient-from{syntax:"<color>";inherits:false;initial-value:#0000}@property --tw-gradient-via{syntax:"<color>";inherits:false;initial-value:#0000}@property --tw-gradient-to{syntax:"<color>";inherits:false;initial-value:#0000}@property --tw-gradient-stops{syntax:"*";inherits:false}@property --tw-gradient-via-stops{syntax:"*";inherits:false}@property --tw-gradient-from-position{syntax:"<length-percentage>";inherits:false;initial-value:0%}@property --tw-gradient-via-position{syntax:"<length-percentage>";inherits:false;initial-value:50%}@property --tw-gradient-to-position{syntax:"<length-percentage>";inherits:false;initial-value:100%}@property --tw-leading{syntax:"*";inherits:false}@property --tw-font-weight{syntax:"*";inherits:false}@property --tw-tracking{syntax:"*";inherits:false}@property --tw-shadow{syntax:"*";inherits:false;initial-value:0 0 #0000}@property --tw-shadow-color{syntax:"*";inherits:false}@property --tw-shadow-alpha{syntax:"<percentage>";inherits:false;initial-value:100%}@property --tw-inset-shadow{syntax:"*";inherits:false;initial-value:0 0 #0000}@property --tw-inset-shadow-color{syntax:"*";inherits:false}@property --tw-inset-shadow-alpha{syntax:"<percentage>";inherits:false;initial-value:100%}@property --tw-ring-color{syntax:"*";inherits:false}@property --tw-ring-shadow{syntax:"*";inherits:false;initial-value:0 0 #0000}@property --tw-inset-ring-color{syntax:"*";inherits:false}@property --tw-inset-ring-shadow{syntax:"*";inherits:false;initial-value:0 0 #0000}@property --tw-ring-inset{syntax:"*";inherits:false}@property --tw-ring-offset-width{syntax:"<length>";inherits:false;initial-value:0}@property --tw-ring-offset-color{syntax:"*";inherits:false;initial-value:#fff}@property --tw-ring-offset-shadow{syntax:"*";inherits:false;initial-value:0 0 #0000}@property --tw-outline-style{syntax:"*";inherits:false;initial-value:solid}@property --tw-backdrop-blur{syntax:"*";inherits:false}@property --tw-backdrop-brightness{syntax:"*";inherits:false}@property --tw-backdrop-contrast{syntax:"*";inherits:false}@property --tw-backdrop-grayscale{syntax:"*";inherits:false}@property --tw-backdrop-hue-rotate{syntax:"*";inherits:false}@property --tw-backdrop-invert{syntax:"*";inherits:false}@property --tw-backdrop-opacity{syntax:"*";inherits:false}@property --tw-backdrop-saturate{syntax:"*";inherits:false}@property --tw-backdrop-sepia{syntax:"*";inherits:false}@property --tw-duration{syntax:"*";inherits:false}@property --tw-ease{syntax:"*";inherits:false}@property --tw-content{syntax:"*";inherits:false;initial-value:""} @keyframes scroll-logos-global{0%{transform:translateX(0)}100%{transform:translateX(-50%)}} .v2-logos-title{text-align:center!important;font-size:32px!important;font-weight:500!important;color:var(--color-vault-navy)!important;margin-bottom:32px!important;letter-spacing:-0.5px!important} @media (max-width:1024px){.v2-logos-title{font-size:24px!important;margin-bottom:44px!important}} @media (max-width:640px){.v2-logos-title{font-size:20px!important;margin-bottom:36px!important}}</style>
+    <style>.wb-h1{font-size:30px} @media(min-width:640px){.wb-h1{font-size:36px}} @media(min-width:1024px){.wb-h1{font-size:clamp(28px,2.8vw,40px);white-space:nowrap}} .wb-two-line{max-width:none!important} @media(min-width:1280px){.wb-two-line{white-space:nowrap}} .wb-hero-grid{display:grid;grid-template-columns:minmax(0,1fr);gap:40px;align-items:center;width:100%} @media(min-width:1024px){.wb-hero-grid{grid-template-columns:minmax(0,1.05fr) minmax(0,.95fr);gap:64px}} .wb-hero-left{display:flex;flex-direction:column;align-items:flex-start;text-align:left} .wb-hero-left h2,.wb-hero-left p{text-align:left!important;margin-left:0!important;margin-right:0!important;max-width:none!important} .wb-hero-left .wb-meta{justify-content:flex-start;margin-bottom:0} .wb-hero-form{background:#fff;border:2px solid var(--palette-neutral-300);border-radius:12px;padding:28px;box-shadow:0 6px 15px -2px rgba(16,24,40,.08)} .wb-hero-form h3{margin:0 0 20px;font-size:22px;font-weight:500;color:var(--color-vault-navy)} .wb-dark-card .wb-num{align-self:flex-start} @media(max-width:1279px){footer .grid>div{width:auto!important;max-width:100%}} @media(max-width:399px){ [data-giwip-nav-root] .ctnav-row>a img{width:76px;height:auto} [data-giwip-nav-root] .ctnav-right [data-nav-cta]{padding:14px 8px!important;font-size:13px!important} [data-giwip-nav-root] .ctnav-right [data-country-btn]{width:44px!important;padding:14px 10px!important;gap:0!important;justify-content:center!important} [data-giwip-nav-root] .ctnav-right{gap:6px} } .wb-pill{display:inline-flex;align-items:center;padding:6px 14px;margin-bottom:24px;border:1px solid var(--palette-neutral-300);border-radius:9999px;background:#fff;font-size:14px;font-weight:600;color:var(--color-vault-navy);letter-spacing:.02em} .wb-meta{display:flex;flex-wrap:wrap;justify-content:center;gap:8px 20px;margin:0 0 28px;font-size:15px;font-weight:600;color:var(--color-vault-navy)} .wb-meta span+span{padding-left:20px;border-left:1px solid var(--palette-neutral-300)} @media(max-width:640px){.wb-meta span+span{padding-left:0;border-left:0}} .wb-photo{width:104px;height:104px;border-radius:16px;object-fit:cover;object-position:top;flex-shrink:0;background:#F3F1F9} .wb-ico{display:flex;align-items:center;justify-content:center;width:44px;height:44px;border-radius:12px;background:#EEEDFF;color:var(--color-nova-blue)} .wb-nowrap{white-space:nowrap} .wb-grid2{display:grid;grid-template-columns:1fr;gap:16px;width:100%;max-width:72rem;margin:0 auto} @media(min-width:1024px){.wb-grid2{grid-template-columns:repeat(2,1fr)}} .wb-grid4{display:grid;grid-template-columns:1fr;gap:16px} @media(min-width:640px){.wb-grid4{grid-template-columns:repeat(2,1fr)}} @media(min-width:1024px){.wb-grid4{grid-template-columns:repeat(4,1fr)}} .wb-num{display:inline-flex;align-items:center;justify-content:center;min-width:36px;height:28px;padding:0 10px;border-radius:9999px;background:#EEEDFF;color:var(--color-nova-blue);font-size:13px;font-weight:600} .wb-dark-card{border:1px solid rgba(255,255,255,.22);border-radius:12px;padding:24px;display:flex;flex-direction:column;gap:16px} .wb-dark-card p{margin:0;color:#fff;font-size:18px;line-height:1.4;font-weight:500} .wb-eyebrow{display:inline-block;margin-bottom:16px;font-size:14px;font-weight:600;letter-spacing:.06em;text-transform:uppercase}</style>
+    <style>[data-giwip-nav-root] .ctnav-wrap{width:100%;max-width:1312px;margin:0 auto;padding:0 16px;box-sizing:border-box} [data-giwip-nav-root] [data-nav-card]{box-sizing:border-box;width:100%;max-width:1280px;margin:0 auto;padding:8px 6px 4px 6px!important;background:#fff;border:2px solid #ECECF4;border-radius:12px;box-shadow:0 6px 15px -2px rgba(16,24,40,.08)} [data-giwip-nav-root] .ctnav-row{display:grid!important;grid-template-columns:208px 1fr 208px;align-items:center;justify-content:space-between;width:100%;height:46px} [data-giwip-nav-root] .ctnav-left{display:flex;align-items:center;justify-self:start;box-sizing:border-box;width:208px;height:24px;padding:0 12px;gap:8px} [data-giwip-nav-root] .ctnav-row>a{justify-self:center} [data-giwip-nav-root] .ctnav-right{display:flex;align-items:center;justify-content:flex-end;justify-self:end;box-sizing:border-box;width:208px;height:46px;gap:8px} [data-giwip-nav-root] [data-nav-toggle]{padding:0!important;gap:8px!important;height:24px;background:transparent!important} [data-giwip-nav-root] .ctnav-menu-text{display:inline-block;box-sizing:border-box;width:43px;height:18px;padding-top:2px;font-size:14px!important;font-weight:600!important;line-height:100%!important;letter-spacing:0;text-align:center;vertical-align:middle;color:#05022A} [data-giwip-nav-root] [data-country-btn]{box-sizing:border-box!important;width:62px!important;height:46px!important;padding:14px 20px 14px 10px!important;gap:8px!important;border-radius:8px!important;border:1px solid #CCCCCC!important;background:#fff!important;box-shadow:0 2px 6px 0 #1018280F!important;justify-content:flex-start!important} [data-giwip-nav-root] .ctnav-country-label{display:block;width:0;height:18px;overflow:hidden;flex:none} [data-giwip-nav-root] [data-nav-cta]{display:inline-flex!important;align-items:center;justify-content:center;box-sizing:border-box;width:138px!important;height:46px!important;padding:14px 20px!important;gap:8px;border-radius:8px!important;background:#5446FF!important;border:1px solid #5446FF!important;color:#ECEFFF!important;box-shadow:0 2px 6px 0 #1018280F!important;font-size:14px!important;font-weight:500!important;line-height:18px!important;white-space:nowrap} [data-giwip-nav-root] [data-nav-cta]:hover{background:#fff!important;color:#5446FF!important} @media (max-width:640px){ [data-giwip-nav-root] .ctnav-row{grid-template-columns:auto 1fr auto} [data-giwip-nav-root] .ctnav-left{width:auto;padding:0 4px} [data-giwip-nav-root] .ctnav-right{width:auto} [data-giwip-nav-root] [data-nav-cta]{width:auto!important;padding:14px 12px!important} [data-giwip-nav-root] .ctnav-menu-text{display:none} } [data-giwip-nav-root] [data-nav-panel],[data-giwip-nav-root] [data-country-panel]{display:grid!important;grid-template-columns:minmax(0,1fr)!important;column-gap:0!important;row-gap:0!important;width:100%!important;max-width:none!important;margin:0!important;padding:0!important;border:0!important} [data-giwip-nav-root] [data-nav-panel]>div,[data-giwip-nav-root] [data-country-panel]>div{min-height:0!important;min-width:0!important;width:100%!important;max-width:none!important} [data-giwip-nav-root] [data-nav-panel]>div{overflow-y:auto;max-height:calc(100svh - 6rem)} [data-giwip-nav-root] .ctnav-body{display:block;padding:24px 16px 16px} @media (max-width:1023px){[data-giwip-nav-root] .ctnav-body{padding:16px 8px 8px}} [data-giwip-nav-root] .ctnav-links{display:flex;flex-wrap:wrap;justify-content:flex-start;align-items:flex-start;gap:24px 72px} @media (min-width:1024px){ [data-giwip-nav-root] .ctnav-links{display:grid;grid-template-columns:1fr auto 1fr;gap:24px} [data-giwip-nav-root] .ctnav-links>.ctnav-col:nth-child(1){justify-self:start} [data-giwip-nav-root] .ctnav-links>.ctnav-col:nth-child(2){justify-self:center} [data-giwip-nav-root] .ctnav-links>.ctnav-col:nth-child(3){justify-self:end} } [data-giwip-nav-root] .ctnav-col{display:flex;flex-direction:column;gap:16px} [data-giwip-nav-root] .ctnav-col p{margin:0} [data-giwip-nav-root] .ctnav-col ul{display:flex;flex-direction:column;gap:12px;list-style:none;margin:0;padding:0} [data-giwip-nav-root] .ctnav-col li{margin:0;padding:0} [data-giwip-nav-root] .ctnav-col li a{display:block} [data-giwip-nav-root] .ctnav-body{height:auto!important;min-height:0!important;max-height:none!important} [data-giwip-nav-root] .ctnav-links{align-items:start!important;align-content:start!important;height:auto!important;min-height:0!important} [data-giwip-nav-root] .ctnav-col{display:flex!important;flex-direction:column!important;justify-content:flex-start!important;align-self:start!important;height:auto!important;min-height:0!important;max-height:none!important;flex:0 0 auto!important} [data-giwip-nav-root] .ctnav-col ul{display:flex!important;flex-direction:column!important;gap:12px!important;list-style:none!important;margin:0!important;padding:0!important;justify-content:flex-start!important;align-items:stretch!important;height:auto!important;min-height:0!important;max-height:none!important;flex:0 0 auto!important} [data-giwip-nav-root] .ctnav-col li{display:block!important;margin:0!important;padding:0!important;height:auto!important;min-height:0!important;max-height:none!important;flex:0 0 auto!important;line-height:normal!important} [data-giwip-nav-root] .ctnav-col li a{display:block!important;height:auto!important;min-height:0!important;margin:0!important;padding:0!important} [data-giwip-nav-root] .ctnav-col ul::before,[data-giwip-nav-root] .ctnav-col ul::after,[data-giwip-nav-root] .ctnav-col li::before,[data-giwip-nav-root] .ctnav-col li::after{content:none!important;display:none!important} [data-giwip-nav-root] [data-nav-panel]>div{height:auto!important} [data-giwip-nav-root] [data-country-panel] li{height:auto!important;min-height:0!important} [data-giwip-nav-root] [data-country-panel]>div{overflow:hidden!important} [data-giwip-nav-root] [data-country-panel]>div>div{padding:24px 16px 16px!important;margin:0!important;width:100%!important} [data-giwip-nav-root] [data-country-panel] ul{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:8px!important;list-style:none!important;margin:0!important;padding:0!important;width:100%!important} [data-giwip-nav-root] [data-country-panel] li{margin:0!important;padding:0!important;min-width:0!important} [data-giwip-nav-root] [data-country-panel] a{display:flex!important;align-items:center!important;gap:8px!important;width:100%!important} @media (min-width:640px){[data-giwip-nav-root] [data-country-panel] ul{grid-template-columns:repeat(4,minmax(0,1fr))!important}} @media (min-width:1024px){[data-giwip-nav-root] [data-country-panel] ul{grid-template-columns:repeat(7,minmax(0,1fr))!important}}</style>
+    <style>.wb-tb-grid{display:grid;grid-template-columns:1fr;gap:16px;width:100%;max-width:1280px;margin:0 auto} @media(min-width:768px){.wb-tb-grid{grid-template-columns:repeat(3,minmax(0,1fr))}} .wb-tb-card{display:flex;align-items:flex-start;gap:16px;padding:24px;background:#fff;border:1px solid var(--palette-neutral-300);border-radius:12px} .wb-tb-ico{display:flex;flex-shrink:0;width:28px;height:28px} .wb-tb-card p{margin:0;font-size:17px;line-height:1.45;font-weight:600;color:#000} .wb-tb-note{max-width:820px;margin:32px auto 0;text-align:center;font-size:18px;line-height:1.55;color:var(--palette-neutral-500)}</style>
+    <link rel="preconnect" href="https://js-na2.hsforms.net">
+    <link rel="preconnect" href="https://forms.hsforms.com">
+    <link rel="preconnect" href="https://forms-na2.hsforms.com">
+    <script src="https://js-na2.hsforms.net/forms/embed/v2.js"></script>
+</head>
+<body>
+    <!-- Google Tag Manager (noscript) -->
+    <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-P5NDQXGH"
+    height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+    <!-- End Google Tag Manager (noscript) -->
+<div data-giwip-nav-root> <div class="fixed top-4 inset-x-0 z-[1000] pointer-events-none"> <div class="ctnav-wrap pointer-events-auto"> <div data-nav-card>
+<div class="ctnav-row">
+<div class="ctnav-left"> <button type="button" data-nav-toggle aria-expanded="false" aria-controls="ctnav-panel" class="group/toggle flex items-center gap-2 px-3 py-2 rounded-lg bg-transparent border-0 cursor-pointer font-[inherit] transition-colors hover:bg-slate-50"> <svg class="block w-6 h-6 shrink-0 text-vault-navy transition-transform duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] group-[.open]/toggle:rotate-90" viewBox="0 0 24 24" fill="none" aria-hidden="true"> <rect y="9" width="24" height="2" rx="1" fill="currentColor"></rect> <rect y="14" width="24" height="2" rx="1" fill="currentColor"></rect> </svg> <span class="ctnav-menu-text font-body">Menu</span> </button> </div>
+<a href="/" class="flex items-center shrink-0" aria-label="ClearTax home"> <img src="https://cdn.prod.website-files.com/6093bce33d9b4bae841b04e3/69dfcff6071b983201f5f097_logo-cleartax.svg" alt="ClearTax" class="h-6 w-28" width="112" height="24" loading="eager" fetchpriority="high" decoding="async"> </a>
+<div class="ctnav-right">
+<button type="button" data-country-btn aria-label="Country: India" aria-expanded="false" aria-controls="ctnav-country" class="group/country inline-flex items-center justify-center gap-2 px-[14px] bg-generic-00 border border-[#CCCCCC] rounded-lg shadow-[0px_2px_6px_rgba(16,24,40,0.06)] cursor-pointer font-[inherit] transition-colors hover:bg-slate-50"> <img src="https://cdn.prod.website-files.com/6141e3720a248d2024615d96/649999dbc3faf054134a1e01_India_flag.png" alt="" class="h-4 w-6 shrink-0 rounded-[2px] object-contain" width="24" height="16" loading="eager" decoding="async"> <span data-country-current class="ctnav-country-label" aria-hidden="true"></span> </button>
+<a href="https://www.cleartax.com/contact-us" data-nav-cta data-demo-open="" class="inline-flex items-center justify-center gap-2 px-5 text-[length:var(--fs-label-lg)] leading-[length:var(--lh-label-lg)] font-medium text-nova-50 bg-nova-blue border border-nova-blue rounded-lg whitespace-nowrap no-underline transition-all duration-200 hover:bg-generic-00 hover:text-nova-blue">Book a demo</a>
+</div>
+</div>
+<div id="ctnav-panel" data-nav-panel style="grid-template-rows:0fr;max-height:0;overflow:hidden" class="grid grid-rows-[0fr] transition-[grid-template-rows] duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] [&.open]:grid-rows-[1fr]">
+<div>
+<div class="ctnav-body">
+<div class="ctnav-links"><div class="ctnav-col"><p class="font-body font-medium text-vault-navy text-[length:var(--fs-body-lg)] leading-[length:var(--lh-body-lg)]">Products</p><ul><li><a href="https://www.cleartax.com/global/recon-ai" class="block no-underline font-medium font-body text-neutral-500 text-[length:var(--fs-body-lg)] leading-[length:var(--lh-body-lg)] transition-colors hover:text-nova-blue">AI Reconciliation</a></li><li><a href="https://www.cleartax.com/global/compliance" class="block no-underline font-medium font-body text-neutral-500 text-[length:var(--fs-body-lg)] leading-[length:var(--lh-body-lg)] transition-colors hover:text-nova-blue">Compliance</a></li><li><a href="https://www.cleartax.com/global/e-invoicing" class="block no-underline font-medium font-body text-neutral-500 text-[length:var(--fs-body-lg)] leading-[length:var(--lh-body-lg)] transition-colors hover:text-nova-blue">Global E-Invoicing</a></li><li><a href="https://www.cleartax.com/global/erp-integration" class="block no-underline font-medium font-body text-neutral-500 text-[length:var(--fs-body-lg)] leading-[length:var(--lh-body-lg)] transition-colors hover:text-nova-blue">Integration</a></li><li><a href="https://www.cleartax.com/global/scale-security" class="block no-underline font-medium font-body text-neutral-500 text-[length:var(--fs-body-lg)] leading-[length:var(--lh-body-lg)] transition-colors hover:text-nova-blue">Scale &amp; Security</a></li></ul></div><div class="ctnav-col"><p class="font-body font-medium text-vault-navy text-[length:var(--fs-body-lg)] leading-[length:var(--lh-body-lg)]">Resources</p><ul><li><a href="https://www.cleartax.com/electronic-invoicing#country-select" class="block no-underline font-medium font-body text-neutral-500 text-[length:var(--fs-body-lg)] leading-[length:var(--lh-body-lg)] transition-colors hover:text-nova-blue">Blogs</a></li><li><a href="https://www.cleartax.com/case-studies" class="block no-underline font-medium font-body text-neutral-500 text-[length:var(--fs-body-lg)] leading-[length:var(--lh-body-lg)] transition-colors hover:text-nova-blue">Case Studies</a></li></ul></div><div class="ctnav-col"><p class="font-body font-medium text-vault-navy text-[length:var(--fs-body-lg)] leading-[length:var(--lh-body-lg)]">Company</p><ul><li><a href="https://www.cleartax.com/contact-us" class="block no-underline font-medium font-body text-neutral-500 text-[length:var(--fs-body-lg)] leading-[length:var(--lh-body-lg)] transition-colors hover:text-nova-blue">Contact Us</a></li><li><a href="https://www.cleartax.com/global/partner-program" class="block no-underline font-medium font-body text-neutral-500 text-[length:var(--fs-body-lg)] leading-[length:var(--lh-body-lg)] transition-colors hover:text-nova-blue">Partners</a></li></ul></div></div>
+</div>
+</div>
+</div>
+<div id="ctnav-country" data-country-panel style="grid-template-rows:0fr;max-height:0;overflow:hidden" class="grid grid-rows-[0fr] transition-[grid-template-rows] duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] [&.open]:grid-rows-[1fr]"> <div class="overflow-hidden"> <div class="px-4 pt-6 pb-4 max-lg:px-2"> <ul class="list-none m-0 p-0 grid gap-2 grid-cols-2 sm:grid-cols-4 lg:grid-cols-7"> <li> <a href="https://www.cleartax.com/bh" class="flex items-center gap-2 w-full px-3 py-2.5 rounded-lg border border-neutral-200 bg-generic-00 text-[length:var(--fs-label)] leading-[length:var(--lh-label)] font-medium text-vault-navy font-body no-underline transition-colors hover:bg-slate-50 hover:border-nova-blue"> <img src="https://cdn.prod.website-files.com/6141e3720a248d2024615d96/63e29d6c2e1ddc75a632d00f_Group%201000003292.svg" alt="" class="h-4 w-6 shrink-0 rounded-[2px] object-contain" loading="lazy" decoding="async"><span>Bahrain</span>  </a> </li><li> <a href="https://www.cleartax.com/fr/en" class="flex items-center gap-2 w-full px-3 py-2.5 rounded-lg border border-neutral-200 bg-generic-00 text-[length:var(--fs-label)] leading-[length:var(--lh-label)] font-medium text-vault-navy font-body no-underline transition-colors hover:bg-slate-50 hover:border-nova-blue"> <img src="https://cdn.prod.website-files.com/6141e3720a248d2024615d96/64999768870655432964457d_france_flag.png" alt="" class="h-4 w-6 shrink-0 rounded-[2px] object-contain" loading="lazy" decoding="async"><span>France</span>  </a> </li><li> <a href="https://www.clear.in/" class="flex items-center gap-2 w-full px-3 py-2.5 rounded-lg border border-neutral-200 bg-generic-00 text-[length:var(--fs-label)] leading-[length:var(--lh-label)] font-medium text-vault-navy font-body no-underline transition-colors hover:bg-slate-50 hover:border-nova-blue"> <img src="https://cdn.prod.website-files.com/6141e3720a248d2024615d96/649999dbc3faf054134a1e01_India_flag.png" alt="" class="h-4 w-6 shrink-0 rounded-[2px] object-contain" loading="lazy" decoding="async"><span>India</span>  </a> </li><li> <a href="https://www.cleartax.com/my/en" class="flex items-center gap-2 w-full px-3 py-2.5 rounded-lg border border-neutral-200 bg-generic-00 text-[length:var(--fs-label)] leading-[length:var(--lh-label)] font-medium text-vault-navy font-body no-underline transition-colors hover:bg-slate-50 hover:border-nova-blue"> <img src="https://cdn.prod.website-files.com/6141e3720a248d2024615d96/649a7b4653733f5dbda826ea_malaysia%20v1.png" alt="" class="h-4 w-6 shrink-0 rounded-[2px] object-contain" loading="lazy" decoding="async"><span>Malaysia</span>  </a> </li><li> <a href="https://www.cleartax.com/om" class="flex items-center gap-2 w-full px-3 py-2.5 rounded-lg border border-neutral-200 bg-generic-00 text-[length:var(--fs-label)] leading-[length:var(--lh-label)] font-medium text-vault-navy font-body no-underline transition-colors hover:bg-slate-50 hover:border-nova-blue"> <img src="https://cdn.prod.website-files.com/6141e3720a248d2024615d96/63e29d499e782b5935404547_Group%201000003291.svg" alt="" class="h-4 w-6 shrink-0 rounded-[2px] object-contain" loading="lazy" decoding="async"><span>Oman</span>  </a> </li><li> <a href="https://www.cleartax.com/sg/e-invoicing-software" class="flex items-center gap-2 w-full px-3 py-2.5 rounded-lg border border-neutral-200 bg-generic-00 text-[length:var(--fs-label)] leading-[length:var(--lh-label)] font-medium text-vault-navy font-body no-underline transition-colors hover:bg-slate-50 hover:border-nova-blue"> <img src="https://cdn.prod.website-files.com/6141e3720a248d2024615d96/66716d4c6753fb52078bec02_singapore%20flag%203.png" alt="" class="h-4 w-6 shrink-0 rounded-[2px] object-contain" loading="lazy" decoding="async"><span>Singapore</span>  </a> </li><li> <a href="https://www.cleartax.com/es/en" class="flex items-center gap-2 w-full px-3 py-2.5 rounded-lg border border-neutral-200 bg-generic-00 text-[length:var(--fs-label)] leading-[length:var(--lh-label)] font-medium text-vault-navy font-body no-underline transition-colors hover:bg-slate-50 hover:border-nova-blue"> <img src="https://cdn.prod.website-files.com/6141e3720a248d2024615d96/64999a546cfce1e0515f0f60_spain%20flag.png" alt="" class="h-4 w-6 shrink-0 rounded-[2px] object-contain" loading="lazy" decoding="async"><span>Spain</span>  </a> </li><li> <a href="https://www.cleartax.com/be/en" class="flex items-center gap-2 w-full px-3 py-2.5 rounded-lg border border-neutral-200 bg-generic-00 text-[length:var(--fs-label)] leading-[length:var(--lh-label)] font-medium text-vault-navy font-body no-underline transition-colors hover:bg-slate-50 hover:border-nova-blue"> <img src="https://cdn.prod.website-files.com/6141e3720a248d2024615d96/67e3e6ae1e19488131f26dfd_belgium_flag.png" alt="" class="h-4 w-6 shrink-0 rounded-[2px] object-contain" loading="lazy" decoding="async"><span>Belgium</span>  </a> </li><li> <a href="https://www.cleartax.com/de/en" class="flex items-center gap-2 w-full px-3 py-2.5 rounded-lg border border-neutral-200 bg-generic-00 text-[length:var(--fs-label)] leading-[length:var(--lh-label)] font-medium text-vault-navy font-body no-underline transition-colors hover:bg-slate-50 hover:border-nova-blue"> <img src="https://assets.clear.in/cleartax/images/1771829770_flagforflaggermanysvgrepocom1.svg" alt="" class="h-4 w-6 shrink-0 rounded-[2px] object-contain" loading="lazy" decoding="async"><span>Germany</span>  </a> </li><li> <a href="https://www.cleartax.com/sa" class="flex items-center gap-2 w-full px-3 py-2.5 rounded-lg border border-neutral-200 bg-generic-00 text-[length:var(--fs-label)] leading-[length:var(--lh-label)] font-medium text-vault-navy font-body no-underline transition-colors hover:bg-slate-50 hover:border-nova-blue"> <img src="https://cdn.prod.website-files.com/6141e3720a248d2024615d96/63e28756aeabe12df79ff5d5_Rectangle%202515530.svg" alt="" class="h-4 w-6 shrink-0 rounded-[2px] object-contain" loading="lazy" decoding="async"><span>KSA</span>  </a> </li><li> <a href="https://www.cleartax.com/no" class="flex items-center gap-2 w-full px-3 py-2.5 rounded-lg border border-neutral-200 bg-generic-00 text-[length:var(--fs-label)] leading-[length:var(--lh-label)] font-medium text-vault-navy font-body no-underline transition-colors hover:bg-slate-50 hover:border-nova-blue"> <img src="https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6a7999a2fdf9fde123422a1b_Flag_of_Norway.svg.webp" alt="" class="h-4 w-6 shrink-0 rounded-[2px] object-contain" loading="lazy" decoding="async"><span>Norway</span>  </a> </li><li> <a href="https://www.cleartax.com/ph" class="flex items-center gap-2 w-full px-3 py-2.5 rounded-lg border border-neutral-200 bg-generic-00 text-[length:var(--fs-label)] leading-[length:var(--lh-label)] font-medium text-vault-navy font-body no-underline transition-colors hover:bg-slate-50 hover:border-nova-blue"> <img src="https://cdn.prod.website-files.com/6141e3720a248d2024615d96/6a2935c197e9e718191d8d34_Flag_of_the_Philippines.svg" alt="" class="h-4 w-6 shrink-0 rounded-[2px] object-contain" loading="lazy" decoding="async"><span>Philippines</span>  </a> </li><li> <a href="https://www.cleartax.com/sk" class="flex items-center gap-2 w-full px-3 py-2.5 rounded-lg border border-neutral-200 bg-generic-00 text-[length:var(--fs-label)] leading-[length:var(--lh-label)] font-medium text-vault-navy font-body no-underline transition-colors hover:bg-slate-50 hover:border-nova-blue"> <img src="https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6a7c4a36ac18ccf3dcb998be_slovakia-flag.png" alt="" class="h-4 w-6 shrink-0 rounded-[2px] object-contain" loading="lazy" decoding="async"><span>Slovakia</span>  </a> </li><li> <a href="https://www.cleartax.com/ae" class="flex items-center gap-2 w-full px-3 py-2.5 rounded-lg border border-neutral-200 bg-generic-00 text-[length:var(--fs-label)] leading-[length:var(--lh-label)] font-medium text-vault-navy font-body no-underline transition-colors hover:bg-slate-50 hover:border-nova-blue"> <img src="https://cdn.prod.website-files.com/6141e3720a248d2024615d96/63e29d24f310792735ab4bba_Mask%20group%20(3).svg" alt="" class="h-4 w-6 shrink-0 rounded-[2px] object-contain" loading="lazy" decoding="async"><span>UAE</span>  </a> </li> </ul> </div> </div> </div>
+</div> </div> </div> </div>
+<script>
+(function () {
+const navbar = document.querySelector("[data-giwip-nav-root]");
+if (!navbar) return;
+const toggle = navbar.querySelector("[data-nav-toggle]");
+const panel = navbar.querySelector("[data-nav-panel]");
+const card = navbar.querySelector("[data-nav-card]");
+const countryBtn = navbar.querySelector("[data-country-btn]");
+const countryPanel = navbar.querySelector("[data-country-panel]");
+const subItems = Array.from(navbar.querySelectorAll("[data-nav-sub]"));
+const forcePanel = (el, open, instant) => {
+if (!el) return;
+clearTimeout(el._closeT);
+el.style.setProperty("display", "grid", "important");
+el.style.setProperty("grid-template-rows", open ? "1fr" : "0fr", "important");
+const inner = el.firstElementChild;
+if (inner) inner.style.setProperty("min-height", "0", "important");
+if (open) {
+el.style.removeProperty("max-height");
+el.style.removeProperty("overflow");
+} else if (instant) {
+el.style.setProperty("max-height", "0", "important");
+el.style.setProperty("overflow", "hidden", "important");
+} else {
+el._closeT = setTimeout(() => {
+el.style.setProperty("max-height", "0", "important");
+el.style.setProperty("overflow", "hidden", "important");
+}, 320);
+}
+};
+const fitCard = (instant) => {
+if (!card) return;
+clearTimeout(card._fitT);
+const anyOpen =
+!!panel?.classList.contains("open") || !!countryPanel?.classList.contains("open");
+if (anyOpen) {
+card.style.setProperty("height", "auto", "important");
+card.style.removeProperty("overflow");
+return;
+}
+const apply = () => {
+const row = card.firstElementChild;
+if (!row) return;
+const cs = getComputedStyle(card);
+const num = (v) => parseFloat(v) || 0;
+let h = row.offsetHeight;
+if (cs.boxSizing === "border-box") {
+h += num(cs.paddingTop) + num(cs.paddingBottom) + num(cs.borderTopWidth) + num(cs.borderBottomWidth);
+}
+card.style.setProperty("height", h + "px", "important");
+card.style.setProperty("overflow", "hidden", "important");
+};
+if (instant) apply();
+else card._fitT = setTimeout(apply, 340);
+};
+const canHover =
+typeof window.matchMedia === "function" &&
+window.matchMedia("(hover: hover) and (pointer: fine)").matches;
+let hoverOpenedKey = null;
+let closeTimer;
+const cancelClose = () => clearTimeout(closeTimer);
+const resetSubs = () => {
+subItems.forEach((item) => {
+item.classList.remove("open");
+item.querySelector("[data-sub-trigger]")?.setAttribute("aria-expanded", "false");
+});
+};
+const syncToggleIcon = () => {
+const anyOpen =
+!!panel?.classList.contains("open") || !!countryPanel?.classList.contains("open");
+toggle?.classList.toggle("open", anyOpen);
+};
+const setPanelOpen = (open) => {
+if (!panel || !toggle) return;
+panel.classList.toggle("open", open);
+forcePanel(panel, open);
+fitCard();
+toggle.setAttribute("aria-expanded", open ? "true" : "false");
+if (!open) {
+resetSubs();
+if (hoverOpenedKey === "menu") hoverOpenedKey = null;
+}
+syncToggleIcon();
+};
+const setCountryOpen = (open) => {
+if (!countryPanel || !countryBtn) return;
+countryPanel.classList.toggle("open", open);
+forcePanel(countryPanel, open);
+fitCard();
+countryBtn.setAttribute("aria-expanded", open ? "true" : "false");
+if (!open && hoverOpenedKey === "country") hoverOpenedKey = null;
+syncToggleIcon();
+};
+const PANELS = {
+menu: { el: () => panel, set: setPanelOpen, setOther: setCountryOpen },
+country: { el: () => countryPanel, set: setCountryOpen, setOther: setPanelOpen },
+};
+const onTriggerClick = (key) => (e) => {
+e.stopPropagation();
+if (hoverOpenedKey === key) {
+hoverOpenedKey = null;
+return;
+}
+const p = PANELS[key];
+const open = !p.el()?.classList.contains("open");
+p.set(open);
+if (open) p.setOther(false);
+};
+const onTriggerHover = (key) => () => {
+cancelClose();
+const p = PANELS[key];
+if (p.el()?.classList.contains("open")) return;
+hoverOpenedKey = key;
+p.setOther(false);
+p.set(true);
+};
+toggle?.addEventListener("click", onTriggerClick("menu"));
+countryBtn?.addEventListener("click", onTriggerClick("country"));
+if (canHover && card) {
+toggle?.addEventListener("mouseenter", onTriggerHover("menu"));
+countryBtn?.addEventListener("mouseenter", onTriggerHover("country"));
+card.addEventListener("mouseenter", cancelClose);
+card.addEventListener("mouseleave", () => {
+const key = hoverOpenedKey;
+if (!key) return;
+cancelClose();
+closeTimer = setTimeout(() => PANELS[key].set(false), 180);
+});
+}
+const setSubOpen = (item, open) => {
+item.classList.toggle("open", open);
+item
+.querySelector("[data-sub-trigger]")
+?.setAttribute("aria-expanded", open ? "true" : "false");
+};
+subItems.forEach((item) => {
+item.querySelector("[data-sub-trigger]")?.addEventListener("click", (e) => {
+e.preventDefault();
+setSubOpen(item, !item.classList.contains("open"));
+});
+});
+document.addEventListener("click", (e) => {
+if (!e.target.closest("[data-giwip-nav-root]")) {
+setPanelOpen(false);
+setCountryOpen(false);
+}
+});
+panel?.addEventListener("click", (e) => {
+if (e.target.closest("a[href]")) setPanelOpen(false);
+});
+countryPanel?.addEventListener("click", (e) => {
+if (e.target.closest("a[href]")) setCountryOpen(false);
+});
+forcePanel(panel, false, true);
+forcePanel(countryPanel, false, true);
+fitCard(true);
+window.addEventListener("load", () => fitCard(true));
+window.addEventListener("resize", () => fitCard(true));
+if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => fitCard(true));
+document.addEventListener("keydown", (e) => {
+if (e.key !== "Escape") return;
+setPanelOpen(false);
+setCountryOpen(false);
+});
+})();
+</script>
+<style>.sp-hero-glow-a{background:radial-gradient(circle at center,#FFF 0%,rgba(242,241,240,.25) 30.04%,rgba(255,255,255,0) 65%)} .sp-hero-glow-b{background:linear-gradient(180deg,#FFF 0%,rgba(242,241,240,.25) 30.04%,rgba(242,241,240,.25) 87.79%,#FFF 100%)} .sp-hero-pad{box-sizing:border-box;width:100%;max-width:1328px!important;padding:100px 24px 64px} @media(min-width:1024px){.sp-hero-pad{padding:108px 24px 96px}}</style>
+<section id="sp-hero" class="sp-hero relative overflow-hidden bg-generic-00" data-line-width="3" data-gap="24" data-max-length="6" data-length-radius="260" data-tilt="1" data-base-color="#C8F006" data-cursor-radius="320" data-pull="14" data-fade-radius="40">
+<div class="absolute inset-0 z-0 w-full h-full pointer-events-none"> <canvas id="sp-hero-dots" class="absolute inset-0 w-full h-full"></canvas> </div>
+<div class="sp-hero-glow-a absolute inset-0 z-0 pointer-events-none"></div>
+<div class="sp-hero-glow-b absolute inset-0 z-0 pointer-events-none"></div>
+<div class="container mx-auto relative z-10 px-4 lg:px-6 sp-hero-pad">
+<style>.wb-h1{white-space:normal!important}@media(min-width:1024px){.wb-h1{font-size:clamp(26px,2.6vw,36px)!important}}@media(max-width:479px){.wb-h1 .wb-nowrap{white-space:normal!important}} .wb-h1{line-height:1.2!important}.wb-h1 .wb-nowrap{display:inline-block;line-height:1.1;padding-top:.02em;padding-bottom:.08em} .wb-date{margin:0 0 20px;font-size:18px;font-weight:600;color:var(--color-vault-navy)} .wb-chips{display:grid;grid-template-columns:1fr;gap:12px;width:100%} @media(min-width:640px){.wb-chips{grid-template-columns:repeat(2,minmax(0,1fr))}} .wb-chip{display:flex;flex-direction:column;gap:2px;padding:12px 16px;background:#fff;border:1px solid var(--palette-neutral-300);border-radius:12px} .wb-chip strong{font-size:15px;font-weight:600;color:var(--color-vault-navy)} .wb-chip span{font-size:14px;line-height:1.4;color:var(--palette-neutral-500)} .wb-hero-form .wb-support{margin:0 0 20px;font-size:15px;line-height:1.5;color:var(--palette-neutral-500)} .wb-hero-form .wb-under{margin:16px 0 0;font-size:14px;color:var(--palette-neutral-500);text-align:center} .wb-hero-form .wb-eyebrow{margin-bottom:8px} .wb-hero-form h3{margin-bottom:8px!important} .wb-hero-left .wb-date{margin:24px 0 0} .wb-spk{display:flex;align-items:center;gap:18px;margin-top:14px;padding:16px 20px;background:#fff;border:1px solid var(--palette-neutral-300);border-radius:14px;width:fit-content;max-width:100%} .wb-spk img{width:84px;height:84px;border-radius:16px;object-fit:cover;object-position:top;flex-shrink:0;background:#F3F1F9} .wb-spk div{display:flex;flex-direction:column;gap:3px;min-width:0} .wb-spk .wb-spk-label{font-size:13px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--color-nova-blue)} .wb-spk strong{font-size:22px;line-height:1.2;font-weight:600;color:var(--color-vault-navy)} .wb-spk div span:last-child{font-size:16px;color:var(--palette-neutral-500)} .wb-spk .wb-li{width:36px;height:36px;border-radius:10px;margin-left:6px} .wb-hero-form .giwip-hs-form-wrap{min-height:0!important} .wb-li{display:inline-flex;align-items:center;justify-content:center;width:30px;height:30px;border-radius:8px;border:1px solid #CCCCCC;background:#fff;color:#0A66C2;text-decoration:none;flex-shrink:0;transition:background .2s,border-color .2s,color .2s} .wb-li:hover{background:#0A66C2;border-color:#0A66C2;color:#fff} .wb-hero-form h3{margin-bottom:20px!important}</style>
+<div class="wb-hero-grid">
+<div class="wb-hero-left">
+<div class="wb-pill">Virtual Event</div>
+<h2 class="wb-h1 text-black font-semibold font-heading leading-[1.1] mb-4 m-0">
+<span class="wb-nowrap text-black bg-flux-lime px-1 rounded-lg">GST 3.0</span>: The Next CFO Agenda<br>for India Enterprises
+</h2>
+<p class="text-base sm:text-lg text-vault-navy font-semibold font-body leading-normal mb-3">Impact of the 57th GST Council Meeting on cash flow, business confidence and the future of finance</p>
+<p class="text-base sm:text-lg text-neutral-500 font-medium font-body leading-normal mb-4">The 57th GST Council Meeting recommended changes to the law. For a CFO, the questions are more immediate. What could these proposals change in the cash forecast, the risk review and the way finance works?</p>
+<p class="text-base sm:text-lg text-neutral-500 font-medium font-body leading-normal mb-0">Join CA Rohit Kumar Jain for a CFO-focused discussion. Explore what deserves attention now and what must wait for the final legal text.</p>
+<p class="wb-date">28th October 2026 · 11:00 AM IST</p>
+<div class="wb-spk"><img src="https://cdn.prod.website-files.com/6141e3720a248d2024615d96/6ad6053f285501752242bcfd_CA.png" alt="Rohit Jain" width="84" height="84" loading="eager" decoding="async"><div><span class="wb-spk-label">Speaker</span><strong>Rohit Jain</strong><span>GST Expert, ClearTax</span></div><a href="https://www.linkedin.com/in/ca-rohit-jain-59339b100/" target="_blank" rel="noopener noreferrer" class="wb-li" aria-label="Rohit Jain on LinkedIn"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M20.45 20.45h-3.56v-5.57c0-1.33-.03-3.04-1.85-3.04-1.85 0-2.14 1.45-2.14 2.94v5.67H9.35V9h3.41v1.56h.05c.48-.9 1.64-1.85 3.37-1.85 3.6 0 4.27 2.37 4.27 5.46v6.28zM5.34 7.43a2.06 2.06 0 1 1 0-4.12 2.06 2.06 0 0 1 0 4.12zM7.12 20.45H3.56V9h3.56v11.45zM22.22 0H1.77C.79 0 0 .77 0 1.73v20.54C0 23.23.79 24 1.77 24h20.45c.98 0 1.78-.77 1.78-1.73V1.73C24 .77 23.2 0 22.22 0z"/></svg></a></div>
+</div>
+<div class="wb-hero-form" id="heroForm">
+<h3>Watch the webinar</h3>
+<div class="wb-vid" id="wb-vid">
+<button type="button" class="wb-vid-play" id="wb-vid-open" aria-haspopup="dialog">
+<img class="wb-vid-thumb" src="https://cdn.prod.website-files.com/6141e3720a248d2024615d96/6aedb2ba7d3349aef1ec8c80_28th%20Oct%20-%20screenshot%20for%20recording%20-%20resized.png" alt="" width="1920" height="1080" decoding="async">
+<span class="wb-vid-btn"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 4l14 8-14 8z"/></svg></span>
+<span class="wb-vid-sr">Watch the webinar</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+</section>
+<script>
+function initSpHeroGrid() {
+const section = document.getElementById('sp-hero');
+if (!section) return;
+const canvas = document.getElementById('sp-hero-dots');
+if (!canvas || !canvas.getContext) return;
+const ctx = canvas.getContext('2d');
+function num(name, fallback) {
+const value = parseFloat(section.getAttribute(name));
+return isNaN(value) ? fallback : value;
+}
+const config = {
+lineWidth: num('data-line-width', 2),
+gap: num('data-gap', 24),
+maxLength: num('data-max-length', 6),
+lengthRadius: num('data-length-radius', 260),
+tilt: num('data-tilt', 1),
+baseColor: section.getAttribute('data-base-color') || '#C8F006',
+cursorRadius: num('data-cursor-radius', 320),
+pull: num('data-pull', 14),
+fadeRadius: num('data-fade-radius', 40),
+fadeSpeed: 12,
+followSpeed: 7,
+engageSpeed: 4,
+focusSpeed: 5,
+};
+const HALF_PI = Math.PI / 2; // straight down, the resting angle
+let width = 0;
+let height = 0;
+let dots = [];
+const mouse = { x: -9999, y: -9999, prevX: -9999, prevY: -9999 };
+let hover = false;
+let speed = 0; // smoothed cursor travel, px per frame
+let engagement = 0; // 0-1, how awake the field is
+let presence = 0; // 0-1, whether a pointer is over the section at all
+let focusX = 0;
+let focusY = 0;
+function initGrid() {
+const parent = canvas.parentElement;
+width = parent.offsetWidth;
+height = parent.offsetHeight;
+if (!width || !height) return;
+const dpr = window.devicePixelRatio || 1;
+canvas.width = Math.round(width * dpr);
+canvas.height = Math.round(height * dpr);
+ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+dots = [];
+const spacing = config.lineWidth + config.gap;
+const cols = Math.floor(width / spacing);
+const rows = Math.floor(height / spacing);
+const startX = (width - cols * spacing) / 2 + config.lineWidth / 2;
+const startY = (height - rows * spacing) / 2 + config.lineWidth / 2;
+for (let y = 0; y <= rows; y++) {
+for (let x = 0; x <= cols; x++) {
+const cx = startX + x * spacing;
+const cy = startY + y * spacing;
+dots.push({ x: cx, y: cy, ox: cx, oy: cy, alpha: 1, hx: 0, hy: 0 });
+}
+}
+if (!hover) {
+focusX = width / 2;
+focusY = height / 2;
+}
+aim();
+paint();
+}
+function aim() {
+const longest = config.maxLength / 2;
+const turn = presence * config.tilt;
+for (let i = 0; i < dots.length; i++) {
+const dot = dots[i];
+const dx = focusX - dot.ox;
+const dy = focusY - dot.oy;
+const dist = Math.sqrt(dx * dx + dy * dy);
+let t = dist / config.lengthRadius;
+if (t > 1) t = 1;
+const grow = 1 - t;
+let reach = longest * grow * grow * (3 - 2 * grow) * presence;
+if (reach < 0.25) reach = 0.25;
+let ux = 0;
+let uy = 1;
+if (turn > 0.001 && dist > 0.01) {
+let off = Math.atan2(dy, dx) - HALF_PI;
+while (off > HALF_PI) off -= Math.PI;
+while (off < -HALF_PI) off += Math.PI;
+const angle = HALF_PI + off * turn;
+ux = Math.cos(angle);
+uy = Math.sin(angle);
+}
+dot.hx = ux * reach;
+dot.hy = uy * reach;
+}
+}
+function paint() {
+ctx.clearRect(0, 0, width, height);
+ctx.strokeStyle = config.baseColor;
+ctx.lineWidth = config.lineWidth;
+ctx.lineCap = 'round'; // so a stroke shrunk to nothing reads as a dot
+ctx.globalAlpha = 1;
+ctx.beginPath();
+for (let i = 0; i < dots.length; i++) {
+const dot = dots[i];
+if (dot.alpha < 0.995) continue;
+ctx.moveTo(dot.x - dot.hx, dot.y - dot.hy);
+ctx.lineTo(dot.x + dot.hx, dot.y + dot.hy);
+}
+ctx.stroke();
+for (let j = 0; j < dots.length; j++) {
+const fading = dots[j];
+if (fading.alpha >= 0.995 || fading.alpha < 0.01) continue;
+ctx.globalAlpha = fading.alpha;
+ctx.beginPath();
+ctx.moveTo(fading.x - fading.hx, fading.y - fading.hy);
+ctx.lineTo(fading.x + fading.hx, fading.y + fading.hy);
+ctx.stroke();
+}
+ctx.globalAlpha = 1;
+}
+const reduceMotion =
+window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+if (reduceMotion) {
+initGrid();
+paint();
+window.addEventListener('resize', () => {
+initGrid();
+paint();
+});
+return;
+}
+let lastTime = performance.now();
+let isFirstFrame = true;
+function draw(time) {
+if (dots.length === 0) {
+initGrid();
+}
+let dt = (time - lastTime) / 1000;
+if (dt > 0.05) dt = 0.05; // cap so a backgrounded tab can't jolt the grid
+lastTime = time;
+const fadeEase = Math.min(1, config.fadeSpeed * dt);
+const followEase = Math.min(1, config.followSpeed * dt);
+const engageEase = Math.min(1, config.engageSpeed * dt);
+const focusEase = Math.min(1, config.focusSpeed * dt);
+const travelX = mouse.x - mouse.prevX;
+const travelY = mouse.y - mouse.prevY;
+mouse.prevX = mouse.x;
+mouse.prevY = mouse.y;
+speed += (Math.sqrt(travelX * travelX + travelY * travelY) - speed) * 0.5;
+if (speed < 0.01) speed = 0;
+engagement += ((hover ? Math.min(speed / 6, 1) : 0) - engagement) * engageEase;
+if (engagement < 0.001) engagement = 0;
+const grip = hover ? 0.4 + 0.6 * engagement : 0;
+const wantX = hover ? mouse.x : width / 2;
+const wantY = hover ? mouse.y : height / 2;
+const swungX = wantX - focusX;
+const swungY = wantY - focusY;
+let swung = swungX > 0.05 || swungX < -0.05 || swungY > 0.05 || swungY < -0.05;
+if (swung) {
+focusX += swungX * focusEase;
+focusY += swungY * focusEase;
+} else if (focusX !== wantX || focusY !== wantY) {
+focusX = wantX;
+focusY = wantY;
+swung = true;
+}
+const wantPresence = hover ? 1 : 0;
+const presenceDiff = wantPresence - presence;
+if (presenceDiff > 0.002 || presenceDiff < -0.002) {
+presence += presenceDiff * focusEase;
+swung = true;
+} else if (presence !== wantPresence) {
+presence = wantPresence;
+swung = true;
+}
+if (swung) aim();
+const crSq = config.cursorRadius * config.cursorRadius;
+let moving = swung;
+for (let i = 0; i < dots.length; i++) {
+const dot = dots[i];
+const dx = focusX - dot.ox;
+const dy = focusY - dot.oy;
+const distSq = dx * dx + dy * dy;
+let targetAlpha = 1;
+let targetX = dot.ox;
+let targetY = dot.oy;
+if (distSq < crSq) {
+const dist = Math.sqrt(distSq);
+if (grip > 0.001) {
+const t = 1 - dist / config.cursorRadius;
+let push = t * t * config.pull * grip;
+if (push > dist * 0.75) push = dist * 0.75;
+const step = dist > 0.01 ? push / dist : 0;
+targetX += dx * step;
+targetY += dy * step;
+}
+if (dist < config.fadeRadius) {
+const ft = dist / config.fadeRadius;
+const hole = ft * ft * (3 - 2 * ft);
+targetAlpha = 1 - (1 - hole) * presence;
+}
+}
+const offX = targetX - dot.x;
+const offY = targetY - dot.y;
+if (offX > 0.05 || offX < -0.05 || offY > 0.05 || offY < -0.05) {
+dot.x += offX * followEase;
+dot.y += offY * followEase;
+moving = true;
+} else if (dot.x !== targetX || dot.y !== targetY) {
+dot.x = targetX;
+dot.y = targetY;
+moving = true;
+}
+const diff = targetAlpha - dot.alpha;
+if (diff > 0.002 || diff < -0.002) {
+dot.alpha += diff * fadeEase;
+moving = true;
+} else if (dot.alpha !== targetAlpha) {
+dot.alpha = targetAlpha;
+moving = true;
+}
+}
+if (moving || isFirstFrame) {
+paint();
+isFirstFrame = false;
+}
+requestAnimationFrame(draw);
+}
+window.addEventListener('resize', initGrid);
+initGrid();
+requestAnimationFrame(draw);
+section.addEventListener('mousemove', (e) => {
+const rect = canvas.getBoundingClientRect();
+const sx = rect.width ? width / rect.width : 1;
+const sy = rect.height ? height / rect.height : 1;
+const nx = (e.clientX - rect.left) * sx;
+const ny = (e.clientY - rect.top) * sy;
+if (!hover) {
+mouse.prevX = nx;
+mouse.prevY = ny;
+}
+hover = true;
+mouse.x = nx;
+mouse.y = ny;
+});
+section.addEventListener('mouseleave', () => {
+hover = false;
+speed = 0;
+});
+}
+if (document.readyState === 'loading') {
+document.addEventListener('DOMContentLoaded', initSpHeroGrid);
+} else {
+initSpHeroGrid();
+}
+</script>
+<script>
+(function () {
+var done = false, tries = 0;
+function init() {
+if (done) return;
+var src = document.getElementById("giwip-contact");
+var target = document.getElementById("gate-form");
+if (!src || !target) { if (tries++ < 50) setTimeout(init, 200); return; }
+var formId = src.getAttribute("data-form-id") || "";
+if (!formId || formId.indexOf("\x7b\x7b") === 0) return;
+if (!(window.hbspt && window.hbspt.forms)) { if (tries++ < 100) setTimeout(init, 200); return; }
+done = true;
+window.hbspt.forms.create({
+portalId: src.getAttribute("data-portal-id") || "245744706",
+formId: formId,
+region: src.getAttribute("data-region") || "na2",
+target: "#gate-form",
+onFormSubmitted: function () { if (window.wbVideoUnlock) window.wbVideoUnlock(true); },
+submitText: "Reserve my seat",
+onFormReady: function ($form) {
+var sk = document.getElementById("gate-form-skeleton");
+if (sk) sk.remove();
+var el = $form && $form[0] ? $form[0] : $form;
+if (el && el.querySelector) {
+var p = new URLSearchParams(window.location.search);
+["utm_source","utm_medium","utm_campaign","utm_term","utm_content"].forEach(function (k) {
+var v = p.get(k), i = v && el.querySelector('input[name="' + k + '"]');
+if (i) i.value = v;
+});
+}
+}
+});
+}
+if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", init); else init();
+})();
+</script>
+<style>.wb-reason{display:grid;grid-template-columns:minmax(0,1fr);gap:32px;width:100%;max-width:1280px;margin:0 auto;align-items:start} @media(min-width:1024px){.wb-reason{grid-template-columns:minmax(0,1fr) minmax(0,1.05fr);gap:64px}} .wb-reason p{margin:0 0 16px;font-size:18px;line-height:1.6;color:var(--palette-neutral-500)} .wb-reason .wb-callout{margin:24px 0 0;padding:20px 24px;background:#F3F1F9;border-left:4px solid var(--color-nova-blue);border-radius:0 12px 12px 0;font-size:18px;line-height:1.55;font-weight:600;color:var(--color-vault-navy)}</style>
+<section class="bg-generic-00 py-12 lg:py-20" id="reason">
+<div class="mx-auto lg:container w-full px-4 lg:px-6">
+<div class="wb-reason">
+<div>
+<span class="wb-eyebrow text-nova-blue">The reason to attend</span>
+<h2 class="text-[26px] sm:text-[32px] lg:text-[40px] font-medium text-vault-navy m-0 leading-[1.2]">The Council has made its recommendations. What goes into your next finance review?</h2>
+</div>
+<div>
+<p>Picture the next review. Treasury asks whether refunds could arrive sooner. Tax has a list of credits that may become eligible. The reporting team is assessing return mismatches. Legal raises a notice spanning multiple financial years.</p>
+<p>These proposals are not yet new entitlements or obligations. But waiting for implementation can leave a CFO without a clear view of the potential implications for cash, controls and disputes.</p>
+<p class="wb-callout">The useful question now is: What can we quantify and prepare without assuming the law has changed?</p>
+</div>
+</div>
+</div>
+</section>
+<style>.wb-cov-grid{display:flex;flex-wrap:wrap;justify-content:center;gap:16px;width:100%;max-width:1280px;margin:0 auto} .wb-cov-card{display:flex;flex-direction:column;gap:14px;box-sizing:border-box;width:100%;padding:24px;background:#fff;border:1px solid var(--palette-neutral-300);border-radius:12px} @media(min-width:640px){.wb-cov-card{width:calc((100% - 16px)/2)}} @media(min-width:1024px){.wb-cov-card{width:calc((100% - 32px)/3)}} .wb-cov-tag{align-self:flex-start;padding:4px 12px;border-radius:9999px;background:#EEEDFF;color:var(--color-nova-blue);font-size:13px;font-weight:600} .wb-cov-card p{margin:0;font-size:17px;line-height:1.45;font-weight:500;color:var(--color-vault-navy)}</style>
+<section class="bg-gradient-to-t from-[#F3F1F9] to-generic-00 py-12 lg:py-20" id="cover">
+<div class="mx-auto lg:container w-full px-4 lg:px-6">
+<div class="text-center mx-auto mb-12">
+<span class="wb-eyebrow text-nova-blue">What we’ll cover</span>
+<h2 class="text-[26px] sm:text-[32px] lg:text-[40px] font-medium text-vault-navy mx-auto mb-4 m-0 leading-[1.2]" style="max-width:none">
+Five questions for the CFO agenda
+</h2>
+</div>
+<div class="wb-cov-grid">
+<div class="wb-cov-card"><span class="wb-cov-tag">Cash flow</span><p>Which refund proposals could affect recovery, and what should stay out of the forecast for now?</p></div>
+<div class="wb-cov-card"><span class="wb-cov-tag">Credit</span><p>Where is ITC difficult to trace, substantiate or assess against the proposed changes?</p></div>
+<div class="wb-cov-card"><span class="wb-cov-tag">Returns</span><p>Can finance see the exceptions behind the numbers reported in GSTR-3B?</p></div>
+<div class="wb-cov-card"><span class="wb-cov-tag">E-invoicing</span><p>Which specified purchase flows could bring new work into AP and finance systems?</p></div>
+<div class="wb-cov-card"><span class="wb-cov-tag">Disputes</span><p>How should proposed procedural relief and the multi-year notice validation clause inform your risk review?</p></div>
+</div>
+</div>
+</section>
+
+<section class="bg-generic-00 py-12 lg:py-20" id="takeback">
+<div class="mx-auto lg:container w-full px-4 lg:px-6">
+<div class="text-center mx-auto mb-12">
+<span class="wb-eyebrow text-nova-blue">What you’ll take back to your team</span>
+<h2 class="text-[26px] sm:text-[32px] lg:text-[40px] font-medium text-vault-navy mx-auto mb-4 m-0 leading-[1.2]" style="max-width:none">
+Better questions for your next finance review
+</h2>
+</div>
+<div class="wb-tb-grid">
+<div class="wb-tb-card"><span class="wb-tb-ico"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="11" fill="#EEEDFF"/><path d="m7.5 12.5 3 3 6-6.5" stroke="#5446ff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span><p>Leave with a way to separate potential cash from cash you can forecast.</p></div>
+<div class="wb-tb-card"><span class="wb-tb-ico"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="11" fill="#EEEDFF"/><path d="m7.5 12.5 3 3 6-6.5" stroke="#5446ff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span><p>See which controls you can improve now, and which rules are still being finalised.</p></div>
+<div class="wb-tb-card"><span class="wb-tb-ico"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="11" fill="#EEEDFF"/><path d="m7.5 12.5 3 3 6-6.5" stroke="#5446ff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span><p>Identify disputes that need review without changing your position prematurely.</p></div>
+</div>
+<p class="wb-tb-note">This is not a walkthrough of every Council recommendation. It is a discussion about the decisions a CFO needs to make around them.</p>
+</div>
+</section>
+<style>.wb-aud-grid{display:flex;flex-wrap:wrap;justify-content:center;gap:16px;width:100%;max-width:1280px;margin:0 auto} .wb-aud-card{display:flex;align-items:center;gap:16px;box-sizing:border-box;width:100%;padding:20px 24px;background:#fff;border:1px solid var(--palette-neutral-300);border-radius:12px} @media(min-width:640px){.wb-aud-card{width:calc((100% - 16px)/2)}} @media(min-width:1024px){.wb-aud-card{width:calc((100% - 32px)/3)}} .wb-aud-ico{display:flex;flex-shrink:0;width:28px;height:28px} .wb-aud-card p{margin:0;font-size:16px;line-height:1.4;font-weight:600;color:#000}</style>
+<section class="bg-gradient-to-t from-[#F3F1F9] to-generic-00 py-12 lg:py-20" id="audience">
+<div class="mx-auto lg:container w-full px-4 lg:px-6">
+<div class="text-center mx-auto mb-12">
+<span class="wb-eyebrow text-nova-blue">Who should attend</span>
+<h2 class="text-[26px] sm:text-[32px] lg:text-[40px] font-medium text-vault-navy mx-auto mb-4 m-0 leading-[1.2]" style="max-width:none">
+Designed for senior finance and tax stakeholders:
+</h2>
+</div>
+<div class="wb-aud-grid">
+<div class="wb-aud-card"><span class="wb-aud-ico"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="11" fill="#EEEDFF"/><path d="m7.5 12.5 3 3 6-6.5" stroke="#5446ff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span><p>CFOs &amp; Finance Directors</p></div>
+<div class="wb-aud-card"><span class="wb-aud-ico"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="11" fill="#EEEDFF"/><path d="m7.5 12.5 3 3 6-6.5" stroke="#5446ff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span><p>Heads of Tax / Tax Directors</p></div>
+<div class="wb-aud-card"><span class="wb-aud-ico"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="11" fill="#EEEDFF"/><path d="m7.5 12.5 3 3 6-6.5" stroke="#5446ff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span><p>Heads of Finance Transformation</p></div>
+<div class="wb-aud-card"><span class="wb-aud-ico"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="11" fill="#EEEDFF"/><path d="m7.5 12.5 3 3 6-6.5" stroke="#5446ff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span><p>ERP &amp; Finance Systems Leaders</p></div>
+<div class="wb-aud-card"><span class="wb-aud-ico"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="11" fill="#EEEDFF"/><path d="m7.5 12.5 3 3 6-6.5" stroke="#5446ff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span><p>Indirect Tax Programme Owners</p></div>
+</div>
+</div>
+</section>
+<style>.giwip-hs-form-wrap{width:100%;min-height:260px}.giwip-hs-form-wrap form{display:flex!important;flex-direction:column!important;gap:20px!important}.giwip-hs-form-wrap .hs-form-field{margin-bottom:0!important}.giwip-hs-form-wrap .hs-form-field>label{display:block!important;font-size:14px!important;font-weight:500!important;color:var(--color-vault-navy)!important;margin-bottom:8px!important}.giwip-hs-form-wrap .hs-form-field>label .hs-form-required{color:var(--palette-destructive-500)!important;margin-left:2px!important}.giwip-hs-form-wrap input[type="text"],.giwip-hs-form-wrap input[type="email"],.giwip-hs-form-wrap input[type="tel"],.giwip-hs-form-wrap input[type="number"],.giwip-hs-form-wrap select,.giwip-hs-form-wrap textarea{width:100%!important;border-radius:8px!important;border:1px solid var(--palette-neutral-200)!important;background-color:var(--palette-generic-00)!important;padding:8px 12px!important;height:40px!important;font-size:14px!important;color:var(--color-vault-navy)!important;outline:none!important;transition:all 0.2s ease!important;box-sizing:border-box!important;box-shadow:0 1px 1px rgba(16,24,40,0.04)!important}.giwip-hs-form-wrap input::placeholder,.giwip-hs-form-wrap textarea::placeholder{color:#9ca3af!important}.giwip-hs-form-wrap input:focus,.giwip-hs-form-wrap select:focus,.giwip-hs-form-wrap textarea:focus{border-color:var(--color-nova-blue)!important;box-shadow:0 0 0 3px rgba(84,70,255,0.12)!important}.giwip-hs-form-wrap textarea{min-height:80px!important;height:auto!important;resize:vertical!important}.giwip-hs-form-wrap fieldset{max-width:none!important;border:none!important;padding:0!important;margin:0!important;display:flex!important;flex-direction:row!important;gap:20px!important}@media (max-width:640px){.giwip-hs-form-wrap fieldset{flex-direction:column!important;gap:20px!important}}.giwip-hs-form-wrap fieldset .hs-form-field{flex:1!important}.giwip-hs-form-wrap .hs-form-booleancheckbox label,.giwip-hs-form-wrap .legal-consent-container label{display:flex!important;align-items:flex-start!important;font-size:14px!important;color:var(--palette-neutral-500)!important;line-height:20px!important;font-weight:400!important;cursor:pointer!important}.giwip-hs-form-wrap .hs-form-booleancheckbox label a,.giwip-hs-form-wrap .legal-consent-container label a{color:var(--color-nova-blue)!important;font-weight:500!important;text-decoration:underline!important}.giwip-hs-form-wrap input[type="checkbox"]{margin-top:2px!important;flex-shrink:0!important;accent-color:var(--color-nova-blue)!important;width:20px!important;height:20px!important;border-radius:4px!important;cursor:pointer!important}.giwip-hs-form-wrap .hs-submit{margin-top:4px!important}.giwip-hs-form-wrap .inputs-list{list-style:none}.giwip-hs-form-wrap input[type="submit"],.giwip-hs-form-wrap .hs-button{background:var(--color-nova-blue)!important;color:var(--palette-nova-50)!important;padding:14px 32px!important;border-radius:8px!important;font-weight:500!important;font-size:16px!important;border:1px solid var(--color-nova-blue)!important;cursor:pointer!important;font-family:inherit!important;transition:all 0.2s ease!important;box-shadow:0 2px 3px rgba(16,24,40,0.06)!important}.giwip-hs-form-wrap input[type="submit"]:hover,.giwip-hs-form-wrap .hs-button:hover{opacity:0.92!important}.giwip-hs-form-wrap .hs-error-msgs{list-style:none!important;padding:0!important;margin:4px 0 0!important;font-size:12px!important;color:var(--palette-destructive-500)!important}.giwip-hs-form-wrap .hs-error-msg{color:var(--palette-destructive-500)!important}.giwip-hs-form-wrap .submitted-message{background:#f5f4fa!important;color:var(--color-vault-navy)!important;padding:18px!important;border-radius:8px!important;font-size:14.5px!important;font-weight:600!important;text-align:center!important;border:1px solid var(--palette-neutral-300)!important}.giwip-hs-form-wrap fieldset:has([class*="hs_utm_"]),.giwip-hs-form-wrap .hs-form-field[style*="display: none"]{display:none!important}.form-skeleton{display:flex;flex-direction:column;gap:20px;width:100%;min-height:260px}.skeleton-label{height:14px;width:80px;background:rgba(0,0,0,0.08);border-radius:4px;margin-bottom:8px}.skeleton-input{height:40px;background:rgba(0,0,0,0.03);border:1px solid rgba(0,0,0,0.08);border-radius:8px;width:100%}.skeleton-button{height:46px;width:148px;background:rgba(84,70,255,0.25);border-radius:8px;margin-top:4px}.shimmer{position:relative;overflow:hidden}.shimmer::after{position:absolute;top:0;right:0;bottom:0;left:0;transform:translateX(-100%);background-image:linear-gradient(90deg,rgba(255,255,255,0) 0%,rgba(255,255,255,0.6) 20%,rgba(255,255,255,0.6) 60%,rgba(255,255,255,0) 100%);animation:shimmer-anim 1.6s infinite;content:""}@keyframes shimmer-anim{100%{transform:translateX(100%)}}</style>
+<style>.wb-cta-grid{display:grid;grid-template-columns:minmax(0,1fr);gap:40px;align-items:start;max-width:1280px;margin:0 auto} @media(min-width:1024px){.wb-cta-grid{grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:64px}} .wb-cta-spk{display:flex;align-items:center;gap:16px;margin-bottom:24px} .wb-cta-spk img{width:96px;height:96px;border-radius:16px;object-fit:cover;object-position:top;background:#F3F1F9;flex-shrink:0} .wb-cta-grid .wb-li{background:transparent;border-color:rgba(255,255,255,.4);color:#fff} .wb-cta-grid .wb-li:hover{background:#fff;color:#0A66C2;border-color:#fff} .wb-cta-grid h2{margin:0 0 8px;font-size:32px;line-height:1.2;font-weight:500;color:#fff} @media(min-width:1024px){.wb-cta-grid h2{font-size:40px}} .wb-cta-role{margin:0 0 16px;font-size:16px;font-weight:600;color:rgba(255,255,255,.75)} .wb-cta-grid .wb-body{margin:0 0 24px;font-size:18px;line-height:1.55;color:rgba(255,255,255,.78)} .wb-cta-tag{display:inline-flex;align-items:center;padding:6px 14px;border:1px solid rgba(255,255,255,.35);border-radius:9999px;font-size:14px;font-weight:600;color:#fff} .wb-cta-card{background:#fff;border-radius:12px;padding:28px} .wb-cta-card .giwip-hs-form-wrap{min-height:0!important} .wb-cta-card h3{margin:0 0 20px;font-size:22px;font-weight:500;color:var(--color-vault-navy)}</style>
+<section class="bg-vault-navy py-16 lg:py-20" id="contactForm">
+<div class="mx-auto w-full px-4 lg:px-6" style="max-width:1328px">
+<div class="wb-cta-grid">
+<div>
+<div class="wb-cta-spk"><img src="https://cdn.prod.website-files.com/6141e3720a248d2024615d96/6ad6053f285501752242bcfd_CA.png" alt="CA Rohit Kumar Jain" width="96" height="96" loading="lazy" decoding="async"><a href="https://www.linkedin.com/in/ca-rohit-jain-59339b100/" target="_blank" rel="noopener noreferrer" class="wb-li" aria-label="Rohit Jain on LinkedIn"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M20.45 20.45h-3.56v-5.57c0-1.33-.03-3.04-1.85-3.04-1.85 0-2.14 1.45-2.14 2.94v5.67H9.35V9h3.41v1.56h.05c.48-.9 1.64-1.85 3.37-1.85 3.6 0 4.27 2.37 4.27 5.46v6.28zM5.34 7.43a2.06 2.06 0 1 1 0-4.12 2.06 2.06 0 0 1 0 4.12zM7.12 20.45H3.56V9h3.56v11.45zM22.22 0H1.77C.79 0 0 .77 0 1.73v20.54C0 23.23.79 24 1.77 24h20.45c.98 0 1.78-.77 1.78-1.73V1.73C24 .77 23.2 0 22.22 0z"/></svg></a></div>
+<h2>Hear from CA Rohit Kumar Jain</h2>
+<p class="wb-cta-role">GST Expert, ClearTax</p>
+<p class="wb-body">Bring the question your finance team is debating. Leave knowing what to ask for now, and what to revisit when the final legal text is available.</p>
+<span class="wb-cta-tag">28th October 2026 · 11:00 AM IST</span>
+</div>
+<div class="wb-cta-card">
+<h3>Reserve my seat</h3>
+<div id="giwip-contact" class="giwip-hs-form-wrap" data-portal-id="245744706" data-form-id="48c427c6-82fc-4f6f-997f-acaf238bfe5a" data-region="na2">
+<div id="giwip-form-skeleton" class="form-skeleton">
+<div><div class="skeleton-label shimmer"></div><div class="skeleton-input shimmer"></div></div>
+<div><div class="skeleton-label shimmer" style="width: 100px;"></div><div class="skeleton-input shimmer"></div></div>
+<div><div class="skeleton-label shimmer" style="width: 120px;"></div><div class="skeleton-input shimmer"></div></div>
+<div class="skeleton-button shimmer"></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<script>
+(() => {
+let initialized = false;
+const initForm = () => {
+if (initialized) return;
+const container = document.getElementById("giwip-contact");
+if (!container) return;
+const portalId = container.getAttribute("data-portal-id");
+const formId = container.getAttribute("data-form-id");
+const region = container.getAttribute("data-region") || "na2";
+if (window.hbspt && window.hbspt.forms) {
+initialized = true;
+window.hbspt.forms.create({
+portalId: portalId,
+formId: formId,
+region: region,
+submitText: "Reserve my seat",
+target: "#giwip-contact",
+onFormReady: function ($form) {
+const skeleton = document.getElementById("giwip-form-skeleton");
+if (skeleton) skeleton.remove();
+const formEl = $form && $form[0] ? $form[0] : $form;
+if (formEl && formEl.querySelector) {
+const urlParams = new URLSearchParams(window.location.search);
+const utms = ["utm_source", "utm_medium", "utm_campaign", "utm_term", "utm_content"];
+utms.forEach((utm) => {
+const value = urlParams.get(utm);
+if (value) {
+const input = formEl.querySelector('input[name="' + utm + '"]');
+if (input) input.value = value;
+}
+});
+}
+},
+});
+}
+};
+const checkAndInit = () => {
+if (window.hbspt && window.hbspt.forms) {
+initForm();
+} else {
+const script = document.querySelector('script[src*="hsforms.net"]');
+if (script) script.addEventListener("load", initForm);
+let pollCount = 0;
+const interval = setInterval(() => {
+pollCount++;
+if (window.hbspt && window.hbspt.forms) {
+clearInterval(interval);
+initForm();
+} else if (pollCount > 100) {
+clearInterval(interval);
+}
+}, 100);
+}
+};
+if (document.readyState === "loading") {
+document.addEventListener("DOMContentLoaded", checkAndInit);
+} else {
+checkAndInit();
+}
+})();
+</script>
+<footer class="bg-generic-00 border-t border-neutral-300"> <div class="max-w-[var(--container-max)] mx-auto flex flex-col gap-12 py-12 px-8"> <div class="grid grid-cols-1 md:grid-cols-3 xl:grid-cols-5 gap-x-12.5 gap-y-10">  <div class="flex flex-col gap-6 w-40"> <div class="flex flex-col gap-4"> <p class="m-0 text-sm font-medium text-vault-navy">Company</p> <div class="flex flex-col gap-3"> <a href="https://www.cleartax.com/about-us" class="text-sm font-medium text-neutral-500 no-underline hover:text-vault-navy transition-colors"> About us </a><a href="https://www.cleartax.com/contact-us" class="text-sm font-medium text-neutral-500 no-underline hover:text-vault-navy transition-colors"> Contact us </a><a href="https://cleartax.in/s/trust" class="text-sm font-medium text-neutral-500 no-underline hover:text-vault-navy transition-colors"> Trust &amp; Safety </a><a href="https://www.clear.in/s/press" class="text-sm font-medium text-neutral-500 no-underline hover:text-vault-navy transition-colors"> Media &amp; Press </a><a href="https://www.cleartax.com/partners" class="text-sm font-medium text-neutral-500 no-underline hover:text-vault-navy transition-colors"> Partners </a><a href="https://www.cleartax.com/contact-us" class="text-sm font-medium text-neutral-500 no-underline hover:text-vault-navy transition-colors"> Book a Demo </a> </div> </div> <div class="flex flex-col gap-4"> <p class="m-0 text-sm font-medium text-vault-navy">Social</p> <div class="flex flex-col gap-3"> <a href="http://linkedin.com/company/cleartax" target="_blank" rel="noopener noreferrer" class="text-sm font-medium text-neutral-500 no-underline hover:text-vault-navy transition-colors"> LinkedIn </a><a href="https://x.com/cleartax_" target="_blank" rel="noopener noreferrer" class="text-sm font-medium text-neutral-500 no-underline hover:text-vault-navy transition-colors"> X </a><a href="https://www.facebook.com/clearfromcleartax" target="_blank" rel="noopener noreferrer" class="text-sm font-medium text-neutral-500 no-underline hover:text-vault-navy transition-colors"> Facebook </a><a href="https://github.com/ClearTax" target="_blank" rel="noopener noreferrer" class="text-sm font-medium text-neutral-500 no-underline hover:text-vault-navy transition-colors"> Github </a> </div> </div> </div>  <div class="flex flex-col gap-4 w-65"> <p class="m-0 text-sm font-medium text-vault-navy">Product</p> <div class="flex flex-col gap-3"> <a href="https://www.cleartax.com/global/e-invoicing" class="text-sm font-medium text-neutral-500 no-underline hover:text-vault-navy transition-colors"> Global E-invoicing Platform </a><a href="https://www.cleartax.com/ae/e-invoicing-software" class="text-sm font-medium text-neutral-500 no-underline hover:text-vault-navy transition-colors"> UAE E-Invoicing Software </a><a href="https://www.cleartax.com/sa/e-invoicing-software" class="text-sm font-medium text-neutral-500 no-underline hover:text-vault-navy transition-colors"> Saudi Arabia E-Invoicing Software </a><a href="https://www.cleartax.com/fr/en" class="text-sm font-medium text-neutral-500 no-underline hover:text-vault-navy transition-colors"> France E-Invoicing Software </a><a href="https://www.cleartax.com/be" class="text-sm font-medium text-neutral-500 no-underline hover:text-vault-navy transition-colors"> Belgium E-Invoicing Software </a><a href="https://www.cleartax.com/de/en/e-invoicing-software" class="text-sm font-medium text-neutral-500 no-underline hover:text-vault-navy transition-colors"> Germany E-Invoicing Software </a><a href="https://www.cleartax.com/om/e-invoicing-software" class="text-sm font-medium text-neutral-500 no-underline hover:text-vault-navy transition-colors"> Oman E-Invoicing Software </a><a href="https://www.cleartax.com/my/en" class="text-sm font-medium text-neutral-500 no-underline hover:text-vault-navy transition-colors"> Malaysia E-Invoicing Software </a><a href="https://www.cleartax.com/ph/en" class="text-sm font-medium text-neutral-500 no-underline hover:text-vault-navy transition-colors"> Philippines E-Invoicing Software </a><a href="https://www.cleartax.com/sg/e-invoicing-software" class="text-sm font-medium text-neutral-500 no-underline hover:text-vault-navy transition-colors"> Singapore E-Invoicing Software </a><a href="https://www.cleartax.com/es/en" class="text-sm font-medium text-neutral-500 no-underline hover:text-vault-navy transition-colors"> Spain E-Invoicing Software </a><a href="https://www.cleartax.com/pl/en" class="text-sm font-medium text-neutral-500 no-underline hover:text-vault-navy transition-colors"> Poland E-Invoicing Software </a><a href="https://www.cleartax.com/bh/e-invoicing-software" class="text-sm font-medium text-neutral-500 no-underline hover:text-vault-navy transition-colors"> Bahrain E-Invoicing Software </a><a href="https://cleartax.in/s/e-invoicing-enterprise-software" class="text-sm font-medium text-neutral-500 no-underline hover:text-vault-navy transition-colors"> India E-Invoicing Software </a><a href="https://cleartax.in/s/clear-compliance-cloud" class="text-sm font-medium text-neutral-500 no-underline hover:text-vault-navy transition-colors"> Clear Compliance Cloud (India) </a> </div> </div>  <div class="flex flex-col gap-4 w-59"> <p class="m-0 text-sm font-medium text-vault-navy">Resources &amp; Guides</p> <div class="flex flex-col gap-3"> <a href="https://www.cleartax.com/electronic-invoicing#country-select" class="text-sm font-medium text-neutral-500 no-underline hover:text-vault-navy transition-colors"> Blog </a><a href="https://www.airmeet.com/e/9efd03e0-4ffc-11f0-b43c-af31dbfde7be" class="text-sm font-medium text-neutral-500 no-underline hover:text-vault-navy transition-colors"> Webinar </a><a href="https://www.cleartax.com/case-studies" class="text-sm font-medium text-neutral-500 no-underline hover:text-vault-navy transition-colors"> Case Studies </a><a href="https://www.cleartax.com/global-e-invoicing-mandates-by-country" class="text-sm font-medium text-neutral-500 no-underline hover:text-vault-navy transition-colors"> E-Invoicing Mandates by Country </a><a href="https://www.cleartax.com/sa/ksa-einvoicing" class="text-sm font-medium text-neutral-500 no-underline hover:text-vault-navy transition-colors"> E-Invoicing in Saudi Arabia </a><a href="https://www.cleartax.com/ae/e-invoicing-uae" class="text-sm font-medium text-neutral-500 no-underline hover:text-vault-navy transition-colors"> E-Invoicing in UAE </a><a href="https://www.cleartax.com/om/e-invoicing-oman" class="text-sm font-medium text-neutral-500 no-underline hover:text-vault-navy transition-colors"> E-Invoicing in Oman </a><a href="https://www.cleartax.com/qa/e-invoicing-qatar" class="text-sm font-medium text-neutral-500 no-underline hover:text-vault-navy transition-colors"> E-Invoicing in Qatar </a><a href="https://www.cleartax.com/fr/en/e-invoicing-france" class="text-sm font-medium text-neutral-500 no-underline hover:text-vault-navy transition-colors"> E-Invoicing in France </a><a href="https://www.cleartax.com/be/e-invoicing-belgium" class="text-sm font-medium text-neutral-500 no-underline hover:text-vault-navy transition-colors"> E-Invoicing in Belgium </a><a href="https://www.cleartax.com/de/en/e-invoicing-germany" class="text-sm font-medium text-neutral-500 no-underline hover:text-vault-navy transition-colors"> E-Invoicing in Germany </a><a href="https://www.cleartax.com/es/en/e-invoicing-spain" class="text-sm font-medium text-neutral-500 no-underline hover:text-vault-navy transition-colors"> E-Invoicing in Spain </a><a href="https://www.cleartax.com/my/en/e-invoicing-malaysia" class="text-sm font-medium text-neutral-500 no-underline hover:text-vault-navy transition-colors"> E-Invoicing in Malaysia </a><a href="https://www.cleartax.com/ph/en/philippines-e-invoicing" class="text-sm font-medium text-neutral-500 no-underline hover:text-vault-navy transition-colors"> E-Invoicing in Phillipines </a><a href="https://www.cleartax.com/sg/en/e-invoicing-singapore" class="text-sm font-medium text-neutral-500 no-underline hover:text-vault-navy transition-colors"> E-Invoicing in Singapore </a><a href="https://www.cleartax.com/pl/en/e-invoicing-poland" class="text-sm font-medium text-neutral-500 no-underline hover:text-vault-navy transition-colors"> E-Invoicing in Poland </a><a href="https://www.cleartax.com/bh/e-invoicing-bahrain" class="text-sm font-medium text-neutral-500 no-underline hover:text-vault-navy transition-colors"> E-Invoicing in Bahrain </a><a href="https://cleartax.in/s/e-invoicing-gst" class="text-sm font-medium text-neutral-500 no-underline hover:text-vault-navy transition-colors"> E-Invoicing in India </a> </div> </div>  <div class="flex flex-col gap-4 w-48.75"> <p class="m-0 text-sm font-medium text-vault-navy">Tools</p> <div class="flex flex-col gap-3"> <a href="https://www.cleartax.com/sa/vat-calculator" class="text-sm font-medium text-neutral-500 no-underline hover:text-vault-navy transition-colors"> VAT Calculator Saudi Arabia </a><a href="https://www.cleartax.com/ae/vat-calculator" class="text-sm font-medium text-neutral-500 no-underline hover:text-vault-navy transition-colors"> VAT Calculator UAE </a><a href="https://www.cleartax.com/fr/en/vat-calculator" class="text-sm font-medium text-neutral-500 no-underline hover:text-vault-navy transition-colors"> VAT Calculator France </a><a href="https://www.cleartax.com/be/vat-calculator" class="text-sm font-medium text-neutral-500 no-underline hover:text-vault-navy transition-colors"> VAT Calculator Belgium </a><a href="https://www.cleartax.com/de/en/vat-calculator" class="text-sm font-medium text-neutral-500 no-underline hover:text-vault-navy transition-colors"> VAT Calculator Germany </a><a href="https://www.cleartax.com/my/en/sst-calculator" class="text-sm font-medium text-neutral-500 no-underline hover:text-vault-navy transition-colors"> VAT Calculator Malaysia </a><a href="https://cleartax.in/compliance-roi-calculator" class="text-sm font-medium text-neutral-500 no-underline hover:text-vault-navy transition-colors"> Compliance ROI Calculator India </a><a href="https://cleartax.in/gst-number-search/" class="text-sm font-medium text-neutral-500 no-underline hover:text-vault-navy transition-colors"> GST Number Search India </a> </div> </div>  <div class="flex flex-col gap-6"> <div class="flex flex-col gap-4 w-39.5"> <p class="m-0 text-sm font-medium text-vault-navy">MENA</p> <div class="flex flex-col gap-3"> <a href="https://www.cleartax.com/sa" class="text-sm font-medium text-neutral-500 no-underline hover:text-vault-navy transition-colors"> Saudi Arabia </a><a href="https://www.cleartax.com/ae" class="text-sm font-medium text-neutral-500 no-underline hover:text-vault-navy transition-colors"> UAE </a><a href="https://www.cleartax.com/om" class="text-sm font-medium text-neutral-500 no-underline hover:text-vault-navy transition-colors"> Oman </a><a href="https://www.cleartax.com/qa/e-invoicing-qatar" class="text-sm font-medium text-neutral-500 no-underline hover:text-vault-navy transition-colors"> Qatar </a><a href="https://www.cleartax.com/bh" class="text-sm font-medium text-neutral-500 no-underline hover:text-vault-navy transition-colors"> Bahrain </a> </div> </div><div class="flex flex-col gap-4 w-39.5"> <p class="m-0 text-sm font-medium text-vault-navy">Europe</p> <div class="flex flex-col gap-3"> <a href="https://www.cleartax.com/fr/en" class="text-sm font-medium text-neutral-500 no-underline hover:text-vault-navy transition-colors"> France </a><a href="https://www.cleartax.com/be" class="text-sm font-medium text-neutral-500 no-underline hover:text-vault-navy transition-colors"> Belgium </a><a href="https://www.cleartax.com/de/en" class="text-sm font-medium text-neutral-500 no-underline hover:text-vault-navy transition-colors"> Germany </a><a href="https://www.cleartax.com/es/en" class="text-sm font-medium text-neutral-500 no-underline hover:text-vault-navy transition-colors"> Spain </a><a href="https://www.cleartax.com/pl/en" class="text-sm font-medium text-neutral-500 no-underline hover:text-vault-navy transition-colors"> Poland </a> </div> </div><div class="flex flex-col gap-4 w-39.5"> <p class="m-0 text-sm font-medium text-vault-navy">APAC</p> <div class="flex flex-col gap-3"> <a href="https://www.clear.in/" class="text-sm font-medium text-neutral-500 no-underline hover:text-vault-navy transition-colors"> India </a><a href="https://www.cleartax.com/my/en" class="text-sm font-medium text-neutral-500 no-underline hover:text-vault-navy transition-colors"> Malaysia </a><a href="https://www.cleartax.com/ph/en" class="text-sm font-medium text-neutral-500 no-underline hover:text-vault-navy transition-colors"> Philippines </a><a href="https://www.cleartax.com/sg/e-invoicing-software" class="text-sm font-medium text-neutral-500 no-underline hover:text-vault-navy transition-colors"> Singapore </a> </div> </div> </div> </div>  <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6 border-t border-neutral-200 pt-6"> <div class="flex flex-col gap-4"> <div class="flex items-center gap-3"> <a href="https://www.clear.in/s/legal" class="text-sm font-medium text-neutral-500 no-underline hover:text-vault-navy transition-colors">Legal</a> <a href="https://www.clear.in/meta/privacy" class="text-sm font-medium text-neutral-500 no-underline hover:text-vault-navy transition-colors">Privacy Policy</a> </div> <p class="m-0 text-sm text-neutral-500">ClearTax is a product by Defmacro Software Pvt. Ltd.</p> </div> <div class="flex flex-col items-start sm:items-end gap-3"> <div class="flex items-center gap-2.5"> <img src="https://cdn.prod.website-files.com/6093bce33d9b4bae841b04e3/69fb0ff41b9a63ce3e1f50d9_iso.png" alt="ISO Certified" class="w-12 h-12 object-contain" loading="lazy" decoding="async"><img src="https://cdn.prod.website-files.com/6093bce33d9b4bae841b04e3/69fad934822abf67d7c25954_soc.png" alt="SOC Certified" class="w-12 h-12 object-contain" loading="lazy" decoding="async"><img src="https://cdn.prod.website-files.com/6093bce33d9b4bae841b04e3/6a154210439a661bb4313f68_ssll.png" alt="SSL Secured" class="w-12 h-12 object-contain" loading="lazy" decoding="async"><img src="https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6a153c9e423a6b967412239c_gdpr.png" alt="GDPR Compliant" class="w-12 h-12 object-contain" loading="lazy" decoding="async"> </div> <p class="m-0 text-sm text-neutral-500">Your data security and privacy matter most to us.</p> </div> </div> </div> </footer>
+<style>
+.wb-vid{position:relative;aspect-ratio:16/9;border-radius:16px;overflow:hidden;background:var(--color-vault-navy);box-shadow:0 8px 24px rgba(5,2,42,.18)}
+.wb-vid-play{all:unset;box-sizing:border-box;position:absolute;inset:0;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.wb-vid-play:focus-visible{box-shadow:inset 0 0 0 3px var(--color-nova-blue)}
+.wb-vid-thumb{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;pointer-events:none}
+.wb-vid-btn{position:relative;width:72px;height:72px;border-radius:16px;background:var(--color-nova-blue);display:grid;place-items:center;transition:transform .16s ease,background-color .16s ease}
+.wb-vid-btn svg{width:28px;height:28px;fill:#fff;margin-inline-start:4px}
+.wb-vid-play:hover .wb-vid-btn{background:#4436F0;transform:scale(1.06)}
+.wb-vid-sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.wb-modal{position:fixed;inset:0;z-index:1000;display:flex;align-items:center;justify-content:center;padding:16px;background:rgba(5,2,42,.6);overflow-y:auto}
+.wb-modal-card{position:relative;width:100%;max-width:460px;margin:auto;background:#fff;border-radius:12px;padding:28px}
+.wb-modal-card h3{margin:0 0 8px;font-size:22px;font-weight:500;color:var(--color-vault-navy)}
+.wb-modal-card p{margin:0 0 20px;font-size:15px;line-height:1.5;color:var(--palette-neutral-500)}
+.wb-modal-card .giwip-hs-form-wrap{min-height:0!important}
+.wb-modal-close{all:unset;box-sizing:border-box;position:absolute;top:12px;inset-inline-end:12px;width:36px;height:36px;display:grid;place-items:center;border-radius:50%;cursor:pointer;color:var(--palette-neutral-500)}
+.wb-modal-close:hover{background:#F3F1F9;color:var(--color-vault-navy)}
+.wb-modal-close:focus-visible{box-shadow:0 0 0 3px var(--color-nova-blue)}
+.wb-modal-close svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round}
+.wb-player{position:fixed;inset:0;z-index:1100;display:flex;align-items:center;justify-content:center;padding:16px;background:rgba(5,2,42,.72)}
+.wb-player-box{position:relative;width:min(960px,100%);aspect-ratio:16/9;border-radius:16px;background:#000}
+.wb-player-box video{width:100%;height:100%;display:block;border-radius:inherit;background:#000;object-fit:contain}
+.wb-player-bar{position:absolute;bottom:100%;inset-inline:0;display:flex;justify-content:flex-end;gap:8px;padding-bottom:8px}
+.wb-player-btn{all:unset;box-sizing:border-box;display:inline-flex;align-items:center;gap:8px;cursor:pointer;height:40px;padding:0 16px;border-radius:8px;background:#fff;color:var(--color-vault-navy);font-size:14px;font-weight:500}
+.wb-player-btn:hover{background:#F3F1F9}
+.wb-player-btn:focus-visible{box-shadow:0 0 0 3px var(--color-nova-blue)}
+.wb-player-btn svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex:none}
+body.wb-modal-open{overflow:hidden}
+</style>
+<div class="wb-modal" id="wb-gate" role="dialog" aria-modal="true" aria-labelledby="wb-gate-title" style="display:none">
+<div class="wb-modal-card">
+<button type="button" class="wb-modal-close" id="wb-gate-close" aria-label="Close"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 5l14 14M19 5L5 19"/></svg></button>
+<h3 id="wb-gate-title">Watch the webinar</h3>
+<p>Register below and the recording starts playing straight away.</p>
+<div id="gate-form" class="giwip-hs-form-wrap">
+<div id="gate-form-skeleton" class="form-skeleton">
+<div><div class="skeleton-label shimmer"></div><div class="skeleton-input shimmer"></div></div>
+<div><div class="skeleton-label shimmer" style="width:100px"></div><div class="skeleton-input shimmer"></div></div>
+<div><div class="skeleton-label shimmer" style="width:120px"></div><div class="skeleton-input shimmer"></div></div>
+<div class="skeleton-button shimmer"></div>
+</div>
+</div>
+</div>
+</div>
+<div class="wb-player" id="wb-player" role="dialog" aria-modal="true" aria-label="Webinar video" style="display:none">
+<div class="wb-player-box" id="wb-player-box">
+<div class="wb-player-bar">
+<a class="wb-player-btn" href="https://go.cleartax.com/hubfs/India/Webinars/OND%202026/28th-Oct-Virtual%20Event-India-GST-3.0.mp4" download="GST-3.0-webinar.mp4" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4v11M7 11l5 5 5-5M5 20h14"/></svg>Download</a>
+<button type="button" class="wb-player-btn" id="wb-player-close"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>Close</button>
+</div>
+</div>
+</div>
+<script>
+/* Webinar video gate. The video only gets a src after the HubSpot form in the
+   overlay reports a submit, so nothing downloads before registration.
+   Unlock is remembered for the browser session. */
+(function () {
+  var KEY = 'wb_webinar_unlocked';
+  var VIDEO_SRC = 'https://go.cleartax.com/hubfs/India/Webinars/OND%202026/28th-Oct-Virtual%20Event-India-GST-3.0.mp4';
+  var openBtn = document.getElementById('wb-vid-open');
+  var gate = document.getElementById('wb-gate');
+  var closeBtn = document.getElementById('wb-gate-close');
+  var player = document.getElementById('wb-player');
+  var playerClose = document.getElementById('wb-player-close');
+  var video = null;
+  if(!openBtn || !gate || !player) return;
+
+  function isUnlocked(){ try { return sessionStorage.getItem(KEY) === '1'; } catch(e){ return false; } }
+  /* Inline display, not the hidden attribute: Webflow's embed can drop `hidden`. */
+  function show(el){ el.style.display = 'flex'; }
+  function hide(el){ el.style.display = 'none'; }
+  function shown(el){ return el.style.display !== 'none'; }
+  function lockScroll(on){ document.body.style.overflow = on ? 'hidden' : ''; }
+
+  function openGate(){ show(gate); lockScroll(true); closeBtn.focus(); }
+  function closeGate(){ hide(gate); lockScroll(false); openBtn.focus(); }
+
+  function openPlayer(){
+    hide(gate); show(player); lockScroll(true);
+    if(!video){
+      video = document.createElement('video');
+      video.controls = true;
+      video.playsInline = true;
+      video.preload = 'auto';
+      video.src = VIDEO_SRC;
+      document.getElementById('wb-player-box').appendChild(video);
+    }
+    var p = video.play();
+    if(p && p.catch) p.catch(function(){
+      video.muted = true;
+      var q = video.play();
+      if(q && q.catch) q.catch(function(){});
+    });
+    playerClose.focus();
+  }
+  function closePlayer(){ if(video) video.pause(); hide(player); lockScroll(false); openBtn.focus(); }
+
+  var done = false;
+  window.wbVideoUnlock = function(autoplay){
+    try { sessionStorage.setItem(KEY, '1'); } catch(e){}
+    if(!autoplay || done) return;
+    done = true;
+    openPlayer();
+  };
+
+  openBtn.addEventListener('click', function(){
+    if(isUnlocked()){ done = true; openPlayer(); } else { done = false; openGate(); }
+  });
+  closeBtn.addEventListener('click', closeGate);
+  playerClose.addEventListener('click', closePlayer);
+  player.addEventListener('click', function(e){ if(e.target === player) closePlayer(); });
+  gate.addEventListener('click', function(e){ if(e.target === gate) closeGate(); });
+  document.addEventListener('keydown', function(e){
+    if(e.key !== 'Escape') return;
+    if(shown(player)) closePlayer(); else if(shown(gate)) closeGate();
+  });
+
+  /* Fallbacks if the form's own submit callback never fires. */
+  window.addEventListener('message', function(e){
+    var d = e.data;
+    if(d && d.type === 'hsFormCallback' && d.eventName === 'onFormSubmitted' && shown(gate)) window.wbVideoUnlock(true);
+  });
+  new MutationObserver(function(){
+    if(shown(gate) && gate.querySelector('.submitted-message')) window.wbVideoUnlock(true);
+  }).observe(gate, {childList:true, subtree:true});
+})();
+</script>
+</body>
+</html>
