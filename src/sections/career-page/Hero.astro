@@ -21,12 +21,12 @@
  * elements, so the transforms compose instead of fighting.
  *
  * Both run for exactly `--cp-rail-duration`, in which the strip advances one
- * six-card set — 6 × 220px = 1320px. So one turn of the scale animation is worth
- * 1320px of travel, and a card's scale can be read as a function of DISTANCE
+ * five-card set — 5 × 220px = 1100px. So one turn of the scale animation is worth
+ * 1100px of travel, and a card's scale can be read as a function of DISTANCE
  * from the lane's outer edge rather than of time. Each card is started part-way
  * through that turn, by exactly as far as it already sits down the strip:
  *
- *     animation-delay = −(slot ÷ 6) × duration        slot = --cp-i, 0…5
+ *     animation-delay = −(slot ÷ 5) × duration        slot = --cp-i, 0…4
  *
  * Every card then traces the same scale-versus-position curve, one after
  * another, which is what makes the size stick to the place rather than to the
@@ -71,32 +71,30 @@ const LEDE =
 const CTA_LABEL = "View current openings";
 const CTA_HREF = "https://clear.darwinbox.in/ms/candidatev2/main/careers/allJobs";
 
-/* Six images a side. Slots only — put a Webflow asset URL in one and that card
+/* Five images a side. Slots only — put a Webflow asset URL in one and that card
    renders an <img>; an empty string leaves the Figma placeholder tint.
  *
- * Six is not decorative. The strip is this set twice over, and the loop
+ * Five is not decorative. The strip is this set twice over, and the loop
  * translates by exactly one set, so changing the COUNT means recomputing the
- * keyframe stops in `@keyframes cp-card-depth` and the `÷ 6` in the card's
- * animation-delay. Changing the IMAGES costs nothing. */
+ * keyframe stops in `@keyframes cp-card-depth`, the `÷ 5` in the card's
+ * animation-delay, the `% 5` in `--cp-i`, and `--cp-rail-span` / duration. Changing the IMAGES costs nothing. */
 const LEFT_RAIL: string[] = [
-  "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6adb4e41cf5353c200285e79_image%2025270.png",
-  "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6adb4e41939c14c377e444ce_image%2025272.png",
-  "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6adb4e413b28c72573c44fd8_image%2025273.png",
-  "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6adb4e41a71cb85a96cef787_image%2025274.png",
-  "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6adb4e418ab3e0aafa503c27_image%2025275.png",
-  "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6adb4e4132e169e233235f1a_image%2025277.png",
+  "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6af440716bdc43fa5152d5e4_hero-left-1.png",
+  "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6af44071325f27aa77e96a81_hero-left-2.png",
+  "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6af4407196fc604c3cbe530a_hero-left-3.png",
+  "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6af44071c30abccd1473ab61_hero-left-4.png",
+  "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6af44071eccb5b619ebbeeee_hero-left-5.png",
 ];
 const RIGHT_RAIL: string[] = [
-  "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6adb4e41916092f4caa3deb4_image%2025278.png",
-  "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6adb4e41ed5cad3df9271d70_image%2025280.png",
-  "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6adb4e417e279e46eacfa35c_image%2025281.png",
-  "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6adb4e417e279e46eacfa357_image%2025282.png",
-  "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6adb4e415a217d357d1135e9_image%2025283.png",
-  "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6adb4e41293b4547bfacb952_image%2025284.png",
+  "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6af44071a26307c106630a93_hero-right-1.png",
+  "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6af440718fffbe95ed315321_hero-right-2.png",
+  "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6af440713720412aebff6ae2_hero-right-3.png",
+  "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6af4407207a71647b37aa859_hero-right-4.png",
+  "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6af440713deeafb4e4cab32b_hero-right-5.png",
 ];
 
 /* Doubled, so translating the strip by one set puts the clone exactly where the
-   original was. Six is the editable set; twelve is what renders. */
+   original was. Five is the editable set; ten is what renders. */
 const LEFT_TRACK: string[] = [...LEFT_RAIL, ...LEFT_RAIL];
 const RIGHT_TRACK: string[] = [...RIGHT_RAIL, ...RIGHT_RAIL];
 
@@ -112,7 +110,7 @@ const MEDIA_CLASS =
   class="cp-hero relative overflow-hidden border-b border-[#CCCCCC] bg-generic-00"
 >
   <!-- Left rail. Travels RIGHT, towards the centre, shrinking as it goes.
-       `--cp-i` is the card's slot in the six-card set, counted from the lane's
+       `--cp-i` is the card's slot in the five-card set, counted from the lane's
        OUTER edge — it is the card's head start through the scale curve, and it
        is the only thing that differs between the twelve cards here. -->
   <div
@@ -122,7 +120,7 @@ const MEDIA_CLASS =
     <div class="cp-hero-track">
       {
         LEFT_TRACK.map((image, i) => (
-          <div class={`${CARD_CLASS} mr-8`} style={`--cp-i:${i % 6}`}>
+          <div class={`${CARD_CLASS} mr-8`} style={`--cp-i:${i % 5}`}>
             <div class={MEDIA_CLASS}>
               {image && (
                 <img
@@ -152,7 +150,7 @@ const MEDIA_CLASS =
     <div class="cp-hero-track">
       {
         RIGHT_TRACK.map((image, i) => (
-          <div class={`${CARD_CLASS} ml-8`} style={`--cp-i:${(11 - i) % 6}`}>
+          <div class={`${CARD_CLASS} ml-8`} style={`--cp-i:${(9 - i) % 5}`}>
             <div class={MEDIA_CLASS}>
               {image && (
                 <img
@@ -242,14 +240,14 @@ const MEDIA_CLASS =
      full size, so it has to clear a full-size card (188px) or they would pop in
      at the edge rather than slide in from outside it.
 
-     `--cp-rail-span` is one set of six slots: 6 × (188px card + 32px margin).
+     `--cp-rail-span` is one set of five slots: 5 × (188px card + 32px margin).
      It is the distance the strip covers in one `--cp-rail-duration`, which makes
      it the conversion factor between the scale keyframes and real position — see
      `@keyframes cp-card-depth`. Change the card size, the margin or the count
      and this and those stops all move together.
 
      THE INNER EDGE IS THE PAGE CENTRE, and that is load-bearing. `overflow:
-     hidden` is required — without it the 2640px strip would run straight out the
+     hidden` is required — without it the 2200px strip would run straight out the
      far side of the headline — but a hard clip is only invisible while something
      opaque covers it. `.cp-hero-copy` is 640px wide and centred, so the page
      centre is 320px inside it AT EVERY VIEWPORT WIDTH. Pinning the lane's inner
@@ -269,13 +267,13 @@ const MEDIA_CLASS =
      the zoom cancels and both are gone. */
   .cp-hero-rail {
     --cp-rail-bleed: 240px;
-    --cp-rail-span: 1320px;
+    --cp-rail-span: 1100px;
 
-    /* One full pass of a six-card set — 1320px, so about 47px/s. Slow enough to
+    /* One full pass of a five-card set — 1100px, so about 47px/s. Slow enough to
        read as a standing composition that drifts, not as a ticker. These cards
        are the only artwork on the section; the rail exists to show them, not to
        move things along. */
-    --cp-rail-duration: 28s;
+    --cp-rail-duration: 23.4s;
 
     /* How long the dissolve into the copy runs, and where it ends. HALF THE
        WIDTH OF `.cp-hero-copy` — the lane's inner edge is the page centre and
@@ -357,8 +355,8 @@ const MEDIA_CLASS =
     right: calc(var(--cp-rail-bleed) * -1);
   }
 
-  /* THE STRIP. Two identical sets of six — 12 × (188 + 32) = 2640px — so one set
-     is 1320px and translating by exactly that puts the clone where the original
+  /* THE STRIP. Two identical sets of five — 10 × (188 + 32) = 2200px — so one set
+     is 1100px and translating by exactly that puts the clone where the original
      was, making the wrap a no-op.
 
      PINNED TO THE LANE'S OUTER EDGE, which is why it is positioned rather than
@@ -420,7 +418,7 @@ const MEDIA_CLASS =
      is the same phase one set along, so the wrap is still a no-op.
 
      Writing this side as `0 → -50%` is the mirror of the SIGN but not of the
-     GEOMETRY: pinned right, it walks the strip's outer end 1320px inwards and
+     GEOMETRY: pinned right, it walks the strip's outer end 1100px inwards and
      empties the lane from the viewport edge in, until the last card is sitting
      by the headline with nothing behind it. Then it snaps back full. */
   @keyframes cp-rail-left {
@@ -434,12 +432,12 @@ const MEDIA_CLASS =
 
   /* THE DEPTH CURVE. One turn of this is one `--cp-rail-span` of travel, so the
      stops below are positions, not moments — each one is a distance from the
-     lane's outer edge divided by the 1320px span:
+     lane's outer edge divided by the 1100px span:
 
        0 … 240px   scale 1        the bleed: outside the viewport, full size
-       240px       scale 1        18.18%  the card reaches the viewport edge
-       460px       scale 0.85     34.85%  one slot in
-       680px       scale 0.7225   51.52%  two slots in, fully shrunk
+       240px       scale 1        21.82%  the card reaches the viewport edge
+       460px       scale 0.85     41.82%  one slot in
+       680px       scale 0.7225   61.82%  two slots in, fully shrunk
        680 … end   scale 0.7225   holds, then snaps back to 1 for the next pass
 
      240 / 460 / 680 are the bleed plus zero, one and two 220px slots, so the
@@ -447,7 +445,7 @@ const MEDIA_CLASS =
      composition, rebuilt as a function of position.
 
      THE SNAP FROM 100% BACK TO 0% IS DELIBERATE and is the only discontinuity in
-     this section. It happens at 1320px from the outer edge, which the `min()` on
+     this section. It happens at 1100px from the outer edge, which the `min()` on
      the lane guarantees is at or beyond the clip, and the clip is under
      `.cp-hero-copy`. So the card is already twice hidden when it resizes.
 
@@ -481,7 +479,7 @@ const MEDIA_CLASS =
     /* The head start: this card is already `--cp-i` slots down the strip, and
        there are 6 slots to a turn. Without it every card would shrink in unison
        and the whole strip would throb instead of the sizes staying put. */
-    animation-delay: calc(var(--cp-rail-duration) * var(--cp-i, 0) / -6);
+    animation-delay: calc(var(--cp-rail-duration) * var(--cp-i, 0) / -5);
   }
 
   /* `translateX` before `scale` is deliberate: a CSS transform list applies
@@ -490,13 +488,13 @@ const MEDIA_CLASS =
      correction would come up short by exactly the factor it is correcting for. */
   @keyframes cp-card-depth {
     0%,
-    18.18% {
+    21.82% {
       transform: translateX(0) scale(1);
     }
-    34.85% {
+    41.82% {
       transform: translateX(calc(-16.5px * var(--cp-dir, 1))) scale(0.85);
     }
-    51.52% {
+    61.82% {
       transform: translateX(calc(-63.5px * var(--cp-dir, 1))) scale(0.7225);
     }
     100% {
