@@ -11,24 +11,29 @@
 interface Card {
     heading: string;
     body: string;
+    icon:string;
 }
 
 const cards: Card[] = [
     {
         heading: "Structured XML, not just an emailed PDF",
         body: `From 1 February 2026, KSeF invoices using the FA schema use FA(3) XML, replacing FA(2). Corrective invoices issued from that date also use FA(3), even where the original used FA(1) or FA(2). Sending a PDF by email does not, by itself, satisfy an obligation to issue a structured invoice through KSeF.`,
+        icon:"/images/poland-regional/e-1.png"
     },
     {
         heading: "A national invoice system, not a Peppol-only route",
         body: `KSeF supports structured invoice issuance, transmission, receipt, access and storage. Commercial financial and accounting software can connect through the KSeF API. Design your Polish invoice flow around KSeF rather than assuming that another market’s exchange route applies.`,
+        icon:"/images/poland-regional/e-2.png"
     },
     {
         heading: "Your invoice number and KSeF number are different",
         body: `KSeF assigns its reference after accepting the invoice. The reference appears in the official receipt confirmation, UPO (urzędowe poświadczenie odbioru), and differs from your invoice number. Plan how finance will link these references to the ERP record.`,
+        icon:"/images/poland-regional/e-3.png"
     },
     {
         heading: "Receiving matters as much as issuing",
         body: `Mandatory receipt through KSeF began on 1 February 2026 for relevant recipients, even where their issuance obligation started later. Exceptions include the recipients identified in Article 106gb(4) of the VAT Act, such as certain foreign entities and consumers.`,
+        icon:"/images/poland-regional/e-4.png"    
     },
 ];
 ---
@@ -67,7 +72,7 @@ const cards: Card[] = [
                         data-pl-supports-open
                         data-pl-supports-index={i}
                     >
-                        <span class="size-[56px] bg-visual-placeholder rounded-lg" />
+                        <img src={card.icon} alt={card.heading} class="object-contain size-[56px] shrink-0" />
                         <span class="min-w-0 flex-1 font-heading font-medium text-vault-navy text-[length:var(--fs-body)] leading-[length:var(--lh-body)] md:text-[length:var(--fs-body-lg)] md:leading-[length:var(--lh-body-lg)] lg:text-[length:var(--fs-h6)] lg:leading-[length:var(--lh-h6)]">
                             {card.heading}
                         </span>
@@ -114,8 +119,8 @@ const cards: Card[] = [
     aria-hidden="true"
     class="fixed inset-0 z-[2000] hidden items-center justify-center bg-generic-100/70 p-4 backdrop-blur-sm"
 >
-    <div
-        class="relative max-h-[90vh] w-full max-w-[500px] overflow-y-auto rounded-xl border-2 border-[#CCCCCC] bg-generic-00 p-6"
+    <div 
+        class="relative max-h-[90vh] w-full max-w-[630px] overflow-y-auto rounded-xl border-2 border-[#CCCCCC] bg-generic-00 p-6"
         data-pl-supports-panel
     >
         <button
@@ -149,15 +154,35 @@ const cards: Card[] = [
         </button>
 
         <div class="flex flex-col items-start gap-6">
-            <div
-                class="flex w-full flex-col justify-between gap-6 lg:w-[440px] lg:shrink-0 lg:self-stretch"
-            >
-                <div class="flex flex-col gap-6">
+            <div class="flex w-full flex-col justify-between gap-6">
+                <div class="flex items-center gap-4">
+                    <div class="size-[56px] shrink-0">
+                        {
+                            cards.map((card, i) => (
+                                <span
+                                    class="size-[56px] shrink-0 items-center justify-center"
+                                    style={
+                                        i === 0
+                                            ? "display: flex;"
+                                            : "display: none;"
+                                    }
+                                    hidden={i !== 0}
+                                    data-pl-supports-icon
+                                >
+                                    <img
+                                        src={card.icon}
+                                        alt={card.heading}
+                                        class="object-contain size-[56px] shrink-0"
+                                    />
+                                </span>
+                            ))
+                        }
+                    </div>
                     <div id="pl-supports-overlay-title">
                         {
                             cards.map((card, i) => (
                                 <h3
-                                    class="m-0 pr-12 font-heading font-medium text-vault-navy text-[length:var(--fs-h5)] leading-[length:var(--lh-h5)] tracking-[-0.5px] lg:pr-0 text-balance"
+                                    class="m-0 pr-12 font-heading font-medium text-vault-navy text-[length:var(--fs-h5)] leading-[length:var(--lh-h5)] tracking-[-0.5px] text-balance"
                                     style={
                                         i === 0
                                             ? "display: block;"
@@ -174,7 +199,7 @@ const cards: Card[] = [
                 </div>
 
                 <div
-                    class="aspect-[510/286] w-full rounded-lg overflow-hidden bg-visual-placeholder"
+                    class="aspect-[574/323] w-full max-w-[574px] rounded-lg overflow-hidden bg-visual-placeholder mx-auto"
                 >
                     {
                         cards.map((card, i) => (
@@ -197,17 +222,18 @@ const cards: Card[] = [
                     <div>
                         {
                             cards.map((card, i) => (
-                                <div
-                                    class="m-0 flex flex-col gap-3 font-body font-normal text-neutral-500 text-[length:var(--fs-body)] leading-[length:var(--lh-body)]"
+                                <p
+                                    class="m-0 font-body font-normal text-neutral-500 text-[length:var(--fs-body)] leading-[length:var(--lh-body)]"
                                     style={
                                         i === 0
-                                            ? "display: flex;"
+                                            ? "display: block;"
                                             : "display: none;"
                                     }
                                     hidden={i !== 0}
                                     data-pl-supports-body
-                                    set:html={card.body}
-                                />
+                                >
+                                    {card.body}
+                                </p>
                             ))
                         }
                     </div>
@@ -253,7 +279,7 @@ const cards: Card[] = [
                 headings[i].hidden = i !== current;
                 headings[i].style.display = i === current ? "block" : "none";
                 bodies[i].hidden = i !== current;
-                bodies[i].style.display = i === current ? "flex" : "none";
+                bodies[i].style.display = i === current ? "block" : "none";
                 if (icons[i]) {
                     icons[i].hidden = i !== current;
                     icons[i].style.display = i === current ? "flex" : "none";
