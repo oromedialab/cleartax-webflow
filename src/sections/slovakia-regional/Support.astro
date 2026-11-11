@@ -21,47 +21,47 @@ const rows: Row[] = [
   {
     title: "Interoperability - One API for Every Mandate",
     body: "Integrate ClearTax once for Slovakia and easily scale across EU and global e-invoicing mandates. As ViDA DRR goes live in 2030 or new regional requirements emerge, simply activate the required country configuration; no new IT projects required.",
-    icon: "/images/slovakia-regional/mandate-1.png",
+    icon: "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6af2ef51b96648083804c2ed_mandate-1.png",
   },
   {
     title: "Single unified dashboard",
     body: "All invoices, incoming or outgoing, flow into one unified dashboard with status, validation result, and error details for every document. As you expand to cross-border transactions, you won’t need a new integration or vendor.",
-    icon: "/images/slovakia-regional/mandate-2.png",
+    icon: "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6af2ef5865c5a80ce7366850_mandate-2.png",
   },
   {
     title: "Auto-healing to keep invoices flowing",
     body: "Our e-invoicing compliance platform validates every invoice before transmission and flags issues before they become failures. Duplicate detection, abnormal value alerts, vendor anomaly detection, etc., surface before they cost you money.",
-    icon: "/images/slovakia-regional/mandate-3.png",
+    icon: "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6af2ef5d6698899bda880bb5_mandate-3.png",
   },
   {
     title: "Constant Support",
     body: "Get guidance from implementation through go-live, with experts available to help you navigate changing compliance requirements. End-to-end encrypted transmission across the Peppol network.",
-    icon: "/images/slovakia-regional/mandate-4.png",
+    icon: "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6af2ef640409661561849f5d_mandate-4.png",
   },
   {
     title: "Enterprise-grade security & privacy",
     body: "Your business data is protected with robust security and privacy measures designed for enterprise compliance.",
-    icon: "/images/slovakia-regional/mandate-5.png",
+    icon: "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6af2ef69dbc9ac290342c7f5_mandate-5.png",
   },
   {
     title: "Continuous regulatory updates",
     body: "Stay aligned with evolving e-invoicing regulations through ongoing platform updates, so you can adapt without disrupting your operations.",
-    icon: "/images/slovakia-regional/mandate-6.png",
+    icon: "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6af2ef6ea03410666c4a4ad1_mandate-6.png",
   },
   {
     title: "Faster transition & go-live",
     body: "Go live 4x faster with AI Integration. Our autonomous integration agent analyses your ERP, maps your data, and configures the connection automatically. Setup goes from months to weeks, and your IT team barely has to touch it.",
-    icon: "/images/slovakia-regional/mandate-7.png",
+    icon: "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6ae82b6f5ad378d32bbbe4d3_timeline-3.png",
   },
   {
     title: "Audit-ready with archival",
     body: "The Recon AI Agent runs a daily reconciliation and compares your ERP sales data with e-invoice data. It highlights discrepancies before authorities notice them. Finance teams query invoices and exceptions in plain language. No deep system navigation required.",
-    icon: "/images/slovakia-regional/mandate-8.png",
+    icon: "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6af2ef839c1427ee4486665c_mandate-8.png",
   },
 ];
 ---
 
-<section class="bg-generic-00 py-12 lg:py-20">
+<section class="bg-generic-00 py-12 lg:py-20" data-sk-support>
   <div class="container mx-auto">
     <div class="flex flex-col gap-12">
       <div class="flex flex-col items-center gap-4 text-center">
@@ -83,14 +83,14 @@ const rows: Row[] = [
           rows.map((row, i) => (
             <div
               class:list={[
-                "grid grid-cols-1 gap-4 lg:grid-cols-[1fr_640px] lg:items-center lg:gap-8",
+                "sk-support-row grid grid-cols-1 gap-4 lg:grid-cols-[1fr_640px] lg:items-center lg:gap-8",
                 i > 0 && "pt-8",
                 i < rows.length - 1 &&
                   "border-b-2 border-[var(--border-divider,#f2f1f0)] pb-8",
               ]}
             >
               <div class="flex items-center gap-6">
-                <img src={row.icon} alt="" class="h-16 w-16" />
+                <img src={row.icon} alt="" class="sk-support-icon h-13 w-13" />
                 <p class="m-0 max-w-[320px] font-heading font-medium text-vault-navy text-[length:var(--fs-h5)] leading-[length:var(--lh-h5)]">
                   {row.title}
                 </p>
@@ -105,3 +105,98 @@ const rows: Row[] = [
     </div>
   </div>
 </section>
+
+<style is:global>
+  /* Rows start dimmed; the row nearest the viewport's vertical centre is
+     promoted to full opacity by the script below. */
+  .sk-support-row {
+    opacity: 0.5;
+    transition:
+      opacity 0.35s ease-in-out,
+      transform 0.35s ease-in-out;
+  }
+
+  .sk-support-row.is-centered {
+    opacity: 1;
+  }
+
+  .sk-support-row.is-scaled {
+    transform: scale(1.015);
+  }
+
+  .sk-support-icon {
+    transition: transform 0.35s ease-in-out;
+  }
+
+  .sk-support-row.is-scaled .sk-support-icon {
+    transform: scale(1.061);
+  }
+</style>
+
+<script is:inline>
+  (function () {
+    const root = document.querySelector("[data-sk-support]");
+    if (!root) return;
+    const rows = Array.from(root.querySelectorAll(".sk-support-row"));
+    if (!rows.length) return;
+
+    if (
+      !("IntersectionObserver" in window) ||
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches
+    ) {
+      // No observer, or motion is unwelcome: every row full opacity rather
+      // than the whole list sitting dimmed with nothing to light it.
+      rows.forEach((el) => el.classList.add("is-centered"));
+      return;
+    }
+
+    // A thin 1% band pinned across the middle of the viewport — "centred"
+    // means the row the centre line is actually inside. The observer only
+    // fires on a crossing, so a wide band could let the nearest row change
+    // with nothing to trigger a recompute; kept thin, every change of row IS
+    // a crossing. `inBand` holds the running set because two rows can
+    // straddle the line for a frame; pick() resolves that by distance.
+    let centred = null;
+    const inBand = new Set();
+
+    const pick = () => {
+      // Nothing in the band means the middle has landed in a gap between
+      // rows — hold the last choice instead of clearing, so the focus never
+      // blinks off between rows.
+      if (!inBand.size) return;
+
+      const middle = window.innerHeight / 2;
+      let best = null;
+      let bestDistance = Infinity;
+
+      inBand.forEach((el) => {
+        const r = el.getBoundingClientRect();
+        const distance = Math.abs((r.top + r.bottom) / 2 - middle);
+        if (distance < bestDistance) {
+          bestDistance = distance;
+          best = el;
+        }
+      });
+
+      if (!best || best === centred) return;
+      if (centred) {
+        centred.classList.remove("is-centered", "is-scaled");
+      }
+      centred = best;
+      centred.classList.add("is-centered", "is-scaled");
+    };
+
+    const centreObserver = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) inBand.add(entry.target);
+          else inBand.delete(entry.target);
+        });
+        pick();
+      },
+      { rootMargin: "-49.5% 0px -49.5% 0px", threshold: 0 },
+    );
+
+    rows.forEach((el) => centreObserver.observe(el));
+  })();
+</script>

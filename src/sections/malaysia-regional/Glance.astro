@@ -49,6 +49,8 @@ interface Card {
     /** The Nova Blue one-liner under the title in the overlay. */
     claim: string;
     caption: string;
+    icon: string;
+    image?: string;
 }
 
 const cards: Card[] = [
@@ -57,24 +59,28 @@ const cards: Card[] = [
         claim: "",
         caption:
             "Every e-invoice is submitted to LHDN's MyInvois system in UBL 2.1 (XML or JSON), with 55 data fields and a digital signature. For API submissions, MyInvois returns a unique ID and validation-link details. The issuer generates the QR code. Only then is it a valid e-invoice to share with your buyer.",
+        icon: "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6af312d191975217e22da0ce_e-1.png",
     },
     {
         title: "B2B, B2C, B2G and self-billed ",
         claim: "",
         caption:
             "Invoices, credit notes, debit notes and refund notes all need validation. B2C sales can be consolidated into one monthly e-invoice, due within 7 days of month-end. For payments such as imports, agent commissions and interest, the buyer must issue a self-billed e-invoice.",
+        icon: "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6af312d93119234d3c8faf77_e-2.png",
     },
     {
         title: "Relaxation ends 31 December 2027",
         claim: "",
         caption:
             "During the relaxation period, eligible businesses can still consolidate transactions, including B2B. After it ends, consolidation is limited to consumer receipts, and any single transaction above RM10,000 needs its own e-invoice. Cancellations are allowed only within 72 hours of validation.",
+        icon: "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6af312de40dffe97797f82f6_e-3.png",
     },
     {
         title: "Your books must match LHDN's ",
         claim: "",
         caption:
             "LHDN now holds the data for nearly 2 billion e-invoices and can compare it with your income tax and SST returns. Mismatches between your ERP and MyInvois are the new audit risk, so reconcile every month, not at year-end.",
+        icon: "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6af312e421c5e688ea53a1af_e-4.png",
     },
 ];
 
@@ -129,9 +135,10 @@ const panels = [
                             data-ih-maiw-open
                             data-ih-maiw-index={index}
                         >
-                            <span
-                                class="block h-14 w-14 shrink-0 self-stretch rounded-lg bg-visual-placeholder"
-                                aria-hidden="true"
+                            <img
+                                src={card.icon}
+                                alt={card.title}
+                                class="h-14 w-14 shrink-0 object-contain"
                             />
                             <span class="min-w-0 flex-1 font-heading font-medium text-vault-navy text-[length:var(--fs-h6)] leading-[length:var(--lh-h6)]">
                                 {card.title}
@@ -193,7 +200,7 @@ const panels = [
     class="fixed inset-0 z-[2000] hidden items-center justify-center bg-generic-100/70 p-4 backdrop-blur-sm"
 >
     <div
-        class="relative max-h-[90vh] w-full max-w-[1280px] overflow-y-auto rounded-xl border-2 border-[#CCCCCC] bg-generic-00 p-6"
+        class="relative max-h-[90vh] w-full max-w-[630px] overflow-y-auto rounded-xl border-2 border-[#CCCCCC] bg-generic-00 p-6"
         data-ih-maiw-panel-detail
     >
         <!-- Anchored to the PANEL, not to the visual it sits over in the Figma:
@@ -203,7 +210,7 @@ const panels = [
         <button
             type="button"
             aria-label="Close"
-            class="absolute right-6 top-6 z-10 inline-flex h-10 w-10 cursor-pointer items-center justify-center rounded-lg border-0 bg-transparent p-0 text-vault-navy transition-opacity duration-150 hover:opacity-70 lg:right-11 lg:top-11"
+            class="absolute right-6 top-6 z-10 inline-flex h-10 w-10 cursor-pointer items-center justify-center rounded-lg border-0 bg-transparent p-0 text-vault-navy transition-opacity duration-150 hover:opacity-70 lg:right-5 lg:top-5"
             data-ih-maiw-close
         >
             <svg
@@ -230,17 +237,31 @@ const panels = [
             </svg>
         </button>
 
-        <div class="flex flex-col items-start gap-6 lg:flex-row lg:gap-12">
-            <!-- 416px = 1280 panel − 48 padding − 48 gap − the 768px the 16:9 visual
-           takes at the design's 432px height. justify-between is what puts the
-           caption and the chevrons on the visual's bottom edge. -->
-            <div
-                class="flex w-full flex-col justify-between gap-6 lg:w-[416px] lg:shrink-0 lg:self-stretch"
-            >
+        <div class="flex flex-col items-start gap-6">
+            <div class="flex w-full flex-col justify-between gap-6">
                 <div class="flex flex-col gap-6">
-                    <span
-                        class="block h-16 w-16 shrink-0 rounded-lg bg-visual-placeholder"
-                        aria-hidden="true"></span>
+                    <div class="h-16 w-16 shrink-0">
+                        {
+                            flat.map(({ card }, i) => (
+                                <img
+                                    src={card.icon}
+                                    alt=""
+                                    width="64"
+                                    height="64"
+                                    class="h-16 w-16 rounded-lg object-contain"
+                                    style={
+                                        i === 0
+                                            ? "display: block;"
+                                            : "display: none;"
+                                    }
+                                    hidden={i !== 0}
+                                    data-ih-maiw-icon
+                                    loading="lazy"
+                                    decoding="async"
+                                />
+                            ))
+                        }
+                    </div>
                     <div id="ih-maiw-overlay-title">
                         {
                             flat.map(({ card, group }, i) => (
@@ -252,13 +273,53 @@ const panels = [
                                     <h3 class="m-0 mb-2 pr-12 font-heading font-medium text-vault-navy text-[length:var(--fs-h5)] leading-[length:var(--lh-h5)] tracking-[-0.5px] lg:pr-0">
                                         {card.title}
                                     </h3>
-                                    <p class="m-0 font-body font-medium text-nova-blue text-[length:var(--fs-body)] leading-[length:var(--lh-body)]">
-                                        {card.claim}
-                                    </p>
+                                    {card.claim && (
+                                        <p class="m-0 font-body font-medium text-nova-blue text-[length:var(--fs-body)] leading-[length:var(--lh-body)]">
+                                            {card.claim}
+                                        </p>
+                                    )}
                                 </div>
                             ))
                         }
                     </div>
+                </div>
+
+                <div
+                    class="aspect-[574/323] w-full max-w-[574px] rounded-lg overflow-hidden bg-visual-placeholder mx-auto"
+                >
+                    {
+                        flat.map(({ card }, i) =>
+                            card.image ? (
+                                <img
+                                    src={card.image}
+                                    alt={card.title}
+                                    width="574"
+                                    height="323"
+                                    class="h-full w-full object-contain"
+                                    style={
+                                        i === 0
+                                            ? "display: block;"
+                                            : "display: none;"
+                                    }
+                                    hidden={i !== 0}
+                                    data-ih-maiw-image
+                                    loading="lazy"
+                                />
+                            ) : (
+                                <div
+                                    class="h-full w-full bg-visual-placeholder"
+                                    style={
+                                        i === 0
+                                            ? "display: block;"
+                                            : "display: none;"
+                                    }
+                                    hidden={i !== 0}
+                                    data-ih-maiw-image
+                                    aria-hidden="true"
+                                />
+                            ),
+                        )
+                    }
                 </div>
 
                 <div class="flex flex-col gap-6">
@@ -275,68 +336,20 @@ const panels = [
                             ))
                         }
                     </div>
-
-                    <div class="flex items-center gap-2">
-                        <button
-                            type="button"
-                            aria-label="Previous"
-                            aria-controls="ih-maiw-overlay-title"
-                            class="inline-flex cursor-pointer items-center justify-center rounded border border-neutral-300 bg-generic-00 p-2 text-vault-navy transition-colors duration-150 hover:border-nova-blue"
-                            data-ih-maiw-prev
-                        >
-                            <svg
-                                width="20"
-                                height="20"
-                                viewBox="0 0 20 20"
-                                fill="none"
-                                aria-hidden="true"
-                                focusable="false"
-                            >
-                                <path
-                                    d="M12 15L7 10L12 5"
-                                    stroke="currentColor"
-                                    stroke-width="1.5"
-                                    stroke-linecap="round"
-                                    stroke-linejoin="round"></path>
-                            </svg>
-                        </button>
-                        <button
-                            type="button"
-                            aria-label="Next"
-                            aria-controls="ih-maiw-overlay-title"
-                            class="inline-flex cursor-pointer items-center justify-center rounded border border-neutral-300 bg-generic-00 p-2 text-vault-navy transition-colors duration-150 hover:border-nova-blue"
-                            data-ih-maiw-next
-                        >
-                            <svg
-                                width="20"
-                                height="20"
-                                viewBox="0 0 20 20"
-                                fill="none"
-                                aria-hidden="true"
-                                focusable="false"
-                            >
-                                <path
-                                    d="M7 5L12 10L7 15"
-                                    stroke="currentColor"
-                                    stroke-width="1.5"
-                                    stroke-linecap="round"
-                                    stroke-linejoin="round"></path>
-                            </svg>
-                        </button>
-                    </div>
                 </div>
-            </div>
-
-            <div
-                class="aspect-[1280/720] w-full rounded-lg bg-visual-placeholder lg:w-auto lg:flex-1"
-                aria-hidden="true"
-            >
             </div>
         </div>
     </div>
 </div>
 
-<style is:global></style>
+<style is:global>
+    [data-ih-maiw-head][hidden],
+    [data-ih-maiw-body][hidden],
+    [data-ih-maiw-icon][hidden],
+    [data-ih-maiw-image][hidden] {
+        display: none !important;
+    }
+</style>
 
 <script is:inline>
     /* Pills filter the grid; a card opens the detail overlay, and the chevrons
@@ -357,6 +370,8 @@ const panels = [
         var nextBtn = overlay.querySelector("[data-ih-maiw-next]");
         var heads = overlay.querySelectorAll("[data-ih-maiw-head]");
         var bodies = overlay.querySelectorAll("[data-ih-maiw-body]");
+        var icons = overlay.querySelectorAll("[data-ih-maiw-icon]");
+        var images = overlay.querySelectorAll("[data-ih-maiw-image]");
         if (!panel || !heads.length || heads.length !== bodies.length) return;
 
         var count = heads.length;
@@ -381,6 +396,14 @@ const panels = [
             for (var i = 0; i < count; i++) {
                 heads[i].hidden = i !== current;
                 bodies[i].hidden = i !== current;
+                if (icons[i]) {
+                    icons[i].hidden = i !== current;
+                    icons[i].style.display = i === current ? "block" : "none";
+                }
+                if (images[i]) {
+                    images[i].hidden = i !== current;
+                    images[i].style.display = i === current ? "block" : "none";
+                }
             }
             // The panel scrolls on short windows; a card further down the list would
             // otherwise open mid-way through its own copy.

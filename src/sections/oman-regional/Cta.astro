@@ -1,21 +1,24 @@
 ---
 /**
- * Closing CTA band — Figma node 15121:21018 ("Container - Partner program -
- * WIP").
+ * Closing CTA band — Figma node 13600:29645 ("Container - Partner program").
  *
  * Background is the same interactive stroke field as `Hero.astro`, not the
- * literal marquee-of-logo-tiles the Figma draws in this slot — see the note in
- * `Hero.astro` for why that substitution is deliberate and consistent with the
- * other brand v2 regional pages. Copied from `france-regional/Cta.astro`; two
- * deliberate differences from the hero:
+ * static seven-column dot grid this section used to draw: a plain grid of dots
+ * until a pointer enters, at which point each dot draws out into a stroke aimed
+ * at the cursor, longest beside it and back to a dot by `lengthRadius`. Same
+ * four layers over it too — the page gradient on the section, a radial wash
+ * behind the copy, a mobile-only top fade, and a bottom fade.
+ *
+ * Two deliberate differences from the hero:
  *   - `baseColor` stays this section's Nova Blue rather than the hero's Flux
  *     Lime, so the band keeps the tint it was designed with. The geometry is
  *     identical: lineWidth 2 + gap 24 is the same 26px pitch the old dot grid
  *     used, so the field lands on the same lattice.
- *   - The animation loop is gated on an IntersectionObserver, so a second
- *     always-on 60fps loop isn't running alongside the hero's.
+ *   - The animation loop is gated on an IntersectionObserver. The hero's runs
+ *     unconditionally, and a second always-on 60fps loop on the same page is
+ *     worth not adding. Behaviour while the section is on screen is unchanged.
  *
- * Ids are `om-cta-` prefixed: embeds share one namespace per page, and this
+ * Ids are `fr-cta-` prefixed: embeds share one namespace per page, and this
  * canvas sits on the same page as the hero's.
  */
 interface Props {
@@ -47,8 +50,8 @@ const {
 ---
 
 <section
-  id="om-cta"
-  class="om-cta relative overflow-hidden bg-generic-00 max-lg:py-16 lg:py-[121px]"
+  id="fr-cta"
+  class="fr-cta relative overflow-hidden bg-generic-00 max-lg:py-16 lg:py-[121px]"
   data-line-width={String(lineWidth)}
   data-gap={String(gap)}
   data-max-length={String(maxLength)}
@@ -60,49 +63,49 @@ const {
   data-fade-radius={String(fadeRadius)}
 >
   <!-- Interactive stroke field -->
-  <div class="absolute inset-0 z-0 w-full h-full pointer-events-none">
-    <canvas id="om-cta-dots" class="absolute inset-0 w-full h-full"></canvas>
+  <div
+    class="absolute inset-y-0 right-0 z-0 w-full lg:w-1/2 h-full pointer-events-none"
+  >
+    <canvas id="fr-cta-dots" class="absolute inset-0 w-full h-full"></canvas>
   </div>
 
   <!-- Radial wash, so the headline keeps its contrast over the field -->
-  <div
-    class="absolute inset-0 z-0 bg-[radial-gradient(circle_at_center,_rgba(255,255,255,1)_30%,_rgba(255,255,255,0.7)_40%,_rgba(255,255,255,0)_65%)] pointer-events-none"
-  >
-  </div>
+  <div class="absolute inset-0 z-0 pointer-events-none"></div>
 
   <!-- Top fade to blend smoothly into the preceding section -->
   <div
-    class="absolute top-0 left-0 right-0 h-40 md:h-56 z-0 pointer-events-none"
+    class="absolute top-0 left-0 right-0 h-40 md:h-56 z-0 bg-gradient-to-b from-white via-white/80 to-transparent pointer-events-none"
     style="background: linear-gradient(180deg, #FFFFFF 0%, rgba(255, 255, 255, 0.85) 40%, rgba(255, 255, 255, 0) 100%);"
   >
   </div>
 
   <div class="container mx-auto relative z-10">
-    <div
-      class="mx-auto flex max-w-[791px] flex-col items-center gap-6 text-center"
-    >
-      <div class="flex flex-col items-center">
-        <h2
-          class="m-0 font-heading font-medium text-vault-navy text-[length:var(--fs-h2)] leading-[length:var(--lh-h2)]"
-        >
-          Get ahead of the mandate
-        </h2>
-        <p
-          class="m-0 font-body font-normal text-neutral-500 text-[length:var(--fs-sm)] leading-[length:var(--lh-sm)] tracking-[-0.5px] max-w-154 mt-4"
-        >
-          Build a future-ready invoicing infrastructure today.
-        </p>
-      </div>
-
-      <!-- Opens the HubSpot modal from `DemoModal.astro`. The href is kept real
-           so the CTA still goes somewhere if that section is absent. -->
-      <a
-        href="https://www.cleartax.com/contact-us"
-        data-demo-open
-        class="inline-flex items-center justify-center gap-2 rounded-lg border border-nova-blue bg-nova-blue px-5 py-3.5 text-[length:var(--fs-label-lg)] leading-[length:var(--lh-label-lg)] font-medium text-nova-50 no-underline transition-all duration-200 hover:bg-generic-00 hover:text-nova-blue"
+    <div class="flex w-full flex-col lg:flex-row">
+      <div
+        class="flex flex-col items-center md:items-start gap-6 text-center lg:w-1/2"
       >
-        Book a Demo
-      </a>
+        <div class="flex flex-col items-center md:items-start gap-2">
+          <h2
+            class="m-0 font-heading font-medium text-vault-navy text-[length:var(--fs-h2)] leading-[length:var(--lh-h2)]"
+          >
+            Get ahead of the mandate
+          </h2>
+          <p
+            class="m-0 font-body text-neutral-500 text-[length:var(--fs-body-lg)] leading-[length:var(--lh-body-lg)]"
+          >
+            Build a future-ready invoicing infrastructure today.
+          </p>
+        </div>
+
+        <a
+          href="https://www.cleartax.com/contact-us"
+          data-demo-open
+          class="inline-flex items-center justify-center gap-2 rounded-lg border border-nova-blue bg-nova-blue px-5 py-3.5 text-[length:var(--fs-label-lg)] leading-[length:var(--lh-label-lg)] font-medium text-nova-50 no-underline transition-all duration-200 hover:bg-nova-50 hover:text-nova-blue"
+        >
+          Book a demo
+        </a>
+      </div>
+      <div class="hidden lg:block lg:w-1/2"></div>
     </div>
   </div>
 </section>
@@ -115,10 +118,10 @@ const {
 
      The one change from the hero copy is the IntersectionObserver at the bottom:
      this loop only runs while the band is on screen. */
-  function initOmCtaGrid() {
-    const section = document.getElementById("om-cta");
+  function initFrCtaGrid() {
+    const section = document.getElementById("fr-cta");
     if (!section) return;
-    const canvas = document.getElementById("om-cta-dots");
+    const canvas = document.getElementById("fr-cta-dots");
     if (!canvas || !canvas.getContext) return;
     const ctx = canvas.getContext("2d");
 
@@ -183,7 +186,15 @@ const {
           const cy = startY + y * spacing;
           // ox/oy is the stroke's home and the point it is drawn centred on;
           // x/y is where that centre is now; hx/hy is half its segment vector.
-          dots.push({ x: cx, y: cy, ox: cx, oy: cy, alpha: 1, hx: 0, hy: 0 });
+          dots.push({
+            x: cx,
+            y: cy,
+            ox: cx,
+            oy: cy,
+            alpha: 1,
+            hx: 0,
+            hy: 0,
+          });
         }
       }
 
@@ -481,8 +492,8 @@ const {
   }
 
   if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", initOmCtaGrid);
+    document.addEventListener("DOMContentLoaded", initFrCtaGrid);
   } else {
-    initOmCtaGrid();
+    initFrCtaGrid();
   }
 </script>

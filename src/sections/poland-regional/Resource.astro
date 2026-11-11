@@ -1,0 +1,88 @@
+---
+/**
+ * "KSA e-invoicing resource centre" — Figma node 18377:73283 ("Container -
+ * Resources"). Same card as `spain-regional/Resources.astro`: a category chip,
+ * an optional status chip, a title and a one-line summary; the whole card is
+ * the link.
+ *
+ * PLACEHOLDER CONTENT: the Figma fills the grid with the France template cards
+ * (one real France title, five identical "French VAT Code…" duplicates). They
+ * are carried over verbatim so the layout matches; every `href` is `#`. Replace
+ * titles and links with the real KSA assets before staging.
+ *
+ * The one lime chip ("Popular") is this screen's Flux Lime instance — keep it
+ * to a single card.
+ */
+interface Resource {
+    category: string;
+    badge?: "New" | "Popular";
+    title: string;
+    desc: string;
+    href: string;
+}
+
+const desc = "A practical framework to get ahead of the mandate";
+const dup =
+    "French VAT Code for E-Invoicing: Key Rules, Requirements & Compliance...";
+
+const resources: Resource[] = [
+    {
+        category: "Case study",
+        badge: "Popular",
+        title: "e-Invoicing in France 2026: Timeline, Requirements, Guidelines & Format",
+        desc,
+        href: "#",
+    },
+    { category: "Whitepaper", badge: "New", title: dup, desc, href: "#" },
+    { category: "Case study", title: dup, desc, href: "#" },
+    { category: "Case study", title: dup, desc, href: "#" },
+    { category: "Case study", title: dup, desc, href: "#" },
+    { category: "Case study", title: dup, desc, href: "#" },
+];
+---
+
+<section class="bg-generic-00 py-16 lg:py-20">
+    <div class="w-full max-w-[var(--container-max)] mx-auto px-4 md:px-6">
+        <h2
+            class="m-0 mb-8 text-center font-heading font-medium text-vault-navy text-[length:var(--fs-h1)] leading-[length:var(--lh-h1)] tracking-[-0.5px] lg:mb-12"
+        >
+            Your Poland KSeF resource centre
+        </h2>
+
+        <div class="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+            {
+                resources.map((r) => (
+                    <a
+                        href={r.href}
+                        class="flex flex-col gap-4 rounded-xl border border-neutral-300 bg-generic-00 p-6 no-underline transition-all duration-200 ease-in-out hover:border-nova-blue"
+                    >
+                        <div class="flex items-start justify-between gap-3">
+                            <span class="inline-flex items-center justify-center rounded-lg bg-neutral-100 px-3 py-1.5 font-body text-[length:var(--fs-label)] leading-[length:var(--lh-label)] font-medium text-neutral-700">
+                                {r.category}
+                            </span>
+                            {r.badge === "New" && (
+                                <span class="inline-flex items-center justify-center rounded-lg bg-nova-blue px-3 py-1.5 font-body text-[length:var(--fs-label)] leading-[length:var(--lh-label)] font-medium text-generic-00">
+                                    New
+                                </span>
+                            )}
+                            {r.badge === "Popular" && (
+                                <span class="inline-flex items-center justify-center rounded-lg bg-flux-lime px-3 py-1.5 font-body text-[length:var(--fs-label)] leading-[length:var(--lh-label)] font-medium text-vault-navy">
+                                    Popular
+                                </span>
+                            )}
+                        </div>
+
+                        <div class="flex flex-col gap-2.5">
+                            <h3 class="m-0 font-body font-semibold text-vault-navy text-[length:var(--fs-body-lg)] leading-[length:var(--lh-body-lg)]">
+                                {r.title}
+                            </h3>
+                            <p class="m-0 font-body font-normal text-neutral-500 text-[length:var(--fs-body)] leading-[length:var(--lh-body)]">
+                                {r.desc}
+                            </p>
+                        </div>
+                    </a>
+                ))
+            }
+        </div>
+    </div>
+</section>

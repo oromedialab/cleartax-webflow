@@ -1,0 +1,348 @@
+---
+/**
+ * Poland e-invoicing at a glance
+ *
+ * Four cards in a 2-column grid. A card is a button: clicking it opens ONE
+ * overlay dialog showing that card's heading and body.
+ *
+ * Ids and data attributes are `pl-supports-` prefixed: embeds share one
+ * namespace per page.
+ */
+interface Card {
+    heading: string;
+    body: string;
+}
+
+const cards: Card[] = [
+    {
+        heading: "Structured XML, not just an emailed PDF",
+        body: `From 1 February 2026, KSeF invoices using the FA schema use FA(3) XML, replacing FA(2). Corrective invoices issued from that date also use FA(3), even where the original used FA(1) or FA(2). Sending a PDF by email does not, by itself, satisfy an obligation to issue a structured invoice through KSeF.`,
+    },
+    {
+        heading: "A national invoice system, not a Peppol-only route",
+        body: `KSeF supports structured invoice issuance, transmission, receipt, access and storage. Commercial financial and accounting software can connect through the KSeF API. Design your Polish invoice flow around KSeF rather than assuming that another market’s exchange route applies.`,
+    },
+    {
+        heading: "Your invoice number and KSeF number are different",
+        body: `KSeF assigns its reference after accepting the invoice. The reference appears in the official receipt confirmation, UPO (urzędowe poświadczenie odbioru), and differs from your invoice number. Plan how finance will link these references to the ERP record.`,
+    },
+    {
+        heading: "Receiving matters as much as issuing",
+        body: `Mandatory receipt through KSeF began on 1 February 2026 for relevant recipients, even where their issuance obligation started later. Exceptions include the recipients identified in Article 106gb(4) of the VAT Act, such as certain foreign entities and consumers.`,
+    },
+];
+---
+
+<section class="bg-generic-00 pt-16 pb-12 lg:pt-20">
+    <div
+        class="w-full max-w-[var(--container-max)] mx-auto px-4 md:px-6 flex flex-col items-center gap-12"
+    >
+        <div class="flex flex-col items-center gap-6 text-center">
+            <h2
+                class="m-0 font-heading font-medium text-vault-navy text-[length:var(--fs-h1)] leading-[length:var(--lh-h1)] max-w-191 tracking-[-0.5px] max-w-127"
+            >
+                Poland e-invoicing at a glance
+            </h2>
+            <p
+                class="m-0 font-body text-neutral-500 text-[length:var(--fs-body)] leading-[length:var(--lh-body)] max-w-235"
+            >
+                Poland’s Krajowy System e-Faktur (KSeF) is the national system
+                for issuing, receiving and storing structured invoices. It
+                assigns a unique KSeF number to accepted invoices, giving
+                finance teams a system reference for each document. Mandatory
+                use depends on the taxpayer, transaction and applicable
+                exclusions or transitional rules.
+            </p>
+        </div>
+
+        <div
+            class="grid w-full grid-cols-1 gap-4 md:grid-cols-2 md:gap-5 lg:gap-8"
+        >
+            {
+                cards.map((card, i) => (
+                    <button
+                        type="button"
+                        class="group m-0 flex h-full w-full cursor-pointer items-center justify-between gap-3 sm:gap-4 md:gap-5 rounded-xl border border-neutral-300 bg-generic-00 p-4 sm:p-5 md:p-6 text-left transition-all duration-150 ease-in-out hover:border-nova-blue"
+                        aria-haspopup="dialog"
+                        data-pl-supports-open
+                        data-pl-supports-index={i}
+                    >
+                        <span class="size-[56px] bg-visual-placeholder rounded-lg" />
+                        <span class="min-w-0 flex-1 font-heading font-medium text-vault-navy text-[length:var(--fs-body)] leading-[length:var(--lh-body)] md:text-[length:var(--fs-body-lg)] md:leading-[length:var(--lh-body-lg)] lg:text-[length:var(--fs-h6)] lg:leading-[length:var(--lh-h6)]">
+                            {card.heading}
+                        </span>
+                        <span
+                            class="ml-auto flex h-10 w-10 sm:h-12 sm:w-12 lg:h-14 lg:w-14 shrink-0 items-center justify-center rounded-lg p-1.5 sm:p-2 text-vault-navy transition-colors duration-150 ease-in-out group-hover:text-nova-blue"
+                            aria-hidden="true"
+                        >
+                            <svg
+                                class="h-6 w-6 sm:h-8 sm:w-8 lg:h-10 lg:w-10"
+                                viewBox="0 0 40 40"
+                                fill="none"
+                                xmlns="http://www.w3.org/2000/svg"
+                            >
+                                <path
+                                    d="M20 10V30"
+                                    stroke="currentColor"
+                                    stroke-width="1.5"
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                />
+                                <path
+                                    d="M30 20L10 20"
+                                    stroke="currentColor"
+                                    stroke-width="1.5"
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                />
+                            </svg>
+                        </span>
+                    </button>
+                ))
+            }
+        </div>
+    </div>
+</section>
+
+<!-- Detail overlay. Lives outside the section's container so the scrim covers
+     the viewport rather than the 1280px column. -->
+<div
+    id="pl-supports-overlay"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="pl-supports-overlay-title"
+    aria-hidden="true"
+    class="fixed inset-0 z-[2000] hidden items-center justify-center bg-generic-100/70 p-4 backdrop-blur-sm"
+>
+    <div
+        class="relative max-h-[90vh] w-full max-w-[500px] overflow-y-auto rounded-xl border-2 border-[#CCCCCC] bg-generic-00 p-6"
+        data-pl-supports-panel
+    >
+        <button
+            type="button"
+            aria-label="Close"
+            class="absolute right-6 top-6 z-10 inline-flex h-10 w-10 cursor-pointer items-center justify-center rounded-lg border-0 bg-transparent p-0 text-vault-navy transition-opacity duration-150 hover:opacity-70 lg:right-5 lg:top-5"
+            data-pl-supports-close
+        >
+            <svg
+                width="40"
+                height="40"
+                viewBox="0 0 40 40"
+                fill="none"
+                class="rotate-45"
+                aria-hidden="true"
+                focusable="false"
+            >
+                <path
+                    d="M20 10V30"
+                    stroke="currentColor"
+                    stroke-width="1.5"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"></path>
+                <path
+                    d="M30 20L10 20"
+                    stroke="currentColor"
+                    stroke-width="1.5"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"></path>
+            </svg>
+        </button>
+
+        <div class="flex flex-col items-start gap-6">
+            <div
+                class="flex w-full flex-col justify-between gap-6 lg:w-[440px] lg:shrink-0 lg:self-stretch"
+            >
+                <div class="flex flex-col gap-6">
+                    <div id="pl-supports-overlay-title">
+                        {
+                            cards.map((card, i) => (
+                                <h3
+                                    class="m-0 pr-12 font-heading font-medium text-vault-navy text-[length:var(--fs-h5)] leading-[length:var(--lh-h5)] tracking-[-0.5px] lg:pr-0 text-balance"
+                                    style={
+                                        i === 0
+                                            ? "display: block;"
+                                            : "display: none;"
+                                    }
+                                    hidden={i !== 0}
+                                    data-pl-supports-heading
+                                >
+                                    {card.heading}
+                                </h3>
+                            ))
+                        }
+                    </div>
+                </div>
+
+                <div
+                    class="aspect-[510/286] w-full rounded-lg overflow-hidden bg-visual-placeholder"
+                >
+                    {
+                        cards.map((card, i) => (
+                            <div
+                                class="h-full w-full bg-visual-placeholder"
+                                style={
+                                    i === 0
+                                        ? "display: block;"
+                                        : "display: none;"
+                                }
+                                hidden={i !== 0}
+                                data-pl-supports-image
+                                aria-hidden="true"
+                            />
+                        ))
+                    }
+                </div>
+
+                <div class="flex flex-col gap-6">
+                    <div>
+                        {
+                            cards.map((card, i) => (
+                                <div
+                                    class="m-0 flex flex-col gap-3 font-body font-normal text-neutral-500 text-[length:var(--fs-body)] leading-[length:var(--lh-body)]"
+                                    style={
+                                        i === 0
+                                            ? "display: flex;"
+                                            : "display: none;"
+                                    }
+                                    hidden={i !== 0}
+                                    data-pl-supports-body
+                                    set:html={card.body}
+                                />
+                            ))
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style is:global>
+    [data-pl-supports-heading][hidden],
+    [data-pl-supports-body][hidden],
+    [data-pl-supports-icon][hidden],
+    [data-pl-supports-image][hidden] {
+        display: none !important;
+    }
+</style>
+
+<script is:inline>
+    /* Card -> detail overlay, with the chevrons walking the eight without closing. */
+    (function () {
+        var overlay = document.getElementById("pl-supports-overlay");
+        if (!overlay) return;
+
+        var panel = overlay.querySelector("[data-pl-supports-panel]");
+        var closeBtn = overlay.querySelector("[data-pl-supports-close]");
+        var prevBtn = overlay.querySelector("[data-pl-supports-prev]");
+        var nextBtn = overlay.querySelector("[data-pl-supports-next]");
+        var headings = overlay.querySelectorAll("[data-pl-supports-heading]");
+        var bodies = overlay.querySelectorAll("[data-pl-supports-body]");
+        var icons = overlay.querySelectorAll("[data-pl-supports-icon]");
+        var images = overlay.querySelectorAll("[data-pl-supports-image]");
+        if (!panel || !headings.length || headings.length !== bodies.length)
+            return;
+
+        var count = headings.length;
+        var current = 0;
+        var lastFocused = null;
+
+        function show(index) {
+            current = ((index % count) + count) % count;
+            for (var i = 0; i < count; i++) {
+                headings[i].hidden = i !== current;
+                headings[i].style.display = i === current ? "block" : "none";
+                bodies[i].hidden = i !== current;
+                bodies[i].style.display = i === current ? "flex" : "none";
+                if (icons[i]) {
+                    icons[i].hidden = i !== current;
+                    icons[i].style.display = i === current ? "flex" : "none";
+                }
+                if (images[i]) {
+                    images[i].hidden = i !== current;
+                    images[i].style.display = i === current ? "block" : "none";
+                }
+            }
+            panel.scrollTop = 0;
+        }
+
+        function open(index, opener) {
+            lastFocused = opener || document.activeElement;
+            show(index);
+            overlay.style.display = "flex";
+            overlay.setAttribute("aria-hidden", "false");
+            document.body.style.overflow = "hidden";
+            if (closeBtn) closeBtn.focus();
+        }
+
+        function close() {
+            overlay.style.display = "none";
+            overlay.setAttribute("aria-hidden", "true");
+            document.body.style.overflow = "";
+            if (lastFocused && lastFocused.focus) lastFocused.focus();
+        }
+
+        function isOpen() {
+            return overlay.style.display === "flex";
+        }
+
+        document.addEventListener("click", function (e) {
+            if (!e.target.closest) return;
+            var opener = e.target.closest("[data-pl-supports-open]");
+            if (!opener) return;
+            open(
+                parseInt(opener.getAttribute("data-pl-supports-index"), 10) ||
+                    0,
+                opener,
+            );
+        });
+
+        if (closeBtn) closeBtn.addEventListener("click", close);
+        if (prevBtn)
+            prevBtn.addEventListener("click", function () {
+                show(current - 1);
+            });
+        if (nextBtn)
+            nextBtn.addEventListener("click", function () {
+                show(current + 1);
+            });
+
+        overlay.addEventListener("click", function (e) {
+            if (e.target === overlay) close();
+        });
+
+        document.addEventListener("keydown", function (e) {
+            if (!isOpen()) return;
+
+            if (e.key === "Escape") {
+                close();
+                return;
+            }
+
+            if (e.key === "ArrowLeft") {
+                show(current - 1);
+                return;
+            }
+            if (e.key === "ArrowRight") {
+                show(current + 1);
+                return;
+            }
+
+            if (e.key !== "Tab") return;
+            var focusable = panel.querySelectorAll(
+                'a[href], button:not([disabled]), input:not([disabled]):not([type="hidden"]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])',
+            );
+            if (!focusable.length) return;
+            var first = focusable[0];
+            var last = focusable[focusable.length - 1];
+
+            if (e.shiftKey && document.activeElement === first) {
+                e.preventDefault();
+                last.focus();
+            } else if (!e.shiftKey && document.activeElement === last) {
+                e.preventDefault();
+                first.focus();
+            }
+        });
+    })();
+</script>
