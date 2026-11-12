@@ -210,53 +210,17 @@ const schemaData = {
         });
       })();
     </script>
-    <!-- HubSpot Lazy Loader: Loads v2.js only when approaching the form or on CTA click -->
-    <script is:inline>
-      (function () {
-        var loaded = false;
-        function loadHubSpot() {
-          if (loaded) return;
-          loaded = true;
-          var s = document.createElement("script");
-          s.src = "https://js-na2.hsforms.net/forms/embed/v2.js";
-          s.defer = true;
-          document.head.appendChild(s);
-        }
+    <!-- Preconnect to HubSpot CDNs -->
+    <link rel="preconnect" href="https://js-na2.hsforms.net" />
+    <link rel="preconnect" href="https://forms.hsforms.com" />
+    <link rel="preconnect" href="https://forms-na2.hsforms.com" />
 
-        document.addEventListener("click", function (e) {
-          var target = e.target && e.target.closest && e.target.closest('a[href*="contact"]');
-          if (target) loadHubSpot();
-        });
-
-        function observeForm() {
-          var target = document.getElementById("giwip-contact") || document.getElementById("contactForm");
-          if (!target) {
-            setTimeout(observeForm, 300);
-            return;
-          }
-          if ("IntersectionObserver" in window) {
-            var observer = new IntersectionObserver(
-              function (entries) {
-                if (entries[0].isIntersecting) {
-                  loadHubSpot();
-                  observer.disconnect();
-                }
-              },
-              { rootMargin: "800px 0px" }
-            );
-            observer.observe(target);
-          } else {
-            loadHubSpot();
-          }
-        }
-
-        if (document.readyState === "loading") {
-          document.addEventListener("DOMContentLoaded", observeForm);
-        } else {
-          observeForm();
-        }
-      })();
-    </script>
+    <!-- HubSpot Embed Script -->
+    <script
+      is:inline
+      defer
+      src="https://js-na2.hsforms.net/forms/embed/v2.js"
+    ></script>
   </head>
   <body class="bg-generic-00 overflow-x-clip min-w-0">
     <!-- Google Tag Manager (noscript) -->
