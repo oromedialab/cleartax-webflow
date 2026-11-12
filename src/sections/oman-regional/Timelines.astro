@@ -1,0 +1,125 @@
+---
+/**
+ * "Key timelines" and "What paper and PDF invoices cost you" tables.
+ *
+ * oman regional page section:
+ * 1. Key timelines table:
+ *    - 3 columns: Date, Milestone, Who it applies to
+ *    - 7 milestone rows detailing ATO Peppol adoption through 2026
+ * 2. What paper and PDF invoices cost you table:
+ *    - 2 columns: For suppliers (AR), For buyers (AP)
+ *    - 4 rows comparing supplier vs buyer friction with paper/PDF invoicing
+ */
+
+interface CostRow {
+    date: string;
+    buyer: string;
+}
+const costs: CostRow[] = [
+    {
+        date:
+            "Aug 2026",
+        buyer: "Selected large VAT-registered businesses go live",
+    },
+    {
+        date:
+            "Feb 2027",
+        buyer: "All large VAT-registered businesses",
+    },
+    {
+        date: "Aug 2027",
+        buyer: "All remaining VAT-registered businesses",
+    },
+    {
+        date: "Aug 2028",
+        buyer: "Government entities (B2G transactions)",
+    },
+];
+---
+
+<section class="bg-generic-00 py-16 lg:py-20">
+    <div class="max-w-[var(--container-max)] w-full px-4 md:px-6 mx-auto">
+        <div class="w-full">
+            <h2
+                class="m-0 font-heading font-medium text-left md:text-center mx-auto text-vault-navy text-[length:var(--fs-h4)] leading-[length:var(--lh-h4)] tracking-[-0.5px] mb-6 lg:mb-12"
+            >
+                Oman E-Invoicing Timeline
+            </h2>
+
+            {/* Desktop Table */}
+            <div
+                class="md:block w-full max-w-full overflow-x-auto rounded-2xl border border-neutral-300 bg-generic-00"
+            >
+                <table class="w-full max-w-full md:min-w-[640px] border-collapse text-left">
+                    <thead>
+                        <tr class="max-w-full border-b border-neutral-200">
+                            <th
+                                class="py-5 px-6 md:px-8 font-heading font-medium text-vault-navy text-[length:var(--fs-h5)] leading-[length:var(--lh-h5)] w-[45vw] max-w-[45vw]"
+                            >
+                                Date
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {
+                            costs.map((row) => (
+                                <tr class="max-w-full align-top border-b border-neutral-200">
+                                    <td class="max-w-[45vw] md:max-w-none text-balance py-3 md:py-5 px-3 md:px-8 font-body font-medium text-vault-navy text-[length:var(--fs-body-lg)] leading-[length:var(--lh-body-lg)] pr-4 md:pr-12">
+                                        {row.date}
+                                    </td>
+                                    <td class="max-w-[55vw] md:max-w-none text-balance py-3 md:py-5 px-3 md:px-8 font-body font-normal text-neutral-500 text-base leading-normal pr-4 md:pr-12">
+                                        {row.buyer}
+                                    </td>
+                                </tr>
+                            ))
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</section>
+
+<script is:inline>
+    (function () {
+        const tabs = document.querySelectorAll("[data-my-cost-tab]");
+        const panels = document.querySelectorAll("[data-my-cost-panel]");
+
+        tabs.forEach((tab) => {
+            tab.addEventListener("click", () => {
+                const target = tab.getAttribute("data-my-cost-tab");
+
+                tabs.forEach((t) => {
+                    const isSelected =
+                        t.getAttribute("data-my-cost-tab") === target;
+                    t.setAttribute(
+                        "aria-selected",
+                        isSelected ? "true" : "false",
+                    );
+                    if (isSelected) {
+                        t.classList.remove(
+                            "text-neutral-700",
+                            "bg-transparent",
+                        );
+                        t.classList.add("bg-generic-00", "text-nova-blue");
+                    } else {
+                        t.classList.remove("bg-generic-00", "text-nova-blue");
+                        t.classList.add("text-neutral-700", "bg-transparent");
+                    }
+                });
+
+                panels.forEach((panel) => {
+                    const isMatch =
+                        panel.getAttribute("data-my-cost-panel") === target;
+                    if (isMatch) {
+                        panel.classList.remove("hidden");
+                        panel.classList.add("flex");
+                    } else {
+                        panel.classList.remove("flex");
+                        panel.classList.add("hidden");
+                    }
+                });
+            });
+        });
+    })();
+</script>
