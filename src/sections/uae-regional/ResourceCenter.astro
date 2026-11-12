@@ -2,7 +2,7 @@
 /**
  * "UAE e-Invoicing resource centre" — Figma regional component.
  *
- * Six cards in a 3-column grid. Each has a category chip, an optional "New" chip,
+ * Six cards in a 3-column grid (3 white papers, 2 blogs, 1 case study). Each has a category chip, an optional "New" chip,
  * a title, and a one-line summary. The entire card is clickable.
  */
 interface Resource {
@@ -11,15 +11,57 @@ interface Resource {
     title: string;
     desc: string;
     href: string;
+    external?: boolean;
 }
 
-const resources: Resource[] = Array.from({ length: 6 }, () => ({
-    category: "Case study",
-    isNew: true,
-    title: "UAE VAT Code for E-Invoicing: Key Rules, Requirements & Compliance...",
-    desc: "A practical framework to get ahead of the mandate",
-    href: "#",
-}));
+const resources: Resource[] = [
+    {
+        category: "White paper",
+        isNew: false,
+        title: "Vendor Discovery, Done Properly",
+        desc: "How to evaluate and shortlist UAE e-invoicing vendors",
+        href: "https://go.cleartax.com/hubfs/UAE/Content%20Assets/Vendor%20discovery%20done%20properly/Vendor%20Discovery%20UAE-2_email.pdf",
+        external: true,
+    },
+    {
+        category: "Case study",
+        isNew: false,
+        title: "ClearTax UAE Customer Case Study",
+        desc: "See how businesses get e-invoicing ready with ClearTax",
+        href: "https://files.clear.in/08iPqLw4PVz",
+        external: true,
+    },
+    {
+        category: "White paper",
+        isNew: false,
+        title: "When an Invoice Fails, Whose Problem Is It?",
+        desc: "Understanding responsibility when e-invoices are rejected",
+        href: "https://go.cleartax.com/hubfs/UAE/Content%20Assets/When%20an%20Invoice%20fails/When%20an%20Invoice%20Fails%2c%20whose%20problem%20it%20is%3Femail.pdf",
+        external: true,
+    },
+    {
+        category: "Blog",
+        isNew: false,
+        title: "UAE E-Invoicing FAQs",
+        desc: "Answers to the most common UAE e-invoicing questions",
+        href: "https://www.cleartax.com/ae/e-invoicing-uae-faqs",
+    },
+    {
+        category: "Blog",
+        isNew: false,
+        title: "UAE E-Invoicing: A Complete Guide",
+        desc: "Everything you need to know about the UAE mandate",
+        href: "https://www.cleartax.com/ae/e-invoicing-uae",
+    },
+    {
+        category: "White paper",
+        isNew: false,
+        title: "16 E-Invoicing Use Cases: Every Invoice Maps to Exactly One, or It Fails",
+        desc: "The invoice scenarios every UAE business needs to map",
+        href: "https://go.cleartax.com/hubfs/UAE/Content%20Assets/16%20E-Invoicing%20use%20cases.%20Every%20invoice%20maps%20to%20exactly%20one%2cor%20it%20fails/16%20e-invoicing%20use%20cases_Email.pdf",
+        external: true,
+    },
+];
 ---
 
 <section id="resources" class="bg-generic-00 py-16 lg:py-20">
@@ -35,7 +77,9 @@ const resources: Resource[] = Array.from({ length: 6 }, () => ({
                 resources.map((r) => (
                     <a
                         href={r.href}
-                        class="flex flex-col gap-4 rounded-xl border border-neutral-300 bg-generic-00 p-6"
+                        target={r.external ? "_blank" : undefined}
+                        rel={r.external ? "noopener noreferrer" : undefined}
+                        class="flex flex-col gap-4 rounded-xl border border-neutral-300 bg-generic-00 p-6 hover:border-nova-blue transition-colors duration-200"
                     >
                         <div class="flex items-start justify-between gap-3">
                             <span class="inline-flex items-center justify-center rounded-lg bg-neutral-100 px-3 py-1.5 font-body text-[length:var(--fs-label)] leading-[length:var(--lh-label)] font-medium text-neutral-700">

@@ -13,3 +13,293 @@
 @source '../sections/legal/**/*.astro';
 
 @config '../../tailwind.config.js';
+
+/* ==========================================================================
+   LAYOUT — rail on the left, one agreement on the right, across many Embeds.
+   See the note at the top of src/sections/legal/Tabs.astro for the sticky
+   zero-height trick that makes this work without a shared parent.
+   ========================================================================== */
+
+/* Below lg: ordinary flow. 112px clears the fixed navbar. */
+.legal-rail-section {
+    padding-top: 112px;
+}
+
+@media (width >= 64rem) {
+    .legal-rail-section {
+        position: sticky;
+        top: var(--nav-clear, 112px);
+        height: 0;
+        margin-top: 184px;
+        padding-top: 0;
+        z-index: 20;
+    }
+    .legal-rail-wrap {
+        position: relative;
+    }
+    .legal-rail {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 340px;
+    }
+    /* Clears the rail (340 + 32 gutter) for every right-hand block. */
+    .legal-col {
+        margin-left: 372px;
+    }
+    /* The rail is taller than its zero-height strip, so it would keep floating
+       over the footer at the end of the page. Lift the footer above it. */
+    .legal-footer {
+        position: relative;
+        z-index: 30;
+    }
+}
+
+@media (width >= 80rem) {
+    .legal-rail {
+        width: 405px;
+    }
+    .legal-col {
+        margin-left: 437px;
+    }
+}
+
+/* ==========================================================================
+   RAIL — same visual language as Experience Centre (.exc-rail / .exc-tab).
+   ========================================================================== */
+
+.legal-rail {
+    min-width: 0;
+    border: 1px solid var(--palette-neutral-300);
+    border-radius: 12px;
+    background: var(--palette-generic-00);
+}
+
+.legal-rail-head {
+    padding: 24px;
+    border-bottom: 1px solid var(--palette-neutral-300);
+}
+
+.legal-rail-title {
+    margin: 0;
+    font-family: var(--font-heading);
+    font-weight: 600;
+    font-size: var(--fs-h1-lg);
+    line-height: var(--lh-h1-lg);
+    letter-spacing: -0.5px;
+    color: var(--color-vault-navy);
+}
+
+.legal-rail-list {
+    display: flex;
+    overflow-x: auto;
+    scrollbar-width: none;
+}
+
+.legal-rail-list::-webkit-scrollbar {
+    display: none;
+}
+
+@media (width >= 64rem) {
+    .legal-rail-list {
+        flex-direction: column;
+        overflow-x: visible;
+        padding-block: 24px;
+    }
+}
+
+.legal-tab {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    width: 100%;
+    padding: 16px 24px 16px 0;
+    border: 0;
+    background: transparent;
+    cursor: pointer;
+    text-align: left;
+    white-space: nowrap;
+    font-family: var(--font-body);
+    font-weight: 500;
+    font-size: var(--fs-body-lg);
+    line-height: var(--lh-body-lg);
+    color: var(--palette-neutral-500);
+    transition: color 200ms ease;
+}
+
+.legal-tab:hover,
+.legal-tab[aria-selected='true'] {
+    color: var(--color-vault-navy);
+}
+
+/* Active marker: a 4px Nova Blue bar on the desktop rail, a 3px underline on
+   the mobile strip — one element, two shapes. */
+.legal-tab-ind {
+    background-color: var(--color-nova-blue);
+    border-radius: 2px;
+    opacity: 0;
+    transition:
+        transform 260ms cubic-bezier(0.22, 0.61, 0.36, 1),
+        opacity 160ms ease;
+}
+
+.legal-tab[aria-selected='true'] .legal-tab-ind {
+    opacity: 1;
+}
+
+@media (width >= 64rem) {
+    .legal-tab-ind {
+        width: 4px;
+        align-self: stretch;
+        transform: scaleY(0);
+    }
+    .legal-tab[aria-selected='true'] .legal-tab-ind {
+        transform: scaleY(1);
+    }
+}
+
+@media (width < 64rem) {
+    .legal-tab {
+        position: relative;
+        flex: none;
+        width: auto;
+        padding: 16px 20px;
+    }
+    .legal-tab-ind {
+        position: absolute;
+        inset-inline: 12px;
+        bottom: 0;
+        height: 3px;
+        transform: scaleX(0);
+    }
+    .legal-tab[aria-selected='true'] .legal-tab-ind {
+        transform: scaleX(1);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .legal-tab-ind {
+        transition: opacity 160ms ease;
+        transform: none !important;
+    }
+}
+
+/* ==========================================================================
+   DOCUMENT SWITCHER + AGREEMENT TEXT
+   ========================================================================== */
+
+.legal-docbar-section {
+    padding-top: 24px;
+}
+
+@media (width >= 64rem) {
+    .legal-docbar-section {
+        padding-top: 0;
+    }
+}
+
+.legal-docbar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    padding: 4px;
+    border: 1px solid var(--palette-neutral-300);
+    border-radius: 16px;
+    background: var(--palette-neutral-50);
+}
+
+.legal-docbtn {
+    flex: 1 1 0;
+    min-width: 200px;
+    padding: 12px 20px;
+    border: 0;
+    border-radius: 12px;
+    background: transparent;
+    cursor: pointer;
+    font-family: var(--font-body);
+    font-weight: 500;
+    font-size: var(--fs-label);
+    line-height: var(--lh-label);
+    color: var(--palette-neutral-600);
+}
+
+.legal-docbtn:hover {
+    color: var(--color-vault-navy);
+}
+
+.legal-docbtn[aria-selected='true'] {
+    background: var(--color-vault-navy);
+    color: #fff;
+}
+
+.legal-docbar[hidden],
+.legal-docbtn[hidden],
+.legal-doc[hidden] {
+    display: none;
+}
+
+.legal-doc {
+    padding-top: 40px;
+}
+
+.legal-doc-last {
+    padding-bottom: 96px;
+}
+
+.legal-head h2 {
+    margin: 0;
+    font-family: var(--font-heading);
+    font-weight: 600;
+    font-size: var(--fs-h2);
+    line-height: var(--lh-h2);
+    letter-spacing: -0.5px;
+    color: var(--color-vault-navy);
+}
+
+.legal-meta {
+    margin: 12px 0 32px;
+    font-family: var(--font-body);
+    font-size: var(--fs-body-sm);
+    line-height: var(--lh-body-sm);
+    color: var(--palette-neutral-500);
+}
+
+/* Clause typography is set once here so none of the ~hundreds of clauses
+   carries a class. Legal text is verbatim — do not re-case or reflow it. */
+.legal-prose p {
+    margin: 0 0 16px;
+    font-family: var(--font-body);
+    font-size: var(--fs-body);
+    line-height: var(--lh-body);
+    color: var(--palette-neutral-600);
+    overflow-wrap: anywhere;
+}
+
+.legal-prose h2 {
+    margin: 72px 0 24px;
+    font-family: var(--font-heading);
+    font-weight: 600;
+    font-size: var(--fs-h3);
+    line-height: var(--lh-h3);
+    letter-spacing: -0.5px;
+    color: var(--color-vault-navy);
+}
+
+.legal-prose h3 {
+    margin: 40px 0 16px;
+    font-family: var(--font-heading);
+    font-weight: 600;
+    font-size: var(--fs-body-lg);
+    line-height: var(--lh-body-lg);
+    color: var(--color-vault-navy);
+}
+
+.legal-prose strong {
+    font-weight: 600;
+    color: var(--color-vault-navy);
+}
+
+.legal-prose a {
+    color: var(--color-nova-blue);
+    text-decoration: underline;
+}

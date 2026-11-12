@@ -1,85 +1,182 @@
 ---
 /**
- * Legal tab bar — sits between the hero and the agreements, inside the
- * content area, and owns the switching logic. Each agreement is two embeds
- * (Mssa1/2, Isa1/2) whose <section>s carry `data-legal-panel="mssa|isa"`; the
- * script shows the active doc's panels and hides the rest, so the tabs only
- * work once all four embeds are on the page. The first tab is open by default.
+ * Legal — the jurisdiction rail (left) and the script that drives the page.
+ * One paste unit; it must be on the page for anything else to switch.
  *
- * Tab switching is click-driven, not hash-driven: each button calls
- * `legalTab(id)`, defined here, so this embed must be on the page. The
- * contents-list links in Mssa1/Isa1 are self-contained inline scrollIntoView
- * calls — they only ever target the agreement that is already open.
+ * LAYOUT ACROSS EMBEDS
+ * ---------------------------------------------------------------------------
+ * The design is two columns, like Experience Centre: a rail on the left, the
+ * agreement on the right. Experience Centre can ship both halves as one embed.
+ * Here the right column is ~700 KB of legal text — 28 embeds — and Webflow
+ * stacks Embeds vertically, so a CSS grid cannot span them.
+ *
+ * Instead this section is a ZERO-HEIGHT `position: sticky` strip, and the rail
+ * hangs off it (absolutely positioned). A sticky box stays pinned for as long as
+ * its parent is on screen, and the parent is the page — so the rail rides along
+ * beside every embed below it. Every `.legal-col` is offset by the rail's width
+ * to clear it. All of that is in `src/styles/legal.css` under "LAYOUT". Below lg
+ * the strip is ordinary flow and the rail becomes a horizontal tab strip.
+ *
+ * SWITCHING
+ * ---------------------------------------------------------------------------
+ * Every agreement chunk is a <section data-legal-j="<jurisdiction>"
+ * data-legal-doc="mssa|isa">. The script shows the chunks matching the
+ * selected pair and hides the rest. The document switcher (DocTabs.astro) is a
+ * separate embed; it only carries buttons, and this script reads them.
+ *
+ * Buttons call `legalSelect(id)` / `legalDoc(id)` through inline `onclick`, so
+ * the URL never changes (no `#id` navigation). The initial state is India's MSSA.
+ *
+ * The rail is `position: sticky`, which would keep it floating over the footer,
+ * so `stopAtEnd()` slides it up with the content: once the last visible
+ * agreement chunk ends, the rail ends with it.
+ *
+ * `legalJurisdictions` MUST list the same ids the generated sections use.
  */
-const tabs = [
-  { id: "mssa", label: "Master subscription and services agreement" },
-  { id: "isa", label: "Integration services agreement" },
+const jurisdictions = [
+  { id: "in", label: "India" },
+  { id: "my", label: "Malaysia" },
+  { id: "ksa", label: "KSA" },
+  { id: "de", label: "Germany" },
+  { id: "fr", label: "France" },
+  { id: "be", label: "Belgium" },
+  { id: "ae", label: "UAE" },
+  { id: "other", label: "Other Jurisdictions" },
 ];
 ---
 
-<section class="bg-generic-00 pt-4 max-lg:pt-0">
+<section class="legal-rail-section" id="legal-root">
   <div class="container mx-auto">
-    <div
-      role="tablist"
-      aria-label="Agreements"
-      class="mx-auto grid max-w-[880px] gap-1 rounded-2xl border border-ledger-200 bg-ledger-50 p-1 sm:grid-cols-2"
-    >
-      {
-        tabs.map((t, i) => (
-          <button
-            type="button"
-            role="tab"
-            id={`legal-tab-${t.id}`}
-            data-legal-tab={t.id}
-            onclick={`legalTab('${t.id}')`}
-            aria-selected={i === 0 ? "true" : "false"}
-            class="cursor-pointer rounded-xl border-0 bg-transparent px-5 py-3 font-body font-medium text-neutral-600 text-[length:var(--fs-label)] leading-[length:var(--lh-label)] hover:text-vault-navy aria-selected:bg-vault-navy aria-selected:text-white aria-selected:hover:text-white"
-          >
-            {t.label}
-          </button>
-        ))
-      }
+    <div class="legal-rail-wrap">
+      <aside class="legal-rail">
+        <div class="legal-rail-head">
+          <h1 class="legal-rail-title">Legal</h1>
+        </div>
+        <div class="legal-rail-list" role="tablist" aria-label="Jurisdictions">
+          {
+            jurisdictions.map((j, i) => (
+              <button
+                type="button"
+                role="tab"
+                id={`legal-tab-${j.id}`}
+                class="legal-tab"
+                data-legal-tab={j.id}
+                onclick={`legalSelect('${j.id}')`}
+                aria-selected={i === 0 ? "true" : "false"}
+              >
+                <span class="legal-tab-ind" aria-hidden="true"></span>
+                <span>{j.label}</span>
+              </button>
+            ))
+          }
+        </div>
+      </aside>
     </div>
   </div>
 </section>
 
 <script is:inline>
   (function () {
-    function show(id) {
-      document.querySelectorAll("[data-legal-tab]").forEach(function (t) {
-        t.setAttribute(
-          "aria-selected",
-          t.getAttribute("data-legal-tab") === id ? "true" : "false"
-        );
-      });
-      document.querySelectorAll("[data-legal-panel]").forEach(function (p) {
-        p.hidden = p.getAttribute("data-legal-panel") !== id;
+    var state = { j: "in", doc: "mssa" };
+    var ORDER = ["mssa", "isa"];
+
+    function docsFor(j) {
+      var found = {};
+      document
+        .querySelectorAll('[data-legal-j="' + j + '"]')
+        .forEach(function (s) {
+          found[s.getAttribute("data-legal-doc")] = true;
+        });
+      return ORDER.filter(function (d) {
+        return found[d];
       });
     }
 
-    // Swapping two very different heights in one frame drags the scroll
-    // position with it and reads as a flicker. Pin the tab bar to where it was
-    // on screen, then fade the incoming panels in.
-    window.legalTab = function (id) {
-      var bar = document.getElementById("legal-tab-" + id);
-      if (!bar || bar.getAttribute("aria-selected") === "true") return;
-      var before = bar.getBoundingClientRect().top;
-      show(id);
-      window.scrollBy(0, bar.getBoundingClientRect().top - before);
-      if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-      document
-        .querySelectorAll('[data-legal-panel="' + id + '"]')
-        .forEach(function (p) {
-          p.animate([{ opacity: 0 }, { opacity: 1 }], {
-            duration: 200,
-            easing: "ease-out",
-          });
-        });
+    function render() {
+      document.querySelectorAll("[data-legal-tab]").forEach(function (t) {
+        t.setAttribute(
+          "aria-selected",
+          t.getAttribute("data-legal-tab") === state.j ? "true" : "false"
+        );
+      });
+      var avail = docsFor(state.j);
+      document.querySelectorAll("[data-legal-docbtn]").forEach(function (b) {
+        var d = b.getAttribute("data-legal-docbtn");
+        b.hidden = avail.indexOf(d) === -1;
+        b.setAttribute("aria-selected", d === state.doc ? "true" : "false");
+      });
+      var bar = document.querySelector("[data-legal-docbar]");
+      if (bar) bar.hidden = avail.length < 2;
+      document.querySelectorAll("[data-legal-j]").forEach(function (s) {
+        s.hidden =
+          s.getAttribute("data-legal-j") !== state.j ||
+          s.getAttribute("data-legal-doc") !== state.doc;
+      });
+    }
+
+    function select(j, doc, fromUser) {
+      var avail = docsFor(j);
+      if (!avail.length) return;
+      if (avail.indexOf(doc) === -1) doc = avail[0];
+      if (j === state.j && doc === state.doc) return;
+      state = { j: j, doc: doc };
+      render();
+      if (fromUser) {
+        // Agreements differ in length by thousands of pixels. Switching from a
+        // long one to a short one while scrolled deep would strand you in the
+        // footer, so pull back to the top of the content — only if you were past it.
+        var bar = document.querySelector("[data-legal-docbar]");
+        var anchor = bar && !bar.hidden ? bar : document.querySelector(".legal-doc:not([hidden])");
+        if (anchor) {
+          var clear =
+            parseFloat(
+              getComputedStyle(document.documentElement).getPropertyValue(
+                "--nav-clear"
+              )
+            ) || 112;
+          var top = anchor.getBoundingClientRect().top;
+          if (top < clear)
+            window.scrollTo({ top: window.pageYOffset + top - clear });
+        }
+      }
+      stopAtEnd();
+    }
+
+    window.legalSelect = function (j) {
+      select(j, "mssa", true);
+    };
+    window.legalDoc = function (d) {
+      select(state.j, d, true);
     };
 
+    // Keep the sticky rail from riding over the footer: once the last visible
+    // chunk's text ends, shift the rail up by however far it would overshoot.
+    var rail = document.querySelector(".legal-rail");
+    var ticking = false;
+    function stopAtEnd() {
+      ticking = false;
+      if (!rail) return;
+      rail.style.transform = "";
+      if (!window.matchMedia("(min-width: 64rem)").matches) return;
+      var chunks = document.querySelectorAll(".legal-doc:not([hidden]) .legal-col");
+      if (!chunks.length) return;
+      var end = chunks[chunks.length - 1].getBoundingClientRect().bottom;
+      var overshoot = rail.getBoundingClientRect().bottom - end;
+      if (overshoot > 0) rail.style.transform = "translateY(" + -overshoot + "px)";
+    }
+    function queue() {
+      if (!ticking) {
+        ticking = true;
+        requestAnimationFrame(stopAtEnd);
+      }
+    }
+    window.addEventListener("scroll", queue, { passive: true });
+    window.addEventListener("resize", queue);
+
+    // Embeds are separate nodes pasted into the page; wait for all of them.
     function init() {
-      var first = document.querySelector("[data-legal-tab]");
-      if (first) show(first.getAttribute("data-legal-tab"));
+      render();
+      stopAtEnd();
     }
     if (document.readyState === "loading")
       document.addEventListener("DOMContentLoaded", init);

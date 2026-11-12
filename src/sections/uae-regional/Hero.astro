@@ -93,7 +93,7 @@ const stats: { label: string; width: string }[] = [
             <div class="flex flex-col items-center w-full">
                 <div class="flex flex-col items-center gap-4 mb-8">
                     <h1
-                        class="m-0 font-heading font-semibold text-vault-navy text-[length:var(--fs-h1)] md:text-[length:var(--fs-display-sm)] lg:text-[length:var(--fs-display-lg)] leading-[length:var(--lh-h1)] md:leading-[length:var(--lh-display-sm)] lg:leading-[length:var(--lh-display-lg)] tracking-[-1px] max-w-[604px]"
+                        class="isolate m-0 font-heading font-semibold text-vault-navy text-[length:var(--fs-h1)] md:text-[length:var(--fs-display-sm)] lg:text-[length:var(--fs-display-lg)] leading-[length:var(--lh-h1)] md:leading-[length:var(--lh-display-sm)] lg:leading-[length:var(--lh-display-lg)] tracking-[-1px] max-w-[604px]"
                     >
                         Get Ready for 2026 UAE <br class="max-md:hidden" /><span
                             class="uae-hero-mark"
@@ -313,7 +313,13 @@ const stats: { label: string; width: string }[] = [
 <style is:global>
     /* The single Flux Lime instance on this screen. clone keeps the block intact
      if the headline wraps inside "France E-invoicing" on narrow viewports. */
+    /* z-index:-1 inside the h1's own stacking context (the `isolate` class) puts the
+     lime behind the headline text, so it can no longer paint over the descender
+     of the line above ("y" in "Ready") — the h1's line-height is tighter than the
+     highlight box. */
     .uae-hero-mark {
+        position: relative;
+        z-index: -1;
         background-color: var(--color-flux-lime);
         padding: 0 0.08em;
         -webkit-box-decoration-break: clone;

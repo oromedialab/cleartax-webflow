@@ -17,7 +17,20 @@ export interface LinkBlock {
   items: LinkItem[];
 }
 
+export interface LinkColumn extends LinkBlock {
+  rtl?: boolean;
+}
+
+export interface LogoItem {
+  src: string;
+  alt: string;
+  href?: string;
+}
+
 export interface Props {
+  logo?: LogoItem;
+  address?: string;
+  columns?: LinkColumn[];
   companyLinks?: LinkItem[];
   socialLinks?: LinkItem[];
   productLinks?: LinkItem[];
@@ -28,6 +41,8 @@ export interface Props {
 }
 
 const {
+  address,
+  columns = [],
   companyLinks = [],
   socialLinks = [],
   productLinks = [],
@@ -38,12 +53,16 @@ const {
 } = Astro.props;
 ---
 
-<footer class="bg-generic-00 border-t border-neutral-300">
+<footer class="font-body bg-generic-00 border-t border-neutral-300">
   <div
     class="max-w-[var(--container-max)] w-full mx-auto flex flex-col gap-12 py-12 px-8"
   >
+
     <div
-      class="grid grid-cols-1 md:grid-cols-3 xl:grid-cols-5 gap-x-12.5 gap-y-0 md:gap-y-10"
+      class:list={[
+        "grid grid-cols-1 md:grid-cols-3 gap-x-12.5 gap-y-0 md:gap-y-10",
+        columns.length > 0 ? "xl:grid-cols-4" : "xl:grid-cols-5",
+      ]}
     >
       <!-- Company + Social -->
       <div class="flex flex-col gap-0 md:gap-6 w-full md:w-40">
@@ -52,7 +71,7 @@ const {
         >
           <button
             type="button"
-            class="footer-acc-trigger flex w-full items-center justify-between gap-3 border-0 bg-transparent p-0 py-2.5 md:py-0 min-h-[44px] md:min-h-0 text-left cursor-pointer md:cursor-default"
+            class="footer-acc-trigger font-[family-name:inherit] flex w-full items-center justify-between gap-3 border-0 bg-transparent p-0 py-2.5 md:py-0 min-h-[44px] md:min-h-0 text-left cursor-pointer md:cursor-default"
             aria-expanded="false"
           >
             <span
@@ -83,12 +102,14 @@ const {
             </div>
           </div>
         </div>
+        {
+          socialLinks.length > 0 && (
         <div
           class="footer-acc group flex flex-col border-b border-neutral-200 py-4 md:border-0 md:py-0 md:gap-4"
         >
           <button
             type="button"
-            class="footer-acc-trigger flex w-full items-center justify-between gap-3 border-0 bg-transparent p-0 py-2.5 md:py-0 min-h-[44px] md:min-h-0 text-left cursor-pointer md:cursor-default"
+            class="footer-acc-trigger font-[family-name:inherit] flex w-full items-center justify-between gap-3 border-0 bg-transparent p-0 py-2.5 md:py-0 min-h-[44px] md:min-h-0 text-left cursor-pointer md:cursor-default"
             aria-expanded="false"
           >
             <span
@@ -121,15 +142,59 @@ const {
             </div>
           </div>
         </div>
+          )
+        }
       </div>
 
+      {
+        columns.map((col) => (
+          <div
+            class="footer-acc group flex flex-col border-b border-neutral-200 py-4 md:border-0 md:py-0 md:gap-4 w-full"
+            dir={col.rtl ? "rtl" : undefined}
+          >
+            <button
+              type="button"
+              class="footer-acc-trigger font-[family-name:inherit] flex w-full items-center justify-between gap-3 border-0 bg-transparent p-0 py-2.5 md:py-0 min-h-[44px] md:min-h-0 text-start cursor-pointer md:cursor-default"
+              aria-expanded="false"
+            >
+              <span class="m-0 text-[length:var(--fs-body-sm)] leading-[length:var(--lh-body-sm)] font-medium text-vault-navy">
+                {col.title}
+              </span>
+              <span
+                class="footer-acc-icon md:hidden shrink-0 text-[18px] leading-none font-normal text-neutral-500"
+                aria-hidden="true"
+              >
+                +
+              </span>
+            </button>
+            <div class="footer-acc-panel grid grid-rows-[0fr] md:grid-rows-[1fr] transition-[grid-template-rows] duration-300 ease-in-out group-[.is-open]:grid-rows-[1fr]">
+              <div class="overflow-hidden">
+                <div class="flex flex-col gap-3 pt-4 md:pt-0">
+                  {col.items.map((it) => (
+                    <a
+                      href={it.href}
+                      class="text-[length:var(--fs-body-sm)] leading-[length:var(--lh-body-sm)] font-medium text-neutral-500 no-underline hover:text-vault-navy transition-colors py-1 inline-flex items-center min-h-[32px] md:min-h-0 md:py-0"
+                    >
+                      {it.label}
+                    </a>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+        ))
+      }
+
+      {
+        columns.length === 0 && (
+          <>
       <!-- Product -->
       <div
         class="footer-acc group flex flex-col border-b border-neutral-200 py-4 md:border-0 md:py-0 md:gap-4 w-full md:w-65"
       >
         <button
           type="button"
-          class="footer-acc-trigger flex w-full items-center justify-between gap-3 border-0 bg-transparent p-0 py-2.5 md:py-0 min-h-[44px] md:min-h-0 text-left cursor-pointer md:cursor-default"
+          class="footer-acc-trigger font-[family-name:inherit] flex w-full items-center justify-between gap-3 border-0 bg-transparent p-0 py-2.5 md:py-0 min-h-[44px] md:min-h-0 text-left cursor-pointer md:cursor-default"
           aria-expanded="false"
         >
           <span
@@ -167,7 +232,7 @@ const {
       >
         <button
           type="button"
-          class="footer-acc-trigger flex w-full items-center justify-between gap-3 border-0 bg-transparent p-0 py-2.5 md:py-0 min-h-[44px] md:min-h-0 text-left cursor-pointer md:cursor-default"
+          class="footer-acc-trigger font-[family-name:inherit] flex w-full items-center justify-between gap-3 border-0 bg-transparent p-0 py-2.5 md:py-0 min-h-[44px] md:min-h-0 text-left cursor-pointer md:cursor-default"
           aria-expanded="false"
         >
           <span
@@ -205,7 +270,7 @@ const {
       >
         <button
           type="button"
-          class="footer-acc-trigger flex w-full items-center justify-between gap-3 border-0 bg-transparent p-0 py-2.5 md:py-0 min-h-[44px] md:min-h-0 text-left cursor-pointer md:cursor-default"
+          class="footer-acc-trigger font-[family-name:inherit] flex w-full items-center justify-between gap-3 border-0 bg-transparent p-0 py-2.5 md:py-0 min-h-[44px] md:min-h-0 text-left cursor-pointer md:cursor-default"
           aria-expanded="false"
         >
           <span
@@ -244,7 +309,7 @@ const {
             <div class="footer-acc group flex flex-col border-b border-neutral-200 py-4 md:border-0 md:py-0 md:gap-4 w-full md:w-39.5">
               <button
                 type="button"
-                class="footer-acc-trigger flex w-full items-center justify-between gap-3 border-0 bg-transparent p-0 py-2.5 md:py-0 min-h-[44px] md:min-h-0 text-left cursor-pointer md:cursor-default"
+                class="footer-acc-trigger font-[family-name:inherit] flex w-full items-center justify-between gap-3 border-0 bg-transparent p-0 py-2.5 md:py-0 min-h-[44px] md:min-h-0 text-left cursor-pointer md:cursor-default"
                 aria-expanded="false"
               >
                 <span class="m-0 text-[length:var(--fs-body-sm)] leading-[length:var(--lh-body-sm)] font-medium text-vault-navy">
@@ -275,6 +340,9 @@ const {
           ))
         }
       </div>
+          </>
+        )
+      }
     </div>
 
     <!-- Bottom bar -->
@@ -294,6 +362,13 @@ const {
             >Privacy Policy</a
           >
         </div>
+        {
+          address && (
+            <p class="m-0 text-[length:var(--fs-body-sm)] leading-[length:var(--lh-body-sm)] text-neutral-500">
+              {address}
+            </p>
+          )
+        }
         <p
           class="m-0 text-[length:var(--fs-body-sm)] leading-[length:var(--lh-body-sm)] text-neutral-500"
         >

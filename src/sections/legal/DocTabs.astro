@@ -1,0 +1,44 @@
+---
+/**
+ * Legal — the document switcher (MSSA / ISA), at the top of the
+ * right-hand column. Buttons only; the script that reads them is in Tabs.astro.
+ *
+ * Both are in the markup. The script hides the bar when the selected
+ * jurisdiction publishes one agreement only. Only India and Other Jurisdictions
+ * have an ISA tab on the live pages; the other five have the ISA text in their
+ * HTML but no tab link, so it is not shown. Their Annexure 1 follows the MSSA.
+ */
+const docs = [
+  { id: "mssa", label: "Master subscription and services agreement" },
+  { id: "isa", label: "Integration services agreement" },
+];
+---
+
+<section class="legal-docbar-section">
+  <div class="container mx-auto">
+    <div class="legal-col">
+      <div
+        class="legal-docbar"
+        data-legal-docbar
+        role="tablist"
+        aria-label="Agreements"
+      >
+        {
+          docs.map((d, i) => (
+            <button
+              type="button"
+              role="tab"
+              class="legal-docbtn"
+              data-legal-docbtn={d.id}
+              onclick={`legalDoc('${d.id}')`}
+              aria-selected={i === 0 ? "true" : "false"}
+             
+            >
+              {d.label}
+            </button>
+          ))
+        }
+      </div>
+    </div>
+  </div>
+</section>
