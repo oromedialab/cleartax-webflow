@@ -1,0 +1,156 @@
+---
+/**
+ * "Start with your ERP. Build around your finance workflow." — Qatar regional page.
+ * Seven rows, title on the left with placeholder icon, explanation on the right, divided by hairlines.
+ *
+ * Every row is drawn at 50% opacity: it is the resting state of a
+ * scroll-spotlight. A small script lifts the row nearest the middle of the
+ * viewport to full opacity as the section scrolls past; without script (or with
+ * reduced motion) all rows stay fully legible.
+ *
+ * The icon squares are unfilled "Visual placeholder" frames, rendering as
+ * `bg-visual-placeholder` (#E8FFE1).
+ *
+ * Classes and ids are `qa-cov-` prefixed: embeds share one namespace per page.
+ */
+interface Row {
+    title: string;
+    body: string;
+}
+
+const rows: Row[] = [
+    {
+        title: "Start with the systems you use",
+        body: "Review your ERP, accounting and billing systems. Discuss data sources, invoice volumes and the connection approach available for your Singapore deployment.",
+    },
+    {
+        title: "Define the checks before transmission",
+        body: "Identify missing master data, inconsistent invoice references and GST mapping requirements. Confirm the available validation controls and how your team would handle exceptions.",
+    },
+    {
+        title: "Plan invoice exchange and IRAS reporting together",
+        body: "Scope customer delivery separately from tax-data submission. Confirm support for the required Peppol and solution-extracted routes, including off-network transactions.",
+    },
+    {
+        title: "Make invoice status actionable",
+        body: "Define the visibility finance needs across delivery, reporting and exceptions. Review the available statuses and the responsibilities for resolving issues.",
+    },
+    {
+        title: "Bring purchases into the plan",
+        body: "Map supplier invoice intake, purchase recording and input-tax treatment. Confirm how required purchase data and credit notes would enter the reporting workflow.",
+    },
+    {
+        title: "Design reconciliation from the start",
+        body: "Agree how source-system records, transmitted invoice data and GST reporting should be checked against each other. Confirm the supported reporting, retrieval and export options.",
+    },
+    {
+        title: "Agree the path to implementation",
+        body: "Set out onboarding, testing, acceptance criteria and support ownership. Confirm Singapore capability availability, dependencies and delivery scope before committing to go-live.",
+    },
+];
+---
+
+<section id="qa-cov" class="bg-generic-00 py-16 lg:py-20">
+    <div
+        class="w-full max-w-[var(--container-max)] mx-auto px-4 md:px-6 flex flex-col items-center gap-12"
+    >
+        <div class="flex flex-col items-center gap-4 text-center">
+            <h2
+                class="m-0 max-w-238 font-heading font-medium text-vault-navy text-[length:var(--fs-h1)] leading-[length:var(--lh-h1)] tracking-[-0.5px]"
+            >
+               How ClearTax supports your Singapore planning
+            </h2>
+            <h5 class="text-text-default text-lg leading-normal font-normal font-body">Start with your ERP. Build around your finance workflow.</h5>
+            <p
+                class="m-0 max-w-241 font-body font-normal text-neutral-500 text-[length:var(--fs-body)] lg:text-[length:var(--fs-body-lg)] leading-[length:var(--lh-body)] lg:leading-[length:var(--lh-body-lg)]"
+            >
+                Bring your invoice landscape to a ClearTax demo. Explore how your Singapore project should connect source-system data, InvoiceNow exchange and IRAS reporting—and confirm the deployment scope that fits your business.
+            </p>
+        </div>
+
+        <div class="flex w-full flex-col">
+            {
+                rows.map((r) => (
+                    <div class="qa-cov-row grid grid-cols-1 gap-4 py-6 lg:grid-cols-2 lg:gap-12 lg:items-center">
+                        <div class="flex items-center gap-4 lg:gap-5">
+                            <div
+                                class="size-12 lg:size-14 rounded-lg bg-visual-placeholder shrink-0"
+                                aria-hidden="true"
+                            />
+                            <h3 class="m-0 font-heading font-medium text-[19px] leading-[26.6px] text-vault-navy">
+                                {r.title}
+                            </h3>
+                        </div>
+                        <p class="m-0 font-body text-neutral-500 w-full lg:w-114 max-w-114 text-[13.3px] leading-[19px] lg:justify-self-end">
+                            {r.body}
+                        </p>
+                    </div>
+                ))
+            }
+        </div>
+    </div>
+</section>
+
+<style is:global>
+    .qa-cov-row + .qa-cov-row {
+        border-top: 1px solid var(--palette-ledger-white);
+    }
+    .qa-cov-js .qa-cov-row {
+        opacity: 0.5;
+        scale: 0.95;
+        transition: all 0.3s ease-in-out;
+    }
+    .qa-cov-js .qa-cov-row.is-active {
+        opacity: 1;
+        scale: 1;
+        transition: all 0.3s ease-in-out;
+    }
+</style>
+
+<script is:inline>
+    (function () {
+        var section = document.getElementById("qa-cov");
+        if (!section) return;
+        if (
+            window.matchMedia &&
+            window.matchMedia("(prefers-reduced-motion: reduce)").matches
+        )
+            return;
+        var rows = section.querySelectorAll(".qa-cov-row");
+        if (!rows.length) return;
+
+        section.classList.add("qa-cov-js");
+
+        // The row whose centre is closest to the middle of the viewport is "on".
+        function update() {
+            var mid = window.innerHeight / 2;
+            var best = null;
+            var bestDist = Infinity;
+            rows.forEach(function (row) {
+                var rect = row.getBoundingClientRect();
+                var dist = Math.abs(rect.top + rect.height / 2 - mid);
+                if (dist < bestDist) {
+                    bestDist = dist;
+                    best = row;
+                }
+            });
+            rows.forEach(function (row) {
+                row.classList.toggle("is-active", row === best);
+            });
+        }
+
+        var ticking = false;
+        function onScroll() {
+            if (ticking) return;
+            ticking = true;
+            requestAnimationFrame(function () {
+                ticking = false;
+                update();
+            });
+        }
+
+        window.addEventListener("scroll", onScroll, { passive: true });
+        window.addEventListener("resize", onScroll);
+        update();
+    })();
+</script>

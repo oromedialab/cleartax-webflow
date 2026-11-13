@@ -1,0 +1,1268 @@
+---
+/**
+ * "Security and privacy" — Figma node 18270:58163
+ * ("Fold 5? .Container - How Cleartax helps"). The tabbed
+ * compliance / integrations / security / support block, copied from
+ * `spain-regional/Seamless.astro` (a page's CSS entry only sources its own
+ * section folder). Only the heading differs from Spain's; tabs, cards and
+ * behaviour are identical.
+ *
+ * Originally ported from global-e-invoicing-mandate-page/index.html:3076-3467.
+ *
+ * Desktop (lg+): original two-column layout — a vertical accordion-style list
+ * of tab headers on the left (each reveals a one-line description when
+ * active), a single shared visual pane on the right that the script swaps
+ * between `[data-ssr-graphic]` panels.
+ *
+ * Mobile (<lg): a horizontal, scrollable tab bar up top; tapping a tab swaps
+ * a single panel below it that holds that tab's description AND its visual
+ * (cards / logo grid / icon grid / image) together — a plain tab switcher,
+ * not an accordion. Separate markup and a separate, independent script from
+ * the desktop block; the two never interact.
+ */
+
+const complianceCardsRow1 = [
+    {
+        name: "Peppol",
+        desc: "Pan-European e-invoicing & procurement network",
+        flags: [
+            {
+                src: "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6ac3682617c04dbca5585956_peppol-140.webp",
+                width: 120,
+                height: 120,
+            },
+        ],
+    },
+    {
+        name: "FTA",
+        desc: "UAE Federal Tax Authority compliance",
+        flags: [
+            {
+                src: "https://cdn.prod.website-files.com/6093bce33d9b4bae841b04e3/69eb07be955837eded28eba4_fta.png",
+                width: 120,
+                height: 120,
+            },
+        ],
+    },
+    {
+        name: "ZATCA",
+        desc: "Saudi e-invoicing mandate (Fatoorah)",
+        flags: [
+            {
+                src: "https://cdn.prod.website-files.com/6093bce33d9b4bae841b04e3/69eb07bee548ff1688c1c0d1_zatca.png",
+                width: 120,
+                height: 120,
+            },
+        ],
+    },
+    {
+        name: "OTA",
+        desc: "Compliant with Oman Tax Authority",
+        flags: [
+            {
+                src: "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6a14430f6a961afae55a59be_authority.png",
+                width: 63,
+                height: 56,
+            },
+        ],
+    },
+];
+
+const complianceCardsRow2 = [
+    {
+        name: "DGFiP",
+        desc: "French tax administration",
+        flag: {
+            src: "https://cdn.prod.website-files.com/6093bce33d9b4bae841b04e3/69eb07bd0cea853c7a3a159b_dgfip.png",
+            width: 120,
+            height: 120,
+        },
+    },
+    {
+        name: "FPS Finance",
+        desc: "Belgian fiscal services",
+        flag: {
+            src: "https://cdn.prod.website-files.com/6093bce33d9b4bae841b04e3/69eb07bed8043fb1a64b6859_fps-finance.png",
+            width: 120,
+            height: 120,
+        },
+    },
+    {
+        name: "NIC",
+        desc: "National Informatics Centre",
+        flag: {
+            src: "https://cdn.prod.website-files.com/6093bce33d9b4bae841b04e3/69eb07be66482af8235e233a_nic.png",
+            width: 120,
+            height: 120,
+        },
+    },
+    {
+        name: "LHDN",
+        desc: "Malaysian tax authority",
+        flag: {
+            src: "https://cdn.prod.website-files.com/6093bce33d9b4bae841b04e3/69eb15cf0f335dfcecdfc9b5_lhdn.png",
+            width: 120,
+            height: 120,
+        },
+    },
+];
+
+const securityCards = [
+    {
+        icon: "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6a8c46212b40d316f76a1676_security-icon-1.png",
+        title: "SOC 2 Type II",
+        desc: "Annual audit compliance for data security",
+    },
+    {
+        icon: "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6a8c4621a0914951dabaeff5_security-icon-2.png",
+        title: "ISO 27001 / 22301",
+        desc: "Information security & business continuity",
+    },
+    {
+        icon: "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6a8c462177bb72fabd963e83_security-icon-3.png",
+        title: "VAPT",
+        desc: "Vulnerability assessment & penetration testing",
+    },
+    {
+        icon: "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6a8c46216c53524eb27e9900_security-icon-4.png",
+        title: "SSL Transit",
+        desc: "Encrypted data in transit with TLS 1.3",
+    },
+    {
+        icon: "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6a8c4621645799f253c12679_security-icon-5.png",
+        title: "AES 256-bit",
+        desc: "Military-grade encryption at rest",
+    },
+    {
+        icon: "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6a8c4621635be25b53f04c22_security-icon-6.png",
+        title: "GDPR",
+        desc: "General Data Protection Regulation",
+    },
+    {
+        icon: "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6a8c462175456c4c648945b2_security-icon-7.png",
+        title: "Auth Tokens",
+        desc: "Secure token-based authentication",
+    },
+    {
+        icon: "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6a8c462196367cbdee212d09_security-icon-8.png",
+        title: "Multi Cloud Hosting",
+        desc: "OCI local residency with AWS backup",
+    },
+    {
+        icon: "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6a8c4621b14d8125a9176fe0_security-icon-9.png",
+        title: "Privacy",
+        desc: "Regulatory-compliant data privacy",
+    },
+];
+
+const mobileComplianceCards = [
+    {
+        name: "Peppol",
+        desc: "Pan-European e-invoicing & procurement network",
+        flag: "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6ac3682617c04dbca5585956_peppol-140.webp",
+    },
+    {
+        name: "FTA",
+        desc: "UAE Federal Tax Authority compliance",
+        flag: "https://cdn.prod.website-files.com/6093bce33d9b4bae841b04e3/69eb07be955837eded28eba4_fta.png",
+    },
+    {
+        name: "ZATCA",
+        desc: "Saudi e-invoicing mandate (Fatoorah)",
+        flag: "https://cdn.prod.website-files.com/6093bce33d9b4bae841b04e3/69eb07bee548ff1688c1c0d1_zatca.png",
+    },
+    {
+        name: "OTA",
+        desc: "Compliant with Oman Tax Authority",
+        flag: "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6a14430f6a961afae55a59be_authority.png",
+    },
+    {
+        name: "DGFiP",
+        desc: "French tax administration",
+        flag: "https://cdn.prod.website-files.com/6093bce33d9b4bae841b04e3/69eb07bd0cea853c7a3a159b_dgfip.png",
+    },
+    {
+        name: "FPS Finance",
+        desc: "Belgian fiscal services",
+        flag: "https://cdn.prod.website-files.com/6093bce33d9b4bae841b04e3/69eb07bed8043fb1a64b6859_fps-finance.png",
+    },
+    {
+        name: "NIC",
+        desc: "National Informatics Centre",
+        flag: "https://cdn.prod.website-files.com/6093bce33d9b4bae841b04e3/69eb07be66482af8235e233a_nic.png",
+    },
+    {
+        name: "LHDN",
+        desc: "Malaysian tax authority",
+        flag: "https://cdn.prod.website-files.com/6093bce33d9b4bae841b04e3/69eb15cf0f335dfcecdfc9b5_lhdn.png",
+    },
+];
+
+/* Service and Support tab — Figma node 18270:58163 shows these six cards
+ * there. Icons are the hosted ones the Security tab already uses. */
+const supportSecurityCards = [
+    {
+        icon: "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6aeb091cf6b9a9d536474730_service-support-1.png",
+        title: "SOC 2 Type II",
+        desc: "Annual audit compliance for data security",
+    },
+    {
+        icon: "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6aeb091c5bc091391444b524_service-support-2.png",
+        title: "ISO 27001 / 22301",
+        desc: "Information security & business continuity",
+    },
+    {
+        icon: "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6aeb091ccba628e836e8299b_service-support-3.png",
+        title: "GDPR",
+        desc: "Vulnerability assessment and penetration testing",
+    },
+    {
+        icon: "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6aeb091c306975cf3e2def71_service-support-4.png",
+        title: "SSL Transit",
+        desc: "Encrypted data in transit with TLS 1.3",
+    },
+    {
+        icon: "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6aeb091c82c8df66613925fc_service-support-5.png",
+        title: "AES 256-bit",
+        desc: "Military-grade encryption at rest",
+    },
+    {
+        icon: "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6aeb091c28b4034f84023084_service-support-6.png",
+        title: "VAPT",
+        desc: "Vulnerability assessment & penetration testing",
+    },
+];
+
+const integrationLogos = [
+    {
+        src: "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6a8d790081c75dc61c33ce75_integration-logo-1.png",
+        alt: "Microsoft",
+    },
+    {
+        src: "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6a8d7907ea849ad69964661e_integration-logo-2.png",
+        alt: "Shopify",
+    },
+    {
+        src: "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6a8d790c06c0ef7ae5ed1090_integration-logo-3.png",
+        alt: "SAP",
+    },
+    {
+        src: "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6a8d791276f0e1022c853905_integration-logo-4.png",
+        alt: "Toshiba",
+    },
+    {
+        src: "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6a8d791aa74f509e0c3e01a6_integration-logo-5.png",
+        alt: "Logo 5",
+    },
+    {
+        src: "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6a8d792462236fe25ed8bd17_integration-logo-6.png",
+        alt: "Logo 6",
+    },
+    {
+        src: "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6a8d792b62ee0e705e570a67_integration-logo-7.png",
+        alt: "Logo 7",
+    },
+    {
+        src: "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6a8d7930fc483189b07616fa_integration-logo-8.png",
+        alt: "Logo 8",
+    },
+];
+---
+
+<!-- Mobile (<lg) -->
+<section class="lg:hidden bg-generic-00 py-12">
+    <div class="w-full max-w-[var(--container-max)] mx-auto px-6">
+        <div class="text-center">
+            <h2
+                class="text-[length:var(--fs-h1)] leading-[length:var(--lh-h1)] mb-0 mt-0 font-medium text-black mb-12 tracking-[-0.02em] max-w-[1170px] w-full mx-auto"
+            >
+                Security and privacy
+            </h2>
+        </div>
+
+        <div class="flex flex-col border-t border-black/10" data-macc-root>
+            <!-- 1. Security -->
+            <div
+                class="macc-item border-b border-black/10 active"
+                data-macc="security"
+            >
+                <button
+                    type="button"
+                    class="macc-trigger w-full flex items-center justify-between py-4 px-4 text-left cursor-pointer bg-transparent border-0 select-none hover:bg-black/[0.02]"
+                    aria-expanded="true"
+                    aria-controls="macc-panel-security"
+                >
+                    <span
+                        class="macc-title text-[length:var(--fs-h6)] leading-[length:var(--lh-h6)] font-medium text-neutral-500 transition-colors duration-200"
+                    >
+                        Security
+                    </span>
+                    <svg
+                        viewBox="0 0 22 22"
+                        fill="none"
+                        height="20"
+                        width="20"
+                        class="macc-chevron text-neutral-400 shrink-0"
+                    >
+                        <path
+                            d="M7 9l4 4 4-4"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"></path>
+                    </svg>
+                </button>
+                <div id="macc-panel-security" class="macc-wrapper">
+                    <div class="macc-inner px-4 pb-6">
+                        <p
+                            class="text-[length:var(--fs-body)] font-normal text-neutral-500 leading-[length:var(--lh-body)] m-0 mb-4"
+                        >
+                            Powering Global e-Invoicing Alongside Regulators
+                        </p>
+                        <div class="flex flex-col gap-3 w-full">
+                            {
+                                securityCards.map((card) => (
+                                    <div class="bg-generic-00 rounded-[12px] p-4 flex items-start gap-3.5 border border-black/10">
+                                        <div class="flex items-center justify-center shrink-0 w-8 h-8 mt-0.5">
+                                            <img
+                                                src={card.icon}
+                                                alt=""
+                                                class="w-7 h-7 object-contain"
+                                                loading="lazy"
+                                                decoding="async"
+                                            />
+                                        </div>
+                                        <div class="flex flex-col flex-1 min-w-0">
+                                            <div class="text-[length:var(--fs-body)] leading-[length:var(--lh-body)] font-semibold mb-1 text-vault-navy">
+                                                {card.title}
+                                            </div>
+                                            <p class="text-[length:var(--fs-body-sm)] text-neutral-500 leading-[length:var(--lh-body-sm)] font-normal m-0">
+                                                {card.desc}
+                                            </p>
+                                        </div>
+                                    </div>
+                                ))
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 2. Compliance -->
+            <div
+                class="macc-item border-b border-black/10"
+                data-macc="compliance"
+            >
+                <button
+                    type="button"
+                    class="macc-trigger w-full flex items-center justify-between py-4 px-4 text-left cursor-pointer bg-transparent border-0 select-none hover:bg-black/[0.02]"
+                    aria-expanded="false"
+                    aria-controls="macc-panel-compliance"
+                >
+                    <span
+                        class="macc-title text-[length:var(--fs-h6)] leading-[length:var(--lh-h6)] font-medium text-neutral-500 transition-colors duration-200"
+                    >
+                        Compliance
+                    </span>
+                    <svg
+                        viewBox="0 0 22 22"
+                        fill="none"
+                        height="20"
+                        width="20"
+                        class="macc-chevron text-neutral-400 shrink-0"
+                    >
+                        <path
+                            d="M7 9l4 4 4-4"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"></path>
+                    </svg>
+                </button>
+                <div id="macc-panel-compliance" class="macc-wrapper">
+                    <div class="macc-inner px-4 pb-6">
+                        <p
+                            class="text-[length:var(--fs-body)] font-normal text-neutral-500 leading-[length:var(--lh-body)] m-0 mb-4"
+                        >
+                            Powering global e-invoicing alongside regulators.
+                        </p>
+                        <div class="grid grid-cols-2 gap-3 w-full">
+                            {
+                                mobileComplianceCards.map((c) => (
+                                    <div class="bg-generic-00 rounded-[12px] p-3.5 flex flex-col justify-between border border-black/10">
+                                        <div class="flex items-center min-h-[34px] mb-5">
+                                            <img
+                                                src={c.flag}
+                                                alt={c.name}
+                                                class="w-9 h-auto object-contain"
+                                                loading="lazy"
+                                                decoding="async"
+                                            />
+                                        </div>
+                                        <div class="flex flex-col">
+                                            <div class="text-[length:var(--fs-body)] font-semibold mb-1 leading-[length:var(--lh-body)] text-vault-navy">
+                                                {c.name}
+                                            </div>
+                                            <p class="text-[length:var(--fs-body-sm)] text-neutral-500 leading-[length:var(--lh-body-sm)] font-normal m-0">
+                                                {c.desc}
+                                            </p>
+                                        </div>
+                                    </div>
+                                ))
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 3. Integrations -->
+            <div
+                class="macc-item border-b border-black/10"
+                data-macc="integrations"
+            >
+                <button
+                    type="button"
+                    class="macc-trigger w-full flex items-center justify-between py-4 px-4 text-left cursor-pointer bg-transparent border-0 select-none hover:bg-black/[0.02]"
+                    aria-expanded="false"
+                    aria-controls="macc-panel-integrations"
+                >
+                    <span
+                        class="macc-title text-[length:var(--fs-h6)] leading-[length:var(--lh-h6)] font-medium text-neutral-500 transition-colors duration-200"
+                    >
+                        Integrations
+                    </span>
+                    <svg
+                        viewBox="0 0 22 22"
+                        fill="none"
+                        height="20"
+                        width="20"
+                        class="macc-chevron text-neutral-400 shrink-0"
+                    >
+                        <path
+                            d="M7 9l4 4 4-4"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"></path>
+                    </svg>
+                </button>
+                <div id="macc-panel-integrations" class="macc-wrapper">
+                    <div class="macc-inner px-4 pb-6">
+                        <p
+                            class="text-[length:var(--fs-body)] font-normal text-neutral-500 leading-[length:var(--lh-body)] m-0 mb-4"
+                        >
+                            Deep integrations means minimal to no changes in
+                            your daily workflow
+                        </p>
+                        <div
+                            class="w-full rounded-[14px] border border-black/10 bg-generic-00 flex flex-col p-4 sm:p-5"
+                        >
+                            <div class="mb-3">
+                                <h3
+                                    class="m-0 text-[length:var(--fs-h6)] font-medium leading-[length:var(--lh-h6)] text-vault-navy"
+                                >
+                                    Multiple Systems
+                                </h3>
+                                <p
+                                    class="m-0 mt-1 text-[length:var(--fs-body)] text-neutral-500 font-normal leading-[length:var(--lh-body)]"
+                                >
+                                    ERPs, POS, Handheld systems
+                                </p>
+                            </div>
+                            <div class="grid grid-cols-2 gap-2.5 my-4">
+                                {
+                                    integrationLogos.slice(0, 6).map((logo) => (
+                                        <div class="bg-generic-00 rounded-[8px] shadow-xs border border-black/5 min-h-13 flex items-center justify-center p-2.5">
+                                            <img
+                                                src={logo.src}
+                                                alt={logo.alt}
+                                                class="max-h-7 max-w-[80%] w-auto object-contain"
+                                                loading="lazy"
+                                                decoding="async"
+                                            />
+                                        </div>
+                                    ))
+                                }
+                            </div>
+                            <div
+                                class="grid grid-cols-2 gap-4 pt-4 border-t border-black/5 mt-auto"
+                            >
+                                <div>
+                                    <div
+                                        class="text-[length:var(--fs-h5)] font-medium leading-[length:var(--lh-h5)] text-vault-navy"
+                                    >
+                                        2,000+
+                                    </div>
+                                    <p
+                                        class="m-0 mt-0.5 text-[length:var(--fs-body-sm)] text-neutral-500 font-normal leading-[length:var(--lh-body-sm)]"
+                                    >
+                                        Successful Integrations
+                                    </p>
+                                </div>
+                                <div>
+                                    <div
+                                        class="text-[length:var(--fs-h5)] font-medium leading-[length:var(--lh-h5)] text-vault-navy"
+                                    >
+                                        100+
+                                    </div>
+                                    <p
+                                        class="m-0 mt-0.5 text-[length:var(--fs-body-sm)] text-neutral-500 font-normal leading-[length:var(--lh-body-sm)]"
+                                    >
+                                        Integration engineers
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 4. Service and Support -->
+            <div class="macc-item border-b border-black/10" data-macc="support">
+                <button
+                    type="button"
+                    class="macc-trigger w-full flex items-center justify-between py-4 px-4 text-left cursor-pointer bg-transparent border-0 select-none hover:bg-black/[0.02]"
+                    aria-expanded="false"
+                    aria-controls="macc-panel-support"
+                >
+                    <span
+                        class="macc-title text-[length:var(--fs-h6)] leading-[length:var(--lh-h6)] font-medium text-neutral-500 transition-colors duration-200"
+                    >
+                        Service and Support
+                    </span>
+                    <svg
+                        viewBox="0 0 22 22"
+                        fill="none"
+                        height="20"
+                        width="20"
+                        class="macc-chevron text-neutral-400 shrink-0"
+                    >
+                        <path
+                            d="M7 9l4 4 4-4"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"></path>
+                    </svg>
+                </button>
+                <div id="macc-panel-support" class="macc-wrapper">
+                    <div class="macc-inner px-4 pb-6">
+                        <p
+                            class="text-[length:var(--fs-body)] font-normal text-neutral-500 leading-[length:var(--lh-body)] m-0 mb-4"
+                        >
+                            End-to-end assistance from onboarding to ongoing
+                            optimisation for your business.
+                        </p>
+                        <div class="flex flex-col gap-3 w-full">
+                            {
+                                supportSecurityCards.map((card) => (
+                                    <div class="bg-generic-00 rounded-[12px] p-4 flex items-start gap-3.5 border border-black/10">
+                                        <div class="flex items-center justify-center shrink-0 w-8 h-8 mt-0.5">
+                                            <img
+                                                src={card.icon}
+                                                alt=""
+                                                class="w-7 h-7 object-contain"
+                                                loading="lazy"
+                                                decoding="async"
+                                            />
+                                        </div>
+                                        <div class="flex flex-col flex-1 min-w-0">
+                                            <div class="text-[length:var(--fs-body)] leading-[length:var(--lh-body)] font-semibold mb-1 text-vault-navy">
+                                                {card.title}
+                                            </div>
+                                            <p class="text-[length:var(--fs-body-sm)] text-neutral-500 leading-[length:var(--lh-body-sm)] font-normal m-0">
+                                                {card.desc}
+                                            </p>
+                                        </div>
+                                    </div>
+                                ))
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Desktop (lg+): original vertical accordion list + shared visual pane -->
+<section class="hidden lg:block bg-generic-00 py-20">
+    <div class="w-full max-w-[var(--container-max)] mx-auto px-6">
+        <div class="text-center">
+            <h2
+                class="text-[length:var(--fs-h1)] leading-[length:var(--lh-h1)] mb-0 mt-0 font-medium text-black mb-12 tracking-[-0.02em] max-w-[1170px] w-full mx-auto"
+            >
+                Make invoice-data security part of the conversation
+            </h2>
+        </div>
+
+        <div class="grid grid-cols-[340px_1fr] gap-6 items-start lg:gap-8">
+            <div class="flex flex-col" data-ssr-root>
+                <div
+                    class="group relative border-b border-black/10 first:border-t before:content-[''] before:absolute before:left-0 before:top-0 before:bottom-0 before:w-[3px] before:bg-[var(--color-purple)] before:rounded-r-[3px] before:scale-y-0 before:transition-transform before:duration-300 before:ease flex flex-col [&.active]:before:scale-y-100 active"
+                    data-ssr="compliance"
+                >
+                    <div
+                        class="flex items-center justify-between p-[20px_16px_20px_20px] cursor-pointer transition-colors duration-200 hover:bg-black/4"
+                    >
+                        <h2
+                            class="text-[length:var(--fs-h6)] leading-[length:var(--lh-h6)] mb-0 mt-0 font-medium text-neutral-500 transition-[color,font-size,line-height] duration-300 group-[.active]:text-vault-navy group-[.active]:text-[length:var(--fs-h5)] group-[.active]:font-medium group-[.active]:leading-[length:var(--lh-h5)]"
+                        >
+                            Compliance
+                        </h2>
+                        <svg
+                            viewBox="0 0 22 22"
+                            fill="none"
+                            height="22"
+                            width="22"
+                            class="text-neutral-400 transition-[transform,color] duration-300 shrink-0 group-[.active]:rotate-180"
+                            ><path
+                                d="M7 9l4 4 4-4"
+                                stroke="currentColor"
+                                stroke-width="2"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"></path></svg
+                        >
+                    </div>
+                    <div
+                        class="max-h-0 overflow-hidden transition-[max-height,padding] duration-400 px-5 group-[.active]:max-h-[120px] group-[.active]:pb-5"
+                    >
+                        <p
+                            class="text-[length:var(--fs-body)]! font-normal! text-neutral-500! leading-[length:var(--lh-body)]! m-0!"
+                        >
+                            Powering Global e-Invoicing Alongside Regulators
+                        </p>
+                    </div>
+                </div>
+                <div
+                    class="group relative border-b border-black/10 first:border-t before:content-[''] before:absolute before:left-0 before:top-0 before:bottom-0 before:w-[3px] before:bg-[var(--color-purple)] before:rounded-r-[3px] before:scale-y-0 before:transition-transform before:duration-300 before:ease flex flex-col [&.active]:before:scale-y-100"
+                    data-ssr="integrations"
+                >
+                    <div
+                        class="flex items-center justify-between p-[20px_16px_20px_20px] cursor-pointer transition-colors duration-200 hover:bg-black/4"
+                    >
+                        <h2
+                            class="text-[length:var(--fs-h6)] leading-[length:var(--lh-h6)] mb-0 mt-0 font-medium text-neutral-500 transition-[color,font-size,line-height] duration-300 group-[.active]:text-vault-navy group-[.active]:text-[length:var(--fs-h5)] group-[.active]:font-medium group-[.active]:leading-[length:var(--lh-h5)]"
+                        >
+                            Integrations
+                        </h2>
+                        <svg
+                            viewBox="0 0 22 22"
+                            fill="none"
+                            height="22"
+                            width="22"
+                            class="text-neutral-400 transition-[transform,color] duration-300 shrink-0 group-[.active]:rotate-180"
+                            ><path
+                                d="M7 9l4 4 4-4"
+                                stroke="currentColor"
+                                stroke-width="2"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"></path></svg
+                        >
+                    </div>
+                    <div
+                        class="max-h-0 overflow-hidden transition-[max-height,padding] duration-400 px-5 group-[.active]:max-h-[120px] group-[.active]:pb-5"
+                    >
+                        <p
+                            class="text-[length:var(--fs-body)]! font-normal! text-neutral-500! leading-[length:var(--lh-body)]! m-0!"
+                        >
+                            Deep integrations means minimal to no changes in
+                            your daily workflow
+                        </p>
+                    </div>
+                </div>
+                <div
+                    class="group relative border-b border-black/10 first:border-t before:content-[''] before:absolute before:left-0 before:top-0 before:bottom-0 before:w-[3px] before:bg-[var(--color-purple)] before:rounded-r-[3px] before:scale-y-0 before:transition-transform before:duration-300 before:ease flex flex-col [&.active]:before:scale-y-100"
+                    data-ssr="security"
+                >
+                    <div
+                        class="flex items-center justify-between p-[20px_16px_20px_20px] cursor-pointer transition-colors duration-200 hover:bg-black/4"
+                    >
+                        <h2
+                            class="text-[length:var(--fs-h6)] leading-[length:var(--lh-h6)] mb-0 mt-0 font-medium text-neutral-500 transition-[color,font-size,line-height] duration-300 group-[.active]:text-vault-navy group-[.active]:text-[length:var(--fs-h5)] group-[.active]:font-medium group-[.active]:leading-[length:var(--lh-h5)]"
+                        >
+                            Security
+                        </h2>
+                        <svg
+                            viewBox="0 0 22 22"
+                            fill="none"
+                            height="22"
+                            width="22"
+                            class="text-neutral-400 transition-[transform,color] duration-300 shrink-0 group-[.active]:rotate-180"
+                            ><path
+                                d="M7 9l4 4 4-4"
+                                stroke="currentColor"
+                                stroke-width="2"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"></path></svg
+                        >
+                    </div>
+                    <div
+                        class="max-h-0 overflow-hidden transition-[max-height,padding] duration-400 px-5 group-[.active]:max-h-[120px] group-[.active]:pb-5"
+                    >
+                        <p
+                            class="text-[length:var(--fs-body)]! font-normal! text-neutral-500! leading-[length:var(--lh-body)]! m-0!"
+                        >
+                            Powering Global e-Invoicing Alongside Regulators
+                        </p>
+                    </div>
+                </div>
+                <div
+                    class="group relative border-b border-black/10 first:border-t before:content-[''] before:absolute before:left-0 before:top-0 before:bottom-0 before:w-[3px] before:bg-[var(--color-purple)] before:rounded-r-[3px] before:scale-y-0 before:transition-transform before:duration-300 before:ease flex flex-col [&.active]:before:scale-y-100"
+                    data-ssr="support"
+                >
+                    <div
+                        class="flex items-center justify-between p-[20px_16px_20px_20px] cursor-pointer transition-colors duration-200 hover:bg-black/4"
+                    >
+                        <h2
+                            class="text-[length:var(--fs-h6)] leading-[length:var(--lh-h6)] mb-0 mt-0 font-medium text-neutral-500 transition-[color,font-size,line-height] duration-300 group-[.active]:text-vault-navy group-[.active]:text-[length:var(--fs-h5)] group-[.active]:font-medium group-[.active]:leading-[length:var(--lh-h5)]"
+                        >
+                            Service and Support
+                        </h2>
+                        <svg
+                            viewBox="0 0 22 22"
+                            fill="none"
+                            height="22"
+                            width="22"
+                            class="text-neutral-400 transition-[transform,color] duration-300 shrink-0 group-[.active]:rotate-180"
+                            ><path
+                                d="M7 9l4 4 4-4"
+                                stroke="currentColor"
+                                stroke-width="2"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"></path></svg
+                        >
+                    </div>
+                    <div
+                        class="max-h-0 overflow-hidden transition-[max-height,padding] duration-400 px-5 group-[.active]:max-h-[120px] group-[.active]:pb-5"
+                    >
+                        <p
+                            class="text-[length:var(--fs-body)]! font-normal! text-neutral-500! leading-[length:var(--lh-body)]! m-0!"
+                        >
+                            End-to-end assistance for your business
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="relative flex items-stretch min-h-full">
+                <div
+                    class="hidden animate-[ssrFadeIn_0.4s_ease] w-full [&.active]:flex [&.active]:items-stretch active"
+                    data-ssr-graphic="compliance"
+                >
+                    <div class="grid grid-cols-12 gap-3.5 w-full">
+                        {
+                            complianceCardsRow1.map((c) => (
+                                <div class="lg:col-span-3 md:col-span-3 bg-generic-00 rounded-[12px] p-4 flex flex-col transition-[transform,box-shadow] duration-200 border border-black/12">
+                                    <div class="flex gap-4 flex-wrap items-center min-h-[34px] mb-[36px] sm:gap-3">
+                                        {c.flags.map((f) => (
+                                            <img
+                                                src={f.src}
+                                                width={f.width}
+                                                height={f.height}
+                                                alt=""
+                                                class="w-10 h-auto"
+                                                loading="lazy"
+                                                decoding="async"
+                                            />
+                                        ))}
+                                    </div>
+                                    <div class="flex flex-col h-full justify-end">
+                                        <div class="text-[length:var(--fs-body)] font-semibold mb-2 leading-[length:var(--lh-body)] text-[var(--color-dark)]">
+                                            {c.name}
+                                        </div>
+                                        <p class="text-[length:var(--fs-body-sm)] text-[var(--color-gray-500)] leading-[length:var(--lh-body-sm)] font-normal m-0">
+                                            {c.desc}
+                                        </p>
+                                    </div>
+                                </div>
+                            ))
+                        }
+                        {
+                            complianceCardsRow2.map((c) => (
+                                <div class="lg:col-span-3 md:col-span-3 bg-generic-00 rounded-[12px] p-4 flex flex-col transition-[transform,box-shadow] duration-200 border border-black/12">
+                                    <div class="flex gap-4 flex-wrap items-center min-h-[34px] mb-[36px] sm:gap-3">
+                                        <img
+                                            src={c.flag.src}
+                                            width={c.flag.width}
+                                            height={c.flag.height}
+                                            alt=""
+                                            class="w-10 h-auto"
+                                            loading="lazy"
+                                            decoding="async"
+                                        />
+                                    </div>
+                                    <div class="flex flex-col h-full justify-end">
+                                        <div class="text-[length:var(--fs-body)] font-semibold mb-2 leading-[length:var(--lh-body)] text-[var(--color-dark)]">
+                                            {c.name}
+                                        </div>
+                                        <p class="text-[length:var(--fs-body-sm)] text-[var(--color-gray-500)] leading-[length:var(--lh-body-sm)] font-normal m-0">
+                                            {c.desc}
+                                        </p>
+                                    </div>
+                                </div>
+                            ))
+                        }
+                    </div>
+                </div>
+
+                <div
+                    class="hidden animate-[ssrFadeIn_0.4s_ease] w-full [&.active]:flex [&.active]:items-stretch"
+                    data-ssr-graphic="integrations"
+                >
+                    <div
+                        class="w-full rounded-[14px] border border-black/10 bg-generic-00 flex flex-col p-6"
+                    >
+                        <!-- Top Section -->
+                        <div class="mb-5">
+                            <h3
+                                class="m-0 text-[length:var(--fs-h6)] font-medium leading-[length:var(--lh-h6)] text-vault-navy"
+                            >
+                                Multiple Systems
+                            </h3>
+                            <p
+                                class="m-0 mt-2 text-[length:var(--fs-body)] text-neutral-500 font-normal leading-[length:var(--lh-body)]"
+                            >
+                                ERPs, POS, Handheld systems
+                            </p>
+                        </div>
+
+                        <!-- Middle Section (Logo Grid) -->
+                        <div class="w-full mb-8 flex flex-col gap-3 sm:gap-4">
+                            <div class="grid grid-cols-4 gap-3 sm:gap-4">
+                                <div
+                                    class="bg-generic-00 rounded-[8px] shadow-sm border border-black/5 min-h-15 flex items-center justify-center p-3"
+                                >
+                                    <img
+                                        src="https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6a8d790081c75dc61c33ce75_integration-logo-1.png"
+                                        alt="Logo 1"
+                                        class="max-h-8 w-auto object-contain"
+                                        loading="lazy"
+                                        decoding="async"
+                                    />
+                                </div>
+                                <div
+                                    class="bg-generic-00 rounded-[8px] shadow-sm border border-black/5 min-h-15 flex items-center justify-center p-3"
+                                >
+                                    <img
+                                        src="https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6a8d7907ea849ad69964661e_integration-logo-2.png"
+                                        alt="Logo 2"
+                                        class="max-h-8 w-auto object-contain"
+                                        loading="lazy"
+                                        decoding="async"
+                                    />
+                                </div>
+                                <div
+                                    class="bg-generic-00 rounded-[8px] shadow-sm border border-black/5 min-h-15 flex items-center justify-center p-3"
+                                >
+                                    <img
+                                        src="https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6a8d790c06c0ef7ae5ed1090_integration-logo-3.png"
+                                        alt="Logo 3"
+                                        class="max-h-8 w-auto object-contain"
+                                        loading="lazy"
+                                        decoding="async"
+                                    />
+                                </div>
+                                <div
+                                    class="bg-generic-00 rounded-[8px] shadow-sm border border-black/5 min-h-15 flex items-center justify-center p-3"
+                                >
+                                    <img
+                                        src="https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6a8d791276f0e1022c853905_integration-logo-4.png"
+                                        alt="Logo 3"
+                                        class="max-h-8 w-auto object-contain"
+                                        loading="lazy"
+                                        decoding="async"
+                                    />
+                                </div>
+                            </div>
+
+                            <div class="grid grid-cols-4 gap-3 sm:gap-4">
+                                <div
+                                    class="bg-generic-00 rounded-[8px] shadow-sm border border-black/5 min-h-15 flex items-center justify-center p-3"
+                                >
+                                    <img
+                                        src="https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6a8d791aa74f509e0c3e01a6_integration-logo-5.png"
+                                        alt="Logo 4"
+                                        class="max-h-8 w-auto object-contain"
+                                        loading="lazy"
+                                        decoding="async"
+                                    />
+                                </div>
+                                <div
+                                    class="bg-generic-00 rounded-[8px] shadow-sm border border-black/5 min-h-15 flex items-center justify-center p-3"
+                                >
+                                    <img
+                                        src="https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6a8d792462236fe25ed8bd17_integration-logo-6.png"
+                                        alt="Logo 5"
+                                        class="max-h-8 w-auto object-contain"
+                                        loading="lazy"
+                                        decoding="async"
+                                    />
+                                </div>
+                                <div
+                                    class="bg-generic-00 rounded-[8px] shadow-sm border border-black/5 min-h-15 flex items-center justify-center p-3"
+                                >
+                                    <img
+                                        src="https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6a8d792b62ee0e705e570a67_integration-logo-7.png"
+                                        alt="Logo 6"
+                                        class="max-h-8 w-auto object-contain"
+                                        loading="lazy"
+                                        decoding="async"
+                                    />
+                                </div>
+                                <div
+                                    class="bg-generic-00 rounded-[8px] shadow-sm border border-black/5 min-h-15 flex items-center justify-center p-3"
+                                >
+                                    <img
+                                        src="https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6a8d7930fc483189b07616fa_integration-logo-8.png"
+                                        alt="Logo 7"
+                                        class="max-h-8 w-auto object-contain"
+                                        loading="lazy"
+                                        decoding="async"
+                                    />
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Bottom Section (Stats) -->
+                        <div class="grid grid-cols-2 gap-6 mt-auto">
+                            <div>
+                                <div
+                                    class="text-[length:var(--fs-h5)] font-medium leading-[length:var(--lh-h5)] text-vault-navy"
+                                >
+                                    2,000+
+                                </div>
+                                <p
+                                    class="m-0 text-[length:var(--fs-body)] text-neutral-500 font-normal leading-[length:var(--lh-body)]"
+                                >
+                                    Successful Integrations
+                                </p>
+                            </div>
+                            <div>
+                                <div
+                                    class="text-[length:var(--fs-h5)] font-medium leading-[length:var(--lh-h5)] text-vault-navy"
+                                >
+                                    1000+
+                                </div>
+                                <p
+                                    class="m-0 text-[length:var(--fs-body)] text-neutral-500 font-normal leading-[length:var(--lh-body)]"
+                                >
+                                    Engineers
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div
+                    class="hidden animate-[ssrFadeIn_0.4s_ease] w-full [&.active]:flex [&.active]:items-stretch"
+                    data-ssr-graphic="security"
+                >
+                    <div class="flex flex-col w-full">
+                        <div
+                            class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 w-full"
+                        >
+                            {
+                                securityCards.map((card, index) => (
+                                    <div class="bg-generic-00 rounded-[12px] p-5 flex items-start gap-4 transition-[transform,box-shadow] duration-200 border border-neutral-300">
+                                        <div class="flex items-center justify-center shrink-0 w-10 h-10">
+                                            <img
+                                                src={card.icon}
+                                                alt="icon"
+                                                loading="lazy"
+                                                decoding="async"
+                                            />
+                                        </div>
+                                        <div class="flex flex-col flex-1">
+                                            <div class="text-[length:var(--fs-body)] leading-[length:var(--lh-body)] font-medium mb-2 text-[var(--color-dark)]">
+                                                {card.title}
+                                            </div>
+                                            <p class="text-[length:var(--fs-body-sm)] text-[var(--color-gray-500)] leading-[length:var(--lh-body-sm)] font-normal m-0">
+                                                {card.desc}
+                                            </p>
+                                        </div>
+                                    </div>
+                                ))
+                            }
+                        </div>
+                    </div>
+                </div>
+
+                <div
+                    class="hidden animate-[ssrFadeIn_0.4s_ease] w-full [&.active]:flex [&.active]:items-stretch"
+                    data-ssr-graphic="support"
+                >
+                    <div
+                        class="grid w-full grid-cols-1 gap-3 md:grid-cols-2 lg:grid-rows-3"
+                    >
+                        {
+                            supportSecurityCards.map((card) => (
+                                <div class="flex items-center gap-3 rounded-[12px] border border-neutral-300 bg-generic-00 p-6">
+                                    <div class="flex h-8 w-8 shrink-0 items-center justify-center">
+                                        <img
+                                            src={card.icon}
+                                            alt=""
+                                            class="h-8 w-8 object-contain"
+                                            loading="lazy"
+                                            decoding="async"
+                                        />
+                                    </div>
+                                    <div class="flex min-w-0 flex-1 flex-col gap-2">
+                                        <div class="font-semibold text-vault-navy text-[length:var(--fs-body)] leading-[18px]">
+                                            {card.title}
+                                        </div>
+                                        <p class="m-0 font-normal text-neutral-500 text-[length:var(--fs-body-sm)] leading-[length:var(--lh-body-sm)]">
+                                            {card.desc}
+                                        </p>
+                                    </div>
+                                </div>
+                            ))
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- <div class="mt-[48px] flex items-center justify-center">
+      <a href="#" class="flex items-center cursor-pointer no-underline group">
+        <div
+          class="flex items-center gap-2 items-center p-[14px_40px]! bg-gradient-to-r! from-[#110072]! to-[#7a5698]! text-white! rounded-[60px]! text-[16px]! font-medium! leading-[1.5]! border-none outline-none transition-transform group-hover:scale-105"
+        >
+          Learn more
+          <span
+            class="inline-flex items-center mt-[3px] justify-between text-white"
+          >
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 16 16"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M3 8H13M13 8L9 4M13 8L9 12"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"></path>
+            </svg>
+          </span>
+        </div>
+      </a>
+    </div> -->
+    </div>
+</section>
+
+<style is:global>
+    @keyframes ssrFadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(8px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .integrations-text-panel::before {
+        content: "";
+        position: absolute;
+        left: 0;
+        right: 0;
+        top: -64px;
+        height: 96px;
+        pointer-events: none;
+        z-index: 10;
+        background: linear-gradient(
+            to bottom,
+            rgba(253, 253, 251, 0) 0%,
+            rgba(253, 253, 251, 0.6) 50%,
+            var(--palette-ledger-50) 100%
+        );
+        backdrop-filter: blur(24px) saturate(120%);
+        -webkit-backdrop-filter: blur(24px) saturate(120%);
+        mask-image: linear-gradient(
+            to bottom,
+            transparent 0%,
+            black 50%,
+            black 100%
+        );
+        -webkit-mask-image: linear-gradient(
+            to bottom,
+            transparent 0%,
+            black 50%,
+            black 100%
+        );
+    }
+
+    /* Mobile vertical accordion (<lg) */
+    .macc-item {
+        border-left: 3px solid transparent;
+        transition:
+            border-color 0.28s ease,
+            background-color 0.2s ease;
+    }
+
+    .macc-item.active {
+        border-left-color: var(--color-nova-blue, #5446ff);
+    }
+
+    .macc-chevron {
+        transition:
+            transform 0.35s cubic-bezier(0.4, 0, 0.2, 1),
+            color 0.2s ease;
+    }
+
+    .macc-item.active .macc-chevron {
+        transform: rotate(180deg);
+        color: var(--color-vault-navy, #0b0e1e);
+    }
+
+    .macc-item.active .macc-title {
+        color: var(--color-vault-navy, #0b0e1e);
+    }
+
+    .macc-wrapper {
+        display: none;
+    }
+
+    .macc-item.active .macc-wrapper {
+        display: block;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        .macc-wrapper,
+        .macc-chevron,
+        .macc-item {
+            transition-duration: 0.01ms !important;
+        }
+    }
+</style>
+
+<script is:inline>
+    // Desktop (lg+): vertical accordion list driving the shared visual pane.
+    (function () {
+        const root = document.querySelector("[data-ssr-root]");
+        if (!root) return;
+        const items = root.querySelectorAll("[data-ssr]");
+        const graphics = document.querySelectorAll("[data-ssr-graphic]");
+        items.forEach((item) => {
+            // The header is the first child of the item (the div containing the label and chevron)
+            const header = item.firstElementChild;
+            header?.addEventListener("click", () => {
+                const key = item.getAttribute("data-ssr");
+                if (item.classList.contains("active")) return;
+                items.forEach((i) => i.classList.remove("active"));
+                graphics.forEach((g) => g.classList.remove("active"));
+                item.classList.add("active");
+                document
+                    .querySelector(`[data-ssr-graphic="${key}"]`)
+                    ?.classList.add("active");
+            });
+        });
+    })();
+
+    // Mobile (<lg): vertical accordion list with smooth slide and display: none when closed.
+    (function () {
+        const root = document.querySelector("[data-macc-root]");
+        if (!root) return;
+
+        const items = root.querySelectorAll("[data-macc]");
+
+        function closeItem(item) {
+            if (!item.classList.contains("active")) return;
+            item.classList.remove("active");
+            const trigger = item.querySelector(".macc-trigger");
+            trigger?.setAttribute("aria-expanded", "false");
+
+            const wrapper = item.querySelector(".macc-wrapper");
+            if (!wrapper) return;
+
+            if (wrapper._anim) cancelAnimationFrame(wrapper._anim);
+
+            wrapper.style.display = "block";
+            wrapper.style.overflow = "hidden";
+            wrapper.style.height = wrapper.scrollHeight + "px";
+            wrapper.style.opacity = "1";
+            wrapper.style.transition =
+                "height 0.3s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.25s ease";
+
+            wrapper.offsetHeight; // Force reflow
+
+            wrapper._anim = requestAnimationFrame(() => {
+                wrapper.style.height = "0px";
+                wrapper.style.opacity = "0";
+            });
+
+            const onEnd = (e) => {
+                if (e.target !== wrapper || e.propertyName !== "height") return;
+                wrapper.removeEventListener("transitionend", onEnd);
+                if (!item.classList.contains("active")) {
+                    wrapper.style.display = "none";
+                    wrapper.style.height = "";
+                    wrapper.style.overflow = "";
+                    wrapper.style.opacity = "";
+                    wrapper.style.transition = "";
+                }
+            };
+            wrapper.addEventListener("transitionend", onEnd);
+        }
+
+        function openItem(item) {
+            item.classList.add("active");
+            const trigger = item.querySelector(".macc-trigger");
+            trigger?.setAttribute("aria-expanded", "true");
+
+            const wrapper = item.querySelector(".macc-wrapper");
+            if (!wrapper) return;
+
+            if (wrapper._anim) cancelAnimationFrame(wrapper._anim);
+
+            wrapper.style.display = "block";
+            wrapper.style.overflow = "hidden";
+            wrapper.style.height = "0px";
+            wrapper.style.opacity = "0";
+            wrapper.style.transition =
+                "height 0.32s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.28s ease";
+
+            const fullHeight = wrapper.scrollHeight;
+
+            wrapper._anim = requestAnimationFrame(() => {
+                wrapper.style.height = fullHeight + "px";
+                wrapper.style.opacity = "1";
+            });
+
+            const onEnd = (e) => {
+                if (e.target !== wrapper || e.propertyName !== "height") return;
+                wrapper.removeEventListener("transitionend", onEnd);
+                if (item.classList.contains("active")) {
+                    wrapper.style.height = "";
+                    wrapper.style.overflow = "";
+                    wrapper.style.opacity = "";
+                    wrapper.style.transition = "";
+                }
+            };
+            wrapper.addEventListener("transitionend", onEnd);
+        }
+
+        items.forEach((item) => {
+            const trigger = item.querySelector(".macc-trigger");
+
+            trigger?.addEventListener("click", () => {
+                const isCurrentlyActive = item.classList.contains("active");
+
+                items.forEach((other) => {
+                    if (other !== item && other.classList.contains("active")) {
+                        closeItem(other);
+                    }
+                });
+
+                if (isCurrentlyActive) {
+                    closeItem(item);
+                } else {
+                    openItem(item);
+                }
+            });
+        });
+    })();
+</script>

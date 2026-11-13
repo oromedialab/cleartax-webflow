@@ -1,0 +1,504 @@
+---
+/**
+ * "Clarity AI, by ClearTax: Making AI work for Finance" — Figma node
+ * 13692:35487, with the card copy carried over from the sticky-deck version
+ * this replaces (13275:28481 / 13091:18569).
+ *
+ * Structurally this is `singapore-regional/glance.astro`: a grid of cards, each
+ * one a button that opens ONE detail overlay with prev/next chevrons. The
+ * difference is the pill bar above it — the cards are split by team and the
+ * pills switch which set the grid shows.
+ *
+ * WHAT THE FIGMA SHOWS AND WHAT IT LEAVES OPEN. The frame draws one state: two
+ * pills, six cards, each card a title + icon square + plus. It does not draw
+ * the tab interaction or the overlay. Two readings were resolved here:
+ *   - The pills FILTER the grid. With the scrolling deck gone they cannot mean
+ *     "position in a stack" any more, and the frame's own card set spans both
+ *     teams, so it is a WIP layout rather than a filtered state.
+ *   - The plus opens the Supports overlay, carrying the claim and the caption.
+ *     The card itself only has room for the title, and that copy has to land
+ *     somewhere.
+ *
+ * PANELS ARE HIDDEN BY INLINE `display`, not by a class or the `hidden`
+ * attribute. `hidden` is a UA-origin `display:none`, so an author `grid`
+ * utility beats it and the panel stays visible; a `hidden` CLASS would race the
+ * `grid` class on source order, which is unlayered once pasted into Webflow.
+ * The initial `display:none` is rendered server-side rather than applied by the
+ * script, so the page never paints every panel and then collapses to one.
+ *
+ * Consequence, and it is deliberate: without JS only the first team's cards are
+ * reachable. The alternative — every card visible, then a jump — is worse, and
+ * the overlay this section is built around needs JS regardless.
+ *
+ * The active pill is Nova Blue. Figma reports `--vault-navy/600` at #1200FF
+ * there, which is an unresolved token in the export — the rendered design is
+ * the brand's Nova Blue (#5446FF), so that is what this uses.
+ *
+ * The icon squares and the overlay visual are unfilled "Icon placeholder" /
+ * "Image" frames in the Figma, so they render as `bg-visual-placeholder` — the
+ * token is #E8FFE1, exactly the fill the design uses. Swap each for a
+ * Webflow-hosted URL when the artwork lands — never a `data:` URI.
+ *
+ * "Audit and Advisory Agent" appearing under both For CFO and For Tax Teams is
+ * the design's own repetition, not a copy-paste slip.
+ *
+ * Ids are `ih-maiw-` prefixed: embeds share one namespace per page.
+ */
+interface Card {
+    title: string;
+    /** The Nova Blue one-liner under the title in the overlay. */
+    claim: string;
+    caption: string;
+    icon: string;
+    image?: string;
+}
+
+const cards: Card[] = [
+    {
+        title: "Structured invoices, not just emailed PDFs",
+        claim: "",
+        caption:
+            "InvoiceNow supports direct transmission of standardised invoice data between business systems. An emailed PDF is not the same as an invoice exchanged through the network. Relevant paper and PDF transactions may still need to be recorded in your solution and reported to IRAS through the solution-extracted route.",
+        icon: "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6af312d191975217e22da0ce_e-1.png",
+    },
+    {
+        title: "Peppol connects the trading partners",
+        claim: "",
+        caption:
+            "Businesses connect through InvoiceNow-Ready Solutions and IMDA-accredited Access Point Providers. Registering in the Singapore Peppol Directory with your UEN gives your business a Peppol ID for network participation.",
+        icon: "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6af312d93119234d3c8faf77_e-2.png",
+    },
+    {
+        title: "IRAS reporting is a separate workflow",
+        claim: "",
+        caption:
+            "Sending a Peppol invoice to your customer does not, by itself, prove that invoice data has been sent to IRAS. Your solution must support the GST submission workflow, with the submission feature enabled and tested.",
+        icon: "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6af312de40dffe97797f82f6_e-3.png",
+    },
+    {
+        title: "Purchases and off-network transactions matter",
+        claim: "",
+        caption:
+            "Scope your accounts-payable processes and sales invoicing. Required purchase data and relevant transactions outside the InvoiceNow network use solution-extracted submissions through your Access Point. Apply IRAS’s transaction-scope rules rather than assuming every accounting entry must be reported.",
+        icon: "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6af312e421c5e688ea53a1af_e-4.png",
+    },
+];
+
+/* The overlay holds one copy of every card's text, addressed by a FLAT index
+   across every team — so the numbering has to be assigned once, here, and used
+   by both the grid and the overlay. Panels render from `panels`, the overlay
+   from `flat`, and the two agree by construction. */
+const flat = cards.map((card) => ({ card, group: "all" }));
+
+let seq = 0;
+const panels = [
+    {
+        id: "all",
+        label: "All",
+        cards: cards.map((card) => ({ card, index: seq++ })),
+    },
+];
+---
+
+<section class="bg-generic-00 py-16 lg:py-20">
+    <div class="max-w-[var(--container-max)] w-full mx-auto px-4 md:px-6">
+        <div class="mb-8 flex flex-col items-center gap-6 text-center lg:mb-12">
+            <div class="flex flex-col items-center gap-4">
+                <h2
+                    class="m-0 font-heading font-medium text-vault-navy text-[length:var(--fs-h1)] leading-[length:var(--lh-h1)] tracking-[-0.5px]"
+                >
+                   Singapore e-invoicing at a glance
+                </h2>
+                <p
+                    class="m-0 max-w-230 font-body font-normal text-neutral-500 text-[length:var(--fs-body-lg)] leading-[length:var(--lh-body-lg)]"
+                >
+                    InvoiceNow is Singapore’s nationwide e-invoicing network, built on the international Peppol standard. Under the GST InvoiceNow Requirement, businesses covered by the rollout must also use InvoiceNow-Ready Solutions to submit required invoice data to IRAS. 
+                </p>
+            </div>
+        </div>
+
+        {
+            panels.map((group) => (
+                <div
+                    id={`ih-maiw-panel-${group.id}`}
+                    class="grid grid-cols-1 gap-6 lg:grid-cols-2 lg:gap-8"
+                    data-ih-maiw-panel={group.id}
+                >
+                    {group.cards.map(({ card, index }) => (
+                        <button
+                            type="button"
+                            class="group m-0 flex w-full cursor-pointer items-center gap-6 self-start rounded-xl border border-neutral-300 bg-generic-00 p-6 text-left transition-all duration-150 ease-in-out hover:border-nova-blue"
+                            aria-haspopup="dialog"
+                            data-ih-maiw-open
+                            data-ih-maiw-index={index}
+                        >
+                            <img
+                                src={card.icon}
+                                alt={card.title}
+                                class="h-14 w-14 shrink-0 object-contain"
+                            />
+                            <span class="min-w-0 flex-1 font-heading font-medium text-vault-navy text-[length:var(--fs-h6)] leading-[length:var(--lh-h6)]">
+                                {card.title}
+                            </span>
+                            <span
+                                class="flex h-14 w-14 shrink-0 items-center justify-center rounded-lg p-2 text-vault-navy transition-colors duration-150 ease-in-out group-hover:text-nova-blue"
+                                aria-hidden="true"
+                            >
+                                {/* The exported Figma glyph (Media / Icon / Unfilled / plus). */}
+                                <svg
+                                    width="40"
+                                    height="40"
+                                    viewBox="0 0 40 40"
+                                    fill="none"
+                                    xmlns="http://www.w3.org/2000/svg"
+                                >
+                                    <path
+                                        d="M20 10V30"
+                                        stroke="currentColor"
+                                        stroke-width="1.5"
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                    />
+                                    <path
+                                        d="M30 20L10 20"
+                                        stroke="currentColor"
+                                        stroke-width="1.5"
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                    />
+                                </svg>
+                            </span>
+                        </button>
+                    ))}
+                </div>
+            ))
+        }
+    </div>
+</section>
+
+<!-- Detail overlay. Lives outside the section's container so the scrim covers
+     the viewport rather than the 1280px column.
+
+     Rendered ONCE with every card's text inside it, `hidden` on all but the
+     active one, rather than one panel per card: eleven copies of the chevrons,
+     the close control and the image frame would be eleven copies of the same
+     bytes, and every byte here is a Webflow Embed byte.
+
+     The per-card blocks use the `hidden` ATTRIBUTE, which is safe only because
+     none of them carries a display utility of its own — don't add one, or it
+     will beat the UA rule and nothing will ever hide. That is also why the
+     heading block spaces itself with `mb-*` rather than `flex gap-*`. -->
+<div
+    id="ih-maiw-overlay"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="ih-maiw-overlay-title"
+    aria-hidden="true"
+    class="fixed inset-0 z-[2000] hidden items-center justify-center bg-generic-100/70 p-4 backdrop-blur-sm"
+>
+    <div
+        class="relative max-h-[90vh] w-full max-w-[630px] overflow-y-auto rounded-xl border-2 border-[#CCCCCC] bg-generic-00 p-6"
+        data-ih-maiw-panel-detail
+    >
+        <!-- Anchored to the PANEL, not to the visual it sits over in the Figma:
+         24px panel padding + the design's 20px inset lands at the same 44px on
+         desktop, and it stays reachable once the visual moves below the copy on
+         mobile. The glyph is the card's plus, turned 45°. -->
+        <button
+            type="button"
+            aria-label="Close"
+            class="absolute right-6 top-6 z-10 inline-flex h-10 w-10 cursor-pointer items-center justify-center rounded-lg border-0 bg-transparent p-0 text-vault-navy transition-opacity duration-150 hover:opacity-70 lg:right-5 lg:top-5"
+            data-ih-maiw-close
+        >
+            <svg
+                width="40"
+                height="40"
+                viewBox="0 0 40 40"
+                fill="none"
+                class="rotate-45"
+                aria-hidden="true"
+                focusable="false"
+            >
+                <path
+                    d="M20 10V30"
+                    stroke="currentColor"
+                    stroke-width="1.5"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"></path>
+                <path
+                    d="M30 20L10 20"
+                    stroke="currentColor"
+                    stroke-width="1.5"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"></path>
+            </svg>
+        </button>
+
+        <div class="flex flex-col items-start gap-6">
+            <div class="flex w-full flex-col justify-between gap-6">
+                <div class="flex items-center gap-4">
+                    <div class="h-16 w-16 shrink-0">
+                        {
+                            flat.map(({ card }, i) => (
+                                <img
+                                    src={card.icon}
+                                    alt=""
+                                    width="64"
+                                    height="64"
+                                    class="h-16 w-16 rounded-lg object-contain"
+                                    style={
+                                        i === 0
+                                            ? "display: block;"
+                                            : "display: none;"
+                                    }
+                                    hidden={i !== 0}
+                                    data-ih-maiw-icon
+                                    loading="lazy"
+                                    decoding="async"
+                                />
+                            ))
+                        }
+                    </div>
+                    <div id="ih-maiw-overlay-title">
+                        {
+                            flat.map(({ card, group }, i) => (
+                                <div
+                                    hidden={i !== 0}
+                                    data-ih-maiw-head
+                                    data-ih-maiw-group={group}
+                                >
+                                    <h3 class="m-0 text-balance pr-12 font-heading font-medium text-vault-navy text-[length:var(--fs-h5)] leading-[length:var(--lh-h5)] tracking-[-0.5px] lg:pr-0">
+                                        {card.title}
+                                    </h3>
+                                    {card.claim && (
+                                        <p class="m-0 font-body font-medium text-nova-blue text-[length:var(--fs-body)] leading-[length:var(--lh-body)]">
+                                            {card.claim}
+                                        </p>
+                                    )}
+                                </div>
+                            ))
+                        }
+                    </div>
+                </div>
+
+                <div
+                    class="aspect-[574/323] w-full max-w-[574px] rounded-lg overflow-hidden bg-visual-placeholder mx-auto"
+                >
+                    {
+                        flat.map(({ card }, i) =>
+                            card.image ? (
+                                <img
+                                    src={card.image}
+                                    alt={card.title}
+                                    width="574"
+                                    height="323"
+                                    class="h-full w-full object-contain"
+                                    style={
+                                        i === 0
+                                            ? "display: block;"
+                                            : "display: none;"
+                                    }
+                                    hidden={i !== 0}
+                                    data-ih-maiw-image
+                                    loading="lazy"
+                                />
+                            ) : (
+                                <div
+                                    class="h-full w-full bg-visual-placeholder"
+                                    style={
+                                        i === 0
+                                            ? "display: block;"
+                                            : "display: none;"
+                                    }
+                                    hidden={i !== 0}
+                                    data-ih-maiw-image
+                                    aria-hidden="true"
+                                />
+                            ),
+                        )
+                    }
+                </div>
+
+                <div class="flex flex-col gap-6">
+                    <div>
+                        {
+                            flat.map(({ card }, i) => (
+                                <p
+                                    class="m-0 font-body font-normal text-neutral-500 text-[length:var(--fs-body)] leading-[length:var(--lh-body)]"
+                                    hidden={i !== 0}
+                                    data-ih-maiw-body
+                                >
+                                    {card.caption}
+                                </p>
+                            ))
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style is:global>
+    [data-ih-maiw-head][hidden],
+    [data-ih-maiw-body][hidden],
+    [data-ih-maiw-icon][hidden],
+    [data-ih-maiw-image][hidden] {
+        display: none !important;
+    }
+</style>
+
+<script is:inline>
+    /* Pills filter the grid; a card opens the detail overlay, and the chevrons
+     walk that card's own team without closing. */
+    (function () {
+        var overlay = document.getElementById("ih-maiw-overlay");
+        if (!overlay) return;
+
+        var reduceMotion =
+            window.matchMedia &&
+            window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+        /* ---- detail overlay ---- */
+
+        var panel = overlay.querySelector("[data-ih-maiw-panel-detail]");
+        var closeBtn = overlay.querySelector("[data-ih-maiw-close]");
+        var prevBtn = overlay.querySelector("[data-ih-maiw-prev]");
+        var nextBtn = overlay.querySelector("[data-ih-maiw-next]");
+        var heads = overlay.querySelectorAll("[data-ih-maiw-head]");
+        var bodies = overlay.querySelectorAll("[data-ih-maiw-body]");
+        var icons = overlay.querySelectorAll("[data-ih-maiw-icon]");
+        var images = overlay.querySelectorAll("[data-ih-maiw-image]");
+        if (!panel || !heads.length || heads.length !== bodies.length) return;
+
+        var count = heads.length;
+        var current = 0;
+        var lastFocused = null;
+
+        // The chevrons walk the card's OWN team, not all eleven — the overlay was
+        // opened from a filtered grid, so stepping into a team whose pill is not
+        // lit would be a jump with nothing on screen to explain it.
+        function teamOf(index) {
+            var group = heads[index].getAttribute("data-ih-maiw-group");
+            var members = [];
+            for (var i = 0; i < count; i++) {
+                if (heads[i].getAttribute("data-ih-maiw-group") === group)
+                    members.push(i);
+            }
+            return members;
+        }
+
+        function show(index) {
+            current = index;
+            for (var i = 0; i < count; i++) {
+                heads[i].hidden = i !== current;
+                bodies[i].hidden = i !== current;
+                if (icons[i]) {
+                    icons[i].hidden = i !== current;
+                    icons[i].style.display = i === current ? "block" : "none";
+                }
+                if (images[i]) {
+                    images[i].hidden = i !== current;
+                    images[i].style.display = i === current ? "block" : "none";
+                }
+            }
+            // The panel scrolls on short windows; a card further down the list would
+            // otherwise open mid-way through its own copy.
+            panel.scrollTop = 0;
+        }
+
+        // Wraps both ways within the team, so neither chevron is ever a dead
+        // control — including on the three-card team.
+        function step(delta) {
+            var members = teamOf(current);
+            var at = members.indexOf(current);
+            show(members[(at + delta + members.length) % members.length]);
+        }
+
+        function open(index, opener) {
+            lastFocused = opener || document.activeElement;
+            show(index);
+            overlay.style.display = "flex";
+            overlay.setAttribute("aria-hidden", "false");
+            document.body.style.overflow = "hidden";
+            if (closeBtn) closeBtn.focus();
+        }
+
+        function close() {
+            overlay.style.display = "none";
+            overlay.setAttribute("aria-hidden", "true");
+            document.body.style.overflow = "";
+            if (lastFocused && lastFocused.focus) lastFocused.focus();
+        }
+
+        function isOpen() {
+            return overlay.style.display === "flex";
+        }
+
+        // Delegated, so it does not matter which Embed mounts first or whether the
+        // cards existed when this ran.
+        document.addEventListener("click", function (e) {
+            if (!e.target.closest) return;
+            var opener = e.target.closest("[data-ih-maiw-open]");
+            if (!opener) return;
+            open(
+                parseInt(opener.getAttribute("data-ih-maiw-index"), 10) || 0,
+                opener,
+            );
+        });
+
+        if (closeBtn) closeBtn.addEventListener("click", close);
+        if (prevBtn)
+            prevBtn.addEventListener("click", function () {
+                step(-1);
+            });
+        if (nextBtn)
+            nextBtn.addEventListener("click", function () {
+                step(1);
+            });
+
+        overlay.addEventListener("click", function (e) {
+            if (e.target === overlay) close();
+        });
+
+        document.addEventListener("keydown", function (e) {
+            if (!isOpen()) return;
+
+            if (e.key === "Escape") {
+                close();
+                return;
+            }
+
+            // Arrow keys drive the same walk the chevrons do. Nothing inside the
+            // dialog is a native arrow-key control (no radio group, select or text
+            // field), so there is no default behaviour to steal here — and the pill
+            // bar's own arrow handling cannot fire, since focus is trapped below.
+            if (e.key === "ArrowLeft") {
+                step(-1);
+                return;
+            }
+            if (e.key === "ArrowRight") {
+                step(1);
+                return;
+            }
+
+            // Keep Tab inside the dialog — `aria-modal` claims the rest is inert, so
+            // focus must not walk out into the page behind it.
+            if (e.key !== "Tab") return;
+            var focusable = panel.querySelectorAll(
+                'a[href], button:not([disabled]), input:not([disabled]):not([type="hidden"]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])',
+            );
+            if (!focusable.length) return;
+            var first = focusable[0];
+            var last = focusable[focusable.length - 1];
+
+            if (e.shiftKey && document.activeElement === first) {
+                e.preventDefault();
+                last.focus();
+            } else if (!e.shiftKey && document.activeElement === last) {
+                e.preventDefault();
+                first.focus();
+            }
+        });
+    })();
+</script>

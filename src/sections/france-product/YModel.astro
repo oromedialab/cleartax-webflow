@@ -58,24 +58,29 @@
 interface ValueItem {
   heading: string;
   body: string;
+  img?: string;
 }
 
 const items: ValueItem[] = [
   {
     heading: "DGFiP-approved PA",
     body: "Already certified. ClearTax is listed on the official Partenaire Dématérialisateur registry. Not going through certification — already certified, live, and operational in the French PPF environment today.",
+    img: "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6af6b0f551c709d62bf79270_fr-img-1.png",
   },
   {
     heading: "All EN16931 formats supported — UBL 2.1, CII, and Factur-X",
     body: "Automatic format transformation from your ERP's native output — no manual field mapping required.",
+    img: "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6af6b100df17554fe03a1d9c_fr-img-2.png",
   },
   {
     heading: "Full 14-status lifecycle tracking",
     body: "Every mandatory status from Déposée through Encaissée automatically reported to DGFiP in real time — without manual intervention.",
+    img: "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6af6b1052dd431f4a8f65d1c_fr-img-3.png",
   },
   {
     heading: "Sovereign French cloud",
     body: "10-year archive hosted on AWS EU with multi-AZ local data residency. ISO 27001:2022, SOC-2, and GDPR compliant throughout the mandatory 10-year retention period.",
+    img: "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6af6b10c9436d947910a7c37_fr-img-4.png",
   },
 ];
 ---
@@ -112,20 +117,26 @@ const items: ValueItem[] = [
       </div>
 
       <div class="w-full h-auto">
-        <div class="fp-ymodel-track flex w-max gap-8 will-change-transform">
+        <div class="fp-ymodel-track flex items-stretch w-max gap-4 sm:gap-8 will-change-transform">
           {
             items.map((item) => (
-              <div class="fp-ymodel-card flex w-[340px] shrink-0 flex-col rounded-xl border border-neutral-300 bg-generic-00 sm:w-[558px] select-none">
+              <div class="fp-ymodel-card flex w-[340px] shrink-0 flex-col rounded-xl border border-neutral-300 bg-generic-00 sm:w-[560px] select-none">
                 <div class="border-b border-neutral-300 p-6 pointer-events-none">
-                  <h3 class="m-0 font-heading font-medium text-vault-navy text-[length:var(--fs-h6)] leading-[length:var(--lh-h6)] truncate">
+                  <h3 class="m-0 font-heading min-h-[2.6em] sm:min-h-0 font-medium text-vault-navy text-[length:var(--fs-h6)] leading-[length:var(--lh-h6)]">
                     {item.heading}
                   </h3>
                 </div>
-                <div class="flex flex-col gap-8 p-6 pointer-events-none">
-                  <div
-                    class="aspect-[1280/720] w-full rounded-lg bg-visual-placeholder"
-                    aria-hidden="true"
-                  />
+                <div class="flex flex-1 flex-col justify-between gap-4 lg:gap-8 p-6 pointer-events-none">
+                  <div class="w-full">
+                    {item.img && (
+                      <img
+                        src={item.img}
+                        alt={item.heading}
+                        class="aspect-[510/286] w-full object-contain"
+                        loading="lazy"
+                      />
+                    )}
+                  </div>
                   <p class="m-0 font-body font-normal text-neutral-500 text-[length:var(--fs-body-sm)] leading-[length:var(--lh-body-sm)]">
                     {item.body}
                   </p>
@@ -145,29 +156,11 @@ const items: ValueItem[] = [
     min-height: calc(100vh - var(--nav-clear, 112px));
   }
 
-  /* Toggled by the scroll handler below, short viewports only. `1fr` -> `0fr`
-     on the track collapses the row by its own measured height — see the doc
-     comment up top for why that reads smooth where a `max-height` guess does
-     not. The inner wrapper is what actually clips: a grid item needs
-     `overflow: hidden` and `min-height: 0` to shrink below its content's
-     natural size instead of just letting the content spill past the track. */
-  .fp-ymodel-heading {
-    display: grid;
-    grid-template-rows: 1fr;
-    opacity: 1;
-    transition:
-      grid-template-rows 0.35s ease,
-      opacity 0.25s ease;
-  }
-
-  .fp-ymodel-heading-inner {
-    overflow: hidden;
-    min-height: 0;
-  }
-
-  .fp-ymodel-heading.fp-ymodel-heading-hidden {
-    grid-template-rows: 0fr;
-    opacity: 0;
+  @media (max-height: 750px) {
+    .fp-ymodel-container section {
+      padding-top: 1.5rem !important;
+      padding-bottom: 1.5rem !important;
+    }
   }
 
   @media (prefers-reduced-motion: reduce) {
@@ -199,6 +192,8 @@ const items: ValueItem[] = [
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
 
     const getNavClear = () => {
+      const header = document.querySelector("header, .navbar, .w-nav");
+      if (header && header.offsetHeight) return header.offsetHeight;
       const value = parseFloat(
         getComputedStyle(document.documentElement).getPropertyValue(
           "--nav-clear",
@@ -207,13 +202,9 @@ const items: ValueItem[] = [
       return isNaN(value) ? 112 : value;
     };
 
-    const SHORT_VIEWPORT = 750; // matches UnderneathMandate's max-height breakpoint
-    const HUGE_SCREEN_WIDTH = 2560; // at/above this width the heading never hides
-
     containers.forEach((container) => {
       const track = container.querySelector(".fp-ymodel-track");
       const section = container.querySelector(".fp-ymodel-sticky");
-      const heading = container.querySelector(".fp-ymodel-heading");
       if (!track || !section) return;
 
       let maxTranslate = 0;
@@ -225,7 +216,18 @@ const items: ValueItem[] = [
         const windowHeight = window.innerHeight;
         const navClear = getNavClear();
 
-        stickyTop = navClear;
+        const trackOffset =
+          track.parentElement.getBoundingClientRect().top -
+          section.getBoundingClientRect().top;
+        const trackHeight = track.offsetHeight;
+        const availableSpace = windowHeight - navClear;
+
+        const idealTrackTop =
+          navClear + Math.max(40, (availableSpace - trackHeight) / 2);
+        const calculatedTop = idealTrackTop - trackOffset;
+
+        // Position section flush under header when sticky, avoiding gap on large screens
+        stickyTop = Math.min(navClear, calculatedTop);
         section.style.top = `${stickyTop}px`;
 
         const containerWidth =
@@ -238,15 +240,9 @@ const items: ValueItem[] = [
 
       updateMeasurements();
 
-      // Only `track` is observed, not `section`. The heading's hide/show
-      // below changes `section`'s height on a timed CSS transition — watching
-      // it here would refire `updateMeasurements` every animation frame of
-      // that transition, changing `totalScrollable` mid-scroll and fighting
-      // the very progress value deciding whether the heading should be
-      // hidden. `track` still needs watching: its `scrollWidth` changes at
-      // the `sm:` card-width breakpoint.
       if (window.ResizeObserver) {
         const ro = new ResizeObserver(updateMeasurements);
+        ro.observe(section);
         ro.observe(track);
       }
       window.addEventListener("resize", updateMeasurements);
@@ -265,19 +261,6 @@ const items: ValueItem[] = [
           progress = Math.max(0, Math.min(1, progress));
 
           track.style.transform = `translate3d(-${progress * maxTranslate}px, 0, 0)`;
-
-          // Short, non-huge screens only: hide the heading for the DURATION
-          // of the pinned scroll (progress > 0), not permanently — restored
-          // the moment scroll returns to the top of the pin. A huge-width
-          // screen never hides it regardless of height — see the doc comment
-          // up top for why height alone isn't the right signal.
-          if (heading) {
-            const shouldHide =
-              window.innerWidth < HUGE_SCREEN_WIDTH &&
-              window.innerHeight <= SHORT_VIEWPORT &&
-              progress > 0.01;
-            heading.classList.toggle("fp-ymodel-heading-hidden", shouldHide);
-          }
 
           ticking = false;
         });
