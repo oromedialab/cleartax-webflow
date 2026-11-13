@@ -102,7 +102,8 @@ export const PAGE_TARGETS = [
   { name: 'cfo-insights', input: 'src/styles/cfo-insights.css', page: 'src/pages/cfo-insights.astro' },
   { name: 'tax-automation', input: 'src/styles/tax-automation.css', page: 'src/pages/tax-automation.astro' },
   { name: 'financial-planning-and-analysis', input: 'src/styles/financial-planning-and-analysis.css', page: 'src/pages/financial-planning-and-analysis.astro' },
-  { name: 'ai-foundation', input: 'src/styles/ai-foundation.css', page: 'src/pages/ai-foundation.astro' }
+  { name: 'ai-foundation', input: 'src/styles/ai-foundation.css', page: 'src/pages/ai-foundation.astro' },
+  { name: 'singapore-regional', input: 'src/styles/singapore-regional.css', page: 'src/pages/singapore-regional.astro' },
 ];
 
 /**

@@ -1,0 +1,176 @@
+---
+/**
+ * singapore regional page — brand v2. Figma "Cleartax | Oro" node 18270:56171
+ * ("singapore Regional Page").
+ *
+ * Head plumbing (fonts, favicons, deferred GTM/Usercentrics loader, HubSpot)
+ * mirrors `bahrain-regional.astro` so every v2 regional page behaves the same
+ * in Webflow. No fonts.css import — that bundle self-hosts the v1 faces; brand
+ * v2 loads Inter Tight + Google Sans from Google Fonts via the <link> below.
+ *
+ * Navbar, Footer and DemoModal are copies of the Bahrain regional sections
+ * (DemoModal differs by one comment line) — a page's CSS entry only sources
+ * its own section folder, so importing across folders would compile none of
+ * their utilities into this bundle. Hero and SocialProof derive from the
+ * Bahrain ones; Changes, Requirements, ExchangeModel, Compliance, SixThings and
+ * Support are this page's own; Faq is a wrapper over `_shared/FaqRb.astro`.
+ *
+ * Section order follows the Figma frame: Hero → Social proof → Fold 2 →
+ * Fold 3 → Fold 12 (exchange diagram) → Fold 5 → Fold 6 alt → Fold 11 → security tabs (node 18270:58163) → FAQ.
+ * The Figma has no contact-form fold, so none is rendered.
+ */
+import "../styles/shared.css";
+import "../styles/.build/singapore-regional.css";
+
+import Navbar from "../sections/singapore-regional/Navbar.astro";
+import Hero from "../sections/singapore-regional/Hero.astro";
+import SocialProof from "../sections/singapore-regional/SocialProof.astro";
+import Glance from "../sections/singapore-regional/Glance.astro";
+import Steps from "../sections/singapore-regional/Steps.astro";
+import Resource from "../sections/singapore-regional/Resource.astro";
+import Contact from "../sections/singapore-regional/Contact.astro";
+import Seamless from "../sections/singapore-regional/Seamless.astro";
+import Faq from "../sections/singapore-regional/Faq.astro";
+import Support from "../sections/singapore-regional/Support.astro";
+import Footer from "../sections/singapore-regional/Footer.astro";
+import Testimonial from "../sections/singapore-regional/Testimonials.astro";
+---
+
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>ClearTax Singapore — ZATCA E-Invoicing System</title>
+        <meta
+            name="description"
+            content="ClearTax makes singapore's ZATCA e-invoicing compliant for all VAT-registered businesses. Integrate with ERP, get buyer-specific e-invoices, and submit daily e-reports automatically — without system changes."
+        />
+        <meta
+            name="keywords"
+            content="Qatar e-invoicing, singapore e-invoicing mandate 2027, Peppol BIS 3.0, Digital Postman, EN 16931, e-invoicing software Qatar, ClearTax Qatar"
+        />
+        <link
+            rel="shortcut icon"
+            type="image/png"
+            href="https://cdn.prod.website-files.com/63ede4a3da6dbd6b05c4612f/63ede4a3da6dbd7162c46439_32by32.png"
+        />
+        <link
+            rel="icon"
+            type="image/png"
+            sizes="32x32"
+            href="https://cdn.prod.website-files.com/63ede4a3da6dbd6b05c4612f/63ede4a3da6dbd7162c46439_32by32.png"
+        />
+        <link
+            rel="icon"
+            type="image/png"
+            sizes="256x256"
+            href="https://cdn.prod.website-files.com/63ede4a3da6dbd6b05c4612f/63ede4a3da6dbd8997c46450_256by256.png"
+        />
+        <link
+            rel="apple-touch-icon"
+            href="https://cdn.prod.website-files.com/63ede4a3da6dbd6b05c4612f/63ede4a3da6dbd8997c46450_256by256.png"
+        />
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+        <link
+            href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap"
+            rel="stylesheet"
+        />
+        <link
+            href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600;700&display=swap"
+            rel="stylesheet"
+        />
+        <!-- Preload critical above-the-fold assets -->
+        <link
+            rel="preload"
+            href="https://cdn.prod.website-files.com/6093bce33d9b4bae841b04e3/69dfcff6071b983201f5f097_logo-cleartax.svg"
+            as="image"
+            type="image/svg+xml"
+            fetchpriority="high"
+        />
+
+        <!-- 1. Usercentrics CMP — loads immediately, before anything else -->
+        <script is:inline>
+            (function () {
+                var blockScript = document.createElement("script");
+                blockScript.src =
+                    "https://web.cmp.usercentrics.eu/modules/autoblocker.js";
+                document.head.appendChild(blockScript);
+
+                var cmpScript = document.createElement("script");
+                cmpScript.id = "usercentrics-cmp";
+                cmpScript.src = "https://web.cmp.usercentrics.eu/ui/loader.js";
+                cmpScript.setAttribute("data-settings-id", "utqqyaEbvbzrTk");
+                cmpScript.async = true;
+                document.head.appendChild(cmpScript);
+            })();
+        </script>
+
+        <!-- 2. GTM — loads only after the visitor responds to the consent banner -->
+        <script is:inline>
+            (function () {
+                function loadGTM() {
+                    (function (w, d, s, l, i) {
+                        w[l] = w[l] || [];
+                        w[l].push({
+                            "gtm.start": new Date().getTime(),
+                            event: "gtm.js",
+                        });
+                        var f = d.getElementsByTagName(s)[0],
+                            j = d.createElement(s),
+                            dl = l != "dataLayer" ? "&l=" + l : "";
+                        j.async = true;
+                        j.src =
+                            "https://www.googletagmanager.com/gtm.js?id=" +
+                            i +
+                            dl;
+                        f.parentNode.insertBefore(j, f);
+                    })(window, document, "script", "dataLayer", "GTM-P5NDQXGH");
+                }
+
+                window.addEventListener("UC_UI_CMP_EVENT", function (event) {
+                    if (
+                        event.detail &&
+                        ["ACCEPT_ALL", "DENY_ALL", "SAVE"].indexOf(
+                            event.detail.type,
+                        ) !== -1
+                    ) {
+                        loadGTM();
+                    }
+                });
+            })();
+        </script>
+
+        <link rel="preconnect" href="https://js-na2.hsforms.net" />
+        <link rel="preconnect" href="https://forms.hsforms.com" />
+        <link rel="preconnect" href="https://forms-na2.hsforms.com" />
+        <script is:inline src="https://js-na2.hsforms.net/forms/embed/v2.js"
+        ></script>
+    </head>
+    <body class="bg-generic-00">
+        <!-- Google Tag Manager (noscript). Does not ship in any embed — it belongs
+         in Webflow's page custom code. -->
+        <noscript
+            ><iframe
+                src="https://www.googletagmanager.com/ns.html?id=GTM-P5NDQXGH"
+                height="0"
+                width="0"
+                style="display:none;visibility:hidden"></iframe></noscript
+        >
+        <Navbar />
+        <Hero />
+        <SocialProof />
+        <Glance />
+        <Steps />
+        <Support />
+        <Seamless />
+        <Resource />
+        <Testimonial />
+        <Contact />
+        <Faq />
+        <Footer />
+        <!-- Renders nothing visible: the "Book a demo" dialog every CTA above
+         opens. Last so its markup can't affect the flow above it. -->
+    </body>
+</html>
