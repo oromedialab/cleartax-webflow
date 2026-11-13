@@ -88,6 +88,7 @@ export const PAGE_TARGETS = [
   { name: 'retail-consumer', input: 'src/styles/retail-consumer.css', page: 'src/pages/retail-consumer.astro' },
   { name: 'philippines-regional', input: 'src/styles/philippines-regional.css', page: 'src/pages/philippines-regional.astro' },
   { name: 'poland-regional', input: 'src/styles/poland-regional.css', page: 'src/pages/poland-regional.astro' },
+  { name: 'qatar-regional', input: 'src/styles/qatar-regional.css', page: 'src/pages/qatar-regional.astro' },
   { name: 'malaysia-regional', input: 'src/styles/malaysia-regional.css', page: 'src/pages/malaysia-regional.astro' },
   { name: 'real-estate', input: 'src/styles/real-estate.css', page: 'src/pages/real-estate.astro' },
   { name: 'manufacturing', input: 'src/styles/manufacturing.css', page: 'src/pages/manufacturing.astro' },

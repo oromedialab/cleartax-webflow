@@ -1,0 +1,155 @@
+---
+/**
+ * "Start with your ERP. Build around your finance workflow." — Qatar regional page.
+ * Seven rows, title on the left with placeholder icon, explanation on the right, divided by hairlines.
+ *
+ * Every row is drawn at 50% opacity: it is the resting state of a
+ * scroll-spotlight. A small script lifts the row nearest the middle of the
+ * viewport to full opacity as the section scrolls past; without script (or with
+ * reduced motion) all rows stay fully legible.
+ *
+ * The icon squares are unfilled "Visual placeholder" frames, rendering as
+ * `bg-visual-placeholder` (#E8FFE1).
+ *
+ * Classes and ids are `qa-cov-` prefixed: embeds share one namespace per page.
+ */
+interface Row {
+    title: string;
+    body: string;
+}
+
+const rows: Row[] = [
+    {
+        title: "Start with the systems you use",
+        body: "Review your ERP, accounting and Point of Sale (PoS) landscape. Discuss data sources, invoice volumes and the connection options available for your proposed deployment.",
+    },
+    {
+        title: "Define the data checks you need",
+        body: "Identify missing information, inconsistent records and calculation checks. Confirm which validation capabilities are available and how your team would resolve exceptions.",
+    },
+    {
+        title: "Scope the applicable submission workflow",
+        body: "Discuss the official requirements relevant to your organisation. Ask what Qatar submission capabilities are available, what is still in development and what dependencies remain.",
+    },
+    {
+        title: "Make invoice status actionable",
+        body: "Define the visibility finance needs across invoices and exceptions. Confirm available statuses, dashboards and operational ownership during the demo.",
+    },
+    {
+        title: "Plan reconciliation and retrieval",
+        body: "Discuss how invoice records should tie back to your ERP and accounting controls. Confirm the supported reconciliation, record-access and export options.",
+    },
+    {
+        title: "Coordinate across your business footprint",
+        body: "Map Qatar requirements separately from those of other countries. Discuss how a wider rollout could accommodate local differences without treating another market's rules as Qatar's.",
+    },
+    {
+        title: "Agree the path to implementation",
+        body: "Clarify onboarding, testing, acceptance criteria and support responsibilities. Confirm delivery scope and timing before committing to go-live.",
+    },
+];
+---
+
+<section id="qa-cov" class="bg-generic-00 py-16 lg:py-20">
+    <div
+        class="w-full max-w-[var(--container-max)] mx-auto px-4 md:px-6 flex flex-col items-center gap-12"
+    >
+        <div class="flex flex-col items-center gap-4 text-center">
+            <h2
+                class="m-0 max-w-238 font-heading font-medium text-vault-navy text-[length:var(--fs-h1)] leading-[length:var(--lh-h1)] tracking-[-0.5px]"
+            >
+                Start with your ERP. Build around your finance workflow.
+            </h2>
+            <p
+                class="m-0 max-w-235 font-body font-normal text-neutral-500 text-[length:var(--fs-body)] lg:text-[length:var(--fs-body-lg)] leading-[length:var(--lh-body)] lg:leading-[length:var(--lh-body-lg)]"
+            >
+                Bring your invoice flows to a ClearTax demo. Discuss the integration, data-quality and operational requirements your Qatar business needs to evaluate, and agree what must be confirmed before implementation.
+            </p>
+        </div>
+
+        <div class="flex w-full flex-col">
+            {
+                rows.map((r) => (
+                    <div class="qa-cov-row grid grid-cols-1 gap-4 py-6 lg:grid-cols-2 lg:gap-12 lg:items-center">
+                        <div class="flex items-center gap-4 lg:gap-5">
+                            <div
+                                class="size-12 lg:size-14 rounded-lg bg-visual-placeholder shrink-0"
+                                aria-hidden="true"
+                            />
+                            <h3 class="m-0 font-heading font-medium text-[19px] leading-[26.6px] text-vault-navy">
+                                {r.title}
+                            </h3>
+                        </div>
+                        <p class="m-0 font-body text-neutral-500 w-full lg:w-114 max-w-114 text-[13.3px] leading-[19px] lg:justify-self-end">
+                            {r.body}
+                        </p>
+                    </div>
+                ))
+            }
+        </div>
+    </div>
+</section>
+
+<style is:global>
+    .qa-cov-row + .qa-cov-row {
+        border-top: 1px solid var(--palette-ledger-white);
+    }
+    .qa-cov-js .qa-cov-row {
+        opacity: 0.5;
+        scale: 0.95;
+        transition: all 0.3s ease-in-out;
+    }
+    .qa-cov-js .qa-cov-row.is-active {
+        opacity: 1;
+        scale: 1;
+        transition: all 0.3s ease-in-out;
+    }
+</style>
+
+<script is:inline>
+    (function () {
+        var section = document.getElementById("qa-cov");
+        if (!section) return;
+        if (
+            window.matchMedia &&
+            window.matchMedia("(prefers-reduced-motion: reduce)").matches
+        )
+            return;
+        var rows = section.querySelectorAll(".qa-cov-row");
+        if (!rows.length) return;
+
+        section.classList.add("qa-cov-js");
+
+        // The row whose centre is closest to the middle of the viewport is "on".
+        function update() {
+            var mid = window.innerHeight / 2;
+            var best = null;
+            var bestDist = Infinity;
+            rows.forEach(function (row) {
+                var rect = row.getBoundingClientRect();
+                var dist = Math.abs(rect.top + rect.height / 2 - mid);
+                if (dist < bestDist) {
+                    bestDist = dist;
+                    best = row;
+                }
+            });
+            rows.forEach(function (row) {
+                row.classList.toggle("is-active", row === best);
+            });
+        }
+
+        var ticking = false;
+        function onScroll() {
+            if (ticking) return;
+            ticking = true;
+            requestAnimationFrame(function () {
+                ticking = false;
+                update();
+            });
+        }
+
+        window.addEventListener("scroll", onScroll, { passive: true });
+        window.addEventListener("resize", onScroll);
+        update();
+    })();
+</script>

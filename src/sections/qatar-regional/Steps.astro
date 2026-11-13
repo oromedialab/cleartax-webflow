@@ -1,0 +1,217 @@
+---
+/**
+ * "Build your Qatar readiness plan in five steps" — Qatar regional page.
+ *
+ * A vertical numbered stepper of 5 cards connected by a hairline.
+ * Clicking a card sets the open set to end there. The connecting hairline fills
+ * cumulatively to match, reading as a progress bar.
+ */
+interface Step {
+  no: string;
+  heading: string;
+  body: string;
+}
+
+const steps: Step[] = [
+  {
+    no: "01",
+    heading: "Assess your Qatar invoice landscape",
+    body: "List your entities, invoice types, customers, suppliers, source systems and transaction volumes. Identify which teams own each stage of the invoice lifecycle.",
+  },
+  {
+    no: "02",
+    heading: "Confirm what applies to your business",
+    body: "Review official GTA guidance and any instructions issued directly to your organisation. Confirm the relevant tax regime and distinguish participant-specific instructions from wider obligations.",
+  },
+  {
+    no: "03",
+    heading: "Prepare and map your invoice data",
+    body: "Review supplier and customer records, invoice identifiers, dates, descriptions, amounts and references. Document data gaps and assign owners to correct them.",
+  },
+  {
+    no: "04",
+    heading: "Scope integration and testing",
+    body: "Bring finance and IT together to assess data extraction, validation, exception handling and reconciliation. Define the deployment test plan once the applicable requirements and interfaces are confirmed.",
+  },
+  {
+    no: "05",
+    heading: "Maintain a change-ready plan",
+    body: "Track official updates, record decisions and keep implementation responsibilities clear. Revisit scope and timing when new requirements are confirmed.",
+  },
+];
+---
+
+<section
+  class="qa-steps-bg relative overflow-hidden bg-generic-00 py-16 lg:py-20"
+>
+  <div
+    class="absolute inset-0 z-0 opacity-60"
+    style="background-image: radial-gradient(circle, #C8F006 1.5px, transparent 1.5px); background-size: 27px 27px; mask-image: radial-gradient(ellipse 70% 60% at center, #000 0%, transparent 75%); -webkit-mask-image: radial-gradient(ellipse 70% 60% at center, #000 0%, transparent 75%);"
+    aria-hidden="true"
+  >
+  </div>
+  <div
+    class="relative z-10 w-full max-w-[var(--container-max)] mx-auto px-4 md:px-6"
+  >
+    <h2
+      class="m-0 mb-8 text-center font-heading font-medium text-vault-navy text-[length:var(--fs-h1)] leading-[length:var(--lh-h1)] tracking-[-0.5px] lg:mb-12"
+    >
+      Build your Qatar readiness plan in five steps
+    </h2>
+
+    <div
+      class="qa-steps-list mx-auto flex max-w-[580px] flex-col items-stretch"
+      data-qa-steps
+    >
+      {
+        steps.map((step, i) => (
+          <>
+            <div
+              class={`qa-steps-item flex gap-4 rounded-xl bg-generic-00 border-2 ${i === 0 ? "border-nova-blue qa-steps-open" : "border-neutral-300"} p-4`}
+              data-qa-steps-item
+            >
+              <button
+                type="button"
+                class="qa-steps-trigger flex w-full cursor-pointer items-start gap-4 border-0 bg-transparent p-0 text-left"
+                aria-expanded={i === 0 ? "true" : "false"}
+              >
+                <span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-neutral-300 bg-generic-00 font-body text-[length:var(--fs-body)] lg:text-[length:var(--fs-body-lg)] font-medium text-vault-navy">
+                  {step.no}
+                </span>
+                <span class="flex flex-1 flex-col justify-center pt-[3px]">
+                  <span
+                    class="font-body text-[length:var(--fs-body-lg)] leading-[length:var(--lh-body-lg)] font-medium text-vault-navy"
+                    data-qa-steps-anchor
+                  >
+                    {step.heading}
+                  </span>
+                  <span class="qa-steps-body-wrap">
+                    <span class="qa-steps-body font-body text-[length:var(--fs-body)] leading-[length:var(--lh-body)] text-neutral-500">
+                      {step.body}
+                    </span>
+                  </span>
+                </span>
+              </button>
+            </div>
+            {i < steps.length - 1 && (
+              <div
+                class="qa-steps-connector mx-auto h-10 w-0.5 bg-neutral-300"
+                data-qa-steps-connector
+                aria-hidden="true"
+              />
+            )}
+          </>
+        ))
+      }
+    </div>
+  </div>
+</section>
+
+<style is:global>
+  .qa-steps-list {
+    overflow-anchor: none;
+  }
+  .qa-steps-item {
+    opacity: 0.5;
+    transition: border-color 350ms ease-in-out, opacity 350ms ease-in-out;
+  }
+  .qa-steps-open.qa-steps-item {
+    opacity: 1;
+  }
+  .qa-steps-connector {
+    transition: background-color 350ms ease-in-out;
+  }
+  .qa-steps-body-wrap {
+    display: grid;
+    grid-template-rows: 0fr;
+    transition: grid-template-rows 400ms cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .qa-steps-open .qa-steps-body-wrap {
+    grid-template-rows: 1fr;
+  }
+  .qa-steps-body {
+    overflow: hidden;
+    min-height: 0;
+    padding-top: 0.75rem;
+    opacity: 0;
+    transition: opacity 300ms ease-in-out;
+  }
+  .qa-steps-open .qa-steps-body {
+    opacity: 1;
+  }
+</style>
+
+<script is:inline>
+  (function () {
+    const root = document.querySelector("[data-qa-steps]");
+    if (!root) return;
+    const items = Array.from(root.querySelectorAll("[data-qa-steps-item]"));
+    const connectors = Array.from(
+      root.querySelectorAll("[data-qa-steps-connector]"),
+    );
+    const anchors = Array.from(
+      root.querySelectorAll("[data-qa-steps-anchor]"),
+    );
+
+    // Initial state: first step open
+    let openUpTo = 0;
+
+    function setOpenUpTo(index) {
+      if (index === openUpTo) return;
+      openUpTo = index;
+      items.forEach((item, i) => {
+        const trigger = item.querySelector(".qa-steps-trigger");
+        const isOpen = i <= openUpTo;
+        item.classList.toggle("qa-steps-open", isOpen);
+        item.classList.toggle("border-nova-blue", isOpen);
+        item.classList.toggle("border-neutral-300", !isOpen);
+        if (trigger) trigger.setAttribute("aria-expanded", String(isOpen));
+      });
+      connectors.forEach((connector, i) => {
+        const isFilled = i < openUpTo;
+        connector.classList.toggle("bg-nova-blue", isFilled);
+        connector.classList.toggle("bg-neutral-300", !isFilled);
+      });
+    }
+
+    items.forEach((item, i) => {
+      const trigger = item.querySelector(".qa-steps-trigger");
+      if (!trigger) return;
+      trigger.addEventListener("click", () => setOpenUpTo(i));
+    });
+
+    if (anchors.length === 0) return;
+
+    let ticking = false;
+
+    function updateActiveFromScroll() {
+      const rootRect = root.getBoundingClientRect();
+      const inView = rootRect.top < window.innerHeight && rootRect.bottom > 0;
+      if (!inView) return;
+
+      const centerY = window.innerHeight / 2;
+      let closestIndex = -1;
+      let closestDistance = Infinity;
+      anchors.forEach((anchor, i) => {
+        const rect = anchor.getBoundingClientRect();
+        const distance = Math.abs(rect.top + rect.height / 2 - centerY);
+        if (distance < closestDistance) {
+          closestDistance = distance;
+          closestIndex = i;
+        }
+      });
+      if (closestIndex !== -1) setOpenUpTo(closestIndex);
+    }
+
+    function onScroll() {
+      if (ticking) return;
+      ticking = true;
+      requestAnimationFrame(() => {
+        updateActiveFromScroll();
+        ticking = false;
+      });
+    }
+
+    window.addEventListener("scroll", onScroll, { passive: true });
+  })();
+</script>
