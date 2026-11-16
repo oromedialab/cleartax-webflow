@@ -16,8 +16,8 @@
 
 /* ==========================================================================
    LAYOUT — rail on the left, one agreement on the right, across many Embeds.
-   See the note at the top of src/sections/legal/Tabs.astro for the sticky
-   zero-height trick that makes this work without a shared parent.
+   See the note at the top of src/sections/legal/Tabs.astro for why the
+   rail is positioned by script across separate embeds.
    ========================================================================== */
 
 /* Below lg: ordinary flow. 112px clears the fixed navbar. */
@@ -25,14 +25,15 @@
     padding-top: 112px;
 }
 
+/* lg+: this strip is only a zero-height marker (its position tells the script
+   where the content starts). The rail is positioned absolutely as a no-JS
+   fallback, and `position: fixed` once the script takes over — see Tabs.astro
+   for why sticky cannot work across Webflow's per-embed wrappers. */
 @media (width >= 64rem) {
     .legal-rail-section {
-        position: sticky;
-        top: var(--nav-clear, 112px);
         height: 0;
         margin-top: 184px;
         padding-top: 0;
-        z-index: 20;
     }
     .legal-rail-wrap {
         position: relative;
@@ -43,12 +44,15 @@
         left: 0;
         width: 340px;
     }
+    .legal-rail.legal-rail-fixed {
+        position: fixed;
+        z-index: 20;
+    }
     /* Clears the rail (340 + 32 gutter) for every right-hand block. */
     .legal-col {
         margin-left: 372px;
     }
-    /* The rail is taller than its zero-height strip, so it would keep floating
-       over the footer at the end of the page. Lift the footer above it. */
+    /* Safety net: keep the footer above the rail if it ever overlaps. */
     .legal-footer {
         position: relative;
         z-index: 30;
@@ -200,27 +204,26 @@
 
 .legal-docbar {
     display: flex;
-    flex-wrap: wrap;
+    align-items: center;
     gap: 4px;
-    padding: 4px;
-    border: 1px solid var(--palette-neutral-300);
-    border-radius: 16px;
-    background: var(--palette-neutral-50);
+    padding: 6px 4px;
+    border-radius: 12px;
+    background: var(--palette-neutral-100);
 }
 
 .legal-docbtn {
     flex: 1 1 0;
-    min-width: 200px;
-    padding: 12px 20px;
+    padding: 8px 16px;
+    align-items: center;
     border: 0;
-    border-radius: 12px;
+    border-radius: 8px;
     background: transparent;
     cursor: pointer;
     font-family: var(--font-body);
     font-weight: 500;
     font-size: var(--fs-label);
     line-height: var(--lh-label);
-    color: var(--palette-neutral-600);
+    color: var(--palette-neutral-700);
 }
 
 .legal-docbtn:hover {
@@ -228,8 +231,9 @@
 }
 
 .legal-docbtn[aria-selected='true'] {
-    background: var(--color-vault-navy);
-    color: #fff;
+    background: var(--color-generic-00);
+    color: var(--color-nova-blue);
+    box-shadow: 0 1px 2px 0 rgba(16, 24, 40, 0.04), 0 1px 2px 0 rgba(16, 24, 40, 0.04);
 }
 
 .legal-docbar[hidden],

@@ -7,15 +7,18 @@
  * ---------------------------------------------------------------------------
  * The design is two columns, like Experience Centre: a rail on the left, the
  * agreement on the right. Experience Centre can ship both halves as one embed.
- * Here the right column is ~700 KB of legal text — 28 embeds — and Webflow
- * stacks Embeds vertically, so a CSS grid cannot span them.
+ * Here the right column is ~700 KB of legal text — 19 embeds — and Webflow
+ * wraps EVERY Embed in its own `<div>`, so neither a CSS grid nor
+ * `position: sticky` can span them (sticky only works inside its parent, and
+ * the parent here is a wrapper holding nothing but this embed).
  *
- * Instead this section is a ZERO-HEIGHT `position: sticky` strip, and the rail
- * hangs off it (absolutely positioned). A sticky box stays pinned for as long as
- * its parent is on screen, and the parent is the page — so the rail rides along
- * beside every embed below it. Every `.legal-col` is offset by the rail's width
- * to clear it. All of that is in `src/styles/legal.css` under "LAYOUT". Below lg
- * the strip is ordinary flow and the rail becomes a horizontal tab strip.
+ * So on lg+ the script pins the rail with `position: fixed` and places it
+ * itself (`placeRail()`): it follows the page down to the nav clearance, then
+ * rides up with the end of the agreement so it never reaches the footer. This
+ * section is a zero-height marker whose own position says where the content
+ * starts. Every `.legal-col` is offset by the rail's width to clear it. CSS is
+ * in `src/styles/legal.css` under "LAYOUT". Below lg the rail is an ordinary
+ * horizontal tab strip and the script leaves it alone.
  *
  * SWITCHING
  * ---------------------------------------------------------------------------
@@ -26,10 +29,6 @@
  *
  * Buttons call `legalSelect(id)` / `legalDoc(id)` through inline `onclick`, so
  * the URL never changes (no `#id` navigation). The initial state is India's MSSA.
- *
- * The rail is `position: sticky`, which would keep it floating over the footer,
- * so `stopAtEnd()` slides it up with the content: once the last visible
- * agreement chunk ends, the rail ends with it.
  *
  * `legalJurisdictions` MUST list the same ids the generated sections use.
  */
@@ -139,7 +138,7 @@ const jurisdictions = [
             window.scrollTo({ top: window.pageYOffset + top - clear });
         }
       }
-      stopAtEnd();
+      placeRail();
     }
 
     window.legalSelect = function (j) {
@@ -149,34 +148,54 @@ const jurisdictions = [
       select(state.j, d, true);
     };
 
-    // Keep the sticky rail from riding over the footer: once the last visible
-    // chunk's text ends, shift the rail up by however far it would overshoot.
+    // Desktop rail: fixed, positioned here (see the note at the top of this
+    // file). top = natural position, clamped to the nav clearance, then pushed
+    // up so its bottom never passes the end of the visible agreement.
     var rail = document.querySelector(".legal-rail");
+    var wrap = document.querySelector(".legal-rail-wrap");
     var ticking = false;
-    function stopAtEnd() {
+    function placeRail() {
       ticking = false;
-      if (!rail) return;
-      rail.style.transform = "";
-      if (!window.matchMedia("(min-width: 64rem)").matches) return;
-      var chunks = document.querySelectorAll(".legal-doc:not([hidden]) .legal-col");
-      if (!chunks.length) return;
-      var end = chunks[chunks.length - 1].getBoundingClientRect().bottom;
-      var overshoot = rail.getBoundingClientRect().bottom - end;
-      if (overshoot > 0) rail.style.transform = "translateY(" + -overshoot + "px)";
+      if (!rail || !wrap) return;
+      if (!window.matchMedia("(min-width: 64rem)").matches) {
+        rail.classList.remove("legal-rail-fixed");
+        rail.style.top = rail.style.left = "";
+        return;
+      }
+      rail.classList.add("legal-rail-fixed");
+      var clear =
+        parseFloat(
+          getComputedStyle(document.documentElement).getPropertyValue(
+            "--nav-clear"
+          )
+        ) || 112;
+      var w = wrap.getBoundingClientRect();
+      var top = Math.max(clear, w.top);
+      var chunks = document.querySelectorAll(
+        ".legal-doc:not([hidden]) .legal-col"
+      );
+      if (chunks.length) {
+        var end = chunks[chunks.length - 1].getBoundingClientRect().bottom;
+        top = Math.min(top, end - rail.offsetHeight);
+      }
+      rail.style.left = w.left + "px";
+      rail.style.top = top + "px";
     }
     function queue() {
       if (!ticking) {
         ticking = true;
-        requestAnimationFrame(stopAtEnd);
+        requestAnimationFrame(placeRail);
       }
     }
     window.addEventListener("scroll", queue, { passive: true });
     window.addEventListener("resize", queue);
+    // Embeds above the content can still be loading images/fonts.
+    window.addEventListener("load", queue);
 
     // Embeds are separate nodes pasted into the page; wait for all of them.
     function init() {
       render();
-      stopAtEnd();
+      placeRail();
     }
     if (document.readyState === "loading")
       document.addEventListener("DOMContentLoaded", init);
