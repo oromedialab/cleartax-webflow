@@ -1,0 +1,277 @@
+---
+/**
+ * Germany Product: "All-in-One E-Invoicing Solution for Germany"
+ * 2-column grid of accordion cards for e-invoicing workflow capabilities.
+ * Cards expand/collapse inline with smooth height transitions, with the
+ * top two cards open by default.
+ */
+interface Card {
+  heading: string;
+  body: string;
+  icon: string;
+}
+
+const cards: Card[] = [
+  {
+    heading: "Create and send e-invoices in one click",
+    body: "Generate EN 16931-compliant and structured invoices from your existing invoice data. Select the invoice format and exchange channel and validate before transmission.",
+    icon: "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6af15f6e6e013e591d860ebc_icon-6.png",
+  },
+  {
+    heading: "Invoice Formats",
+    body: "XRechnung, ZUGFeRD 2.x, and Peppol BIS 3.0 - all mandatory structured invoice formats are supported with full schema validation before transmission.",
+    icon: "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6aec914d818a73f351a82eae_icon-1.png",
+  },
+  {
+    heading: "Transmission",
+    body: "Peppol, email, or EDI - one dashboard for every inbound and outbound channel unified. No invisible gaps, no missed invoices, no fragmented audit trail.",
+    icon: "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6aedccb069772fdea8e04033_ir-icon-5.png",
+  },
+  {
+    heading: "Receive and validate automatically",
+    body: "ClearTax can centralise incoming invoices from configured channels, validate their structure and applicable rules, and route them into your ERP or AP workflow.",
+    icon: "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6ac776e909e9bc8ba8a13933_icon-5.png",
+  },
+  {
+    heading: "E-Invoice archiving with GoBD Standards",
+    body: "ClearTax supports 8-year GoBD-certified archival of invoices in a controlled and audit-ready design. It also includes preservation of the structured component in its original form.",
+    icon: "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6aedccb50312b33243ae8407_ir-icon-6.png",
+  },
+  {
+    heading: "Easy ERP Integration",
+    body: "Your existing ERP stays as the source of invoice data, and we handle the compliance and exchange layer. ClearTax can connect to multi-ERP channels, like SAP ECC, SAP S/4HANA, Oracle, Microsoft Dynamics and other ERP environments.",
+    icon: "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6afaf5d52269c49258d1b075_de-icon-6.png",
+  },
+];
+---
+
+<section class="bg-generic-00 py-16 lg:py-20">
+  <div
+    class="w-full max-w-[var(--container-max)] mx-auto px-4 md:px-6 flex flex-col items-center gap-12"
+  >
+    <div class="flex flex-col items-center gap-6 text-center">
+      <h2
+        class="m-0 font-heading font-medium text-vault-navy text-[length:var(--fs-h1)] leading-[length:var(--lh-h1)] tracking-[-0.5px]"
+      >
+        All-in-One E-Invoicing Solution for Germany
+      </h2>
+      <p
+        class="m-0 max-w-[916px] font-body font-normal text-neutral-500 text-[length:var(--fs-body)] lg:text-[length:var(--fs-body-lg)] leading-[length:var(--lh-body)] lg:leading-[length:var(--lh-body-lg)]"
+      >
+        One platform for every step of your e-invoicing workflow.
+      </p>
+    </div>
+
+    <div class="grid w-full grid-cols-1 gap-5 sm:grid-cols-2 lg:gap-8 items-stretch" data-de-invoicing-grid>
+      <!-- Left Column (Cards 0, 2, 4) -->
+      <div class="flex flex-col gap-5 lg:gap-8 h-full" data-de-invoicing-col>
+        {
+          [cards[0], cards[2], cards[4]].map((card, colIdx) => {
+            const isOpenInitially = colIdx === 0;
+            return (
+              <div
+                class={`de-invoicing-item group flex flex-col w-full rounded-xl border border-neutral-300 bg-generic-00 p-6 text-left transition-all duration-300 ease-in-out hover:border-nova-blue ${isOpenInitially ? "de-invoicing-open" : ""}`}
+                data-de-invoicing-item
+              >
+                <button
+                  type="button"
+                  class="de-invoicing-trigger m-0 flex w-full min-h-[56px] cursor-pointer items-center justify-between gap-5 border-0 bg-transparent p-0 text-left"
+                  aria-expanded={isOpenInitially ? "true" : "false"}
+                  data-de-invoicing-trigger
+                >
+                  <img src={card.icon} alt="" class="h-14 w-14 shrink-0" />
+                  <span class="min-w-0 flex-1 font-heading font-medium text-vault-navy text-balance max-w-[414px] text-[length:var(--fs-body)] leading-[length:var(--lh-body)] sm:text-[length:var(--fs-h6)] sm:leading-[length:var(--lh-h6)]">
+                    {card.heading}
+                  </span>
+                  <span
+                    class="de-invoicing-icon ml-auto flex h-14 w-14 shrink-0 items-center justify-center rounded-lg p-2 text-vault-navy transition-all duration-300 ease-in-out group-hover:text-nova-blue"
+                    aria-hidden="true"
+                  >
+                    <svg
+                      width="40"
+                      height="40"
+                      viewBox="0 0 40 40"
+                      fill="none"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        d="M20 10V30"
+                        stroke="currentColor"
+                        stroke-width="1.5"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                      />
+                      <path
+                        d="M30 20L10 20"
+                        stroke="currentColor"
+                        stroke-width="1.5"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                      />
+                    </svg>
+                  </span>
+                </button>
+                <div
+                  class={`de-invoicing-panel overflow-hidden transition-[height] duration-300 [transition-timing-function:cubic-bezier(.4,0,.2,1)] ${isOpenInitially ? "h-auto" : "h-0"}`}
+                  style={isOpenInitially ? "height: auto;" : "height: 0px;"}
+                  data-de-invoicing-panel
+                >
+                  <p class="m-0 pt-4 font-body font-normal text-neutral-500 text-[length:var(--fs-body)] leading-[length:var(--lh-body)]">
+                    {card.body}
+                  </p>
+                </div>
+              </div>
+            );
+          })
+        }
+      </div>
+
+      <!-- Right Column (Cards 1, 3, 5) -->
+      <div class="flex flex-col gap-5 lg:gap-8 h-full" data-de-invoicing-col>
+        {
+          [cards[1], cards[3], cards[5]].map((card, colIdx) => {
+            const isOpenInitially = colIdx === 0;
+            return (
+              <div
+                class={`de-invoicing-item group flex flex-col w-full rounded-xl border border-neutral-300 bg-generic-00 p-6 text-left transition-all duration-300 ease-in-out hover:border-nova-blue ${isOpenInitially ? "de-invoicing-open" : ""}`}
+                data-de-invoicing-item
+              >
+                <button
+                  type="button"
+                  class="de-invoicing-trigger m-0 flex w-full min-h-[56px] cursor-pointer items-center justify-between gap-5 border-0 bg-transparent p-0 text-left"
+                  aria-expanded={isOpenInitially ? "true" : "false"}
+                  data-de-invoicing-trigger
+                >
+                  <img src={card.icon} alt="" class="h-14 w-14 shrink-0" />
+                  <span class="min-w-0 flex-1 font-heading font-medium text-vault-navy text-balance max-w-[414px] text-[length:var(--fs-body)] leading-[length:var(--lh-body)] sm:text-[length:var(--fs-h6)] sm:leading-[length:var(--lh-h6)]">
+                    {card.heading}
+                  </span>
+                  <span
+                    class="de-invoicing-icon ml-auto flex h-14 w-14 shrink-0 items-center justify-center rounded-lg p-2 text-vault-navy transition-all duration-300 ease-in-out group-hover:text-nova-blue"
+                    aria-hidden="true"
+                  >
+                    <svg
+                      width="40"
+                      height="40"
+                      viewBox="0 0 40 40"
+                      fill="none"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        d="M20 10V30"
+                        stroke="currentColor"
+                        stroke-width="1.5"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                      />
+                      <path
+                        d="M30 20L10 20"
+                        stroke="currentColor"
+                        stroke-width="1.5"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                      />
+                    </svg>
+                  </span>
+                </button>
+                <div
+                  class={`de-invoicing-panel overflow-hidden transition-[height] duration-300 [transition-timing-function:cubic-bezier(.4,0,.2,1)] ${isOpenInitially ? "h-auto" : "h-0"}`}
+                  style={isOpenInitially ? "height: auto;" : "height: 0px;"}
+                  data-de-invoicing-panel
+                >
+                  <p class="m-0 pt-4 font-body font-normal text-neutral-500 text-[length:var(--fs-body)] leading-[length:var(--lh-body)]">
+                    {card.body}
+                  </p>
+                </div>
+              </div>
+            );
+          })
+        }
+      </div>
+    </div>
+  </div>
+</section>
+
+<style is:global>
+  .de-invoicing-item {
+    min-height: 106px;
+  }
+  @media (min-width: 640px) {
+    .de-invoicing-item.de-invoicing-open {
+      flex: 1 0 auto;
+    }
+  }
+  .de-invoicing-item.de-invoicing-open .de-invoicing-icon {
+    transform: rotate(45deg);
+  }
+</style>
+
+<script is:inline>
+  (function () {
+    var grid = document.querySelector("[data-de-invoicing-grid]");
+    if (!grid) return;
+
+    var columns = grid.querySelectorAll("[data-de-invoicing-col]");
+
+    function closeItem(item, panel, trigger) {
+      panel.style.height = panel.scrollHeight + "px";
+      panel.classList.remove("h-auto");
+      panel.offsetHeight; // force reflow
+      requestAnimationFrame(function () {
+        panel.style.height = "0px";
+      });
+      item.classList.remove("de-invoicing-open");
+      trigger.setAttribute("aria-expanded", "false");
+    }
+
+    function openItem(item, panel, trigger) {
+      panel.classList.remove("h-0");
+      panel.style.height = "0px";
+      panel.offsetHeight; // force reflow
+      panel.style.height = panel.scrollHeight + "px";
+      item.classList.add("de-invoicing-open");
+      trigger.setAttribute("aria-expanded", "true");
+      panel.addEventListener("transitionend", function handler(e) {
+        if (e.propertyName !== "height") return;
+        panel.removeEventListener("transitionend", handler);
+        if (item.classList.contains("de-invoicing-open")) {
+          panel.style.height = "auto";
+        }
+      });
+    }
+
+    columns.forEach(function (col) {
+      var items = col.querySelectorAll("[data-de-invoicing-item]");
+
+      items.forEach(function (item) {
+        var trigger = item.querySelector("[data-de-invoicing-trigger]");
+        var panel = item.querySelector("[data-de-invoicing-panel]");
+        if (!trigger || !panel) return;
+
+        trigger.addEventListener("click", function () {
+          if (item.classList.contains("de-invoicing-open")) {
+            closeItem(item, panel, trigger);
+          } else {
+            // Close any currently open card in THIS column only (e.g. top card closes when below one opens)
+            items.forEach(function (other) {
+              if (other !== item && other.classList.contains("de-invoicing-open")) {
+                var otherPanel = other.querySelector("[data-de-invoicing-panel]");
+                var otherTrigger = other.querySelector("[data-de-invoicing-trigger]");
+                if (otherPanel && otherTrigger) {
+                  closeItem(other, otherPanel, otherTrigger);
+                }
+              }
+            });
+            openItem(item, panel, trigger);
+          }
+        });
+
+        window.addEventListener("resize", function () {
+          if (item.classList.contains("de-invoicing-open")) {
+            panel.style.height = "auto";
+          }
+        });
+      });
+    });
+  })();
+</script>
