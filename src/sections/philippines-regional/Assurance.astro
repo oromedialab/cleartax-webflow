@@ -1,5 +1,11 @@
 ---
-const loadContent = [
+interface ContentItem {
+    title: string;
+    desc: string;
+    image?: string;
+}
+
+const loadContent: ContentItem[] = [
     {
         title: "We've done this before — at scale.",
         desc: "Every connector, every schema, every clearance flow — engineered in-house, then paid for again in upkeep.",
@@ -64,6 +70,21 @@ const loadContent = [
                                 <p class="font-body text-[length:var(--fs-body)] leading-[length:var(--lh-body)] text-neutral-500 font-normal pb-4 m-0 max-w-[480px]">
                                     {item.desc}
                                 </p>
+
+                                <!-- Mobile Visual Placeholder (inside open tab on responsive) -->
+                                <div
+                                    class="lg:hidden w-full aspect-video sm:aspect-[16/10] rounded-xl bg-visual-placeholder border border-neutral-200 mb-4 overflow-hidden flex items-center justify-center"
+                                    aria-hidden="true"
+                                >
+                                    {item.image && (
+                                        <img
+                                            src={item.image}
+                                            alt={item.title}
+                                            class="w-full h-full object-contain"
+                                            loading="lazy"
+                                        />
+                                    )}
+                                </div>
                             </div>
 
                             <!-- Animated Border / Progress Line -->
@@ -81,8 +102,8 @@ const loadContent = [
                 }
             </div>
 
-            <!-- Right Side: Sliding Visuals -->
-            <div class="lg:col-span-7 w-full flex justify-center lg:justify-end">
+            <!-- Right Side: Sliding Visuals (Desktop) -->
+            <div class="hidden lg:flex lg:col-span-7 w-full justify-center lg:justify-end">
                 <div
                     class="relative w-full max-w-[600px] min-h-[360px] rounded-2xl overflow-hidden aspect-video md:aspect-[4/3] lg:aspect-auto lg:h-[480px] border border-neutral-200 bg-generic-00"
                 >
@@ -92,7 +113,16 @@ const loadContent = [
                     >
                         {
                             loadContent.map((item, i) => (
-                                <div class="w-full max-w-[600px] shrink-0 h-full bg-visual-placeholder flex items-center justify-center rounded-xl" />
+                                <div class="w-full max-w-[600px] shrink-0 h-full bg-visual-placeholder flex items-center justify-center rounded-xl overflow-hidden">
+                                    {item.image && (
+                                        <img
+                                            src={item.image}
+                                            alt={item.title}
+                                            class="w-full h-full object-contain"
+                                            loading="lazy"
+                                        />
+                                    )}
+                                </div>
                             ))
                         }
                     </div>
@@ -103,7 +133,7 @@ const loadContent = [
 </section>
 
 <script is:inline>
-    document.addEventListener("DOMContentLoaded", () => {
+    const initAssurance = () => {
         const items = document.querySelectorAll(".assurance-item");
         const slider = document.getElementById("assurance-slider");
         if (!items.length) return;
@@ -119,7 +149,7 @@ const loadContent = [
         const activateTab = (index, animateProgress = true) => {
             currentIndex = index;
 
-            // Slide right panel
+            // Slide right panel (desktop)
             if (slider) {
                 slider.style.transform = `translateX(calc(-${index * 100}% - ${index * 16}px))`;
             }
@@ -206,6 +236,14 @@ const loadContent = [
             });
         });
 
+        // Recalculate max-height on window resize (e.g. orientation or breakpoint change)
+        window.addEventListener("resize", () => {
+            const activeDesc = items[currentIndex]?.querySelector(".assurance-desc");
+            if (activeDesc) {
+                activeDesc.style.maxHeight = activeDesc.scrollHeight + "px";
+            }
+        });
+
         // Pause/resume when tab loses visibility
         document.addEventListener("visibilitychange", () => {
             if (document.hidden) {
@@ -217,5 +255,11 @@ const loadContent = [
 
         // Start auto-play
         startTimer();
-    });
+    };
+
+    if (document.readyState === "loading") {
+        document.addEventListener("DOMContentLoaded", initAssurance);
+    } else {
+        initAssurance();
+    }
 </script>
