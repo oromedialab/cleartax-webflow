@@ -104,6 +104,7 @@ export const PAGE_TARGETS = [
   { name: 'financial-planning-and-analysis', input: 'src/styles/financial-planning-and-analysis.css', page: 'src/pages/financial-planning-and-analysis.astro' },
   { name: 'ai-foundation', input: 'src/styles/ai-foundation.css', page: 'src/pages/ai-foundation.astro' },
   { name: 'singapore-regional', input: 'src/styles/singapore-regional.css', page: 'src/pages/singapore-regional.astro' },
+  { name: 'germany-product', input: 'src/styles/germany-product.css', page: 'src/pages/germany-product.astro' },
 ];
 
 /**
