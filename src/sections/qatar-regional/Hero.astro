@@ -96,7 +96,7 @@ const stats: { value: string; label: string; }[] = [
                     <h1
                         class="m-0 font-heading font-semibold text-vault-navy text-[length:var(--fs-h1)] md:text-[length:var(--fs-display-sm)] lg:text-[length:var(--fs-display-lg)] leading-[length:var(--lh-h1)] md:leading-[length:var(--lh-display-sm)] lg:leading-[length:var(--lh-display-lg)] tracking-[-1px] max-w-191"
                     >
-                        Qatar e-invoicing. Prepare today. Adapt with confidence.
+                        Qatar <span class="text-text-default bg-flux-lime px-1 rounded-lg">E-invoicing.</span> Prepare today. Adapt with confidence.
                     </h1>
                     <p
                         class="m-0 font-body text-neutral-500 text-[length:var(--fs-body)] leading-[length:var(--lh-body)] max-w-193"
@@ -144,7 +144,7 @@ const stats: { value: string; label: string; }[] = [
            absent, onclick lets the browser follow the href as normal. -->
             <a
                 href="javascript:void(0)"
-                onclick="document.getElementById('contactForm').scrollIntoView({behavior:'smooth'})"
+                onclick="event.preventDefault(); window.scrollQaToContact?.() || (document.querySelector('#contactForm .max-w-6xl') || document.getElementById('contactForm'))?.scrollIntoView({ behavior: 'smooth', block: 'center' });"
                 class="inline-flex w-full sm:w-auto items-center justify-center gap-2 rounded-lg border border-nova-blue bg-nova-blue px-10 py-3.5 text-[length:var(--fs-label-lg)] leading-[length:var(--lh-label-lg)] font-medium text-nova-50 no-underline transition-all duration-200 hover:bg-generic-00 hover:text-nova-blue"
             >
                 Book a Demo
@@ -504,6 +504,33 @@ const stats: { value: string; label: string; }[] = [
             speed = 0;
         });
     }
+
+    window.scrollQaToContact = function (e) {
+        if (e) e.preventDefault();
+        const card =
+            document.querySelector("#contactForm .max-w-6xl") ||
+            document.getElementById("contactForm");
+        if (!card) return;
+        if (window.innerHeight >= card.offsetHeight + 100) {
+            card.scrollIntoView({ behavior: "smooth", block: "center" });
+        } else {
+            const navOffset = 90;
+            const top =
+                card.getBoundingClientRect().top +
+                window.pageYOffset -
+                navOffset;
+            window.scrollTo({ top, behavior: "smooth" });
+        }
+    };
+
+    // Ensure all CTA clicks on the Qatar page (Hero + Navbar) scroll perfectly to the contact card
+    document.addEventListener("click", function (e) {
+        const cta = e.target.closest('[data-nav-cta], a[href*="contactForm"]');
+        if (cta && document.getElementById("qa-hero")) {
+            e.preventDefault();
+            window.scrollQaToContact();
+        }
+    });
 
     if (document.readyState === "loading") {
         document.addEventListener("DOMContentLoaded", initQaHeroGrid);

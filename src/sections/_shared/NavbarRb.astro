@@ -45,20 +45,15 @@ export interface Props {
   ctaLabel?: string;
   ctaHref?: string;
   /**
-   * Marks both CTAs (desktop and the one inside the mobile panel) as openers for
-   * a `[data-demo-modal]` on the page — see
-   * `global-homepage/DemoModal.astro`. Opt-in so the pages without that section
-   * render byte-identical markup and need no re-paste. `ctaHref` stays the real
-   * link either way: with no modal present, or before its script runs, the CTA
-   * just navigates.
+   * Maintained for backward compatibility. Pop up modal display logic has been
+   * removed — CTAs now smoothly scroll to the in-page contact form if present,
+   * or navigate to `ctaHref` (defaults to contact-us).
    */
   ctaOpensModal?: boolean;
   /**
    * Id of a section on the same page for both CTAs to scroll to, e.g.
    * `"contactForm"` for a page whose `ContactFormRb` section is the destination.
-   * Opt-in, and mutually exclusive with `ctaOpensModal` — a page either has a
-   * modal or has the form in the page. When set it overrides `ctaHref`, since
-   * there is nowhere else for the button to go.
+   * If omitted, CTAs automatically detect any in-page contact form section.
    */
   ctaScrollTo?: string;
   /** Label on the globe control. Shows the active region, updates on selection. */
@@ -175,18 +170,9 @@ const {
   idPrefix = "ctnav",
 } = Astro.props;
 
-/* Astro drops an attribute set to `undefined`, so these emit `data-demo-open` /
-   `onclick` only when opted in — no empty attribute left behind on the other
-   pages, which keeps their markup byte-identical and saves a re-paste. */
-const demoOpenAttr = ctaOpensModal ? "" : undefined;
-
-/* Inline `onclick` rather than a listener in the script below: an Embed's script
-   may not have run when a visitor clicks, and the same pattern is already used
-   by the hero and closing-band CTAs that scroll to the same section. */
-const ctaClickAttr = ctaScrollTo
-  ? `event.preventDefault(); document.getElementById('${ctaScrollTo}')?.scrollIntoView({ behavior: 'smooth' });`
-  : undefined;
-const resolvedCtaHref = ctaScrollTo ? "javascript:void(0)" : ctaHref;
+/* When clicked: if an in-page contact form section is present, smooth-scroll to it;
+   otherwise allow standard navigation to `ctaHref` (defaults to contact-us). No modal popup. */
+const ctaClickAttr = `var target = ${ctaScrollTo ? `document.getElementById('${ctaScrollTo}') || ` : ''}document.getElementById('contactForm') || document.getElementById('contact-form') || document.getElementById('contact') || document.querySelector('#fp-hero-contact, #hero-card, #hero-contact, [data-lead-form], [data-contact-form]'); if (target) { event.preventDefault(); target.scrollIntoView({ behavior: 'smooth' }); }`;
 
 const panelId = `${idPrefix}-panel`;
 const countryId = `${idPrefix}-country`;
@@ -363,10 +349,9 @@ function toBlocks(items: NavChild[]): Block[] {
             </button>
 
             <a
-              href={resolvedCtaHref}
+              href={ctaHref}
               onclick={ctaClickAttr}
               data-nav-cta
-              data-demo-open={demoOpenAttr}
               class="hidden sm:inline-flex items-center justify-center gap-2 px-5 py-3.5 text-[length:var(--fs-label-lg)] leading-[length:var(--lh-label-lg)] font-medium text-nova-50 bg-nova-blue border border-nova-blue rounded-lg whitespace-nowrap no-underline transition-all duration-200 hover:bg-generic-00 hover:text-nova-blue"
             >
               {ctaLabel}
@@ -629,9 +614,9 @@ function toBlocks(items: NavChild[]): Block[] {
                    the script's `countryBtns` loop. -->
               <div class="lg:hidden flex items-center gap-2 mt-6">
                 <a
-                  href={resolvedCtaHref}
+                  href={ctaHref}
                   onclick={ctaClickAttr}
-                  data-demo-open={demoOpenAttr}
+                  data-nav-cta
                   class="flex-1 inline-flex items-center justify-center gap-2 px-5 py-3.5 text-[length:var(--fs-label-lg)] leading-[length:var(--lh-label-lg)] font-medium text-nova-50 bg-nova-blue rounded-lg no-underline transition-all duration-200 hover:bg-generic-00 hover:text-nova-blue ease-in-out"
                 >
                   {ctaLabel}
