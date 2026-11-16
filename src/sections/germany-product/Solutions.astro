@@ -190,7 +190,10 @@ const steps: Step[] = [
         {
           steps.map((step, i) => (
             <>
-              <div class="relative z-10 flex w-full items-center gap-4 rounded-xl border-2 border-nova-blue bg-generic-00 p-4 sm:p-5 shadow-sm">
+              <div
+                class="de-solution-card relative z-10 flex w-full items-center gap-4 rounded-xl border-2 bg-generic-00 p-4 sm:p-5 shadow-sm"
+                data-de-solution-card
+              >
                 <span class="flex h-10 w-12 shrink-0 items-center justify-center rounded-lg border border-neutral-300 bg-generic-00 font-body text-sm font-medium text-vault-navy">
                   {step.no}
                 </span>
@@ -216,6 +219,21 @@ const steps: Step[] = [
 </section>
 
 <style is:global>
+  .de-solution-card {
+    border-color: #5446FF;
+    transition: opacity 350ms cubic-bezier(0.2, 0.8, 0.2, 1),
+                border-color 350ms cubic-bezier(0.2, 0.8, 0.2, 1),
+                box-shadow 350ms cubic-bezier(0.2, 0.8, 0.2, 1);
+  }
+  .de-solution-js .de-solution-card {
+    opacity: 0.45;
+    border-color: #e5e5e5;
+  }
+  .de-solution-js .de-solution-card.is-active {
+    opacity: 1;
+    border-color: #5446FF;
+    box-shadow: 0 4px 16px -2px rgba(84, 70, 255, 0.12);
+  }
   .de-solution-line {
     transform: scaleY(0);
     transform-origin: top;
@@ -231,15 +249,42 @@ const steps: Step[] = [
     const root = document.querySelector("[data-de-solutions]");
     if (!root) return;
 
+    const cards = Array.from(
+      root.querySelectorAll("[data-de-solution-card]")
+    );
     const connectors = Array.from(
       root.querySelectorAll("[data-de-solution-connector]")
     );
-    if (!connectors.length) return;
+    if (!cards.length) return;
+
+    const reduceMotion =
+      window.matchMedia &&
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+    if (reduceMotion) {
+      cards.forEach((c) => c.classList.add("is-active"));
+      connectors.forEach((conn) => {
+        const line = conn.querySelector(".de-solution-line");
+        if (line) line.classList.add("is-drawn");
+      });
+      return;
+    }
+
+    root.classList.add("de-solution-js");
 
     let ticking = false;
 
-    function updateConnectors() {
-      const triggerY = window.innerHeight * 0.7;
+    function update() {
+      const triggerY = window.innerHeight * 0.72;
+
+      cards.forEach((card) => {
+        const rect = card.getBoundingClientRect();
+        if (rect.top <= triggerY) {
+          card.classList.add("is-active");
+        } else if (rect.top > triggerY + 40) {
+          card.classList.remove("is-active");
+        }
+      });
 
       connectors.forEach((conn) => {
         const line = conn.querySelector(".de-solution-line");
@@ -258,7 +303,7 @@ const steps: Step[] = [
       if (ticking) return;
       ticking = true;
       requestAnimationFrame(() => {
-        updateConnectors();
+        update();
         ticking = false;
       });
     }
@@ -267,6 +312,6 @@ const steps: Step[] = [
     window.addEventListener("resize", onScroll, { passive: true });
 
     // Initial check on load
-    updateConnectors();
+    update();
   })();
 </script>
