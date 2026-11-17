@@ -262,8 +262,9 @@ const cards: Card[] = [
               type="button"
               aria-label="Previous"
               aria-controls="be-glance-overlay-title"
-              class="inline-flex cursor-pointer items-center justify-center rounded border border-neutral-300 bg-generic-00 p-2 text-vault-navy transition-colors duration-150 hover:border-nova-blue"
+              class="inline-flex cursor-pointer items-center justify-center rounded border border-neutral-300 bg-generic-00 p-2 text-vault-navy transition-colors duration-150 hover:border-nova-blue disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:border-neutral-300"
               data-be-glance-prev
+              disabled
             >
               <svg
                 width="20"
@@ -285,7 +286,7 @@ const cards: Card[] = [
               type="button"
               aria-label="Next"
               aria-controls="be-glance-overlay-title"
-              class="inline-flex cursor-pointer items-center justify-center rounded border border-neutral-300 bg-generic-00 p-2 text-vault-navy transition-colors duration-150 hover:border-nova-blue"
+              class="inline-flex cursor-pointer items-center justify-center rounded border border-neutral-300 bg-generic-00 p-2 text-vault-navy transition-colors duration-150 hover:border-nova-blue disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:border-neutral-300"
               data-be-glance-next
             >
               <svg
@@ -358,8 +359,19 @@ const cards: Card[] = [
     var current = 0;
     var lastFocused = null;
 
+    function updateNav() {
+      if (prevBtn) {
+        prevBtn.disabled = current <= 0;
+      }
+      if (nextBtn) {
+        nextBtn.disabled = current >= count - 1;
+      }
+    }
+
     function show(index) {
-      current = ((index % count) + count) % count;
+      if (index < 0) index = 0;
+      if (index >= count) index = count - 1;
+      current = index;
       for (var i = 0; i < count; i++) {
         headings[i].hidden = i !== current;
         bodies[i].hidden = i !== current;
@@ -376,6 +388,7 @@ const cards: Card[] = [
           images[i].style.display = i === current ? "block" : "none";
         }
       }
+      updateNav();
       panel.scrollTop = 0;
     }
 
@@ -412,11 +425,11 @@ const cards: Card[] = [
     if (closeBtn) closeBtn.addEventListener("click", close);
     if (prevBtn)
       prevBtn.addEventListener("click", function () {
-        show(current - 1);
+        if (current > 0) show(current - 1);
       });
     if (nextBtn)
       nextBtn.addEventListener("click", function () {
-        show(current + 1);
+        if (current < count - 1) show(current + 1);
       });
 
     overlay.addEventListener("click", function (e) {
@@ -432,11 +445,11 @@ const cards: Card[] = [
       }
 
       if (e.key === "ArrowLeft") {
-        show(current - 1);
+        if (current > 0) show(current - 1);
         return;
       }
       if (e.key === "ArrowRight") {
-        show(current + 1);
+        if (current < count - 1) show(current + 1);
         return;
       }
 
