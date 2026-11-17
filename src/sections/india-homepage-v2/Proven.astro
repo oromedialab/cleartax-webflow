@@ -1,0 +1,303 @@
+---
+/**
+ * "What finance teams are solving with Clarity AI, today." — Figma node
+ * 17981:55558 (global homepage v2; was "Proven to work in the real world").
+ *
+ * Five rows, each a use-case card joined to an outcome card by a dot bridge.
+ *
+ * Row focus is a second IntersectionObserver, independent of the reveal one
+ * below. Figma node 12745:19646 specimens the two states as component variants:
+ *
+ *   Default  (resting) — opacity 50%, bridge dots #A6C705
+ *   Variant2 (focused) — full opacity, bridge dots #5446FF Nova Blue
+ *
+ * The focused row additionally scales to 1.02. That is ours, not the Figma's —
+ * the specimen only varies opacity and dot colour.
+ *
+ * The row at the middle of the viewport gets Variant2, so scrolling walks the
+ * focus down the list.
+ *
+ * ON THE 50% DIM: an earlier note here rejected the Figma's `opacity: 50%`,
+ * reading it as a WIP artifact, because at ~2.4:1 the body copy fails WCAG AA.
+ * That reasoning held while every row was permanently dim. It no longer does:
+ * the dim is now the RESTING half of a focus pair, and the row being read is
+ * always the full-opacity one. Rows you are not looking at are de-emphasised;
+ * the row you are looking at is not. If it still reads too faint on a real
+ * screen, `.gh-proven-row > *` is the single place to raise it.
+ *
+ * Without JS, or with reduced motion, every row renders focused — full opacity
+ * and lit bridge — rather than the whole list sitting dimmed.
+ */
+interface Row {
+  icon: string;
+  title: string;
+  desc: string;
+  stats: { value: string; label: string }[];
+  attribution: string;
+}
+
+const rows: Row[] = [
+  {
+    icon: "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6aabb396dd0fdafe6fbbb50d_proven-icon-1.png",
+    title: "Minimise cost impact due to shipment delays",
+    desc: "Identify where and why shipment delays happen",
+    stats: [
+      { value: "6 days", label: "cut from order to delivery" },
+      { value: "18%", label: "less stock in transit" },
+    ],
+    attribution: "A multi-country distributor in the Middle East",
+  },
+  {
+    icon: "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6aabb3967bee0cd225fdc49c_proven-icon-2.png",
+    title: "Make tax and compliance less manual",
+    desc: "Answer every tax notice, with full evidence trail.",
+    stats: [
+      { value: "7×", label: "faster end to end" },
+      { value: "3 days", label: "vs 20–30 days before" },
+    ],
+    attribution: "Large multi-entity enterprise in India",
+  },
+  {
+    icon: "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6aabb39650ec41a671cd8e4a_proven-icon-3.png",
+    title: "Faster accounts receivables",
+    desc: "Match every contract with the corresponding transaction and improve contracting accuracy.",
+    stats: [
+      { value: "4%", label: "of SKUs selling off-contract" },
+      { value: "800", label: "contracts checked continuously" },
+    ],
+    attribution: "A large manufacturer in the KSA",
+  },
+  {
+    icon: "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6aabb396d87ec91b8e63c57e_proven-icon-4.png",
+    title: "Plug leakage in accounts payable",
+    desc: "Flag potential duplicate payments and vendor non-compliance before payout.",
+    stats: [
+      { value: "0.4%", label: "of payment value recovered" },
+      { value: "100%", label: "of invoices screened, daily" },
+    ],
+    attribution: "A large retail group in the UAE",
+  },
+  {
+    icon: "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6aabb3965e196ab94d454e82_proven-icon-5.png",
+    title: "Negotiate better with vendors and suppliers",
+    desc: "Rank every vendor on cost, quality, and delivery to identify cost saving opportunities.",
+    stats: [
+      { value: "12,000+", label: "vendors scored on live data" },
+      { value: "3%", label: "of spend redirected" },
+    ],
+    attribution: "A diversified conglomerate in India",
+  },
+];
+---
+
+<section class="bg-generic-00 max-lg:py-12 lg:py-20" data-gh-proven>
+  <div class="max-w-[var(--container-max)] w-full mx-auto px-4 md:px-6">
+    <div class="flex flex-col gap-12">
+      <h2
+        class="m-0 text-center font-heading font-medium text-vault-navy text-[length:var(--fs-h1)] leading-[length:var(--lh-h1)] tracking-[-0.5px]"
+      >
+        What finance teams are solving with Clarity AI, today.
+      </h2>
+
+      <ul class="m-0 flex list-none flex-col gap-8 p-0">
+        {
+          rows.map((row) => (
+            <li class="gh-proven-row premium-reveal flex items-center justify-center gap-2 sm:gap-4 md:gap-8 max-lg:flex-col sm:flex-row md:flex-row">
+              <div class="flex flex-col md:flex-row flex-1 items-start md:items-center gap-6 self-stretch rounded-xl border border-[#CCCCCC] bg-generic-00 p-6 max-lg:w-full">
+                <span
+                  class="max-lg:h-10 max-lg:w-10 md:h-16 md:w-16 shrink-0 rounded-lg"
+                  aria-hidden="true"
+                >
+                  <img
+                    src={row.icon}
+                    alt={row.title}
+                    width="64"
+                    height="64"
+                    loading="lazy"
+                    decoding="async"
+                    class="h-full w-full object-contain"
+                  />
+                </span>
+                <div class="flex min-w-0 flex-col gap-3">
+                  <h3 class="m-0 font-heading font-medium text-vault-navy text-[length:var(--fs-h5)] leading-[length:var(--lh-h5)] tracking-[-0.5px]">
+                    {row.title}
+                  </h3>
+                  <p class="m-0 font-body font-medium text-neutral-500 text-[length:var(--fs-body-lg)] leading-[length:var(--lh-body-lg)]">
+                    {row.desc}
+                  </p>
+                </div>
+              </div>
+
+              <span
+                class="gh-proven-bridge shrink-0 max-lg:rotate-90 md:rotate-0 max-lg:hidden"
+                aria-hidden="true"
+              />
+
+              <div class="flex flex-1 items-start rounded-xl border border-[#CCCCCC] bg-generic-00 p-6 max-lg:w-full">
+                <div class="flex min-w-0 flex-col sm:flex-1 gap-2 sm:gap-6">
+                  <div class="flex items-start flex-col sm:flex-row gap-2 sm:gap-6">
+                    {row.stats.map((s) => (
+                      <div class="flex min-w-0 flex-1 flex-col gap-2 sm:gap-3">
+                        <p class="m-0 font-heading font-medium text-vault-navy text-[length:var(--fs-h5)] leading-[length:var(--lh-h5)] tracking-[-0.5px]">
+                          {s.value}
+                        </p>
+                        <p class="m-0 font-body font-medium text-neutral-500 text-[length:var(--fs-body-lg)] leading-[length:var(--lh-body-lg)]">
+                          {s.label}
+                        </p>
+                      </div>
+                    ))}
+                  </div>
+                  <p class="m-0 font-body text-vault-navy text-[length:var(--fs-label)] leading-[length:var(--lh-body-sm)]">
+                    {row.attribution}
+                  </p>
+                </div>
+              </div>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </div>
+</section>
+
+<style is:global>
+  /* Row focus, per Figma node 12745:19646, which specimens the two states side
+     by side. The row at the middle of the viewport is the "Variant2" instance —
+     full opacity, Nova Blue dots. Every other row is "Default" — 50% opacity,
+     #A6C705 dots. Scrolling therefore walks the focus down the list.
+
+     The focused row also lifts slightly. Both the dim and the scale sit on the
+     row's CHILDREN, not the row: shared.css ends the premium-reveal with
+     `opacity: 1 !important` AND `transform: translateY(0) !important` on the
+     <li>, so either property set there would be wiped the moment the row
+     reveals. Each child scales about its own centre, so the dot bridge stays
+     centred between the two cards.
+
+     scale(1.02) is deliberately small. At 1440 it grows each card by ~6px per
+     side, which stays inside the container's 24px gutter — anything larger
+     starts pushing the cards past the page edge. */
+  .gh-proven-row > * {
+    opacity: 0.5;
+    transform: scale(0.95);
+    transition: all 0.35s ease;
+  }
+
+  .gh-proven-row.is-centered > * {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  /* The 30×82 dot bridge between the two cards: two columns, four rows,
+     3.88px dots on a 25.22px pitch — the Figma's Frame 2147225847.
+
+     #A6C705 is a one-off in this component, not a brand token — it is the fill
+     Figma exports for the resting bridge. Painted from currentColor because
+     `color` is transitionable and a background-image is not; a fixed colour
+     stop would snap between states while the opacity eased. */
+  .gh-proven-bridge {
+    display: block;
+    width: 29.1px;
+    height: 79.54px;
+    color: #a6c705;
+    /* `at 1.94px 1.94px` anchors the dot to the tile's top-left rather than its
+       centre, so two columns fit inside 29.1px and four rows inside 79.54px.
+       A centred dot renders only one column — the second falls outside the box. */
+    background-image: radial-gradient(
+      circle at 1.94px 1.94px,
+      currentColor 1.94px,
+      transparent 2px
+    );
+    background-size: 25.22px 25.22px;
+    background-repeat: repeat;
+    transition: color 0.35s ease;
+  }
+
+  .gh-proven-row.is-centered .gh-proven-bridge {
+    color: var(--color-nova-blue);
+  }
+</style>
+
+<script is:inline>
+  (function () {
+    const root = document.querySelector("[data-gh-proven]");
+    if (!root) return;
+    const items = Array.from(root.querySelectorAll(".premium-reveal"));
+    if (!items.length) return;
+
+    if (
+      !("IntersectionObserver" in window) ||
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches
+    ) {
+      // No observer, or motion is unwelcome: show every row and light every
+      // bridge, rather than leaving the whole list dimmed to #EFEFEF.
+      items.forEach((el) => {
+        el.classList.add("is-visible");
+        el.classList.add("is-centered");
+      });
+      return;
+    }
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (!entry.isIntersecting) return;
+          entry.target.classList.add("is-visible");
+          observer.unobserve(entry.target);
+        });
+      },
+      { rootMargin: "0px 0px -12% 0px", threshold: 0.1 },
+    );
+
+    items.forEach((el) => observer.observe(el));
+
+    // ---- Centred row -----------------------------------------------------
+    // A thin 1% band pinned across the middle of the viewport, so "centred"
+    // means the row the centre line is actually inside. That matters: the
+    // observer only fires when a row enters or leaves the band, and nothing
+    // recomputes in between. A wide band would let the nearest row change with
+    // no crossing to trigger it, leaving the accent a row behind. Kept thin,
+    // every change of row IS a crossing, so the two can never drift apart.
+    //
+    // `inBand` holds the running set because two rows can straddle the line for
+    // a frame; pick() resolves that by distance rather than callback order.
+    let centred = null;
+    const inBand = new Set();
+
+    const pick = () => {
+      // Nothing in the band means the middle has landed in a gap between rows.
+      // Hold the last choice instead of clearing, so the accent never blinks off.
+      if (!inBand.size) return;
+
+      const middle = window.innerHeight / 2;
+      let best = null;
+      let bestDistance = Infinity;
+
+      inBand.forEach((el) => {
+        const r = el.getBoundingClientRect();
+        const distance = Math.abs((r.top + r.bottom) / 2 - middle);
+        if (distance < bestDistance) {
+          bestDistance = distance;
+          best = el;
+        }
+      });
+
+      if (!best || best === centred) return;
+      if (centred) centred.classList.remove("is-centered");
+      centred = best;
+      centred.classList.add("is-centered");
+    };
+
+    const centreObserver = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) inBand.add(entry.target);
+          else inBand.delete(entry.target);
+        });
+        pick();
+      },
+      { rootMargin: "-49.5% 0px -49.5% 0px", threshold: 0 },
+    );
+
+    items.forEach((el) => centreObserver.observe(el));
+  })();
+</script>
