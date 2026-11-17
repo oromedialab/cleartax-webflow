@@ -51,7 +51,7 @@ const cards: Card[] = [
   >
     <div class="flex flex-col items-center gap-6 text-center">
       <h2
-        class="m-0 font-heading font-medium text-vault-navy text-[length:var(--fs-h1)] leading-[length:var(--lh-h1)] tracking-[-0.5px]"
+        class="m-0 font-heading font-medium text-vault-navy text-[length:var(--fs-h2)] leading-[length:var(--lh-h2)] lg:text-[length:var(--fs-h1)] lg:leading-[length:var(--lh-h1)] tracking-[-0.5px]"
       >
         All-in-One E-Invoicing Solution for Germany
       </h2>
@@ -62,21 +62,21 @@ const cards: Card[] = [
       </p>
     </div>
 
-    <div class="grid w-full grid-cols-1 gap-5 sm:grid-cols-2 lg:gap-8 items-stretch" data-de-invoicing-grid>
+    <div class="grid w-full grid-cols-1 gap-5 sm:grid-cols-1 lg:grid-cols-2 lg:gap-8 items-stretch" data-de-invoicing-grid>
       <!-- Left Column (Cards 0, 2, 4) -->
       <div class="flex flex-col gap-5 lg:gap-8 h-full" data-de-invoicing-col>
         {
           [cards[0], cards[2], cards[4]].map((card, colIdx) => {
-            const isOpenInitially = colIdx === 0;
+            const isInitOpen = colIdx === 0;
             return (
               <div
-                class={`de-invoicing-item group flex flex-col w-full rounded-xl border border-neutral-300 bg-generic-00 p-6 text-left transition-all duration-300 ease-in-out hover:border-nova-blue ${isOpenInitially ? "de-invoicing-open" : ""}`}
+                class={`de-invoicing-item group flex flex-col w-full rounded-xl border border-neutral-300 bg-generic-00 p-6 text-left transition-all duration-300 ease-in-out hover:border-nova-blue ${isInitOpen ? "de-invoicing-init-open" : ""}`}
                 data-de-invoicing-item
               >
                 <button
                   type="button"
                   class="de-invoicing-trigger m-0 flex w-full min-h-[56px] cursor-pointer items-center justify-between gap-5 border-0 bg-transparent p-0 text-left"
-                  aria-expanded={isOpenInitially ? "true" : "false"}
+                  aria-expanded={isInitOpen ? "true" : "false"}
                   data-de-invoicing-trigger
                 >
                   <img src={card.icon} alt="" class="h-14 w-14 shrink-0" />
@@ -112,8 +112,7 @@ const cards: Card[] = [
                   </span>
                 </button>
                 <div
-                  class={`de-invoicing-panel overflow-hidden transition-[height] duration-300 [transition-timing-function:cubic-bezier(.4,0,.2,1)] ${isOpenInitially ? "h-auto" : "h-0"}`}
-                  style={isOpenInitially ? "height: auto;" : "height: 0px;"}
+                  class="de-invoicing-panel overflow-hidden transition-[height] duration-300 [transition-timing-function:cubic-bezier(.4,0,.2,1)]"
                   data-de-invoicing-panel
                 >
                   <p class="m-0 pt-4 font-body font-normal text-neutral-500 text-[length:var(--fs-body)] leading-[length:var(--lh-body)]">
@@ -130,16 +129,16 @@ const cards: Card[] = [
       <div class="flex flex-col gap-5 lg:gap-8 h-full" data-de-invoicing-col>
         {
           [cards[1], cards[3], cards[5]].map((card, colIdx) => {
-            const isOpenInitially = colIdx === 0;
+            const isInitOpen = colIdx === 0;
             return (
               <div
-                class={`de-invoicing-item group flex flex-col w-full rounded-xl border border-neutral-300 bg-generic-00 p-6 text-left transition-all duration-300 ease-in-out hover:border-nova-blue ${isOpenInitially ? "de-invoicing-open" : ""}`}
+                class={`de-invoicing-item group flex flex-col w-full rounded-xl border border-neutral-300 bg-generic-00 p-6 text-left transition-all duration-300 ease-in-out hover:border-nova-blue ${isInitOpen ? "de-invoicing-init-open" : ""}`}
                 data-de-invoicing-item
               >
                 <button
                   type="button"
                   class="de-invoicing-trigger m-0 flex w-full min-h-[56px] cursor-pointer items-center justify-between gap-5 border-0 bg-transparent p-0 text-left"
-                  aria-expanded={isOpenInitially ? "true" : "false"}
+                  aria-expanded={isInitOpen ? "true" : "false"}
                   data-de-invoicing-trigger
                 >
                   <img src={card.icon} alt="" class="h-14 w-14 shrink-0" />
@@ -175,8 +174,7 @@ const cards: Card[] = [
                   </span>
                 </button>
                 <div
-                  class={`de-invoicing-panel overflow-hidden transition-[height] duration-300 [transition-timing-function:cubic-bezier(.4,0,.2,1)] ${isOpenInitially ? "h-auto" : "h-0"}`}
-                  style={isOpenInitially ? "height: auto;" : "height: 0px;"}
+                  class="de-invoicing-panel overflow-hidden transition-[height] duration-300 [transition-timing-function:cubic-bezier(.4,0,.2,1)]"
                   data-de-invoicing-panel
                 >
                   <p class="m-0 pt-4 font-body font-normal text-neutral-500 text-[length:var(--fs-body)] leading-[length:var(--lh-body)]">
@@ -196,13 +194,25 @@ const cards: Card[] = [
   .de-invoicing-item {
     min-height: 106px;
   }
+  .de-invoicing-panel {
+    height: 0px;
+  }
   @media (min-width: 640px) {
-    .de-invoicing-item.de-invoicing-open {
+    .de-invoicing-item.de-invoicing-open,
+    .de-invoicing-item.de-invoicing-init-open:not(.de-invoicing-closed) {
       flex: 1 0 auto;
     }
   }
   .de-invoicing-item.de-invoicing-open .de-invoicing-icon {
     transform: rotate(45deg);
+  }
+  @media (min-width: 1024px) {
+    .de-invoicing-item.de-invoicing-init-open:not(.de-invoicing-closed) .de-invoicing-icon {
+      transform: rotate(45deg);
+    }
+    .de-invoicing-item.de-invoicing-init-open:not(.de-invoicing-closed) .de-invoicing-panel {
+      height: auto;
+    }
   }
 </style>
 
@@ -213,19 +223,32 @@ const cards: Card[] = [
 
     var columns = grid.querySelectorAll("[data-de-invoicing-col]");
 
+    function isDesktop() {
+      return window.innerWidth >= 1024;
+    }
+
+    function isItemOpen(item) {
+      if (item.classList.contains("de-invoicing-open")) return true;
+      if (item.classList.contains("de-invoicing-closed")) return false;
+      if (item.classList.contains("de-invoicing-init-open")) {
+        return isDesktop();
+      }
+      return false;
+    }
+
     function closeItem(item, panel, trigger) {
       panel.style.height = panel.scrollHeight + "px";
-      panel.classList.remove("h-auto");
       panel.offsetHeight; // force reflow
       requestAnimationFrame(function () {
         panel.style.height = "0px";
       });
       item.classList.remove("de-invoicing-open");
+      item.classList.add("de-invoicing-closed");
       trigger.setAttribute("aria-expanded", "false");
     }
 
     function openItem(item, panel, trigger) {
-      panel.classList.remove("h-0");
+      item.classList.remove("de-invoicing-closed");
       panel.style.height = "0px";
       panel.offsetHeight; // force reflow
       panel.style.height = panel.scrollHeight + "px";
@@ -240,6 +263,13 @@ const cards: Card[] = [
       });
     }
 
+    // On responsive screens (<1024px), make sure aria-expanded starts as false
+    if (!isDesktop()) {
+      grid.querySelectorAll("[data-de-invoicing-trigger]").forEach(function (btn) {
+        btn.setAttribute("aria-expanded", "false");
+      });
+    }
+
     columns.forEach(function (col) {
       var items = col.querySelectorAll("[data-de-invoicing-item]");
 
@@ -249,12 +279,12 @@ const cards: Card[] = [
         if (!trigger || !panel) return;
 
         trigger.addEventListener("click", function () {
-          if (item.classList.contains("de-invoicing-open")) {
+          if (isItemOpen(item)) {
             closeItem(item, panel, trigger);
           } else {
-            // Close any currently open card in THIS column only (e.g. top card closes when below one opens)
+            // Close any currently open card in THIS column
             items.forEach(function (other) {
-              if (other !== item && other.classList.contains("de-invoicing-open")) {
+              if (other !== item && isItemOpen(other)) {
                 var otherPanel = other.querySelector("[data-de-invoicing-panel]");
                 var otherTrigger = other.querySelector("[data-de-invoicing-trigger]");
                 if (otherPanel && otherTrigger) {
@@ -267,8 +297,10 @@ const cards: Card[] = [
         });
 
         window.addEventListener("resize", function () {
-          if (item.classList.contains("de-invoicing-open")) {
+          if (isItemOpen(item)) {
             panel.style.height = "auto";
+          } else if (!item.classList.contains("de-invoicing-open")) {
+            panel.style.height = "0px";
           }
         });
       });
