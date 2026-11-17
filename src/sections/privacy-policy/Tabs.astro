@@ -1,0 +1,156 @@
+---
+/**
+ * Privacy Policy — the region rail (left) and the script that drives the page.
+ * One paste unit; it must be on the page for anything else to switch.
+ *
+ * LAYOUT ACROSS EMBEDS
+ * ---------------------------------------------------------------------------
+ * Same design as the Legal page (see sections/legal/Tabs.astro): a rail on the
+ * left, the policy on the right. Webflow wraps EVERY Embed in its own `<div>`,
+ * so neither a CSS grid nor `position: sticky` can span the rail and the
+ * policy embeds. On lg+ the script pins the rail with `position: fixed` and
+ * places it itself (`placeRail()`): it follows the page down to the nav
+ * clearance, then rides up with the end of the policy so it never reaches the
+ * footer. This section is a zero-height marker whose own position says where
+ * the content starts. Every `.pp-col` is offset by the rail's width to clear
+ * it. CSS is in `src/styles/privacy-policy.css` under "LAYOUT". Below lg the
+ * rail is an ordinary horizontal tab strip and the script leaves it alone.
+ *
+ * SWITCHING
+ * ---------------------------------------------------------------------------
+ * Every policy is a <section data-pp-j="<region>">. The script shows the one
+ * matching the selected region and hides the rest. Buttons call
+ * `ppSelect(id)` through inline `onclick`, so the URL never changes (no `#id`
+ * navigation). The tabs are alphabetical; the initial state is Europe, the first one.
+ *
+ * `regions` MUST list the same ids the generated Policy<Region> sections use.
+ */
+const regions = [
+  { id: "eu", label: "Europe" },
+  { id: "in", label: "India" },
+  { id: "my", label: "Malaysia" },
+  { id: "sa", label: "Saudi Arabia" },
+];
+---
+
+<section class="pp-rail-section" id="pp-root">
+  <div class="container mx-auto">
+    <div class="pp-rail-wrap">
+      <aside class="pp-rail">
+        <div class="pp-rail-head">
+          <h1 class="pp-rail-title">Privacy Policy</h1>
+        </div>
+        <div class="pp-rail-list" role="tablist" aria-label="Regions">
+          {
+            regions.map((r, i) => (
+              <button
+                type="button"
+                role="tab"
+                id={`pp-tab-${r.id}`}
+                class="pp-tab"
+                data-pp-tab={r.id}
+                onclick={`ppSelect('${r.id}')`}
+                aria-selected={i === 0 ? "true" : "false"}
+              >
+                <span class="pp-tab-ind" aria-hidden="true" />
+                <span>{r.label}</span>
+              </button>
+            ))
+          }
+        </div>
+      </aside>
+    </div>
+  </div>
+</section>
+
+<script is:inline>
+  (function () {
+    var state = "eu";
+
+    function render() {
+      document.querySelectorAll("[data-pp-tab]").forEach(function (t) {
+        t.setAttribute(
+          "aria-selected",
+          t.getAttribute("data-pp-tab") === state ? "true" : "false"
+        );
+      });
+      document.querySelectorAll("[data-pp-j]").forEach(function (s) {
+        s.hidden = s.getAttribute("data-pp-j") !== state;
+      });
+    }
+
+    function navClear() {
+      return (
+        parseFloat(
+          getComputedStyle(document.documentElement).getPropertyValue(
+            "--nav-clear"
+          )
+        ) || 112
+      );
+    }
+
+    function select(j) {
+      if (j === state) return;
+      state = j;
+      render();
+      // Policies differ in length by thousands of pixels. Switching from a
+      // long one to a short one while scrolled deep would strand you in the
+      // footer, so pull back to the top of the content — only if you were past it.
+      var doc = document.querySelector(".pp-doc:not([hidden])");
+      if (doc) {
+        var top = doc.getBoundingClientRect().top;
+        var clear = navClear();
+        if (top < clear)
+          window.scrollTo({ top: window.pageYOffset + top - clear });
+      }
+      placeRail();
+    }
+
+    window.ppSelect = select;
+
+    // Desktop rail: fixed, positioned here (see the note at the top of this
+    // file). top = natural position, clamped to the nav clearance, then pushed
+    // up so its bottom never passes the end of the visible policy.
+    var rail = document.querySelector(".pp-rail");
+    var wrap = document.querySelector(".pp-rail-wrap");
+    var ticking = false;
+    function placeRail() {
+      ticking = false;
+      if (!rail || !wrap) return;
+      if (!window.matchMedia("(min-width: 64rem)").matches) {
+        rail.classList.remove("pp-rail-fixed");
+        rail.style.top = rail.style.left = "";
+        return;
+      }
+      rail.classList.add("pp-rail-fixed");
+      var w = wrap.getBoundingClientRect();
+      var top = Math.max(navClear(), w.top);
+      var cols = document.querySelectorAll(".pp-doc:not([hidden]) .pp-col");
+      if (cols.length) {
+        var end = cols[cols.length - 1].getBoundingClientRect().bottom;
+        top = Math.min(top, end - rail.offsetHeight);
+      }
+      rail.style.left = w.left + "px";
+      rail.style.top = top + "px";
+    }
+    function queue() {
+      if (!ticking) {
+        ticking = true;
+        requestAnimationFrame(placeRail);
+      }
+    }
+    window.addEventListener("scroll", queue, { passive: true });
+    window.addEventListener("resize", queue);
+    // Embeds above the content can still be loading images/fonts.
+    window.addEventListener("load", queue);
+
+    // Embeds are separate nodes pasted into the page; wait for all of them.
+    function init() {
+      render();
+      placeRail();
+    }
+    if (document.readyState === "loading")
+      document.addEventListener("DOMContentLoaded", init);
+    else init();
+  })();
+</script>
