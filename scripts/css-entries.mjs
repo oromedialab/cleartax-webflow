@@ -105,6 +105,7 @@ export const PAGE_TARGETS = [
   { name: 'ai-foundation', input: 'src/styles/ai-foundation.css', page: 'src/pages/ai-foundation.astro' },
   { name: 'singapore-regional', input: 'src/styles/singapore-regional.css', page: 'src/pages/singapore-regional.astro' },
   { name: 'germany-product', input: 'src/styles/germany-product.css', page: 'src/pages/germany-product.astro' },
+  { name: 'india-homepage-v2', input: 'src/styles/india-homepage-v2.css', page: 'src/pages/india-homepage-v2.astro' },
 ];
 
 /**
