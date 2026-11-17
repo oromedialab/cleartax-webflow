@@ -119,8 +119,9 @@ const panels = [
                 <h2
                     class="m-0 font-heading font-medium text-vault-navy text-[length:var(--fs-h1)] leading-[length:var(--lh-h1)] tracking-[-0.5px]"
                 >
-                    How ClearTax Supports the Germany's e-Invoicing Mandate
+                    Clarity AI: Purpose built for finance work
                 </h2>
+                <p class="m-0 font-body font-normal text-neutral-500 text-[length:var(--fs-body-lg)] leading-[length:var(--lh-body-lg)]">Reliable, auditable, and production-ready agents which handle Accounts Payable and Tax Compliance</p>
             </div>
         </div>
 
@@ -290,13 +291,65 @@ const panels = [
                             ))
                         }
                     </div>
-                    <a
+                    <div class="flex flex-col gap-6">
+                      <a
                         href="#"
                         data-ih-maiw-cta
-                        class="inline-flex w-fit items-center font-body justify-center gap-2 rounded-lg border border-navy-400 bg-generic-00 px-5 py-3.5 text-[length:var(--fs-body)] leading-[length:var(--lh-body)] font-medium text-navy-400 shadow-[0_2px_6px_rgba(16,24,40,0.06)] outline-none transition-all ease-in-out duration-200 hover:bg-nova-blue hover:text-white cursor-pointer"
+                        class="m-0 font-body font-normal text-neutral-500 text-[length:var(--fs-body)] leading-[length:var(--lh-body)] underline  cursor-pointer"
                     >
                         Learn more
                     </a>
+                     <div class="flex items-center gap-2">
+                        <button
+                            type="button"
+                            aria-label="Previous"
+                            aria-controls="ih-maiw-overlay-title"
+                            class="inline-flex cursor-pointer items-center justify-center rounded border border-neutral-300 bg-generic-00 p-2 text-vault-navy transition-colors duration-150 hover:border-nova-blue disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:border-neutral-300"
+                            data-ih-maiw-prev
+                            disabled
+                        >
+                            <svg
+                                width="20"
+                                height="20"
+                                viewBox="0 0 20 20"
+                                fill="none"
+                                aria-hidden="true"
+                                focusable="false"
+                            >
+                                <path
+                                    d="M12 15L7 10L12 5"
+                                    stroke="currentColor"
+                                    stroke-width="1.5"
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"></path>
+                            </svg>
+                        </button>
+                        <button
+                            type="button"
+                            aria-label="Next"
+                            aria-controls="ih-maiw-overlay-title"
+                            class="inline-flex cursor-pointer items-center justify-center rounded border border-neutral-300 bg-generic-00 p-2 text-vault-navy transition-colors duration-150 hover:border-nova-blue disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:border-neutral-300"
+                            data-ih-maiw-next
+                        >
+                            <svg
+                                width="20"
+                                height="20"
+                                viewBox="0 0 20 20"
+                                fill="none"
+                                aria-hidden="true"
+                                focusable="false"
+                            >
+                                <path
+                                    d="M7 5L12 10L7 15"
+                                    stroke="currentColor"
+                                    stroke-width="1.5"
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"></path>
+                            </svg>
+                        </button>
+                    </div>   
+                    </div>
+                   
                 </div>
             </div>
 
@@ -350,6 +403,18 @@ const panels = [
             return members;
         }
 
+        function updateNav() {
+            var members = teamOf(current);
+            var at = members.indexOf(current);
+            if (at === -1) at = 0;
+            if (prevBtn) {
+                prevBtn.disabled = at <= 0;
+            }
+            if (nextBtn) {
+                nextBtn.disabled = at >= members.length - 1;
+            }
+        }
+
         function show(index) {
             current = index;
             for (var i = 0; i < count; i++) {
@@ -360,17 +425,20 @@ const panels = [
                 var cardLink = bodies[current].getAttribute("data-ih-maiw-link");
                 ctaBtn.setAttribute("href", cardLink || "#");
             }
+            updateNav();
             // The panel scrolls on short windows; a card further down the list would
             // otherwise open mid-way through its own copy.
             panel.scrollTop = 0;
         }
 
-        // Wraps both ways within the team, so neither chevron is ever a dead
-        // control — including on the three-card team.
         function step(delta) {
             var members = teamOf(current);
             var at = members.indexOf(current);
-            show(members[(at + delta + members.length) % members.length]);
+            if (at === -1) at = 0;
+            var nextAt = at + delta;
+            if (nextAt >= 0 && nextAt < members.length) {
+                show(members[nextAt]);
+            }
         }
 
         function open(index, opener) {
