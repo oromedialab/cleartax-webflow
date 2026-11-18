@@ -446,8 +446,8 @@ const hubspotRegion = "na2";
 </style>
 
 <script is:inline>
-  /* HubSpot form embed with URL parameters auto-prefill — same pattern as
-     `_shared/ContactFormRb.astro`. */
+  /* HubSpot form embed with URL parameters auto-prefill — deferred execution
+     to eliminate main-thread CPU polling and initial load impact. */
   (() => {
     let initialized = false;
 
@@ -492,32 +492,61 @@ const hubspotRegion = "na2";
             }
           },
         });
-      }
-    };
-
-    const checkAndInit = () => {
-      if (window.hbspt && window.hbspt.forms) {
-        initForm();
       } else {
         const script = document.querySelector('script[src*="hsforms.net"]');
-        if (script) script.addEventListener("load", initForm);
-        let pollCount = 0;
-        const interval = setInterval(() => {
-          pollCount++;
-          if (window.hbspt && window.hbspt.forms) {
-            clearInterval(interval);
-            initForm();
-          } else if (pollCount > 100) {
-            clearInterval(interval);
-          }
-        }, 100);
+        if (script) {
+          script.addEventListener("load", initForm, { once: true });
+        }
       }
     };
 
-    if (document.readyState === "loading") {
-      document.addEventListener("DOMContentLoaded", checkAndInit);
+    const scheduleInit = () => {
+      if (initialized) return;
+      const run = () => {
+        if (initialized) return;
+        if (window.hbspt && window.hbspt.forms) {
+          initForm();
+        } else {
+          const script = document.querySelector('script[src*="hsforms.net"]');
+          if (script) {
+            script.addEventListener("load", initForm, { once: true });
+          }
+          // Backstop check 500ms after load in case the load event already fired
+          setTimeout(() => {
+            if (!initialized && window.hbspt && window.hbspt.forms) {
+              initForm();
+            }
+          }, 500);
+        }
+      };
+
+      if ("requestIdleCallback" in window) {
+        requestIdleCallback(run, { timeout: 2000 });
+      } else {
+        setTimeout(run, 150);
+      }
+    };
+
+    // User intent: trigger immediate init if user interacts with the form before idle
+    const container = document.getElementById("fp-hero-contact");
+    if (container) {
+      ["pointerenter", "touchstart", "focusin"].forEach((evt) => {
+        container.addEventListener(
+          evt,
+          () => {
+            if (!initialized && window.hbspt && window.hbspt.forms) {
+              initForm();
+            }
+          },
+          { once: true, passive: true },
+        );
+      });
+    }
+
+    if (document.readyState === "complete") {
+      scheduleInit();
     } else {
-      checkAndInit();
+      window.addEventListener("load", scheduleInit, { once: true });
     }
   })();
 </script>
