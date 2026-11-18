@@ -38,6 +38,14 @@ export interface Props {
   toolLinks?: LinkItem[];
   regionGroups?: LinkBlock[];
   complianceBadges?: BadgeItem[];
+  /** Fixed UI strings; each defaults to the English label. */
+  labels?: {
+    company?: string;
+    social?: string;
+    legal?: string;
+    privacy?: string;
+    privacyNote?: string;
+  };
 }
 
 const {
@@ -50,7 +58,15 @@ const {
   toolLinks = [],
   regionGroups = [],
   complianceBadges = [],
+  labels = {},
 } = Astro.props;
+const {
+  company: companyLabel = "Company",
+  social: socialLabel = "Social",
+  legal: legalLabel = "Legal",
+  privacy: privacyLabel = "Privacy Policy",
+  privacyNote = "Your data security and privacy matter most to us.",
+} = labels;
 ---
 
 <footer class="font-body bg-generic-00 border-t border-neutral-300">
@@ -76,7 +92,7 @@ const {
           >
             <span
               class="m-0 text-[length:var(--fs-body-sm)] leading-[length:var(--lh-body-sm)] font-medium text-vault-navy"
-              >Company</span
+              >{companyLabel}</span
             >
             <span
               class="footer-acc-icon md:hidden shrink-0 text-[18px] leading-none font-normal text-neutral-500"
@@ -114,7 +130,7 @@ const {
           >
             <span
               class="m-0 text-[length:var(--fs-body-sm)] leading-[length:var(--lh-body-sm)] font-medium text-vault-navy"
-              >Social</span
+              >{socialLabel}</span
             >
             <span
               class="footer-acc-icon md:hidden shrink-0 text-[18px] leading-none font-normal text-neutral-500"
@@ -354,12 +370,12 @@ const {
           <a
             href="https://www.clear.in/s/legal"
             class="text-[length:var(--fs-body-sm)] leading-[length:var(--lh-body-sm)] font-medium text-neutral-500 no-underline hover:text-vault-navy transition-colors py-1 inline-flex items-center"
-            >Legal</a
+            >{legalLabel}</a
           >
           <a
             href="https://www.clear.in/meta/privacy"
             class="text-[length:var(--fs-body-sm)] leading-[length:var(--lh-body-sm)] font-medium text-neutral-500 no-underline hover:text-vault-navy transition-colors py-1 inline-flex items-center"
-            >Privacy Policy</a
+            >{privacyLabel}</a
           >
         </div>
         {
@@ -394,7 +410,7 @@ const {
         <p
           class="m-0 text-[length:var(--fs-body-sm)] leading-[length:var(--lh-body-sm)] text-neutral-500"
         >
-          Your data security and privacy matter most to us.
+          {privacyNote}
         </p>
       </div>
     </div>
