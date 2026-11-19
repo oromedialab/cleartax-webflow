@@ -148,6 +148,7 @@ const cards: SupportCard[] = [
   aria-modal="true"
   aria-labelledby="fr-supports-overlay-title"
   aria-hidden="true"
+  inert
   class="fixed inset-0 z-[2000] hidden items-center justify-center bg-generic-100/70 p-4 backdrop-blur-sm"
 >
   <div
@@ -249,8 +250,9 @@ const cards: SupportCard[] = [
               type="button"
               aria-label="Précédent"
               aria-controls="fr-supports-overlay-title"
-              class="inline-flex cursor-pointer items-center justify-center rounded border border-neutral-300 bg-generic-00 p-2 text-vault-navy transition-colors duration-150 hover:border-nova-blue"
+              class="inline-flex cursor-pointer items-center justify-center rounded border border-neutral-300 bg-generic-00 p-2 text-vault-navy transition-colors duration-150 hover:border-nova-blue disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:border-neutral-300"
               data-fr-supports-prev
+              disabled
             >
               <svg
                 width="20"
@@ -272,7 +274,7 @@ const cards: SupportCard[] = [
               type="button"
               aria-label="Suivant"
               aria-controls="fr-supports-overlay-title"
-              class="inline-flex cursor-pointer items-center justify-center rounded border border-neutral-300 bg-generic-00 p-2 text-vault-navy transition-colors duration-150 hover:border-nova-blue"
+              class="inline-flex cursor-pointer items-center justify-center rounded border border-neutral-300 bg-generic-00 p-2 text-vault-navy transition-colors duration-150 hover:border-nova-blue disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:border-neutral-300"
               data-fr-supports-next
             >
               <svg
@@ -336,9 +338,19 @@ const cards: SupportCard[] = [
     var current = 0;
     var lastFocused = null;
 
+    function updateNav() {
+      if (prevBtn) {
+        prevBtn.disabled = current <= 0;
+      }
+      if (nextBtn) {
+        nextBtn.disabled = current >= count - 1;
+      }
+    }
+
     function show(index) {
-      // Wraps both ways, so neither chevron is ever a dead control.
-      current = ((index % count) + count) % count;
+      if (index < 0) index = 0;
+      if (index >= count) index = count - 1;
+      current = index;
       for (var i = 0; i < count; i++) {
         headings[i].hidden = i !== current;
         bodies[i].hidden = i !== current;
@@ -349,6 +361,7 @@ const cards: SupportCard[] = [
           icons[i].style.display = i === current ? "block" : "none";
         }
       }
+      updateNav();
       // The panel scrolls on short windows; a card further down the list would
       // otherwise open mid-way through its own copy.
       panel.scrollTop = 0;
@@ -360,6 +373,7 @@ const cards: SupportCard[] = [
     function open(index, opener) {
       lastFocused = opener || document.activeElement;
       show(index);
+      overlay.removeAttribute("inert");
       overlay.style.display = "flex";
       overlay.setAttribute("aria-hidden", "false");
       document.body.style.overflow = "hidden";
@@ -369,6 +383,7 @@ const cards: SupportCard[] = [
     function close() {
       overlay.style.display = "none";
       overlay.setAttribute("aria-hidden", "true");
+      overlay.setAttribute("inert", "");
       document.body.style.overflow = "";
       if (lastFocused && lastFocused.focus) lastFocused.focus();
     }
@@ -392,11 +407,15 @@ const cards: SupportCard[] = [
     if (closeBtn) closeBtn.addEventListener("click", close);
     if (prevBtn)
       prevBtn.addEventListener("click", function () {
-        show(current - 1);
+        if (current > 0) {
+          show(current - 1);
+        }
       });
     if (nextBtn)
       nextBtn.addEventListener("click", function () {
-        show(current + 1);
+        if (current < count - 1) {
+          show(current + 1);
+        }
       });
 
     overlay.addEventListener("click", function (e) {
@@ -415,11 +434,15 @@ const cards: SupportCard[] = [
       // dialog is a native arrow-key control (no radio group, select or text
       // field), so there is no default behaviour to steal here.
       if (e.key === "ArrowLeft") {
-        show(current - 1);
+        if (current > 0) {
+          show(current - 1);
+        }
         return;
       }
       if (e.key === "ArrowRight") {
-        show(current + 1);
+        if (current < count - 1) {
+          show(current + 1);
+        }
         return;
       }
 

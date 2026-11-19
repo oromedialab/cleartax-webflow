@@ -322,7 +322,7 @@ const stats: { label: string; value: string; width: string }[] = [
       <!-- Opens the HubSpot modal from `DemoModal.astro`. The href is kept real
            so the CTA still goes somewhere if that section is absent. -->
       <a
-        href="javascript:void(0)"
+        href="#contactForm"
         onclick="document.getElementById('contactForm').scrollIntoView({behavior:'smooth'})"
         class="max-md:w-full inline-flex items-center justify-center gap-2 rounded-lg border border-nova-blue bg-nova-blue px-10 py-3.5 text-[length:var(--fs-label-lg)] leading-[length:var(--lh-label-lg)] font-medium text-nova-50 no-underline transition-all duration-200 hover:bg-generic-00 hover:text-nova-blue"
       >
@@ -509,8 +509,10 @@ const stats: { label: string; value: string; width: string }[] = [
     const reduceMotion =
       window.matchMedia &&
       window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const isTouchOnly =
+      window.matchMedia && window.matchMedia("(hover: none)").matches;
 
-    if (reduceMotion) {
+    if (reduceMotion || isTouchOnly) {
       // Static dot grid. No animation loop, no cursor reaction.
       initGrid();
       paint();
@@ -523,6 +525,18 @@ const stats: { label: string; value: string; width: string }[] = [
 
     let lastTime = performance.now();
     let isFirstFrame = true;
+    let running = false;
+
+    function start() {
+      if (running) return;
+      running = true;
+      lastTime = performance.now();
+      requestAnimationFrame(draw);
+    }
+
+    function stop() {
+      running = false;
+    }
 
     function draw(time) {
       if (dots.length === 0) {
@@ -646,12 +660,38 @@ const stats: { label: string; value: string; width: string }[] = [
         paint();
         isFirstFrame = false;
       }
-      requestAnimationFrame(draw);
+
+      // Idle sleeping: if settled and no cursor is over the section, stop loop
+      if (!moving && !hover && !isFirstFrame) {
+        stop();
+      } else if (running) {
+        requestAnimationFrame(draw);
+      }
     }
 
-    window.addEventListener("resize", initGrid);
-    initGrid();
-    requestAnimationFrame(draw);
+    function rebuild() {
+      initGrid();
+      paint();
+    }
+
+    window.addEventListener("resize", rebuild);
+    rebuild();
+
+    if ("IntersectionObserver" in window) {
+      const io = new IntersectionObserver(
+        (entries) => {
+          for (let i = 0; i < entries.length; i++) {
+            if (entries[i].isIntersecting) {
+              if (hover) start();
+            } else {
+              stop();
+            }
+          }
+        },
+        { rootMargin: "200px 0px" },
+      );
+      io.observe(section);
+    }
 
     section.addEventListener("mousemove", (e) => {
       const rect = canvas.getBoundingClientRect();
@@ -668,6 +708,7 @@ const stats: { label: string; value: string; width: string }[] = [
       hover = true;
       mouse.x = nx;
       mouse.y = ny;
+      start();
     });
 
     section.addEventListener("mouseleave", () => {
