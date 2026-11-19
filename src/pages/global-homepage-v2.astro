@@ -94,31 +94,31 @@ import DemoModal from "../sections/global-homepage-v2/DemoModal.astro";
       })();
     </script>
 
-    <!-- 2. GTM — loads only after the visitor responds to the consent banner -->
+    <!-- 2. GTM — standard snippet, loaded unconditionally so Search Console and
+         crawlers can see it. Consent is enforced by Google Consent Mode v2:
+         every signal defaults to denied until Usercentrics reports a choice
+         (Usercentrics must have Google Consent Mode enabled / the GTM template
+         in use). The default block MUST run before the GTM snippet. -->
     <script is:inline>
-      (function () {
-        function loadGTM() {
-          (function (w, d, s, l, i) {
-            w[l] = w[l] || [];
-            w[l].push({ "gtm.start": new Date().getTime(), event: "gtm.js" });
-            var f = d.getElementsByTagName(s)[0],
-              j = d.createElement(s),
-              dl = l != "dataLayer" ? "&l=" + l : "";
-            j.async = true;
-            j.src = "https://www.googletagmanager.com/gtm.js?id=" + i + dl;
-            f.parentNode.insertBefore(j, f);
-          })(window, document, "script", "dataLayer", "GTM-P5NDQXGH");
-        }
-
-        window.addEventListener("UC_UI_CMP_EVENT", function (event) {
-          if (
-            event.detail &&
-            ["ACCEPT_ALL", "DENY_ALL", "SAVE"].indexOf(event.detail.type) !== -1
-          ) {
-            loadGTM();
-          }
-        });
-      })();
+      window.dataLayer = window.dataLayer || [];
+      function gtag() {
+        dataLayer.push(arguments);
+      }
+      gtag("consent", "default", {
+        ad_storage: "denied",
+        ad_user_data: "denied",
+        ad_personalization: "denied",
+        analytics_storage: "denied",
+        functionality_storage: "denied",
+        personalization_storage: "denied",
+        security_storage: "granted",
+        wait_for_update: 500,
+      });
+      gtag("set", "ads_data_redaction", true);
+      gtag("set", "url_passthrough", true);
+    </script>
+    <script is:inline>
+      (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','GTM-P5NDQXGH');
     </script>
     <link rel="preconnect" href="https://js-na2.hsforms.net" />
     <link rel="preconnect" href="https://forms.hsforms.com" />
