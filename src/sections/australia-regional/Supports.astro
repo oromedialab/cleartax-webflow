@@ -3,7 +3,8 @@
  * "Australia e-invoicing at a glance"
  *
  * 2x2 grid of 4 cards:
- * - Top 2 cards (card 0 and card 1) are open by default.
+ * - On desktop (md+): Top 2 cards (card 0 and card 1) are open by default.
+ * - On mobile (< md): All cards start closed and only open when clicked.
  * - Bottom cards start closed and only open when clicked.
  * - Each card sizes independently to its own content (items-start).
  * - Clicking a card toggles only that card open/closed without stretching adjacent cards.
@@ -79,9 +80,10 @@ const cards: SupportCard[] = [
                         >
                             <button
                                 type="button"
-                                class={`group flex w-full cursor-pointer items-center justify-between gap-4 md:gap-6 p-6 text-left transition-all duration-150 ease-in-out bg-generic-00 border-0 outline-none focus:outline-none focus:ring-0 ${isDefaultOpen ? "pb-3" : ""}`}
+                                class="group flex w-full cursor-pointer items-center justify-between gap-4 md:gap-6 p-6 text-left transition-all duration-150 ease-in-out bg-generic-00 border-0 outline-none focus:outline-none focus:ring-0"
                                 data-au-glance-toggle={i}
-                                aria-expanded={isDefaultOpen ? "true" : "false"}
+                                data-default-open={isDefaultOpen ? "true" : undefined}
+                                aria-expanded="false"
                             >
                                 <img
                                     src={card.icon}
@@ -104,11 +106,7 @@ const cards: SupportCard[] = [
                                     aria-hidden="true"
                                     focusable="false"
                                     data-au-glance-icon={i}
-                                    style={
-                                        isDefaultOpen
-                                            ? "transform: rotate(45deg);"
-                                            : "transform: rotate(0deg);"
-                                    }
+                                    data-default-open={isDefaultOpen ? "true" : undefined}
                                 >
                                     <path
                                         d="M12 5V19"
@@ -127,14 +125,10 @@ const cards: SupportCard[] = [
                                 </svg>
                             </button>
                             <div
-                                class="grid overflow-hidden transition-[grid-template-rows,opacity] duration-300 ease-out border-0"
-                                style={
-                                    isDefaultOpen
-                                        ? "grid-template-rows: 1fr; opacity: 1;"
-                                        : "grid-template-rows: 0fr; opacity: 0;"
-                                }
+                                class="au-glance-content grid overflow-hidden transition-[grid-template-rows,opacity] duration-300 ease-out border-0"
                                 data-au-glance-content={i}
-                                data-open={isDefaultOpen ? "true" : "false"}
+                                data-default-open={isDefaultOpen ? "true" : undefined}
+                                data-open="false"
                             >
                                 <div class="overflow-hidden border-0">
                                     <div class="px-6 pb-6 pt-1">
@@ -151,6 +145,28 @@ const cards: SupportCard[] = [
         </div>
     </div>
 </section>
+
+<style>
+    .au-glance-content {
+        grid-template-rows: 0fr;
+        opacity: 0;
+    }
+
+    @media (min-width: 768px) {
+        .au-glance-content[data-default-open="true"] {
+            grid-template-rows: 1fr;
+            opacity: 1;
+        }
+
+        [data-au-glance-icon][data-default-open="true"] {
+            transform: rotate(45deg);
+        }
+
+        [data-au-glance-toggle][data-default-open="true"] {
+            padding-bottom: 0.75rem;
+        }
+    }
+</style>
 
 <script is:inline>
     (function () {
@@ -212,6 +228,10 @@ const cards: SupportCard[] = [
             );
             if (!content || !btn) return;
 
+            content.removeAttribute("data-default-open");
+            btn.removeAttribute("data-default-open");
+            if (icon) icon.removeAttribute("data-default-open");
+
             var num = Number(index);
             var pairIndex = num % 2 === 0 ? num + 1 : num - 1;
             var thisCard = document.querySelector(
@@ -244,6 +264,10 @@ const cards: SupportCard[] = [
                 '[data-au-glance-icon="' + index + '"]',
             );
             if (!content || !btn) return;
+
+            content.removeAttribute("data-default-open");
+            btn.removeAttribute("data-default-open");
+            if (icon) icon.removeAttribute("data-default-open");
 
             var num = Number(index);
             var pairIndex = num % 2 === 0 ? num + 1 : num - 1;
@@ -289,12 +313,32 @@ const cards: SupportCard[] = [
             toggle(index);
         });
 
-        window.addEventListener("resize", syncRowHeights);
-        if (document.readyState === "loading") {
-            document.addEventListener("DOMContentLoaded", syncRowHeights);
-        } else {
+        function init() {
+            var isDesktop = window.innerWidth >= 768;
+            for (var i = 0; i < 4; i++) {
+                var content = document.querySelector(
+                    '[data-au-glance-content="' + i + '"]',
+                );
+                var btn = document.querySelector(
+                    '[data-au-glance-toggle="' + i + '"]',
+                );
+                if (content && content.hasAttribute("data-default-open")) {
+                    var isOpen = isDesktop && (i === 0 || i === 1);
+                    content.setAttribute("data-open", isOpen ? "true" : "false");
+                    if (btn) btn.setAttribute("aria-expanded", isOpen ? "true" : "false");
+                }
+            }
             syncRowHeights();
         }
+
+        init();
+        if (document.readyState === "loading") {
+            document.addEventListener("DOMContentLoaded", init);
+        }
         window.addEventListener("load", syncRowHeights);
+        window.addEventListener("resize", function () {
+            init();
+            syncRowHeights();
+        });
     })();
 </script>
