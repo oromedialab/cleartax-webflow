@@ -769,6 +769,11 @@ const countries: Country[] = [
           flag.height = 28;
           flag.loading = "lazy";
           flag.decoding = "async";
+          /* If the flag host is blocked (CSP img-src) or down, drop the broken
+             image icon and leave the marker as a plain dot. */
+          flag.onerror = function () {
+            flag.remove();
+          };
           content.appendChild(flag);
         }
         wrapper.appendChild(content);
