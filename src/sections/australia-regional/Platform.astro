@@ -1,17 +1,15 @@
 ---
 /**
- * "Build your Norway e-invoicing solution for 2027 and 2030." — Figma node
- * 17103:85017 ("Fold 9").
+ * "How ClearTax gets you on Peppol in Australia"
  *
- * A 2-column grid of 5 feature cards, the last spanning both columns. Each
- * card is an accordion that expands inline to reveal an image placeholder
- * and body text. First 4 cards sit in a 2×2 grid at equal size; the 5th
- * card spans both columns at full width.
+ * Feature cards with accordion expansion:
+ * - On desktop (md+): Top cards in each column (cards 0 and 1) start open by default.
+ * - On mobile (< md): All cards start closed and only open when clicked.
+ * - Cards 2, 3, 4, 5, 6 start closed and only open when clicked.
+ * - Clicking a card toggles it open/closed (and closes any open sibling in the same column).
+ * - Plus icon rotates to a minus when open.
  *
- * All cards are collapsed by default. Clicking a card toggles it open/closed.
- * The plus icon rotates to a minus when open.
- *
- * Ids are `no-features-` prefixed: embeds share one namespace per page.
+ * Ids are `no-features-` prefixed.
  */
 interface Feature {
     title: string;
@@ -62,293 +60,299 @@ const features: Feature[] = [
 
 <section class="bg-generic-00 py-16 lg:py-20">
     <div class="w-full max-w-[var(--container-max)] mx-auto px-4 md:px-6">
-        <div
-            class="mx-auto mb-8 flex flex-col items-center gap-4 text-center lg:mb-12"
-        >
-            <h2
-                class="m-0 max-w-141 font-heading font-medium text-vault-navy text-[length:var(--fs-h1)] leading-[length:var(--lh-h1)] tracking-[-0.5px]"
-            >
+        <div class="mx-auto mb-8 flex flex-col items-center gap-4 text-center lg:mb-12">
+            <h2 class="m-0 max-w-141 font-heading font-medium text-vault-navy text-[length:var(--fs-h1)] leading-[length:var(--lh-h1)] tracking-[-0.5px]">
                 How ClearTax gets you on Peppol in Australia
             </h2>
-            <p
-                class="m-0 max-w-147 font-body text-[length:var(--fs-body)] leading-[length:var(--lh-body)] text-neutral-500"
-            >
+            <p class="m-0 max-w-147 font-body text-[length:var(--fs-body)] leading-[length:var(--lh-body)] text-neutral-500">
                 One Peppol platform to create, validate, send, receive and
                 archive every invoice, connected to your ERP and the rest of
                 your global footprint.
             </p>
         </div>
 
-        {
-            /* Two independent columns so expanding one card doesn't push the adjacent column */
-        }
+        {/* Two independent columns so expanding one card doesn't push the adjacent column */}
         <div class="flex flex-col gap-6 md:flex-row">
             {/* Left column: cards 0, 2, 4 */}
             <div class="flex flex-1 flex-col gap-6">
-                {
-                    features
-                        .filter((f) => !f.span2)
-                        .filter((_, idx) => idx % 2 === 0)
-                        .map((f) => {
-                            const i = features.indexOf(f);
-                            const isDefaultOpen = i === 0;
-                            return (
-                                <div
-                                    class="flex flex-col"
-                                    data-no-features-card={i}
-                                >
-                                    <button
-                                        type="button"
-                                        class={`group flex w-full cursor-pointer items-center justify-between gap-6 rounded-xl border border-neutral-300 bg-generic-00 p-6 text-left transition-all duration-150 ease-in-out ${isDefaultOpen ? "rounded-b-none border-b-0" : ""}`}
-                                        data-no-features-toggle={i}
-                                        aria-expanded={
-                                            isDefaultOpen ? "true" : "false"
-                                        }
-                                    >
-                                        <span class="font-heading text-[length:var(--fs-h6)] leading-[length:var(--lh-h6)] font-medium text-vault-navy md:min-h-[56px] flex items-center">
-                                            {f.title}
-                                        </span>
-                                        <svg
-                                            width="24"
-                                            height="24"
-                                            viewBox="0 0 24 24"
-                                            fill="none"
-                                            class="shrink-0 text-vault-navy transition-colors duration-150 ease-in-out"
-                                            aria-hidden="true"
-                                            focusable="false"
-                                            data-no-features-icon={i}
-                                            style={
-                                                isDefaultOpen
-                                                    ? "transform: rotate(180deg);"
-                                                    : ""
-                                            }
-                                        >
-                                            <path
-                                                d="M5 12H19"
-                                                stroke="currentColor"
-                                                stroke-width="1.5"
-                                                stroke-linecap="round"
-                                                stroke-linejoin="round"
-                                            />
-                                            <path
-                                                d="M12 5V19"
-                                                stroke="currentColor"
-                                                stroke-width="1.5"
-                                                stroke-linecap="round"
-                                                stroke-linejoin="round"
-                                                data-no-features-vertical={i}
-                                                style={
-                                                    isDefaultOpen
-                                                        ? "opacity: 0;"
-                                                        : "opacity: 1;"
-                                                }
-                                            />
-                                        </svg>
-                                    </button>
-                                    <div
-                                        class="grid overflow-hidden rounded-b-xl border border-t-0 border-neutral-300 bg-generic-00 transition-[grid-template-rows,opacity,border-color] duration-300 ease-in-out flex-1"
-                                        style={
-                                            isDefaultOpen
-                                                ? "grid-template-rows: 1fr; opacity: 1;"
-                                                : "grid-template-rows: 0fr; opacity: 0; border-color: transparent;"
-                                        }
-                                        data-no-features-content={i}
-                                        data-open={
-                                            isDefaultOpen ? "true" : "false"
-                                        }
-                                    >
-                                        <div class="overflow-hidden h-full flex flex-col justify-between">
-                                            <div class="p-6 pt-0 flex-1 flex flex-col justify-between">
-                                                <div class="mt-4 w-full">
-                                                    <img
-                                                        src={f.image}
-                                                        alt={f.title}
-                                                        class="aspect-[574/323] w-full rounded-lg bg-visual-placeholder object-cover"
-                                                        loading="lazy"
-                                                    />
-                                                </div>
-                                                <p class="m-0 mt-4 font-body font-normal text-neutral-500 text-[length:var(--fs-body)] leading-[length:var(--lh-body)] md:min-h-[192px] lg:min-h-[144px]">
-                                                    {f.body}
-                                                </p>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            );
-                        })
-                }
-            </div>
-            {/* Right column: cards 1, 3, 5 */}
-            <div class="flex flex-1 flex-col gap-6">
-                {
-                    features
-                        .filter((f) => !f.span2)
-                        .filter((_, idx) => idx % 2 === 1)
-                        .map((f) => {
-                            const i = features.indexOf(f);
-                            const isDefaultOpen = i === 1;
-                            return (
-                                <div
-                                    class="flex flex-col"
-                                    data-no-features-card={i}
-                                >
-                                    <button
-                                        type="button"
-                                        class={`group flex w-full cursor-pointer items-center justify-between gap-6 rounded-xl border border-neutral-300 bg-generic-00 p-6 text-left transition-all duration-150 ease-in-out ${isDefaultOpen ? "rounded-b-none border-b-0" : ""}`}
-                                        data-no-features-toggle={i}
-                                        aria-expanded={
-                                            isDefaultOpen ? "true" : "false"
-                                        }
-                                    >
-                                        <span class="font-heading text-[length:var(--fs-h6)] leading-[length:var(--lh-h6)] font-medium text-vault-navy md:min-h-[56px] flex items-center">
-                                            {f.title}
-                                        </span>
-                                        <svg
-                                            width="24"
-                                            height="24"
-                                            viewBox="0 0 24 24"
-                                            fill="none"
-                                            class="shrink-0 text-vault-navy transition-colors duration-150 ease-in-out"
-                                            aria-hidden="true"
-                                            focusable="false"
-                                            data-no-features-icon={i}
-                                            style={
-                                                isDefaultOpen
-                                                    ? "transform: rotate(180deg);"
-                                                    : ""
-                                            }
-                                        >
-                                            <path
-                                                d="M5 12H19"
-                                                stroke="currentColor"
-                                                stroke-width="1.5"
-                                                stroke-linecap="round"
-                                                stroke-linejoin="round"
-                                                />
-                                            <path
-                                                d="M12 5V19"
-                                                stroke="currentColor"
-                                                stroke-width="1.5"
-                                                stroke-linecap="round"
-                                                stroke-linejoin="round"
-                                                data-no-features-vertical={i}
-                                                style={
-                                                    isDefaultOpen
-                                                        ? "opacity: 0;"
-                                                        : "opacity: 1;"
-                                                }
-                                            />
-                                        </svg>
-                                    </button>
-                                    <div
-                                        class="grid overflow-hidden rounded-b-xl border border-t-0 border-neutral-300 bg-generic-00 transition-[grid-template-rows,opacity,border-color] duration-300 ease-in-out flex-1"
-                                        style={
-                                            isDefaultOpen
-                                                ? "grid-template-rows: 1fr; opacity: 1;"
-                                                : "grid-template-rows: 0fr; opacity: 0; border-color: transparent;"
-                                        }
-                                        data-no-features-content={i}
-                                        data-open={
-                                            isDefaultOpen ? "true" : "false"
-                                        }
-                                    >
-                                        <div class="overflow-hidden h-full flex flex-col justify-between">
-                                            <div class="p-6 pt-0 flex-1 flex flex-col justify-between">
-                                                <div class="mt-4 w-full">
-                                                    <img
-                                                        src={f.image}
-                                                        alt={f.title}
-                                                        class="aspect-[574/323] w-full rounded-lg bg-visual-placeholder object-cover"
-                                                        loading="lazy"
-                                                    />
-                                                </div>
-                                                <p class="m-0 mt-4 font-body font-normal text-neutral-500 text-[length:var(--fs-body)] leading-[length:var(--lh-body)] md:min-h-[192px] lg:min-h-[144px]">
-                                                    {f.body}
-                                                </p>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            );
-                        })
-                }
-            </div>
-        </div>
-        {/* Last card — full width */}
-        {
-            features
-                .filter((f) => f.span2)
-                .map((f) => {
-                    const i = features.indexOf(f);
-                    return (
-                        <div
-                            class="mt-6 flex flex-col"
-                            data-no-features-card={i}
-                        >
-                            <button
-                                type="button"
-                                class="group flex w-full cursor-pointer items-center justify-between gap-6 rounded-xl border border-neutral-300 bg-generic-00 p-6 text-left transition-all duration-150 ease-in-out"
-                                data-no-features-toggle={i}
-                                aria-expanded="false"
-                            >
-                                <span class="font-heading text-[length:var(--fs-h6)] leading-[length:var(--lh-h6)] font-medium text-vault-navy">
-                                    {f.title}
-                                </span>
-                                <svg
-                                    width="24"
-                                    height="24"
-                                    viewBox="0 0 24 24"
-                                    fill="none"
-                                    class="shrink-0 text-vault-navy transition-colors duration-150 ease-in-out"
-                                    aria-hidden="true"
-                                    focusable="false"
-                                    data-no-features-icon={i}
-                                >
-                                    <path
-                                        d="M5 12H19"
-                                        stroke="currentColor"
-                                        stroke-width="1.5"
-                                        stroke-linecap="round"
-                                        stroke-linejoin="round"
-                                    />
-                                    <path
-                                        d="M12 5V19"
-                                        stroke="currentColor"
-                                        stroke-width="1.5"
-                                        stroke-linecap="round"
-                                        stroke-linejoin="round"
-                                        data-no-features-vertical={i}
-                                    />
-                                </svg>
-                            </button>
+                {features
+                    .filter((f) => !f.span2)
+                    .filter((_, idx) => idx % 2 === 0)
+                    .map((f) => {
+                        const i = features.indexOf(f);
+                        const isDefaultOpen = i === 0;
+                        return (
                             <div
-                                class="grid overflow-hidden rounded-b-xl border border-t-0 border-neutral-300 bg-generic-00 transition-[grid-template-rows,opacity,border-color] duration-300 ease-in-out"
-                                style="grid-template-rows: 0fr; opacity: 0; border-color: transparent;"
-                                data-no-features-content={i}
-                                data-open="false"
+                                class="flex flex-col"
+                                data-no-features-card={i}
                             >
-                                <div class="overflow-hidden">
-                                    <div class="p-6 pt-0">
-                                        <div class="mt-4 w-full">
-                                            <img
-                                                src={f.image}
-                                                alt={f.title}
-                                                class="aspect-[574/323] w-full rounded-lg bg-visual-placeholder object-cover"
-                                                loading="lazy"
-                                            />
+                                <button
+                                    type="button"
+                                    class="group flex w-full cursor-pointer items-center justify-between gap-6 rounded-xl border border-neutral-300 bg-generic-00 p-6 text-left transition-all duration-150 ease-in-out"
+                                    data-no-features-toggle={i}
+                                    data-default-open={
+                                        isDefaultOpen ? "true" : undefined
+                                    }
+                                    aria-expanded="false"
+                                >
+                                    <span class="font-heading text-[length:var(--fs-h6)] leading-[length:var(--lh-h6)] font-medium text-vault-navy md:min-h-[56px] flex items-center">
+                                        {f.title}
+                                    </span>
+                                    <svg
+                                        width="24"
+                                        height="24"
+                                        viewBox="0 0 24 24"
+                                        fill="none"
+                                        class="shrink-0 text-vault-navy transition-colors duration-150 ease-in-out"
+                                        aria-hidden="true"
+                                        focusable="false"
+                                        data-no-features-icon={i}
+                                        data-default-open={
+                                            isDefaultOpen ? "true" : undefined
+                                        }
+                                    >
+                                        <path
+                                            d="M5 12H19"
+                                            stroke="currentColor"
+                                            stroke-width="1.5"
+                                            stroke-linecap="round"
+                                            stroke-linejoin="round"
+                                        />
+                                        <path
+                                            d="M12 5V19"
+                                            stroke="currentColor"
+                                            stroke-width="1.5"
+                                            stroke-linecap="round"
+                                            stroke-linejoin="round"
+                                            data-no-features-vertical={i}
+                                            data-default-open={
+                                                isDefaultOpen
+                                                    ? "true"
+                                                    : undefined
+                                            }
+                                        />
+                                    </svg>
+                                </button>
+                                <div
+                                    class="no-features-content grid overflow-hidden rounded-b-xl border border-t-0 border-neutral-300 bg-generic-00 transition-[grid-template-rows,opacity,border-color] duration-300 ease-in-out flex-1"
+                                    data-no-features-content={i}
+                                    data-default-open={
+                                        isDefaultOpen ? "true" : undefined
+                                    }
+                                    data-open="false"
+                                >
+                                    <div class="overflow-hidden h-full flex flex-col justify-between">
+                                        <div class="p-6 pt-0 flex-1 flex flex-col justify-between">
+                                            <div class="mt-4 w-full">
+                                                <img
+                                                    src={f.image}
+                                                    alt={f.title}
+                                                    class="aspect-[574/323] w-full rounded-lg bg-visual-placeholder object-cover"
+                                                    loading="lazy"
+                                                />
+                                            </div>
+                                            <p class="m-0 mt-4 font-body font-normal text-neutral-500 text-[length:var(--fs-body)] leading-[length:var(--lh-body)] md:min-h-[192px] lg:min-h-[144px]">
+                                                {f.body}
+                                            </p>
                                         </div>
-                                        <p class="m-0 mt-4 font-body font-normal text-neutral-500 text-[length:var(--fs-body)] leading-[length:var(--lh-body)]">
-                                            {f.body}
-                                        </p>
                                     </div>
                                 </div>
                             </div>
+                        );
+                    })}
+            </div>
+            {/* Right column: cards 1, 3, 5 */}
+            <div class="flex flex-1 flex-col gap-6">
+                {features
+                    .filter((f) => !f.span2)
+                    .filter((_, idx) => idx % 2 === 1)
+                    .map((f) => {
+                        const i = features.indexOf(f);
+                        const isDefaultOpen = i === 1;
+                        return (
+                            <div
+                                class="flex flex-col"
+                                data-no-features-card={i}
+                            >
+                                <button
+                                    type="button"
+                                    class="group flex w-full cursor-pointer items-center justify-between gap-6 rounded-xl border border-neutral-300 bg-generic-00 p-6 text-left transition-all duration-150 ease-in-out"
+                                    data-no-features-toggle={i}
+                                    data-default-open={
+                                        isDefaultOpen ? "true" : undefined
+                                    }
+                                    aria-expanded="false"
+                                >
+                                    <span class="font-heading text-[length:var(--fs-h6)] leading-[length:var(--lh-h6)] font-medium text-vault-navy md:min-h-[56px] flex items-center">
+                                        {f.title}
+                                    </span>
+                                    <svg
+                                        width="24"
+                                        height="24"
+                                        viewBox="0 0 24 24"
+                                        fill="none"
+                                        class="shrink-0 text-vault-navy transition-colors duration-150 ease-in-out"
+                                        aria-hidden="true"
+                                        focusable="false"
+                                        data-no-features-icon={i}
+                                        data-default-open={
+                                            isDefaultOpen ? "true" : undefined
+                                        }
+                                    >
+                                        <path
+                                            d="M5 12H19"
+                                            stroke="currentColor"
+                                            stroke-width="1.5"
+                                            stroke-linecap="round"
+                                            stroke-linejoin="round"
+                                        />
+                                        <path
+                                            d="M12 5V19"
+                                            stroke="currentColor"
+                                            stroke-width="1.5"
+                                            stroke-linecap="round"
+                                            stroke-linejoin="round"
+                                            data-no-features-vertical={i}
+                                            data-default-open={
+                                                isDefaultOpen
+                                                    ? "true"
+                                                    : undefined
+                                            }
+                                        />
+                                    </svg>
+                                </button>
+                                <div
+                                    class="no-features-content grid overflow-hidden rounded-b-xl border border-t-0 border-neutral-300 bg-generic-00 transition-[grid-template-rows,opacity,border-color] duration-300 ease-in-out flex-1"
+                                    data-no-features-content={i}
+                                    data-default-open={
+                                        isDefaultOpen ? "true" : undefined
+                                    }
+                                    data-open="false"
+                                >
+                                    <div class="overflow-hidden h-full flex flex-col justify-between">
+                                        <div class="p-6 pt-0 flex-1 flex flex-col justify-between">
+                                            <div class="mt-4 w-full">
+                                                <img
+                                                    src={f.image}
+                                                    alt={f.title}
+                                                    class="aspect-[574/323] w-full rounded-lg bg-visual-placeholder object-cover"
+                                                    loading="lazy"
+                                                />
+                                            </div>
+                                            <p class="m-0 mt-4 font-body font-normal text-neutral-500 text-[length:var(--fs-body)] leading-[length:var(--lh-body)] md:min-h-[192px] lg:min-h-[144px]">
+                                                {f.body}
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        );
+                    })}
+            </div>
+        </div>
+        {/* Last card — full width */}
+        {features
+            .filter((f) => f.span2)
+            .map((f) => {
+                const i = features.indexOf(f);
+                return (
+                    <div class="mt-6 flex flex-col" data-no-features-card={i}>
+                        <button
+                            type="button"
+                            class="group flex w-full cursor-pointer items-center justify-between gap-6 rounded-xl border border-neutral-300 bg-generic-00 p-6 text-left transition-all duration-150 ease-in-out"
+                            data-no-features-toggle={i}
+                            aria-expanded="false"
+                        >
+                            <span class="font-heading text-[length:var(--fs-h6)] leading-[length:var(--lh-h6)] font-medium text-vault-navy">
+                                {f.title}
+                            </span>
+                            <svg
+                                width="24"
+                                height="24"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                class="shrink-0 text-vault-navy transition-colors duration-150 ease-in-out"
+                                aria-hidden="true"
+                                focusable="false"
+                                data-no-features-icon={i}
+                            >
+                                <path
+                                    d="M5 12H19"
+                                    stroke="currentColor"
+                                    stroke-width="1.5"
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                />
+                                <path
+                                    d="M12 5V19"
+                                    stroke="currentColor"
+                                    stroke-width="1.5"
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    data-no-features-vertical={i}
+                                />
+                            </svg>
+                        </button>
+                        <div
+                            class="no-features-content grid overflow-hidden rounded-b-xl border border-t-0 border-neutral-300 bg-generic-00 transition-[grid-template-rows,opacity,border-color] duration-300 ease-in-out"
+                            data-no-features-content={i}
+                            data-open="false"
+                        >
+                            <div class="overflow-hidden">
+                                <div class="p-6 pt-0">
+                                    <div class="mt-4 w-full">
+                                        <img
+                                            src={f.image}
+                                            alt={f.title}
+                                            class="aspect-[574/323] w-full rounded-lg bg-visual-placeholder object-cover"
+                                            loading="lazy"
+                                        />
+                                    </div>
+                                    <p class="m-0 mt-4 font-body font-normal text-neutral-500 text-[length:var(--fs-body)] leading-[length:var(--lh-body)]">
+                                        {f.body}
+                                    </p>
+                                </div>
+                            </div>
                         </div>
-                    );
-                })
-        }
+                    </div>
+                );
+            })}
     </div>
 </section>
+
+<style is:global>
+    .no-features-content {
+        grid-template-rows: 0fr;
+        opacity: 0;
+        border-color: transparent;
+    }
+
+    .no-features-content[data-open="true"] {
+        border-color: var(--palette-neutral-300, #d1d5db);
+    }
+
+    @media (min-width: 768px) {
+        .no-features-content[data-default-open="true"] {
+            grid-template-rows: 1fr;
+            opacity: 1;
+            border-color: var(--palette-neutral-300, #d1d5db);
+        }
+
+        [data-no-features-icon][data-default-open="true"] {
+            transform: rotate(180deg);
+        }
+
+        [data-no-features-vertical][data-default-open="true"] {
+            opacity: 0;
+        }
+
+        [data-no-features-toggle][data-default-open="true"] {
+            border-bottom-left-radius: 0;
+            border-bottom-right-radius: 0;
+            border-bottom-width: 0;
+        }
+    }
+</style>
 
 <script is:inline>
     /* Smooth accordion toggle for feature cards with row height synchronization. */
@@ -424,6 +428,12 @@ const features: Feature[] = [
             );
             if (!content || content.getAttribute("data-open") !== "true")
                 return;
+
+            content.removeAttribute("data-default-open");
+            if (btn) btn.removeAttribute("data-default-open");
+            if (vertical) vertical.removeAttribute("data-default-open");
+            if (icon) icon.removeAttribute("data-default-open");
+
             content.style.gridTemplateRows = "0fr";
             content.style.opacity = "0";
             content.style.borderColor = "transparent";
@@ -479,10 +489,17 @@ const features: Feature[] = [
                 setTimeout(syncRowHeights, 320);
             } else {
                 closeSiblingInColumn(index);
+
+                content.removeAttribute("data-default-open");
+                if (btn) btn.removeAttribute("data-default-open");
+                if (vertical) vertical.removeAttribute("data-default-open");
+                if (icon) icon.removeAttribute("data-default-open");
+
                 // Open — animate height to auto
                 content.style.gridTemplateRows = "1fr";
                 content.style.opacity = "1";
-                content.style.borderColor = "";
+                content.style.borderColor =
+                    "var(--palette-neutral-300, #d1d5db)";
                 content.setAttribute("data-open", "true");
                 btn.classList.add("rounded-b-none", "border-b-0");
                 btn.setAttribute("aria-expanded", "true");
@@ -515,9 +532,41 @@ const features: Feature[] = [
             toggle(index);
         });
 
+        function init() {
+            var isDesktop = window.innerWidth >= 768;
+            for (var i = 0; i < 7; i++) {
+                var content = document.querySelector(
+                    '[data-no-features-content="' + i + '"]',
+                );
+                var btn = document.querySelector(
+                    '[data-no-features-toggle="' + i + '"]',
+                );
+                if (content && content.hasAttribute("data-default-open")) {
+                    var isOpen = isDesktop && (i === 0 || i === 1);
+                    content.setAttribute(
+                        "data-open",
+                        isOpen ? "true" : "false",
+                    );
+                    if (btn)
+                        btn.setAttribute(
+                            "aria-expanded",
+                            isOpen ? "true" : "false",
+                        );
+                }
+            }
+            syncRowHeights();
+        }
+
         // Initialize and maintain row height sync on resize/load
-        syncRowHeights();
-        window.addEventListener("resize", syncRowHeights);
+        init();
+        if (document.readyState === "loading") {
+            document.addEventListener("DOMContentLoaded", init);
+        }
+        window.addEventListener("load", syncRowHeights);
+        window.addEventListener("resize", function () {
+            init();
+            syncRowHeights();
+        });
         setTimeout(syncRowHeights, 150);
         setTimeout(syncRowHeights, 450);
     })();

@@ -27,7 +27,6 @@ const stats = [
   },
 ];
 
-// Duplicate sets to create an infinite circular dialer wheel
 const loopSets = [0, 1, 2, 3];
 ---
 
@@ -53,10 +52,10 @@ const loopSets = [0, 1, 2, 3];
         <div class="bg-visual-placeholder aspect-[490/275] w-full rounded-xl mt-2 lg:mt-6"></div>
       </div>
 
-      <!-- Right Column: Repeating Dialer Wheel -->
-      <div class="lg:col-span-7 flex flex-col justify-center relative w-full h-[380px] sm:h-[525px] overflow-hidden">
+      <!-- Right Column: Auto-Drifting Dialer Wheel -->
+      <div class="lg:col-span-7 flex flex-col justify-center relative w-full h-[300px] sm:h-[525px] overflow-hidden">
         <div
-          class="de-platform-dialer relative w-full h-full overflow-y-scroll select-none cursor-grab"
+          class="de-platform-dialer relative w-full h-full overflow-hidden select-none"
           data-de-platform-dialer
           aria-label="E-Invoice workflow steps dialer"
         >
@@ -129,46 +128,30 @@ const loopSets = [0, 1, 2, 3];
     let itemHeight = items[0].offsetHeight || 60;
     let setHeight = itemHeight * itemCountPerSet;
 
-    // Recalculate dimensions on resize
     function measure() {
       itemHeight = items[0].offsetHeight || 60;
       setHeight = itemHeight * itemCountPerSet;
     }
 
-    // Start in the second set (setIndex 1) for infinite bidirectional scrolling
     measure();
-    dialer.scrollTop = setHeight;
+    let currentScroll = setHeight;
+    dialer.scrollTop = currentScroll;
 
-    let isInteracting = false;
-    let isPointerDown = false;
-    let startY = 0;
-    let startScrollTop = 0;
-    let interactionTimeout = null;
+    let isPaused = false;
+    let isVisible = false;
+    let rafId = null;
 
-    function handleInteractionStart() {
-      isInteracting = true;
-      if (interactionTimeout) clearTimeout(interactionTimeout);
-    }
+    // Pause auto-drift when hovered on desktop
+    dialer.addEventListener("mouseenter", () => {
+      isPaused = true;
+    });
+    dialer.addEventListener("mouseleave", () => {
+      isPaused = false;
+    });
 
-    function handleInteractionEnd() {
-      if (interactionTimeout) clearTimeout(interactionTimeout);
-      interactionTimeout = setTimeout(() => {
-        if (!isPointerDown) {
-          isInteracting = false;
-        }
-      }, 1500);
-    }
-
-    // Infinite loop wrap check & focal styling update
+    // Focal styling update
     function updateDialer() {
       if (!setHeight) return;
-
-      // Wrap around seamlessly
-      if (dialer.scrollTop < setHeight * 0.5) {
-        dialer.scrollTop += setHeight;
-      } else if (dialer.scrollTop >= setHeight * 2.5) {
-        dialer.scrollTop -= setHeight;
-      }
 
       const dialerRect = dialer.getBoundingClientRect();
       const dialerCenter = dialerRect.top + dialerRect.height / 2;
@@ -176,8 +159,8 @@ const loopSets = [0, 1, 2, 3];
 
       items.forEach((item) => {
         const itemRect = item.getBoundingClientRect();
-        // Check if item is inside or close to viewport
-        if (itemRect.bottom < dialerRect.top - 50 || itemRect.top > dialerRect.bottom + 50) {
+        if (itemRect.bottom < dialerRect.top - 20 || itemRect.top > dialerRect.bottom + 20) {
+          item.style.opacity = "0.2";
           return;
         }
 
@@ -207,53 +190,39 @@ const loopSets = [0, 1, 2, 3];
       });
     }
 
-    dialer.addEventListener("scroll", updateDialer, { passive: true });
-
-    // Pointer Drag interactions
-    dialer.addEventListener("pointerdown", (e) => {
-      isPointerDown = true;
-      handleInteractionStart();
-      startY = e.clientY;
-      startScrollTop = dialer.scrollTop;
-      dialer.style.cursor = "grabbing";
-      dialer.setPointerCapture(e.pointerId);
-    });
-
-    dialer.addEventListener("pointermove", (e) => {
-      if (!isPointerDown) return;
-      const dy = e.clientY - startY;
-      dialer.scrollTop = startScrollTop - dy;
-    });
-
-    function endPointerDrag(e) {
-      if (!isPointerDown) return;
-      isPointerDown = false;
-      dialer.style.cursor = "grab";
-      try {
-        dialer.releasePointerCapture(e.pointerId);
-      } catch (_) {}
-      handleInteractionEnd();
-    }
-
-    dialer.addEventListener("pointerup", endPointerDrag);
-    dialer.addEventListener("pointercancel", endPointerDrag);
-
-    // Pause auto-drift when hovered
-    dialer.addEventListener("mouseenter", handleInteractionStart);
-    dialer.addEventListener("mouseleave", handleInteractionEnd);
-    dialer.addEventListener("wheel", () => {
-      handleInteractionStart();
-      handleInteractionEnd();
-    }, { passive: true });
-
-    // Slow idle drift like a dialer wheel
-    let rafId = null;
+    // Continuous smooth automatic drift
     function autoDrift() {
-      if (!isInteracting) {
-        dialer.scrollTop += 0.45;
+      if (isVisible && !isPaused && setHeight > 0) {
+        currentScroll += 0.5;
+
+        // Seamless wrap around
+        if (currentScroll >= setHeight * 2.5) {
+          currentScroll -= setHeight;
+        } else if (currentScroll < setHeight * 0.5) {
+          currentScroll += setHeight;
+        }
+
+        dialer.scrollTop = currentScroll;
+        updateDialer();
       }
       rafId = requestAnimationFrame(autoDrift);
     }
+
+    // Only run animation when in view
+    if ("IntersectionObserver" in window) {
+      const observer = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            isVisible = entry.isIntersecting;
+          });
+        },
+        { threshold: 0.1 }
+      );
+      observer.observe(dialer);
+    } else {
+      isVisible = true;
+    }
+
     rafId = requestAnimationFrame(autoDrift);
 
     window.addEventListener("resize", () => {
