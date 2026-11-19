@@ -1,18 +1,485 @@
 ---
 /**
- * Solution section for Max ITC.
+ * Solution section for Max ITC — "The all-in-one Solution".
  */
+
+interface SolutionItem {
+  id: string;
+  title: string;
+  description: string;
+}
+
+const solutions: SolutionItem[] = [
+  {
+    id: "vendor-payments",
+    title: "Auto-manage vendor payments",
+    description:
+      "Zero impact from non-compliant vendors using smart vendor risk sort & auto payment",
+  },
+  {
+    id: "erp-flow",
+    title: "Instant updates with 2-way ERP flow",
+    description:
+      "Schedule Auto-Recon on Sundays, see the results in your mailbox on Monday morning!",
+  },
+  {
+    id: "vendor-comm",
+    title: "Automate vendor communication",
+    description:
+      "Multi-channel vendor communication to simplify vendor interactions",
+  },
+  {
+    id: "user-actions",
+    title: "Define or modify user actions",
+    description:
+      "Allow teams to smoothly interact, without accessing confidential data with advanced UAM",
+  },
+  {
+    id: "pan-matching",
+    title: "Configurable PAN-level Matching",
+    description:
+      "Avoid manual matching through highly configurable AI powered PAN level matching",
+  },
+];
 ---
 
-<section id="solution" class="py-16 lg:py-24 bg-generic-00">
-  <div class="mx-auto container px-4 lg:px-8">
-    <div class="text-center max-w-[800px] mx-auto mb-12">
-      <h2 class="font-heading font-semibold text-vault-navy text-2xl lg:text-4xl tracking-tight mb-4">
-        An end-to-end reconciliation solution
+<section id="solution" class="py-16 md:py-24 bg-generic-00">
+  <div class="mx-auto w-full max-w-[var(--container-max)] px-4 md:px-6">
+    <!-- Centered Header -->
+    <div class="text-center max-w-138 mx-auto mb-12 lg:mb-16">
+      <h2 class="text-[length:var(--fs-h2)] md:text-[length:var(--fs-h1)] leading-[length:var(--lh-h2)] md:leading-[length:var(--lh-h1)] font-medium text-vault-navy font-heading mb-4">
+        The all-in-one Solution
       </h2>
-      <p class="font-body text-neutral-500 text-base lg:text-lg">
-        Ingest data, run multi-tier matching algorithms, generate reports, and push results back to your ERP seamlessly.
+      <p class="font-body text-neutral-500 text-[length:var(--fs-body)] md:text-[length:var(--fs-body-lg)] leading-[length:var(--lh-body)] md:leading-[length:var(--lh-body-lg)]">
+        Try the one and only comprehensive solution to claim maximum ITC
+        automatically, powered by Artificial Intelligence!
       </p>
+    </div>
+
+    <!-- 2-Column Accordion + Visual -->
+    <div class="solution-grid">
+      <!-- Left Column: Smooth Interactive Accordion List -->
+      <div
+        class="solution-col-left w-full max-w-[540px] lg:max-w-[480px] flex flex-col"
+        data-solution-root
+      >
+        {solutions.map((item, index) => {
+          const isActive = index === 0;
+          return (
+            <div
+              class={`solution-item ${isActive ? "active" : ""}`}
+              data-solution-item
+              data-solution-key={item.id}
+            >
+              <!-- Trigger Header (76px Height, Title & Chevron) -->
+              <div class="solution-header">
+                <h3 class="solution-title">{item.title}</h3>
+                <svg viewBox="0 0 24 24" fill="none" class="solution-chevron">
+                  <path
+                    d="M6 9l6 6 6-6"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  />
+                </svg>
+              </div>
+
+              <!-- Description Body (Smooth reveal and slide) -->
+              <div class="solution-body">
+                <p class="solution-desc">{item.description}</p>
+                <!-- Mobile Visual Placeholder inside open accordion (visible on mobile only) -->
+                <div class="solution-mobile-placeholder"></div>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+
+      <!-- Right Column: Visual Placeholder with Slide Track (Desktop & Tablet >= 768px only) -->
+      <div class="solution-col-right w-full min-w-0 justify-start lg:justify-center items-center">
+        <div class="solution-visual-box">
+          <div class="solution-track" data-solution-track>
+            {solutions.map((item, index) => (
+              <div
+                class={`solution-slide ${index === 0 ? "active" : ""}`}
+                data-solution-slide={item.id}
+              ></div>
+            ))}
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </section>
+
+<style is:global>
+  /* Responsive Layout: 1 col on mobile (< 768px), 2 cols on tablet & desktop (>= 768px) */
+  .solution-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 2rem;
+    align-items: center;
+    width: 100%;
+  }
+
+  @media (min-width: 768px) {
+    .solution-grid {
+      grid-template-columns: 360px minmax(0, 1fr);
+      gap: 2rem;
+      align-items: center;
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .solution-grid {
+      grid-template-columns: 420px minmax(0, 1fr);
+      gap: 2.5rem;
+      align-items: center;
+    }
+  }
+
+  @media (min-width: 1280px) {
+    .solution-grid {
+      grid-template-columns: 480px minmax(0, 1fr);
+      gap: 3.5rem;
+    }
+  }
+
+  .solution-col-left {
+    min-width: 0;
+  }
+
+  .solution-col-right {
+    min-width: 0;
+    width: 100%;
+    display: none;
+  }
+
+  @media (min-width: 768px) {
+    .solution-col-right {
+      display: flex !important;
+      flex-direction: column !important;
+    }
+  }
+
+  @media (max-width: 767px) {
+    .solution-col-right {
+      display: none !important;
+    }
+  }
+
+  /* Accordion Item: exactly 76px closed */
+  .solution-item {
+    position: relative;
+    width: 100%;
+    max-width: 100%;
+    height: 76px;
+    min-height: 76px;
+    overflow: hidden;
+    cursor: pointer;
+    user-select: none;
+    box-sizing: border-box;
+    transition: height 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  /* Left Indicator: 3px bar that scales on Y (like Seamless.astro) */
+  .solution-item::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 3px;
+    background-color: var(--palette-nova-blue, #5446ff);
+    border-top-right-radius: 3px;
+    border-bottom-right-radius: 3px;
+    transform: scaleY(0);
+    transform-origin: center;
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .solution-item.active::before {
+    transform: scaleY(1);
+  }
+
+  /* Open State: 173px on desktop, 148px on tablet, auto on mobile to contain placeholder */
+  .solution-item.active {
+    height: 173px;
+  }
+
+  @media (max-width: 1279px) {
+    .solution-item.active {
+      height: 154px;
+    }
+  }
+
+  @media (max-width: 1023px) {
+    .solution-item.active {
+      height: 128px;
+    }
+  }
+
+  @media (max-width: 767px) {
+    .solution-item.active {
+      height: auto !important;
+      min-height: 76px;
+    }
+  }
+
+  /* Header inside item */
+  .solution-header {
+    height: 76px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 20px 0 24px;
+    box-sizing: border-box;
+  }
+
+  @media (max-width: 640px) {
+    .solution-header {
+      padding: 0 16px 0 20px;
+    }
+  }
+
+  .solution-title {
+    font-family: var(--palette-font-heading, inherit);
+    font-size: 20px !important;
+    line-height: 28px !important;
+    margin: 0;
+    color: var(--palette-neutral-500, #667085);
+    font-weight: 500;
+    transition:
+      color 0.3s ease,
+      font-size 0.25s ease,
+      line-height 0.25s ease,
+      font-weight 0.2s ease;
+  }
+
+  .solution-item:not(.active) .solution-title {
+    font-size: 20px !important;
+    line-height: 28px !important;
+    color: var(--palette-neutral-500, #667085);
+    font-weight: 500;
+  }
+
+  .solution-item.active .solution-title {
+    color: var(--palette-vault-navy, #0b0e1e) !important;
+    font-size: 24px !important;
+    line-height: 32px !important;
+    font-weight: 500 !important;
+  }
+
+  /* 768px tablet only: shrink title font sizes & heights so they fit without breaking single words or leaving excess space */
+  @media (min-width: 768px) and (max-width: 1023px) {
+    .solution-item {
+      height: 64px;
+      min-height: 64px;
+    }
+
+    .solution-header {
+      height: 64px;
+      padding: 0 16px 0 20px;
+    }
+
+    .solution-item.active {
+      height: 128px;
+    }
+
+    .solution-title,
+    .solution-item:not(.active) .solution-title {
+      font-size: 16px !important;
+      line-height: 22px !important;
+    }
+
+    .solution-item.active .solution-title {
+      font-size: 18px !important;
+      line-height: 26px !important;
+    }
+
+    .solution-body {
+      padding: 0 16px 20px 20px;
+    }
+
+    .solution-desc {
+      font-size: 14px;
+      line-height: 20px;
+    }
+  }
+
+  .solution-chevron {
+    width: 20px;
+    height: 20px;
+    color: var(--palette-neutral-400, #98a2b3);
+    flex-shrink: 0;
+    transition:
+      transform 0.35s cubic-bezier(0.4, 0, 0.2, 1),
+      color 0.3s ease;
+  }
+
+  .solution-item.active .solution-chevron {
+    transform: rotate(180deg);
+    color: var(--palette-vault-navy, #0b0e1e);
+  }
+
+  /* Description Body */
+  .solution-body {
+    padding: 0 20px 24px 24px;
+    margin-top: -6px;
+    opacity: 0;
+    transform: translateY(6px);
+    transition:
+      opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+      transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    pointer-events: none;
+    box-sizing: border-box;
+  }
+
+  @media (max-width: 640px) {
+    .solution-body {
+      padding: 0 16px 20px 20px;
+    }
+  }
+
+  .solution-item.active .solution-body {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+  }
+
+  .solution-desc {
+    font-family: var(--palette-font-body, inherit);
+    font-size: 15px;
+    line-height: 24px;
+    color: var(--palette-neutral-500, #667085);
+    margin: 0;
+    max-width: 420px;
+    width: 100%;
+  }
+
+  /* Mobile Visual Placeholder inside accordion (inside ONLY in mobile < 768px) */
+  .solution-mobile-placeholder {
+    display: none;
+    width: 100%;
+    aspect-ratio: 752 / 423;
+    background-color: var(--palette-visual-placeholder, #e8ffe1);
+    border-radius: 12px;
+    border: 1px solid rgba(0, 0, 0, 0.06);
+    margin-top: 16px;
+    box-sizing: border-box;
+  }
+
+  @media (max-width: 767px) {
+    .solution-mobile-placeholder {
+      display: block !important;
+    }
+  }
+
+  @media (min-width: 768px) {
+    .solution-mobile-placeholder {
+      display: none !important;
+    }
+  }
+
+  /* Visual Placeholder with exact 752/423 ratio and slide track */
+  .solution-visual-box {
+    width: 100%;
+    max-width: 752px;
+    min-width: 0;
+    aspect-ratio: 752 / 423;
+    background-color: transparent;
+    border-radius: 12px;
+    overflow: hidden;
+    flex-shrink: 0;
+    position: relative;
+  }
+
+  .solution-track {
+    display: flex;
+    width: 100%;
+    height: 100%;
+    min-width: 0;
+    gap: 20px;
+    transition: transform 0.45s cubic-bezier(0.4, 0, 0.2, 1);
+    will-change: transform;
+  }
+
+  .solution-slide {
+    flex: 0 0 100%;
+    width: 100%;
+    max-width: 100%;
+    height: 100%;
+    background-color: var(--palette-visual-placeholder, #e8ffe1);
+    border-radius: 12px;
+    box-sizing: border-box;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .solution-item,
+    .solution-item::before,
+    .solution-chevron,
+    .solution-body,
+    .solution-track {
+      transition-duration: 0.01ms !important;
+      animation-duration: 0.01ms !important;
+    }
+  }
+</style>
+
+<script is:inline>
+  (function () {
+    function setupSolutionAccordion() {
+      const root = document.querySelector("[data-solution-root]");
+      const box = document.querySelector(".solution-visual-box");
+      const track = document.querySelector("[data-solution-track]");
+      if (!root) return;
+
+      const items = root.querySelectorAll("[data-solution-item]");
+      const slides = document.querySelectorAll("[data-solution-slide]");
+      if (!items.length) return;
+
+      function updateSlide(index) {
+        if (!box || !track) return;
+        const slideWidth = box.offsetWidth;
+        if (slideWidth === 0) return;
+        const gap = 20;
+        track.style.transform =
+          "translateX(-" + index * (slideWidth + gap) + "px)";
+        slides.forEach((slide, sIdx) => {
+          slide.classList.toggle("active", sIdx === index);
+        });
+      }
+
+      items.forEach((item, index) => {
+        item.addEventListener("click", () => {
+          if (item.classList.contains("active")) return;
+
+          items.forEach((other) => other.classList.remove("active"));
+          item.classList.add("active");
+
+          updateSlide(index);
+        });
+      });
+
+      window.addEventListener("resize", () => {
+        const activeItem = root.querySelector("[data-solution-item].active");
+        if (activeItem) {
+          const activeIndex = Array.from(items).indexOf(activeItem);
+          if (activeIndex >= 0) updateSlide(activeIndex);
+        }
+      });
+    }
+
+    if (document.readyState === "loading") {
+      document.addEventListener("DOMContentLoaded", setupSolutionAccordion);
+    } else {
+      setupSolutionAccordion();
+    }
+    document.addEventListener("astro:page-load", setupSolutionAccordion);
+  })();
+</script>
