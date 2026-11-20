@@ -1,0 +1,70 @@
+---
+/**
+ * Round flag + country name, drawn over a card thumbnail. A primitive used by
+ * `Resources.astro` and `Featured.astro`; pasted nowhere on its own (renders
+ * nothing without a country, which is fine).
+ *
+ * Single country  -> one flag and its name.
+ * `Global`        -> four overlapped flags, no name (as in the Figma cards).
+ * Unknown country -> nothing. See `src/data/knowledge-hub-flags.ts`.
+ *
+ * Flags are CSS backgrounds, not <img>: see that file for why.
+ */
+import { flagKey, globalFlagKeys } from "../../data/knowledge-hub-flags";
+
+interface Props {
+  country?: string;
+  /** Positioning on the thumbnail, e.g. "left-4 bottom-4". */
+  position?: string;
+}
+const { country = "", position = "left-4 bottom-4" } = Astro.props;
+
+const isGlobal = country === "Global";
+const stack = isGlobal ? globalFlagKeys : flagKey[country] ? [flagKey[country]] : [];
+---
+
+{
+  stack.length > 0 && (
+    <span class={`absolute ${position} flex items-center gap-2`}>
+      <span class="flex items-center" aria-hidden="true">
+        {stack.map((k) => (
+          <span class={`kh-flag kh-flag-${k}`} />
+        ))}
+      </span>
+      {!isGlobal && (
+        <span class="font-body font-medium text-vault-navy text-[length:var(--fs-label-lg)] leading-[var(--lh-label-lg)]">
+          {country}
+        </span>
+      )}
+    </span>
+  )
+}
+
+<style is:global>
+  .kh-flag {
+    display: block;
+    flex-shrink: 0;
+    width: 32px;
+    height: 32px;
+    border: 2px solid var(--color-generic-00, #fff);
+    border-radius: 999px;
+    background-color: var(--color-neutral-100, #f2f4f7);
+    background-size: cover;
+    background-position: center;
+  }
+  .kh-flag + .kh-flag {
+    margin-left: -8px;
+  }
+  .kh-flag-india { background-image: url(https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6ab26e682610f7dcf4a0863f_india-flag.png); }
+  .kh-flag-uae { background-image: url(https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6ab26e68ec63561a84363114_uae-flag.png); }
+  .kh-flag-saudi-arabia { background-image: url(https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6ab26e68709f44a0fbdd626c_saudi-arabia-flag.png); }
+  .kh-flag-malaysia { background-image: url(https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6ab26e68cbb96cfd20c17875_malaysia-flag.png); }
+  .kh-flag-oman { background-image: url(https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6ab26e68465dd97b085f1a9e_oman-flag.png); }
+  .kh-flag-europe { background-image: url(https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6ab26e69f1cc7421388afc1b_europe-flag.png); }
+  .kh-flag-france { background-image: url(https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6ab26eb1cd30d8963df43a63_france-flag.png); }
+  .kh-flag-belgium { background-image: url(https://cdn.prod.website-files.com/6141e3720a248d2024615d96/67e3e6ae1e19488131f26dfd_belgium_flag.png); }
+  .kh-flag-philippines { background-image: url(https://cdn.prod.website-files.com/6141e3720a248d2024615d96/6a2935c197e9e718191d8d34_Flag_of_the_Philippines.svg); }
+  .kh-flag-singapore { background-image: url("https://cdn.prod.website-files.com/6141e3720a248d2024615d96/66716d4c6753fb52078bec02_singapore%20flag%203.png"); }
+  .kh-flag-spain { background-image: url("https://cdn.prod.website-files.com/6141e3720a248d2024615d96/64999a546cfce1e0515f0f60_spain%20flag.png"); }
+  .kh-flag-germany { background-image: url(https://assets.clear.in/cleartax/images/1771829770_flagforflaggermanysvgrepocom1.svg); }
+</style>

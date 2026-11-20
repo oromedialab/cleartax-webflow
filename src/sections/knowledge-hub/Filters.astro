@@ -28,7 +28,7 @@ const subheading =
 /* Exactly the four values `ResourceItem.category` allows. This is a closed
    set, unlike Country — a fifth option here would be unreachable by
    construction. */
-const categories: string[] = ["Blog", "Whitepaper", "Report", "Case study"];
+const categories: string[] = ["Whitepaper", "Case study"];
 
 const countries: string[] = [
   "Global",
@@ -39,6 +39,11 @@ const countries: string[] = [
   "France",
   "Germany",
   "Singapore",
+  "Spain",
+  "Europe",
+  "Philippines",
+  "Oman",
+  "Belgium",
 ];
 
 const fieldClass =
@@ -114,13 +119,22 @@ const selects: Array<{
 <section data-kh-filter-root class="bg-generic-00">
   <div
     data-kh-filter-bar
-    class="bg-generic-00 border-b border-ledger-200 pt-12 pb-8 md:pt-20 md:pb-12 transition-shadow duration-200 data-[pinned]:shadow-[0px_2px_6px_0px_rgba(16,24,40,0.06)]"
+    class="group/bar bg-generic-00 border-b border-ledger-200 pt-12 pb-8 md:pt-20 md:pb-12 transition-shadow duration-200 data-[pinned]:shadow-[0px_2px_6px_0px_rgba(16,24,40,0.06)]"
   >
+    <!--
+      Collapses while the bar is pinned. The transition lives ONLY on the
+      pinned state: on release the pin script's reset() calls measure()
+      straight away, and an animated expand would make it read a half-open
+      height and corrupt every pin offset after it. Expanding is therefore
+      instant (it happens off-screen or under the page); only the collapse,
+      which the user watches, is eased.
+    -->
     <div
-      class="max-w-[var(--container-max)] w-full mx-auto px-4 md:px-6 mb-6 md:mb-8"
+      class="grid grid-rows-[1fr] mb-6 md:mb-8 group-data-[pinned]/bar:mb-0 group-data-[pinned]/bar:grid-rows-[0fr] group-data-[pinned]/bar:opacity-0 group-data-[pinned]/bar:transition-[grid-template-rows,margin,opacity] group-data-[pinned]/bar:duration-300 group-data-[pinned]/bar:ease-out motion-reduce:transition-none"
     >
+     <div class="min-h-0 overflow-hidden">
       <div
-        class="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between lg:gap-8"
+        class="max-w-[var(--container-max)] w-full mx-auto px-4 md:px-6 flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between lg:gap-8"
       >
         <h2
           class="font-heading font-medium text-vault-navy text-[length:var(--fs-h1)] leading-[var(--lh-h1)] tracking-[var(--tracking-heading)] m-0 lg:max-w-[672px]"
@@ -133,6 +147,7 @@ const selects: Array<{
           {subheading}
         </p>
       </div>
+     </div>
     </div>
 
     <div class="max-w-[var(--container-max)] w-full mx-auto px-4 md:px-6">
