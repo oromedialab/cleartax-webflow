@@ -1,5 +1,6 @@
 /**
- * Knowledge Hub feed: the "Asset" and "Case study" tabs -> JSON.
+ * Knowledge Hub + Events feed: the "Asset", "Case study" and "Webinar" tabs -> JSON.
+ * (Webinar is read by scripts/sync-events.mjs.)
  *
  * This file only exposes the raw rows. All mapping (category, country,
  * date, title rules) lives in scripts/sync-knowledge-hub.mjs so it is
@@ -12,7 +13,7 @@
  *      Web app, Execute as: Me, Who has access: Anyone.
  *   3. .env.local: KNOWLEDGE_HUB_FEED_URL=<the /exec URL>
  */
-var TABS = ['Asset', 'Case study'];
+var TABS = ['Asset', 'Case study', 'Webinar'];
 
 function doGet() {
   var ss = SpreadsheetApp.getActive();
