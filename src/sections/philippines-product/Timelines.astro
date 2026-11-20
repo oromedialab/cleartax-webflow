@@ -1,0 +1,99 @@
+---
+/**
+ * Philippines EIS Implementation Timeline.
+ * 4-row timeline matching the official mandate roadmap:
+ * - Feb 2025: Issued
+ * - Sep 2025: Extended
+ * - 31 Dec 2026: Phase 1: Mandatory
+ * - 2027 onwards: Phase 2: Expanding Scope
+ */
+export interface TimelineItem {
+    date: string;
+    tag: string;
+    desc: string;
+    icon: string;
+}
+
+interface Props {
+    heading?: string;
+    items?: TimelineItem[];
+}
+
+const defaultRows: TimelineItem[] = [
+    {
+        date: "Feb 2025",
+        tag: "Issued",
+        desc: "RR No. 011-2025 published. BIR establishes mandatory e-invoicing for large taxpayers, e-commerce businesses, and exporters.",
+        icon: "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6b0025b7c1d95b127848c9ea_ph-icon-1.png",
+    },
+    {
+        date: "Sep 2025",
+        tag: "Extended",
+        desc: "BIR issues RR No. 026-2025, extending Phase 1 deadline to 31 December 2026, recognising the complexity of system transition.",
+        icon: "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6b0025be0e7b1e736b4f59ca_ph-icon-2.png",
+    },
+    {
+        date: "31 Dec 2026",
+        tag: "Phase 1: Mandatory",
+        desc: "Large Taxpayers (LTs), e-commerce businesses, and ERP users must issue structured e-invoices and transmit data to BIR's EIS in real time.",
+        icon: "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6b0025c2622476a04d98f6b4_ph-icon-3.png",
+    },
+    {
+        date: "2027 onwards",
+        tag: "Phase 2: Expanding Scope",
+        desc: "Registered Business Enterprises (RBEs) and additional taxpayer groups brought into scope. Timelines subject to future BIR Revenue Regulations.",
+        icon: "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6af2df91092b9f7d3f891101_sp-icon-4.png",
+    },
+];
+
+const {
+    heading = "Philippines EIS Implementation Timeline",
+    items = defaultRows,
+} = Astro.props;
+---
+
+<section class="bg-generic-00 py-12 lg:py-20">
+    <div class="w-full max-w-[var(--container-max)] mx-auto px-4 md:px-6">
+        <div class="flex flex-col gap-12">
+            <div class="flex flex-col items-center gap-4 text-center">
+                <h2 class="m-0 font-heading font-medium text-vault-navy text-[length:var(--fs-h1)] leading-[length:var(--lh-h1)] tracking-[-0.5px]">
+                    {heading}
+                </h2>
+            </div>
+
+            <div class="flex flex-col divide-y divide-neutral-200">
+                {items.map((row) => (
+                    <div class="grid grid-cols-1 gap-4 py-8 lg:grid-cols-[380px_1fr] lg:items-center lg:gap-12">
+                        {/* Left column: Icon + Date & Tag */}
+                        <div class="flex items-center gap-5 sm:gap-6">
+                            <div class="size-14 sm:size-18 shrink-0">
+                                <img
+                                    src={row.icon}
+                                    alt=""
+                                    class="object-contain"
+                                    loading="lazy"
+                                    decoding="async"
+                                />
+                            </div>
+                            <div class="flex flex-col gap-1.5">
+                                <h3 class="m-0 font-heading font-medium text-vault-navy text-[length:var(--fs-h5)] leading-[length:var(--lh-h5)]">
+                                    {row.date}
+                                </h3>
+                                <span class="inline-flex items-center w-fit px-3 py-1.5 rounded-md bg-ledger-white text-vault-navy font-body text-[length:var(--fs-body-sm)] leading-[length:var(--lh-body-sm)]">
+                                    {row.tag}
+                                </span>
+                            </div>
+                        </div>
+
+                        {/* Right column: Description */}
+                        <div>
+                            <p class="m-0 font-body text-neutral-500 text-[length:var(--fs-body)] leading-[length:var(--lh-body)]">
+                                {row.desc}
+                            </p>
+                        </div>
+                    </div>
+                ))}
+            </div>
+        </div>
+    </div>
+</section>

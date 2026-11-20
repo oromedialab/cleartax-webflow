@@ -1,36 +1,25 @@
 ---
 /**
- * France regional hero — Figma node 13600:27940.
- *
- * Background is the interactive stroke field from
- * `sections/global-homepage/Hero.astro` (originally
- * `sections/blog-listing/Newsletter.astro`, which carries the full explanation of
- * the geometry): a plain grid of lime dots until a pointer enters, at which point
- * each dot draws out into a stroke aimed at the cursor, longest beside it and back
- * to a dot by `lengthRadius`. Same four gradient layers over it — page gradient,
- * radial wash behind the copy, a mobile-only top fade, and a bottom fade.
- *
- * Ids and the canvas id are `sp-` prefixed rather than the `hero` /
- * `hero-dots-canvas` older files use, because embeds share one namespace per page
- * and a bare `hero` is exactly the kind of name that collides later.
- *
- * The three badges carry a 37px `bg-visual-placeholder` square where the Figma
- * has an unfilled "Icon placeholder" frame. Swap each for a Webflow-hosted asset
- * once the icons exist — never a `data:` URI, which would blow the paste cap.
+ * Hero section for Indirect Tax page.
+ * Uses interactive Dotgrid in Flux Lime with high-contrast radial wash,
+ * brand typography, and tailored copy.
  */
+import Dotgrid from "../_shared/Dotgrid.astro";
+
 interface Props {
-    /** Stroke width, and so the diameter of the dot it becomes at rest. */
     lineWidth?: number;
     gap?: number;
-    /** Must stay under the grid pitch or the field knits into a mesh. */
     maxLength?: number;
     lengthRadius?: number;
-    /** Leave at 1 — a partial turn makes strokes flip as the cursor crosses them. */
     tilt?: number;
     baseColor?: string;
     cursorRadius?: number;
     pull?: number;
     fadeRadius?: number;
+    titlePrefix?: string;
+    titleHighlight?: string;
+    titleSuffix?: string;
+    description?: string;
 }
 
 const {
@@ -43,623 +32,334 @@ const {
     cursorRadius = 320,
     pull = 14,
     fadeRadius = 40,
+    titlePrefix = "Want an EIS",
+    titleHighlight = "readiness",
+    titleSuffix = "walkthrough for your business?",
+    description = "ClearTax converts your ERP invoice data into BIR-compliant structured JSON, transmits data to the EIS, and keeps your business audit-ready;  automatically.",
 } = Astro.props;
 
-const stats: { label: string; width: string }[] = [
+const badges = [
     {
-        label: "EN 16931 Compliant",
-        width: "sm:max-w-[189px]",
+        value: "100% compliant with the Philippines",
+        label: "Electronic Invoicing/Receipting System (EIS)",
     },
     {
-        label: "Multi-ERP Integration",
-        width: "sm:max-w-[189px]",
+        value: "AI-powered integration",
+        label: "with any ERP or POS system",
     },
     {
-        label: "VeR Verified",
-        width: "sm:max-w-[189px]",
+        value: "Single unified Global e-Invoicing API,",
+        label: "supporting 50+ country mandates",
     },
 ];
 ---
 
 <section
-    id="sp-hero"
-    class="sp-hero relative overflow-hidden bg-generic-00"
-    data-line-width={String(lineWidth)}
-    data-gap={String(gap)}
-    data-max-length={String(maxLength)}
-    data-length-radius={String(lengthRadius)}
-    data-tilt={String(tilt)}
-    data-base-color={baseColor}
-    data-cursor-radius={String(cursorRadius)}
-    data-pull={String(pull)}
-    data-fade-radius={String(fadeRadius)}
+    class="de-hero-section relative bg-generic-00 overflow-hidden flex flex-col max-lg:pt-32 max-lg:pb-16 lg:pt-[257px] lg:pb-[161px]"
+    id="hero"
 >
-    <!-- Interactive stroke field -->
-    <div class="absolute inset-0 z-0 w-full h-full pointer-events-none">
-        <canvas
-            id="sp-hero-dots"
-            class="absolute inset-0 w-full h-full"
-        ></canvas>
-    </div>
+    <!-- Interactive Dot Grid Background -->
+    <Dotgrid
+        containerId="hero"
+        lineWidth={lineWidth}
+        gap={gap}
+        maxLength={maxLength}
+        lengthRadius={lengthRadius}
+        tilt={tilt}
+        baseColor={baseColor}
+        cursorRadius={cursorRadius}
+        pull={pull}
+        fadeRadius={fadeRadius}
+    />
 
     <!-- Radial wash, so the headline keeps its contrast over the field -->
     <div class="absolute inset-0 z-0 bg-[radial-gradient(circle_at_center,_#FFF_0%,_rgba(242,_241,_240,_0.25)_30.04%,_rgba(255,255,255,0)_65%)] pointer-events-none"></div>
 
-    <div class="container mx-auto relative z-10">
-        <div class="flex flex-col items-center gap-6 text-center max-lg:pt-32 max-lg:pb-16 lg:pt-[257px] lg:pb-[177px]">
-            <div class="flex flex-col items-center w-full">
-                <h1 class="m-0 font-heading font-semibold text-vault-navy text-[length:var(--fs-h1)] md:text-[length:var(--fs-display-sm)] lg:text-[length:var(--fs-display-lg)] leading-[length:var(--lh-h1)] md:leading-[length:var(--lh-display-sm)] lg:leading-[length:var(--lh-display-lg)] tracking-[-1px] max-w-167">
-                    Germany’s E-Invoicing Deadline Is{" "}
-                    <span class="inline-block text-generic-100 bg-flux-lime py-1 px-[13px] rounded-xl">
-                        Closing In
-                    </span>
+    <div class="relative z-10 mx-auto lg:container w-full h-full flex flex-col px-4 md:px-6 pointer-events-auto">
+        <div class="flex justify-center w-full h-full">
+            <!-- Hero Content -->
+            <div class="hero-content flex flex-col items-center mx-auto text-center w-full h-full">
+                <!-- Headline -->
+                <h1 class="text-[length:var(--fs-h1)] sm:text-[length:var(--fs-display-sm)] lg:text-[length:var(--fs-display-lg)] leading-[length:var(--lh-h1)] sm:leading-[length:var(--lh-display-sm)] lg:leading-[length:var(--lh-display-lg)] text-generic-100 font-semibold font-heading max-w-223 mx-auto mb-4 m-0 text-center">
+                    {titlePrefix}
+                    {titleHighlight && (
+                        <span class="text-generic-100 bg-flux-lime partner-hero-mark rounded-lg">
+                            {titleHighlight}
+                        </span>
+                    )}
+                    {titleSuffix}
                 </h1>
-                <span class="m-o mt-4 text-[length:var(--fs-body-lg)] leading-[length:var(--lh-body-lg)] font-normal">
-                    Go live with e-invoicing software built for what’s next
-                </span>
-                <p class="m-0 font-body mt-3 text-neutral-500 text-[length:var(--fs-body-lg)] leading-[length:var(--lh-body-lg)] max-w-225">
-                    The ultimate e-invoicing software solution for Germany -
-                    Integrate once with your ERP, generate compliant invoices,
-                    automate validation & exchange, and manage the full invoice
-                    lifecycle. All in one platform.
+
+                <!-- Description -->
+                <p class="text-[length:var(--fs-body)] leading-[length:var(--lh-body)] sm:text-[length:var(--fs-body-base)] sm:leading-[length:var(--lh-body-lg)] max-w-184 text-neutral-500 font-medium font-body text-center">
+                    {description}
                 </p>
+                <ul
+                    aria-label="Germany e-invoicing highlights"
+                    class="m-0 mt-4 lg:mt-8 flex w-full max-w-[1100px] list-none flex-col overflow-hidden rounded-xl border border-neutral-300 bg-generic-00 p-0 md:flex-row"
+                >
+                    {badges.map((badge, index) => (
+                        <>
+                            {index > 0 && (
+                                <li
+                                    aria-hidden="true"
+                                    class="h-px w-auto bg-neutral-100 max-md:mx-4 md:h-[60px] md:w-[2px] md:shrink-0 md:self-center"
+                                />
+                            )}
+                            <li class="flex flex-1 items-center gap-3 sm:gap-4 p-4 text-left">
+                                <div class="size-14 shrink-0 flex items-center justify-center">
+                                    {index === 0 && (
+                                        <svg
+                                            width="56"
+                                            height="56"
+                                            viewBox="0 0 56 56"
+                                            fill="none"
+                                            xmlns="http://www.w3.org/2000/svg"
+                                        >
+                                            <rect
+                                                x="0.5"
+                                                y="0.5"
+                                                width="55"
+                                                height="55"
+                                                rx="7.5"
+                                                stroke="#CCCCCC"
+                                            />
+                                            <path
+                                                d="M19.8516 36.9117C21.9936 38.8312 24.8214 40 27.917 40C34.5877 40 40.0153 34.5725 40.0153 27.9018C40.0153 25.7803 39.4663 23.7845 38.503 22.0491"
+                                                stroke-width="1.2"
+                                                stroke-miterlimit="10"
+                                                stroke-linecap="round"
+                                                stroke-linejoin="round"
+                                                stroke="#05022A"
+                                            />
+                                            <path
+                                                d="M20.5848 36.5164C20.9509 36.8825 20.9509 37.4761 20.5848 37.8422C20.2187 38.2083 19.6251 38.2083 19.259 37.8422C18.8928 37.4761 18.8928 36.8825 19.259 36.5164C19.6251 36.1502 20.2187 36.1502 20.5848 36.5164Z"
+                                                stroke-width="1.2"
+                                                stroke-miterlimit="10"
+                                                stroke-linecap="round"
+                                                stroke-linejoin="round"
+                                                stroke="#05022A"
+                                            />
+                                            <path
+                                                d="M36.1406 19.0883C33.9986 17.1688 31.1707 16 28.0751 16C21.4044 16 15.9769 21.4275 15.9769 28.0982C15.9769 30.2197 16.5259 32.2155 17.4892 33.9509"
+                                                stroke-width="1.2"
+                                                stroke-miterlimit="10"
+                                                stroke-linecap="round"
+                                                stroke-linejoin="round"
+                                                stroke="#05022A"
+                                            />
+                                            <path
+                                                d="M36.9207 18.4109C37.2869 18.777 37.2869 19.3706 36.9207 19.7367C36.5546 20.1029 35.961 20.1029 35.5949 19.7367C35.2288 19.3706 35.2288 18.777 35.5949 18.4109C35.961 18.0448 36.5546 18.0448 36.9207 18.4109Z"
+                                                stroke-width="1.2"
+                                                stroke-miterlimit="10"
+                                                stroke-linecap="round"
+                                                stroke-linejoin="round"
+                                                stroke="#05022A"
+                                            />
+                                            <path
+                                                d="M25.5206 24.3453H26.7262M25.5206 26.7565L27.9318 26.7565M32.7541 25.5509V24.3453L29.1373 20.7285L24.315 20.7285C23.6491 20.7285 23.1094 21.2683 23.1094 21.9341L23.1094 33.7489C23.1094 34.4147 23.6491 34.9545 24.315 34.9545H27.9318M29.1373 20.7285V23.1397C29.1373 23.8055 29.6771 24.3453 30.3429 24.3453H32.7541"
+                                                stroke-width="1.2"
+                                                stroke-miterlimit="10"
+                                                stroke-linecap="round"
+                                                stroke-linejoin="round"
+                                                stroke="#05022A"
+                                            />
+                                            <path
+                                                d="M31.4844 31.1278L32.1727 31.8268L33.544 30.0417"
+                                                stroke-width="1.2"
+                                                stroke-miterlimit="10"
+                                                stroke-linecap="round"
+                                                stroke-linejoin="round"
+                                                stroke="#5446FF"
+                                            />
+                                            <path
+                                                d="M35.5004 29.0029C35.1438 28.8363 34.4713 28.4463 34.3111 27.8183C34.2694 27.6547 34.113 27.5397 33.9337 27.5397L30.498 27.5397C30.3188 27.5397 30.1624 27.6547 30.1206 27.8183C29.9605 28.4463 29.288 28.8363 28.9314 29.0029C28.7875 29.0702 28.6956 29.2071 28.6953 29.3578C28.6938 30.162 28.9486 32.6652 31.9587 34.5913C32.0345 34.6397 32.1241 34.6656 32.2159 34.6656C32.3077 34.6656 32.3973 34.6397 32.4731 34.5913C35.4832 32.6652 35.7379 30.162 35.7365 29.3578C35.7362 29.2071 35.6443 29.0702 35.5004 29.0029Z"
+                                                stroke-width="1.2"
+                                                stroke-miterlimit="10"
+                                                stroke-linecap="round"
+                                                stroke-linejoin="round"
+                                                stroke="#5446FF"
+                                            />
+                                        </svg>
+                                    )}
+                                    {index === 1 && (
+                                        <svg
+                                            width="56"
+                                            height="56"
+                                            viewBox="0 0 56 56"
+                                            fill="none"
+                                            xmlns="http://www.w3.org/2000/svg"
+                                        >
+                                            <rect
+                                                x="0.5"
+                                                y="0.5"
+                                                width="55"
+                                                height="55"
+                                                rx="7.5"
+                                                stroke="#CCCCCC"
+                                            />
+                                            <path
+                                                d="M20.6406 37.4781C25.3484 41.1439 32.1594 40.8131 36.4873 36.4852C40.8152 32.1573 41.146 25.3463 37.4802 20.6385"
+                                                stroke-width="1.2"
+                                                stroke-miterlimit="10"
+                                                stroke-linecap="round"
+                                                stroke-linejoin="round"
+                                                stroke="#5446FF"
+                                            />
+                                            <path
+                                                d="M35.3613 18.5216C30.6535 14.8558 23.8425 15.1865 19.5146 19.5144C15.1867 23.8423 14.856 30.6533 18.5218 35.3611"
+                                                stroke-width="1.2"
+                                                stroke-miterlimit="10"
+                                                stroke-linecap="round"
+                                                stroke-linejoin="round"
+                                                stroke="#5446FF"
+                                            />
+                                            <path
+                                                d="M37.5451 20.5751C36.9593 21.1609 36.0095 21.1609 35.4237 20.5751C34.8379 19.9893 34.8379 19.0396 35.4237 18.4538C36.0095 17.8679 36.9593 17.8679 37.5451 18.4538C38.1309 19.0396 38.1309 19.9893 37.5451 20.5751Z"
+                                                stroke-width="1.2"
+                                                stroke-miterlimit="10"
+                                                stroke-linecap="round"
+                                                stroke-linejoin="round"
+                                                stroke="#5446FF"
+                                            />
+                                            <path
+                                                d="M20.5764 37.5459C19.9906 38.1317 19.0408 38.1317 18.455 37.5459C17.8692 36.9601 17.8692 36.0104 18.455 35.4246C19.0408 34.8388 19.9906 34.8388 20.5764 35.4246C21.1621 36.0104 21.1621 36.9601 20.5764 37.5459Z"
+                                                stroke-width="1.2"
+                                                stroke-miterlimit="10"
+                                                stroke-linecap="round"
+                                                stroke-linejoin="round"
+                                                stroke="#5446FF"
+                                            />
+                                            <path
+                                                d="M35.5002 29.1248V26.8748L33.7974 26.4491C33.6618 25.9408 33.4595 25.4526 33.1958 24.9973L34.099 23.492L32.508 21.9009L31.0026 22.8041C30.5474 22.5404 30.0592 22.3381 29.5508 22.2025L29.1251 20.4997H26.8751L26.4494 22.2025C25.941 22.3381 25.4529 22.5404 24.9976 22.8041L23.4922 21.9009L21.9012 23.492L22.8044 24.9973C22.5407 25.4526 22.3384 25.9408 22.2028 26.4491L20.5 26.8748V29.1248L22.2028 29.5506C22.3384 30.0589 22.5407 30.5471 22.8044 31.0024L21.9012 32.5077L23.4922 34.0987L24.9976 33.1956C25.4529 33.4592 25.941 33.6615 26.4494 33.7972L26.8751 35.4999H29.1251L29.5508 33.7972C30.0592 33.6615 30.5474 33.4592 31.0026 33.1956L32.508 34.0987L34.099 32.5077L33.1958 31.0024C33.4595 30.5471 33.6618 30.0589 33.7974 29.5506L35.5002 29.1248Z"
+                                                stroke-width="1.2"
+                                                stroke-miterlimit="10"
+                                                stroke-linecap="round"
+                                                stroke-linejoin="round"
+                                                stroke="#05022A"
+                                            />
+                                            <path
+                                                d="M31.0001 27.9998C31.0001 29.6567 29.6569 30.9999 28 30.9999C26.3432 30.9999 25 29.6567 25 27.9998C25 26.343 26.3432 24.9998 28 24.9998C29.6569 24.9998 31.0001 26.343 31.0001 27.9998Z"
+                                                stroke-width="1.2"
+                                                stroke-miterlimit="10"
+                                                stroke-linecap="round"
+                                                stroke-linejoin="round"
+                                                stroke="#05022A"
+                                            />
+                                        </svg>
+                                    )}
+                                    {index === 2 && (
+                                        <svg
+                                            width="56"
+                                            height="56"
+                                            viewBox="0 0 56 56"
+                                            fill="none"
+                                            xmlns="http://www.w3.org/2000/svg"
+                                        >
+                                            <rect
+                                                x="0.5"
+                                                y="0.5"
+                                                width="55"
+                                                height="55"
+                                                rx="7.5"
+                                                stroke="#CCCCCC"
+                                            />
+                                            <path
+                                                d="M19.8516 36.9117C21.9936 38.8312 24.8214 40 27.917 40C34.5877 40 40.0153 34.5725 40.0153 27.9018C40.0153 25.7803 39.4663 23.7845 38.503 22.0491"
+                                                stroke-width="1.2"
+                                                stroke-miterlimit="10"
+                                                stroke-linecap="round"
+                                                stroke-linejoin="round"
+                                                stroke="#5446FF"
+                                            />
+                                            <path
+                                                d="M20.5848 36.5165C20.9509 36.8827 20.9509 37.4762 20.5848 37.8423C20.2187 38.2085 19.6251 38.2085 19.259 37.8423C18.8928 37.4762 18.8928 36.8827 19.259 36.5165C19.6251 36.1504 20.2187 36.1504 20.5848 36.5165Z"
+                                                stroke-width="1.2"
+                                                stroke-miterlimit="10"
+                                                stroke-linecap="round"
+                                                stroke-linejoin="round"
+                                                stroke="#5446FF"
+                                            />
+                                            <path
+                                                d="M36.1406 19.0883C33.9986 17.1688 31.1707 16 28.0751 16C21.4044 16 15.9769 21.4275 15.9769 28.0982C15.9769 30.2197 16.5259 32.2155 17.4892 33.9509"
+                                                stroke-width="1.2"
+                                                stroke-miterlimit="10"
+                                                stroke-linecap="round"
+                                                stroke-linejoin="round"
+                                                stroke="#5446FF"
+                                            />
+                                            <path
+                                                d="M36.9207 18.4111C37.2869 18.7772 37.2869 19.3708 36.9207 19.7369C36.5546 20.103 35.961 20.103 35.5949 19.7369C35.2288 19.3708 35.2288 18.7772 35.5949 18.4111C35.961 18.0449 36.5546 18.0449 36.9207 18.4111Z"
+                                                stroke-width="1.2"
+                                                stroke-miterlimit="10"
+                                                stroke-linecap="round"
+                                                stroke-linejoin="round"
+                                                stroke="#5446FF"
+                                            />
+                                            <path
+                                                d="M28 36.4375C23.3477 36.4375 19.5625 32.6522 19.5625 28C19.5625 23.3477 23.3477 19.5625 28 19.5625C32.6522 19.5625 36.4375 23.3477 36.4375 28C36.4375 32.6522 32.6522 36.4375 28 36.4375Z"
+                                                stroke-width="1.2"
+                                                stroke-miterlimit="10"
+                                                stroke-linecap="round"
+                                                stroke-linejoin="round"
+                                                stroke="#05022A"
+                                            />
+                                            <path
+                                                d="M31 28.1375C31 32.7215 29.6569 36.4375 28 36.4375C26.3431 36.4375 25 32.7215 25 28.1375C25 23.5536 26.3431 19.8375 28 19.8375C29.6569 19.8375 31 23.5536 31 28.1375Z"
+                                                stroke-width="1.2"
+                                                stroke-miterlimit="10"
+                                                stroke-linecap="round"
+                                                stroke-linejoin="round"
+                                                stroke="#05022A"
+                                            />
+                                            <path
+                                                d="M20 27.4375H35.911"
+                                                stroke-width="1.2"
+                                                stroke-miterlimit="10"
+                                                stroke-linecap="round"
+                                                stroke-linejoin="round"
+                                                stroke="#05022A"
+                                            />
+                                        </svg>
+                                    )}
+                                </div>
+                                <div class="flex flex-col">
+                                    <span class="font-heading font-medium text-vault-navy text-[length:var(--fs-body-sm)] leading-[length:var(--lh-body-sm)]">
+                                        {badge.value}
+                                    </span>
+                                    <span class="font-body text-neutral-500 font-normal text-[length:var(--fs-body-xs)] leading-[length:var(--lh-body-xs)]">
+                                        {badge.label}
+                                    </span>
+                                </div>
+                            </li>
+                        </>
+                    ))}
+                </ul>
+                <!-- demo btn -->
+                <div class="mt-6 w-full md:w-auto">
+                    <a
+                        href="javascript:void(0)"
+                        onclick="document.getElementById('contactForm').scrollIntoView({behavior:'smooth'})"
+                        class="inline-flex w-full items-center justify-center gap-2 rounded-lg border border-nova-blue bg-nova-blue px-10 py-3.5 text-[length:var(--fs-label-lg)] leading-[length:var(--lh-label-lg)] font-medium text-nova-50 no-underline transition-all duration-200 hover:bg-nova-50 hover:text-nova-blue md:w-auto"
+                    >
+                        Book a demo
+                    </a>
+                </div>
             </div>
-
-            <ul
-                aria-label="Germany e-invoicing highlights"
-                class="m-0 flex w-full max-w-[645px] list-none flex-col overflow-hidden rounded-xl border border-neutral-300 bg-generic-00 p-0 md:px-1 md:flex-row"
-            >
-                {stats.map((st, index) => (
-                    <>
-                        {index > 0 && (
-                            <li
-                                aria-hidden="true"
-                                class="h-px w-auto bg-neutral-100 max-md:mx-4 md:h-[60px] md:w-[2px] md:shrink-0 md:self-center"
-                            />
-                        )}
-                        <li class="flex flex-1 items-center gap-2 py-3 px-4 text-left">
-                            <div class="size-8 shrink-0 rounded-xl flex items-center justify-center">
-                                {index === 0 && (
-                                    <svg
-                                        width="32"
-                                        height="32"
-                                        viewBox="0 0 32 32"
-                                        fill="none"
-                                        xmlns="http://www.w3.org/2000/svg"
-                                    >
-                                        <path
-                                            d="M9.41597 10.1019L11.4499 10.1019M9.41597 14.1697H13.4838M21.6194 12.1358V10.1019L15.5177 4.00021L7.38207 4.00021C6.25875 4.00021 5.34818 4.91079 5.34818 6.03411L5.34818 25.9663C5.34818 27.0895 6.25875 28.0002 7.38207 28.0002L13.4838 28.0002M15.5177 4.00021L15.5177 8.06801C15.5177 9.19128 16.4283 10.1019 17.5516 10.1019L21.6194 10.1019"
-                                            stroke-width="1.6"
-                                            stroke-miterlimit="10"
-                                            stroke-linecap="round"
-                                            stroke-linejoin="round"
-                                            stroke="#05022A"
-                                        />
-                                        <path
-                                            d="M19.4821 21.5448L20.6434 22.7238L22.9568 19.7124"
-                                            stroke-width="1.6"
-                                            stroke-miterlimit="10"
-                                            stroke-linecap="round"
-                                            stroke-linejoin="round"
-                                            stroke="#5446FF"
-                                        />
-                                        <path
-                                            d="M26.2503 17.9607C25.6486 17.6795 24.5142 17.0215 24.2439 15.9622C24.1735 15.6862 23.9097 15.4921 23.6072 15.4921L17.8111 15.4921C17.5086 15.4921 17.2448 15.6862 17.1743 15.9622C16.9041 17.0215 15.7697 17.6795 15.168 17.9607C14.9253 18.0741 14.7702 18.3051 14.7698 18.5594C14.7673 19.9161 15.197 24.139 20.2752 27.3884C20.4031 27.4702 20.5543 27.5139 20.7091 27.5139C20.8639 27.5139 21.0152 27.4702 21.1431 27.3884C26.2213 24.139 26.651 19.9161 26.6486 18.5594C26.6481 18.3051 26.493 18.0741 26.2503 17.9607Z"
-                                            stroke-width="1.6"
-                                            stroke-miterlimit="10"
-                                            stroke-linecap="round"
-                                            stroke-linejoin="round"
-                                            stroke="#5446FF"
-                                        />
-                                    </svg>
-                                )}
-                                {index === 1 && (
-                                    <svg
-                                        width="32"
-                                        height="32"
-                                        viewBox="0 0 32 32"
-                                        fill="none"
-                                        xmlns="http://www.w3.org/2000/svg"
-                                    >
-                                        <path
-                                            d="M23.2642 9.22638L21.3701 8.61871C21.2984 8.41349 21.2151 8.21253 21.1206 8.0168L21.9779 6.29803C22.02 6.21348 22.0346 6.11785 22.0195 6.0246C22.0044 5.93135 21.9604 5.8452 21.8937 5.77829L20.6238 4.50499C20.5573 4.43812 20.4714 4.39395 20.3783 4.37878C20.2852 4.36361 20.1898 4.37823 20.1055 4.42053L18.3914 5.28014C18.1962 5.18532 17.9958 5.10179 17.791 5.02995L17.185 3.17742C17.1554 3.08788 17.0983 3.00994 17.0219 2.95469C16.9455 2.89943 16.8536 2.86967 16.7593 2.86963H14.9632C14.8689 2.86966 14.7769 2.89942 14.7005 2.95467C14.6241 3.00993 14.567 3.08787 14.5374 3.17742L13.9314 5.02995C13.7266 5.10181 13.5262 5.18536 13.3311 5.28019L11.6169 4.42053C11.5327 4.37807 11.4371 4.36338 11.344 4.37855C11.2509 4.39372 11.165 4.43798 11.0986 4.50499L9.82875 5.77829C9.76206 5.8452 9.71807 5.93135 9.70296 6.0246C9.68785 6.11785 9.70239 6.21348 9.74454 6.29803L10.6018 8.0168C10.5073 8.21253 10.424 8.41349 10.3523 8.61871L8.4582 9.22638C8.27496 9.28751 8.15131 9.41276 8.15131 9.60665V11.4543C8.15119 11.5487 8.18077 11.6407 8.23586 11.7173C8.29095 11.794 8.36875 11.8513 8.45825 11.8813L10.3524 12.4889C10.424 12.6941 10.5073 12.8951 10.6019 13.0909L9.74454 14.8096C9.70241 14.8942 9.68787 14.9898 9.70298 15.083C9.71809 15.1763 9.76208 15.2624 9.82875 15.3293L11.0987 16.6027C11.2364 16.7403 11.4451 16.7742 11.617 16.6871L13.3311 15.8275C13.5262 15.9223 13.7267 16.0059 13.9314 16.0777L14.5374 17.9302C14.567 18.0198 14.6241 18.0977 14.7005 18.1529C14.777 18.2082 14.8689 18.2379 14.9632 18.238H16.7593C16.8536 18.2379 16.9455 18.2082 17.0219 18.1529C17.0984 18.0977 17.1555 18.0197 17.1851 17.9302L17.7911 16.0777C17.9958 16.0058 18.1962 15.9223 18.3914 15.8275L20.1055 16.6871C20.1899 16.7291 20.2853 16.7435 20.3783 16.7284C20.4713 16.7132 20.5572 16.6692 20.6238 16.6026L21.8937 15.3293C21.9604 15.2624 22.0044 15.1762 22.0195 15.083C22.0346 14.9897 22.02 14.8941 21.9779 14.8096L21.1206 13.0908C21.2152 12.8951 21.2985 12.6941 21.3701 12.4889L23.2642 11.8812C23.3537 11.8513 23.4315 11.7939 23.4866 11.7173C23.5417 11.6407 23.5712 11.5487 23.5711 11.4543V9.69996C23.5711 9.50612 23.4475 9.28751 23.2642 9.22638Z"
-                                            stroke-width="1.6"
-                                            stroke-miterlimit="10"
-                                            stroke-linecap="round"
-                                            stroke-linejoin="round"
-                                            stroke="#05022A"
-                                        />
-                                        <path
-                                            d="M18.5239 10.5543C18.5239 12.0257 17.3312 13.2185 15.86 13.2185C14.3888 13.2185 13.1962 12.0257 13.1962 10.5543C13.1962 9.08286 14.3888 7.8901 15.86 7.8901C17.3312 7.8901 18.5239 9.08286 18.5239 10.5543Z"
-                                            stroke-width="1.6"
-                                            stroke-miterlimit="10"
-                                            stroke-linecap="round"
-                                            stroke-linejoin="round"
-                                            stroke="#05022A"
-                                        />
-                                        <path
-                                            d="M8.87354 23.0021H13.3243V20.3267"
-                                            stroke-width="1.6"
-                                            stroke-miterlimit="10"
-                                            stroke-linecap="round"
-                                            stroke-linejoin="round"
-                                            stroke="#05022A"
-                                        />
-                                        <path
-                                            d="M8.87719 23.0025C8.87719 23.8594 8.18253 24.5541 7.32562 24.5541C6.46871 24.5541 5.77405 23.8594 5.77405 23.0025C5.77405 22.1456 6.46871 21.4509 7.32562 21.4509C8.18253 21.4509 8.87719 22.1456 8.87719 23.0025Z"
-                                            stroke-width="1.6"
-                                            stroke-miterlimit="10"
-                                            stroke-linecap="round"
-                                            stroke-linejoin="round"
-                                            stroke="#5446FF"
-                                        />
-                                        <path
-                                            d="M23.1092 23.0021H18.6584V20.3267"
-                                            stroke-width="1.6"
-                                            stroke-miterlimit="10"
-                                            stroke-linecap="round"
-                                            stroke-linejoin="round"
-                                            stroke="#05022A"
-                                        />
-                                        <path
-                                            d="M26.2148 23.0025C26.2148 23.8594 25.5202 24.5541 24.6633 24.5541C23.8064 24.5541 23.1117 23.8594 23.1117 23.0025C23.1117 22.1456 23.8064 21.4509 24.6633 21.4509C25.5202 21.4509 26.2148 22.1456 26.2148 23.0025Z"
-                                            stroke-width="1.6"
-                                            stroke-miterlimit="10"
-                                            stroke-linecap="round"
-                                            stroke-linejoin="round"
-                                            stroke="#5446FF"
-                                        />
-                                        <path
-                                            d="M15.9944 20.4819V25.7975"
-                                            stroke-width="1.6"
-                                            stroke-miterlimit="10"
-                                            stroke-linecap="round"
-                                            stroke-linejoin="round"
-                                            stroke="#05022A"
-                                        />
-                                        <path
-                                            d="M16.2411 25.8182C17.087 25.9554 17.6614 26.7524 17.5241 27.5983C17.3868 28.4441 16.5898 29.0185 15.744 28.8812C14.8981 28.7439 14.3237 27.9469 14.461 27.1011C14.5983 26.2553 15.3953 25.6809 16.2411 25.8182Z"
-                                            stroke-width="1.6"
-                                            stroke-miterlimit="10"
-                                            stroke-linecap="round"
-                                            stroke-linejoin="round"
-                                            stroke="#5446FF"
-                                        />
-                                    </svg>
-                                )}
-                                {index === 2 && (
-                                    <svg
-                                        width="32"
-                                        height="32"
-                                        viewBox="0 0 32 32"
-                                        fill="none"
-                                        xmlns="http://www.w3.org/2000/svg"
-                                    >
-                                        <path
-                                            d="M9.01013 18.3298H15.1681M9.01013 22.9892H15.1681M9.01013 13.6704H11.6088M9.01013 9.01102H11.6088"
-                                            stroke-width="1.6"
-                                            stroke-miterlimit="10"
-                                            stroke-linecap="round"
-                                            stroke-linejoin="round"
-                                            stroke="#05022A"
-                                        />
-                                        <path
-                                            d="M23.0518 10.3651V8.46519L18.5867 4.00012H7.93995C6.25501 4.00012 4.8891 5.36604 4.8891 7.05097V24.9493C4.8891 26.6342 6.25501 28.0001 7.93995 28.0001H20.001C20.2116 28.0001 20.4172 27.9788 20.6158 27.9381"
-                                            stroke-width="1.6"
-                                            stroke-miterlimit="10"
-                                            stroke-linecap="round"
-                                            stroke-linejoin="round"
-                                            stroke="#05022A"
-                                        />
-                                        <path
-                                            d="M27.1031 19.501C27.1031 21.7385 25.2893 23.5523 23.0518 23.5523C20.8144 23.5523 19.0005 21.7385 19.0005 19.501C19.0005 17.2636 20.8144 15.4497 23.0518 15.4497C25.2893 15.4497 27.1031 17.2636 27.1031 19.501Z"
-                                            stroke-width="1.6"
-                                            stroke-miterlimit="10"
-                                            stroke-linecap="round"
-                                            stroke-linejoin="round"
-                                            stroke="#5446FF"
-                                        />
-                                        <path
-                                            d="M26.1734 22.2686V26.7728C26.1734 27.7597 25.0663 28.3416 24.2534 27.7819L23.0517 26.9547L21.8501 27.7819C21.0373 28.3416 19.9301 27.7597 19.9301 26.7728V22.2686"
-                                            stroke-width="1.6"
-                                            stroke-miterlimit="10"
-                                            stroke-linecap="round"
-                                            stroke-linejoin="round"
-                                            stroke="#5446FF"
-                                        />
-                                    </svg>
-                                )}
-                            </div>
-                            <div class={`flex flex-col ${st.width}`}>
-                                <span class="font-medium text-neutral-700 text-[length:var(--fs-label)] leading-[length:var(--lh-body-sm)]">
-                                    {st.label}
-                                </span>
-                            </div>
-                        </li>
-                    </>
-                ))}
-            </ul>
-
-            <!-- Opens the HubSpot modal from `DemoModal.astro`. The href is kept real
-           so the CTA still goes somewhere if that section is absent. -->
-            <a
-                href="javascript:void(0)"
-                onclick="document.getElementById('contactForm').scrollIntoView({behavior: 'smooth'})"
-                class="max-md:w-full inline-flex items-center justify-center gap-2 rounded-lg border border-nova-blue bg-nova-blue px-10 py-3.5 text-[length:var(--fs-label-lg)] leading-[length:var(--lh-label-lg)] font-medium text-nova-50 no-underline transition-all duration-200 hover:bg-generic-00 hover:text-nova-blue"
-            >
-                Book a demo
-            </a>
         </div>
     </div>
 </section>
 
 <style is:global>
-    /* The single Flux Lime instance on this screen. clone keeps the block intact
-     if the headline wraps inside "France E-invoicing" on narrow viewports. */
-    .sp-hero-mark {
+    /* The single Flux Lime instance on this screen. Keeps the highlight intact
+       with proportional horizontal padding and clearance from adjacent text. */
+    .partner-hero-mark {
+        display: inline-block;
         background-color: var(--color-flux-lime);
-        padding: 0 0.08em;
+        padding: 4px 13px;
         -webkit-box-decoration-break: clone;
         box-decoration-break: clone;
         border-radius: 12px;
+        vertical-align: baseline;
     }
 </style>
-
-<script is:inline>
-    /* Interactive stroke field — the one from `sections/global-invoicing/Hero.astro`,
-     which took it from `sections/blog-listing/Newsletter.astro`. That file carries
-     the full explanation of the geometry; the numbers here come off the section's
-     data-* attributes so there is a single source for each. */
-    function initSpHeroGrid() {
-        const section = document.getElementById("sp-hero");
-        if (!section) return;
-        const canvas = document.getElementById("sp-hero-dots");
-        if (!canvas || !canvas.getContext) return;
-        const ctx = canvas.getContext("2d");
-
-        function num(name, fallback) {
-            const value = parseFloat(section.getAttribute(name));
-            return isNaN(value) ? fallback : value;
-        }
-
-        const config = {
-            lineWidth: num("data-line-width", 2),
-            gap: num("data-gap", 24),
-            maxLength: num("data-max-length", 6),
-            lengthRadius: num("data-length-radius", 260),
-            tilt: num("data-tilt", 1),
-            baseColor: section.getAttribute("data-base-color") || "#C8F006",
-            cursorRadius: num("data-cursor-radius", 320),
-            pull: num("data-pull", 14),
-            fadeRadius: num("data-fade-radius", 40),
-            fadeSpeed: 12,
-            followSpeed: 7,
-            engageSpeed: 4,
-            focusSpeed: 5,
-        };
-
-        const HALF_PI = Math.PI / 2; // straight down — the resting angle
-
-        let width = 0;
-        let height = 0;
-        let dots = [];
-        const mouse = { x: -9999, y: -9999, prevX: -9999, prevY: -9999 };
-        let hover = false;
-        let speed = 0; // smoothed cursor travel, px per frame
-        let engagement = 0; // 0–1, how awake the field is
-        let presence = 0; // 0–1, whether a pointer is over the section at all
-        let focusX = 0;
-        let focusY = 0;
-
-        function initGrid() {
-            const parent = canvas.parentElement;
-            width = parent.offsetWidth;
-            height = parent.offsetHeight;
-            if (!width || !height) return;
-
-            const dpr = window.devicePixelRatio || 1;
-            canvas.width = Math.round(width * dpr);
-            canvas.height = Math.round(height * dpr);
-            // setTransform, not scale: scale() multiplies the existing matrix, so
-            // every resize would compound the DPR and shrink the grid.
-            ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-
-            dots = [];
-            const spacing = config.lineWidth + config.gap;
-            const cols = Math.floor(width / spacing);
-            const rows = Math.floor(height / spacing);
-            const startX = (width - cols * spacing) / 2 + config.lineWidth / 2;
-            const startY = (height - rows * spacing) / 2 + config.lineWidth / 2;
-
-            for (let y = 0; y <= rows; y++) {
-                for (let x = 0; x <= cols; x++) {
-                    const cx = startX + x * spacing;
-                    const cy = startY + y * spacing;
-                    // ox/oy is the stroke's home and the point it is drawn centred on;
-                    // x/y is where that centre is now; hx/hy is half its segment vector.
-                    dots.push({
-                        x: cx,
-                        y: cy,
-                        ox: cx,
-                        oy: cy,
-                        alpha: 1,
-                        hx: 0,
-                        hy: 0,
-                    });
-                }
-            }
-
-            if (!hover) {
-                focusX = width / 2;
-                focusY = height / 2;
-            }
-            aim();
-            paint();
-        }
-
-        // Length and angle, both straight off the focus. The focus and `presence`
-        // are already eased, so neither needs easing here.
-        function aim() {
-            const longest = config.maxLength / 2;
-            const turn = presence * config.tilt;
-
-            for (let i = 0; i < dots.length; i++) {
-                const dot = dots[i];
-                const dx = focusX - dot.ox;
-                const dy = focusY - dot.oy;
-                const dist = Math.sqrt(dx * dx + dy * dy);
-
-                // 1 at the pointer, 0 by `lengthRadius`. Scaled by `presence`, so with
-                // no cursor on the section every stroke is a plain dot.
-                let t = dist / config.lengthRadius;
-                if (t > 1) t = 1;
-                const grow = 1 - t;
-                let reach = longest * grow * grow * (3 - 2 * grow) * presence;
-                // A canvas subpath of exactly zero length is not reliably painted, even
-                // with a round cap. A quarter pixel is a dot and is always drawn.
-                if (reach < 0.25) reach = 0.25;
-
-                let ux = 0;
-                let uy = 1;
-
-                if (turn > 0.001 && dist > 0.01) {
-                    // Folded into a quarter turn either side: a segment drawn about its
-                    // centre looks the same pointed either way, so this takes the short
-                    // way round. Only seamless because `turn` reaches 1 — scaling the
-                    // angle by any fraction makes strokes flip as the cursor crosses them.
-                    let off = Math.atan2(dy, dx) - HALF_PI;
-                    while (off > HALF_PI) off -= Math.PI;
-                    while (off < -HALF_PI) off += Math.PI;
-
-                    const angle = HALF_PI + off * turn;
-                    ux = Math.cos(angle);
-                    uy = Math.sin(angle);
-                }
-
-                dot.hx = ux * reach;
-                dot.hy = uy * reach;
-            }
-        }
-
-        function paint() {
-            ctx.clearRect(0, 0, width, height);
-            ctx.strokeStyle = config.baseColor;
-            ctx.lineWidth = config.lineWidth;
-            ctx.lineCap = "round"; // so a stroke shrunk to nothing reads as a dot
-
-            // Two passes. Only the strokes the cursor is touching have an alpha of
-            // their own; the rest of the field goes down as one path in one stroke
-            // call. Setting globalAlpha per stroke across the whole grid stutters.
-            ctx.globalAlpha = 1;
-            ctx.beginPath();
-            for (let i = 0; i < dots.length; i++) {
-                const dot = dots[i];
-                if (dot.alpha < 0.995) continue;
-                ctx.moveTo(dot.x - dot.hx, dot.y - dot.hy);
-                ctx.lineTo(dot.x + dot.hx, dot.y + dot.hy);
-            }
-            ctx.stroke();
-
-            for (let j = 0; j < dots.length; j++) {
-                const fading = dots[j];
-                if (fading.alpha >= 0.995 || fading.alpha < 0.01) continue;
-                ctx.globalAlpha = fading.alpha;
-                ctx.beginPath();
-                ctx.moveTo(fading.x - fading.hx, fading.y - fading.hy);
-                ctx.lineTo(fading.x + fading.hx, fading.y + fading.hy);
-                ctx.stroke();
-            }
-
-            ctx.globalAlpha = 1;
-        }
-
-        const reduceMotion =
-            window.matchMedia &&
-            window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-
-        if (reduceMotion) {
-            // Static dot grid. No animation loop, no cursor reaction.
-            initGrid();
-            paint();
-            window.addEventListener("resize", () => {
-                initGrid();
-                paint();
-            });
-            return;
-        }
-
-        let lastTime = performance.now();
-        let isFirstFrame = true;
-
-        function draw(time) {
-            if (dots.length === 0) {
-                initGrid();
-            }
-
-            let dt = (time - lastTime) / 1000;
-            if (dt > 0.05) dt = 0.05; // cap so a backgrounded tab can't jolt the grid
-            lastTime = time;
-
-            const fadeEase = Math.min(1, config.fadeSpeed * dt);
-            const followEase = Math.min(1, config.followSpeed * dt);
-            const engageEase = Math.min(1, config.engageSpeed * dt);
-            const focusEase = Math.min(1, config.focusSpeed * dt);
-
-            const travelX = mouse.x - mouse.prevX;
-            const travelY = mouse.y - mouse.prevY;
-            mouse.prevX = mouse.x;
-            mouse.prevY = mouse.y;
-            speed +=
-                (Math.sqrt(travelX * travelX + travelY * travelY) - speed) *
-                0.5;
-            if (speed < 0.01) speed = 0;
-
-            engagement +=
-                ((hover ? Math.min(speed / 6, 1) : 0) - engagement) *
-                engageEase;
-            if (engagement < 0.001) engagement = 0;
-
-            // A parked cursor still holds the field open, just more gently.
-            const grip = hover ? 0.4 + 0.6 * engagement : 0;
-
-            const wantX = hover ? mouse.x : width / 2;
-            const wantY = hover ? mouse.y : height / 2;
-            const swungX = wantX - focusX;
-            const swungY = wantY - focusY;
-            let swung =
-                swungX > 0.05 ||
-                swungX < -0.05 ||
-                swungY > 0.05 ||
-                swungY < -0.05;
-            if (swung) {
-                focusX += swungX * focusEase;
-                focusY += swungY * focusEase;
-            } else if (focusX !== wantX || focusY !== wantY) {
-                focusX = wantX;
-                focusY = wantY;
-                swung = true;
-            }
-
-            const wantPresence = hover ? 1 : 0;
-            const presenceDiff = wantPresence - presence;
-            if (presenceDiff > 0.002 || presenceDiff < -0.002) {
-                presence += presenceDiff * focusEase;
-                swung = true;
-            } else if (presence !== wantPresence) {
-                presence = wantPresence;
-                swung = true;
-            }
-
-            // Length and angle hang off those two, so they only need recomputing on
-            // the frames one of them actually moved.
-            if (swung) aim();
-
-            const crSq = config.cursorRadius * config.cursorRadius;
-            let moving = swung;
-
-            for (let i = 0; i < dots.length; i++) {
-                const dot = dots[i];
-
-                // Measured from the stroke's home, not its current position, or one
-                // that has moved toward the focus reads as closer and runs away into it.
-                const dx = focusX - dot.ox;
-                const dy = focusY - dot.oy;
-                const distSq = dx * dx + dy * dy;
-
-                let targetAlpha = 1;
-                let targetX = dot.ox;
-                let targetY = dot.oy;
-
-                if (distSq < crSq) {
-                    const dist = Math.sqrt(distSq);
-
-                    if (grip > 0.001) {
-                        const t = 1 - dist / config.cursorRadius;
-                        let push = t * t * config.pull * grip;
-                        // A stroke must never reach the cursor: past it, it crosses to the
-                        // far side and the field knots up around the pointer.
-                        if (push > dist * 0.75) push = dist * 0.75;
-                        const step = dist > 0.01 ? push / dist : 0;
-                        targetX += dx * step;
-                        targetY += dy * step;
-                    }
-
-                    if (dist < config.fadeRadius) {
-                        const ft = dist / config.fadeRadius;
-                        const hole = ft * ft * (3 - 2 * ft);
-                        // Also the pointer's doing, so the resting grid keeps every dot.
-                        targetAlpha = 1 - (1 - hole) * presence;
-                    }
-                }
-
-                const offX = targetX - dot.x;
-                const offY = targetY - dot.y;
-                if (
-                    offX > 0.05 ||
-                    offX < -0.05 ||
-                    offY > 0.05 ||
-                    offY < -0.05
-                ) {
-                    dot.x += offX * followEase;
-                    dot.y += offY * followEase;
-                    moving = true;
-                } else if (dot.x !== targetX || dot.y !== targetY) {
-                    dot.x = targetX;
-                    dot.y = targetY;
-                    moving = true;
-                }
-
-                const diff = targetAlpha - dot.alpha;
-                if (diff > 0.002 || diff < -0.002) {
-                    dot.alpha += diff * fadeEase;
-                    moving = true;
-                } else if (dot.alpha !== targetAlpha) {
-                    dot.alpha = targetAlpha;
-                    moving = true;
-                }
-            }
-
-            // A settled field is repainted zero times a second, not sixty.
-            if (moving || isFirstFrame) {
-                paint();
-                isFirstFrame = false;
-            }
-            requestAnimationFrame(draw);
-        }
-
-        window.addEventListener("resize", initGrid);
-        initGrid();
-        requestAnimationFrame(draw);
-
-        section.addEventListener("mousemove", (e) => {
-            const rect = canvas.getBoundingClientRect();
-            const sx = rect.width ? width / rect.width : 1;
-            const sy = rect.height ? height / rect.height : 1;
-            const nx = (e.clientX - rect.left) * sx;
-            const ny = (e.clientY - rect.top) * sy;
-            if (!hover) {
-                // Re-entering: seed prev with the entry point, or the jump from the last
-                // position would register as a colossal cursor speed.
-                mouse.prevX = nx;
-                mouse.prevY = ny;
-            }
-            hover = true;
-            mouse.x = nx;
-            mouse.y = ny;
-        });
-
-        section.addEventListener("mouseleave", () => {
-            // Dropping `hover` is what matters: the focus starts its swing back to the
-            // centre, the strokes reel in and the pull lets go. Nothing reads the
-            // parked coordinates while `hover` is false, and re-entry reseeds them.
-            hover = false;
-            speed = 0;
-        });
-    }
-
-    if (document.readyState === "loading") {
-        document.addEventListener("DOMContentLoaded", initSpHeroGrid);
-    } else {
-        initSpHeroGrid();
-    }
-</script>
