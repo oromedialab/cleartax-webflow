@@ -1,0 +1,137 @@
+---
+/**
+ * Business section for Max ITC.
+ */
+
+const tabs = [
+  "e-Commerce",
+  "Manufacturing",
+  "Financial services",
+  "Retail",
+  "FMCG",
+  "Healthcare & Pharmaceutical",
+  "Hospitality & Real estate",
+  "Healthcare & Pharmaceutical",
+];
+
+const cards = [1, 2, 3, 4];
+---
+
+<section id="business" class="bg-generic-00 py-16 md:py-20">
+  <div class="mx-auto w-full max-w-[var(--container-max)] px-4 md:px-6">
+    <!-- Header -->
+    <div class="text-center max-w-139 mx-auto mb-6">
+      <h2 class="text-[length:var(--fs-h2)] md:text-[length:var(--fs-h1)] leading-[length:var(--lh-h2)] md:leading-[length:var(--lh-h1)] font-medium text-vault-navy font-heading mb-4">
+        India's first end-to-end solution to maximize ITC for businesses
+      </h2>
+      <p class="text-neutral-500 font-normal text-[length:var(--fs-body)] md:text-[length:var(--fs-body-lg)] leading-[length:var(--lh-body)] md:leading-[length:var(--lh-body-lg)] font-body">
+        We've unblocked over{" "}
+        <span class="font-bold text-neutral-500">₹ 9000 crores</span> for{" "}
+        <span class="font-bold text-neutral-500">3000+ businesses</span>
+      </p>
+    </div>
+
+    <!-- Tabs Navigation Bar -->
+    <div class="flex justify-start lg:justify-center mb-8 md:mb-10 overflow-x-auto [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden py-1">
+      <div
+        class="inline-flex items-center gap-1 p-1.5 bg-neutral-100 rounded-xl shrink-0"
+        role="tablist"
+      >
+        {tabs.map((tab, index) => {
+          const isActive = index === 0;
+          return (
+            <button
+              type="button"
+              role="tab"
+              data-business-tab
+              aria-selected={isActive ? "true" : "false"}
+              class={`px-3.5 sm:px-4 py-2 text-xs sm:text-sm font-medium rounded-xl border-0 transition-all duration-200 ease-in-out cursor-pointer outline-none select-none ${
+                isActive
+                  ? "active bg-generic-00 text-navy-600 shadow-xs"
+                  : "text-neutral-700 bg-transparent hover:text-vault-navy"
+              }`}
+            >
+              {tab}
+            </button>
+          );
+        })}
+      </div>
+    </div>
+
+    <!-- 4 Cards Grid -->
+    <div
+      id="business-cards-grid"
+      class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 mb-8 md:mb-10 transition-all duration-200 ease-out"
+    >
+      {cards.map((_) => (
+        <div class="w-full aspect-[4/3] rounded-2xl bg-visual-placeholder" />
+      ))}
+    </div>
+
+    <!-- Download Whitepaper CTA -->
+    <div class="flex justify-center">
+      <a
+        href="#"
+        class="inline-flex items-center justify-center px-5 py-3.5 rounded-lg border border-neutral-200 bg-generic-00 font-body font-medium text-neutral-700 text-[length:var(--fs-label-lg)] leading-[length:var(--lh-label-lg)] shadow-xs hover:bg-neutral-50 hover:border-neutral-300 transition-colors no-underline"
+      >
+        Download Whitepaper
+      </a>
+    </div>
+  </div>
+</section>
+
+<script>
+  function setupBusinessTabs() {
+    const tabButtons = document.querySelectorAll<HTMLButtonElement>(
+      "[data-business-tab]",
+    );
+    const cardsGrid = document.getElementById("business-cards-grid");
+
+    tabButtons.forEach((button) => {
+      button.addEventListener("click", () => {
+        if (button.getAttribute("aria-selected") === "true") return;
+
+        // Reset all tabs
+        tabButtons.forEach((btn) => {
+          btn.classList.remove(
+            "active",
+            "bg-generic-00",
+            "text-navy-600",
+            "shadow-xs",
+          );
+          btn.classList.add(
+            "text-neutral-700",
+            "hover:text-vault-navy",
+            "bg-transparent",
+          );
+          btn.setAttribute("aria-selected", "false");
+        });
+
+        // Activate selected tab (without hover:text-vault-navy so color stays text-navy-600)
+        button.classList.add(
+          "active",
+          "bg-generic-00",
+          "text-navy-600",
+          "shadow-xs",
+        );
+        button.classList.remove(
+          "text-neutral-700",
+          "hover:text-vault-navy",
+          "bg-transparent",
+        );
+        button.setAttribute("aria-selected", "true");
+
+        // Smoothly scroll tab into view if it overflows container
+        button.scrollIntoView({
+          behavior: "smooth",
+          block: "nearest",
+          inline: "center",
+        });
+      });
+    });
+  }
+
+  // Setup on initial load & view transitions if any
+  setupBusinessTabs();
+  document.addEventListener("astro:page-load", setupBusinessTabs);
+</script>
