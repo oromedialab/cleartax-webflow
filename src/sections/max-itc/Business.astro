@@ -11,7 +11,6 @@ const tabs = [
   "FMCG",
   "Healthcare & Pharmaceutical",
   "Hospitality & Real estate",
-  "Healthcare & Pharmaceutical",
 ];
 
 const cards = [1, 2, 3, 4];
@@ -20,8 +19,8 @@ const cards = [1, 2, 3, 4];
 <section id="business" class="bg-generic-00 py-16 md:py-20">
   <div class="mx-auto w-full max-w-[var(--container-max)] px-4 md:px-6">
     <!-- Header -->
-    <div class="text-center max-w-139 mx-auto mb-6">
-      <h2 class="m-0 text-[length:var(--fs-h2)] md:text-[length:var(--fs-h1)] leading-[length:var(--lh-h2)] md:leading-[length:var(--lh-h1)] font-medium text-vault-navy font-heading mb-4">
+    <div class="text-center max-w-139 mx-auto mb-6 sm:mb-8">
+      <h2 class="m-0 text-[length:var(--fs-h2)] md:text-[length:var(--fs-h1)] leading-[length:var(--lh-h2)] md:leading-[length:var(--lh-h1)] font-medium text-vault-navy font-heading mb-3 sm:mb-4">
         India's first end-to-end solution to maximize ITC for businesses
       </h2>
       <p class="m-0 text-neutral-500 font-normal text-[length:var(--fs-body)] md:text-[length:var(--fs-body-lg)] leading-[length:var(--lh-body)] md:leading-[length:var(--lh-body-lg)] font-body">
@@ -31,10 +30,15 @@ const cards = [1, 2, 3, 4];
       </p>
     </div>
 
-    <!-- Tabs Navigation Bar -->
-    <div class="flex justify-start lg:justify-center mb-8 md:mb-10 overflow-x-auto [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden py-1">
+    <!-- Tabs Navigation Bar (Centered on desktop, smoothly scrollable on mobile) -->
+    <div
+      id="business-tabs-scroll"
+      class="w-full overflow-x-auto overscroll-x-contain [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden py-2 mb-8 md:mb-10 flex"
+      style="-webkit-overflow-scrolling: touch;"
+    >
       <div
-        class="inline-flex items-center gap-1 p-1.5 bg-neutral-100 rounded-xl shrink-0"
+        id="business-tabs-container"
+        class="inline-flex items-center gap-1 p-1.5 bg-neutral-100 rounded-xl sm:rounded-2xl shrink-0 min-w-max mx-auto"
         role="tablist"
       >
         {tabs.map((tab, index) => {
@@ -43,11 +47,11 @@ const cards = [1, 2, 3, 4];
             <button
               type="button"
               role="tab"
-              data-business-tab
+              data-business-tab={index}
               aria-selected={isActive ? "true" : "false"}
-              class={`px-3.5 sm:px-4 py-2 text-xs sm:text-sm font-medium rounded-xl border-0 transition-all duration-200 ease-in-out cursor-pointer outline-none select-none ${
+              class={`px-3.5 sm:px-4 py-2 text-xs sm:text-sm font-medium rounded-lg sm:rounded-xl border-0 transition-all duration-200 ease-in-out cursor-pointer outline-none select-none whitespace-nowrap shrink-0 ${
                 isActive
-                  ? "active bg-generic-00 text-navy-600 shadow-xs"
+                  ? "active bg-generic-00 text-nova-blue shadow-xs"
                   : "text-neutral-700 bg-transparent hover:text-vault-navy"
               }`}
             >
@@ -58,13 +62,13 @@ const cards = [1, 2, 3, 4];
       </div>
     </div>
 
-    <!-- 4 Cards Grid -->
+    <!-- 4 Cards Grid (2x2 on mobile, 4 columns on desktop) -->
     <div
       id="business-cards-grid"
-      class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 mb-8 md:mb-10 transition-all duration-200 ease-out"
+      class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-6 mb-8 md:mb-10 transition-opacity duration-200 ease-out"
     >
       {cards.map((_) => (
-        <div class="w-full aspect-[4/3] rounded-2xl bg-visual-placeholder" />
+        <div class="w-full aspect-[2/1] rounded-xl sm:rounded-2xl bg-visual-placeholder" />
       ))}
     </div>
 
@@ -82,52 +86,133 @@ const cards = [1, 2, 3, 4];
 
 <script is:inline>
   (function () {
+    let timer = null;
+    let currentIndex = 0;
+    const INTERVAL_MS = 4000;
+
     function setupBusinessTabs() {
+      const section = document.getElementById("business");
+      const scrollContainer = document.getElementById("business-tabs-scroll");
+      const container = document.getElementById("business-tabs-container");
       const tabButtons = document.querySelectorAll("[data-business-tab]");
-      if (!tabButtons.length) return;
+      const cardsGrid = document.getElementById("business-cards-grid");
+      if (!tabButtons.length || !container || !scrollContainer) return;
 
-      tabButtons.forEach((button) => {
-        button.addEventListener("click", () => {
-          if (button.getAttribute("aria-selected") === "true") return;
+      if (container.dataset.tabsInitialized === "true") return;
+      container.dataset.tabsInitialized = "true";
 
-          // Reset all tabs
-          tabButtons.forEach((btn) => {
-            btn.classList.remove(
-              "active",
-              "bg-generic-00",
-              "text-navy-600",
-              "shadow-xs",
-            );
-            btn.classList.add(
-              "text-neutral-700",
-              "hover:text-vault-navy",
-              "bg-transparent",
-            );
-            btn.setAttribute("aria-selected", "false");
-          });
+      // Initialize current index based on active tab
+      tabButtons.forEach((btn, idx) => {
+        if (btn.getAttribute("aria-selected") === "true") {
+          currentIndex = idx;
+        }
+      });
 
-          // Activate selected tab
-          button.classList.add(
+      function activateTab(index) {
+        currentIndex = index;
+        const targetBtn = tabButtons[index];
+        if (!targetBtn) return;
+
+        tabButtons.forEach((btn) => {
+          btn.classList.remove(
             "active",
             "bg-generic-00",
-            "text-navy-600",
+            "text-nova-blue",
             "shadow-xs",
           );
-          button.classList.remove(
+          btn.classList.add(
             "text-neutral-700",
-            "hover:text-vault-navy",
             "bg-transparent",
+            "hover:text-vault-navy",
           );
-          button.setAttribute("aria-selected", "true");
+          btn.setAttribute("aria-selected", "false");
+        });
 
-          // Smoothly scroll tab into view if it overflows container
-          button.scrollIntoView({
-            behavior: "smooth",
-            block: "nearest",
-            inline: "center",
-          });
+        targetBtn.classList.remove(
+          "text-neutral-700",
+          "bg-transparent",
+          "hover:text-vault-navy",
+        );
+        targetBtn.classList.add(
+          "active",
+          "bg-generic-00",
+          "text-nova-blue",
+          "shadow-xs",
+        );
+        targetBtn.setAttribute("aria-selected", "true");
+
+        // Subtle cross-fade animation feedback on cards
+        if (cardsGrid) {
+          cardsGrid.classList.add("opacity-70");
+          setTimeout(() => {
+            cardsGrid.classList.remove("opacity-70");
+          }, 150);
+        }
+
+        // Scroll ONLY the horizontal tab container without affecting window scroll position
+        const targetLeft =
+          targetBtn.offsetLeft -
+          scrollContainer.clientWidth / 2 +
+          targetBtn.clientWidth / 2;
+
+        scrollContainer.scrollTo({
+          left: Math.max(0, targetLeft),
+          behavior: "smooth",
+        });
+      }
+
+      function nextTab() {
+        const nextIndex = (currentIndex + 1) % tabButtons.length;
+        activateTab(nextIndex);
+      }
+
+      function startTimer() {
+        stopTimer();
+        timer = setInterval(nextTab, INTERVAL_MS);
+      }
+
+      function stopTimer() {
+        if (timer) {
+          clearInterval(timer);
+          timer = null;
+        }
+      }
+
+      // Manual click interaction: immediately switch and restart the 4s countdown
+      tabButtons.forEach((button, idx) => {
+        button.addEventListener("click", () => {
+          activateTab(idx);
+          startTimer();
         });
       });
+
+      // Pause when browser tab is inactive, resume immediately when active
+      document.addEventListener("visibilitychange", () => {
+        if (document.hidden) {
+          stopTimer();
+        } else {
+          startTimer();
+        }
+      });
+
+      // Only auto-swap when the Business section is visible in the viewport
+      if ("IntersectionObserver" in window && section) {
+        const observer = new IntersectionObserver(
+          (entries) => {
+            entries.forEach((entry) => {
+              if (entry.isIntersecting) {
+                startTimer();
+              } else {
+                stopTimer();
+              }
+            });
+          },
+          { threshold: 0.1 }
+        );
+        observer.observe(section);
+      } else {
+        startTimer();
+      }
     }
 
     if (document.readyState === "loading") {
@@ -135,6 +220,5 @@ const cards = [1, 2, 3, 4];
     } else {
       setupBusinessTabs();
     }
-    document.addEventListener("astro:page-load", setupBusinessTabs);
   })();
 </script>
