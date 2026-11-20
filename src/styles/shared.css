@@ -330,3 +330,24 @@ img {
   transition: transform 0.2s cubic-bezier(0.03, 0.98, 0.52, 0.99);
   transform-style: preserve-3d;
 }
+
+/* GTM announcement ticker (#ct-announcement-ticker, injected by a GTM Custom
+   HTML tag, not by this repo). It is appended to <body> with a fixed 76px
+   mobile height and inherits body's `line-height: var(--lh-body)` (24px), which
+   makes its date, title and button too tall and clips the title. Pin a compact
+   line-height on it so it renders the same as on non-brand-v2 pages. */
+#ct-announcement-ticker {
+  line-height: 1.15;
+}
+/* Mobile: date + 2-line title + button must fit the tag's fixed 76px (about
+   71px at 1.15). The extra `html` raises specificity over the tag's own rules,
+   which are injected later and would otherwise win ties. */
+@media (max-width: 639px) {
+  html #ct-announcement-ticker .ctt-inner {
+    gap: 2px;
+  }
+  html #ct-announcement-ticker .ctt-cta {
+    padding-top: 4px;
+    padding-bottom: 4px;
+  }
+}
