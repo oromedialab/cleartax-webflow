@@ -108,6 +108,7 @@ export const PAGE_TARGETS = [
   { name: 'germany-product', input: 'src/styles/germany-product.css', page: 'src/pages/germany-product.astro' },
   { name: 'india-homepage-v2', input: 'src/styles/india-homepage-v2.css', page: 'src/pages/india-homepage-v2.astro' },
   { name: 'max-itc', input: 'src/styles/max-itc.css', page: 'src/pages/max-itc.astro' },
+  { name: 'recon-ai', input: 'src/styles/recon-ai.css', page: 'src/pages/recon-ai.astro' },
 ];
 
 /**
