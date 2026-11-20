@@ -1,0 +1,244 @@
+---
+/**
+ * "Get ready for Netherlands e-invoicing in 5 steps"
+ *
+ * Implements sticky horizontal scroll container matching ERPintegration specs:
+ * - Section pins to viewport as reader scrolls down the page
+ * - Translates horizontal track smoothly across the 5 implementation step cards
+ * - Purple connecting progress line connects all cards together and fills dynamically with scroll progress
+ */
+
+interface PlatformCard {
+    icon: string;
+    title: string;
+    subtitle: string;
+}
+
+const cards: PlatformCard[] = [
+    {
+        icon: "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6b003cec94da39ce2d50d6b4_ph-icon-11.png",
+        title: "Global depth, local accountability",
+        subtitle:
+            "ClearTax has navigated e-invoicing mandates across India, Saudi Arabia, Malaysia, France, and 50+ other countries. We've seen what happens when mandates evolve post-launch, and we've built our platform to handle it.",
+    },
+    {
+        icon: "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6b003cf129256214adc48439_ph-icon-12.png",
+        title: "Built for tax from day one",
+        subtitle:
+            "ClearTax wasn't originally an ERP or EDI tool that added compliance as a feature. Tax compliance is the product. That means schema updates, BIR regulatory changes, and new reporting requirements are handled at the platform level.",
+    },
+    {
+        icon: "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6b003cf7b9c7a7c087a4c969_ph-icon-13.png",
+        title: "You don't want to be the test case",
+        subtitle:
+            "Every market that has gone through a mandate launch saw the same pattern: businesses that chose lightweight or unproven tools spent 12–18 months fire-fighting compliance failures after go-live. Businesses that chose ClearTax didn't. The Philippines will be no different.",
+    },
+    {
+        icon: "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6b003cfcca6f01ed73100b48_ph-icon-14.png",
+        title: "Certifications that matter",
+        subtitle:
+            "ISO 27001:2022 · SOC 2 Type II · GDPR compliant · VAPT audited · Accredited across ZATCA, FTA, LHDN, MDEC, NIC · Open Peppol Access Point. These credentials matter because enterprise clients demand them and regulators audit them.",
+    },
+    {
+        icon: "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6b003d02e43c46ccb7a36351_ph-icon-15.png",
+        title: "A team, not just a tool",
+        subtitle:
+            "A dedicated Philippines support team that knows BIR regulations, EIS technical specs, and the nuances of the mandate, not just generic e-invoicing. When something changes, you hear from us before the BIR does.",
+    },
+];
+---
+
+<div class="nl-glance-sticky-container bg-generic-00 relative">
+    <section
+        class="sticky top-0 flex flex-col justify-center bg-generic-00 py-12 md:py-16 xl:py-20 overflow-hidden min-h-[calc(100vh-80px)]"
+        id="nl-glance"
+    >
+        <div class="max-w-[var(--container-max)] mx-auto w-full px-4 md:px-6">
+            <!-- Header -->
+            <div class="nl-glance-header-wrapper text-center mx-auto mb-8 md:mb-12">
+                <h2 class="m-0 font-heading max-w-210 mx-auto font-medium text-vault-navy text-[length:var(--fs-h2)] md:text-[length:var(--fs-h1)] leading-[length:var(--lh-h2)] md:leading-[length:var(--lh-h1)] tracking-[-0.5px] mb-3 sm:mb-4">
+                    The wrong platform doesn't just slow you down. It puts you
+                    at risk.
+                </h2>
+                <p class="m-0 font-body max-w-207 mx-auto font-normal text-neutral-500 text-[length:var(--fs-body)] md:text-[length:var(--fs-body-lg)] leading-[length:var(--lh-body)] md:leading-[length:var(--lh-body-lg)]">
+                    A lot of vendors will tell you they support Philippines EIS
+                    compliance. Very few have the global depth, the local track
+                    record, and the technical infrastructure to back that up.
+                    Here's why it matters.
+                </p>
+            </div>
+
+            <!-- Cards Track -->
+            <div class="w-full h-auto relative">
+                <div class="nl-glance-scroll-track flex items-stretch gap-6 md:gap-8 w-max transition-transform duration-[200ms] ease-out will-change-transform py-2">
+                    {cards.map((card) => (
+                        <div class="nl-glance-card-item relative z-10 w-[380px] sm:w-[380px] md:w-[420px] lg:w-[560px] shrink-0 rounded-xl border border-neutral-300 bg-generic-00 flex flex-col justify-start p-6 md:p-8 select-none transition-all duration-200">
+                            <!-- Icon -->
+                            <div class="w-16 h-16 shrink-0 mb-6">
+                                <img
+                                    src={card.icon}
+                                    alt=""
+                                    aria-hidden="true"
+                                    class="w-16 h-16 shrink-0"
+                                    loading="lazy"
+                                />
+                            </div>
+
+                            <!-- Title -->
+                            <h3 class="m-0 font-heading font-medium text-vault-navy text-[length:var(--fs-h5)] leading-[length:var(--lh-h5)] mb-3">
+                                {card.title}
+                            </h3>
+
+                            <!-- Subtitle -->
+                            <p class="m-0 font-body font-normal text-neutral-500 text-[length:var(--fs-body)] leading-[length:var(--lh-body)]">
+                                {card.subtitle}
+                            </p>
+                        </div>
+                    ))}
+                </div>
+            </div>
+
+            <!-- Progress Bar below cards -->
+            <div
+                class="w-full mt-8 md:mt-12 h-[3px] bg-neutral-200 rounded-full overflow-hidden"
+                aria-hidden="true"
+            >
+                <div
+                    class="nl-glance-progress-fill h-full bg-nova-blue rounded-full transition-all duration-150 ease-out"
+                    style="width: 10%;"
+                ></div>
+            </div>
+        </div>
+    </section>
+</div>
+
+<style is:global>
+    @media (max-height: 750px) {
+        .nl-glance-sticky-container section {
+            padding-top: var(--spacing-big, 1.25rem) !important;
+            padding-bottom: var(--spacing-big, 1.25rem) !important;
+        }
+        .nl-glance-header-wrapper {
+            margin-bottom: var(--spacing-md, 1rem) !important;
+        }
+        .nl-glance-card-item {
+            min-height: 315px !important;
+        }
+    }
+</style>
+
+<script is:inline>
+    document.addEventListener("DOMContentLoaded", () => {
+        const containers = document.querySelectorAll(
+            ".nl-glance-sticky-container",
+        );
+        if (!containers.length) return;
+
+        containers.forEach((container) => {
+            const track = container.querySelector(".nl-glance-scroll-track");
+            const section = container.querySelector("section");
+            const progressFill = container.querySelector(
+                ".nl-glance-progress-fill",
+            );
+            if (!container || !track || !section) return;
+
+            const getHeaderHeight = () => {
+                const header = document.querySelector(
+                    "header, .navbar, .w-nav",
+                );
+                return header ? header.offsetHeight : 80;
+            };
+
+            let maxTranslate = 0;
+            let totalScrollable = 0;
+            let stickyTop = 0;
+
+            const updateMeasurements = () => {
+                const sectionHeight = section.offsetHeight;
+                const windowHeight = window.innerHeight;
+                const headerHeight = getHeaderHeight();
+
+                const trackOffset =
+                    track.parentElement.getBoundingClientRect().top -
+                    section.getBoundingClientRect().top;
+                const trackHeight = track.offsetHeight;
+                const availableSpace = windowHeight - headerHeight;
+
+                const idealTrackTop =
+                    headerHeight +
+                    Math.max(40, (availableSpace - trackHeight) / 2);
+                let calculatedTop = idealTrackTop - trackOffset;
+
+                stickyTop = Math.min(headerHeight, calculatedTop);
+                section.style.top = `${stickyTop}px`;
+
+                const containerWidth =
+                    track.parentElement.getBoundingClientRect().width;
+                maxTranslate = Math.max(0, track.scrollWidth - containerWidth);
+                container.style.height = `${maxTranslate + windowHeight}px`;
+                totalScrollable =
+                    container.getBoundingClientRect().height - sectionHeight;
+            };
+
+            updateMeasurements();
+
+            if (window.ResizeObserver) {
+                const ro = new ResizeObserver(updateMeasurements);
+                ro.observe(section);
+                ro.observe(track);
+            }
+            window.addEventListener("resize", updateMeasurements);
+
+            let ticking = false;
+
+            const handleScroll = () => {
+                if (!ticking) {
+                    window.requestAnimationFrame(() => {
+                        const containerRect = container.getBoundingClientRect();
+                        const scrolledDistance = Math.max(
+                            0,
+                            stickyTop - containerRect.top,
+                        );
+
+                        let progress =
+                            totalScrollable > 0
+                                ? scrolledDistance / totalScrollable
+                                : 0;
+                        progress = Math.max(0, Math.min(1, progress));
+
+                        track.style.transform = `translate3d(-${progress * maxTranslate}px, 0, 0)`;
+
+                        if (progressFill) {
+                            // Progress bar fills proportionally from 10% to 100% as you scroll through all 5 cards
+                            const fillPercent = 10 + progress * 90;
+                            progressFill.style.width = `${fillPercent}%`;
+                        }
+
+                        ticking = false;
+                    });
+                    ticking = true;
+                }
+            };
+
+            const observer = new IntersectionObserver(
+                (entries) => {
+                    entries.forEach((entry) => {
+                        if (entry.isIntersecting) {
+                            window.addEventListener("scroll", handleScroll, {
+                                passive: true,
+                            });
+                            handleScroll();
+                        } else {
+                            window.removeEventListener("scroll", handleScroll);
+                        }
+                    });
+                },
+                {
+                    rootMargin: "100% 0px 100% 0px",
+                },
+            );
+
+            observer.observe(container);
+        });
+    });
+</script>
