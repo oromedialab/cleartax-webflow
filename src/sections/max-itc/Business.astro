@@ -21,10 +21,10 @@ const cards = [1, 2, 3, 4];
   <div class="mx-auto w-full max-w-[var(--container-max)] px-4 md:px-6">
     <!-- Header -->
     <div class="text-center max-w-139 mx-auto mb-6">
-      <h2 class="text-[length:var(--fs-h2)] md:text-[length:var(--fs-h1)] leading-[length:var(--lh-h2)] md:leading-[length:var(--lh-h1)] font-medium text-vault-navy font-heading mb-4">
+      <h2 class="m-0 text-[length:var(--fs-h2)] md:text-[length:var(--fs-h1)] leading-[length:var(--lh-h2)] md:leading-[length:var(--lh-h1)] font-medium text-vault-navy font-heading mb-4">
         India's first end-to-end solution to maximize ITC for businesses
       </h2>
-      <p class="text-neutral-500 font-normal text-[length:var(--fs-body)] md:text-[length:var(--fs-body-lg)] leading-[length:var(--lh-body)] md:leading-[length:var(--lh-body-lg)] font-body">
+      <p class="m-0 text-neutral-500 font-normal text-[length:var(--fs-body)] md:text-[length:var(--fs-body-lg)] leading-[length:var(--lh-body)] md:leading-[length:var(--lh-body-lg)] font-body">
         We've unblocked over{" "}
         <span class="font-bold text-neutral-500">₹ 9000 crores</span> for{" "}
         <span class="font-bold text-neutral-500">3000+ businesses</span>
@@ -80,58 +80,61 @@ const cards = [1, 2, 3, 4];
   </div>
 </section>
 
-<script>
-  function setupBusinessTabs() {
-    const tabButtons = document.querySelectorAll<HTMLButtonElement>(
-      "[data-business-tab]",
-    );
-    const cardsGrid = document.getElementById("business-cards-grid");
+<script is:inline>
+  (function () {
+    function setupBusinessTabs() {
+      const tabButtons = document.querySelectorAll("[data-business-tab]");
+      if (!tabButtons.length) return;
 
-    tabButtons.forEach((button) => {
-      button.addEventListener("click", () => {
-        if (button.getAttribute("aria-selected") === "true") return;
+      tabButtons.forEach((button) => {
+        button.addEventListener("click", () => {
+          if (button.getAttribute("aria-selected") === "true") return;
 
-        // Reset all tabs
-        tabButtons.forEach((btn) => {
-          btn.classList.remove(
+          // Reset all tabs
+          tabButtons.forEach((btn) => {
+            btn.classList.remove(
+              "active",
+              "bg-generic-00",
+              "text-navy-600",
+              "shadow-xs",
+            );
+            btn.classList.add(
+              "text-neutral-700",
+              "hover:text-vault-navy",
+              "bg-transparent",
+            );
+            btn.setAttribute("aria-selected", "false");
+          });
+
+          // Activate selected tab
+          button.classList.add(
             "active",
             "bg-generic-00",
             "text-navy-600",
             "shadow-xs",
           );
-          btn.classList.add(
+          button.classList.remove(
             "text-neutral-700",
             "hover:text-vault-navy",
             "bg-transparent",
           );
-          btn.setAttribute("aria-selected", "false");
-        });
+          button.setAttribute("aria-selected", "true");
 
-        // Activate selected tab (without hover:text-vault-navy so color stays text-navy-600)
-        button.classList.add(
-          "active",
-          "bg-generic-00",
-          "text-navy-600",
-          "shadow-xs",
-        );
-        button.classList.remove(
-          "text-neutral-700",
-          "hover:text-vault-navy",
-          "bg-transparent",
-        );
-        button.setAttribute("aria-selected", "true");
-
-        // Smoothly scroll tab into view if it overflows container
-        button.scrollIntoView({
-          behavior: "smooth",
-          block: "nearest",
-          inline: "center",
+          // Smoothly scroll tab into view if it overflows container
+          button.scrollIntoView({
+            behavior: "smooth",
+            block: "nearest",
+            inline: "center",
+          });
         });
       });
-    });
-  }
+    }
 
-  // Setup on initial load & view transitions if any
-  setupBusinessTabs();
-  document.addEventListener("astro:page-load", setupBusinessTabs);
+    if (document.readyState === "loading") {
+      document.addEventListener("DOMContentLoaded", setupBusinessTabs);
+    } else {
+      setupBusinessTabs();
+    }
+    document.addEventListener("astro:page-load", setupBusinessTabs);
+  })();
 </script>
