@@ -63,5 +63,17 @@ export default defineConfig({
   },
   vite: {
     plugins: [autoSharedEntries(), tailwindcss()],
+    // Dev only. The blog API's dev host sends no CORS header for localhost, so
+    // blog-listing's scripts call `/blog-api/...` here and Vite forwards it
+    // server-side (VPN required). Ignored by `astro build`.
+    server: {
+      proxy: {
+        '/blog-api': {
+          target: 'https://wg-finfo-cleartax-com-b2c-mum-dev-http.internal.cleartax.co',
+          changeOrigin: true,
+          rewrite: (path) => path.replace(/^\/blog-api/, '/f/content_management/blog'),
+        },
+      },
+    },
   },
 });
