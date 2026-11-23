@@ -107,6 +107,7 @@ export const PAGE_TARGETS = [
   { name: 'singapore-regional', input: 'src/styles/singapore-regional.css', page: 'src/pages/singapore-regional.astro' },
   { name: 'germany-product', input: 'src/styles/germany-product.css', page: 'src/pages/germany-product.astro' },
   { name: 'india-homepage-v2', input: 'src/styles/india-homepage-v2.css', page: 'src/pages/india-homepage-v2.astro' },
+  { name: 'accounts-payable-v2', input: 'src/styles/accounts-payable-v2.css', page: 'src/pages/accounts-payable-v2.astro' },
   { name: 'max-itc', input: 'src/styles/max-itc.css', page: 'src/pages/max-itc.astro' },
   { name: 'recon-ai', input: 'src/styles/recon-ai.css', page: 'src/pages/recon-ai.astro' },
   { name: 'philippines-product', input: 'src/styles/philippines-product.css', page: 'src/pages/philippines-product.astro' },
