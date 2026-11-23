@@ -3,17 +3,224 @@
  * Business section for Max ITC.
  */
 
-const tabs = [
-  "e-Commerce",
-  "Manufacturing",
-  "Financial services",
-  "Retail",
-  "FMCG",
-  "Healthcare & Pharmaceutical",
-  "Hospitality & Real estate",
+interface Industry {
+  tab: string;
+  logos: {
+    name: string;
+    src: string;
+    width: number;
+    height: number;
+  }[];
+}
+
+const industries: Industry[] = [
+  {
+    tab: "e-Commerce",
+    logos: [
+      {
+        name: "Swiggy",
+        src: "/images/max-itc/swiggy.png",
+        width: 137,
+        height: 41,
+      },
+      {
+        name: "myntra",
+        src: "/images/max-itc/myntra.png",
+        width: 133,
+        height: 58,
+      },
+      {
+        name: "zomato",
+        src: "/images/max-itc/zomato.png",
+        width: 176,
+        height: 37,
+      },
+      {
+        name: "flipkart",
+        src: "/images/max-itc/flipkart.png",
+        width: 124,
+        height: 37,
+      },
+    ],
+  },
+  {
+    tab: "Manufacturing",
+    logos: [
+      {
+        name: "apollo",
+        src: "/images/max-itc/apollo.png",
+        width: 130,
+        height: 50,
+      },
+      {
+        name: "Bosch",
+        src: "/images/max-itc/bosch.png",
+        width: 149,
+        height: 33,
+      },
+      {
+        name: "beml",
+        src: "/images/max-itc/beml.png",
+        width: 102,
+        height: 37,
+      },
+      {
+        name: "JK Tyres",
+        src: "/images/max-itc/jk.png",
+        width: 177,
+        height: 29,
+      },
+    ],
+  },
+  {
+    tab: "Financial services",
+    logos: [
+      {
+        name: "Standard Chartered",
+        src: "/images/max-itc/sc.png",
+        width: 117,
+        height: 45,
+      },
+      {
+        name: "TATA AIG",
+        src: "/images/max-itc/tata.png",
+        width: 62,
+        height: 50,
+      },
+      {
+        name: "Bank of Baroda",
+        src: "/images/max-itc/bob.png",
+        width: 166,
+        height: 41,
+      },
+      {
+        name: "SBI Card",
+        src: "/images/max-itc/sbi.png",
+        width: 175,
+        height: 33,
+      },
+    ],
+  },
+  {
+    tab: "Retail",
+    logos: [
+      {
+        name: "Puma",
+        src: "/images/max-itc/puma.png",
+        width: 107,
+        height: 33,
+      },
+      {
+        name: "TITAN",
+        src: "/images/max-itc/titan.png",
+        width: 164,
+        height: 29,
+      },
+      {
+        name: "IKEA",
+        src: "/images/max-itc/ikea.png",
+        width: 124,
+        height: 90,
+      },
+      {
+        name: "cinpolis",
+        src: "/images/max-itc/cinepolis.png",
+        width: 169,
+        height: 41,
+      },
+    ],
+  },
+  {
+    tab: "FMCG",
+    logos: [
+      {
+        name: "Reckitt Benckiser",
+        src: "/images/max-itc/rb.png",
+        width: 115,
+        height: 77,
+      },
+      {
+        name: "marico",
+        src: "/images/max-itc/marico.png",
+        width: 57,
+        height: 50,
+      },
+      {
+        name: "pepsi",
+        src: "/images/max-itc/pepsi.png",
+        width: 115,
+        height: 41,
+      },
+      {
+        name: "bisleri",
+        src: "/images/max-itc/bisleri.png",
+        width: 111,
+        height: 37,
+      },
+    ],
+  },
+  {
+    tab: "Healthcare & Pharmaceutical",
+    logos: [
+      {
+        name: "Manipal Hospitals",
+        src: "/images/max-itc/manipal.png",
+        width: 168,
+        height: 33,
+      },
+      {
+        name: "Sun Pharma",
+        src: "/images/max-itc/sun.png",
+        width: 104,
+        height: 37,
+      },
+      {
+        name: "medanta",
+        src: "/images/max-itc/medanta.png",
+        width: 133,
+        height: 41,
+      },
+      {
+        name: "teva",
+        src: "/images/max-itc/teva.png",
+        width: 107,
+        height: 37,
+      },
+    ],
+  },
+  {
+    tab: "Hospitality & Real estate",
+    logos: [
+      {
+        name: "Brigade",
+        src: "/images/max-itc/brigade.png",
+        width: 51,
+        height: 58,
+      },
+      {
+        name: "DLF",
+        src: "/images/max-itc/dlf.png",
+        width: 95,
+        height: 33,
+      },
+      {
+        name: "Taj",
+        src: "/images/max-itc/tajhotel.png",
+        width: 55,
+        height: 48,
+      },
+      {
+        name: "Marriott",
+        src: "/images/max-itc/marriott.png",
+        width: 108,
+        height: 41,
+      },
+    ],
+  },
 ];
 
-const cards = [1, 2, 3, 4];
+// Default active tab: "Hospitality & Real estate" (matches the Figma design)
+const defaultActiveIndex = 6;
 ---
 
 <section id="business" class="bg-generic-00 py-16 md:py-20">
@@ -33,16 +240,15 @@ const cards = [1, 2, 3, 4];
     <!-- Tabs Navigation Bar (Centered on desktop, smoothly scrollable on mobile) -->
     <div
       id="business-tabs-scroll"
-      class="w-full overflow-x-auto overscroll-x-contain [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden py-2 mb-8 md:mb-10 flex"
-      style="-webkit-overflow-scrolling: touch;"
+      class="w-full overflow-x-auto overscroll-x-contain [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden py-2 mb-8 md:mb-10 flex [-webkit-overflow-scrolling:touch]"
     >
       <div
         id="business-tabs-container"
         class="inline-flex items-center gap-1 p-1.5 bg-neutral-100 rounded-xl sm:rounded-2xl shrink-0 min-w-max mx-auto"
         role="tablist"
       >
-        {tabs.map((tab, index) => {
-          const isActive = index === 0;
+        {industries.map((item, index) => {
+          const isActive = index === defaultActiveIndex;
           return (
             <button
               type="button"
@@ -55,28 +261,50 @@ const cards = [1, 2, 3, 4];
                   : "text-neutral-700 bg-transparent hover:text-vault-navy"
               }`}
             >
-              {tab}
+              {item.tab}
             </button>
           );
         })}
       </div>
     </div>
 
-    <!-- 4 Cards Grid (2x2 on mobile, 4 columns on desktop) -->
-    <div
-      id="business-cards-grid"
-      class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-6 mb-8 md:mb-10 transition-opacity duration-200 ease-out"
-    >
-      {cards.map((_) => (
-        <div class="w-full aspect-[2/1] rounded-xl sm:rounded-2xl bg-visual-placeholder" />
-      ))}
+    <!-- 4 Cards Grid (one set per industry tab, active tab visible) -->
+    <div id="business-cards-container" class="relative mb-6 sm:mb-8">
+      {industries.map((item, index) => {
+        const isActive = index === defaultActiveIndex;
+        return (
+          <div
+            data-business-cards-group={index}
+            class={`grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5 md:gap-6 transition-opacity duration-200 ease-out ${
+              isActive ? "" : "hidden"
+            }`}
+          >
+            {item.logos.map((logo) => (
+              <div class="w-full aspect-[16/9] rounded-xl border border-[#CCCCCC] bg-generic-00 flex items-center justify-center p-4 sm:p-6">
+                <div class="w-full h-full flex items-center justify-center">
+                  <img
+                    src={logo.src}
+                    alt={logo.name}
+                    width={logo.width}
+                    height={logo.height}
+                    style={`--logo-width: ${logo.width}px; --logo-height: ${logo.height}px;`}
+                    class="w-auto h-auto max-w-[75%] max-h-[48px] sm:max-w-[var(--logo-width)] sm:max-h-[var(--logo-height)] object-contain"
+                    loading="lazy"
+                    decoding="async"
+                  />
+                </div>
+              </div>
+            ))}
+          </div>
+        );
+      })}
     </div>
 
     <!-- Download Whitepaper CTA -->
     <div class="flex justify-center">
       <a
         href="#"
-        class="inline-flex items-center justify-center px-5 py-3.5 rounded-lg border border-neutral-200 bg-generic-00 font-body font-medium text-neutral-700 text-[length:var(--fs-label-lg)] leading-[length:var(--lh-label-lg)] shadow-xs hover:bg-neutral-50 hover:border-neutral-300 transition-colors no-underline"
+        class="inline-flex items-center justify-center px-4.5 py-2 rounded-lg border border-neutral-200 bg-generic-00 font-body font-medium text-neutral-700 text-[length:var(--fs-label)] leading-[length:var(--lh-label)] shadow-xs hover:bg-neutral-50 hover:border-neutral-300 transition-colors no-underline"
       >
         Download Whitepaper
       </a>
@@ -95,7 +323,6 @@ const cards = [1, 2, 3, 4];
       const scrollContainer = document.getElementById("business-tabs-scroll");
       const container = document.getElementById("business-tabs-container");
       const tabButtons = document.querySelectorAll("[data-business-tab]");
-      const cardsGrid = document.getElementById("business-cards-grid");
       if (!tabButtons.length || !container || !scrollContainer) return;
 
       if (container.dataset.tabsInitialized === "true") return;
@@ -107,6 +334,21 @@ const cards = [1, 2, 3, 4];
           currentIndex = idx;
         }
       });
+
+      // Scroll initial active tab into view horizontally if not the first tab
+      if (currentIndex > 0) {
+        const activeBtn = tabButtons[currentIndex];
+        if (activeBtn) {
+          const targetLeft =
+            activeBtn.offsetLeft -
+            scrollContainer.clientWidth / 2 +
+            activeBtn.clientWidth / 2;
+          scrollContainer.scrollTo({
+            left: Math.max(0, targetLeft),
+            behavior: "auto",
+          });
+        }
+      }
 
       function activateTab(index) {
         currentIndex = index;
@@ -141,13 +383,22 @@ const cards = [1, 2, 3, 4];
         );
         targetBtn.setAttribute("aria-selected", "true");
 
-        // Subtle cross-fade animation feedback on cards
-        if (cardsGrid) {
-          cardsGrid.classList.add("opacity-70");
-          setTimeout(() => {
-            cardsGrid.classList.remove("opacity-70");
-          }, 150);
-        }
+        // Swap cards group with smooth subtle fade
+        const allGroups = document.querySelectorAll(
+          "[data-business-cards-group]",
+        );
+        allGroups.forEach((group) => {
+          const groupIndex = group.getAttribute("data-business-cards-group");
+          if (groupIndex === String(index)) {
+            group.classList.remove("hidden");
+            group.classList.add("opacity-70");
+            setTimeout(() => {
+              group.classList.remove("opacity-70");
+            }, 150);
+          } else {
+            group.classList.add("hidden");
+          }
+        });
 
         // Scroll ONLY the horizontal tab container without affecting window scroll position
         const targetLeft =
@@ -207,7 +458,7 @@ const cards = [1, 2, 3, 4];
               }
             });
           },
-          { threshold: 0.1 }
+          { threshold: 0.1 },
         );
         observer.observe(section);
       } else {
