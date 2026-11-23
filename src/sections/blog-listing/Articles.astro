@@ -2,24 +2,105 @@
 /**
  * Article grid + Load more — Figma node 12289:26928.
  *
- * This section owns both the data and the filtering behaviour. The controls it
- * reads live in `Filters.astro`, a separate Embed, so the script binds its
- * listeners on `document` instead of on the form: delegation makes the wiring
- * independent of which Embed Webflow renders first, and of whether the filter
- * bar is present at all.
+ * Cards come from the cleartax.com/in Blog API (see blog_api.pdf), fetched in
+ * the browser — the grid ships empty and the script fills it. Filtering is
+ * server-side: every control change re-calls `/blog` with new params and
+ * replaces the grid; Load more follows the API's `next` link.
  *
- * `topic` / `country` must match the option lists in `Filters.astro`.
- * `image: ''` falls back to the Figma "Visual Placeholder" tint.
+ * The controls live in `Filters.astro`, a separate Embed, so listeners bind on
+ * `document` and read the form lazily. Nothing here depends on which Embed
+ * Webflow renders first.
+ *
+ * Filter mapping (values come from `Filters.astro`):
+ *   search   -> ?search=
+ *   topic    -> ?category=<slug>   (matches sub-categories too)
+ *   country  -> ?tag=<name>        (API has no country field; best-effort
+ *                                   match against keywords/tags)
+ *
+ * Switch `data-api-base` to https://www.cleartax.com/f/content_management/blog
+ * once the API is released to production. Dev is VPN-only.
+ *
+ * FIRST PAGE IS RENDERED SERVER-SIDE (in this frontmatter, at dev-render/build
+ * time) so it works without any browser CORS allowance. If that fetch fails
+ * (off VPN) the grid is left empty and the client script loads page 1 instead.
+ * Filtering and Load more are still client-side. The server cards MUST keep the
+ * same markup as `card()` in the script below.
  */
-// The post list is shared with `/blog-listing/[slug]`, which generates one
-// detail page per entry. Keeping it here as well would let a card link to a
-// slug that has no page — a 404 nothing in the build would catch.
-import { posts, postPath } from "../../data/blog-posts";
+const API =
+  "https://wg-finfo-cleartax-com-b2c-mum-dev-http.internal.cleartax.co/f/content_management/blog";
+const CARD_BASE = "/blog-listing/";
+
+interface ApiPost {
+  title: string;
+  permalink: string;
+  description?: string;
+  image?: { src?: string; alt?: string } | null;
+  created_at?: string;
+  updated_at?: string;
+}
+
+// The API's own images are ignored (about two thirds of articles have none):
+// cards cycle through these in grid order, so the 9 thumbnails are all
+// different before any repeats, and in the 3-column grid no card ever sits next
+// to (or directly above) the same one. Deterministic — builds stay stable.
+// Keep THUMBS and thumbFor() identical to the copy in the script below.
+const THUMBS = [
+  "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6b03dd1f9074e782ec53da5a_thumbnail-1.png",
+  "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6b03dd1fd43ae95650243c4d_thumbnail-7.png",
+  "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6b03dd1f786d0a3b5b2dd28d_thumbnail-2.png",
+  "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6b03dd1f7de300d04b7ceb16_thumbnail-6.png",
+  "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6b03dd1fc10cf55957613135_thumbnail-4.png",
+  "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6b03dd1f26d1b45d7cbc5fd4_thumbnail-5.png",
+  "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6b03dd1f7722c624e3c719ac_thumbnail-3.png",
+  "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6b03dd1f9074e782ec53da71_thumbnail-8.png",
+  "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6b03dd1fc561e5cf141fd94c_thumbnail-9.png",
+];
+const thumbFor = (index: number) => THUMBS[index % THUMBS.length];
+
+const decode = (s: string) =>
+  (s || "")
+    .replace(/&#(\d+);/g, (_, n) => String.fromCharCode(Number(n)))
+    .replace(/&#x([0-9a-f]+);/gi, (_, n) => String.fromCharCode(parseInt(n, 16)))
+    .replace(/&amp;/g, "&")
+    .replace(/&lt;/g, "<")
+    .replace(/&gt;/g, ">")
+    .replace(/&quot;/g, '"')
+    .replace(/&nbsp;/g, " ");
+
+const MONTHS = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+const fmt = (iso?: string) => {
+  const d = new Date(iso || "");
+  return isNaN(d.getTime())
+    ? ""
+    : `${MONTHS[d.getMonth()]} ${d.getDate()}, ${d.getFullYear()}`;
+};
+
+let serverPosts: ApiPost[] = [];
+let serverNext = "";
+try {
+  const res = await fetch(`${API}?domain=80&page=1&limit=12`, {
+    signal: AbortSignal.timeout(8000),
+  });
+  if (res.ok) {
+    const data = await res.json();
+    serverPosts = data.results ?? [];
+    serverNext = data.next ?? "";
+  } else {
+    console.warn(`[blog-listing] Blog API ${res.status}`);
+  }
+} catch (err) {
+  console.warn("[blog-listing] Blog API unreachable:", (err as Error).message);
+}
 ---
 
-<section class="bg-generic-00 py-12 md:py-20" data-blog-articles>
-  <!-- Icon sprite: defined once, referenced by all cards. Keeps the pasted
-       Embed small — the calendar path alone is ~900 characters. -->
+<section
+  class="bg-generic-00 py-12 md:py-20"
+  data-blog-articles
+  data-api-base={API}
+  data-card-base={CARD_BASE}
+  data-server-next={serverNext}
+  data-server-rendered={serverPosts.length ? "true" : "false"}
+>
   <svg
     width="0"
     height="0"
@@ -46,87 +127,69 @@ import { posts, postPath } from "../../data/blog-posts";
       <div
         class="grid w-full grid-cols-1 gap-x-6 gap-y-12 sm:grid-cols-2 lg:grid-cols-3"
         data-blog-grid
+        aria-live="polite"
       >
         {
-          posts.map((post, index) => (
+          serverPosts.map((post, index) => (
             <a
-              href={postPath(post.slug)}
+              href={CARD_BASE + encodeURIComponent(post.permalink)}
               data-blog-card
-              data-topic={post.topic}
-              data-country={post.country}
-              data-search={`${post.title} ${post.excerpt} ${post.topic} ${post.country}`.toLowerCase()}
               class="group flex flex-col gap-6 self-start rounded-xl no-underline"
             >
               <div class="relative aspect-video w-full overflow-hidden rounded-lg bg-visual-placeholder">
-                {post.image && (
+                {
                   <img
-                    src={post.image}
-                    alt={post.title}
+                    src={thumbFor(index)}
+                    alt={decode(post.title)}
                     width="1280"
                     height="720"
                     loading={index < 3 ? "eager" : "lazy"}
                     decoding="async"
                     class="h-full w-full object-cover"
                   />
-                )}
+                }
                 <span class="absolute right-4 top-4 flex h-10 w-10 items-center justify-center rounded-lg bg-ledger-white text-vault-navy transition-colors duration-200 group-hover:bg-nova-blue group-hover:text-ledger-white">
-                  <svg
-                    width="20"
-                    height="20"
-                    aria-hidden="true"
-                    focusable="false"
-                  >
+                  <svg width="20" height="20" aria-hidden="true" focusable="false">
                     <use href="#ct-blog-card-arrow" />
                   </svg>
                 </span>
               </div>
-
               <div class="flex flex-col gap-2">
-                {/* Clamped so a long title or excerpt can't leave one card in
-                    the row taller than its neighbours. */}
                 <h3 class="line-clamp-2 font-body font-medium text-vault-navy text-[length:var(--fs-label-lg)] leading-[var(--lh-label-lg)] tracking-[var(--tracking-body)] m-0 transition-colors duration-200 group-hover:text-nova-blue">
-                  {post.title}
+                  {decode(post.title)}
                 </h3>
-                <p class="line-clamp-2 font-body font-normal text-neutral-500 text-[length:var(--fs-body)] leading-[var(--lh-body)] m-0">
-                  {post.excerpt}
-                </p>
-                <p class="flex items-center gap-2 font-body font-normal text-neutral-500 text-[length:var(--fs-body-sm)] leading-[var(--lh-body-sm)] m-0">
-                  <svg
-                    width="20"
-                    height="20"
-                    class="shrink-0"
-                    aria-hidden="true"
-                    focusable="false"
-                  >
-                    <use href="#ct-blog-card-calendar" />
-                  </svg>
-                  {post.date}
-                </p>
+                {post.description && (
+                  <p class="line-clamp-2 font-body font-normal text-neutral-500 text-[length:var(--fs-body)] leading-[var(--lh-body)] m-0">
+                    {decode(post.description)}
+                  </p>
+                )}
+                {fmt(post.updated_at || post.created_at) && (
+                  <p class="flex items-center gap-2 font-body font-normal text-neutral-500 text-[length:var(--fs-body-sm)] leading-[var(--lh-body-sm)] m-0">
+                    <svg width="20" height="20" class="shrink-0" aria-hidden="true" focusable="false">
+                      <use href="#ct-blog-card-calendar" />
+                    </svg>
+                    {fmt(post.updated_at || post.created_at)}
+                  </p>
+                )}
               </div>
             </a>
           ))
         }
       </div>
 
-      {
-        /* Hidden inline, NOT with `hidden`. `setVisible` shows an element by
-          clearing its inline display, which hands control back to the class —
-          and a `hidden` class would put it straight back to display:none, so
-          this message could never appear. Inline start, inline finish. */
-      }
       <p
-        data-blog-empty
+        data-blog-status
         role="status"
         style="display: none"
         class="font-body font-normal text-neutral-500 text-[length:var(--fs-body-lg)] leading-[var(--lh-body-lg)] text-center m-0"
       >
-        No articles match those filters yet. Try a broader search.
       </p>
 
       <button
         type="button"
         data-blog-load-more
-        class="rounded-lg border border-nova-blue bg-generic-00 px-5 py-3.5 font-body font-medium text-nova-blue text-[length:var(--fs-label-lg)] leading-[var(--lh-label-lg)] shadow-[0px_2px_6px_0px_rgba(16,24,40,0.06)] cursor-pointer transition-colors duration-150 hover:bg-nova-blue hover:text-ledger-white"
+        style="display: none"
+        class="rounded-lg border border-nova-blue bg-generic-00 px-5 py-3.5 font-body font-medium text-nova-blue text-[length:var(--fs-label-lg)] leading-[var(--lh-label-lg)] shadow-[0px_2px_6px_0px_rgba(16,24,40,0.06)] cursor-pointer transition-colors duration-150 hover:bg-nova-blue hover:text-ledger-white disabled:opacity-60 disabled:cursor-default"
       >
         Load more
       </button>
@@ -139,21 +202,149 @@ import { posts, postPath } from "../../data/blog-posts";
     var root = document.querySelector("[data-blog-articles]");
     if (!root) return;
 
-    var cards = Array.prototype.slice.call(
-      root.querySelectorAll("[data-blog-card]"),
-    );
+    var API = root.getAttribute("data-api-base");
+    var CARD_BASE = root.getAttribute("data-card-base");
+    var grid = root.querySelector("[data-blog-grid]");
+    var status = root.querySelector("[data-blog-status]");
     var moreBtn = root.querySelector("[data-blog-load-more]");
-    var empty = root.querySelector("[data-blog-empty]");
 
-    var PAGE_SIZE = 15;
-    var shown = PAGE_SIZE;
+    // On localhost the dev API blocks the browser (CORS), so calls go through
+    // the Vite proxy at /blog-api (see astro.config.mjs). Elsewhere, unchanged.
+    var IS_LOCAL = /^(localhost|127\.0\.0\.1)$/.test(location.hostname);
+    function viaProxy(url) {
+      return IS_LOCAL ? url.replace(/^https?:\/\/[^/]+\/f\/content_management\/blog/, "/blog-api") : url;
+    }
 
-    // Visibility is toggled inline, not with a class: the utilities pasted into
-    // Webflow are unlayered, so a `.hidden` class would have to out-order
-    // `.flex` on the same element. An inline style always wins.
+    var LIMIT = 12;
+    var nextUrl = null;
+    // Bumped on every fresh query so a slow response for an old filter can't
+    // overwrite the grid after the reader has already changed it.
+    var ticket = 0;
+    var MONTHS = [
+      "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+      "Jul", "Aug", "Sep", "Oct", "Nov", "Dec",
+    ];
+
+    // Inline display, not a class: pasted utilities are unlayered, so a
+    // `.hidden` class would race `.flex` on source order. Inline always wins.
     function setVisible(el, visible) {
-      if (!el) return;
-      el.style.display = visible ? "" : "none";
+      if (el) el.style.display = visible ? "" : "none";
+    }
+
+    function setStatus(msg) {
+      status.textContent = msg || "";
+      setVisible(status, !!msg);
+    }
+
+    // ~3% of titles arrive with entities such as &#038; from the original import.
+    function decode(str) {
+      var t = document.createElement("textarea");
+      t.innerHTML = str || "";
+      return t.value;
+    }
+
+    function formatDate(iso) {
+      var d = new Date(iso);
+      if (isNaN(d.getTime())) return "";
+      return MONTHS[d.getMonth()] + " " + d.getDate() + ", " + d.getFullYear();
+    }
+
+    var THUMBS = [
+      "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6b03dd1f9074e782ec53da5a_thumbnail-1.png",
+      "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6b03dd1fd43ae95650243c4d_thumbnail-7.png",
+      "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6b03dd1f786d0a3b5b2dd28d_thumbnail-2.png",
+      "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6b03dd1f7de300d04b7ceb16_thumbnail-6.png",
+      "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6b03dd1fc10cf55957613135_thumbnail-4.png",
+      "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6b03dd1f26d1b45d7cbc5fd4_thumbnail-5.png",
+      "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6b03dd1f7722c624e3c719ac_thumbnail-3.png",
+      "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6b03dd1f9074e782ec53da71_thumbnail-8.png",
+      "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6b03dd1fc561e5cf141fd94c_thumbnail-9.png",
+    ];
+    function thumbFor(index) {
+      return THUMBS[index % THUMBS.length];
+    }
+
+    function el(tag, cls, text) {
+      var n = document.createElement(tag);
+      if (cls) n.className = cls;
+      if (text != null) n.textContent = text;
+      return n;
+    }
+
+    function svgUse(id, size, cls) {
+      var ns = "http://www.w3.org/2000/svg";
+      var svg = document.createElementNS(ns, "svg");
+      svg.setAttribute("width", size);
+      svg.setAttribute("height", size);
+      svg.setAttribute("aria-hidden", "true");
+      svg.setAttribute("focusable", "false");
+      if (cls) svg.setAttribute("class", cls);
+      var use = document.createElementNS(ns, "use");
+      use.setAttribute("href", "#" + id);
+      svg.appendChild(use);
+      return svg;
+    }
+
+    // Built with createElement / textContent, never innerHTML: titles and
+    // descriptions are data, and this keeps them inert.
+    function card(post, index) {
+      var title = decode(post.title);
+      var a = el(
+        "a",
+        "group flex flex-col gap-6 self-start rounded-xl no-underline",
+      );
+      a.href = CARD_BASE + encodeURIComponent(post.permalink);
+      a.setAttribute("data-blog-card", "");
+
+      var media = el(
+        "div",
+        "relative aspect-video w-full overflow-hidden rounded-lg bg-visual-placeholder",
+      );
+      var img = el("img", "h-full w-full object-cover");
+      img.src = thumbFor(index);
+      img.alt = title;
+      img.width = 1280;
+      img.height = 720;
+      img.loading = index < 3 ? "eager" : "lazy";
+      img.decoding = "async";
+      media.appendChild(img);
+      var arrow = el(
+        "span",
+        "absolute right-4 top-4 flex h-10 w-10 items-center justify-center rounded-lg bg-ledger-white text-vault-navy transition-colors duration-200 group-hover:bg-nova-blue group-hover:text-ledger-white",
+      );
+      arrow.appendChild(svgUse("ct-blog-card-arrow", 20));
+      media.appendChild(arrow);
+      a.appendChild(media);
+
+      var body = el("div", "flex flex-col gap-2");
+      body.appendChild(
+        el(
+          "h3",
+          "line-clamp-2 font-body font-medium text-vault-navy text-[length:var(--fs-label-lg)] leading-[var(--lh-label-lg)] tracking-[var(--tracking-body)] m-0 transition-colors duration-200 group-hover:text-nova-blue",
+          title,
+        ),
+      );
+      if (post.description) {
+        body.appendChild(
+          el(
+            "p",
+            "line-clamp-2 font-body font-normal text-neutral-500 text-[length:var(--fs-body)] leading-[var(--lh-body)] m-0",
+            decode(post.description),
+          ),
+        );
+      }
+      var date = formatDate(post.updated_at || post.created_at);
+      if (date) {
+        var meta = el(
+          "p",
+          "flex items-center gap-2 font-body font-normal text-neutral-500 text-[length:var(--fs-body-sm)] leading-[var(--lh-body-sm)] m-0",
+        );
+        meta.appendChild(svgUse("ct-blog-card-calendar", 20, "shrink-0"));
+        meta.appendChild(document.createTextNode(date));
+        body.appendChild(meta);
+      }
+      a.appendChild(body);
+      return a;
     }
 
     function readFilters() {
@@ -163,70 +354,101 @@ import { posts, postPath } from "../../data/blog-posts";
       var topic = form.querySelector("[data-blog-topic]");
       var country = form.querySelector("[data-blog-country]");
       return {
-        q: search ? search.value.trim().toLowerCase() : "",
+        q: search ? search.value.trim() : "",
         topic: topic ? topic.value : "",
         country: country ? country.value : "",
       };
     }
 
-    function matches(card, f) {
-      if (f.topic && card.getAttribute("data-topic") !== f.topic) return false;
-      if (f.country && card.getAttribute("data-country") !== f.country)
-        return false;
-      if (f.q && (card.getAttribute("data-search") || "").indexOf(f.q) === -1)
-        return false;
-      return true;
+    function buildUrl(f) {
+      var p = new URLSearchParams({ domain: "80", page: "1", limit: LIMIT });
+      if (f.q) p.set("search", f.q);
+      if (f.topic) p.set("category", f.topic);
+      if (f.country) p.set("tag", f.country);
+      return API + "?" + p.toString();
     }
 
-    function render() {
-      var f = readFilters();
-      var hits = [];
-
-      cards.forEach(function (card) {
-        if (matches(card, f)) hits.push(card);
-        setVisible(card, false);
+    function fetchJson(url) {
+      return fetch(viaProxy(url)).then(function (res) {
+        if (!res.ok) throw new Error("Blog API " + res.status);
+        return res.json();
       });
-
-      hits.slice(0, shown).forEach(function (card) {
-        setVisible(card, true);
-      });
-
-      setVisible(empty, hits.length === 0);
-      setVisible(moreBtn, hits.length > shown);
     }
 
-    function reset() {
-      shown = PAGE_SIZE;
-      render();
+    function append(results) {
+      var start = grid.children.length;
+      results.forEach(function (post, i) {
+        grid.appendChild(card(post, start + i));
+      });
+    }
+
+    function load(url, replace) {
+      var mine = replace ? ++ticket : ticket;
+      moreBtn.disabled = true;
+      if (replace) setStatus("Loading articles…");
+
+      fetchJson(url)
+        .then(function (data) {
+          if (mine !== ticket) return;
+          if (replace) grid.textContent = "";
+          append(data.results || []);
+          nextUrl = data.next || null;
+          setStatus(
+            grid.children.length
+              ? ""
+              : "No articles match those filters yet. Try a broader search.",
+          );
+        })
+        .catch(function () {
+          if (mine !== ticket) return;
+          if (replace) grid.textContent = "";
+          nextUrl = null;
+          setStatus("We couldn’t load articles right now. Please try again.");
+        })
+        .then(function () {
+          if (mine !== ticket) return;
+          moreBtn.disabled = false;
+          setVisible(moreBtn, !!nextUrl);
+        });
+    }
+
+    function reload() {
+      load(buildUrl(readFilters()), true);
+    }
+
+    // Typing fires `input` per keystroke; wait for a pause before calling out.
+    var debounce = null;
+    function reloadSoon() {
+      clearTimeout(debounce);
+      debounce = setTimeout(reload, 300);
     }
 
     // Delegated on `document` so the filter bar can live in a different Webflow
     // Embed, mount later, or not exist at all.
     document.addEventListener("input", function (e) {
-      if (e.target.closest && e.target.closest("[data-blog-filter]")) reset();
+      if (e.target.closest && e.target.closest("[data-blog-filter]")) reloadSoon();
     });
-
     document.addEventListener("change", function (e) {
-      if (e.target.closest && e.target.closest("[data-blog-filter]")) reset();
+      if (e.target.closest && e.target.closest("[data-blog-filter]")) reload();
     });
-
     document.addEventListener("submit", function (e) {
       if (e.target.closest && e.target.closest("[data-blog-filter]")) {
         e.preventDefault();
-        reset();
+        reload();
       }
     });
-
     document.addEventListener("click", function (e) {
-      if (e.target.closest && e.target.closest("[data-blog-load-more]")) {
-        shown += PAGE_SIZE;
-        render();
+      if (e.target.closest && e.target.closest("[data-blog-load-more]") && nextUrl) {
+        load(nextUrl, false);
       }
     });
 
-    render();
-    if (document.readyState === "loading") {
-      document.addEventListener("DOMContentLoaded", render);
+    // Server already rendered page 1: just arm Load more from its `next` link.
+    if (root.getAttribute("data-server-rendered") === "true") {
+      nextUrl = root.getAttribute("data-server-next") || null;
+      setVisible(moreBtn, !!nextUrl);
+    } else {
+      reload();
     }
   })();
 </script>

@@ -7,10 +7,10 @@
  * using document-level delegation — so it does not matter which Embed element
  * Webflow renders first.
  *
- * The two option lists must stay in sync with the `topic` / `country` values in
- * `Articles.astro`. They are duplicated rather than shared because each section
- * is pasted into Webflow as an independent Embed and cannot import from a
- * sibling at runtime.
+ * Topic options come from the Blog API (`/blog/filters` categories, value = slug).
+ * Country stays a static list — the API has no country field, so `Articles.astro`
+ * sends it as `?tag=`. The API base below must match `data-api-base` there; it is
+ * duplicated because each section is an independent Embed.
  *
  * Topic and Country are custom listboxes, not bare `<select>`s: a native select
  * paints its open list through the OS, so `appearance: none` styles the closed
@@ -20,13 +20,9 @@
  * bubbling `change`, which is exactly what `Articles.astro` already listens for,
  * so none of the filtering logic knows this UI exists.
  */
-const topics: string[] = [
-  "E-Invoicing",
-  "Compliance",
-  "ERP Integration",
-  "Tax Technology",
-  "Product",
-];
+// Topic options are NOT listed here: they are the API's categories, loaded by
+// the script below from `/blog/filters` so the UI never offers an empty topic.
+const topics: string[] = [];
 
 const countries: string[] = [
   "Global",
@@ -257,6 +253,16 @@ const selects: Array<{
      and fires a bubbling `change`, so `Articles.astro` filters exactly as it did
      when these were native selects. */
   (function () {
+    var API =
+      "https://wg-finfo-cleartax-com-b2c-mum-dev-http.internal.cleartax.co/f/content_management/blog";
+
+    // On localhost the dev API blocks the browser (CORS), so calls go through
+    // the Vite proxy at /blog-api (see astro.config.mjs). Elsewhere, unchanged.
+    var IS_LOCAL = /^(localhost|127\.0\.0\.1)$/.test(location.hostname);
+    function viaProxy(url) {
+      return IS_LOCAL ? url.replace(/^https?:\/\/[^/]+\/f\/content_management\/blog/, "/blog-api") : url;
+    }
+
     if (document.readyState === "loading") {
       document.addEventListener("DOMContentLoaded", init);
     } else {
@@ -265,7 +271,48 @@ const selects: Array<{
 
     function init() {
       var roots = document.querySelectorAll("[data-blog-select]");
-      for (var i = 0; i < roots.length; i++) setup(roots[i]);
+      // Topic options must exist before its listbox is wired, because setup()
+      // captures the option rows once. If the API is unreachable the topic list
+      // is just "Select" — the page still works.
+      loadCategories()
+        .catch(function () {})
+        .then(function () {
+          for (var i = 0; i < roots.length; i++) setup(roots[i]);
+        });
+    }
+
+    function loadCategories() {
+      var select = document.querySelector("[data-blog-topic]");
+      if (!select) return Promise.resolve();
+      var panel = select.closest("[data-blog-select]").querySelector("[data-select-panel]");
+      var template = panel.querySelector("[data-select-option]");
+      return fetch(viaProxy(API) + "/filters?domain=80")
+        .then(function (res) {
+          if (!res.ok) throw new Error("Blog API " + res.status);
+          return res.json();
+        })
+        .then(function (data) {
+          // Top-level categories only; `?category=` already includes children.
+          (data.categories || []).forEach(function (cat) {
+            if (!cat.total_posts) return;
+            var name = decodeEntities(cat.name);
+            var opt = template.cloneNode(true);
+            opt.setAttribute("data-value", cat.slug);
+            opt.setAttribute("aria-selected", "false");
+            opt.querySelector("span").textContent = name;
+            panel.appendChild(opt);
+            var native = document.createElement("option");
+            native.value = cat.slug;
+            native.textContent = name;
+            select.appendChild(native);
+          });
+        });
+    }
+
+    function decodeEntities(str) {
+      var t = document.createElement("textarea");
+      t.innerHTML = str || "";
+      return t.value;
     }
 
     function setup(root) {
