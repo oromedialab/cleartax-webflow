@@ -48,20 +48,24 @@
 interface Requirement {
     heading: string;
     body: string | string[];
+    img?: string;
 }
 
 const requirements: Requirement[] = [
     {
         heading: "Structured B2B invoicing, not PDFs",
         body: "Germany's mandate makes structured e-invoices the default for domestic B2B. A PDF alone does not qualify, and paper or PDF invoicing is only possible if the buyer explicitly agrees. In practice, finance teams must reliably receive, read, validate, and process e-invoices end to end.",
+        img: "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6b03c97904b37b9ff917dd2d_de-img-9.png",
     },
     {
         heading: "EN 16931 formats: XRechnung or ZUGFeRD",
         body: "A compliant German e-invoice must follow EN 16931 and be machine-readable. Most businesses use XRechnung (XML) or ZUGFeRD 2.x (PDF with embedded XML). The XML data is the compliant core, so missing or incorrect structured fields can lead to rejection and payment delays.",
+        img: "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6b03c97d6ffd6e3132de150a_de-img-10.png",
     },
     {
         heading: "Direct exchange with audit-ready archiving",
         body: "Germany uses a peer-to-peer model for B2B e-invoicing with no central portal. Partners can exchange via email, EDI, Peppol, or portals, as agreed. Compliance depends on strong operations such as validation checks, exception handling, and archiving the original structured invoice file in an audit-ready way.",
+        img: "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6b03c982963ee6df80b64d3d_de-img-11.png",
     },
 ];
 
@@ -78,24 +82,16 @@ const CTA_HREF = "";
         <!-- Scroll-away header — copy left, CTA right, baselines aligned. Shown on
          mobile AND on any window too short to pin it; see .germany-invoice-header-*
          in the style block. -->
-        <div
-            class="germany-invoice-header-flow flex flex-col items-center text-center gap-6 bg-generic-00 mb-8 lg:mb-12"
-        >
-            <div
-                class="flex flex-col items-center gap-3 w-full lg:max-w-[887px]"
-            >
-                <h2
-                    class="m-0 font-heading font-medium text-vault-navy text-[length:var(--fs-h1)] leading-[length:var(--lh-h1)] tracking-[-0.5px]"
-                >
+        <div class="germany-invoice-header-flow flex flex-col items-center text-center gap-6 bg-generic-00 mb-8 lg:mb-12">
+            <div class="flex flex-col items-center gap-3 w-full lg:max-w-[887px]">
+                <h2 class="m-0 font-heading font-medium text-vault-navy text-[length:var(--fs-h1)] leading-[length:var(--lh-h1)] tracking-[-0.5px]">
                     {HEADING}
                 </h2>
-                {
-                    LEDE && (
-                        <p class="m-0 font-body font-normal text-neutral-500 text-[length:var(--fs-body)] lg:text-[length:var(--fs-body-lg)] leading-[length:var(--lh-body)] lg:leading-[length:var(--lh-body-lg)]">
-                            {LEDE}
-                        </p>
-                    )
-                }
+                {LEDE && (
+                    <p class="m-0 font-body font-normal text-neutral-500 text-[length:var(--fs-body)] lg:text-[length:var(--fs-body-lg)] leading-[length:var(--lh-body)] lg:leading-[length:var(--lh-body-lg)]">
+                        {LEDE}
+                    </p>
+                )}
             </div>
         </div>
 
@@ -103,58 +99,57 @@ const CTA_HREF = "";
             id="germany-invoice-stack"
             class="germany-invoice-stack flex w-full flex-col gap-[30vh] lg:gap-[50vh]"
         >
-            {
-                requirements.map((r, i) => (
-                    <div
-                        class="germany-invoice-sticky sticky"
-                        style={`top:calc(var(--nav-clear, 112px) + ${i * 16}px);z-index:${i};`}
-                    >
-                        {i === 0 && (
-                            <div
-                                id="germany-invoice-header"
-                                class="bg-generic-00"
-                            >
-                                <div class="germany-invoice-header-stuck flex flex-col items-center text-center gap-6">
-                                    <div class="flex flex-col items-center gap-3 w-full lg:max-w-[887px]">
-                                        <h2 class="m-0 font-heading font-medium text-vault-navy text-[length:var(--fs-h1)] leading-[length:var(--lh-h1)] tracking-[-0.5px]">
-                                            {HEADING}
-                                        </h2>
-                                        {LEDE && (
-                                            <p class="m-0 font-body font-normal text-neutral-500 text-[length:var(--fs-body)] lg:text-[length:var(--fs-body-lg)] leading-[length:var(--lh-body)] lg:leading-[length:var(--lh-body-lg)]">
-                                                {LEDE}
-                                            </p>
-                                        )}
-                                    </div>
-                                </div>
-                            </div>
-                        )}
-
-                        <article
-                            class="germany-invoice-card flex flex-col items-stretch gap-6 rounded-xl border border-neutral-300 bg-generic-00 p-6 will-change-transform lg:flex-row lg:items-center lg:gap-12"
-                            style="transform-origin: top center;"
-                        >
-                            <div class="flex flex-col justify-between gap-6 lg:max-w-[400px] lg:flex-1 lg:self-stretch">
-                                <h3 class="m-0 font-heading font-medium text-vault-navy text-[length:var(--fs-h3)] leading-[length:var(--lh-h3)] lg:text-[length:var(--fs-h2)] lg:leading-[length:var(--lh-h2)]">
-                                    {r.heading}
-                                </h3>
-                                <div class="flex flex-col gap-3 font-body font-normal text-neutral-500 text-[length:var(--fs-body)] leading-[length:var(--lh-body)]">
-                                    {Array.isArray(r.body) ? (
-                                        r.body.map((p) => (
-                                            <p class="m-0">{p}</p>
-                                        ))
-                                    ) : (
-                                        <p class="m-0">{r.body}</p>
+            {requirements.map((r, i) => (
+                <div
+                    class="germany-invoice-sticky sticky"
+                    style={`top:calc(var(--nav-clear, 112px) + ${i * 16}px);z-index:${i};`}
+                >
+                    {i === 0 && (
+                        <div id="germany-invoice-header" class="bg-generic-00">
+                            <div class="germany-invoice-header-stuck flex flex-col items-center text-center gap-6">
+                                <div class="flex flex-col items-center gap-3 w-full lg:max-w-[887px]">
+                                    <h2 class="m-0 font-heading font-medium text-vault-navy text-[length:var(--fs-h1)] leading-[length:var(--lh-h1)] tracking-[-0.5px]">
+                                        {HEADING}
+                                    </h2>
+                                    {LEDE && (
+                                        <p class="m-0 font-body font-normal text-neutral-500 text-[length:var(--fs-body)] lg:text-[length:var(--fs-body-lg)] leading-[length:var(--lh-body)] lg:leading-[length:var(--lh-body-lg)]">
+                                            {LEDE}
+                                        </p>
                                     )}
                                 </div>
                             </div>
-                            <div
-                                class="aspect-[1280/720] w-full rounded-lg bg-visual-placeholder lg:flex-1"
-                                aria-hidden="true"
+                        </div>
+                    )}
+
+                    <article
+                        class="germany-invoice-card flex flex-col items-stretch gap-6 rounded-xl border border-neutral-300 bg-generic-00 p-6 will-change-transform lg:flex-row lg:items-center lg:gap-12"
+                        style="transform-origin: top center;"
+                    >
+                        <div class="flex flex-col justify-between gap-6 lg:max-w-[400px] lg:flex-1 lg:self-stretch">
+                            <h3 class="m-0 font-heading font-medium text-vault-navy text-[length:var(--fs-h3)] leading-[length:var(--lh-h3)] lg:text-[length:var(--fs-h2)] lg:leading-[length:var(--lh-h2)]">
+                                {r.heading}
+                            </h3>
+                            <div class="flex flex-col gap-3 font-body font-normal text-neutral-500 text-[length:var(--fs-body)] leading-[length:var(--lh-body)]">
+                                {Array.isArray(r.body) ? (
+                                    r.body.map((p) => <p class="m-0">{p}</p>)
+                                ) : (
+                                    <p class="m-0">{r.body}</p>
+                                )}
+                            </div>
+                        </div>
+                        <div class="aspect-[1280/720] w-full overflow-hidden rounded-lg lg:w-auto lg:flex-1 flex items-center justify-center">
+                            <img
+                                src={r.img}
+                                alt={r.heading}
+                                width="730"
+                                height="410"
+                                class="h-full w-full object-contain"
+                                loading="lazy"
                             />
-                        </article>
-                    </div>
-                ))
-            }
+                        </div>
+                    </article>
+                </div>
+            ))}
 
             <!-- Tail room so the last card can finish sticking before the next section -->
             <div style="height: 80px;"></div>
