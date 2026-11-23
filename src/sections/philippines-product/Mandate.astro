@@ -1,0 +1,198 @@
+---
+/**
+ * "Norway E-Invoicing Mandate at a glance" — Figma node 17103:83413
+ * ("Container - Regulatory Timeline").
+ *
+ * Unlike the sticky-card stack used for the "at a glance" section on other
+ * brand v2 regional pages (`spain-regional/Glance.astro`,
+ * `france-regional/Mandate.astro`), the Norway Figma shows a flat single-
+ * column list: an icon placeholder, a row label and a description, divided
+ * by hairlines. Each row is the shared "Timeline" component (Figma node
+ * 16433:24519) used standalone, not inside a scroll-pinned stack.
+ *
+ * Scroll-opacity focus effect ported from `france-product/RegulatoryTimeline.astro`:
+ * the row nearest the vertical centre of the viewport sits at full opacity;
+ * every other row rests at 50% opacity.
+ * Mechanics (thin-band IntersectionObserver picking the closest row to the
+ * centre line) are copied verbatim from that file — see its docblock for the
+ * long-form rationale, originally from `global-homepage/Proven.astro`.
+ *
+ * The row icons use the matching Norway regional icon assets.
+ */
+interface Row {
+    icon: string;
+    label: string;
+    desc: string;
+}
+
+const rows: Row[] = [
+    {
+        icon: "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6b00360392cad7d2d6b1f06f_ph-icon-5.png",
+        label: "Format",
+        desc: "JSON · PDFs and scanned invoices do not qualify. Digital signature required on every invoice.",
+    },
+    {
+        icon: "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6b0036061281da0f88ca1977_ph-icon-6.png",
+        label: "Transmission",
+        desc: "Invoices delivered directly to buyers via system-to-system API. For enterprises in scope of ESRS (Wave 2), data is also transmitted to BIR's EIS within 3 calendar days. Every submission tracked and confirmed.",
+    },
+    {
+        icon: "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6b00360a92cad7d2d6b1f282_ph-icon-7.png",
+        label: "Scope",
+        desc: "Large Taxpayers · E-commerce businesses · Exporters Covers all Phase 1 in-scope entities. Multi-branch businesses covered under a single deployment — head office and all branches unified.",
+    },
+    {
+        icon: "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6b00360e2fc5d4526947e6e3_ph-icon-8.png",
+        label: "Archival",
+        desc: "BIR-compliant invoice retention E-invoices and credit notes stored in structured, retrievable format per BIR archiving requirements. No manual prep needed for audit readiness.",
+    },
+    {
+        icon: "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6b003612957ea7de9f564cf5_ph-icon-9.png",
+        label: "Validation",
+        desc: "Deep pre-transmission checks Field completeness, schema validation, and error detection before data ever reaches the BIR — so failed transmissions don't become compliance incidents.",
+    },
+    {
+        icon: "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6b0036172994dd6b8f3e43ad_ph-icon-10.png",
+        label: "Security",
+        desc: "GDPR · ISO 27001:2022 · SOC 2 Enterprise-grade encryption at rest (AES-256), SSL in transit, role-based access, and data residency controls aligned to Philippine data privacy requirements.",
+    },
+];
+---
+
+<section class="bg-generic-00 py-16 lg:py-20" data-no-glance>
+    <div class="w-full max-w-[var(--container-max)] mx-auto px-4 md:px-6">
+        <div class="text-center mx-auto mb-12 flex flex-col">
+            <h2 class="m-0 mb-4 max-w-[681px] mx-auto font-heading text-center font-medium text-vault-navy text-[length:var(--fs-h1)] leading-[length:var(--lh-h1)] tracking-[-0.5px]">
+                What the BIR EIS mandate requires and what ClearTax covers
+            </h2>
+            <p class="m-0 font-body text-center text-[length:var(--fs-body)] leading-[length:var(--lh-body)] text-neutral-500 max-w-180 mx-auto">
+                The Philippines uses a direct transmission model: your business
+                system connects to BIR's EIS via API. ClearTax handles every
+                technical and compliance requirement out of the box.
+            </p>
+        </div>
+
+        <div class="flex flex-col">
+            {rows.map((row, i) => (
+                <div
+                    class:list={[
+                        "no-glance-row flex flex-col justify-between gap-4 py-6 md:flex-row md:items-center md:gap-8",
+                        i < rows.length - 1 && "border-b border-neutral-200",
+                    ]}
+                >
+                    <div class="flex shrink-0 items-center gap-6 md:max-w-[434px] flex-1">
+                        <img
+                            src={row.icon}
+                            width="64"
+                            height="64"
+                            alt=""
+                            aria-hidden="true"
+                            class="no-glance-icon size-14 sm:size-16 shrink-0 object-contain"
+                        />
+                        <span class="font-heading text-[length:var(--fs-h5)] leading-[length:var(--lh-h5)] font-medium text-vault-navy">
+                            {row.label}
+                        </span>
+                    </div>
+                    <p class="m-0 font-body text-[length:var(--fs-body)] leading-[length:var(--lh-body)] text-neutral-500 md:flex-1 max-w-[640px]">
+                        {row.desc}
+                    </p>
+                </div>
+            ))}
+        </div>
+    </div>
+</section>
+
+<style is:global>
+    /* Rows start dimmed; the row nearest the viewport's vertical centre is
+       promoted to full opacity by the script below. */
+    .no-glance-row {
+        opacity: 0.5;
+        transition:
+            opacity 0.35s ease-in-out,
+            transform 0.35s ease-in-out;
+    }
+
+    .no-glance-row.is-centered {
+        opacity: 1;
+    }
+
+    .no-glance-row.is-scaled {
+        transform: scale(1.02);
+    }
+
+    .no-glance-icon {
+        transition: transform 0.35s ease-in-out;
+    }
+
+    .no-glance-row.is-scaled .no-glance-icon {
+        transform: scale(1.1);
+    }
+</style>
+
+<script is:inline>
+    (function () {
+        const root = document.querySelector("[data-no-glance]");
+        if (!root) return;
+        const rows = Array.from(root.querySelectorAll(".no-glance-row"));
+        if (!rows.length) return;
+
+        if (
+            !("IntersectionObserver" in window) ||
+            window.matchMedia("(prefers-reduced-motion: reduce)").matches
+        ) {
+            // No observer, or motion is unwelcome: every row full opacity rather
+            // than the whole list sitting dimmed with nothing to light it.
+            rows.forEach((el) => el.classList.add("is-centered"));
+            return;
+        }
+
+        // A thin 1% band pinned across the middle of the viewport — "centred"
+        // means the row the centre line is actually inside. The observer only
+        // fires on a crossing, so a wide band could let the nearest row change
+        // with nothing to trigger a recompute; kept thin, every change of row IS
+        // a crossing. `inBand` holds the running set because two rows can
+        // straddle the line for a frame; pick() resolves that by distance.
+        let centred = null;
+        const inBand = new Set();
+
+        const pick = () => {
+            // Nothing in the band means the middle has landed in a gap between
+            // rows — hold the last choice instead of clearing, so the focus never
+            // blinks off between rows.
+            if (!inBand.size) return;
+
+            const middle = window.innerHeight / 2;
+            let best = null;
+            let bestDistance = Infinity;
+
+            inBand.forEach((el) => {
+                const r = el.getBoundingClientRect();
+                const distance = Math.abs((r.top + r.bottom) / 2 - middle);
+                if (distance < bestDistance) {
+                    bestDistance = distance;
+                    best = el;
+                }
+            });
+
+            if (!best || best === centred) return;
+            if (centred) {
+                centred.classList.remove("is-centered", "is-scaled");
+            }
+            centred = best;
+            centred.classList.add("is-centered", "is-scaled");
+        };
+
+        const centreObserver = new IntersectionObserver(
+            (entries) => {
+                entries.forEach((entry) => {
+                    if (entry.isIntersecting) inBand.add(entry.target);
+                    else inBand.delete(entry.target);
+                });
+                pick();
+            },
+            { rootMargin: "-49.5% 0px -49.5% 0px", threshold: 0 },
+        );
+
+        rows.forEach((el) => centreObserver.observe(el));
+    })();
+</script>
