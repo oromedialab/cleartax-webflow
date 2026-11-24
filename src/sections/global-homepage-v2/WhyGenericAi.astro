@@ -6089,6 +6089,7 @@ const LEDE =
                         return;
                     }
 
+                    const typingObj = { charIndex: 0 };
                     const tl = gsap.timeline({
                         paused: true,
                         defaults: { ease: "power2.inOut" },
@@ -6160,7 +6161,21 @@ const LEDE =
                         pillTypedText.textContent = "";
                     }
                     tl.add(() => {
+                        typingObj.charIndex = 0;
                         if (pillTypedText) pillTypedText.textContent = "";
+                        if (chart) {
+                            chart.classList.remove("is-revealed");
+                            chart.classList.add("hidden");
+                        }
+                        if (chartHeader) chartHeader.classList.add("hidden");
+                        if (chartImg && !chartImgIsChildOfChart) chartImg.classList.add("hidden");
+                        if (chartBottom) chartBottom.classList.add("hidden");
+                        if (bubble) bubble.classList.add("hidden");
+                        if (checklist) checklist.classList.add("hidden");
+                        if (skeleton) skeleton.classList.add("hidden");
+                        if (borderPath) {
+                            gsap.set(borderPath, { opacity: 0 });
+                        }
                     }, 0);
                     tl.set(pillThinking, { display: "none", opacity: 0 });
                     tl.set(cursor, {
@@ -6199,7 +6214,7 @@ const LEDE =
                     );
                     tl.set(pillPlaceholder, { display: "none" });
                     tl.to(pillTyped, { opacity: 1, duration: 0.15 }, "<");
-                    const typingObj = { charIndex: 0 };
+                    typingObj.charIndex = 0;
                     tl.to(
                         typingObj,
                         {
@@ -6452,28 +6467,42 @@ const LEDE =
                         "<+=0.1",
                     );
 
-                    // Animation completes and stays on final result (Frame 5)
+                    // Register timeline for synchronized loop control
+                    window.__ghWhy = window.__ghWhy || {};
+                    window.__ghWhy.genericTimelines = window.__ghWhy.genericTimelines || [];
+                    window.__ghWhy.genericTimelines[idx] = tl;
 
-                    // Viewport IntersectionObserver: Trigger once when card is 30% visible
-                    // Small delay ensures GSAP is fully initialised before the timeline starts
-                    const triggerEl = card;
+                    // Safety fallback: if ClearTax card flow doesn't restart after 12s, loop generic independently
+                    tl.to({}, { duration: 12.0 });
+                    tl.add(() => {
+                        const isVisible = card.dataset.visible === "true";
+                        if (isVisible) {
+                            tl.restart();
+                        } else {
+                            tl.pause(0);
+                        }
+                    });
+
+                    // Viewport IntersectionObserver: start only when visible, pause when hidden, resume when re-entering
+                    const triggerEl = card.closest(".gh-why-card") || card;
                     if (typeof IntersectionObserver !== "undefined") {
-                        let hasPlayed = false;
                         const observer = new IntersectionObserver(
                             (entries) => {
                                 entries.forEach((entry) => {
-                                    if (entry.isIntersecting && !hasPlayed) {
-                                        hasPlayed = true;
-                                        // Short delay so the card is not mid-viewport on hard reload
-                                        setTimeout(() => tl.play(), 120);
-                                        observer.disconnect();
+                                    if (entry.isIntersecting) {
+                                        card.dataset.visible = "true";
+                                        tl.play();
+                                    } else {
+                                        card.dataset.visible = "false";
+                                        tl.pause();
                                     }
                                 });
                             },
-                            { threshold: 0.3, rootMargin: "0px 0px -40px 0px" },
+                            { threshold: 0.15 },
                         );
                         observer.observe(triggerEl);
                     } else {
+                        card.dataset.visible = "true";
                         tl.play();
                     }
                 };
@@ -6719,6 +6748,8 @@ const LEDE =
                     return;
                 }
 
+                const initialSpinnerText = spinnerText ? spinnerText.textContent : "Analyzing uploaded file…";
+                const typingObj = { charIndex: 0 };
                 const tl = gsap.timeline({
                     paused: true,
                     defaults: { ease: "power2.inOut" },
@@ -6754,13 +6785,36 @@ const LEDE =
                     inputBox.style.borderRadius = "";
                 }
                 tl.add(() => {
+                    typingObj.charIndex = 0;
+                    if (typedText) typedText.textContent = "";
+                    if (spinner) {
+                        spinner.classList.remove("is-active");
+                        spinner.classList.add("hidden");
+                        spinner.style.display = "none";
+                        spinner.style.opacity = "0";
+                    }
+                    if (spinnerText) {
+                        spinnerText.textContent = initialSpinnerText;
+                    }
                     if (inputBox) {
                         inputBox.classList.remove("rounded-full");
                         inputBox.classList.add("rounded-2xl");
                         inputBox.style.borderRadius = "";
                     }
-                    if (spinnerText) {
-                        spinnerText.textContent = "Analyzing uploaded file…";
+                    if (resultGroup) {
+                        resultGroup.classList.add("hidden");
+                        resultGroup.style.display = "none";
+                        resultGroup.style.opacity = "0";
+                    }
+                    if (sentGroup) {
+                        sentGroup.classList.add("hidden");
+                        sentGroup.style.display = "none";
+                        sentGroup.style.opacity = "0";
+                    }
+                    if (sentBubble) {
+                        sentBubble.classList.add("hidden");
+                        sentBubble.style.display = "none";
+                        sentBubble.style.opacity = "0";
                     }
                 }, 0);
 
@@ -6954,7 +7008,7 @@ const LEDE =
                 }
 
                 // Text prompt types out character by character
-                const typingObj = { charIndex: 0 };
+                typingObj.charIndex = 0;
                 tl.to(
                     typingObj,
                     {
@@ -7279,24 +7333,53 @@ const LEDE =
                     "<+=0.1",
                 );
 
-                // Viewport IntersectionObserver: Trigger once when 50% of ClearTax card is visible
-                const triggerEl = card;
+                // Hold on final result (Frame 7) for 3.0 seconds so the viewer can read the comparison output
+                tl.to({}, { duration: 3.0 });
+
+                // Seamless continuous loop: Restart both Left (Generic/ClearTax AI) and Right (Most AP Tools) animations together
+                tl.add(() => {
+                    if (window.__ghWhy && window.__ghWhy.genericCardComplete) {
+                        window.__ghWhy.genericCardComplete[idx] = false;
+                    }
+                    const genTl =
+                        window.__ghWhy &&
+                        window.__ghWhy.genericTimelines &&
+                        window.__ghWhy.genericTimelines[idx];
+                    const isVisible = card.dataset.visible === "true";
+                    if (isVisible) {
+                        if (genTl) genTl.restart();
+                        tl.restart();
+                    } else {
+                        if (genTl) genTl.pause(0);
+                        tl.pause(0);
+                    }
+                });
+
+                // Register timeline for synchronized loop control
+                window.__ghWhy = window.__ghWhy || {};
+                window.__ghWhy.clearTaxTimelines = window.__ghWhy.clearTaxTimelines || [];
+                window.__ghWhy.clearTaxTimelines[idx] = tl;
+
+                // Viewport IntersectionObserver: start only when visible, pause when hidden, resume when re-entering
+                const triggerEl = card.closest(".gh-why-card") || card;
                 if (typeof IntersectionObserver !== "undefined") {
-                    let hasPlayed = false;
                     const observer = new IntersectionObserver(
                         (entries) => {
                             entries.forEach((entry) => {
-                                if (entry.isIntersecting && !hasPlayed) {
-                                    hasPlayed = true;
-                                    setTimeout(() => tl.play(), 120);
-                                    observer.disconnect();
+                                if (entry.isIntersecting) {
+                                    card.dataset.visible = "true";
+                                    tl.play();
+                                } else {
+                                    card.dataset.visible = "false";
+                                    tl.pause();
                                 }
                             });
                         },
-                        { threshold: 0.5 },
+                        { threshold: 0.15 },
                     );
                     observer.observe(triggerEl);
                 } else {
+                    card.dataset.visible = "true";
                     tl.play();
                 }
             };
