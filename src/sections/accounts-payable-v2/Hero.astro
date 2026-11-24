@@ -1,0 +1,683 @@
+---
+/**
+ * France regional hero — Figma node 13600:27940.
+ *
+ * Background is the interactive stroke field from
+ * `sections/global-homepage/Hero.astro` (originally
+ * `sections/blog-listing/Newsletter.astro`, which carries the full explanation of
+ * the geometry): a plain grid of lime dots until a pointer enters, at which point
+ * each dot draws out into a stroke aimed at the cursor, longest beside it and back
+ * to a dot by `lengthRadius`. Same four gradient layers over it — page gradient,
+ * radial wash behind the copy, a mobile-only top fade, and a bottom fade.
+ *
+ * Ids and the canvas id are `fr-` prefixed rather than the `hero` /
+ * `hero-dots-canvas` older files use, because embeds share one namespace per page
+ * and a bare `hero` is exactly the kind of name that collides later.
+ *
+ * The three badges carry a 37px `bg-visual-placeholder` square where the Figma
+ * has an unfilled "Icon placeholder" frame. Swap each for a Webflow-hosted asset
+ * once the icons exist — never a `data:` URI, which would blow the paste cap.
+ */
+interface Props {
+    /** Stroke width, and so the diameter of the dot it becomes at rest. */
+    lineWidth?: number;
+    gap?: number;
+    /** Must stay under the grid pitch or the field knits into a mesh. */
+    maxLength?: number;
+    lengthRadius?: number;
+    /** Leave at 1 — a partial turn makes strokes flip as the cursor crosses them. */
+    tilt?: number;
+    baseColor?: string;
+    cursorRadius?: number;
+    pull?: number;
+    fadeRadius?: number;
+}
+
+const {
+    lineWidth = 3,
+    gap = 24,
+    maxLength = 6,
+    lengthRadius = 260,
+    tilt = 1,
+    baseColor = "#C8F006",
+    cursorRadius = 320,
+    pull = 14,
+    fadeRadius = 40,
+} = Astro.props;
+
+const stats: { label: string; value: string; width: string }[] = [
+    {
+        value: "Peppol Access Point",
+        label: "supporting the PINT A-NZ specification",
+        width: "sm:max-w-[350px]",
+    },
+    {
+        value: "AI-powered seamless integration",
+        label: "with any ERP/POS systems",
+        width: "sm:max-w-[350px]",
+    },
+    {
+        value: "One global e-invoicing",
+        label: "API for 50+ country mandates",
+        width: "sm:max-w-[350px]",
+    },
+];
+---
+
+<section
+    id="au-hero"
+    class="au-hero relative overflow-hidden bg-generic-00"
+    data-line-width={String(lineWidth)}
+    data-gap={String(gap)}
+    data-max-length={String(maxLength)}
+    data-length-radius={String(lengthRadius)}
+    data-tilt={String(tilt)}
+    data-base-color={baseColor}
+    data-cursor-radius={String(cursorRadius)}
+    data-pull={String(pull)}
+    data-fade-radius={String(fadeRadius)}
+>
+    <!-- Interactive stroke field -->
+    <div class="absolute inset-0 z-0 w-full h-full pointer-events-none">
+        <canvas
+            id="au-hero-dots"
+            class="absolute inset-0 w-full h-full"
+        ></canvas>
+    </div>
+
+    <!-- Radial wash, so the headline keeps its contrast over the field -->
+    <div class="absolute inset-0 z-0 bg-[radial-gradient(circle_at_center,_#FFF_0%,_rgba(242,_241,_240,_0.25)_30.04%,_rgba(255,255,255,0)_65%)] pointer-events-none"></div>
+
+    <div class="container mx-auto relative z-10">
+        <div class="flex flex-col items-center gap-6 text-center max-lg:pt-32 max-lg:pb-16 lg:pt-[257px] lg:pb-[177px]">
+            <div class="flex flex-col items-center w-full">
+                <h1 class="m-0 font-heading font-semibold text-vault-navy text-[length:var(--fs-h1)] md:text-[length:var(--fs-display-sm)] lg:text-[length:var(--fs-display-lg)] leading-[length:var(--lh-h1)] md:leading-[length:var(--lh-display-sm)] lg:leading-[length:var(--lh-display-lg)] tracking-[-1px] max-w-185">
+                    Peppol{" "}
+                    <span class="inline-block text-generic-100 bg-flux-lime py-1 px-[13px] rounded-xl">
+                        E-invoicing
+                    </span>{" "}
+                    for Australia. Get paid in days, not weeks.
+                </h1>
+                <p class="m-0 font-body mt-2 text-neutral-500 text-[length:var(--fs-body-lg)] leading-[length:var(--lh-body-lg)] max-w-179">
+                    Send and receive every invoice in PINT A-NZ over Peppol,
+                    straight from your ERP.
+                </p>
+
+                <!-- 3 up on desktop in a unified bordered card with vertical dividers -->
+                <ul class="mt-4 p-0 sm:mt-8 grid grid-cols-1 md:grid-cols-3 divide-y md:divide-y-0 divide-neutral-200 rounded-xl border border-neutral-300 bg-generic-00 list-none m-0 w-full max-w-[1056px]">
+                    {stats.map((st, index) => (
+                        <li class="relative flex items-center gap-3 p-4 text-left first:before:hidden md:before:block before:hidden before:absolute before:left-0 before:top-1/2 before:-translate-y-1/2 before:h-10 sm:before:h-11 before:w-px before:bg-neutral-200">
+                            <div class="size-11 sm:size-12 shrink-0 rounded-xl flex items-center justify-center">
+                                {index === 0 && (
+                                    <svg
+                                        width="56"
+                                        height="56"
+                                        viewBox="0 0 56 56"
+                                        fill="none"
+                                        xmlns="http://www.w3.org/2000/svg"
+                                    >
+                                        <rect
+                                            x="0.5"
+                                            y="0.5"
+                                            width="55"
+                                            height="55"
+                                            rx="7.5"
+                                            stroke="#CCCCCC"
+                                        />
+                                        <path
+                                            d="M21.9989 37.5533H20.611C19.8927 37.5533 19.3047 37.0604 19.3047 36.4581V17.0948C19.3047 16.4924 19.8925 15.9996 20.611 15.9996H32.6941C33.4125 15.9996 34.0004 16.4927 34.0004 17.0948V36.4581C34.0004 37.0603 33.4124 37.5533 32.6941 37.5533H31.3062"
+                                            stroke-width="1.2"
+                                            stroke-miterlimit="10"
+                                            stroke="#05022A"
+                                        />
+                                        <path
+                                            d="M25.0475 33.0232H22.6754M22.6754 28.6145H25.0475M22.6754 30.8189H25.0475M30.9777 33.0232H28.6056M28.6056 28.6145H30.9777M28.6056 30.8189H30.9777M22.0003 18.5724H31.2974C31.4354 18.5724 31.5474 18.6843 31.5474 18.8224V25.9152C31.5474 26.0532 31.4354 26.1652 31.2974 26.1652H22.0003C21.8622 26.1652 21.7502 26.0532 21.7502 25.9152V18.8224C21.7502 18.6843 21.8622 18.5724 22.0003 18.5724Z"
+                                            stroke-width="1.2"
+                                            stroke-miterlimit="10"
+                                            stroke="#05022A"
+                                        />
+                                        <path
+                                            d="M34.2493 18.9354H35.3514C36.0924 18.9354 36.6986 19.5416 36.6986 20.2825V33.2637C36.6986 34.0047 36.0924 34.6108 35.3514 34.6108H34.2493"
+                                            stroke-width="1.2"
+                                            stroke-miterlimit="10"
+                                            stroke="#05022A"
+                                        />
+                                        <path
+                                            d="M31.0601 39.9995L29.5905 39.0198L28.121 39.9995L26.6514 39.0198L25.1818 39.9995L23.7122 39.0198L22.2427 39.9995V35.5909H31.0601V39.9995Z"
+                                            stroke-width="1.2"
+                                            stroke-miterlimit="10"
+                                            stroke-linecap="round"
+                                            stroke-linejoin="round"
+                                            stroke="#5446FF"
+                                        />
+                                    </svg>
+                                )}
+                                {index === 1 && (
+                                    <svg
+                                        width="56"
+                                        height="56"
+                                        viewBox="0 0 56 56"
+                                        fill="none"
+                                        xmlns="http://www.w3.org/2000/svg"
+                                    >
+                                        <rect
+                                            x="0.5"
+                                            y="0.5"
+                                            width="55"
+                                            height="55"
+                                            rx="7.5"
+                                            stroke="#CCCCCC"
+                                        />
+                                        <path
+                                            d="M20.639 37.4781C25.3468 41.1439 32.1578 40.8131 36.4858 36.4852C40.8136 32.1573 41.1444 25.3463 37.4786 20.6385"
+                                            stroke-width="1.2"
+                                            stroke-miterlimit="10"
+                                            stroke-linecap="round"
+                                            stroke-linejoin="round"
+                                            stroke="#5446FF"
+                                        />
+                                        <path
+                                            d="M35.3616 18.5216C30.6538 14.8558 23.8428 15.1866 19.5149 19.5144C15.187 23.8423 14.8563 30.6534 18.5221 35.3611"
+                                            stroke-width="1.2"
+                                            stroke-miterlimit="10"
+                                            stroke-linecap="round"
+                                            stroke-linejoin="round"
+                                            stroke="#5446FF"
+                                        />
+                                        <path
+                                            d="M37.5465 20.5751C36.9607 21.1609 36.0109 21.1609 35.4251 20.5751C34.8393 19.9893 34.8393 19.0396 35.4251 18.4538C36.0109 17.868 36.9607 17.868 37.5465 18.4538C38.1323 19.0396 38.1323 19.9893 37.5465 20.5751Z"
+                                            stroke-width="1.2"
+                                            stroke-miterlimit="10"
+                                            stroke-linecap="round"
+                                            stroke-linejoin="round"
+                                            stroke="#5446FF"
+                                        />
+                                        <path
+                                            d="M20.5756 37.5459C19.9898 38.1317 19.0401 38.1317 18.4542 37.5459C17.8684 36.9601 17.8684 36.0104 18.4542 35.4246C19.0401 34.8388 19.9898 34.8388 20.5756 35.4246C21.1614 36.0104 21.1614 36.9601 20.5756 37.5459Z"
+                                            stroke-width="1.2"
+                                            stroke-miterlimit="10"
+                                            stroke-linecap="round"
+                                            stroke-linejoin="round"
+                                            stroke="#5446FF"
+                                        />
+                                        <path
+                                            d="M35.5004 29.1248V26.8748L33.7976 26.4491C33.662 25.9408 33.4597 25.4526 33.196 24.9973L34.0992 23.492L32.5082 21.9009L31.0028 22.8041C30.5475 22.5404 30.0594 22.3381 29.551 22.2025L29.1253 20.4997H26.8753L26.4496 22.2025C25.9412 22.3381 25.453 22.5404 24.9977 22.8041L23.4924 21.9009L21.9014 23.492L22.8046 24.9973C22.5409 25.4526 22.3386 25.9408 22.203 26.4491L20.5002 26.8748V29.1248L22.203 29.5506C22.3386 30.0589 22.5409 30.5471 22.8046 31.0024L21.9014 32.5077L23.4924 34.0987L24.9977 33.1956C25.453 33.4592 25.9412 33.6615 26.4496 33.7972L26.8753 35.4999H29.1253L29.551 33.7972C30.0594 33.6615 30.5475 33.4592 31.0028 33.1956L32.5082 34.0987L34.0992 32.5077L33.196 31.0024C33.4597 30.5471 33.662 30.0589 33.7976 29.5506L35.5004 29.1248Z"
+                                            stroke-width="1.2"
+                                            stroke-miterlimit="10"
+                                            stroke-linecap="round"
+                                            stroke-linejoin="round"
+                                            stroke="#05022A"
+                                        />
+                                        <path
+                                            d="M31.0003 27.9998C31.0003 29.6567 29.6572 30.9999 28.0003 30.9999C26.3434 30.9999 25.0002 29.6567 25.0002 27.9998C25.0002 26.343 26.3434 24.9998 28.0003 24.9998C29.6572 24.9998 31.0003 26.343 31.0003 27.9998Z"
+                                            stroke-width="1.2"
+                                            stroke-miterlimit="10"
+                                            stroke-linecap="round"
+                                            stroke-linejoin="round"
+                                            stroke="#05022A"
+                                        />
+                                    </svg>
+                                )}
+                                {index === 2 && (
+                                    <svg
+                                        width="56"
+                                        height="56"
+                                        viewBox="0 0 56 56"
+                                        fill="none"
+                                        xmlns="http://www.w3.org/2000/svg"
+                                    >
+                                        <rect
+                                            x="0.5"
+                                            y="0.5"
+                                            width="55"
+                                            height="55"
+                                            rx="7.5"
+                                            stroke="#CCCCCC"
+                                        />
+                                        <path
+                                            d="M28.3713 34.7496H21.2626V31.7496M21.2626 31.7496V28.7495H31.7627V31.2482M21.2626 31.7496L30.7539 31.7494"
+                                            stroke-width="1.2"
+                                            stroke-miterlimit="10"
+                                            stroke-linecap="round"
+                                            stroke-linejoin="round"
+                                            stroke="#05022A"
+                                        />
+                                        <path
+                                            d="M29.887 38.5004H18.2626V15.9997H30.241L34.7411 20.4998V31.2567"
+                                            stroke-width="1.2"
+                                            stroke-miterlimit="10"
+                                            stroke-linecap="round"
+                                            stroke-linejoin="round"
+                                            stroke="#05022A"
+                                        />
+                                        <path
+                                            d="M37.7375 35.4996C37.7375 37.9849 35.7228 39.9997 33.2375 39.9997C30.7522 39.9997 28.7375 37.9849 28.7375 35.4996C28.7375 33.0143 30.7522 30.9995 33.2375 30.9995C35.7228 30.9995 37.7375 33.0143 37.7375 35.4996Z"
+                                            stroke-width="1.2"
+                                            stroke-miterlimit="10"
+                                            stroke-linecap="round"
+                                            stroke-linejoin="round"
+                                            stroke="#5446FF"
+                                        />
+                                        <path
+                                            d="M30.2392 15.9997V20.4998H34.7392M26.5 28.7501V34.7502"
+                                            stroke-width="1.2"
+                                            stroke-miterlimit="10"
+                                            stroke-linecap="round"
+                                            stroke-linejoin="round"
+                                            stroke="#05022A"
+                                        />
+                                        <path
+                                            d="M31.575 35.464L32.7558 36.7101L35.1835 34.2823"
+                                            stroke-width="1.2"
+                                            stroke-miterlimit="10"
+                                            stroke-linecap="round"
+                                            stroke-linejoin="round"
+                                            stroke="#5446FF"
+                                        />
+                                        <path
+                                            d="M23.9967 20.4761C23.7965 20.3682 23.1913 20.0894 22.625 20.3088C22.0086 20.5476 21.7623 21.394 22.3263 21.8234C22.6351 22.0585 23.0557 22.1901 23.4181 22.3182C24.5756 22.7273 24.1656 24.3458 23.0052 24.3899M23.0052 24.3899C22.992 24.3904 22.9787 24.3907 22.9653 24.3908C22.5006 24.3939 22.2833 24.3644 21.8751 24.0974M23.0052 24.3899V24.3849M23.0052 24.3899V25.3023M23.0052 19.3021V20.1686"
+                                            stroke-width="1.2"
+                                            stroke-miterlimit="10"
+                                            stroke-linecap="round"
+                                            stroke-linejoin="round"
+                                            stroke="#05022A"
+                                        />
+                                    </svg>
+                                )}
+                            </div>
+                            <div class={`flex flex-col ${st.width}`}>
+                                <span class="font-medium text-vault-navy text-[length:var(--fs-label)] leading-[length:var(--lh-body)]">
+                                    {st.value}
+                                </span>
+                                <span class="font-normal text-neutral-500 text-[length:var(--fs-label-xs)] leading-[length:var(--lh-body-sm)]">
+                                    {st.label}
+                                </span>
+                            </div>
+                        </li>
+                    ))}
+                </ul>
+            </div>
+
+            <!-- Opens the HubSpot modal from `DemoModal.astro`. The href is kept real
+           so the CTA still goes somewhere if that section is absent. -->
+            <a
+                href="javascript:void(0)"
+                onclick="document.getElementById('contactForm').scrollIntoView({behavior:'smooth'})"
+                class="inline-flex w-full sm:w-auto items-center justify-center gap-2 rounded-lg border border-nova-blue bg-nova-blue px-10 py-3.5 text-[length:var(--fs-label-lg)] leading-[length:var(--lh-label-lg)] font-medium text-nova-50 no-underline transition-all duration-200 hover:bg-generic-00 hover:text-nova-blue"
+            >
+                Book a Demo
+            </a>
+        </div>
+    </div>
+</section>
+
+<style is:global>
+    /* The single Flux Lime instance on this screen. clone keeps the block intact
+     if the headline wraps inside "France E-invoicing" on narrow viewports. */
+    .au-hero-mark {
+        background-color: var(--color-flux-lime);
+        padding: 0 0.08em;
+        -webkit-box-decoration-break: clone;
+        box-decoration-break: clone;
+        border-radius: 12px;
+    }
+</style>
+
+<script is:inline>
+    /* Interactive stroke field — the one from `sections/global-invoicing/Hero.astro`,
+     which took it from `sections/blog-listing/Newsletter.astro`. That file carries
+     the full explanation of the geometry; the numbers here come off the section's
+     data-* attributes so there is a single source for each. */
+    function initAuHeroGrid() {
+        const section = document.getElementById("au-hero");
+        if (!section) return;
+        const canvas = document.getElementById("au-hero-dots");
+        if (!canvas || !canvas.getContext) return;
+        const ctx = canvas.getContext("2d");
+
+        function num(name, fallback) {
+            const value = parseFloat(section.getAttribute(name));
+            return isNaN(value) ? fallback : value;
+        }
+
+        const config = {
+            lineWidth: num("data-line-width", 2),
+            gap: num("data-gap", 24),
+            maxLength: num("data-max-length", 6),
+            lengthRadius: num("data-length-radius", 260),
+            tilt: num("data-tilt", 1),
+            baseColor: section.getAttribute("data-base-color") || "#C8F006",
+            cursorRadius: num("data-cursor-radius", 320),
+            pull: num("data-pull", 14),
+            fadeRadius: num("data-fade-radius", 40),
+            fadeSpeed: 12,
+            followSpeed: 7,
+            engageSpeed: 4,
+            focusSpeed: 5,
+        };
+
+        const HALF_PI = Math.PI / 2; // straight down — the resting angle
+
+        let width = 0;
+        let height = 0;
+        let dots = [];
+        const mouse = { x: -9999, y: -9999, prevX: -9999, prevY: -9999 };
+        let hover = false;
+        let speed = 0; // smoothed cursor travel, px per frame
+        let engagement = 0; // 0–1, how awake the field is
+        let presence = 0; // 0–1, whether a pointer is over the section at all
+        let focusX = 0;
+        let focusY = 0;
+
+        function initGrid() {
+            const parent = canvas.parentElement;
+            width = parent.offsetWidth;
+            height = parent.offsetHeight;
+            if (!width || !height) return;
+
+            const dpr = window.devicePixelRatio || 1;
+            canvas.width = Math.round(width * dpr);
+            canvas.height = Math.round(height * dpr);
+            // setTransform, not scale: scale() multiplies the existing matrix, so
+            // every resize would compound the DPR and shrink the grid.
+            ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+            dots = [];
+            const spacing = config.lineWidth + config.gap;
+            const cols = Math.floor(width / spacing);
+            const rows = Math.floor(height / spacing);
+            const startX = (width - cols * spacing) / 2 + config.lineWidth / 2;
+            const startY = (height - rows * spacing) / 2 + config.lineWidth / 2;
+
+            for (let y = 0; y <= rows; y++) {
+                for (let x = 0; x <= cols; x++) {
+                    const cx = startX + x * spacing;
+                    const cy = startY + y * spacing;
+                    // ox/oy is the stroke's home and the point it is drawn centred on;
+                    // x/y is where that centre is now; hx/hy is half its segment vector.
+                    dots.push({
+                        x: cx,
+                        y: cy,
+                        ox: cx,
+                        oy: cy,
+                        alpha: 1,
+                        hx: 0,
+                        hy: 0,
+                    });
+                }
+            }
+
+            if (!hover) {
+                focusX = width / 2;
+                focusY = height / 2;
+            }
+            aim();
+            paint();
+        }
+
+        // Length and angle, both straight off the focus. The focus and `presence`
+        // are already eased, so neither needs easing here.
+        function aim() {
+            const longest = config.maxLength / 2;
+            const turn = presence * config.tilt;
+
+            for (let i = 0; i < dots.length; i++) {
+                const dot = dots[i];
+                const dx = focusX - dot.ox;
+                const dy = focusY - dot.oy;
+                const dist = Math.sqrt(dx * dx + dy * dy);
+
+                // 1 at the pointer, 0 by `lengthRadius`. Scaled by `presence`, so with
+                // no cursor on the section every stroke is a plain dot.
+                let t = dist / config.lengthRadius;
+                if (t > 1) t = 1;
+                const grow = 1 - t;
+                let reach = longest * grow * grow * (3 - 2 * grow) * presence;
+                // A canvas subpath of exactly zero length is not reliably painted, even
+                // with a round cap. A quarter pixel is a dot and is always drawn.
+                if (reach < 0.25) reach = 0.25;
+
+                let ux = 0;
+                let uy = 1;
+
+                if (turn > 0.001 && dist > 0.01) {
+                    // Folded into a quarter turn either side: a segment drawn about its
+                    // centre looks the same pointed either way, so this takes the short
+                    // way round. Only seamless because `turn` reaches 1 — scaling the
+                    // angle by any fraction makes strokes flip as the cursor crosses them.
+                    let off = Math.atan2(dy, dx) - HALF_PI;
+                    while (off > HALF_PI) off -= Math.PI;
+                    while (off < -HALF_PI) off += Math.PI;
+
+                    const angle = HALF_PI + off * turn;
+                    ux = Math.cos(angle);
+                    uy = Math.sin(angle);
+                }
+
+                dot.hx = ux * reach;
+                dot.hy = uy * reach;
+            }
+        }
+
+        function paint() {
+            ctx.clearRect(0, 0, width, height);
+            ctx.strokeStyle = config.baseColor;
+            ctx.lineWidth = config.lineWidth;
+            ctx.lineCap = "round"; // so a stroke shrunk to nothing reads as a dot
+
+            // Two passes. Only the strokes the cursor is touching have an alpha of
+            // their own; the rest of the field goes down as one path in one stroke
+            // call. Setting globalAlpha per stroke across the whole grid stutters.
+            ctx.globalAlpha = 1;
+            ctx.beginPath();
+            for (let i = 0; i < dots.length; i++) {
+                const dot = dots[i];
+                if (dot.alpha < 0.995) continue;
+                ctx.moveTo(dot.x - dot.hx, dot.y - dot.hy);
+                ctx.lineTo(dot.x + dot.hx, dot.y + dot.hy);
+            }
+            ctx.stroke();
+
+            for (let j = 0; j < dots.length; j++) {
+                const fading = dots[j];
+                if (fading.alpha >= 0.995 || fading.alpha < 0.01) continue;
+                ctx.globalAlpha = fading.alpha;
+                ctx.beginPath();
+                ctx.moveTo(fading.x - fading.hx, fading.y - fading.hy);
+                ctx.lineTo(fading.x + fading.hx, fading.y + fading.hy);
+                ctx.stroke();
+            }
+
+            ctx.globalAlpha = 1;
+        }
+
+        const reduceMotion =
+            window.matchMedia &&
+            window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+        if (reduceMotion) {
+            // Static dot grid. No animation loop, no cursor reaction.
+            initGrid();
+            paint();
+            window.addEventListener("resize", () => {
+                initGrid();
+                paint();
+            });
+            return;
+        }
+
+        let lastTime = performance.now();
+        let isFirstFrame = true;
+
+        function draw(time) {
+            if (dots.length === 0) {
+                initGrid();
+            }
+
+            let dt = (time - lastTime) / 1000;
+            if (dt > 0.05) dt = 0.05; // cap so a backgrounded tab can't jolt the grid
+            lastTime = time;
+
+            const fadeEase = Math.min(1, config.fadeSpeed * dt);
+            const followEase = Math.min(1, config.followSpeed * dt);
+            const engageEase = Math.min(1, config.engageSpeed * dt);
+            const focusEase = Math.min(1, config.focusSpeed * dt);
+
+            const travelX = mouse.x - mouse.prevX;
+            const travelY = mouse.y - mouse.prevY;
+            mouse.prevX = mouse.x;
+            mouse.prevY = mouse.y;
+            speed +=
+                (Math.sqrt(travelX * travelX + travelY * travelY) - speed) *
+                0.5;
+            if (speed < 0.01) speed = 0;
+
+            engagement +=
+                ((hover ? Math.min(speed / 6, 1) : 0) - engagement) *
+                engageEase;
+            if (engagement < 0.001) engagement = 0;
+
+            // A parked cursor still holds the field open, just more gently.
+            const grip = hover ? 0.4 + 0.6 * engagement : 0;
+
+            const wantX = hover ? mouse.x : width / 2;
+            const wantY = hover ? mouse.y : height / 2;
+            const swungX = wantX - focusX;
+            const swungY = wantY - focusY;
+            let swung =
+                swungX > 0.05 ||
+                swungX < -0.05 ||
+                swungY > 0.05 ||
+                swungY < -0.05;
+            if (swung) {
+                focusX += swungX * focusEase;
+                focusY += swungY * focusEase;
+            } else if (focusX !== wantX || focusY !== wantY) {
+                focusX = wantX;
+                focusY = wantY;
+                swung = true;
+            }
+
+            const wantPresence = hover ? 1 : 0;
+            const presenceDiff = wantPresence - presence;
+            if (presenceDiff > 0.002 || presenceDiff < -0.002) {
+                presence += presenceDiff * focusEase;
+                swung = true;
+            } else if (presence !== wantPresence) {
+                presence = wantPresence;
+                swung = true;
+            }
+
+            // Length and angle hang off those two, so they only need recomputing on
+            // the frames one of them actually moved.
+            if (swung) aim();
+
+            const crSq = config.cursorRadius * config.cursorRadius;
+            let moving = swung;
+
+            for (let i = 0; i < dots.length; i++) {
+                const dot = dots[i];
+
+                // Measured from the stroke's home, not its current position, or one
+                // that has moved toward the focus reads as closer and runs away into it.
+                const dx = focusX - dot.ox;
+                const dy = focusY - dot.oy;
+                const distSq = dx * dx + dy * dy;
+
+                let targetAlpha = 1;
+                let targetX = dot.ox;
+                let targetY = dot.oy;
+
+                if (distSq < crSq) {
+                    const dist = Math.sqrt(distSq);
+
+                    if (grip > 0.001) {
+                        const t = 1 - dist / config.cursorRadius;
+                        let push = t * t * config.pull * grip;
+                        // A stroke must never reach the cursor: past it, it crosses to the
+                        // far side and the field knots up around the pointer.
+                        if (push > dist * 0.75) push = dist * 0.75;
+                        const step = dist > 0.01 ? push / dist : 0;
+                        targetX += dx * step;
+                        targetY += dy * step;
+                    }
+
+                    if (dist < config.fadeRadius) {
+                        const ft = dist / config.fadeRadius;
+                        const hole = ft * ft * (3 - 2 * ft);
+                        // Also the pointer's doing, so the resting grid keeps every dot.
+                        targetAlpha = 1 - (1 - hole) * presence;
+                    }
+                }
+
+                const offX = targetX - dot.x;
+                const offY = targetY - dot.y;
+                if (
+                    offX > 0.05 ||
+                    offX < -0.05 ||
+                    offY > 0.05 ||
+                    offY < -0.05
+                ) {
+                    dot.x += offX * followEase;
+                    dot.y += offY * followEase;
+                    moving = true;
+                } else if (dot.x !== targetX || dot.y !== targetY) {
+                    dot.x = targetX;
+                    dot.y = targetY;
+                    moving = true;
+                }
+
+                const diff = targetAlpha - dot.alpha;
+                if (diff > 0.002 || diff < -0.002) {
+                    dot.alpha += diff * fadeEase;
+                    moving = true;
+                } else if (dot.alpha !== targetAlpha) {
+                    dot.alpha = targetAlpha;
+                    moving = true;
+                }
+            }
+
+            // A settled field is repainted zero times a second, not sixty.
+            if (moving || isFirstFrame) {
+                paint();
+                isFirstFrame = false;
+            }
+            requestAnimationFrame(draw);
+        }
+
+        window.addEventListener("resize", initGrid);
+        initGrid();
+        requestAnimationFrame(draw);
+
+        section.addEventListener("mousemove", (e) => {
+            const rect = canvas.getBoundingClientRect();
+            const sx = rect.width ? width / rect.width : 1;
+            const sy = rect.height ? height / rect.height : 1;
+            const nx = (e.clientX - rect.left) * sx;
+            const ny = (e.clientY - rect.top) * sy;
+            if (!hover) {
+                // Re-entering: seed prev with the entry point, or the jump from the last
+                // position would register as a colossal cursor speed.
+                mouse.prevX = nx;
+                mouse.prevY = ny;
+            }
+            hover = true;
+            mouse.x = nx;
+            mouse.y = ny;
+        });
+
+        section.addEventListener("mouseleave", () => {
+            // Dropping `hover` is what matters: the focus starts its swing back to the
+            // centre, the strokes reel in and the pull lets go. Nothing reads the
+            // parked coordinates while `hover` is false, and re-entry reseeds them.
+            hover = false;
+            speed = 0;
+        });
+    }
+
+    if (document.readyState === "loading") {
+        document.addEventListener("DOMContentLoaded", initAuHeroGrid);
+    } else {
+        initAuHeroGrid();
+    }
+</script>
