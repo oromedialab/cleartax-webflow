@@ -464,20 +464,17 @@ const cardsData = [
             ticking = false;
         };
 
-        const getUnstuckTop = (el) => {
-            let top = 0;
-            let curr = el;
-            while (curr) {
-                top += curr.offsetTop;
-                curr = curr.offsetParent;
-            }
-            return top;
-        };
-
         const getCardTargetY = (index) => {
+            const stackTopDoc =
+                stack.getBoundingClientRect().top + window.scrollY;
+            const gap = parseFloat(getComputedStyle(stack).rowGap) || 0;
+            let localOffset = 0;
+            for (let i = 0; i < index; i++) {
+                localOffset += outers[i].offsetHeight + gap;
+            }
             const stickyTopPx =
                 (parseFloat(outers[index].style.top) || NAV_CLEAR) * zoom;
-            return getUnstuckTop(outers[index]) - stickyTopPx;
+            return stackTopDoc + localOffset * zoom - stickyTopPx;
         };
 
         sidebarBtns.forEach((btn) => {
