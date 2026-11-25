@@ -1,23 +1,14 @@
 ---
 /**
- * "Norway E-Invoicing Mandate at a glance" — Figma node 17103:83413
- * ("Container - Regulatory Timeline").
+ * Accounts Payable V2 — "Invoice Lifecycle" section.
  *
- * Unlike the sticky-card stack used for the "at a glance" section on other
- * brand v2 regional pages (`spain-regional/Glance.astro`,
- * `france-regional/Mandate.astro`), the Norway Figma shows a flat single-
- * column list: an icon placeholder, a row label and a description, divided
- * by hairlines. Each row is the shared "Timeline" component (Figma node
- * 16433:24519) used standalone, not inside a scroll-pinned stack.
+ * Displays a single-column list detailing the end-to-end automated
+ * invoice processing pipeline: from ingestion and agent inbox routing,
+ * through specialized AP and Reviewer agents, to human-in-the-loop exception handling.
  *
- * Scroll-opacity focus effect ported from `france-product/RegulatoryTimeline.astro`:
- * the row nearest the vertical centre of the viewport sits at full opacity;
+ * Scroll-opacity focus effect:
+ * The row nearest the vertical centre of the viewport sits at full opacity;
  * every other row rests at 50% opacity.
- * Mechanics (thin-band IntersectionObserver picking the closest row to the
- * centre line) are copied verbatim from that file — see its docblock for the
- * long-form rationale, originally from `global-homepage/Proven.astro`.
- *
- * The row icons use the matching Norway regional icon assets.
  */
 interface Row {
     icon: string;
@@ -27,33 +18,44 @@ interface Row {
 
 const rows: Row[] = [
     {
-        icon: "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6ae983a756356f1fc861b4f3_icon-1.png",
-        label: "Transmission model",
-        desc: "Post-audit. Invoices delivered directly to buyers — no BIR clearance required.",
+        icon: "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6b05836943c475e5a4f998b9_life-1.png",
+        label: "Invoice Arrival and Capture",
+        desc: "Supplier mail and PDFs | eInvoices from tax portals | POs and goods receipts from ERP | Replies from suppliers and approvers",
     },
     {
-        icon: "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6ae983c74f37fa62a4f1ac89_icon-2.png",
-        label: "Scope",
-        desc: "From 1 January 2027, bookkeeping-obliged businesses must issue structured electronic invoices for sales to other bookkeeping-obliged businesses. Digital bookkeeping and e-invoice reception will follow by January 2030, subject to the transitional rules.",
+        icon: "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6b05836ea5faddbd63413ecf_life-2.png",
+        label: "Agent Inbox",
+        desc: "Decides which downstream agent to invoke depending on the task. One task per invoice, mail or reply",
     },
     {
-        icon: "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6ae983d2269378bbc36b7570_icon-3.png",
-        label: "Invoice Format",
-        desc: "The B2B law requires a structured electronic sales document suitable for automated processing. EHF Fakturering 3.0 and Peppol BIS Billing 3.0 are established formats under Norway's public-procurement rules; detailed format requirements for the new B2B obligation are to be set in regulations.",
+        icon: "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6b0583747f9e423ab7cb8934_life-3.png",
+        label: "AP Agents",
+        desc: "Specific agents for Intake, Digitization, Validation, Matching, Compliance, Follow-up, Approvals, and Posting",
     },
     {
-        icon: "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6ae983d9c44ecae161b11250_icon-4.png",
-        label: "Check Your Recipient's eligibility",
-        desc: "Check whether your buyer is subject to Norwegian bookkeeping obligations and can receive structured e-invoices. ELMA registration is relevant to EHF/Peppol delivery, but does not treat absence from ELMA as an automatic legal exemption from the 2027 issuing rule without checking the applicable transitional rules.",
+        icon: "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6b05837a25a77eea6f06816b_life-4.png",
+        label: "Reviewer Agents",
+        desc: "Reviews the whole book every morning. Flags what is stuck, late or at risk, names an owner, and puts the AP agent back to work.",
+    },
+    {
+        icon: "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6b05838799a360c60d4523a1_life-5.png",
+        label: "Human Inbox",
+        desc: "Records exceptions. Flags to a human. Human in the loop (HITL): only what needs a decision",
     },
 ];
 ---
 
 <section class="bg-generic-00 py-16 lg:py-20" data-no-glance>
     <div class="w-full max-w-[var(--container-max)] mx-auto px-4 md:px-6">
-        <h2 class="m-0 mb-8 font-heading text-center font-medium text-vault-navy text-[length:var(--fs-h1)] leading-[length:var(--lh-h1)] tracking-[-0.5px] lg:mb-12">
-            Norway E-Invoicing Mandate at a glance
-        </h2>
+        <div class="text-center w-full mx-auto mb-8 md:mb-12">
+            <h2 class="m-0 mb-4 font-heading text-center font-medium text-vault-navy text-[length:var(--fs-h1)] leading-[length:var(--lh-h1)] tracking-[-0.5px] max-w-3xl mx-auto">
+                Everything you need to automate your entire invoice lifecycle
+            </h2>
+            <p class="m-0 font-body text-[length:var(--fs-body)] md:text-[length:var(--fs-body-lg)] leading-[length:var(--lh-body)] md:leading-[length:var(--lh-body-lg)] text-neutral-500 font-normal mx-auto">
+                From data ingestion, to your business logic, and validation
+                rules - all in one place
+            </p>
+        </div>
 
         <div class="flex flex-col">
             {rows.map((row, i) => (
@@ -66,11 +68,11 @@ const rows: Row[] = [
                     <div class="flex shrink-0 items-center gap-6 md:max-w-[434px] flex-1">
                         <img
                             src={row.icon}
-                            width="64"
-                            height="64"
+                            width="44"
+                            height="44"
                             alt=""
                             aria-hidden="true"
-                            class="no-glance-icon h-[64px] w-[64px] shrink-0 object-contain"
+                            class="no-glance-icon h-[44px] w-[44px] shrink-0 object-contain"
                         />
                         <span class="font-heading text-[length:var(--fs-h5)] leading-[length:var(--lh-h5)] font-medium text-vault-navy">
                             {row.label}
