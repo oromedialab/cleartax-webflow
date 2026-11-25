@@ -1,0 +1,127 @@
+---
+/**
+ * Thank-you confirmation — a centred card over a lime dot field. The card is
+ * the only content; the page has no footer.
+ *
+ * The background is the shared interactive `Dotgrid` (lime dots that stroke
+ * towards the cursor). Those dots are this screen's single Flux Lime use.
+ */
+import Dotgrid from "../_shared/Dotgrid.astro";
+
+const exploreHref = "https://www.cleartax.com";
+---
+
+<section
+    id="thankyou-hero"
+    class="relative flex min-h-screen items-center justify-center overflow-hidden bg-neutral-50 px-4 pt-32 pb-16 md:px-6 lg:pt-40"
+>
+    <Dotgrid containerId="thankyou-hero" />
+    <!-- Fade the field out at the top and towards the card -->
+    <div
+        class="pointer-events-none absolute inset-0 z-0 bg-[linear-gradient(180deg,_#FFF_0%,_rgba(255,255,255,0)_25%)]"
+    >
+    </div>
+
+    <div
+        class="relative z-10 flex w-full max-w-[490px] flex-col items-center rounded-3xl border border-neutral-300 bg-generic-00 px-4 py-8 text-center md:px-8 md:py-12"
+    >
+        <!-- Same 51px mark, rebuilt as strokes (ring r=24 + 3px line = the
+             original 3px outline) so the paths can be drawn on. -->
+        <svg
+            class="mb-4 ty-check"
+            width="51"
+            height="51"
+            viewBox="0 0 51 51"
+            fill="none"
+            aria-hidden="true"
+        >
+            <circle
+                class="ty-check-ring"
+                cx="25.5"
+                cy="25.5"
+                r="24"
+                pathLength="1"
+                stroke="#05022A"
+                stroke-width="3"
+                transform="rotate(-90 25.5 25.5)"></circle>
+            <path
+                class="ty-check-tick"
+                d="M15.5 27.5l6 6 14-14"
+                pathLength="1"
+                stroke="#5446FF"
+                stroke-width="3"
+                stroke-linecap="round"
+                stroke-linejoin="round"></path>
+        </svg>
+
+
+        <h1
+            class="m-0 font-heading font-semibold text-vault-navy text-[length:var(--fs-h2)] leading-[length:var(--lh-h2)] tracking-[-0.5px]"
+        >
+            Thank you!
+        </h1>
+        <p
+            class="m-0 mb-1 font-body font-normal text-vault-navy text-[length:var(--fs-body-lg)] leading-[length:var(--lh-body-lg)]"
+        >
+            Your request has been received.
+        </p>
+        <p
+            class="m-0 mb-6 max-w-full font-body font-normal text-neutral-500 text-[length:var(--fs-body-sm)] leading-[length:var(--lh-body-sm)]"
+        >
+            One of our compliance experts will reach out to you shortly with tailored guidance for your compliance and e-invoicing needs.
+        </p>
+
+        <a
+            href={exploreHref}
+            class="inline-flex items-center justify-center gap-1.5 rounded-lg border border-nova-blue bg-nova-blue px-6 py-2.5 shadow-[0_1px_2px_0_rgba(16,24,40,0.04),0_1px_2px_0_rgba(16,24,40,0.04)] font-body text-[length:var(--fs-body)] leading-[length:var(--lh-body)] font-medium text-generic-00 no-underline transition-colors duration-200 hover:border-nova-blue hover:bg-generic-00 hover:text-nova-blue"
+        >
+            Explore ClearTax
+        </a>
+
+        <p
+            class="m-0 mt-6 font-body text-neutral-400 text-[length:var(--fs-body-xs)] leading-[length:var(--lh-body-xs)]"
+        >
+            © 2026 ClearTax · Trusted by 6000+ global enterprises
+        </p>
+    </div>
+</section>
+
+<style is:global>
+    /* Ring draws, tick draws, then the whole mark bounces once. */
+    .ty-check {
+        overflow: visible;
+        animation: ty-check-bounce 0.5s ease-in-out 1s;
+    }
+    .ty-check-ring,
+    .ty-check-tick {
+        /* 1.02, not 1: a dash of exactly the path length leaves a hairline
+           gap where the ring closes. */
+        stroke-dasharray: 1.02;
+        stroke-dashoffset: 1.02;
+        animation: ty-check-draw 0.7s ease-out forwards;
+    }
+    .ty-check-tick {
+        animation-duration: 0.4s;
+        animation-delay: 0.6s;
+    }
+    @keyframes ty-check-draw {
+        to {
+            stroke-dashoffset: 0;
+        }
+    }
+
+    @keyframes ty-check-bounce {
+        50% {
+            transform: scale(1.15);
+        }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        .ty-check,
+        .ty-check-ring,
+        .ty-check-tick {
+            animation: none !important;
+            stroke-dashoffset: 0;
+        }
+    }
+</style>
