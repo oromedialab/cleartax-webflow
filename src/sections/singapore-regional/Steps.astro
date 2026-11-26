@@ -2,17 +2,71 @@
 /**
  * "Build your InvoiceNow readiness plan in five steps" — Singapore regional page.
  *
- * A vertical numbered stepper of 5 cards connected by a hairline.
- * Clicking a card sets the open set to end there. The connecting hairline fills
- * cumulatively to match, reading as a progress bar.
+ * Implements sticky horizontal scroll container matching regional specs:
+ * - Section pins to viewport as reader scrolls down the page
+ * - Translates horizontal track smoothly across the 5 implementation step cards
+ * - Blue connecting progress line connects all cards together and fills dynamically with scroll progress
  */
+
 interface Step {
+  number: number;
+  title: string;
+  bullets: string[];
+}
+
+const steps: Step[] = [
+  {
+    number: 1,
+    title: "Confirm your entities and implementation phase",
+    bullets: [
+      "Check GST registration status, the relevant application date, the 2025 supplies measure and any IRAS exclusions.",
+      "Map the requirement to each GST registration in Singapore. Entities registered on their own can fall into different phases, while members of a GST group follow the group’s phase.",
+    ],
+  },
+  {
+    number: 2,
+    title: "Choose the connection approach",
+    bullets: [
+      "Check whether your finance solution is InvoiceNow-ready.",
+      "Businesses using in-house enterprise systems can work with an IMDA-accredited Access Point Provider to establish connectivity. Register with your UEN and obtain a Peppol ID.",
+    ],
+  },
+  {
+    number: 3,
+    title: "Prepare sales and purchase data",
+    bullets: [
+      "Review master data, invoice references, credit notes and GST treatment.",
+      "Map your internal tax codes to the prescribed IRAS GST category codes. Identify how required off-network invoice data will enter the submission workflow.",
+    ],
+  },
+  {
+    number: 4,
+    title: "Enable reporting and test end-to-end",
+    bullets: [
+      "Enable the GST InvoiceNow submission feature and test successful transmission to IRAS—not only delivery to the customer.",
+      "Include required sales, purchase and credit-note scenarios in your testing.",
+    ],
+  },
+  {
+    number: 5,
+    title: "Reconcile and maintain your GST controls",
+    bullets: [
+      "Assign owners for exceptions, reporting deadlines and reconciliation.",
+      "Continue filing GST returns and keeping the required business records; InvoiceNow does not replace those obligations. [S1, S2]",
+    ],
+  },
+];
+
+/* ============================================================================
+   PREVIOUS VERTICAL ACCORDION IMPLEMENTATION DATA (Preserved for rollback)
+   ============================================================================
+interface PrevStep {
   no: string;
   heading: string;
   body: string;
 }
 
-const steps: Step[] = [
+const prevSteps: PrevStep[] = [
   {
     no: "01",
     heading: "Confirm your entities and implementation phase",
@@ -39,7 +93,213 @@ const steps: Step[] = [
     body: "Assign owners for exceptions, reporting deadlines and reconciliation. Continue filing GST returns and keeping the required business records; InvoiceNow does not replace those obligations. [S1, S2]",
   },
 ];
+============================================================================ */
 ---
+
+<div class="sa-steps-sticky-container bg-generic-00 relative">
+  <section
+    class="sticky top-0 flex flex-col justify-center bg-generic-00 py-12 md:py-16 xl:py-20 overflow-hidden min-h-[calc(100vh-80px)]"
+    id="sa-steps"
+  >
+    <div class="max-w-[var(--container-max)] mx-auto w-full px-4 md:px-6">
+      <!-- Header -->
+      <div class="sa-steps-header-wrapper text-center mx-auto mb-8 md:mb-12">
+        <h2 class="m-0 font-heading max-w-215 mx-auto font-medium text-vault-navy text-[length:var(--fs-h2)] md:text-[length:var(--fs-h1)] leading-[length:var(--lh-h2)] md:leading-[length:var(--lh-h1)] tracking-[-0.5px] mb-3 sm:mb-4">
+          Build your InvoiceNow readiness plan in five steps
+        </h2>
+      </div>
+
+      <!-- Cards Track with Connecting Progress Line -->
+      <div class="w-full h-auto relative">
+        <div class="sa-steps-scroll-track flex items-stretch gap-6 md:gap-8 w-max transition-transform duration-[200ms] ease-out will-change-transform relative py-2">
+          <!-- Connecting Progress Line between the cards -->
+          <div
+            class="hidden md:block absolute top-[160px] left-16 right-16 h-[2.5px] bg-neutral-200 z-0 pointer-events-none rounded-full overflow-hidden"
+            aria-hidden="true"
+          >
+            <div
+              class="sa-steps-progress-fill h-full bg-nova-blue rounded-full transition-all duration-150 ease-out"
+              style="width: 10%;"
+            ></div>
+          </div>
+
+          <!-- 5 Implementation Step Cards -->
+          {steps.map((step) => (
+            <div class="sa-steps-card-item relative z-10 w-[320px] sm:w-[360px] md:w-[380px] lg:w-[478px] shrink-0 rounded-2xl border border-neutral-300 bg-generic-00 flex flex-col justify-start min-h-[317px] select-none overflow-hidden transition-all duration-200">
+              <!-- Card Header (spans full width above divider) -->
+              <div class="p-6 pb-6 border-b border-neutral-200 bg-generic-00 w-full">
+                <!-- Step Badge -->
+                <div class="w-8 h-8 rounded-lg border border-neutral-300 flex items-center justify-center font-heading font-medium text-neutral-500 text-[length:var(--fs-body-xs)] leading-[length:var(--lh-body-xs)] shrink-0 bg-[#FBFBFC]">
+                  {step.number}
+                </div>
+
+                <!-- Step Title (16px margin from top number, 20px font size) -->
+                <h3 class="m-0 font-heading font-medium text-vault-navy text-[length:var(--fs-h6)] leading-[length:var(--lh-h6)] mt-4 min-h-[24px]">
+                  {step.title}
+                </h3>
+              </div>
+
+              <!-- Card Body: Bullet Points (14px font size) -->
+              <div class="p-6 pt-6 flex-1 flex flex-col w-full">
+                <ul class="m-0 p-0 list-none space-y-4 flex-1">
+                  {step.bullets.map((bullet) => (
+                    <li class="flex items-start gap-2.5 font-body font-normal text-neutral-500 text-[length:var(--fs-body-sm)] leading-[length:var(--lh-body-sm)]">
+                      <span
+                        class="w-1 h-1 rounded-full bg-neutral-400 shrink-0 mt-2"
+                        aria-hidden="true"
+                      ></span>
+                      <span>{bullet}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<style is:global>
+  @media (max-height: 750px) {
+    .sa-steps-sticky-container section {
+      padding-top: var(--spacing-big, 1.25rem) !important;
+      padding-bottom: var(--spacing-big, 1.25rem) !important;
+    }
+    .sa-steps-header-wrapper {
+      margin-bottom: var(--spacing-md, 1rem) !important;
+    }
+    .sa-steps-card-item {
+      min-height: 315px !important;
+    }
+  }
+</style>
+
+<script is:inline>
+  (function () {
+    function initSingaporeSteps() {
+      const containers = document.querySelectorAll(
+        ".sa-steps-sticky-container",
+      );
+      if (!containers.length) return;
+
+      containers.forEach((container) => {
+        const track = container.querySelector(".sa-steps-scroll-track");
+        const section = container.querySelector("section");
+        const progressFill = container.querySelector(".sa-steps-progress-fill");
+        if (!container || !track || !section) return;
+
+        const getHeaderHeight = () => {
+          const header = document.querySelector("header, .navbar, .w-nav");
+          return header ? header.offsetHeight : 80;
+        };
+
+        let maxTranslate = 0;
+        let totalScrollable = 0;
+        let stickyTop = 0;
+
+        const updateMeasurements = () => {
+          const sectionHeight = section.offsetHeight;
+          const windowHeight = window.innerHeight;
+          const headerHeight = getHeaderHeight();
+
+          const trackOffset =
+            track.parentElement.getBoundingClientRect().top -
+            section.getBoundingClientRect().top;
+          const trackHeight = track.offsetHeight;
+          const availableSpace = windowHeight - headerHeight;
+
+          const idealTrackTop =
+            headerHeight + Math.max(40, (availableSpace - trackHeight) / 2);
+          let calculatedTop = idealTrackTop - trackOffset;
+
+          stickyTop = Math.min(headerHeight, calculatedTop);
+          section.style.top = `${stickyTop}px`;
+
+          const containerWidth =
+            track.parentElement.getBoundingClientRect().width;
+          maxTranslate = Math.max(0, track.scrollWidth - containerWidth);
+          container.style.height = `${maxTranslate + windowHeight}px`;
+          totalScrollable =
+            container.getBoundingClientRect().height - sectionHeight;
+        };
+
+        updateMeasurements();
+
+        if (window.ResizeObserver) {
+          const ro = new ResizeObserver(updateMeasurements);
+          ro.observe(section);
+          ro.observe(track);
+        }
+        window.addEventListener("resize", updateMeasurements);
+
+        let ticking = false;
+
+        const handleScroll = () => {
+          if (!ticking) {
+            window.requestAnimationFrame(() => {
+              const containerRect = container.getBoundingClientRect();
+              const scrolledDistance = Math.max(
+                0,
+                stickyTop - containerRect.top,
+              );
+
+              let progress =
+                totalScrollable > 0 ? scrolledDistance / totalScrollable : 0;
+              progress = Math.max(0, Math.min(1, progress));
+
+              track.style.transform = `translate3d(-${progress * maxTranslate}px, 0, 0)`;
+
+              if (progressFill) {
+                // Progress bar fills proportionally from 10% to 100% as you scroll through all 5 cards
+                const fillPercent = 10 + progress * 90;
+                progressFill.style.width = `${fillPercent}%`;
+              }
+
+              ticking = false;
+            });
+            ticking = true;
+          }
+        };
+
+        const observer = new IntersectionObserver(
+          (entries) => {
+            entries.forEach((entry) => {
+              if (entry.isIntersecting) {
+                window.addEventListener("scroll", handleScroll, {
+                  passive: true,
+                });
+                handleScroll();
+              } else {
+                window.removeEventListener("scroll", handleScroll);
+              }
+            });
+          },
+          {
+            rootMargin: "100% 0px 100% 0px",
+          },
+        );
+
+        observer.observe(container);
+      });
+    }
+
+    if (document.readyState === "loading") {
+      document.addEventListener("DOMContentLoaded", initSingaporeSteps);
+    } else {
+      initSingaporeSteps();
+    }
+  })();
+</script>
+
+{/*
+===============================================================================
+PREVIOUS VERTICAL ACCORDION IMPLEMENTATION (COMMENTED OUT FOR ROLLBACK)
+To restore:
+1. Replace current steps array with prevSteps in frontmatter.
+2. Uncomment the markup, style, and script below and replace current section above.
+===============================================================================
 
 <section
   class="sa-steps-bg relative overflow-hidden bg-generic-00 py-16 lg:py-20"
@@ -64,7 +324,7 @@ const steps: Step[] = [
       data-sa-steps
     >
       {
-        steps.map((step, i) => (
+        prevSteps.map((step, i) => (
           <>
             <div
               class={`sa-steps-item flex gap-4 rounded-xl bg-generic-00 border-2 ${i === 0 ? "border-nova-blue sa-steps-open" : "border-neutral-300"} p-4`}
@@ -93,7 +353,7 @@ const steps: Step[] = [
                 </span>
               </button>
             </div>
-            {i < steps.length - 1 && (
+            {i < prevSteps.length - 1 && (
               <div
                 class="sa-steps-connector mx-auto h-10 w-0.5 bg-neutral-300"
                 data-sa-steps-connector
@@ -215,3 +475,4 @@ const steps: Step[] = [
     window.addEventListener("scroll", onScroll, { passive: true });
   })();
 </script>
+=============================================================================== */}
