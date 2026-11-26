@@ -3,6 +3,9 @@
  * Mandates at a glance — Figma node 19809:56131. Country chips are grouped by
  * the status Tracker.astro publishes; clicking one opens its dialog.
  *
+ * The timeline track fills with Vault Navy as the page scrolls: the script
+ * sets --gmt-draw (0–1) on each stage's track.
+ *
  * The 3D globe (markup, styles, script) is a copy of the one in
  * global-homepage/Einvoicing.astro.
  */
@@ -44,11 +47,11 @@ const groups = [
                 </div>
             </div>
             <ol class="m-0 flex list-none flex-col p-0">
-                {groups.map((g, i) => (
+                {groups.map((g) => (
                     <li class="group flex gap-4 md:gap-6">
-                        <div class="flex w-4 shrink-0 flex-col items-center pt-1.5" aria-hidden="true">
-                            <span class={`size-4 shrink-0 rounded-sm ${["bg-vault-navy", "bg-neutral-300", "bg-neutral-200", "bg-neutral-100"][i]}`}></span>
-                            <span class={`w-[3px] flex-1 ${["bg-vault-navy", "bg-neutral-300", "bg-neutral-200", "bg-neutral-100"][i]}`}></span>
+                        <div class="flex w-4 shrink-0 flex-col items-center pt-1.5" aria-hidden="true" data-gmt-track>
+                            <span class="gmt-track-dot relative size-4 shrink-0 rounded-sm bg-neutral-200"></span>
+                            <span class="gmt-track-line relative w-[3px] flex-1 bg-neutral-200"></span>
                         </div>
                         <div class="flex min-w-0 flex-1 flex-col gap-3 pb-12 group-last:pb-0">
                             <h3 class="m-0 font-heading font-medium text-vault-navy text-[length:var(--fs-h6)] leading-[length:var(--lh-h6)]">{g.title}</h3>
@@ -78,6 +81,33 @@ const groups = [
             radial-gradient(circle, var(--color-nova-200) 1.5px, transparent 2px);
         background-size: 100% 100%, 26px 26px;
     }
+    /* Navy overlay on the timeline track, driven by --gmt-draw. */
+    .gmt-track-dot::after,
+    .gmt-track-line::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        border-radius: inherit;
+        background: var(--color-vault-navy);
+        transition:
+            opacity 0.4s ease-out,
+            transform 0.4s ease-out;
+    }
+    .gmt-track-dot::after {
+        opacity: min(1, calc(var(--gmt-draw, 0) * 4));
+    }
+    .gmt-track-line::after {
+        transform: scaleY(var(--gmt-draw, 0));
+        transform-origin: top;
+        opacity: calc(0.3 + var(--gmt-draw, 0) * 0.7);
+    }
+    @media (prefers-reduced-motion: reduce) {
+        .gmt-track-dot::after,
+        .gmt-track-line::after {
+            transition: none;
+        }
+    }
+
   /* Crossfade between the poster <img> (default fallback) and the
      Three.js canvas stage (enhancement, mounted lazily by script). */
   .gmt-globe-poster {
@@ -191,8 +221,33 @@ const groups = [
                 });
             });
         }
+        /* Each stage fills as it passes a line 65% down the viewport. */
+        var tracks = root.querySelectorAll("[data-gmt-track]");
+        var still = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+        var queued = false;
+        function draw() {
+            queued = false;
+            var mark = window.innerHeight * 0.65;
+            tracks.forEach(function (track) {
+                var box = track.getBoundingClientRect();
+                var done = still ? 1 : Math.min(1, Math.max(0, (mark - box.top) / box.height));
+                track.style.setProperty("--gmt-draw", done.toFixed(3));
+            });
+        }
+        function queue() {
+            if (queued) return;
+            queued = true;
+            requestAnimationFrame(draw);
+        }
+        window.addEventListener("scroll", queue, { passive: true });
+        window.addEventListener("resize", queue);
+        queue();
+
         if (window.gmtRows) paint(window.gmtRows);
-        document.addEventListener("gmt:data", function (e) { paint(e.detail); });
+        document.addEventListener("gmt:data", function (e) {
+            paint(e.detail);
+            queue();
+        });
     })();
 </script>
 
