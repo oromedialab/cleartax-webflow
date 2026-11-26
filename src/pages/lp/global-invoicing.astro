@@ -1,0 +1,216 @@
+---
+/**
+ * Global E-Invoicing landing page (LP) — brand v2.
+ *
+ * Based on src/pages/global-invoicing.astro, with a HubSpot form in the hero and
+ * without the logo strip or the bottom form section. Every other section is imported from
+ * src/sections/global-invoicing/, so an edit there changes both pages.
+ */
+import "../../styles/shared.css";
+import "../../styles/.build/lp-global-invoicing.css";
+
+import Navbar from "../../sections/global-invoicing/Navbar.astro";
+import Hero from "../../sections/lp/global-invoicing/Hero.astro";
+import Platform from "../../sections/global-invoicing/Platform.astro";
+import Mandate from "../../sections/global-invoicing/Mandate.astro";
+import Seamless from "../../sections/global-invoicing/Seamless.astro";
+import Testimonials from "../../sections/global-invoicing/Testimonials.astro";
+import Faq from "../../sections/global-invoicing/Faq.astro";
+import Footer from "../../sections/global-invoicing/Footer.astro";
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Global E-Invoicing Compliance Software | ClearTax</title>
+    <meta
+      name="description"
+      content="Automate e-invoicing compliance across 50+ countries with ClearTax's single API — Peppol, ZATCA, FTA and more, backed by 2,000+ ERP integrations."
+    />
+    <meta name="robots" content="noindex, follow" />
+    <meta property="og:title" content="Global E-Invoicing Compliance Software | ClearTax" />
+    <meta
+      property="og:description"
+      content="Automate e-invoicing compliance across 50+ countries with ClearTax's single API — Peppol, ZATCA, FTA and more, backed by 2,000+ ERP integrations."
+    />
+    <meta property="og:type" content="website" />
+    <!-- Placeholder — swap for a branded 1200x630 OG banner uploaded to Webflow assets before launch. -->
+    <meta property="og:image" content="https://img.youtube.com/vi/UX0Yt61EdfY/maxresdefault.jpg" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Global E-Invoicing Compliance Software | ClearTax" />
+    <meta
+      name="twitter:description"
+      content="Automate e-invoicing compliance across 50+ countries with ClearTax's single API — Peppol, ZATCA, FTA and more, backed by 2,000+ ERP integrations."
+    />
+    <meta name="twitter:image" content="https://img.youtube.com/vi/UX0Yt61EdfY/maxresdefault.jpg" />
+    <link
+      rel="shortcut icon"
+      type="image/png"
+      href="https://cdn.prod.website-files.com/63ede4a3da6dbd6b05c4612f/63ede4a3da6dbd7162c46439_32by32.png"
+    />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="32x32"
+      href="https://cdn.prod.website-files.com/63ede4a3da6dbd6b05c4612f/63ede4a3da6dbd7162c46439_32by32.png"
+    />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="256x256"
+      href="https://cdn.prod.website-files.com/63ede4a3da6dbd6b05c4612f/63ede4a3da6dbd8997c46450_256by256.png"
+    />
+    <link
+      rel="apple-touch-icon"
+      href="https://cdn.prod.website-files.com/63ede4a3da6dbd6b05c4612f/63ede4a3da6dbd8997c46450_256by256.png"
+    />
+    <!-- Navbar wordmark (blur-up placeholder + full logo, both fetchpriority=high,
+         see NavbarRb.astro) and the favicons above all load from this origin.
+         Without this, the very first above-the-fold image pays a cold
+         DNS+TLS round trip before the browser can even request it. -->
+    <link rel="preconnect" href="https://cdn.prod.website-files.com" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <!-- One request for both families instead of two — each is a separate
+         render-blocking round trip to fonts.googleapis.com. Inter is also
+         narrowed to the only weights this page actually sets on font-body
+         text (400/500/600, never italic) instead of the full variable axis
+         (every weight 100-900, upright AND italic, opsz 14-32) — that full
+         axis was a single ~45KB file for three static weights.
+
+         Loaded via preload+swap instead of a plain <link rel="stylesheet">:
+         a stylesheet link blocks rendering until it's fetched, but this CSS
+         only supplies @font-face rules — nothing it contains is needed to
+         paint the page (font-display:swap already shows the fallback font
+         immediately). Preloading it, then flipping it to a stylesheet once
+         it arrives, takes it off the render-blocking critical path. -->
+    <link
+      rel="preload"
+      as="style"
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Inter+Tight:wght@400;500;600;700&display=swap"
+      onload="this.onload=null;this.rel='stylesheet'"
+    />
+    <noscript>
+      <link
+        rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Inter+Tight:wght@400;500;600;700&display=swap"
+      />
+    </noscript>
+    <!-- 1. Usercentrics CMP — loads immediately, before anything else -->
+    <script is:inline>
+      (function () {
+        var blockScript = document.createElement("script");
+        blockScript.src = "https://web.cmp.usercentrics.eu/modules/autoblocker.js";
+        document.head.appendChild(blockScript);
+
+        var cmpScript = document.createElement("script");
+        cmpScript.id = "usercentrics-cmp";
+        cmpScript.src = "https://web.cmp.usercentrics.eu/ui/loader.js";
+        cmpScript.setAttribute("data-settings-id", "utqqyaEbvbzrTk");
+        cmpScript.async = true;
+        document.head.appendChild(cmpScript);
+      })();
+    </script>
+
+    <!-- 2. GTM — loads only after the visitor responds to the consent banner -->
+    <script is:inline>
+      (function () {
+        function loadGTM() {
+          (function (w, d, s, l, i) {
+            w[l] = w[l] || [];
+            w[l].push({ "gtm.start": new Date().getTime(), event: "gtm.js" });
+            var f = d.getElementsByTagName(s)[0],
+              j = d.createElement(s),
+              dl = l != "dataLayer" ? "&l=" + l : "";
+            j.async = true;
+            j.src = "https://www.googletagmanager.com/gtm.js?id=" + i + dl;
+            f.parentNode.insertBefore(j, f);
+          })(window, document, "script", "dataLayer", "GTM-P5NDQXGH");
+        }
+
+        window.addEventListener("UC_UI_CMP_EVENT", function (event) {
+          if (
+            event.detail &&
+            ["ACCEPT_ALL", "DENY_ALL", "SAVE"].indexOf(event.detail.type) !== -1
+          ) {
+            loadGTM();
+          }
+        });
+      })();
+    </script>
+
+    <!-- Anchor links: smooth scroll and clean the URL hash -->
+    <script is:inline>
+      (function () {
+        // Clean URL hash on anchor link clicks & initial landing
+        const setupHashCleaner = () => {
+          try {
+            document.querySelectorAll('a[href^="#"]').forEach((anchor) => {
+              anchor.addEventListener("click", function (e) {
+                const targetId = this.getAttribute("href");
+                if (targetId === "#") return;
+                const targetElement = document.querySelector(targetId);
+                if (targetElement) {
+                  e.preventDefault();
+                  targetElement.scrollIntoView({ behavior: "smooth" });
+                  history.pushState(
+                    null,
+                    document.title,
+                    window.location.pathname + window.location.search,
+                  );
+                }
+              });
+            });
+
+            if (window.location.hash) {
+              setTimeout(() => {
+                history.replaceState(
+                  null,
+                  document.title,
+                  window.location.pathname + window.location.search,
+                );
+              }, 1000);
+            }
+          } catch (e) {
+            console.error("Anchor hash handler failed", e);
+          }
+        };
+
+        if (document.readyState === "loading") {
+          document.addEventListener("DOMContentLoaded", setupHashCleaner);
+        } else {
+          setupHashCleaner();
+        }
+      })();
+    </script>
+    <!-- Preconnect to HubSpot CDNs -->
+    <link rel="preconnect" href="https://js-na2.hsforms.net" />
+    <link rel="preconnect" href="https://forms.hsforms.com" />
+    <link rel="preconnect" href="https://forms-na2.hsforms.com" />
+
+    <!-- HubSpot Embed Script -->
+    <script is:inline src="https://js-na2.hsforms.net/forms/embed/v2.js"
+    ></script>
+  </head>
+  <body class="bg-generic-00">
+    <!-- Google Tag Manager (noscript) -->
+    <noscript
+      ><iframe
+        src="https://www.googletagmanager.com/ns.html?id=GTM-P5NDQXGH"
+        height="0"
+        width="0"
+        style="display:none;visibility:hidden"></iframe></noscript
+    >
+    <!-- End Google Tag Manager (noscript) -->
+    <Navbar />
+    <Hero />
+    <Platform />
+    <Mandate />
+    <Seamless />
+    <Testimonials />
+    <Faq />
+    <Footer />
+  </body>
+</html>

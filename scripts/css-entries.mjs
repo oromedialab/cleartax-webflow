@@ -33,6 +33,7 @@ export const PAGE_TARGETS = [
   { name: 'v1-blog', input: 'src/styles/v1-blog.css', page: 'src/pages/v1-blog.astro' },
   { name: 'v1-global-invoicing-delivery', input: 'src/styles/v1-global-invoicing-delivery.css', page: 'src/pages/v1-global-invoicing-delivery.astro' },
   { name: 'global-invoicing', input: 'src/styles/global-invoicing.css', page: 'src/pages/global-invoicing.astro' },
+  { name: 'lp-global-invoicing', input: 'src/styles/lp-global-invoicing.css', page: 'src/pages/lp/global-invoicing.astro' },
   { name: 'blog-listing', input: 'src/styles/blog-listing.css', page: 'src/pages/blog-listing.astro' },
   // Detail route. It uses no utilities beyond `container` — the design is
   // element selectors in blog-detail.css so a Webflow Rich Text body styles
