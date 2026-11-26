@@ -2,14 +2,11 @@
 /**
  * "How ClearTax gets you on Peppol in Australia"
  *
- * Feature cards with accordion expansion:
- * - On desktop (md+): Top cards in each column (cards 0 and 1) start open by default.
- * - On mobile (< md): All cards start closed and only open when clicked.
- * - Cards 2, 3, 4, 5, 6 start closed and only open when clicked.
- * - Clicking a card toggles it open/closed (and closes any open sibling in the same column).
- * - Plus icon rotates to a minus when open.
+ * Feature cards in a 2-column grid, the last spanning both columns.
+ * Clicking a card opens a detail overlay dialog showing that card's title,
+ * image and body text.
  *
- * Ids are `no-features-` prefixed.
+ * Ids and data attributes are `au-platform-` prefixed.
  */
 interface Feature {
     title: string;
@@ -22,22 +19,22 @@ const features: Feature[] = [
     {
         title: "Send and receive on Peppol",
         body: "Exchange PINT A-NZ invoices and credit notes with any business or government agency on the Peppol network through our Access Point accredited to operate in Australia. Your ABN is registered once, and archiving runs in the same flow.",
-        image: "/images/australia-regional/aus-1.png",
+        image: "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6b0822a7963ccc2d2baf89c1_aus-1.png",
     },
     {
         title: "Get paid faster by government",
         body: "Send e-invoices to Peppol-enabled government agencies; under the current policy, eligible e-invoices to non-corporate Commonwealth entities have a 5-calendar-day payment term once the policy conditions are met. Track each invoice from sent to paid, so AR knows what's coming in.",
-        image: "/images/australia-regional/aus-2.png",
+        image: "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6b0822bbaa9323b2c1882785_aus-2.png",
     },
     {
         title: "Catch errors before your buyer does",
         body: "AI-powered checks validate every PINT A-NZ field, ABN and GST value before an invoice leaves your ERP. Fewer rejections, fewer disputes and faster payments.",
-        image: "/images/australia-regional/aus-3.png",
+        image: "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6b0822d90998cb42700c5b6a_aus-3.png",
     },
     {
         title: "AP that runs itself",
         body: "Receive supplier e-invoices, match them to purchase orders and post them to your ERP without keying anything in. Approval workflows and a single dashboard show what's stuck and why, before month-end close.",
-        image: "/images/australia-regional/aus-4.png",
+        image: "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6b0822eeaa7f97937ada6a07_aus-4.png",
     },
     {
         title: "Integrates with any ERP or POS",
@@ -47,7 +44,7 @@ const features: Feature[] = [
     {
         title: "Australia today. Every mandate you face next.",
         body: "One platform and one API for 50+ countries. Your Australian entities reuse the same integration as your entities in the EU, the Middle East and Asia, where e-invoicing is already mandatory.",
-        image: "/images/australia-regional/aus-6.png",
+        image: "https://cdn.prod.website-files.com/69fda2cd307dcc6cf810e935/6b0822f29dcce88b966374f0_aus-6.png",
     },
     {
         title: "Clean books and expert support",
@@ -61,513 +58,271 @@ const features: Feature[] = [
 <section class="bg-generic-00 py-16 lg:py-20">
     <div class="w-full max-w-[var(--container-max)] mx-auto px-4 md:px-6">
         <div class="mx-auto mb-8 flex flex-col items-center gap-4 text-center lg:mb-12">
-            <h2 class="m-0 max-w-141 font-heading font-medium text-vault-navy text-[length:var(--fs-h1)] leading-[length:var(--lh-h1)] tracking-[-0.5px]">
+            <h2 class="m-0 max-w-[620px] font-heading font-medium text-vault-navy text-[length:var(--fs-h1)] leading-[length:var(--lh-h1)] tracking-[-0.5px]">
                 How ClearTax gets you on Peppol in Australia
             </h2>
-            <p class="m-0 max-w-147 font-body text-[length:var(--fs-body)] leading-[length:var(--lh-body)] text-neutral-500">
+            <p class="m-0 max-w-[1020px] font-body text-[length:var(--fs-body)] leading-[length:var(--lh-body)] text-neutral-500">
                 One Peppol platform to create, validate, send, receive and
                 archive every invoice, connected to your ERP and the rest of
                 your global footprint.
             </p>
         </div>
 
-        {/* Two independent columns so expanding one card doesn't push the adjacent column */}
-        <div class="flex flex-col gap-6 md:flex-row">
-            {/* Left column: cards 0, 2, 4 */}
-            <div class="flex flex-1 flex-col gap-6">
-                {features
-                    .filter((f) => !f.span2)
-                    .filter((_, idx) => idx % 2 === 0)
-                    .map((f) => {
-                        const i = features.indexOf(f);
-                        const isDefaultOpen = i === 0;
-                        return (
-                            <div
-                                class="flex flex-col"
-                                data-no-features-card={i}
-                            >
-                                <button
-                                    type="button"
-                                    class="group flex w-full cursor-pointer items-center justify-between gap-6 rounded-xl border border-neutral-300 bg-generic-00 p-6 text-left transition-all duration-150 ease-in-out"
-                                    data-no-features-toggle={i}
-                                    data-default-open={
-                                        isDefaultOpen ? "true" : undefined
-                                    }
-                                    aria-expanded="false"
-                                >
-                                    <span class="font-heading text-[length:var(--fs-h6)] leading-[length:var(--lh-h6)] font-medium text-vault-navy md:min-h-[56px] flex items-center">
-                                        {f.title}
-                                    </span>
-                                    <svg
-                                        width="24"
-                                        height="24"
-                                        viewBox="0 0 24 24"
-                                        fill="none"
-                                        class="shrink-0 text-vault-navy transition-colors duration-150 ease-in-out"
-                                        aria-hidden="true"
-                                        focusable="false"
-                                        data-no-features-icon={i}
-                                        data-default-open={
-                                            isDefaultOpen ? "true" : undefined
-                                        }
-                                    >
-                                        <path
-                                            d="M5 12H19"
-                                            stroke="currentColor"
-                                            stroke-width="1.5"
-                                            stroke-linecap="round"
-                                            stroke-linejoin="round"
-                                        />
-                                        <path
-                                            d="M12 5V19"
-                                            stroke="currentColor"
-                                            stroke-width="1.5"
-                                            stroke-linecap="round"
-                                            stroke-linejoin="round"
-                                            data-no-features-vertical={i}
-                                            data-default-open={
-                                                isDefaultOpen
-                                                    ? "true"
-                                                    : undefined
-                                            }
-                                        />
-                                    </svg>
-                                </button>
-                                <div
-                                    class="no-features-content grid overflow-hidden rounded-b-xl border border-t-0 border-neutral-300 bg-generic-00 transition-[grid-template-rows,opacity,border-color] duration-300 ease-in-out flex-1"
-                                    data-no-features-content={i}
-                                    data-default-open={
-                                        isDefaultOpen ? "true" : undefined
-                                    }
-                                    data-open="false"
-                                >
-                                    <div class="overflow-hidden h-full flex flex-col justify-between">
-                                        <div class="p-6 pt-0 flex-1 flex flex-col justify-between">
-                                            <div class="mt-4 w-full">
-                                                <img
-                                                    src={f.image}
-                                                    alt={f.title}
-                                                    class="aspect-[574/323] w-full rounded-lg bg-visual-placeholder object-cover"
-                                                    loading="lazy"
-                                                />
-                                            </div>
-                                            <p class="m-0 mt-4 font-body font-normal text-neutral-500 text-[length:var(--fs-body)] leading-[length:var(--lh-body)] md:min-h-[192px] lg:min-h-[144px]">
-                                                {f.body}
-                                            </p>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        );
-                    })}
-            </div>
-            {/* Right column: cards 1, 3, 5 */}
-            <div class="flex flex-1 flex-col gap-6">
-                {features
-                    .filter((f) => !f.span2)
-                    .filter((_, idx) => idx % 2 === 1)
-                    .map((f) => {
-                        const i = features.indexOf(f);
-                        const isDefaultOpen = i === 1;
-                        return (
-                            <div
-                                class="flex flex-col"
-                                data-no-features-card={i}
-                            >
-                                <button
-                                    type="button"
-                                    class="group flex w-full cursor-pointer items-center justify-between gap-6 rounded-xl border border-neutral-300 bg-generic-00 p-6 text-left transition-all duration-150 ease-in-out"
-                                    data-no-features-toggle={i}
-                                    data-default-open={
-                                        isDefaultOpen ? "true" : undefined
-                                    }
-                                    aria-expanded="false"
-                                >
-                                    <span class="font-heading text-[length:var(--fs-h6)] leading-[length:var(--lh-h6)] font-medium text-vault-navy md:min-h-[56px] flex items-center">
-                                        {f.title}
-                                    </span>
-                                    <svg
-                                        width="24"
-                                        height="24"
-                                        viewBox="0 0 24 24"
-                                        fill="none"
-                                        class="shrink-0 text-vault-navy transition-colors duration-150 ease-in-out"
-                                        aria-hidden="true"
-                                        focusable="false"
-                                        data-no-features-icon={i}
-                                        data-default-open={
-                                            isDefaultOpen ? "true" : undefined
-                                        }
-                                    >
-                                        <path
-                                            d="M5 12H19"
-                                            stroke="currentColor"
-                                            stroke-width="1.5"
-                                            stroke-linecap="round"
-                                            stroke-linejoin="round"
-                                        />
-                                        <path
-                                            d="M12 5V19"
-                                            stroke="currentColor"
-                                            stroke-width="1.5"
-                                            stroke-linecap="round"
-                                            stroke-linejoin="round"
-                                            data-no-features-vertical={i}
-                                            data-default-open={
-                                                isDefaultOpen
-                                                    ? "true"
-                                                    : undefined
-                                            }
-                                        />
-                                    </svg>
-                                </button>
-                                <div
-                                    class="no-features-content grid overflow-hidden rounded-b-xl border border-t-0 border-neutral-300 bg-generic-00 transition-[grid-template-rows,opacity,border-color] duration-300 ease-in-out flex-1"
-                                    data-no-features-content={i}
-                                    data-default-open={
-                                        isDefaultOpen ? "true" : undefined
-                                    }
-                                    data-open="false"
-                                >
-                                    <div class="overflow-hidden h-full flex flex-col justify-between">
-                                        <div class="p-6 pt-0 flex-1 flex flex-col justify-between">
-                                            <div class="mt-4 w-full">
-                                                <img
-                                                    src={f.image}
-                                                    alt={f.title}
-                                                    class="aspect-[574/323] w-full rounded-lg bg-visual-placeholder object-cover"
-                                                    loading="lazy"
-                                                />
-                                            </div>
-                                            <p class="m-0 mt-4 font-body font-normal text-neutral-500 text-[length:var(--fs-body)] leading-[length:var(--lh-body)] md:min-h-[192px] lg:min-h-[144px]">
-                                                {f.body}
-                                            </p>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        );
-                    })}
-            </div>
+        <div class="grid w-full grid-cols-1 gap-4 md:grid-cols-2 md:gap-5 lg:gap-6">
+            {features.map((feature, i) => (
+                <button
+                    type="button"
+                    class:list={[
+                        "group m-0 flex h-full w-full cursor-pointer items-center justify-between gap-6 rounded-xl border border-neutral-300 bg-generic-00 p-6 text-left transition-all duration-150 ease-in-out hover:border-nova-blue",
+                        feature.span2 && "md:col-span-2",
+                    ]}
+                    aria-haspopup="dialog"
+                    data-au-platform-open
+                    data-au-platform-index={i}
+                >
+                    <span class="min-w-0 flex-1 font-heading text-[length:var(--fs-h6)] leading-[length:var(--lh-h6)] font-medium text-vault-navy">
+                        {feature.title}
+                    </span>
+                    <svg
+                        width="24"
+                        height="24"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        class="shrink-0 text-vault-navy transition-colors duration-150 ease-in-out group-hover:text-nova-blue"
+                        aria-hidden="true"
+                        focusable="false"
+                    >
+                        <path
+                            d="M5 12H19"
+                            stroke="currentColor"
+                            stroke-width="1.5"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                        />
+                        <path
+                            d="M12 5V19"
+                            stroke="currentColor"
+                            stroke-width="1.5"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                        />
+                    </svg>
+                </button>
+            ))}
         </div>
-        {/* Last card — full width */}
-        {features
-            .filter((f) => f.span2)
-            .map((f) => {
-                const i = features.indexOf(f);
-                return (
-                    <div class="mt-6 flex flex-col" data-no-features-card={i}>
-                        <button
-                            type="button"
-                            class="group flex w-full cursor-pointer items-center justify-between gap-6 rounded-xl border border-neutral-300 bg-generic-00 p-6 text-left transition-all duration-150 ease-in-out"
-                            data-no-features-toggle={i}
-                            aria-expanded="false"
-                        >
-                            <span class="font-heading text-[length:var(--fs-h6)] leading-[length:var(--lh-h6)] font-medium text-vault-navy">
-                                {f.title}
-                            </span>
-                            <svg
-                                width="24"
-                                height="24"
-                                viewBox="0 0 24 24"
-                                fill="none"
-                                class="shrink-0 text-vault-navy transition-colors duration-150 ease-in-out"
-                                aria-hidden="true"
-                                focusable="false"
-                                data-no-features-icon={i}
-                            >
-                                <path
-                                    d="M5 12H19"
-                                    stroke="currentColor"
-                                    stroke-width="1.5"
-                                    stroke-linecap="round"
-                                    stroke-linejoin="round"
-                                />
-                                <path
-                                    d="M12 5V19"
-                                    stroke="currentColor"
-                                    stroke-width="1.5"
-                                    stroke-linecap="round"
-                                    stroke-linejoin="round"
-                                    data-no-features-vertical={i}
-                                />
-                            </svg>
-                        </button>
-                        <div
-                            class="no-features-content grid overflow-hidden rounded-b-xl border border-t-0 border-neutral-300 bg-generic-00 transition-[grid-template-rows,opacity,border-color] duration-300 ease-in-out"
-                            data-no-features-content={i}
-                            data-open="false"
-                        >
-                            <div class="overflow-hidden">
-                                <div class="p-6 pt-0">
-                                    <div class="mt-4 w-full">
-                                        <img
-                                            src={f.image}
-                                            alt={f.title}
-                                            class="aspect-[574/323] w-full rounded-lg bg-visual-placeholder object-cover"
-                                            loading="lazy"
-                                        />
-                                    </div>
-                                    <p class="m-0 mt-4 font-body font-normal text-neutral-500 text-[length:var(--fs-body)] leading-[length:var(--lh-body)]">
-                                        {f.body}
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                );
-            })}
     </div>
 </section>
 
+<!-- Detail overlay. Lives outside the section's container so the scrim covers
+     the viewport rather than the 1280px column. -->
+<div
+    id="au-platform-overlay"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="au-platform-overlay-title"
+    aria-hidden="true"
+    class="fixed inset-0 z-[2000] hidden items-center justify-center p-4 backdrop-blur-sm"
+    style="background-color: rgba(0, 0, 0, 0.7);"
+>
+    <div
+        class="relative max-h-[90vh] w-full max-w-[630px] overflow-y-auto rounded-xl border-2 border-[#CCCCCC] bg-generic-00 p-6"
+        data-au-platform-panel
+    >
+        <button
+            type="button"
+            aria-label="Close"
+            class="absolute right-6 top-6 z-10 inline-flex h-10 w-10 cursor-pointer items-center justify-center rounded-lg border-0 bg-transparent p-0 text-vault-navy transition-opacity duration-150 hover:opacity-70 lg:right-5 lg:top-5"
+            data-au-platform-close
+        >
+            <svg
+                width="40"
+                height="40"
+                viewBox="0 0 40 40"
+                fill="none"
+                class="rotate-45"
+                aria-hidden="true"
+                focusable="false"
+            >
+                <path
+                    d="M20 10V30"
+                    stroke="currentColor"
+                    stroke-width="1.5"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                ></path>
+                <path
+                    d="M30 20L10 20"
+                    stroke="currentColor"
+                    stroke-width="1.5"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                ></path>
+            </svg>
+        </button>
+
+        <div class="flex flex-col items-start gap-6">
+            <div class="flex w-full flex-col justify-between gap-6">
+                <div class="flex flex-col gap-6">
+                    <div id="au-platform-overlay-title">
+                        {features.map((feature, i) => (
+                            <h3
+                                class="m-0 pr-12 font-heading font-medium text-vault-navy text-[length:var(--fs-h5)] leading-[length:var(--lh-h5)] tracking-[-0.5px] lg:pr-0 text-balance"
+                                style={i === 0 ? "display: block;" : "display: none;"}
+                                hidden={i !== 0}
+                                data-au-platform-heading
+                            >
+                                {feature.title}
+                            </h3>
+                        ))}
+                    </div>
+                </div>
+
+                <div class="aspect-[574/323] w-full max-w-[574px] overflow-hidden mx-auto">
+                    {features.map((feature, i) => (
+                        <img
+                            src={feature.image}
+                            alt={feature.title}
+                            width="574"
+                            height="323"
+                            class="h-full w-full object-contain"
+                            style={i === 0 ? "display: block;" : "display: none;"}
+                            hidden={i !== 0}
+                            data-au-platform-image
+                            loading="lazy"
+                        />
+                    ))}
+                </div>
+
+                <div class="flex flex-col gap-6">
+                    <div>
+                        {features.map((feature, i) => (
+                            <div
+                                class="m-0 flex flex-col gap-3 font-body font-normal text-neutral-500 text-[length:var(--fs-body)] leading-[length:var(--lh-body)]"
+                                style={i === 0 ? "display: flex;" : "display: none;"}
+                                hidden={i !== 0}
+                                data-au-platform-body
+                            >
+                                <p class="m-0">{feature.body}</p>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
 <style is:global>
-    .no-features-content {
-        grid-template-rows: 0fr;
-        opacity: 0;
-        border-color: transparent;
+    #au-platform-overlay {
+        background-color: rgba(0, 0, 0, 0.7);
     }
-
-    .no-features-content[data-open="true"] {
-        border-color: var(--palette-neutral-300, #d1d5db);
-    }
-
-    @media (min-width: 768px) {
-        .no-features-content[data-default-open="true"] {
-            grid-template-rows: 1fr;
-            opacity: 1;
-            border-color: var(--palette-neutral-300, #d1d5db);
-        }
-
-        [data-no-features-icon][data-default-open="true"] {
-            transform: rotate(180deg);
-        }
-
-        [data-no-features-vertical][data-default-open="true"] {
-            opacity: 0;
-        }
-
-        [data-no-features-toggle][data-default-open="true"] {
-            border-bottom-left-radius: 0;
-            border-bottom-right-radius: 0;
-            border-bottom-width: 0;
-        }
+    [data-au-platform-heading][hidden],
+    [data-au-platform-body][hidden],
+    [data-au-platform-image][hidden] {
+        display: none !important;
     }
 </style>
 
 <script is:inline>
-    /* Smooth accordion toggle for feature cards with row height synchronization. */
+    /* Card -> detail overlay */
     (function () {
-        var cards = document.querySelectorAll("[data-no-features-card]");
-        if (!cards.length) return;
+        var overlay = document.getElementById("au-platform-overlay");
+        if (!overlay) return;
 
-        var LEFT_COLUMN = ["0", "2", "4"];
-        var RIGHT_COLUMN = ["1", "3", "5"];
+        var panel = overlay.querySelector("[data-au-platform-panel]");
+        var closeBtn = overlay.querySelector("[data-au-platform-close]");
+        var headings = overlay.querySelectorAll("[data-au-platform-heading]");
+        var bodies = overlay.querySelectorAll("[data-au-platform-body]");
+        var images = overlay.querySelectorAll("[data-au-platform-image]");
+        if (!panel || !headings.length || headings.length !== bodies.length) return;
 
-        function syncRowHeights() {
-            if (window.innerWidth < 768) {
-                for (var i = 0; i < 6; i++) {
-                    var c = document.querySelector(
-                        '[data-no-features-card="' + i + '"]',
-                    );
-                    if (c) c.style.height = "";
+        var count = headings.length;
+        var current = 0;
+        var lastFocused = null;
+
+        function show(index) {
+            current = ((index % count) + count) % count;
+            for (var i = 0; i < count; i++) {
+                headings[i].hidden = i !== current;
+                headings[i].style.display = i === current ? "block" : "none";
+                bodies[i].hidden = i !== current;
+                bodies[i].style.display = i === current ? "flex" : "none";
+                if (images[i]) {
+                    images[i].hidden = i !== current;
+                    images[i].style.display = i === current ? "block" : "none";
                 }
-                return;
             }
-
-            var rows = [
-                [0, 1],
-                [2, 3],
-                [4, 5],
-            ];
-
-            rows.forEach(function (pair) {
-                var cardA = document.querySelector(
-                    '[data-no-features-card="' + pair[0] + '"]',
-                );
-                var cardB = document.querySelector(
-                    '[data-no-features-card="' + pair[1] + '"]',
-                );
-                var contentA = document.querySelector(
-                    '[data-no-features-content="' + pair[0] + '"]',
-                );
-                var contentB = document.querySelector(
-                    '[data-no-features-content="' + pair[1] + '"]',
-                );
-
-                if (!cardA || !cardB || !contentA || !contentB) return;
-
-                var openA = contentA.getAttribute("data-open") === "true";
-                var openB = contentB.getAttribute("data-open") === "true";
-
-                cardA.style.height = "";
-                cardB.style.height = "";
-
-                if (openA && openB) {
-                    var h = Math.max(cardA.offsetHeight, cardB.offsetHeight);
-                    cardA.style.height = h + "px";
-                    cardB.style.height = h + "px";
-                }
-            });
+            panel.scrollTop = 0;
         }
 
-        function closeCard(index) {
-            var content = document.querySelector(
-                '[data-no-features-content="' + index + '"]',
-            );
-            var btn = document.querySelector(
-                '[data-no-features-toggle="' + index + '"]',
-            );
-            var vertical = document.querySelector(
-                '[data-no-features-vertical="' + index + '"]',
-            );
-            var icon = document.querySelector(
-                '[data-no-features-icon="' + index + '"]',
-            );
-            var card = document.querySelector(
-                '[data-no-features-card="' + index + '"]',
-            );
-            if (!content || content.getAttribute("data-open") !== "true")
-                return;
-
-            content.removeAttribute("data-default-open");
-            if (btn) btn.removeAttribute("data-default-open");
-            if (vertical) vertical.removeAttribute("data-default-open");
-            if (icon) icon.removeAttribute("data-default-open");
-
-            content.style.gridTemplateRows = "0fr";
-            content.style.opacity = "0";
-            content.style.borderColor = "transparent";
-            content.setAttribute("data-open", "false");
-            if (btn) {
-                btn.classList.remove("rounded-b-none", "border-b-0");
-                btn.setAttribute("aria-expanded", "false");
-            }
-            if (card) {
-                card.style.height = "";
-            }
-            if (vertical) vertical.style.opacity = "1";
-            if (icon) icon.style.transform = "";
+        function open(index, opener) {
+            lastFocused = opener || document.activeElement;
+            show(index);
+            overlay.style.display = "flex";
+            overlay.setAttribute("aria-hidden", "false");
+            document.body.style.overflow = "hidden";
+            if (closeBtn) closeBtn.focus();
         }
 
-        function closeSiblingInColumn(index) {
-            var strIdx = String(index);
-            var col = null;
-            if (LEFT_COLUMN.indexOf(strIdx) !== -1) {
-                col = LEFT_COLUMN;
-            } else if (RIGHT_COLUMN.indexOf(strIdx) !== -1) {
-                col = RIGHT_COLUMN;
-            }
-
-            if (col) {
-                col.forEach(function (siblingIdx) {
-                    if (siblingIdx !== strIdx) {
-                        closeCard(siblingIdx);
-                    }
-                });
-            }
+        function close() {
+            overlay.style.display = "none";
+            overlay.setAttribute("aria-hidden", "true");
+            document.body.style.overflow = "";
+            if (lastFocused && lastFocused.focus) lastFocused.focus();
         }
 
-        function toggle(index) {
-            var content = document.querySelector(
-                '[data-no-features-content="' + index + '"]',
-            );
-            var btn = document.querySelector(
-                '[data-no-features-toggle="' + index + '"]',
-            );
-            var vertical = document.querySelector(
-                '[data-no-features-vertical="' + index + '"]',
-            );
-            var icon = document.querySelector(
-                '[data-no-features-icon="' + index + '"]',
-            );
-            if (!content || !btn) return;
-
-            var isOpen = content.getAttribute("data-open") === "true";
-
-            if (isOpen) {
-                closeCard(index);
-                setTimeout(syncRowHeights, 320);
-            } else {
-                closeSiblingInColumn(index);
-
-                content.removeAttribute("data-default-open");
-                if (btn) btn.removeAttribute("data-default-open");
-                if (vertical) vertical.removeAttribute("data-default-open");
-                if (icon) icon.removeAttribute("data-default-open");
-
-                // Open — animate height to auto
-                content.style.gridTemplateRows = "1fr";
-                content.style.opacity = "1";
-                content.style.borderColor =
-                    "var(--palette-neutral-300, #d1d5db)";
-                content.setAttribute("data-open", "true");
-                btn.classList.add("rounded-b-none", "border-b-0");
-                btn.setAttribute("aria-expanded", "true");
-                if (vertical) vertical.style.opacity = "0";
-                if (icon) icon.style.transform = "rotate(180deg)";
-                setTimeout(syncRowHeights, 50);
-                setTimeout(syncRowHeights, 320);
-            }
-        }
-
-        // Add transition to vertical bars for smooth plus-to-minus
-        var verticals = document.querySelectorAll(
-            "[data-no-features-vertical]",
-        );
-        for (var v = 0; v < verticals.length; v++) {
-            verticals[v].style.transition = "opacity 0.3s ease-in-out";
-        }
-
-        // Add transition to icons for smooth rotation
-        var icons = document.querySelectorAll("[data-no-features-icon]");
-        for (var k = 0; k < icons.length; k++) {
-            icons[k].style.transition = "transform 0.3s ease-in-out";
+        function isOpen() {
+            return overlay.style.display === "flex";
         }
 
         document.addEventListener("click", function (e) {
             if (!e.target.closest) return;
-            var toggleBtn = e.target.closest("[data-no-features-toggle]");
-            if (!toggleBtn) return;
-            var index = toggleBtn.getAttribute("data-no-features-toggle");
-            toggle(index);
+            var opener = e.target.closest("[data-au-platform-open]");
+            if (!opener) return;
+            open(
+                parseInt(opener.getAttribute("data-au-platform-index"), 10) || 0,
+                opener,
+            );
         });
 
-        function init() {
-            var isDesktop = window.innerWidth >= 768;
-            for (var i = 0; i < 7; i++) {
-                var content = document.querySelector(
-                    '[data-no-features-content="' + i + '"]',
-                );
-                var btn = document.querySelector(
-                    '[data-no-features-toggle="' + i + '"]',
-                );
-                if (content && content.hasAttribute("data-default-open")) {
-                    var isOpen = isDesktop && (i === 0 || i === 1);
-                    content.setAttribute(
-                        "data-open",
-                        isOpen ? "true" : "false",
-                    );
-                    if (btn)
-                        btn.setAttribute(
-                            "aria-expanded",
-                            isOpen ? "true" : "false",
-                        );
-                }
+        if (closeBtn) closeBtn.addEventListener("click", close);
+
+        overlay.addEventListener("click", function (e) {
+            if (e.target === overlay) close();
+        });
+
+        document.addEventListener("keydown", function (e) {
+            if (!isOpen()) return;
+
+            if (e.key === "Escape") {
+                close();
+                return;
             }
-            syncRowHeights();
-        }
 
-        // Initialize and maintain row height sync on resize/load
-        init();
-        if (document.readyState === "loading") {
-            document.addEventListener("DOMContentLoaded", init);
-        }
-        window.addEventListener("load", syncRowHeights);
-        window.addEventListener("resize", function () {
-            init();
-            syncRowHeights();
+            if (e.key === "ArrowLeft") {
+                show(current - 1);
+                return;
+            }
+            if (e.key === "ArrowRight") {
+                show(current + 1);
+                return;
+            }
+
+            if (e.key !== "Tab") return;
+            var focusable = panel.querySelectorAll(
+                'a[href], button:not([disabled]), input:not([disabled]):not([type="hidden"]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])',
+            );
+            if (!focusable.length) return;
+            var first = focusable[0];
+            var last = focusable[focusable.length - 1];
+
+            if (e.shiftKey && document.activeElement === first) {
+                e.preventDefault();
+                last.focus();
+            } else if (!e.shiftKey && document.activeElement === last) {
+                e.preventDefault();
+                first.focus();
+            }
         });
-        setTimeout(syncRowHeights, 150);
-        setTimeout(syncRowHeights, 450);
     })();
 </script>
