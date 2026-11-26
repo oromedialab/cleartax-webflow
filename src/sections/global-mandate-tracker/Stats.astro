@@ -1,0 +1,46 @@
+---
+/**
+ * Headline numbers — Figma node 19809:56080. The three `key` figures are
+ * recounted from the sheet data Tracker.astro publishes; the values here are
+ * what shows until it arrives.
+ */
+const stats = [
+    { label: "Showing", value: "90+", note: "countries" },
+    { label: "Live Mandates", value: "19", note: "already active", key: "live" },
+    { label: "2025–26 Deadlines", value: "13", note: "act now", key: "near" },
+    { label: "Planned", value: "19", note: "on the horizon", key: "planned" },
+    { label: "Market Size", value: "$15.5B", note: "projected 2026" },
+];
+---
+
+<section class="bg-generic-00 py-6">
+    <div class="container mx-auto">
+        <ul class="m-0 mx-auto grid max-w-[1139px] list-none grid-cols-2 gap-y-6 rounded-xl border border-neutral-300 bg-generic-00 px-4 py-6 md:grid-cols-5 md:px-8">
+            {stats.map((s) => (
+                <li class="flex flex-col items-center justify-center gap-2 px-2 text-center max-md:last:col-span-2 md:border-0 md:border-l md:border-solid md:border-ledger-white md:first:border-l-0">
+                    <span class="font-body text-vault-navy text-[length:var(--fs-body)] leading-[length:var(--lh-body)]">{s.label}</span>
+                    <span class="font-heading font-semibold tracking-[-0.5px] text-vault-navy text-[28px] leading-9" data-gmt-stat={s.key}>{s.value}</span>
+                    <span class="font-body text-neutral-500 text-[length:var(--fs-body-sm)] leading-[length:var(--lh-body-sm)]">{s.note}</span>
+                </li>
+            ))}
+        </ul>
+    </div>
+</section>
+
+<script is:inline>
+    (function () {
+        function paint(rows) {
+            var count = { live: 0, near: 0, planned: 0 };
+            rows.forEach(function (r) {
+                if (r.status === "live") count.live++;
+                else if (r.status === "2025" || r.status === "2026") count.near++;
+                else if (r.status === "planned") count.planned++;
+            });
+            document.querySelectorAll("[data-gmt-stat]").forEach(function (el) {
+                el.textContent = count[el.getAttribute("data-gmt-stat")];
+            });
+        }
+        if (window.gmtRows) paint(window.gmtRows);
+        document.addEventListener("gmt:data", function (e) { paint(e.detail); });
+    })();
+</script>

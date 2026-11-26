@@ -5,10 +5,8 @@
  * an optional status chip, a title and a one-line summary; the whole card is
  * the link.
  *
- * PLACEHOLDER CONTENT: the Figma fills the grid with the France template cards
- * (one real France title, five identical "French VAT Code…" duplicates). They
- * are carried over verbatim so the layout matches; every `href` is `#`. Replace
- * titles and links with the real KSA assets before staging.
+ * Three cards: two Ireland pages and one PDF (opens in a new tab). Titles and
+ * summaries are written from the URLs, not copied from the sources.
  *
  * The one lime chip ("Popular") is this screen's Flux Lime instance — keep it
  * to a single card.
@@ -19,25 +17,30 @@ interface Resource {
     title: string;
     desc: string;
     href: string;
+    target?: "_blank";
 }
-
-const desc = "A practical framework to get ahead of the mandate";
-const dup =
-    "French VAT Code for E-Invoicing: Key Rules, Requirements & Compliance...";
 
 const resources: Resource[] = [
     {
-        category: "Case study",
+        category: "Guide",
         badge: "Popular",
-        title: "e-Invoicing in France 2026: Timeline, Requirements, Guidelines & Format",
-        desc,
-        href: "#",
+        title: "e-Invoicing in Ireland",
+        desc: "Requirements, timelines and what your business needs to do to comply",
+        href: "https://www.cleartax.com/ie/e-invoicing-ireland",
     },
-    { category: "Whitepaper", badge: "New", title: dup, desc, href: "#" },
-    { category: "Case study", title: dup, desc, href: "#" },
-    { category: "Case study", title: dup, desc, href: "#" },
-    { category: "Case study", title: dup, desc, href: "#" },
-    { category: "Case study", title: dup, desc, href: "#" },
+    {
+        category: "Guide",
+        title: "Mandatory Data Fields for e-Invoicing in Ireland",
+        desc: "The information every compliant e-invoice needs to include",
+        href: "https://www.cleartax.com/ie/mandatory-data-fields-for-e-invoicing-in-ireland",
+    },
+    {
+        category: "Whitepaper",
+        title: "The Early Mover's Edge",
+        desc: "Why preparing for e-invoicing ahead of the mandate pays off",
+        href: "https://go.cleartax.com/hubfs/EU/Content%20Assets/early%20movers%20edge_LN.pdf",
+        target: "_blank",
+    },
 ];
 ---
 
@@ -54,6 +57,8 @@ const resources: Resource[] = [
                 resources.map((r) => (
                     <a
                         href={r.href}
+                        target={r.target}
+                        rel={r.target ? "noopener noreferrer" : undefined}
                         class="flex flex-col gap-4 rounded-xl border border-neutral-300 bg-generic-00 p-6 no-underline transition-all duration-200 ease-in-out hover:border-nova-blue"
                     >
                         <div class="flex items-start justify-between gap-3">

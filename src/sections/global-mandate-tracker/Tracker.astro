@@ -1,0 +1,355 @@
+---
+/**
+ * Country list, filters and detail dialog — Figma node 19809:56107.
+ *
+ * Data comes from the Apps Script web app in
+ * archive/global-e-invoicing-tracker/Code.gs, which reads the Google Sheet.
+ * This is the only section that fetches it. It publishes the rows as
+ * `window.gmtRows` + a `gmt:data` event (read by Stats and Glance), and opens
+ * the dialog on a `gmt:open` event carrying a country code.
+ *
+ * The dialog is not in the Figma frame; its fields are the old tracker's.
+ */
+const dataUrl =
+    "https://script.google.com/macros/s/AKfycbyy2IWZIzk14Rap3AciRetLktaCta3awdghumYQQg6KhKFHzCYIKJiKRYVAKzbmynGN/exec";
+
+const regions = [
+    ["Europe", "Europe"],
+    ["APAC", "Asia-Pacific"],
+    ["LATAM", "Latin America"],
+    ["Middle East", "Middle East"],
+    ["Africa", "Africa"],
+    ["North America", "North America"],
+];
+const statuses = [
+    ["live", "Live"],
+    ["2025", "2025"],
+    ["2026", "2026"],
+    ["2027", "2027+"],
+    ["planned", "Planned"],
+];
+---
+
+<section id="gmt-tracker" class="border-0 border-b border-solid border-neutral-300 bg-generic-00 pb-10" data-url={dataUrl} data-page-size="6" data-step="12">
+    <div class="container mx-auto flex flex-col items-center gap-4 pt-16 pb-4 text-center lg:pt-24">
+        <h2 class="m-0 font-heading font-medium tracking-[-0.5px] text-vault-navy text-[length:var(--fs-h2)] leading-[length:var(--lh-h2)] md:text-[length:var(--fs-h1)] md:leading-[length:var(--lh-h1)]">Find your compliance requirements</h2>
+        <p class="m-0 font-body text-neutral-500 text-[length:var(--fs-body-lg)] leading-[length:var(--lh-body-lg)]">Click any country card for full details, format, deadline, scope, and ClearTax tips.</p>
+    </div>
+
+    <div data-gmt-sentinel></div>
+    <div class="gmt-bar sticky top-[88px] z-20 border-0 border-b border-solid border-neutral-300 bg-generic-00 py-4 md:pb-8">
+        <div class="container mx-auto">
+            <div class="mx-auto flex max-w-200 flex-wrap items-end gap-3 md:flex-nowrap md:gap-4">
+                <label class="flex min-w-0 flex-1 flex-col gap-2 font-body font-medium text-neutral-900 text-[length:var(--fs-body-sm)] leading-4">
+                    Region
+                    <select class="gmt-select h-10 w-full cursor-pointer rounded-lg border border-solid border-neutral-200 bg-generic-00 pl-3 pr-10 font-body text-[length:var(--fs-body-sm)] text-vault-navy shadow-xs" data-gmt-filter="region">
+                        <option value="">All regions</option>
+                        {regions.map(([v, l]) => <option value={v}>{l}</option>)}
+                    </select>
+                </label>
+                <label class="flex min-w-0 flex-1 flex-col gap-2 font-body font-medium text-neutral-900 text-[length:var(--fs-body-sm)] leading-4">
+                    Status
+                    <select class="gmt-select h-10 w-full cursor-pointer rounded-lg border border-solid border-neutral-200 bg-generic-00 pl-3 pr-10 font-body text-[length:var(--fs-body-sm)] text-vault-navy shadow-xs" data-gmt-filter="status">
+                        <option value="">All statuses</option>
+                        {statuses.map(([v, l]) => <option value={v}>{l}</option>)}
+                    </select>
+                </label>
+                <button type="button" class="cursor-pointer rounded-lg border border-solid border-neutral-200 bg-generic-00 px-5 py-3.5 font-body font-medium text-neutral-700 text-[length:var(--fs-label-lg)] leading-[length:var(--lh-label-lg)] shadow-xs transition-colors hover:bg-neutral-50 max-md:w-full" data-gmt-clear>Clear all</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="container mx-auto pt-4">
+        <p class="sr-only" aria-live="polite" data-gmt-count></p>
+        <ul class="m-0 list-none p-0" data-gmt-list>
+            {[0, 1, 2, 3, 4, 5].map(() => (
+                <li class="border-0 border-b border-solid border-ledger-white py-6 last:border-b-0" aria-hidden="true">
+                    <div class="h-16 animate-pulse rounded-lg bg-neutral-100"></div>
+                </li>
+            ))}
+        </ul>
+        <div class="hidden flex-col items-center gap-4 py-12 text-center" data-gmt-message>
+            <p class="m-0 font-body text-neutral-500 text-[length:var(--fs-body-lg)] leading-[length:var(--lh-body-lg)]" data-gmt-message-text></p>
+            <button type="button" class="cursor-pointer rounded-lg border border-solid border-neutral-200 bg-generic-00 px-5 py-3.5 font-body font-medium text-neutral-700 text-[length:var(--fs-label-lg)] leading-[length:var(--lh-label-lg)] shadow-xs transition-colors hover:bg-neutral-50" data-gmt-message-action></button>
+        </div>
+        <div class="flex justify-center pt-6">
+            <button type="button" class="cursor-pointer rounded-lg border border-solid border-neutral-200 bg-generic-00 px-5 py-3.5 font-body font-medium text-neutral-700 text-[length:var(--fs-label-lg)] leading-[length:var(--lh-label-lg)] shadow-xs transition-colors hover:bg-neutral-50 hidden" data-gmt-more>Show more countries</button>
+        </div>
+    </div>
+
+    <template data-gmt-row>
+        <li class="border-0 border-b border-solid border-ledger-white last:border-b-0">
+            <button type="button" aria-haspopup="dialog" class="grid w-full cursor-pointer grid-cols-[minmax(0,1fr)_24px] items-center gap-x-4 gap-y-4 border-0 bg-transparent px-0 py-6 text-left transition-colors hover:bg-neutral-50 md:grid-cols-[220px_minmax(0,1fr)_minmax(0,1fr)_24px] md:gap-x-8 lg:grid-cols-[320px_minmax(0,1fr)_minmax(0,1fr)_24px] lg:gap-x-16">
+                <span class="flex items-center gap-3">
+                    <span class="flex size-14 shrink-0 items-center justify-center rounded-lg">
+                        <img data-gmt="flag" alt="" width="32" height="24" loading="lazy" class="h-6 w-8 rounded-xs object-cover" />
+                    </span>
+                    <span class="flex min-w-0 flex-col gap-1">
+                        <span class="flex flex-wrap items-center gap-2">
+                            <span data-gmt="name" class="font-body font-medium text-vault-navy text-[length:var(--fs-body)] leading-[length:var(--lh-body)]"></span>
+                            <span data-gmt="badge" class="inline-flex items-center whitespace-nowrap rounded-full border border-solid border-neutral-200 px-3 py-1.5 font-body font-medium text-neutral-700 text-[length:var(--fs-body-sm)] leading-4"></span>
+                        </span>
+                        <span data-gmt="region" class="font-body text-neutral-500 text-[length:var(--fs-body-sm)] leading-[length:var(--lh-body-sm)]"></span>
+                    </span>
+                </span>
+                <span class="flex min-w-0 flex-col gap-1 max-md:col-span-2 max-md:row-start-2">
+                    <span class="font-body font-semibold uppercase tracking-[1px] text-neutral-500 text-[length:var(--fs-body-xs)] leading-[length:var(--lh-body-xs)]">Deadline</span>
+                    <span data-gmt="deadline" class="font-body text-vault-navy text-[length:var(--fs-body-sm)] leading-[length:var(--lh-body-sm)] [overflow-wrap:anywhere]"></span>
+                </span>
+                <span class="flex min-w-0 flex-col gap-1 max-md:col-span-2 max-md:row-start-3">
+                    <span class="font-body font-semibold uppercase tracking-[1px] text-neutral-500 text-[length:var(--fs-body-xs)] leading-[length:var(--lh-body-xs)]">Format</span>
+                    <span data-gmt="format" class="font-body text-vault-navy text-[length:var(--fs-body-sm)] leading-[length:var(--lh-body-sm)] [overflow-wrap:anywhere]"></span>
+                </span>
+                <svg class="text-vault-navy max-md:col-start-2 max-md:row-start-1" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7M8 7h9v9" /></svg>
+            </button>
+        </li>
+    </template>
+
+    <div class="fixed inset-0 z-[1900] hidden items-center justify-center bg-vault-navy/60 p-4" data-gmt-dialog>
+        <div role="dialog" aria-modal="true" aria-labelledby="gmt-dialog-title" tabindex="-1" class="flex max-h-[90vh] w-full max-w-135 flex-col overflow-y-auto overscroll-contain rounded-xl border border-solid border-neutral-300 bg-generic-00">
+            <div class="flex items-center gap-3 border-0 border-b-2 border-solid border-ledger-white p-6">
+                <span class="flex size-14 shrink-0 items-center justify-center rounded-lg">
+                    <img data-gmt="flag" alt="" width="32" height="24" class="h-6 w-8 rounded-xs object-cover" />
+                </span>
+                <div class="flex min-w-0 flex-1 flex-col gap-2">
+                    <div class="flex items-center justify-between gap-3">
+                        <h3 id="gmt-dialog-title" data-gmt="name" class="m-0 font-body font-medium text-vault-navy text-[length:var(--fs-body)] leading-[length:var(--lh-body)]"></h3>
+                        <span data-gmt="badge" class="inline-flex items-center whitespace-nowrap rounded-full border border-solid border-neutral-200 px-3 py-1.5 font-body font-medium text-neutral-700 text-[length:var(--fs-body-sm)] leading-4"></span>
+                    </div>
+                    <div class="flex flex-wrap items-center justify-between gap-x-3 font-body text-[length:var(--fs-body-sm)] leading-[length:var(--lh-body-sm)]">
+                        <span data-gmt="region" class="text-neutral-500"></span>
+                        <span data-gmt="note"></span>
+                    </div>
+                </div>
+            </div>
+            <div class="flex flex-col gap-8 p-6">
+                <dl class="m-0 flex flex-col gap-6">
+                    <div class="grid gap-1 sm:grid-cols-[153px_minmax(0,1fr)] sm:gap-6">
+                        <dt class="font-body text-[length:var(--fs-body-sm)] leading-[length:var(--lh-body-sm)] text-neutral-500">Mandate deadline</dt>
+                        <dd class="m-0 font-body text-[length:var(--fs-body-sm)] leading-[length:var(--lh-body-sm)] text-vault-navy [overflow-wrap:anywhere]" data-gmt="deadline"></dd>
+                    </div>
+                    <div class="grid gap-1 sm:grid-cols-[153px_minmax(0,1fr)] sm:gap-6">
+                        <dt class="font-body text-[length:var(--fs-body-sm)] leading-[length:var(--lh-body-sm)] text-neutral-500">Invoice format</dt>
+                        <dd class="m-0 font-body text-[length:var(--fs-body-sm)] leading-[length:var(--lh-body-sm)] text-vault-navy [overflow-wrap:anywhere]" data-gmt="format"></dd>
+                    </div>
+                    <div class="grid gap-1 sm:grid-cols-[153px_minmax(0,1fr)] sm:gap-6">
+                        <dt class="font-body text-[length:var(--fs-body-sm)] leading-[length:var(--lh-body-sm)] text-neutral-500">Transmission model</dt>
+                        <dd class="m-0 font-body text-[length:var(--fs-body-sm)] leading-[length:var(--lh-body-sm)] text-vault-navy [overflow-wrap:anywhere]" data-gmt="model"></dd>
+                    </div>
+                    <div class="grid gap-1 sm:grid-cols-[153px_minmax(0,1fr)] sm:gap-6">
+                        <dt class="font-body text-[length:var(--fs-body-sm)] leading-[length:var(--lh-body-sm)] text-neutral-500">Penalty risk</dt>
+                        <dd class="m-0 font-body text-[length:var(--fs-body-sm)] leading-[length:var(--lh-body-sm)] text-vault-navy [overflow-wrap:anywhere]" data-gmt="penalty"></dd>
+                    </div>
+                </dl>
+                <div class="flex flex-col gap-3 border-0 border-t border-solid border-ledger-white pt-8">
+                    <h4 class="m-0 font-body font-semibold uppercase tracking-[1px] text-neutral-500 text-[length:var(--fs-body-xs)] leading-[length:var(--lh-body-xs)]">Who it applies to</h4>
+                    <p class="m-0 font-body text-[length:var(--fs-body-sm)] leading-[length:var(--lh-body-sm)] text-vault-navy" data-gmt="scope"></p>
+                </div>
+                <p class="m-0 border-0 border-t border-solid border-ledger-white pt-8 font-body text-[length:var(--fs-body-sm)] leading-[length:var(--lh-body-sm)] text-nova-blue [overflow-wrap:anywhere]" data-gmt="tip"></p>
+                <div class="flex gap-3">
+                    <button type="button" class="inline-flex flex-1 items-center justify-center rounded-lg border border-solid px-5 py-3.5 font-body font-medium text-[length:var(--fs-label-lg)] leading-[length:var(--lh-label-lg)] shadow-xs transition-colors cursor-pointer border-neutral-200 bg-generic-00 text-neutral-700 hover:bg-neutral-50" data-gmt-close>Back</button>
+                    <a href="https://www.cleartax.com/contact-us" data-demo-open data-gmt-demo class="inline-flex flex-1 items-center justify-center rounded-lg border border-solid px-5 py-3.5 font-body font-medium text-[length:var(--fs-label-lg)] leading-[length:var(--lh-label-lg)] shadow-xs transition-colors border-nova-blue bg-nova-blue text-nova-50 no-underline hover:bg-generic-00 hover:text-nova-blue">Book a demo</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<style is:global>
+    [data-gmt-dialog] [data-gmt="note"] {
+        color: var(--color-neutral-500);
+    }
+    [data-gmt-dialog][data-status="live"] [data-gmt="note"] {
+        color: var(--color-success-700);
+    }
+    [data-gmt-dialog][data-status="2025"] [data-gmt="note"],
+    [data-gmt-dialog][data-status="2026"] [data-gmt="note"] {
+        color: var(--color-destructive-700);
+    }
+    [data-gmt-dialog] [role="dialog"]:focus {
+        outline: none;
+    }
+    .gmt-select {
+        appearance: none;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' fill='none' stroke='%2305022a' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m5 7.5 5 5 5-5'/%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: right 12px center;
+    }
+    /* Covers the strip behind the floating navbar once the filters stick. */
+    .gmt-bar.is-stuck::before {
+        content: "";
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: 100%;
+        height: 88px;
+        background: var(--color-generic-00);
+    }
+</style>
+
+<script is:inline>
+    (function () {
+        var root = document.getElementById("gmt-tracker");
+        if (!root) return;
+        var CACHE = "gmt-rows-v1";
+        var BADGE = { live: "Live", 2025: "2025", 2026: "2026", 2027: "2027+", planned: "Planned" };
+        var NOTE = {
+            live: "Mandate is active",
+            2025: "Imminent — prepare now",
+            2026: "Act within 12 months",
+            2027: "Plan ahead",
+            planned: "Monitoring stage",
+        };
+        var one = function (s) { return root.querySelector(s); };
+        var list = one("[data-gmt-list]");
+        var rowTpl = one("[data-gmt-row]");
+        var message = one("[data-gmt-message]");
+        var messageText = one("[data-gmt-message-text]");
+        var messageAction = one("[data-gmt-message-action]");
+        var more = one("[data-gmt-more]");
+        var dialog = one("[data-gmt-dialog]");
+        var selects = root.querySelectorAll("[data-gmt-filter]");
+        var pageSize = Number(root.getAttribute("data-page-size"));
+        var step = Number(root.getAttribute("data-step"));
+        var shown = pageSize;
+        var rows = [];
+        var lastFocus = null;
+
+        /* Sheet values are untrusted text: textContent only, never innerHTML. */
+        function fill(scope, row) {
+            var values = {
+                name: row.name,
+                region: row.region,
+                badge: BADGE[row.status] || row.status,
+                note: NOTE[row.status] || "",
+            };
+            scope.querySelectorAll("[data-gmt]").forEach(function (el) {
+                var key = el.getAttribute("data-gmt");
+                if (key === "flag") {
+                    el.src = "https://cdn.jsdelivr.net/npm/flag-icons@7.2.3/flags/4x3/" + encodeURIComponent(row.code) + ".svg";
+                } else {
+                    el.textContent = (key in values ? values[key] : row[key]) || "—";
+                }
+            });
+        }
+
+        function showMessage(text, action, handler) {
+            message.classList.toggle("hidden", !text);
+            message.classList.toggle("flex", !!text);
+            messageText.textContent = text || "";
+            messageAction.textContent = action || "";
+            messageAction.onclick = handler || null;
+        }
+
+        function render() {
+            var want = {};
+            selects.forEach(function (s) { want[s.getAttribute("data-gmt-filter")] = s.value; });
+            var found = rows.filter(function (r) {
+                return (!want.region || r.region === want.region) && (!want.status || r.status === want.status);
+            });
+            list.textContent = "";
+            found.slice(0, shown).forEach(function (row) {
+                var node = rowTpl.content.cloneNode(true);
+                fill(node, row);
+                node.querySelector("button").addEventListener("click", function () { open(row); });
+                list.appendChild(node);
+            });
+            one("[data-gmt-count]").textContent = found.length + (found.length === 1 ? " country" : " countries");
+            more.classList.toggle("hidden", found.length <= shown);
+            if (found.length) showMessage("");
+            else showMessage("No countries match your filter.", "Clear all filters", clear);
+        }
+
+        function clear() {
+            selects.forEach(function (s) { s.value = ""; });
+            shown = pageSize;
+            render();
+        }
+
+        function open(row) {
+            lastFocus = document.activeElement;
+            fill(dialog, row);
+            dialog.setAttribute("data-status", row.status);
+            dialog.classList.remove("hidden");
+            dialog.classList.add("flex");
+            dialog.firstElementChild.scrollTop = 0;
+            document.body.style.overflow = "hidden";
+            // Focus the panel, not a button, so short screens open at the top.
+            dialog.firstElementChild.focus({ preventScroll: true });
+        }
+
+        function close() {
+            if (dialog.classList.contains("hidden")) return;
+            dialog.classList.add("hidden");
+            dialog.classList.remove("flex");
+            document.body.style.overflow = "";
+            if (lastFocus) lastFocus.focus({ preventScroll: true });
+        }
+
+        selects.forEach(function (s) {
+            s.addEventListener("change", function () { shown = pageSize; render(); });
+        });
+        one("[data-gmt-clear]").addEventListener("click", clear);
+        more.addEventListener("click", function () { shown += step; render(); });
+        root.querySelectorAll("[data-gmt-close], [data-gmt-demo]").forEach(function (el) {
+            el.addEventListener("click", close);
+        });
+        dialog.addEventListener("click", function (e) { if (e.target === dialog) close(); });
+        document.addEventListener("keydown", function (e) {
+            if (dialog.classList.contains("hidden")) return;
+            if (e.key === "Escape") return close();
+            if (e.key !== "Tab") return;
+            var items = dialog.querySelectorAll("button, a[href]");
+            var first = items[0];
+            var last = items[items.length - 1];
+            if (e.shiftKey && (document.activeElement === first || document.activeElement === dialog.firstElementChild)) { e.preventDefault(); last.focus(); }
+            else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+        });
+        document.addEventListener("gmt:open", function (e) {
+            var row = rows.filter(function (r) { return r.code === e.detail; })[0];
+            if (row) open(row);
+        });
+
+        var bar = one(".gmt-bar");
+        var sentinel = one("[data-gmt-sentinel]");
+        window.addEventListener("scroll", function () {
+            bar.classList.toggle("is-stuck", sentinel.getBoundingClientRect().top < 88 && bar.getBoundingClientRect().top <= 89);
+        }, { passive: true });
+
+        function publish(data) {
+            rows = data.slice().sort(function (a, b) { return a.name.localeCompare(b.name); });
+            window.gmtRows = rows;
+            render();
+            document.dispatchEvent(new CustomEvent("gmt:data", { detail: rows }));
+        }
+
+        /* Paint from the last visit's copy, then swap in fresh data if it changed. */
+        function load() {
+            var cached = null;
+            try { cached = localStorage.getItem(CACHE); } catch (e) {}
+            if (cached && !rows.length) {
+                try { publish(JSON.parse(cached)); } catch (e) { cached = null; }
+            }
+            fetch(root.getAttribute("data-url"))
+                .then(function (r) { return r.json(); })
+                .then(function (data) {
+                    var fresh = (Array.isArray(data) ? data : data.rows || []).filter(function (r) { return r && r.name; });
+                    if (!fresh.length) throw new Error(data.error || "No rows returned");
+                    var json = JSON.stringify(fresh);
+                    if (json === cached) return;
+                    try { localStorage.setItem(CACHE, json); } catch (e) {}
+                    publish(fresh);
+                })
+                .catch(function (err) {
+                    console.error("Mandate tracker data failed to load:", err);
+                    if (rows.length) return;
+                    list.textContent = "";
+                    showMessage("We couldn't load the tracker data.", "Try again", function () {
+                        showMessage("Loading…");
+                        load();
+                    });
+                });
+        }
+        load();
+    })();
+</script>
