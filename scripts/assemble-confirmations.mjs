@@ -268,8 +268,13 @@ ${body.innerHTML}
 // sections to assemble, so skip it rather than emitting an empty preview.
 const SKIP_PAGES = new Set(['index.astro']);
 
-const pages = readdirSync(PAGES_DIR)
-  .filter(f => f.endsWith('.astro') && f !== 'embed' && !SKIP_PAGES.has(f));
+// Landing pages live one level down, in src/pages/lp/, and preview to
+// dist/preview/lp/<page>.html.
+const LP_DIR = join(PAGES_DIR, 'lp');
+const lpPages = existsSync(LP_DIR) ? readdirSync(LP_DIR).map((f) => `lp/${f}`) : [];
+
+const pages = [...readdirSync(PAGES_DIR), ...lpPages]
+  .filter(f => f.endsWith('.astro') && !SKIP_PAGES.has(f));
 
 for (const pageFile of pages) {
   const pageName = pageFile.replace(/\.astro$/, '');
@@ -287,7 +292,7 @@ for (const pageFile of pages) {
   // pull in _shared @sources). Either way we want the bundle name to look
   // up in dist/css/<name>.css.
   const cssImports = [];
-  const cssImportRegex = /import\s+['"]\.\.\/styles\/(?:\.build\/)?([a-z0-9-]+\.css)['"]/g;
+  const cssImportRegex = /import\s+['"](?:\.\.\/)+styles\/(?:\.build\/)?([a-z0-9-]+\.css)['"]/g;
   let cssMatch;
   while ((cssMatch = cssImportRegex.exec(frontmatter)) !== null) {
     cssImports.push(cssMatch[1]);
@@ -389,6 +394,7 @@ ${assembledHtml}
 </html>`;
 
   const outPath = join(OUT_DIR, `${pageName}.html`);
+  mkdirSync(dirname(outPath), { recursive: true });
   writeFileSync(outPath, finalHtml, 'utf8');
 }
 
