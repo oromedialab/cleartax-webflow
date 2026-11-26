@@ -1,26 +1,94 @@
 ---
 /**
- * "What you should do before 2027" — Figma node 17103:83435 ("Fold 8").
+ * "What you should do before 2027" — Norway regional page.
  *
- * A vertical numbered stepper of 8 cards connected by a hairline. Diverges
- * from the Figma's single-open accordion: every card from the first through
- * whichever is closest to the viewport's vertical centre is open at once —
- * scrolling down grows that open set (opening the next card); scrolling back
- * up shrinks it from the end, closing one card at a time. Clicking a card
- * sets the open set to end there. The connecting hairline fills cumulatively
- * to match, reading as a progress bar.
- *
- * Background is the same dot-grid field used in the hero, static here (no
- * cursor interaction) since this section sits well below the fold — see
- * `.no-roadmap-bg` below.
+ * Implements sticky horizontal scroll container matching regional specs:
+ * - Section pins to viewport as reader scrolls down the page
+ * - Translates horizontal track smoothly across the 8 roadmap cards
+ * - Blue connecting progress line connects all cards together and fills dynamically with scroll progress
  */
+
 interface Step {
+  number: number;
+  title: string;
+  bullets: string[];
+}
+
+const steps: Step[] = [
+  {
+    number: 1,
+    title: "Confirm your bookkeeping obligation",
+    bullets: [
+      "Determine whether your Norwegian entity falls within the new e-invoicing requirement.",
+    ],
+  },
+  {
+    number: 2,
+    title: "Check how your customers receive e-invoices",
+    bullets: [
+      "Check which business buyers are registered in ELMA and can receive e-invoices.",
+      "Confirm each customer's reception capability; use ELMA lookup when sending through the EHF/Peppol network.",
+      "Do not assume that an absent ELMA listing automatically removes a legal obligation.",
+    ],
+  },
+  {
+    number: 3,
+    title: "Choose an invoice-exchange route.",
+    bullets: [
+      "Check the final B2B format rules before describing any one route as mandatory.",
+      "If you use EHF through Peppol, confirm how your system connects to an Access Point and test delivery to recipients.",
+    ],
+  },
+  {
+    number: 4,
+    title: "Prepare structured invoice data.",
+    bullets: [
+      "Review the information your systems need to produce for an electronic invoice suitable for automated processing.",
+    ],
+  },
+  {
+    number: 5,
+    title: "Related accounting deadline",
+    bullets: [
+      "Update your SAF-T capability separately because SAF-T Financial v1.40 is required from January 2027.",
+      "Manage it as a parallel accounting-data workstream.",
+    ],
+  },
+  {
+    number: 6,
+    title: "Connect your ERP",
+    bullets: [
+      "Establish an e-invoicing software to your ERP. It works as a compliant layer for sending e-invoices through the required digital infrastructure.",
+      "ClearTax acts as both Seller's and Buyer's Peppol Access Point for e-invoice exchange.",
+    ],
+  },
+  {
+    number: 7,
+    title: "Review retention and storage.",
+    bullets: [
+      "Preserve the original electronic invoices, apply the retention period relevant to your records and business, and check the conditions before storing accounting material outside Norway.",
+    ],
+  },
+  {
+    number: 8,
+    title: "Prepare for 2030",
+    bullets: [
+      "Don't build only for outbound invoices.",
+      "Your accounts will also need to receive and automatically process e-invoices from 2030.",
+    ],
+  },
+];
+
+/* ============================================================================
+   PREVIOUS VERTICAL ACCORDION IMPLEMENTATION DATA (Preserved for rollback)
+   ============================================================================
+interface PrevStep {
   no: string;
   heading: string;
   body: string;
 }
 
-const steps: Step[] = [
+const prevSteps: PrevStep[] = [
   {
     no: "01",
     heading: "Confirm your bookkeeping obligation",
@@ -62,7 +130,218 @@ const steps: Step[] = [
     body: "Don't build only for outbound invoices. Your accounts will also need to receive and automatically process e-invoices from 2030.",
   },
 ];
+============================================================================ */
 ---
+
+<div class="no-roadmap-sticky-container bg-generic-00 relative">
+  <section
+    class="sticky top-0 flex flex-col justify-center bg-generic-00 py-12 md:py-16 xl:py-20 overflow-hidden min-h-[calc(100vh-80px)]"
+    id="no-roadmap"
+  >
+    <div class="max-w-[var(--container-max)] mx-auto w-full px-4 md:px-6">
+      <!-- Header -->
+      <div class="no-roadmap-header-wrapper text-center mx-auto mb-8 md:mb-12 max-w-3xl">
+        <h2
+          class="m-0 font-heading max-w-150 mx-auto font-medium text-vault-navy text-[length:var(--fs-h2)] md:text-[length:var(--fs-h1)] leading-[length:var(--lh-h2)] md:leading-[length:var(--lh-h1)] tracking-[-0.5px] mb-3 sm:mb-4"
+        >
+          What you should do before 2027
+        </h2>
+      </div>
+
+      <!-- Cards Track with Connecting Progress Line -->
+      <div class="w-full h-auto relative">
+        <div
+          class="no-roadmap-scroll-track flex items-stretch gap-6 md:gap-8 w-max transition-transform duration-[200ms] ease-out will-change-transform relative py-2"
+        >
+          <!-- Connecting Progress Line between the cards -->
+          <div
+            class="hidden md:block absolute top-[160px] left-16 right-16 h-[2.5px] bg-neutral-200 z-0 pointer-events-none rounded-full overflow-hidden"
+            aria-hidden="true"
+          >
+            <div
+              class="no-roadmap-progress-fill h-full bg-nova-blue rounded-full transition-all duration-150 ease-out"
+              style="width: 5%;"
+            ></div>
+          </div>
+
+          <!-- 8 Implementation Step Cards -->
+          {
+            steps.map((step) => (
+              <div
+                class="no-roadmap-card-item relative z-10 w-[320px] sm:w-[360px] md:w-[380px] lg:w-[478px] shrink-0 rounded-2xl border border-neutral-300 bg-generic-00 flex flex-col justify-start min-h-[317px] select-none overflow-hidden transition-all duration-200"
+              >
+                <!-- Card Header (spans full width above divider) -->
+                <div class="p-6 pb-6 border-b border-neutral-200 bg-generic-00 w-full">
+                  <!-- Step Badge -->
+                  <div class="w-8 h-8 rounded-lg border border-neutral-300 flex items-center justify-center font-heading font-medium text-neutral-500 text-[length:var(--fs-body-xs)] leading-[length:var(--lh-body-xs)] shrink-0 bg-[#FBFBFC]">
+                    {step.number}
+                  </div>
+
+                  <!-- Step Title -->
+                  <h3 class="m-0 font-heading font-medium text-vault-navy text-[length:var(--fs-h6)] leading-[length:var(--lh-h6)] mt-4 min-h-[24px]">
+                    {step.title}
+                  </h3>
+                </div>
+
+                <!-- Card Body: Bullet Points -->
+                <div class="p-6 pt-6 flex-1 flex flex-col w-full">
+                  <ul class="m-0 p-0 list-none space-y-4 flex-1">
+                    {step.bullets.map((bullet) => (
+                      <li class="flex items-start gap-2.5 font-body font-normal text-neutral-500 text-[length:var(--fs-body-sm)] leading-[length:var(--lh-body-sm)]">
+                        <span class="w-1 h-1 rounded-full bg-neutral-400 shrink-0 mt-2" aria-hidden="true"></span>
+                        <span>{bullet}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </div>
+            ))
+          }
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<style is:global>
+  @media (max-height: 750px) {
+    .no-roadmap-sticky-container section {
+      padding-top: var(--spacing-big, 1.25rem) !important;
+      padding-bottom: var(--spacing-big, 1.25rem) !important;
+    }
+    .no-roadmap-header-wrapper {
+      margin-bottom: var(--spacing-md, 1rem) !important;
+    }
+    .no-roadmap-card-item {
+      min-height: 315px !important;
+    }
+  }
+</style>
+
+<script is:inline>
+  (function () {
+    function initNorwayRoadmap() {
+      const containers = document.querySelectorAll(".no-roadmap-sticky-container");
+      if (!containers.length) return;
+
+      containers.forEach((container) => {
+        const track = container.querySelector(".no-roadmap-scroll-track");
+        const section = container.querySelector("section");
+        const progressFill = container.querySelector(".no-roadmap-progress-fill");
+        if (!container || !track || !section) return;
+
+        const getHeaderHeight = () => {
+          const header = document.querySelector("header, .navbar, .w-nav");
+          return header ? header.offsetHeight : 80;
+        };
+
+        let maxTranslate = 0;
+        let totalScrollable = 0;
+        let stickyTop = 0;
+
+        const updateMeasurements = () => {
+          const sectionHeight = section.offsetHeight;
+          const windowHeight = window.innerHeight;
+          const headerHeight = getHeaderHeight();
+
+          const trackOffset =
+            track.parentElement.getBoundingClientRect().top -
+            section.getBoundingClientRect().top;
+          const trackHeight = track.offsetHeight;
+          const availableSpace = windowHeight - headerHeight;
+
+          const idealTrackTop =
+            headerHeight + Math.max(40, (availableSpace - trackHeight) / 2);
+          let calculatedTop = idealTrackTop - trackOffset;
+
+          stickyTop = Math.min(headerHeight, calculatedTop);
+          section.style.top = `${stickyTop}px`;
+
+          const containerWidth =
+            track.parentElement.getBoundingClientRect().width;
+          maxTranslate = Math.max(0, track.scrollWidth - containerWidth);
+          container.style.height = `${maxTranslate + windowHeight}px`;
+          totalScrollable =
+            container.getBoundingClientRect().height - sectionHeight;
+        };
+
+        updateMeasurements();
+
+        if (window.ResizeObserver) {
+          const ro = new ResizeObserver(updateMeasurements);
+          ro.observe(section);
+          ro.observe(track);
+        }
+        window.addEventListener("resize", updateMeasurements);
+
+        let ticking = false;
+
+        const handleScroll = () => {
+          if (!ticking) {
+            window.requestAnimationFrame(() => {
+              const containerRect = container.getBoundingClientRect();
+              const scrolledDistance = Math.max(
+                0,
+                stickyTop - containerRect.top
+              );
+
+              let progress =
+                totalScrollable > 0
+                  ? scrolledDistance / totalScrollable
+                  : 0;
+              progress = Math.max(0, Math.min(1, progress));
+
+              track.style.transform = `translate3d(-${progress * maxTranslate}px, 0, 0)`;
+
+              if (progressFill) {
+                // Progress bar fills proportionally from 5% to 100% as you scroll through all 8 cards
+                const fillPercent = 5 + progress * 95;
+                progressFill.style.width = `${fillPercent}%`;
+              }
+
+              ticking = false;
+            });
+            ticking = true;
+          }
+        };
+
+        const observer = new IntersectionObserver(
+          (entries) => {
+            entries.forEach((entry) => {
+              if (entry.isIntersecting) {
+                window.addEventListener("scroll", handleScroll, {
+                  passive: true,
+                });
+                handleScroll();
+              } else {
+                window.removeEventListener("scroll", handleScroll);
+              }
+            });
+          },
+          {
+            rootMargin: "100% 0px 100% 0px",
+          }
+        );
+
+        observer.observe(container);
+      });
+    }
+
+    if (document.readyState === "loading") {
+      document.addEventListener("DOMContentLoaded", initNorwayRoadmap);
+    } else {
+      initNorwayRoadmap();
+    }
+  })();
+</script>
+
+{/*
+===============================================================================
+PREVIOUS VERTICAL ACCORDION IMPLEMENTATION (COMMENTED OUT FOR ROLLBACK)
+To restore:
+1. Replace current steps array with prevSteps in frontmatter.
+2. Uncomment the markup, style, and script below and replace current section above.
+===============================================================================
 
 <section
   class="no-roadmap-bg relative overflow-hidden bg-generic-00 py-16 lg:py-20"
@@ -86,57 +365,50 @@ const steps: Step[] = [
       class="no-roadmap-list mx-auto flex max-w-[534px] flex-col items-stretch"
       data-no-roadmap
     >
-      {
-        steps.map((step, i) => (
-          <>
-            <div
-              class="no-roadmap-item flex gap-4 rounded-xl bg-generic-00 border-2 border-neutral-300 p-4"
-              data-no-roadmap-item
+      {prevSteps.map((step, i) => (
+        <>
+          <div
+            class="no-roadmap-item flex gap-4 rounded-xl bg-generic-00 border-2 border-neutral-300 p-4"
+            data-no-roadmap-item
+          >
+            <button
+              type="button"
+              class="no-roadmap-trigger flex w-full cursor-pointer items-start gap-4 border-0 bg-transparent p-0 text-left"
+              aria-expanded="false"
             >
-              <button
-                type="button"
-                class="no-roadmap-trigger flex w-full cursor-pointer items-start gap-4 border-0 bg-transparent p-0 text-left"
-                aria-expanded="false"
-              >
-                <span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-neutral-300 bg-generic-00 font-body text-[length:var(--fs-body-lg)] font-medium text-vault-navy">
-                  {step.no}
+              <span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-neutral-300 bg-generic-00 font-body text-[length:var(--fs-body-lg)] font-medium text-vault-navy">
+                {step.no}
+              </span>
+              <span class="flex flex-1 flex-col justify-center pt-[3px]">
+                <span
+                  class="font-body text-[length:var(--fs-body-lg)] leading-[length:var(--lh-body-lg)] font-medium text-vault-navy"
+                  data-no-roadmap-anchor
+                >
+                  {step.heading}
                 </span>
-                <span class="flex flex-1 flex-col justify-center pt-[3px]">
-                  <span
-                    class="font-body text-[length:var(--fs-body-lg)] leading-[length:var(--lh-body-lg)] font-medium text-vault-navy"
-                    data-no-roadmap-anchor
-                  >
-                    {step.heading}
-                  </span>
-                  <span class="no-roadmap-body-wrap">
-                    <span class="no-roadmap-body font-body text-[length:var(--fs-body)] leading-[length:var(--lh-body)] text-neutral-500">
-                      {step.body}
-                    </span>
+                <span class="no-roadmap-body-wrap">
+                  <span class="no-roadmap-body font-body text-[length:var(--fs-body)] leading-[length:var(--lh-body)] text-neutral-500">
+                    {step.body}
                   </span>
                 </span>
-              </button>
-            </div>
-            {i < steps.length - 1 && (
-              <div
-                class="no-roadmap-connector mx-auto h-10 w-0.5 bg-neutral-300"
-                data-no-roadmap-connector
-                aria-hidden="true"
-              />
-            )}
-          </>
-        ))
-      }
+              </span>
+            </button>
+          </div>
+          {i < prevSteps.length - 1 && (
+            <div
+              class="no-roadmap-connector mx-auto h-10 w-0.5 bg-neutral-300"
+              data-no-roadmap-connector
+              aria-hidden="true"
+            />
+          )}
+        </>
+      ))}
     </div>
   </div>
 </section>
 
 <style is:global>
   .no-roadmap-list {
-    /* Accordion items change height when they open/close. Without this, the
-       browser's scroll-anchoring can silently nudge scrollY to compensate
-       for that height change, which our scroll-direction detection then
-       misreads as the user scrolling up — closing a step they never asked
-       to close. */
     overflow-anchor: none;
   }
   .no-roadmap-item {
@@ -181,11 +453,6 @@ const steps: Step[] = [
       root.querySelectorAll("[data-no-roadmap-anchor]"),
     );
 
-    // Every step from 0 through this index is open. Scrolling down grows
-    // it (opening the next step); scrolling back up shrinks it from the
-    // end (closing the trailing step), one at a time, since it's
-    // recomputed from scratch on every scroll frame rather than only
-    // ever allowed to increase.
     let openUpTo = -1;
 
     function setOpenUpTo(index) {
@@ -200,9 +467,6 @@ const steps: Step[] = [
         if (trigger) trigger.setAttribute("aria-expanded", String(isOpen));
       });
       connectors.forEach((connector, i) => {
-        // Connector i sits between item i and item i+1 — fill it once the
-        // open set has reached at least that point, so the line reads as
-        // a cumulative progress bar.
         const isFilled = i <= openUpTo;
         connector.classList.toggle("bg-nova-blue", isFilled);
         connector.classList.toggle("bg-neutral-300", !isFilled);
@@ -217,13 +481,6 @@ const steps: Step[] = [
 
     if (anchors.length === 0) return;
 
-    // Recompute from live geometry on every scroll frame, rather than
-    // reacting to IntersectionObserver enter/exit edges — a step opening
-    // or closing changes the page's layout height, which can make
-    // edge-crossing events fire out of order. Picking whichever heading is
-    // actually closest to the viewport centre is immune to that, and keeps
-    // working correctly in both scroll directions since it's recomputed
-    // from scratch every frame rather than tracked incrementally.
     let ticking = false;
 
     function updateActiveFromScroll() {
@@ -257,3 +514,4 @@ const steps: Step[] = [
     window.addEventListener("scroll", onScroll, { passive: true });
   })();
 </script>
+=============================================================================== */}
