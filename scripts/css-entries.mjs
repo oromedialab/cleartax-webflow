@@ -114,6 +114,7 @@ export const PAGE_TARGETS = [
   { name: 'max-itc', input: 'src/styles/max-itc.css', page: 'src/pages/max-itc.astro' },
   { name: 'recon-ai', input: 'src/styles/recon-ai.css', page: 'src/pages/recon-ai.astro' },
   { name: 'philippines-product', input: 'src/styles/philippines-product.css', page: 'src/pages/philippines-product.astro' },
+  { name: 'uae-product', input: 'src/styles/uae-product.css', page: 'src/pages/uae-product.astro' },
 ];
 
 /**
