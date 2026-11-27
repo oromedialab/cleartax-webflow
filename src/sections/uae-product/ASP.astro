@@ -1,0 +1,251 @@
+---
+interface PhaseItem {
+    phase: string;
+    title: string;
+    desc: string;
+    img?: string;
+}
+
+interface Props {
+    title?: string;
+    items?: PhaseItem[];
+}
+
+const defaultItems: PhaseItem[] = [
+    {
+        phase: "PHASE I",
+        title: "Gap Assessment",
+        desc: "We review your current invoicing systems and data against the PINT AE Data Dictionary, identify compliance gaps, map your transactions, and prepare a detailed Business Requirements Document.",
+    },
+    {
+        phase: "PHASE II",
+        title: "Integration & Build",
+        desc: "We map your data to the required XML structure, set up and customise the ClearTax platform, and manage ERP connector deployment, with zero changes required to your ERP after go-live.",
+    },
+    {
+        phase: "PHASE III",
+        title: "Testing & Training",
+        desc: "Full UAT plan execution, sign-off coordination, and awareness sessions for every stakeholder who touches invoicing among finance, AP, AR, IT, and procurement.",
+    },
+    {
+        phase: "PHASE IV",
+        title: "Go-Live & Support",
+        desc: "Technical support during launch, FTA validation error resolution, and structured handover to your internal team. Post-go-live, your dedicated Customer Success Manager is reachable by phone and email.",
+    },
+];
+
+const {
+    title = "From ASP appointment to January readiness in four structured phases.",
+    items = defaultItems,
+} = Astro.props;
+---
+
+<section class="py-16 md:py-20 bg-generic-00" id="asp-readiness">
+    <div class="max-w-[var(--container-max)] w-full mx-auto px-4 md:px-6">
+        <div class="text-center mb-12">
+            <h2 class="font-heading text-[length:var(--fs-h2)] md:text-[length:var(--fs-h1)] leading-[length:var(--lh-h2)] md:leading-[length:var(--lh-h1)] font-medium max-w-[768px] mx-auto m-0 text-text-default">
+                From ASP appointment to January readiness in four structured
+                phases.
+            </h2>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-20 lg:items-center mx-auto">
+            <!-- Left Side: Tabs -->
+            <div
+                class="lg:col-span-6 flex flex-col justify-center relative"
+                id="uae-asp-tabs"
+            >
+                {items.map((item, i) => (
+                    <div
+                        class={`uae-asp-item flex flex-col cursor-pointer group ${i === 0 ? "active" : ""}`}
+                        data-index={i}
+                    >
+                        <span class="font-heading text-xs uppercase font-semibold tracking-wider text-neutral-400 group-[.active]:text-nova-blue transition-colors duration-200">
+                            {item.phase}
+                        </span>
+                        <h3 class="uae-asp-title font-heading text-[length:var(--fs-h5)] leading-[length:var(--lh-h5)] font-medium m-0 text-text-default pt-1.5 pb-1 transition-colors duration-200">
+                            {item.title}
+                        </h3>
+
+                        <div
+                            class="uae-asp-desc overflow-hidden max-w-[480px] transition-all duration-500 ease-in-out"
+                            style={
+                                i === 0
+                                    ? "max-height: 500px; opacity: 1;"
+                                    : "max-height: 0px; opacity: 0;"
+                            }
+                        >
+                            <p class="font-body text-[length:var(--fs-body)] leading-[length:var(--lh-body)] m-0 text-neutral-500 font-normal max-w-[540px] pt-2 pb-3.5">
+                                {item.desc}
+                            </p>
+
+                            <!-- Mobile Visual (appears inside open tab on mobile) -->
+                            <div class="lg:hidden w-full aspect-[620/387] rounded-xl overflow-hidden mb-3">
+                                {item.img ? (
+                                    <img
+                                        src={item.img}
+                                        alt={item.title}
+                                        class="w-full h-full object-contain pointer-events-none select-none"
+                                        loading="lazy"
+                                    />
+                                ) : (
+                                    <div
+                                        class="w-full h-full bg-visual-placeholder rounded-xl"
+                                        aria-hidden="true"
+                                    />
+                                )}
+                            </div>
+                        </div>
+
+                        <!-- Progress line loader -->
+                        <div class="relative w-full h-[2px] bg-neutral-200 mt-2.5 mb-5 rounded-full overflow-hidden">
+                            <!-- Active blue line (fills up) -->
+                            <div
+                                class="uae-asp-progress absolute left-0 top-0 h-full bg-nova-blue rounded-full transition-none"
+                                style="width: 0%;"
+                            />
+                        </div>
+                    </div>
+                ))}
+            </div>
+
+            <!-- Right Side: Visual Slider (Desktop only) -->
+            <div class="hidden lg:flex lg:col-span-6 w-full h-full items-stretch">
+                <div class="relative w-full h-full min-h-[360px] lg:min-h-0 aspect-[620/507] lg:aspect-auto rounded-lg overflow-hidden">
+                    <div
+                        id="uae-asp-track"
+                        class="flex w-full h-full transition-transform duration-500 gap-2 ease-in-out will-change-transform"
+                        style="transform: translateX(0%);"
+                    >
+                        {items.map((item, i) =>
+                            item.img ? (
+                                <div
+                                    class="w-full h-full shrink-0 flex items-center justify-center rounded-lg overflow-hidden"
+                                    data-slide-index={i}
+                                >
+                                    <img
+                                        src={item.img}
+                                        alt={item.title}
+                                        class="w-full h-full object-contain pointer-events-none select-none"
+                                        loading="lazy"
+                                    />
+                                </div>
+                            ) : (
+                                <div
+                                    class="w-full h-full shrink-0 bg-visual-placeholder rounded-lg"
+                                    data-slide-index={i}
+                                    aria-hidden="true"
+                                />
+                            ),
+                        )}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<script is:inline>
+    (() => {
+        const init = () => {
+            const tabsContainer = document.getElementById("uae-asp-tabs");
+            if (!tabsContainer) return;
+            const items = tabsContainer.querySelectorAll(".uae-asp-item");
+            if (!items.length) return;
+            const track = document.getElementById("uae-asp-track");
+
+            let currentIndex = 0;
+            let timer = null;
+            const duration = 5000; // 5 seconds per tab
+
+            const activateTab = (index, instant = false) => {
+                currentIndex = index;
+
+                if (track) {
+                    const gap =
+                        parseFloat(window.getComputedStyle(track).gap) || 0;
+                    track.style.transform = `translateX(calc(-${index} * (100% + ${gap}px)))`;
+                }
+
+                items.forEach((item, i) => {
+                    const desc = item.querySelector(".uae-asp-desc");
+                    const progress = item.querySelector(".uae-asp-progress");
+
+                    if (i === index) {
+                        // Active state
+                        item.classList.add("active");
+                        if (desc) {
+                            desc.style.maxHeight = desc.scrollHeight + "px";
+                            desc.style.opacity = "1";
+                        }
+
+                        if (progress) {
+                            // Reset progress line to 0, then animate to 100%
+                            progress.style.transition = "none";
+                            progress.style.width = "0%";
+
+                            // Force reflow to ensure the transition restart works
+                            void progress.offsetWidth;
+
+                            if (!instant) {
+                                progress.style.transition = `width ${duration}ms linear`;
+                                progress.style.width = "100%";
+                            }
+                        }
+                    } else {
+                        // Inactive state
+                        item.classList.remove("active");
+                        if (desc) {
+                            desc.style.maxHeight = "0px";
+                            desc.style.opacity = "0";
+                        }
+
+                        if (progress) {
+                            progress.style.transition = "width 0.2s ease";
+                            progress.style.width = "0%";
+                        }
+                    }
+                });
+            };
+
+            const nextTab = () => {
+                const next = (currentIndex + 1) % items.length;
+                activateTab(next);
+            };
+
+            const startTimer = () => {
+                clearInterval(timer);
+                activateTab(currentIndex);
+                timer = setInterval(nextTab, duration);
+            };
+
+            // Allow user to click to switch tabs manually
+            items.forEach((item, i) => {
+                item.addEventListener("click", () => {
+                    clearInterval(timer);
+                    activateTab(i);
+                    // Restart timer for the new tab
+                    timer = setInterval(nextTab, duration);
+                });
+            });
+
+            // Recalculate active description max-height on window resize
+            window.addEventListener("resize", () => {
+                const activeDesc =
+                    items[currentIndex]?.querySelector(".uae-asp-desc");
+                if (activeDesc) {
+                    activeDesc.style.maxHeight = activeDesc.scrollHeight + "px";
+                }
+            });
+
+            // Start auto-play
+            startTimer();
+        };
+
+        if (document.readyState === "loading") {
+            document.addEventListener("DOMContentLoaded", init);
+        } else {
+            init();
+        }
+    })();
+</script>
